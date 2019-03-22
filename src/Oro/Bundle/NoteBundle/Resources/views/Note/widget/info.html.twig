@@ -19,11 +19,11 @@
             <div class="attachment-item attachment-item--note">
                 <div class="thumbnail">
                     {% if attachment.attachmentThumbnail  %}
-                        <a href="{{ attachment.attachmentURL }}" data-gallery="note-view-{{ entity.id }}" class="no-hash" title="{{ attachment.attachmentFileName }}">
+                        <a href="{{ attachment.attachmentURL }}" data-gallery="note-view-{{ entity.id }}" class="no-hash" title="{{ attachment.attachmentFileName|e('html_attr') }}">
                             <span class="thumbnail" style="background: url('{{ attachment.attachmentThumbnail  }}') 50% 50% no-repeat;"></span>
                         </a>
                     {% else  %}
-                        <span class="fa {{ attachment.attachmentIcon }} fa-3x" aria-hidden="true"></span>
+                        <span class="fa {{ attachment.attachmentIcon }} fa-offset-none" aria-hidden="true"></span>
                     {% endif  %}
                 </div>
                 <div class="dropdown link-to-record">

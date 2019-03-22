@@ -238,8 +238,8 @@ abstract class AbstractImportExportTest extends WebTestCase
      */
     protected function assertPreExportActionExecuted(ImportExportConfigurationInterface $configuration)
     {
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'POST',
             $this->getUrl('oro_importexport_export_instant', [
                 'processorAlias' => $configuration->getExportProcessorAlias(),
                 'exportJob' => $configuration->getExportJobName(),
@@ -274,8 +274,8 @@ abstract class AbstractImportExportTest extends WebTestCase
             ->get('oro_importexport.file.file_manager')
             ->saveImportingFile($file);
 
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'POST',
             $this->getUrl('oro_importexport_import_process', [
                 'processorAlias' => $configuration->getImportProcessorAlias(),
                 'importJob' => $configuration->getImportJobName(),

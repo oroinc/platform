@@ -9,6 +9,10 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 
+/**
+ * Represents datagrid.
+ * Provides methods to work with data source, configuration, metadata and data.
+ */
 class Datagrid implements DatagridInterface
 {
     /** @var DatasourceInterface */
@@ -31,6 +35,9 @@ class Datagrid implements DatagridInterface
 
     /** @var ResultsObject */
     protected $cachedResult = null;
+
+    /** @var MetadataObject|null */
+    protected $metadata;
 
     /**
      * @param string                $name
@@ -103,10 +110,12 @@ class Datagrid implements DatagridInterface
      */
     public function getMetadata()
     {
-        $data = MetadataObject::createNamed($this->getName(), []);
-        $this->acceptor->acceptMetadata($data);
+        if (null === $this->metadata) {
+            $this->metadata = MetadataObject::createNamed($this->getName(), []);
+            $this->acceptor->acceptMetadata($this->metadata);
+        }
 
-        return $data;
+        return $this->metadata;
     }
 
     /**

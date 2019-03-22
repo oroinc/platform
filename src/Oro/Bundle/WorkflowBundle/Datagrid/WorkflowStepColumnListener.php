@@ -13,6 +13,8 @@ use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\ReportBundle\Entity\Report;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
@@ -101,7 +103,9 @@ class WorkflowStepColumnListener
         }
 
         // whether entity has active workflow and entity should render workflow step field
-        $isShowWorkflowStep = !empty($this->getWorkflows($rootEntity)) && $this->isShowWorkflowStep($rootEntity);
+        $isShowWorkflowStep = !$this->isReportDatagrid($event->getDatagrid()) &&
+            !empty($this->getWorkflows($rootEntity)) &&
+            $this->isShowWorkflowStep($rootEntity);
 
         // check whether grid contains workflow step column
         $columns = $config->offsetGetByPath('[columns]', []);
@@ -376,5 +380,22 @@ class WorkflowStepColumnListener
     protected function getWorkflowManager()
     {
         return $this->workflowManagerRegistry->getManager();
+    }
+
+
+    /**
+     * @param DatagridInterface $grid
+     * @return bool
+     */
+    private function isReportDatagrid(DatagridInterface $grid): bool
+    {
+        return (bool) preg_match(
+            sprintf(
+                '/(%s|%s)\d+/',
+                Report::GRID_PREFIX,
+                Segment::GRID_PREFIX
+            ),
+            $grid->getName()
+        );
     }
 }

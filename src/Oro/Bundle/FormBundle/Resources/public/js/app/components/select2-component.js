@@ -12,6 +12,7 @@ define(function(require) {
         resultTemplate: require('text!oroui/templates/select2/default-template.html'),
         selectionTemplate: require('text!oroui/templates/select2/default-template.html'),
         url: '',
+        type: 'GET',
         perPage: 10,
         excluded: [],
         view: null,
@@ -42,6 +43,7 @@ define(function(require) {
             }
 
             this.perPage = _.result(config, 'per_page') || this.perPage;
+            this.type = _.result(config, 'type') || this.type;
             this.url = _.result(options, 'url') || '';
             this.excluded = _.result(options, 'excluded') || this.excluded;
             config = this.preConfig(config);
@@ -70,6 +72,7 @@ define(function(require) {
             if (this.url) {
                 config.ajax = {
                     url: this.url,
+                    type: this.type,
                     data: function(query, page) {
                         return {
                             page: page,
@@ -226,6 +229,7 @@ define(function(require) {
             element.trigger('select2-data-request');
             $.ajax({
                 url: url,
+                type: ajaxOptions.type,
                 data: searchData,
                 success: function(response) {
                     if (_.isFunction(ajaxOptions.results)) {

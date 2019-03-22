@@ -59,7 +59,7 @@ define(function(require) {
 
         mediator.execute('showLoading');
         var url = routing.generate('oro_embedded_form_default_data', {formType: formType});
-        $.get(url)
+        $.post(url)
             .done(function(data, code, response) {
                 $cssField.val(data.css);
                 $successMessageField.val(data.successMessage);

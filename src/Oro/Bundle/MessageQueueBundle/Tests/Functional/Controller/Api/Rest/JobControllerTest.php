@@ -29,7 +29,7 @@ class JobControllerTest extends WebTestCase
         $this->getEntityManager()->flush();
 
         $this->client->request(
-            'GET',
+            'POST',
             $this->getUrl('oro_api_message_queue_job_interrupt_root_job', ['id' => $rootJob->getId()])
         );
 

@@ -101,19 +101,6 @@ class Element extends NodeElement
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function find($selector, $locator)
-    {
-        return $this->spin(
-            function () use ($selector, $locator) {
-                return parent::find($selector, $locator);
-            },
-            3
-        );
-    }
-
-    /**
      * Finds label with specified locator.
      *
      * @param string $text label text

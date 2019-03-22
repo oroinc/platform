@@ -79,7 +79,8 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
                 new Reference($listenerId),
                 '%session.storage.options%',
                 new Reference('security.token_storage')
-            ]);
+            ])
+            ->addMethodCall('setCsrfRequestManager', [new Reference('oro_security.csrf_request_manager')]);
         $contextListeners = [];
         /** @var IteratorArgument $listeners */
         $listeners = $contextDef->getArgument(0);

@@ -25,6 +25,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
+ * REST API Workflow controller
  * @Rest\NamePrefix("oro_api_workflow_")
  */
 class WorkflowController extends FOSRestController
@@ -37,7 +38,7 @@ class WorkflowController extends FOSRestController
      * - HTTP_NOT_FOUND (404) response: array('message' => errorMessageString)
      * - HTTP_INTERNAL_SERVER_ERROR (500) response: array('message' => errorMessageString)
      *
-     * @Rest\Get(
+     * @Rest\Post(
      *      "/api/rest/{version}/workflow/start/{workflowName}/{transitionName}",
      *      requirements={"version"="latest|v1"},
      *      defaults={"version"="latest", "_format"="json"}
@@ -140,7 +141,7 @@ class WorkflowController extends FOSRestController
      * - HTTP_NOT_FOUND (404) response: array('message' => errorMessageString)
      * - HTTP_INTERNAL_SERVER_ERROR (500) response: array('message' => errorMessageString)
      *
-     * @Rest\Get(
+     * @Rest\Post(
      *      "/api/rest/{version}/workflow/transit/{workflowItemId}/{transitionName}",
      *      requirements={"version"="latest|v1", "workflowItemId"="\d+"},
      *      defaults={"version"="latest", "_format"="json"}
@@ -233,7 +234,7 @@ class WorkflowController extends FOSRestController
      * Returns
      * - HTTP_OK (200)
      *
-     * @Rest\Get(
+     * @Rest\Post(
      *      "/api/rest/{version}/workflow/activate/{workflowDefinition}",
      *      requirements={"version"="latest|v1"},
      *      defaults={"version"="latest", "_format"="json"}
@@ -267,7 +268,7 @@ class WorkflowController extends FOSRestController
      * Returns
      * - HTTP_OK (204)
      *
-     * @Rest\Get(
+     * @Rest\Post(
      *      "/api/rest/{version}/workflow/deactivate/{workflowDefinition}",
      *      requirements={"version"="latest|v1"},
      *      defaults={"version"="latest", "_format"="json"}

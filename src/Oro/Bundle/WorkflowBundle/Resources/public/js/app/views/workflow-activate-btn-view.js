@@ -66,7 +66,7 @@ define(function(require) {
         onClick: function(e) {
             e.preventDefault();
             var el = this.$el.find(this.options.selectors.button);
-            activationHandler.call(el, el.prop('href'), el.data('name'), el.data('label'));
+            activationHandler.call(el, el.attr('href'), el.data('name'), el.data('label'));
         },
 
         dispose: function() {

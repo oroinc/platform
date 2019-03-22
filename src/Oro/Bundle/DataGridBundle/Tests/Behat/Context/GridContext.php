@@ -290,6 +290,19 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Example: And It should be exactly 3 columns in grid
+     *
+     * @Then /^It should be (?P<count>.+) columns in grid$/
+     * @Then /^It should be (?P<count>.+) columns in "(?P<gridName>[^"]+)" grid$/
+     * And It should be exactly 3 columns in grid
+     */
+    public function itShouldBeColumnsInGrid(int $count, ?string $gridName = null)
+    {
+        $gridHeader = $this->getGrid($gridName)->getHeader();
+        self::assertSame($count, $gridHeader->getColumnsCount());
+    }
+
+    /**
      * Example: When I click "Delete" link from mass action dropdown
      * Example: And click Delete mass action
      *

@@ -1,41 +1,9 @@
 /* @theme: admin.oro; */
 
-.reminders-collection,
-.ui-dialog .form-horizontal .control-group .controls .reminders-collection {
-    .number {
-        width: $reminders-collection-mobile-number-width;
-    }
-
-    .validation-failed {
-        margin-#{$start}: $reminders-collection-mobile-validation-failed-offset-start;
-    }
+.reminders-collection .oro-multiselect-holder {
+    width: 100%;
 
     .float-holder {
-        float: none;
-
-        > div {
-            display: flex;
-            justify-content: stretch;
-        }
-    }
-
-    .inline-field {
-        float: none;
-    }
-
-    select.unit {
-        width: 100%;
-    }
-
-    select.method {
-        width: 100%;
-    }
-
-    input.number {
-        width: 60px;
-    }
-
-    .oro-multiselect-holder {
-        padding-#{$end}: 40px;
+        width: calc(100% - #{$btn-icon-mobile-width});
     }
 }

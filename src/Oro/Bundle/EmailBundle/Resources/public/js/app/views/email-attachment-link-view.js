@@ -43,7 +43,7 @@ define([
         linkAttachment: function(e) {
             var self = this;
             e.preventDefault();
-            $.getJSON(
+            $.post(
                 this.options.url,
                 {},
                 function(response) {
@@ -55,7 +55,8 @@ define([
                     } else {
                         messenger.notificationFlashMessage('error', __(response.error));
                     }
-                }
+                },
+                'json'
             );
             return false;
         },

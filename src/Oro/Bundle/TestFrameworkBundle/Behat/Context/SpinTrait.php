@@ -10,14 +10,12 @@ trait SpinTrait
     /**
      * @param \Closure $lambda
      * @param int $timeLimit in seconds
-     * @param bool $strict
      * @return null|mixed Return null if closure throw error or return not true value.
      *                    Return value that return closure.
      */
-    protected function spin(\Closure $lambda, $timeLimit = 60, $strict = false)
+    protected function spin(\Closure $lambda, $timeLimit = 60)
     {
-        $limitOverride = $this->getSpinLimit();
-        $time = !$strict && $limitOverride > 0 ? $limitOverride : $timeLimit;
+        $time = $timeLimit;
 
         while ($time > 0) {
             $start = microtime(true);
@@ -35,13 +33,5 @@ trait SpinTrait
             $time -= microtime(true) - $start;
         }
         return null;
-    }
-
-    /**
-     * @return int
-     */
-    private function getSpinLimit(): int
-    {
-        return (int) getenv('BEHAT_SPIN_LIMIT');
     }
 }

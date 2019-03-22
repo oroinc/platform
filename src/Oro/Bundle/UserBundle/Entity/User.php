@@ -35,6 +35,7 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  * @ORM\Table(name="oro_user", indexes = {
  *      @ORM\Index("user_first_name_last_name_idx", columns = {"first_name", "last_name"}),
  *      @ORM\Index(name="idx_oro_user_email_lowercase", columns={"email_lowercase"}),
+ *      @ORM\Index(name="idx_oro_user_username_lowercase", columns={"username_lowercase"}),
  * })
  * @ORM\HasLifecycleCallbacks()
  * @Config(
@@ -120,6 +121,24 @@ class User extends ExtendUser implements
      * )
      */
     protected $username;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="username_lowercase", type="string", length=255)
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=false
+     *          },
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      },
+     *      mode="hidden"
+     * )
+     */
+    protected $usernameLowercase;
 
     /**
      * @var string
@@ -486,6 +505,25 @@ class User extends ExtendUser implements
     public function getEmailFields()
     {
         return ['email'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUsername($username)
+    {
+        parent::setUsername($username);
+        $this->usernameLowercase = mb_strtolower($username);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsernameLowercase(): string
+    {
+        return $this->usernameLowercase;
     }
 
     /**
@@ -1248,5 +1286,15 @@ class User extends ExtendUser implements
         }
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        parent::unserialize($serialized);
+
+        $this->setUsername($this->username);
     }
 }

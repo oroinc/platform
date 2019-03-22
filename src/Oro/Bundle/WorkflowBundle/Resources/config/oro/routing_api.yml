@@ -17,7 +17,7 @@ oro_workflow_process_api:
 # deprecated API routes
 oro_workflow_api_rest_process_activate: # a copy of oro_api_process_activate
     path:            /api/rest/{version}/process/activate/{processDefinition}.{_format}
-    methods:         [GET]
+    methods:         [POST]
     defaults:
         _controller: OroWorkflowBundle:Api\Rest\Process:activate
         _format:     json
@@ -28,7 +28,7 @@ oro_workflow_api_rest_process_activate: # a copy of oro_api_process_activate
 
 oro_workflow_api_rest_process_deactivate: # a copy of oro_api_process_deactivate
     path:            /api/rest/{version}/process/deactivate/{processDefinition}.{_format}
-    methods:         [GET]
+    methods:         [POST]
     defaults:
         _controller: OroWorkflowBundle:Api\Rest\Process:deactivate
         _format:     json
@@ -119,7 +119,7 @@ oro_workflow_api_rest_workflow_delete: # a copy of oro_api_workflow_delete
 
 oro_workflow_api_rest_workflow_activate: # a copy of oro_api_workflow_activate
     path:            /api/rest/{version}/workflow/activate/{workflowDefinition}.{_format}
-    methods:         [GET]
+    methods:         [POST]
     defaults:
         _controller: OroWorkflowBundle:Api\Rest\Workflow:activate
         _format:     json
@@ -130,7 +130,7 @@ oro_workflow_api_rest_workflow_activate: # a copy of oro_api_workflow_activate
 
 oro_workflow_api_rest_workflow_deactivate: # a copy of oro_api_workflow_deactivate
     path:            /api/rest/{version}/workflow/deactivate/{workflowDefinition}.{_format}
-    methods:         [GET]
+    methods:         [POST]
     defaults:
         _controller: OroWorkflowBundle:Api\Rest\Workflow:deactivate
         _format:     json
@@ -141,7 +141,7 @@ oro_workflow_api_rest_workflow_deactivate: # a copy of oro_api_workflow_deactiva
 
 oro_workflow_api_rest_workflow_start: # a copy of oro_api_workflow_start
     path:            /api/rest/{version}/workflow/start/{workflowName}/{transitionName}.{_format}
-    methods:         [GET]
+    methods:         [POST]
     defaults:
         _controller: OroWorkflowBundle:Api\Rest\Workflow:start
         _format:     json
@@ -152,7 +152,7 @@ oro_workflow_api_rest_workflow_start: # a copy of oro_api_workflow_start
 
 oro_workflow_api_rest_workflow_transit: # a copy of oro_api_workflow_transit
     path:            /api/rest/{version}/workflow/transit/{workflowItemId}/{transitionName}.{_format}
-    methods:         [GET]
+    methods:         [POST]
     defaults:
         _controller: OroWorkflowBundle:Api\Rest\Workflow:transit
         _format:     json

@@ -202,6 +202,7 @@ activityButton.html.twig
         'reload-grid-name' : 'activity-email-grid',
         'options' : {
             'alias': 'email-dialog',
+            'method': 'POST',
             'dialogOptions' : {
                 'title' : 'oro.email.send_email'|trans,
                 'allowMaximize': true,
@@ -235,6 +236,7 @@ activityLink.html.twig
         'reload-grid-name' : 'activity-email-grid',
         'options' : {
             'alias': 'email-dialog',
+            'method': 'POST',
             'dialogOptions' : {
                 'title' : 'oro.email.send_email'|trans,
                 'allowMaximize': true,

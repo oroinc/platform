@@ -12,6 +12,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * REST API Process Controller
  * @Rest\NamePrefix("oro_api_process_")
  */
 class ProcessController extends FOSRestController
@@ -22,7 +23,7 @@ class ProcessController extends FOSRestController
      * Returns
      * - HTTP_OK (200)
      *
-     * @Rest\Get(
+     * @Rest\Post(
      *      "/api/rest/{version}/process/activate/{processDefinition}",
      *      requirements={"version"="latest|v1"},
      *      defaults={"version"="latest", "_format"="json"}
@@ -63,7 +64,7 @@ class ProcessController extends FOSRestController
      * Returns
      * - HTTP_OK (204)
      *
-     * @Rest\Get(
+     * @Rest\Post(
      *      "/api/rest/{version}/process/deactivate/{processDefinition}",
      *      requirements={"version"="latest|v1"},
      *      defaults={"version"="latest", "_format"="json"}

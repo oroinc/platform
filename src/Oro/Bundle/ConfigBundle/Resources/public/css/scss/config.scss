@@ -60,6 +60,10 @@
             .checkbox-view {
                 margin-top: $content-padding-small;
             }
+
+            td .checkbox-view {
+                margin-top: 0;
+            }
         }
     }
 

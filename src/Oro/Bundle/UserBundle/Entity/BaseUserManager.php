@@ -156,7 +156,7 @@ class BaseUserManager implements UserProviderInterface
     }
 
     /**
-     * Finds a user either by email, or username
+     * Finds a user either by email or username
      *
      * @param  string $usernameOrEmail
      *

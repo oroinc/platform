@@ -13,6 +13,95 @@ The current file describes significant changes in the code that may affect the u
 #### WorkflowBundle
 * Command `oro:workflow:definitions:upgrade20` was removed because it was used for 2.x version update only.
 
+### Changed
+#### EmailBundle
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::checkSmtpConnectionAction` 
+ (`oro_email_check_smtp_connection` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::purgeEmailsAttachmentsAction` 
+ (`oro_email_purge_emails_attachments` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::linkAction` 
+ (`oro_email_attachment_link` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::userEmailsSyncAction` 
+ (`oro_email_user_sync_emails` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::toggleSeenAction` 
+ (`oro_email_toggle_seen` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::markSeenAction` 
+ (`oro_email_mark_seen` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::markAllEmailsAsSeenAction` 
+ (`oro_email_mark_all_as_seen` route)
+ action the request method was changed to POST. 
+#### EmbeddedFormBundle
+* In `Oro\Bundle\EmbeddedFormBundle\Controller\EmbeddedFormController::deleteAction` 
+ (`oro_embedded_form_delete` route)
+ action the request method was changed to DELETE. 
+* In `Oro\Bundle\EmbeddedFormBundle\Controller\EmbeddedFormController::defaultDataAction` 
+ (`oro_embedded_form_default_data` route)
+ action the request method was changed to POST. 
+#### EntityBundle
+* In `Oro\Bundle\EntityBundle\Controller\EntitiesController::deleteAction` 
+ (`oro_entity_delete` route)
+ action the request method was changed to DELETE. 
+#### EntityConfigBundle
+* In `Oro\Bundle\EntityConfigBundle\Controller\AttributeController::removeAction` 
+ (`oro_attribute_remove` route)
+ action the request method was changed to DELETE. 
+* In `Oro\Bundle\EntityConfigBundle\Controller\AttributeController::unremoveAction` 
+ (`oro_attribute_unremove` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\EntityConfigBundle\Controller\AttributeFamilyController::deleteAction` 
+ (`oro_attribute_family_delete` route)
+ action the request method was changed to DELETE. 
+#### EntityExtendBundle
+* In `Oro\Bundle\EntityExtendBundle\Controller\ConfigEntityGridController::removeAction` 
+ (`oro_entityextend_entity_remove` route)
+ action the request method was changed to DELETE. 
+* In `Oro\Bundle\EntityExtendBundle\Controller\ConfigEntityGridController::unremoveAction` 
+ (`oro_entityextend_field_unremove` route)
+ action the request method was changed to POST. 
+#### ImportExportBundle
+* In `Oro\Bundle\ImportExportBundle\Controller\ImportExportController::importValidateAction` 
+ (`oro_importexport_import_validate` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\ImportExportBundle\Controller\ImportExportController::importProcessAction` 
+ (`oro_importexport_import_process` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\ImportExportBundle\Controller\ImportExportController::instantExportAction` 
+ (`oro_importexport_export_instant` route)
+ action the request method was changed to POST. 
+#### IntegrationBundle
+* In `Oro\Bundle\IntegrationBundle\Controller\IntegrationController::scheduleAction` 
+ (`oro_integration_schedule` route)
+ action the request method was changed to POST. 
+#### MessageQueueBundle
+* In `Oro\Bundle\MessageQueueBundle\Controller\Api\Rest\JobController::interruptRootJobAction` 
+ (`/api/rest/{version}/message-queue/job/interrupt/{id}` path)
+ action the request method was changed to POST. 
+#### WorkflowBundle
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\ProcessController::activateAction` 
+ (`/api/rest/{version}/process/activate/{processDefinition}` path)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\ProcessController::deactivateAction` 
+ (`/api/rest/{version}/process/deactivate/{processDefinition}` path)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::startAction` 
+ (`/api/rest/{version}/workflow/start/{workflowName}/{transitionName}` path)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::transitAction` 
+ (`/api/rest/{version}/workflow/transit/{workflowName}/{transitionName}` path)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::activateAction` 
+ (`/api/rest/{version}/workflow/activate/{workflowName}/{transitionName}` path)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::deactivateAction` 
+ (`/api/rest/{version}/workflow/deactivate/{workflowName}/{transitionName}` path)
+ action the request method was changed to POST. 
+
 ## 3.1.3 (2019-02-19)
 [Show detailed list of changes](incompatibilities-3-1-3.md)
 

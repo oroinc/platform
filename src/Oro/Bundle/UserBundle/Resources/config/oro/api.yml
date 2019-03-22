@@ -22,6 +22,8 @@ api:
                         email: ~
                 emailLowercase:
                     exclude: true
+                usernameLowercase:
+                    exclude: true
             actions:
                 delete:
                     exclude: false # set manually because this entity is marked as a dictionary

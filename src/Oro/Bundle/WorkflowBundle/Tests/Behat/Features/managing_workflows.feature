@@ -45,13 +45,13 @@ Feature: Managing workflows
       | Priority        | 0    |
 
   Scenario: Workflow activation from grid
-    Given I sort grid by Related Entity
-    Then I should see following actions for Test Workflow in grid:
+    Given I check "User" in "Related Entity" filter
+    Then I should see following actions for Test workflow in grid:
       | Edit |
-    And I click Activate Test workflow in grid
+    And I click "Activate" on row "Test workflow" in grid
     And I click "Activate"
     Then I should see "Workflow activated" flash message
-    And I should not see following actions for Test Workflow in grid:
+    And I should not see following actions for Test workflow in grid:
       | Edit |
     And I should see Test workflow in grid with following data:
       | Related Entity  | User |
@@ -60,10 +60,10 @@ Feature: Managing workflows
       | Priority        | 0    |
 
   Scenario: Workflow deactivation from grid
-    Given I sort grid by Related Entity
-    When I click Deactivate Test workflow in grid
+    When I click "Deactivate" on row "Test workflow" in grid
     And I click "Yes, Deactivate"
-    Then I should see following actions for Test Workflow in grid:
+    Then I should see "Workflow deactivated" flash message
+    Then I should see following actions for Test workflow in grid:
       | Edit |
     And I should see Test workflow in grid with following data:
       | Related Entity  | User |
@@ -72,7 +72,7 @@ Feature: Managing workflows
       | Priority        | 0    |
 
   Scenario: Workflow activation from entity view
-    Given I click View Test workflow in grid
+    Given I click "View" on row "Test workflow" in grid
     Then I should see an "Entity Edit Button" element
     And I click "Activate"
     And I click "Activate"
@@ -87,7 +87,7 @@ Feature: Managing workflows
 
   Scenario: Workflow edit
     Given I go to System/ Workflows
-    And I click Edit Test workflow in grid
+    And I click "Edit" on row "Test workflow" in grid
     When I click "Trans1"
     Then "Workflow Transition Edit Info Form" must contains values:
       | label           | Trans1  |
@@ -118,7 +118,7 @@ Feature: Managing workflows
 
   Scenario: Workflow clone
     Given I sort grid by Related Entity
-    And I click Clone Glorious workflow in grid
+    And I click "Clone" on row "Glorious workflow" in grid
     When I save and close form
     Then I should see "Translation cache update is required. Click here to update" flash message
     And I should see "Workflow saved." flash message
@@ -131,11 +131,11 @@ Feature: Managing workflows
 
   Scenario: Deleting workflow
     Given I sort grid by Related Entity
-    And I click Delete Copy of Glorious workflow in grid
+    And I click "Delete" on row "Copy of Glorious workflow" in grid
     When I confirm deletion
     Then I should see "Item deleted" flash message
     And there is no "Copy of Glorious workflow" in grid
-    When I click view Glorious workflow in grid
+    When I click "View" on row "Glorious workflow" in grid
     And I click "Delete Workflow"
     And I confirm deletion
     Then there is no "Glorious workflow" in grid

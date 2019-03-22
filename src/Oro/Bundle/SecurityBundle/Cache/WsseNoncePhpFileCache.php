@@ -4,6 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Cache;
 
 use Oro\Bundle\CacheBundle\Provider\PhpFileCache as BasePhpFileCache;
 
+/**
+ * Cleanup for WSSE cache.
+ */
 class WsseNoncePhpFileCache extends BasePhpFileCache
 {
     /** Determines how often the purging of expired nonces is executed */
@@ -113,8 +116,17 @@ class WsseNoncePhpFileCache extends BasePhpFileCache
 
         // delete expired nonces
         $lastPurgeTime = $startTime;
+
+        if (file_exists($purgeStatusFilePath)) {
+            $fp = fopen($purgeStatusFilePath, 'r');
+            if (!flock($fp, LOCK_EX | LOCK_NB)) {
+                return;
+            }
+            fclose($fp);
+        }
+
         if ($this->doPurge($directory, $startTime, $purgeStatusFileName)) {
-            $this->writePurgeStatus($purgeStatusFilePath, $lastPurgeTime);
+            return $this->writePurgeStatus($purgeStatusFilePath, $lastPurgeTime);
         }
     }
 

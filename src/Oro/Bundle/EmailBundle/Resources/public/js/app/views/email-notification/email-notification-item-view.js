@@ -67,7 +67,7 @@ define(function(require) {
             });
             model.set('seen', !status);
             Backbone.ajax({
-                type: 'GET',
+                type: 'POST',
                 url: url,
                 success: function(response) {
                     if (_.result(response, 'successful') !== true) {

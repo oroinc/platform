@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SyncBundle\Controller;
 
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -17,6 +18,7 @@ class TicketController extends Controller
      *
      * @Route("/sync/ticket", name="oro_sync_ticket")
      * @Method({"POST"})
+     * @CsrfProtection()
      *
      * @return JsonResponse
      */

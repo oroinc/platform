@@ -92,6 +92,9 @@ class OptionsHelper
             'url'            => $executionUrl,
             'jsDialogWidget' => $data['jsDialogWidget'],
         ];
+        if (isset($data['requestMethod'])) {
+            $options['requestMethod'] = $data['requestMethod'];
+        }
         if ($button instanceof OperationButton) {
             $options['executionTokenData'] =
                 $this->formProvider->createTokenData($button->getOperation(), $button->getData());

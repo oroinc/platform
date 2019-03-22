@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional\Engine;
 
 use Doctrine\Common\Collections\Expr\Expression;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
+use Oro\Bundle\SearchBundle\Engine\Orm;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
@@ -53,8 +54,13 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
         array $expectedItems,
         $listener,
         Expression $condition = null,
-        array $orderings = []
+        array $orderings = [],
+        $engine = null
     ) {
+        if ($engine && $this->getContainer()->getParameter('oro_search.engine') !== $engine) {
+            $this->markTestSkipped('Should be tested only with ' . $engine . ' search engine');
+        }
+
         $this->listener = $listener;
         $this->getContainer()->get('event_dispatcher')->addListener(
             PrepareEntityMapEvent::EVENT_NAME,
@@ -145,6 +151,7 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
                     'item_2',
                     'item_3',
                     'item_4',
+                    'item_5',
                     'item_6',
                     'item_7',
                     'item_8',
@@ -156,7 +163,9 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
                         = 1 / $data[Query::TYPE_DECIMAL]['decimalValue'];
                     $event->setData($data);
                 },
-                'condition' => Criteria::expr()->notContains('text.stringValue', 'item5'),
+                'condition' => Criteria::expr()->contains('text.all_text', 'item'),
+                'orderings' => [],
+                'engine' => Orm::ENGINE_NAME,
             ],
             'descending with fulltext search without orderings' => [
                 'expected items' => [
@@ -164,6 +173,7 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
                     'item_8',
                     'item_7',
                     'item_6',
+                    'item_5',
                     'item_4',
                     'item_3',
                     'item_2',
@@ -175,7 +185,9 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
                         = $data[Query::TYPE_DECIMAL]['decimalValue'];
                     $event->setData($data);
                 },
-                'condition' => Criteria::expr()->notContains('text.stringValue', 'item5'),
+                'condition' => Criteria::expr()->contains('text.all_text', 'item'),
+                'orderings' => [],
+                'engine' => Orm::ENGINE_NAME,
             ],
             'without fulltext search with orderings' => [
                 // weight is generated for descending values, but actual results are ascending
@@ -208,6 +220,7 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
                     'item_2',
                     'item_3',
                     'item_4',
+                    'item_5',
                     'item_6',
                     'item_7',
                     'item_8',
@@ -219,7 +232,7 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
                         = $data[Query::TYPE_DECIMAL]['decimalValue'];
                     $event->setData($data);
                 },
-                'condition' => Criteria::expr()->notContains('text.stringValue', 'item5'),
+                'condition' => Criteria::expr()->contains('text.all_text', 'item'),
                 'orderings' => ['integer.integerValue' => 'ASC']
             ],
         ];
