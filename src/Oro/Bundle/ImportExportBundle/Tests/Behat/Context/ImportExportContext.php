@@ -23,6 +23,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ImportExportContext extends OroFeatureContext implements
     KernelAwareContext,
@@ -372,16 +373,36 @@ class ImportExportContext extends OroFeatureContext implements
     }
 
     /**
-     * Assert that given column is present on downloaded csv template
+     * Assert that given column is present in the downloaded csv template
      * Example: When I download Data Template file
      *          And I see Account Customer name column
      *
      * @Then /^(?:|I )see (?P<column>([\w\s.+\/]+)) column$/
+     * @Then /^(?:|I )see (?P<column>([\w\s.+\/]+)) column is present in the downloaded csv template$/
      */
     public function iSeeColumn($column)
     {
         $csv = array_map('str_getcsv', file($this->template));
         self::assertContains($column, $csv[0]);
+    }
+
+    /**
+     * Assert that given columns are present in the downloaded csv template
+     * Example: When I download Data Template file
+     *          And I see the following columns in the downloaded csv template:
+     *              | sku    |
+     *              | status |
+     *              | type   |
+     *
+     * @Then /^(?:|I )see the following columns in the downloaded csv template:$/
+     */
+    public function iSeeColumns(TableNode $table)
+    {
+        $csv = array_map('str_getcsv', file($this->template));
+        $rows = array_column($table->getRows(), 0);
+        foreach ($rows as $row) {
+            self::assertContains($row, $csv[0]);
+        }
     }
 
     /**

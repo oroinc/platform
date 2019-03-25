@@ -2,6 +2,7 @@
 
 $field-size: 32px !default;
 $field-width: 294px !default;
+$select-caret-offset-end: 10px !default;
 
 $input-field-border-radius: 2px !default;
 $input-background-color: $primary-inverse !default;
@@ -113,7 +114,7 @@ $selector-uniform-arrow-outer-offset: side-values(2px 0 0 0) !default;
 $selector-uniform-arrow-display: inline-block !default;
 $selector-uniform-arrow-font-family: FontAwesome !default;
 $selector-uniform-arrow-position: absolute !default;
-$selector-uniform-arrow-right: $content-padding-small !default;
+$selector-uniform-arrow-right: $select-caret-offset-end !default;
 
 $selector-uniform-arrow-color: $primary-400 !default;
 $selector-uniform-line-height: 1 !default;

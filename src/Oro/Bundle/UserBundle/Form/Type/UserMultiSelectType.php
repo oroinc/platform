@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Form type provides functionality to select an existing entity from the tree
+ * Form type that provides choice several users
  */
 class UserMultiSelectType extends AbstractType
 {

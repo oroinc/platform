@@ -18,6 +18,7 @@
     >
         <div class="entity-fallback-container__value">
             {{ form_widget(form.scalarValue, {'attr': {'class': 'entity-field-value'}}) }}
+            {{ form_errors(form.scalarValue) }}
         </div>
         <div class="entity-fallback-container__line">
             <div class="entity-fallback-container__use">

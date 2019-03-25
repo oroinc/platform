@@ -68,6 +68,10 @@
     .fields-row {
         .input-small {
             width: $controls-fields-row-input-small-width;
+
+            &:first-child {
+                margin-#{$end}: $controls-fields-row-input-small-gap;
+            }
         }
     }
 }

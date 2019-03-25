@@ -19,9 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class EmailModelBuilder
- *
- * @package Oro\Bundle\EmailBundle\Builder
+ * Builds an email model base on the current request.
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -109,7 +107,7 @@ class EmailModelBuilder
         }
 
         $request = $this->request ?? $this->requestStack->getCurrentRequest();
-        if ($request && $request->isMethod('GET')) {
+        if ($request) {
             $this->applyRequest($emailModel);
             if (!count($emailModel->getContexts())) {
                 $entityClass = $request->get('entityClass');
@@ -117,8 +115,8 @@ class EmailModelBuilder
                 if ($entityClass && $entityId) {
                     $emailModel->setContexts([
                         $this->helper->getTargetEntity(
-                            $request->get('entityClass'),
-                            $request->get('entityId')
+                            $entityClass,
+                            $entityId
                         )
                     ]);
                 }
@@ -319,13 +317,17 @@ class EmailModelBuilder
     protected function applyEntityData(EmailModel $emailModel)
     {
         $request = $this->request ?? $this->requestStack->getCurrentRequest();
-        if ($request->query->has('entityClass')) {
+
+        $entityClass = $request->get('entityClass');
+        if ($entityClass) {
             $emailModel->setEntityClass(
-                $this->helper->decodeClassName($request->query->get('entityClass'))
+                $this->helper->decodeClassName($entityClass)
             );
         }
-        if ($request->query->has('entityId')) {
-            $emailModel->setEntityId($request->query->get('entityId'));
+
+        $entityId = $request->get('entityId');
+        if ($entityId) {
+            $emailModel->setEntityId($entityId);
         }
         if (!$emailModel->getEntityClass() || !$emailModel->getEntityId()) {
             if ($emailModel->getParentEmailId()) {
@@ -343,18 +345,18 @@ class EmailModelBuilder
     {
         if (!$emailModel->getFrom()) {
             $request = $this->request ?? $this->requestStack->getCurrentRequest();
-            if ($request->query->has('from')) {
-                $from = $request->query->get('from');
-                if (!empty($from)) {
-                    $this->helper->preciseFullEmailAddress($from);
-                }
-                $emailModel->setFrom($from);
+
+            $from = $request->get('from');
+            if ($from) {
+                $this->helper->preciseFullEmailAddress($from);
             } else {
                 $user = $this->helper->getUser();
                 if ($user) {
-                    $emailModel->setFrom($this->helper->buildFullEmailAddress($user));
+                    $from = $this->helper->buildFullEmailAddress($user);
                 }
             }
+
+            $emailModel->setFrom($from);
         }
     }
 
@@ -379,23 +381,19 @@ class EmailModelBuilder
      */
     protected function getRecipients(EmailModel $emailModel, $type, $excludeCurrentUser = false)
     {
-        $addresses = [];
         $request = $this->request ?? $this->requestStack->getCurrentRequest();
-        if ($request->query->has($type)) {
-            $address = trim($request->query->get($type));
-            if (!empty($address)) {
-                $this->helper->preciseFullEmailAddress(
-                    $address,
-                    $emailModel->getEntityClass(),
-                    $emailModel->getEntityId(),
-                    $excludeCurrentUser
-                );
-            }
-            if ($address) {
-                $addresses = [$address];
-            }
+
+        $address = trim($request->get($type));
+        if ($address) {
+            $this->helper->preciseFullEmailAddress(
+                $address,
+                $emailModel->getEntityClass(),
+                $emailModel->getEntityId(),
+                $excludeCurrentUser
+            );
         }
-        return $addresses;
+
+        return $address ? [$address] : [];
     }
 
     /**
@@ -404,8 +402,9 @@ class EmailModelBuilder
     protected function applySubject(EmailModel $model)
     {
         $request = $this->request ?? $this->requestStack->getCurrentRequest();
-        if ($request->query->has('subject')) {
-            $subject = trim($request->query->get('subject'));
+
+        $subject = trim($request->get('subject'));
+        if ($subject) {
             $model->setSubject($subject);
         }
     }

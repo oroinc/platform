@@ -3,14 +3,40 @@
 namespace Oro\Bundle\EntityBundle\ImportExport\Serializer;
 
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
+use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 /**
  * Serializer implementation for EntityFieldFallbackValue class
  */
 class EntityFieldFallbackValueNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    public const VIRTUAL_FIELD_NAME = 'value';
+
+    /** @var EntityFallbackResolver */
+    private $fallbackResolver;
+
+    /** @var LocaleSettings */
+    private $localeSettings;
+
+    /**
+     * @param EntityFallbackResolver $fallbackResolver
+     */
+    public function setEntityFallbackResolver(EntityFallbackResolver $fallbackResolver)
+    {
+        $this->fallbackResolver = $fallbackResolver;
+    }
+
+    /**
+     * @param LocaleSettings $localeSettings
+     */
+    public function setLocaleSettings(LocaleSettings $localeSettings)
+    {
+        $this->localeSettings = $localeSettings;
+    }
+
     /**
      * @param EntityFieldFallbackValue $object
      *
@@ -22,10 +48,7 @@ class EntityFieldFallbackValueNormalizer implements NormalizerInterface, Denorma
             return null;
         }
 
-        return [
-            'fallback' => $object->getFallback(),
-            'value' => $object->getOwnValue()
-        ];
+        return [self::VIRTUAL_FIELD_NAME => $object->getFallback() ?: $object->getOwnValue()];
     }
 
     /**
@@ -33,18 +56,30 @@ class EntityFieldFallbackValueNormalizer implements NormalizerInterface, Denorma
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
+        if (!$this->fallbackResolver) {
+            throw new \LogicException('To denormalize EntityFieldFallbackValue you must call ' .
+                'setEntityFallbackResolver first');
+        }
+        if (!$this->localeSettings) {
+            throw new \LogicException('To denormalize EntityFieldFallbackValue you must call ' .
+                'setLocaleSettings first');
+        }
+
         $object = new EntityFieldFallbackValue();
-        if (!is_array($data)) {
-            $data = ['value' => $data];
-        }
-        if (isset($data['fallback'])) {
-            $object->setFallback($data['fallback']);
-        }
-        $value = $data['value'];
-        if (is_array($data['value'])) {
-            $object->setArrayValue($value);
+        if (is_array($data) && array_key_exists(self::VIRTUAL_FIELD_NAME, $data)) {
+            $value = $data[self::VIRTUAL_FIELD_NAME];
         } else {
-            $object->setScalarValue($value);
+            throw new \InvalidArgumentException('To denormalize EntityFieldFallbackValue you must specify its value');
+        }
+
+        if ($this->fallbackResolver->isFallbackConfigured(
+            $value,
+            $context['entityName'],
+            $context['fieldName']
+        )) {
+            $object->setFallback($value);
+        } else {
+            $object->setScalarValue($this->parseScalarValue($value, $context['entityName'], $context['fieldName']));
         }
 
         return $object;
@@ -64,5 +99,34 @@ class EntityFieldFallbackValueNormalizer implements NormalizerInterface, Denorma
     public function supportsNormalization($data, $format = null, array $context = [])
     {
         return $data instanceof EntityFieldFallbackValue;
+    }
+
+    /**
+     * @param mixed $value
+     * @param string $parentEntityName
+     * @param string $fieldName
+     * @return mixed
+     */
+    private function parseScalarValue($value, string $parentEntityName, string $fieldName)
+    {
+        if (!\in_array(
+            $this->fallbackResolver->getType($parentEntityName, $fieldName),
+            [EntityFallbackResolver::TYPE_DECIMAL, EntityFallbackResolver::TYPE_INTEGER],
+            false
+        )) {
+            return $value;
+        }
+
+        $position = 0;
+        $formatter = new \NumberFormatter($this->localeSettings->getLocale(), \NumberFormatter::DECIMAL);
+        $parsedValue = $formatter->parse($value, \NumberFormatter::TYPE_DOUBLE, $position);
+
+        if (intl_is_failure($formatter->getErrorCode()) || $position < strlen($value) || is_infinite($parsedValue)) {
+            // Returns value as-is after the failed parsing, because it still has to be passed to the validators which
+            // are executed afterwards.
+            return $value;
+        }
+
+        return fmod($parsedValue, 1) === 0.0 ? (int)$parsedValue : $parsedValue;
     }
 }
