@@ -374,3 +374,21 @@ services:
             - '@doctrine'
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
+
+    oro_locale.datagrid.event_listener.enabled_localizations_grid:
+        class: Oro\Bundle\LocaleBundle\Datagrid\EventListener\EnabledLocalizationsGridListener
+        arguments:
+            - '@oro_config.manager'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.enabled-localizations-select-grid, method: onPreBuild }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.enabled-localizations-select-grid, method: onBuildAfter }
+
+    oro_locale.autocomplete.enabled_localizations.search_handler:
+        parent: oro_form.autocomplete.search_handler
+        class: Oro\Bundle\LocaleBundle\Autocomplete\EnabledLocalizationsSearchHandler
+        arguments:
+            - '%oro_locale.entity.localization.class%'
+            - ['name']
+            - '@oro_config.manager'
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: oro_enabled_localization, acl_resource: oro_locale_localization_view }
