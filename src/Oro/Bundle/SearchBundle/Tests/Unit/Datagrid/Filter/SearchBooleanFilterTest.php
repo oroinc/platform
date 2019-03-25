@@ -10,10 +10,17 @@ use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapte
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchBooleanFilter;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 class SearchBooleanFilterTest extends \PHPUnit\Framework\TestCase
 {
     private const FIELD_NAME = 'testField';
+
+    /**
+     * @var FormInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $form;
 
     /**
      * @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
@@ -35,8 +42,17 @@ class SearchBooleanFilterTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
+        $this->form = $this->createMock(FormInterface::class);
+
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->formFactory->expects($this->any())
+            ->method('create')
+            ->willReturn($this->form);
+
         $this->filterUtility = $this->createMock(FilterUtility::class);
+        $this->filterUtility->expects($this->any())
+            ->method('getExcludeParams')
+            ->willReturn([]);
 
         $this->filter = new SearchBooleanFilter($this->formFactory, $this->filterUtility);
     }
@@ -48,6 +64,38 @@ class SearchBooleanFilterTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Invalid filter datasource adapter provided: '.get_class($dataSource));
         $this->filter->apply($dataSource, []);
+    }
+
+    public function testGetMetadata()
+    {
+        $this->filter->init('test', []);
+
+        $formView = new FormView();
+
+        $valueFormView = new FormView($formView);
+        $valueFormView->vars['choices'] = [];
+
+        $typeFormView = new FormView($formView);
+        $typeFormView->vars['choices'] = [];
+
+        $formView->children = ['value' => $valueFormView, 'type' => $typeFormView];
+
+        $this->form->expects($this->any())
+            ->method('createView')
+            ->willReturn($formView);
+
+        $this->assertEquals(
+            [
+                'name' => 'test',
+                'label' => 'Test',
+                'choices' => [],
+                FilterUtility::FRONTEND_TYPE_KEY => 'search-boolean',
+                'contextSearch' => false,
+                'options' => [],
+                'lazy' => false,
+            ],
+            $this->filter->getMetadata()
+        );
     }
 
     public function testApplyWhenNoValue()
