@@ -7,6 +7,7 @@ use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
+use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -27,22 +28,28 @@ class EmailNotificationHandler implements EventHandlerInterface
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var ChainAdditionalEmailAssociationProvider */
+    private $additionalEmailAssociationProvider;
+
     /**
-     * @param EmailNotificationManager $manager
-     * @param ManagerRegistry          $doctrine
-     * @param PropertyAccessor         $propertyAccessor
-     * @param EventDispatcherInterface $eventDispatcher
+     * @param EmailNotificationManager                $manager
+     * @param ManagerRegistry                         $doctrine
+     * @param PropertyAccessor                        $propertyAccessor
+     * @param EventDispatcherInterface                $eventDispatcher
+     * @param ChainAdditionalEmailAssociationProvider $additionalEmailAssociationProvider
      */
     public function __construct(
         EmailNotificationManager $manager,
         ManagerRegistry $doctrine,
         PropertyAccessor $propertyAccessor,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        ChainAdditionalEmailAssociationProvider $additionalEmailAssociationProvider
     ) {
         $this->manager = $manager;
         $this->doctrine = $doctrine;
         $this->propertyAccessor = $propertyAccessor;
         $this->eventDispatcher = $eventDispatcher;
+        $this->additionalEmailAssociationProvider = $additionalEmailAssociationProvider;
     }
 
     /**
@@ -75,7 +82,8 @@ class EmailNotificationHandler implements EventHandlerInterface
             $notification,
             $this->doctrine->getManager(),
             $this->propertyAccessor,
-            $this->eventDispatcher
+            $this->eventDispatcher,
+            $this->additionalEmailAssociationProvider
         );
     }
 }

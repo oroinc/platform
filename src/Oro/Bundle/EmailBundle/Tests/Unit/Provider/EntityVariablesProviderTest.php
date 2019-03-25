@@ -81,13 +81,6 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
-    {
-        unset($this->emailConfigProvider);
-        unset($this->entityConfigProvider);
-        unset($this->provider);
-    }
-
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
@@ -324,50 +317,12 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVariableGettersForOneEntity()
+    public function testGetVariableProcessors()
     {
-        $field1Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field1', 'string'));
-        $field1Config->set('available_in_template', true);
-        $field2Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field2', 'integer'));
-        $field3Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field3', 'boolean'));
-        $field3Config->set('available_in_template', true);
-        $field4Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field4', 'string'));
-        $field4Config->set('available_in_template', true);
-        $field5Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field5', 'string'));
-        $field5Config->set('available_in_template', true);
-
-        $entityExtendConfig = new Config(new EntityConfigId('extend', self::TEST_ENTITY_NAME));
-        $entityExtendConfig->set('is_extend', true);
-
-        $this->extendConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with(self::TEST_ENTITY_NAME)
-            ->will($this->returnValue(true));
-        $this->extendConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::TEST_ENTITY_NAME)
-            ->will($this->returnValue($entityExtendConfig));
-        $this->emailConfigProvider->expects($this->once())
-            ->method('getConfigs')
-            ->with(self::TEST_ENTITY_NAME)
-            ->will(
-                $this->returnValue(
-                    [$field1Config, $field2Config, $field3Config, $field4Config, $field5Config]
-                )
-            );
-
-        $result = $this->provider->getVariableGetters(self::TEST_ENTITY_NAME);
-        $this->assertEquals(
-            [
-                'field1' => 'getField1',
-                'field3' => 'isField3',
-                'field5' => null,
-            ],
-            $result
-        );
+        self::assertSame([], $this->provider->getVariableProcessors(self::TEST_ENTITY_NAME));
     }
 
-    public function testGetVariableGettersForAllEntities()
+    public function testGetVariableGetters()
     {
         $entity1field1Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field1', 'string'));
         $entity1field1Config->set('available_in_template', true);

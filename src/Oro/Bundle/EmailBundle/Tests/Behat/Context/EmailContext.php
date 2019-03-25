@@ -53,6 +53,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
     /**
      * @Given /^Email should contains the following "([^"]*)" text$/
      * @Given /^An email containing the following "([^"]*)" text was sent$/
+     * @Given /^Email should contains the following text:/
      *
      * @param string $text
      */

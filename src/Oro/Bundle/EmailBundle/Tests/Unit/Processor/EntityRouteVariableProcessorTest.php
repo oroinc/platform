@@ -5,264 +5,131 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Processor;
 use Oro\Bundle\EmailBundle\Processor\EntityRouteVariableProcessor;
 use Oro\Bundle\EmailBundle\Provider\UrlProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RouterInterface;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateData;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_GENERATED_ROUTE = 'generated_route';
-    const TEST_BASE_PATH = 'http://localhost/';
-
     /** @var EntityRouteVariableProcessor */
-    protected $processor;
-
-    /** @var  RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
+    private $processor;
 
     /** @var  DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
-
-    /** @var  EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityConfigManager;
-
-    /** @var  ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $extendConfigProvider;
+    private $doctrineHelper;
 
     /** @var UrlProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $urlProvider;
 
-    /**
-     * {@inheritDoc}
-     */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
+
     protected function setUp()
     {
-        $this->router = $this->createMock(RouterInterface::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->entityConfigManager = $this->createMock(EntityConfigManager::class);
         $this->urlProvider = $this->createMock(UrlProvider::class);
-
-        $this->extendConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityConfigManager->expects($this->any())->method('getProvider')->willReturnMap([
-            ['extend', $this->extendConfigProvider],
-        ]);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->processor = new EntityRouteVariableProcessor(
-            $this->router,
             $this->doctrineHelper,
-            $this->entityConfigManager,
-            $this->urlProvider
+            $this->urlProvider,
+            $this->logger
         );
     }
 
     /**
-     * @param string $expected
-     * @param string $variable
-     * @param array $definition
      * @param array $data
      *
-     * @dataProvider processDataProvider
+     * @return TemplateData
      */
-    public function testProcess($expected, $variable, array $definition, array $data = [])
+    private function getTemplateData(array $data): TemplateData
     {
-        if (isset($definition['route'])) {
-            $routeCollection = $this->createMock(RouteCollection::class);
-            $routeCollection->expects($this->once())
-                ->method('get')
-                ->with($definition['route'])
-                ->willReturnArgument(0);
-    
-            $this->router->expects($this->once())->method('getRouteCollection')->willReturn($routeCollection);
-    
-            if (!preg_match('/^.*_index$/', $definition['route'])) {
-                $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->willReturn(1);
-            } else {
-                $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifier');
-            }
-    
-            $this->urlProvider->expects($this->once())
-                ->method('getAbsoluteUrl')
-                ->with($definition['route'])
-                ->willReturn(self::TEST_BASE_PATH . self::TEST_GENERATED_ROUTE);
-        }
-    
-        if (isset($data['entity'])) {
-            $this->doctrineHelper->expects($this->once())->method('isManageableEntity')->willReturnArgument(0);
-    
-            $config = $this->createMock(ConfigInterface::class);
-            $config->expects($this->once())->method('is')->with('is_extend')->willReturn(false);
-            $this->extendConfigProvider->expects($this->once())->method('hasConfig')->willReturn(true);
-            $this->extendConfigProvider->expects($this->once())->method('getConfig')->willReturn($config);
-        }
-    
-        $this->assertEquals($expected, $this->processor->process($variable, $definition, $data));
-    }
-    
-    /**
-     * @return \Generator
-     */
-    public function processDataProvider()
-    {
-        yield 'non-supported variable' => [
-            'expected' => '{{ \'test\' }}',
-            'variable' => 'test',
-            'definition' => [],
-            'data' => [],
-        ];
-    
-        yield 'empty definition' => [
-            'expected' => '{{ \'entity.url.index\' }}',
-            'variable' => 'entity.url.index',
-            'definition' => [],
-            'data' => [],
-        ];
-    
-        yield 'empty data' => [
-            'expected' => '{{ \'entity.url.index\' }}',
-            'variable' => 'entity.url.index',
-            'definition' => [],
-            'data' => [],
-        ];
-    
-        yield 'test entity index' => [
-            'expected' => sprintf('{{ \'%s\' }}', self::TEST_BASE_PATH . self::TEST_GENERATED_ROUTE),
-            'variable' => 'entity.url.index',
-            'definition' => [
-                'route' => 'route_index',
-            ],
-            'data' => [
-                'entity' => new \stdClass(),
-            ],
-        ];
-    
-        yield 'test entity view' => [
-            'expected' => sprintf('{{ \'%s\' }}', self::TEST_BASE_PATH . self::TEST_GENERATED_ROUTE),
-            'variable' => 'entity.url.view',
-            'definition' => [
-                'route' => 'route_view',
-            ],
-            'data' => [
-                'entity' => new \stdClass(),
-            ],
-        ];
-    }
-    
-    /**
-     * @param string $expected
-     * @param string $variable
-     * @param array $definition
-     * @param array $data
-     *
-     * @dataProvider  invalidDataProvider
-     */
-    public function testProcessWithWrongRoute($expected, $variable, array $definition, array $data = [])
-    {
-        $routeCollection = $this->createMock(RouteCollection::class);
-        $routeCollection->expects($this->once())
-            ->method('get')
-            ->willReturn(null);
-    
-        $this->router->expects($this->once())->method('getRouteCollection')->willReturn($routeCollection);
-    
-        $this->assertEquals($expected, $this->processor->process($variable, $definition, $data));
-    }
-    
-    /**
-     * @param string $expected
-     * @param string $variable
-     * @param array $definition
-     * @param array $data
-     *
-     * @dataProvider  invalidDataProvider
-     */
-    public function testProcessWithNonManageableEntity($expected, $variable, array $definition, array $data = [])
-    {
-        $routeCollection = $this->createMock(RouteCollection::class);
-        $routeCollection->expects($this->once())
-            ->method('get')
-            ->willReturn(true);
-    
-        $this->router->expects($this->once())->method('getRouteCollection')->willReturn($routeCollection);
-    
-        $this->doctrineHelper->expects($this->once())->method('isManageableEntity')->willReturn(false);
-    
-        $this->assertEquals($expected, $this->processor->process($variable, $definition, $data));
-    }
-    
-    /**
-     * @param string $expected
-     * @param string $variable
-     * @param array $definition
-     * @param array $data
-     *
-     * @dataProvider  invalidDataProvider
-     */
-    public function testProcessWithoutEntityConfig($expected, $variable, array $definition, array $data = [])
-    {
-        $routeCollection = $this->createMock(RouteCollection::class);
-        $routeCollection->expects($this->once())
-            ->method('get')
-            ->willReturn(true);
-    
-        $this->router->expects($this->once())->method('getRouteCollection')->willReturn($routeCollection);
-    
-        $this->doctrineHelper->expects($this->once())->method('isManageableEntity')->willReturn(true);
-    
-        $this->extendConfigProvider->expects($this->once())->method('hasConfig')->willReturn(false);
-    
-        $this->assertEquals($expected, $this->processor->process($variable, $definition, $data));
+        return new TemplateData($data, 'system', 'entity', 'computed');
     }
 
-    /**
-     * @param string $expected
-     * @param string $variable
-     * @param array $definition
-     * @param array $data
-     *
-     * @dataProvider  invalidDataProvider
-     */
-    public function testProcessNonAccessibleEntity($expected, $variable, array $definition, array $data = [])
+    public function testProcessForRouteThatDoesNotRequireEntityId()
     {
-        $routeCollection = $this->createMock(RouteCollection::class);
-        $routeCollection->expects($this->once())
-            ->method('get')
-            ->willReturn(true);
+        $variable = 'entity.url.index';
+        $definition = ['route' => 'route_index'];
+        $data = $this->getTemplateData(['entity' => new \stdClass()]);
+        $url = 'http://example.com/entity';
 
-        $this->router->expects($this->once())->method('getRouteCollection')->willReturn($routeCollection);
+        $this->doctrineHelper->expects(self::never())
+            ->method('getSingleEntityIdentifier');
 
-        $this->doctrineHelper->expects($this->once())->method('isManageableEntity')->willReturn(true);
+        $this->urlProvider->expects(self::once())
+            ->method('getAbsoluteUrl')
+            ->with($definition['route'])
+            ->willReturn($url);
 
-        $this->extendConfigProvider->expects($this->once())->method('hasConfig')->willReturn(true);
+        $this->processor->process($variable, $definition, $data);
 
-        $configId = $this->createMock(ConfigIdInterface::class);
-        $this->extendConfigProvider->expects($this->once())->method('getConfig')->willReturn(
-            new Config($configId, [
-                'is_extend' => true,
-                'is_deleted' => true,
-            ])
-        );
-
-        $this->assertEquals($expected, $this->processor->process($variable, $definition, $data));
+        self::assertEquals($url, $data->getComputedVariable($variable));
     }
 
-    public function invalidDataProvider()
+    public function testProcessForRouteThatRequiresEntityId()
     {
-        yield 'sample' => [
-            'expected' => '{{ \'entity.url.index\' }}',
-            'variable' => 'entity.url.index',
-            'definition' => [
-                'route' => 'route_index',
-            ],
-            'data' => [
-                'entity' => new \stdClass(),
-            ],
-        ];
+        $variable = 'entity.url.update';
+        $definition = ['route' => 'route_update'];
+        $data = $this->getTemplateData(['entity' => new \stdClass()]);
+        $entityId = 123;
+        $url = 'http://example.com/entity/123';
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifier')
+            ->willReturn($entityId);
+
+        $this->urlProvider->expects(self::once())
+            ->method('getAbsoluteUrl')
+            ->with($definition['route'], ['id' => $entityId])
+            ->willReturn($url);
+
+        $this->processor->process($variable, $definition, $data);
+
+        self::assertEquals($url, $data->getComputedVariable($variable));
+    }
+
+    public function testProcessWithWrongEntity()
+    {
+        $variable = 'entity.url.update';
+        $definition = ['route' => 'route_update'];
+        $data = $this->getTemplateData(['entity' => new \stdClass()]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifier')
+            ->willThrowException(new \Exception('invalid entity'));
+
+        $this->urlProvider->expects(self::never())
+            ->method('getAbsoluteUrl');
+
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(sprintf('The variable "%s" cannot be resolved.', $variable));
+
+        $this->processor->process($variable, $definition, $data);
+
+        self::assertNull($data->getComputedVariable($variable));
+    }
+
+    public function testProcessWithWrongRoute()
+    {
+        $variable = 'entity.url.index';
+        $definition = ['route' => 'route_index'];
+        $data = $this->getTemplateData(['entity' => new \stdClass()]);
+
+        $this->doctrineHelper->expects(self::never())
+            ->method('getSingleEntityIdentifier');
+
+        $this->urlProvider->expects(self::once())
+            ->method('getAbsoluteUrl')
+            ->with($definition['route'])
+            ->willThrowException(new RouteNotFoundException('unknown route'));
+
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(sprintf('The variable "%s" cannot be resolved.', $variable));
+
+        $this->processor->process($variable, $definition, $data);
+
+        self::assertNull($data->getComputedVariable($variable));
     }
 }

@@ -63,21 +63,26 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_form.update_factory'
 
+    oro_form.registry.form_template_data_provider:
+        class: Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry
+        public: false
+        arguments:
+            - ~ # providers. Set by Oro\Bundle\FormBundle\DependencyInjection\Compiler\FormTemplateDataProviderCompilerPass
+
     oro_form.provider.from_template_data.default:
         class: Oro\Bundle\FormBundle\Provider\FromTemplateDataProvider
+        public: false
         tags:
             - { name: oro_form.form_template_data_provider, alias: default }
 
-    oro_form.registry.form_template_data_provider:
-        class: 'Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry'
-        public: false
-
     oro_form.registry.form_handler:
+        class: Oro\Bundle\FormBundle\Model\FormHandlerRegistry
         public: false
-        class: 'Oro\Bundle\FormBundle\Model\FormHandlerRegistry'
+        arguments:
+            - ~ # handlers. Set by Oro\Bundle\FormBundle\DependencyInjection\Compiler\FormHandlerCompilerPass
 
     oro_form.form.handler.default:
-        class: 'Oro\Bundle\FormBundle\Form\Handler\FormHandler'
+        class: Oro\Bundle\FormBundle\Form\Handler\FormHandler
         arguments:
             - '@oro_form.event.event_dispatcher'
             - '@oro_entity.doctrine_helper'

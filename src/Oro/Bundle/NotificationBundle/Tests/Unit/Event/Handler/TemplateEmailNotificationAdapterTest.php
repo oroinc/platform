@@ -12,6 +12,7 @@ use Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository;
 use Oro\Bundle\NotificationBundle\Event\Handler\TemplateEmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationProcessRecipientsEvent;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
+use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -41,13 +42,22 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
         $this->emailNotification = $this->createMock(EmailNotification::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->em = $this->createMock(EntityManager::class);
+        $propertyAccessor = $this->getPropertyAccessor();
+
+        $additionalEmailAssociationProvider = $this->createMock(ChainAdditionalEmailAssociationProvider::class);
+        $additionalEmailAssociationProvider->expects($this->any())
+            ->method('getAssociationValue')
+            ->willReturnCallback(function ($associationEntity, $associationComponent) use ($propertyAccessor) {
+                return $propertyAccessor->getValue($associationEntity, $associationComponent);
+            });
 
         $this->adapter = new TemplateEmailNotificationAdapter(
             $this->entity,
             $this->emailNotification,
             $this->em,
-            $this->getPropertyAccessor(),
-            $this->eventDispatcher
+            $propertyAccessor,
+            $this->eventDispatcher,
+            $additionalEmailAssociationProvider
         );
     }
 

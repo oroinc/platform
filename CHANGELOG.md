@@ -2,6 +2,50 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## 4.0.0-rc
+
+### Changed
+#### EmailBundle
+* The `Oro\Bundle\EmailBundle\Provider\EmailRenderer` was reimplemented to support computed variables.
+  The following changes were made:
+    - remove extending of this class from `Twig_Environment`
+    - method `renderWithDefaultFilters` was renamed to `renderTemplate`
+    - move loading of configuration to `Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProvider`
+    - move rendering of template to `Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRenderer`
+    - move formatting of entity related variables to `Oro\Bundle\EntityBundle\Twig\Sandbox\EntityFormatExtension`
+* The interface `Oro\Bundle\EmailBundle\Processor\VariableProcessorInterface` was moved to
+  `Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorInterface`.
+  The method `process` was changed from `process($variable, array $definition, array $data = [])`
+  to `process(string $variable, array $processorArguments, TemplateData $data): void`.
+  This allows processors to add computed values.
+* The interface `Oro\Bundle\EmailBundle\Provider\SystemVariablesProviderInterface` was moved to
+  `Oro\Bundle\EntityBundle\Twig\Sandbox\SystemVariablesProviderInterface`.
+  The method `getVariableDefinitions` was changed from `getVariableDefinitions()` to `getVariableDefinitions(): array`.
+  The method `getVariableValues` was changed from `getVariableValues()` to `getVariableValues(): array`.
+* The interface `Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface` was moved to
+  `Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariablesProviderInterface`.
+  The method `getVariableDefinitions` was changed from `getVariableDefinitions($entityClass = null)`
+  to `getVariableDefinitions(string $entityClass = null): array`.
+  The method `getVariableGetters` was changed from `getVariableGetters($entityClass = null)`
+  to `getVariableGetters(): array`.
+  By performance reasons new method `getVariableProcessors(string $entityClass): array` was added.
+  If method `getVariableDefinitions` of your provider returns info about processors, move it to `getVariableProcessors`.
+
+#### UIBundle
+* The redundant methods `getFormatterName`, `getSupportedTypes` and `isDefaultFormatter` were removed from `Oro\Bundle\UIBundle\Formatter\FormatterInterface`.
+  Use `data_type` attribute of `oro_formatter` tag to specify the default formatter for the data type.
+
+### Removed
+#### DependencyInjection component
+* The `ServiceLinkRegistry` and all relates classes was removed.
+  To define a bag of lazy loaded services use Symfony [Service Locator](https://symfony.com/doc/3.4/service_container/service_subscribers_locators.html#defining-a-service-locator).
+  The list of removed classes:
+    - `Oro\Component\DependencyInjection\ServiceLinkRegistry`
+    - `Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface`
+    - `Oro\Component\DependencyInjection\ServiceLinkRegistryAwareTrait`
+    - `Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass`
+    - `Oro\Component\DependencyInjection\Exception\UnknownAliasException`
+
 ## 4.0.0-beta
 
 ### Changed

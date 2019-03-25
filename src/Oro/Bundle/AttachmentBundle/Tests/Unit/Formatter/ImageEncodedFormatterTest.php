@@ -30,11 +30,6 @@ class ImageEncodedFormatterTest extends \PHPUnit\Framework\TestCase
         $this->formatter   = new ImageEncodedFormatter($this->fileManager, $this->fileLocator);
     }
 
-    public function testGetFormatterName()
-    {
-        $this->assertEquals('image_encoded', $this->formatter->getFormatterName());
-    }
-
     public function testFormat()
     {
         $file = new File();
@@ -63,15 +58,5 @@ class ImageEncodedFormatterTest extends \PHPUnit\Framework\TestCase
             ->willReturn(__DIR__ . '/../Fixtures/testFile/test.png');
 
         $this->assertEquals($expected, $this->formatter->getDefaultValue());
-    }
-
-    public function testGetSupportedTypes()
-    {
-        $this->assertEquals(['image'], $this->formatter->getSupportedTypes());
-    }
-
-    public function testIsDefaultFormatter()
-    {
-        $this->assertTrue($this->formatter->isDefaultFormatter());
     }
 }

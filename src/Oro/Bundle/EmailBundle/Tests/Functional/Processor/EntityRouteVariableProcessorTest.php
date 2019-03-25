@@ -30,7 +30,7 @@ class EntityRouteVariableProcessorTest extends WebTestCase
      */
     public function testVariables($variable, $expected)
     {
-        $data = $this->emailRenderer->renderWithDefaultFilters(
+        $data = $this->emailRenderer->renderTemplate(
             sprintf('{{ %s }}', $variable),
             ['entity' => $this->entity]
         );

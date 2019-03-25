@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Model\CategorizedRecipient;
@@ -357,6 +356,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         ];
         $organization = (new Organization())->setName('ORO');
         $object = new CustomerStub('Customer Name', $organization);
+        $objectClass = get_class($object);
 
         $em = $this->createMock(ObjectManager::class);
         $objectMetadata = $this->getEntity(ClassMetadata::class, [
@@ -369,12 +369,12 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->registry->expects(self::once())
             ->method('getManagerForClass')
-            ->with(ClassUtils::getClass($object))
+            ->with($objectClass)
             ->willReturn($em);
 
         $em->expects(self::once())
             ->method('getClassMetadata')
-            ->with(ClassUtils::getClass($object))
+            ->with($objectClass)
             ->willReturn($objectMetadata);
 
         $this->nameFormatter->expects(self::once())
@@ -429,18 +429,23 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
             'admin@example.com' => '"John Doe" <admin@example.com>',
         ];
         $object = new \stdClass();
+        $objectClass = get_class($object);
 
         $em = $this->createMock(ObjectManager::class);
         $objectMetadata = $this->createMock(ClassMetadata::class);
+        $objectMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with(self::identicalTo($object))
+            ->willReturn([]);
 
         $this->registry->expects(self::once())
             ->method('getManagerForClass')
-            ->with(ClassUtils::getClass($object))
+            ->with($objectClass)
             ->willReturn($em);
 
         $em->expects(self::once())
             ->method('getClassMetadata')
-            ->with(ClassUtils::getClass($object))
+            ->with($objectClass)
             ->willReturn($objectMetadata);
 
         $expected = [
@@ -461,18 +466,23 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     {
         $emails = [];
         $object = new \stdClass();
+        $objectClass = get_class($object);
 
         $em = $this->createMock(ObjectManager::class);
         $objectMetadata = $this->createMock(ClassMetadata::class);
+        $objectMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with(self::identicalTo($object))
+            ->willReturn([]);
 
         $this->registry->expects(self::once())
             ->method('getManagerForClass')
-            ->with(ClassUtils::getClass($object))
+            ->with($objectClass)
             ->willReturn($em);
 
         $em->expects(self::once())
             ->method('getClassMetadata')
-            ->with(ClassUtils::getClass($object))
+            ->with($objectClass)
             ->willReturn($objectMetadata);
 
         $expected = [];
