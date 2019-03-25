@@ -199,6 +199,10 @@ define(function(require) {
             var url = $form.attr('action');
             var method = $form.attr('method') || 'GET';
 
+            if (url && url.indexOf('#') === 0) {
+                return;
+            }
+
             if (url && method.toUpperCase() === 'GET') {
                 data = $form.serialize();
                 if (data) {
