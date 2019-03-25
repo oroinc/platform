@@ -60,8 +60,8 @@ define(function(require) {
         render: function() {
             this.updateStepTransitions();
             if (!this.isConnected) {
-                this.isConnected = true;
                 this.connect();
+                this.isConnected = true;
             }
             return this;
         },
@@ -113,10 +113,10 @@ define(function(require) {
             }
             this.removeStaleConnections();
 
-            this.areaView.stepCollectionView.getItemView(endStep).updateStepMinWidth();
+            this.stepCollectionView.getItemView(endStep).updateStepMinWidth();
             for (i = 0; i < startSteps.length; i++) {
                 startStep = startSteps[i];
-                this.areaView.stepCollectionView.getItemView(startStep).updateStepMinWidth();
+                this.stepCollectionView.getItemView(startStep).updateStepMinWidth();
             }
         },
 
@@ -195,7 +195,6 @@ define(function(require) {
         cleanup: function() {
             this.addStaleMark();
             this.removeStaleConnections();
-            this.stopListening();
         }
     });
 

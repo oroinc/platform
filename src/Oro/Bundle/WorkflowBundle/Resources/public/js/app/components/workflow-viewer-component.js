@@ -65,6 +65,7 @@ define(function(require) {
         initViews: function($el, flowchartOptions) {
             if (this.flowchartEnabled) {
                 flowchartOptions = _.extend(flowchartOptions, {
+                    autoRender: true,
                     model: this.model,
                     el: $el.find('.workflow-flowchart'),
                     flowchartState: this.flowchartState

@@ -275,7 +275,7 @@ define(function(require) {
 
             // compute the rest of the line
             var points = this.smartlineManager.getConnectionPath(this, paintInfo);
-            if (points.length === 0) {
+            if (!points || points.length === 0) {
                 // leave everything as is
                 return;
             }
