@@ -259,14 +259,14 @@ class AttributeControllerTest extends AbstractConfigControllerTest
     {
         $fieldConfigModel = $this->getFieldByName('file');
 
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'DELETE',
             $this->getUrl('oro_attribute_remove', ['id' => $fieldConfigModel->getId()])
         );
 
         $fieldConfig = $this->getFieldConfigByName('file', 'extend');
 
-        $this->assertEquals($fieldConfig->get('state'), 'Deleted');
+        $this->assertEquals('Deleted', $fieldConfig->get('state'));
     }
 
     public function testRequiredProperties()

@@ -13,6 +13,9 @@ define([
      * @extends oro.datagrid.action.ModelAction
      */
     AjaxAction = ModelAction.extend({
+        /** @property {String} */
+        requestType: 'POST',
+
         /**
          * @inheritDoc
          */

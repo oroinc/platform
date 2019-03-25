@@ -22,8 +22,8 @@ define(function(require) {
             e.preventDefault();
 
             $.ajax({
-                url: e.currentTarget.href,
-                type: 'GET',
+                url: e.currentTarget.pathname,
+                method: 'POST',
                 success: function(response) {
                     if (response.message) {
                         mediator.execute('showFlashMessage', 'success', response.message, {afterReload: true});

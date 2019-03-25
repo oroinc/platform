@@ -14,6 +14,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Ajax Abstract Menu Controller
+ */
 abstract class AbstractAjaxMenuController extends Controller
 {
     /**
@@ -52,7 +55,7 @@ abstract class AbstractAjaxMenuController extends Controller
      * @param string  $menuName
      * @param string  $parentKey
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function createAction(Request $request, $menuName, $parentKey)
     {
@@ -92,7 +95,7 @@ abstract class AbstractAjaxMenuController extends Controller
      * @param string  $key
      * @param Request $request
      *
-     * @return Response
+     * @return JsonResponse
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function deleteAction($menuName, $key, Request $request)
@@ -134,7 +137,7 @@ abstract class AbstractAjaxMenuController extends Controller
      * @param string  $key
      * @param Request $request
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function showAction($menuName, $key, Request $request)
     {
@@ -156,7 +159,7 @@ abstract class AbstractAjaxMenuController extends Controller
      * @param string  $key
      * @param Request $request
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function hideAction($menuName, $key, Request $request)
     {

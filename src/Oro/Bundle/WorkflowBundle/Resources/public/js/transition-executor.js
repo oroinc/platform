@@ -14,7 +14,7 @@ define([
     return function(element, data, pageRefresh) {
         TransitionEventHandlers.getOnStart(element, pageRefresh)();
 
-        $.getJSON(element.data('transition-url'), data ? {data: data} : null)
+        $.post(element.data('transition-url'), data ? {data: data} : null, null, 'json')
             .done(TransitionEventHandlers.getOnSuccess(element, pageRefresh))
             .fail(TransitionEventHandlers.getOnFailure(element, pageRefresh));
     };

@@ -59,6 +59,7 @@ define(function(require) {
             mediator.execute('showLoading');
 
             $.ajax(url, {
+                method: 'POST',
                 errorHandlerMessage: false,
                 success: function(response) {
                     messenger.notificationMessage(

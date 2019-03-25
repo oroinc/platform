@@ -20,7 +20,9 @@ use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -225,9 +227,12 @@ class ImportExportController extends Controller
 
     /**
      * Validate import data
+     * Called by importValidateExportTemplateFormAction with forward
      *
      * @Route("/import/validate/{processorAlias}", name="oro_importexport_import_validate")
      * @AclAncestor("oro_importexport_import")
+     * @Method("POST")
+     * @CsrfProtection()
      *
      * @param Request $request
      * @param string $processorAlias
@@ -260,8 +265,13 @@ class ImportExportController extends Controller
     }
 
     /**
+     * Execute import process
+     * Called by importValidateExportTemplateFormAction with forward
+     *
      * @Route("/import/process/{processorAlias}", name="oro_importexport_import_process")
      * @AclAncestor("oro_importexport_export")
+     * @Method("POST")
+     * @CsrfProtection()
      *
      * @param string $processorAlias
      * @param Request $request
@@ -296,6 +306,8 @@ class ImportExportController extends Controller
     /**
      * @Route("/export/instant/{processorAlias}", name="oro_importexport_export_instant")
      * @AclAncestor("oro_importexport_export")
+     * @Method("POST")
+     * @CsrfProtection()
      *
      * @param string $processorAlias
      * @param Request $request

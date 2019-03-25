@@ -25,6 +25,7 @@ define(function(require) {
             actionsEl: '.widget-actions',
             moveAdoptedActions: true,
             url: false,
+            method: 'GET',
             elementFirst: true,
             title: '',
             alias: null,
@@ -673,7 +674,7 @@ define(function(require) {
                 url = window.location.href;
             }
             if (this.firstRun || method === undefined || !method) {
-                method = 'get';
+                method = this.options.method;
             }
             var options = this.prepareContentRequestOptions(data, method, url);
 
@@ -684,10 +685,19 @@ define(function(require) {
         },
 
         prepareContentRequestOptions: function(data, method, url) {
+            var query = '';
+
+            if (method.toUpperCase() === 'POST') {
+                var urlParts = url.split('?');
+
+                url = urlParts[0];
+                query = typeof urlParts[1] === 'undefined' ? '' : urlParts[1] + '&';
+            }
+
             var options = {
                 url: url,
                 type: method,
-                data: data === void 0 ? '' : data + '&',
+                data: query + (data === void 0 ? '' : data + '&'),
                 errorHandlerMessage: false
             };
 
@@ -699,7 +709,8 @@ define(function(require) {
         _getWidgetData: function() {
             var data = {
                 _widgetContainer: this.options.type,
-                _wid: this.getWid()
+                _wid: this.getWid(),
+                _widgetInit: this.firstRun ? 1 : 0
             };
 
             if (this.options.widgetTemplate) {

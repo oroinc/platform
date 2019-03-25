@@ -12,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -20,8 +21,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
  * Provides the ability to control of the Grid
@@ -170,6 +169,8 @@ class GridController extends Controller
      *      name="oro_datagrid_mass_action",
      *      requirements={"gridName"="[\w\:-]+", "actionName"="[\w-]+"}
      * )
+     * @CsrfProtection()
+     *
      * @param Request $request
      * @param string $gridName
      * @param string $actionName
@@ -179,12 +180,6 @@ class GridController extends Controller
      */
     public function massActionAction(Request $request, $gridName, $actionName)
     {
-        /* @var $tokenManager CsrfTokenManagerInterface */
-        $tokenManager = $this->get('security.csrf.token_manager');
-        if (!$tokenManager->isTokenValid(new CsrfToken($actionName, $request->get('token')))) {
-            return new JsonResponse('Invalid CSRF Token', JsonResponse::HTTP_FORBIDDEN);
-        }
-
         /** @var MassActionDispatcher $massActionDispatcher */
         $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');
 

@@ -26,6 +26,7 @@ define(function(require) {
             redirectUrl: '',
             dialogUrl: '',
             executionUrl: '',
+            requestMethod: 'GET',
             confirmation: {},
             message: {},
             showDialog: false,
@@ -116,9 +117,15 @@ define(function(require) {
                         .done(_.bind(this.ajaxDone, this))
                         .fail(_.bind(this.ajaxFail, this));
                 } else {
-                    $.getJSON(this.options.executionUrl)
-                        .done(_.bind(this.ajaxDone, this))
-                        .fail(_.bind(this.ajaxFail, this));
+                    if (this.options.requestMethod === 'POST') {
+                        $.post(this.options.executionUrl, null, 'json')
+                            .done(_.bind(this.ajaxDone, this))
+                            .fail(_.bind(this.ajaxFail, this));
+                    } else {
+                        $.getJSON(this.options.executionUrl)
+                            .done(_.bind(this.ajaxDone, this))
+                            .fail(_.bind(this.ajaxFail, this));
+                    }
                 }
             }
         },

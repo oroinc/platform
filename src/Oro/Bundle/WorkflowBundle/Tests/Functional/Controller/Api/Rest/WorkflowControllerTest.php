@@ -81,7 +81,7 @@ class WorkflowControllerTest extends WebTestCase
         $processesBefore = $repositoryProcess->findAll();
 
         $this->client->request(
-            'GET',
+            'POST',
             $this->getUrl(
                 'oro_api_workflow_deactivate',
                 ['workflowDefinition' => LoadWorkflowDefinitions::WITH_START_STEP]
@@ -102,7 +102,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertEntityWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
 
         $this->client->request(
-            'GET',
+            'POST',
             $this->getUrl(
                 'oro_api_workflow_activate',
                 ['workflowDefinition' => LoadWorkflowDefinitions::WITH_START_STEP]
@@ -237,7 +237,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertActiveWorkflow($testEntity, LoadWorkflowDefinitions::NO_START_STEP);
 
         $this->client->request(
-            'GET',
+            'POST',
             $this->getUrl(
                 'oro_workflow_api_rest_workflow_start',
                 [
@@ -271,7 +271,7 @@ class WorkflowControllerTest extends WebTestCase
         $workflowItem = $this->getWorkflowItem($testEntity, LoadWorkflowDefinitions::MULTISTEP);
 
         $this->client->request(
-            'GET',
+            'POST',
             $this->getUrl(
                 'oro_workflow_api_rest_workflow_transit',
                 [
@@ -305,7 +305,7 @@ class WorkflowControllerTest extends WebTestCase
     public function testStartWorkflowFromNonRelatedEntity($routeName, $entityClass, $transitionName)
     {
         $this->client->request(
-            'GET',
+            'POST',
             $this->getUrl(
                 'oro_workflow_api_rest_workflow_start',
                 [

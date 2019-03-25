@@ -94,7 +94,7 @@ define(function(require) {
             var _this = this;
             $.ajax({
                 url: this.element.attr('href'),
-                type: 'GET',
+                type: this.element.data('request-method') || 'GET',
                 success: function(response) {
                     _this._hideLoading();
                     actionInput.val(JSON.stringify({
@@ -113,7 +113,7 @@ define(function(require) {
             var _this = this;
             $.ajax({
                 url: this.element.attr('href'),
-                type: 'GET',
+                type: this.element.data('request-method') || 'GET',
                 success: function(response) {
                     _this._hideLoading();
                     _this._processResponse(response.url, response.message);
