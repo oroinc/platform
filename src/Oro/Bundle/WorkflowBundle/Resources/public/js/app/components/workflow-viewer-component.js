@@ -4,12 +4,11 @@ define(function(require) {
 
     var WorkflowViewerComponent;
     var _ = require('underscore');
-    var tools = require('oroui/js/tools');
+    var $ = require('jquery');
     var BaseComponent = require('oroui/js/app/components/base/component');
-    var workflowModelFactory = require('../../tools/workflow-model-factory');
-    var FlowchartViewerWorkflowView = require('../views/flowchart/viewer/workflow-view');
-    var FlowchartControlView = require('../views/flowchart/viewer/flowchart-control-view');
-    var FlowchartStateModel = require('../models/flowchart-state-model');
+    var workflowModelFactory = require('oroworkflow/js/tools/workflow-model-factory');
+    var FlowchartViewerWorkflowView = require('oroworkflow/js/app/views/flowchart/viewer/workflow-view');
+    var FlowchartStateModel = require('oroworkflow/js/app/models/flowchart-state-model');
 
     /**
      * Builds workflow editor UI.
@@ -18,17 +17,18 @@ define(function(require) {
      * @augments BaseComponent
      */
     WorkflowViewerComponent = BaseComponent.extend(/** @lends WorkflowViewerComponent.prototype */{
-        options: {
-            entity: {},
-            chartOptions: {},
-            connectionOptions: {},
-            availableDestinations: {}
-        },
+        FlowchartWorkflowView: FlowchartViewerWorkflowView,
+
+        /**
+         * @type {Array.<Promise>}
+         */
+        _initPromises: null,
 
         /**
          * @inheritDoc
          */
         constructor: function WorkflowViewerComponent() {
+            this._initPromises = [];
             WorkflowViewerComponent.__super__.constructor.apply(this, arguments);
         },
 
@@ -36,48 +36,37 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            this.options = _.defaults(options || {}, this.options);
-
-            this.flowchartEnabled = !tools.isMobile();
-            var flowchartOptions = this.flowchartEnabled ? {} : _.pick(options, ['connectionOptions', 'chartOptions']);
             WorkflowViewerComponent.__super__.initialize.apply(this, arguments);
             this.model = workflowModelFactory.createWorkflowModel(options);
-            if (this.flowchartEnabled) {
-                this.flowchartState = new FlowchartStateModel();
-                this.FlowchartWorkflowView = FlowchartViewerWorkflowView;
-            }
-            if (this.deferredInit) {
-                this.deferredInit.done(function() {
-                    this.initViews(options._sourceElement, flowchartOptions);
-                }.bind(this));
-            } else {
-                this.initViews(options._sourceElement, flowchartOptions);
-            }
-        },
 
-        /**
-         * Initializes related views
-         *
-         * @param {jQuery} $el root element
-         * @param {Object} flowchartOptions options for the flow chart
-         *  contain connectionOptions and chartOptions properties
-         */
-        initViews: function($el, flowchartOptions) {
-            if (this.flowchartEnabled) {
-                flowchartOptions = _.extend(flowchartOptions, {
-                    autoRender: true,
+            var subComponentPromise = options._subPromises['flowchart-container'];
+
+            if (subComponentPromise) {
+                this._initPromises.push(subComponentPromise);
+                this.flowchartEnabled = true;
+                this.flowchartState = new FlowchartStateModel();
+
+                var flowchartOptions = _.extend({
                     model: this.model,
-                    el: $el.find('.workflow-flowchart'),
-                    flowchartState: this.flowchartState
-                });
-                this.flowchartView = new this.FlowchartWorkflowView(flowchartOptions);
-                this.flowchartControlView = new FlowchartControlView({
-                    model: this.flowchartState,
-                    el: $el.find('.workflow-flowchart-controls')
-                });
+                    flowchartState: this.flowchartState,
+                    chartOptions: {},
+                    connectionOptions: {}
+                }, _.pick(options, 'connectionOptions', 'chartOptions'));
+
+                subComponentPromise.then(function(flowchartContainerComponent) {
+                    flowchartContainerComponent.view
+                        .createFlowchartView(this.FlowchartWorkflowView, flowchartOptions);
+                }.bind(this));
+            }
+
+            if (this._initPromises.length) {
+                this._deferredInit();
+                $.when.apply($, this._initPromises).then(function() {
+                    delete this._initPromises;
+                    this._resolveDeferredInit();
+                }.bind(this));
             }
         }
-
     });
 
     return WorkflowViewerComponent;

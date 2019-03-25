@@ -54,15 +54,15 @@
 .workflow-flowchart-wrapper {
     overflow: hidden;
     height: 700px;
-}
 
-.workflow-flowchart {
-    position: relative;
-    min-height: 610px;
-    margin: 0;
+    .workflow-flowchart {
+        position: relative;
+        height: 100%;
+        margin: 0;
 
-    ._jsPlumb_endpoint {
-        z-index: 100;
+        ._jsPlumb_endpoint {
+            z-index: 100;
+        }
     }
 }
 
