@@ -20,8 +20,8 @@ define(function(require) {
             FlowchartJsPlumbBaseView.__super__.render.apply(this, arguments);
 
             if (!this.isConnected) {
-                this.isConnected = true;
                 this.connect();
+                this.isConnected = true;
             }
             return this;
         },

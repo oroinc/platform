@@ -95,8 +95,8 @@ define(function(require) {
         render: function() {
             // do nothing except connect()
             if (!this.isConnected) {
-                this.isConnected = true;
                 this.connect();
+                this.isConnected = true;
             }
             return this;
         },
@@ -106,8 +106,7 @@ define(function(require) {
                 container: this.id()
             }, this.defaultsChartOptions);
             this.jsPlumbInstance = jsPlumb.getInstance(chartOptions);
-            this.debouncedRepaintEverything = _.debounce(
-                _.bind(this.jsPlumbInstance.repaintEverything, this.jsPlumbInstance), 0);
+            this.debouncedRepaintEverything = _.debounce(this.repaintEverything.bind(this), 0);
             this.jsPlumbManager = new JPManager(this.jsPlumbInstance, this.model);
             var stepWithPosition = this.model.get('steps').find(function(step) {
                 var position = step.get('position');
@@ -116,6 +115,12 @@ define(function(require) {
             // if positions of step wasn't defined
             if (_.isUndefined(stepWithPosition)) {
                 this.jsPlumbManager.organizeBlocks();
+            }
+        },
+
+        repaintEverything: function() {
+            if (this.isConnected) {
+                this.jsPlumbInstance.repaintEverything();
             }
         },
 

@@ -10,7 +10,6 @@ define(function(require) {
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
     FlowchartViewerWorkflowView = FlowchartJsPlumbAreaView.extend({
-        autoRender: true,
         /**
          * @type {Constructor.<FlowchartJsPlumbOverlayView>}
          */
@@ -25,16 +24,6 @@ define(function(require) {
          * @type {Constructor.<FlowchartViewerTransitionView>}
          */
         transitionView: FlowchartViewerTransitionView,
-
-        /**
-         * @type {BaseCollectionView<FlowchartJsPlumbBoxView>}
-         */
-        stepCollectionView: null,
-
-        /**
-         * @type {BaseCollectionView<FlowchartViewerTransitionView>}
-         */
-        transitionCollectionView: null,
 
         className: 'workflow-flowchart-viewer',
 
@@ -66,7 +55,7 @@ define(function(require) {
         },
 
         findStepModelByElement: function(el) {
-            var stepCollectionView = this.stepCollectionView;
+            var stepCollectionView = this.subview('stepCollectionView');
             return this.model.get('steps').find(function(model) {
                 return stepCollectionView.getItemView(model).el === el;
             });
@@ -76,14 +65,13 @@ define(function(require) {
             FlowchartViewerWorkflowView.__super__.connect.apply(this, arguments);
             this.jsPlumbInstance.batch(_.bind(function() {
                 this.$el.addClass(this.className);
-                var stepCollectionView;
                 var transitionOverlayView = this.transitionOverlayView;
                 var connectionOptions = _.extend({}, this.defaultConnectionOptions);
                 var StepView = this.stepView;
                 var TransitionView = this.transitionView;
                 var _this = this;
                 var steps = this.model.get('steps');
-                this.stepCollectionView = stepCollectionView = new BaseCollectionView({
+                var stepCollectionView = new BaseCollectionView({
                     el: this.$el,
                     collection: steps,
                     animationDuration: 0,
@@ -96,7 +84,7 @@ define(function(require) {
                     },
                     autoRender: true
                 });
-                this.transitionCollectionView = new BaseCollectionView({
+                var transitionCollectionView = new BaseCollectionView({
                     el: this.$el,
                     collection: this.model.get('transitions'),
                     animationDuration: 0,
@@ -114,8 +102,8 @@ define(function(require) {
                     autoRender: true
                 });
 
-                this.subview('stepCollectionView', this.stepCollectionView);
-                this.subview('transitionCollectionView', this.transitionCollectionView);
+                this.subview('stepCollectionView', stepCollectionView);
+                this.subview('transitionCollectionView', transitionCollectionView);
             }, this));
 
             // tell zoomable-area to update zoom level
