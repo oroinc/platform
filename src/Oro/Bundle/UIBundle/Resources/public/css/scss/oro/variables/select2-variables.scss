@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@import "oroui/css/scss/oro/variables/form-variables";
+
 $select2-container-offset: 0 !default;
 $select2-container-position: relative !default;
 $select2-container-display: inline-block !default;
@@ -166,7 +168,7 @@ $select2-search-choice-close-allow-display: inline-block !default;
 
 $select2-search-choice-arrow-display: inline-block !default;
 $select2-search-choice-arrow-position: absolute !default;
-$select2-search-choice-arrow-right: 10px !default;
+$select2-search-choice-arrow-right: $select-caret-offset-end !default;
 $select2-search-choice-arrow-top: 7px !default;
 $select2-search-choice-arrow-font-size: 16px !default;
 $select2-search-choice-arrow-font-family: FontAwesome !default;
