@@ -30,7 +30,6 @@
     .workflow-flowchart-container {
         background-color: #fafafa;
         border: 1px solid #f1f1f1;
-        border-top-width: 0;
     }
 }
 
@@ -49,6 +48,10 @@
             margin-right: 6px;
         }
     }
+}
+
+.workflow-flowchart-alert {
+    margin-top: 30px;
 }
 
 .workflow-flowchart-wrapper {
