@@ -14,6 +14,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Decimal;
 use Symfony\Component\Validator\Constraints\Length;
 
+/**
+ * Based on the configuration, it determines the field type, parameters and constraints
+ */
 class ExtendFieldTypeGuesser extends AbstractFormGuesser
 {
     /** @var ConfigProvider */
@@ -141,6 +144,10 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
                     'No' => false,
                     'Yes' => true
                 ];
+                break;
+            case 'float':
+            case 'decimal':
+                $options['grouping'] = true;
                 break;
             case 'enum':
                 $options['enum_code'] = $this->enumConfigProvider->getConfig($className, $fieldName)
