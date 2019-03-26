@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -18,13 +17,13 @@ class ResourcesCache
     private const RESOURCES_WITHOUT_ID_KEY_PREFIX = 'resources_wid_';
     private const EXCLUDED_ACTIONS_KEY_PREFIX     = 'excluded_actions_';
 
-    /** @var CacheProvider */
+    /** @var ResourcesCacheAccessor */
     private $cache;
 
     /**
-     * @param CacheProvider $cache
+     * @param ResourcesCacheAccessor $cache
      */
-    public function __construct(CacheProvider $cache)
+    public function __construct(ResourcesCacheAccessor $cache)
     {
         $this->cache = $cache;
     }
@@ -39,9 +38,7 @@ class ResourcesCache
      */
     public function getAccessibleResources(string $version, RequestType $requestType): ?array
     {
-        $resources = $this->cache->fetch(
-            self::ACCESSIBLE_RESOURCES_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType)
-        );
+        $resources = $this->cache->fetch($version, $requestType, self::ACCESSIBLE_RESOURCES_KEY_PREFIX);
 
         if (false === $resources) {
             return null;
@@ -60,9 +57,7 @@ class ResourcesCache
      */
     public function getExcludedActions(string $version, RequestType $requestType): ?array
     {
-        $excludedActions = $this->cache->fetch(
-            self::EXCLUDED_ACTIONS_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType)
-        );
+        $excludedActions = $this->cache->fetch($version, $requestType, self::EXCLUDED_ACTIONS_KEY_PREFIX);
 
         if (false === $excludedActions) {
             return null;
@@ -81,9 +76,7 @@ class ResourcesCache
      */
     public function getResources(string $version, RequestType $requestType): ?array
     {
-        $resources = $this->cache->fetch(
-            self::RESOURCES_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType)
-        );
+        $resources = $this->cache->fetch($version, $requestType, self::RESOURCES_KEY_PREFIX);
 
         if (false === $resources) {
             return null;
@@ -111,9 +104,7 @@ class ResourcesCache
         string $version,
         RequestType $requestType
     ): ?ApiResourceSubresources {
-        $cachedData = $this->cache->fetch(
-            self::SUBRESOURCE_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType) . $entityClass
-        );
+        $cachedData = $this->cache->fetch($version, $requestType, self::SUBRESOURCE_KEY_PREFIX . $entityClass);
 
         if (false === $cachedData) {
             return null;
@@ -132,9 +123,7 @@ class ResourcesCache
      */
     public function getResourcesWithoutIdentifier(string $version, RequestType $requestType): ?array
     {
-        $resources = $this->cache->fetch(
-            self::RESOURCES_WITHOUT_ID_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType)
-        );
+        $resources = $this->cache->fetch($version, $requestType, self::RESOURCES_WITHOUT_ID_KEY_PREFIX);
 
         if (false === $resources) {
             return null;
@@ -165,10 +154,9 @@ class ResourcesCache
             $allResources[$entityClass] = $this->serializeApiResource($resource);
         }
 
-        $keyIndex = $this->getCacheKeyIndex($version, $requestType);
-        $this->cache->save(self::RESOURCES_KEY_PREFIX . $keyIndex, $allResources);
-        $this->cache->save(self::ACCESSIBLE_RESOURCES_KEY_PREFIX . $keyIndex, $accessibleResources);
-        $this->cache->save(self::EXCLUDED_ACTIONS_KEY_PREFIX . $keyIndex, $excludedActions);
+        $this->cache->save($version, $requestType, self::RESOURCES_KEY_PREFIX, $allResources);
+        $this->cache->save($version, $requestType, self::ACCESSIBLE_RESOURCES_KEY_PREFIX, $accessibleResources);
+        $this->cache->save($version, $requestType, self::EXCLUDED_ACTIONS_KEY_PREFIX, $excludedActions);
     }
 
     /**
@@ -183,10 +171,7 @@ class ResourcesCache
         RequestType $requestType,
         array $resourcesWithoutId
     ): void {
-        $this->cache->save(
-            self::RESOURCES_WITHOUT_ID_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType),
-            $resourcesWithoutId
-        );
+        $this->cache->save($version, $requestType, self::RESOURCES_WITHOUT_ID_KEY_PREFIX, $resourcesWithoutId);
     }
 
     /**
@@ -198,10 +183,11 @@ class ResourcesCache
      */
     public function saveSubresources(string $version, RequestType $requestType, array $subresources): void
     {
-        $keyIndex = self::SUBRESOURCE_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType);
         foreach ($subresources as $entitySubresources) {
             $this->cache->save(
-                $keyIndex . $entitySubresources->getEntityClass(),
+                $version,
+                $requestType,
+                self::SUBRESOURCE_KEY_PREFIX . $entitySubresources->getEntityClass(),
                 $this->serializeApiResourceSubresources($entitySubresources)
             );
         }
@@ -212,18 +198,7 @@ class ResourcesCache
      */
     public function clear(): void
     {
-        $this->cache->deleteAll();
-    }
-
-    /**
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return string
-     */
-    private function getCacheKeyIndex(string $version, RequestType $requestType): string
-    {
-        return $version . (string)$requestType;
+        $this->cache->clear();
     }
 
     /**

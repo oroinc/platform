@@ -68,8 +68,8 @@ class AttributeFamilyControllerTest extends WebTestCase
      */
     private function assertFamilyIsNotDeleted(AttributeFamily $attributeFamily)
     {
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'DELETE',
             $this->getUrl('oro_attribute_family_delete', ['id' => $attributeFamily->getId()])
         );
 
@@ -84,8 +84,8 @@ class AttributeFamilyControllerTest extends WebTestCase
 
         $attributeFamily = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_2);
 
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'DELETE',
             $this->getUrl('oro_attribute_family_delete', ['id' => $attributeFamily->getId()])
         );
 

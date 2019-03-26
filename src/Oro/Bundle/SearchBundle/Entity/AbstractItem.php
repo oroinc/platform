@@ -53,7 +53,7 @@ abstract class AbstractItem
 
     /**
      * @var float
-     * @ORM\Column(name="weight", type="decimal", precision=21, scale=8, nullable=false, options={"default"=1.0}))
+     * @ORM\Column(name="weight", type="decimal", precision=8, scale=4, nullable=false, options={"default"=1.0}))
      */
     protected $weight = 1.0;
 

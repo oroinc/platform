@@ -60,6 +60,10 @@
             .checkbox-view {
                 margin-top: $content-padding-small;
             }
+
+            td .checkbox-view {
+                margin-top: 0;
+            }
         }
     }
 
@@ -97,6 +101,11 @@
     .form-text,
     .description-container {
         margin-top: $content-padding-small;
+    }
+
+    .description-container {
+        min-width: $field-width;
+        max-width: $field-width;
     }
 }
 

@@ -10,10 +10,8 @@ use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
 use Gaufrette\File;
-use Guzzle\Http\Client;
-use Guzzle\Plugin\Cookie\Cookie;
-use Guzzle\Plugin\Cookie\CookieJar\ArrayCookieJar;
-use Guzzle\Plugin\Cookie\CookiePlugin;
+use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -25,6 +23,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ImportExportContext extends OroFeatureContext implements
     KernelAwareContext,
@@ -180,10 +179,12 @@ class ImportExportContext extends OroFeatureContext implements
         );
 
         $cookieJar = $this->getCookieJar($this->getSession());
-        $client = new Client($this->getSession()->getCurrentUrl());
-        $client->addSubscriber(new CookiePlugin($cookieJar));
-        $request = $client->get($url, null, ['save_to' => $this->template]);
-        $response = $request->send();
+        $client = new Client([
+            'allow_redirects' => true,
+            'cookies' => $cookieJar,
+            'save_to' => $this->template
+        ]);
+        $response = $client->get($url);
 
         self::assertEquals(200, $response->getStatusCode());
     }
@@ -372,16 +373,36 @@ class ImportExportContext extends OroFeatureContext implements
     }
 
     /**
-     * Assert that given column is present on downloaded csv template
+     * Assert that given column is present in the downloaded csv template
      * Example: When I download Data Template file
      *          And I see Account Customer name column
      *
      * @Then /^(?:|I )see (?P<column>([\w\s.+\/]+)) column$/
+     * @Then /^(?:|I )see (?P<column>([\w\s.+\/]+)) column is present in the downloaded csv template$/
      */
     public function iSeeColumn($column)
     {
         $csv = array_map('str_getcsv', file($this->template));
         self::assertContains($column, $csv[0]);
+    }
+
+    /**
+     * Assert that given columns are present in the downloaded csv template
+     * Example: When I download Data Template file
+     *          And I see the following columns in the downloaded csv template:
+     *              | sku    |
+     *              | status |
+     *              | type   |
+     *
+     * @Then /^(?:|I )see the following columns in the downloaded csv template:$/
+     */
+    public function iSeeColumns(TableNode $table)
+    {
+        $csv = array_map('str_getcsv', file($this->template));
+        $rows = array_column($table->getRows(), 0);
+        foreach ($rows as $row) {
+            self::assertContains($row, $csv[0]);
+        }
     }
 
     /**
@@ -651,16 +672,20 @@ class ImportExportContext extends OroFeatureContext implements
     /**
      * @param Session $session
      *
-     * @return ArrayCookieJar
+     * @return CookieJar
      */
     private function getCookieJar(Session $session)
     {
-        $cookies = $session->getDriver()->getWebDriverSession()->getCookie();
-        $cookieJar = new ArrayCookieJar();
-        foreach ($cookies as $cookie) {
-            $cookieJar->add(new Cookie($cookie));
+        $sessionCookies = $session->getDriver()->getWebDriverSession()->getCookie();
+        $cookies = [];
+        foreach ($sessionCookies as $sessionCookie) {
+            $cookie = [];
+            foreach ($sessionCookie as $key => $value) {
+                $cookie[ucwords($key, '-')] = $value;
+            }
+            $cookies[] = $cookie;
         }
 
-        return $cookieJar;
+        return new CookieJar(false, $cookies);
     }
 }

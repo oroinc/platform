@@ -290,6 +290,19 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Example: And It should be exactly 3 columns in grid
+     *
+     * @Then /^It should be (?P<count>.+) columns in grid$/
+     * @Then /^It should be (?P<count>.+) columns in "(?P<gridName>[^"]+)" grid$/
+     * And It should be exactly 3 columns in grid
+     */
+    public function itShouldBeColumnsInGrid(int $count, ?string $gridName = null)
+    {
+        $gridHeader = $this->getGrid($gridName)->getHeader();
+        self::assertSame($count, $gridHeader->getColumnsCount());
+    }
+
+    /**
      * Example: When I click "Delete" link from mass action dropdown
      * Example: And click Delete mass action
      *
@@ -823,11 +836,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And filter Name as is equal to "User"
      *
      * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|is empty|is not empty))$/
-     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)"$/
-     * @When /^(?:|I )filter "(?P<filterName>.+)" as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)"$/
-     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)"$/
-     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid$/
-     * @When /^(?:|I )filter (?P<filterName>.+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid ?(?P<strictly>strictly)$/
+     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )filter "(?P<filterName>.+)" as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid$/
+     * @When /^(?:|I )filter (?P<filterName>.+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid ?(?P<strictly>strictly)$/
      *
      * @param string $filterName
      * @param string $type
@@ -843,6 +856,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterGridName = 'Grid',
         string $strictly = ''
     ) {
+        $value = $this->fixStepArgument($value);
+
         /** @var GridFilterStringItem $filterItem */
         $filterItem = $this
             ->getGridFilters($filterGridName)
@@ -2019,9 +2034,9 @@ TEXT;
 
         static::assertInstanceOf(Table::class, $table, sprintf('Element should be of type %s', Table::class));
 
-        $rows = $table->getRows();
         $expectedRows = $expectedTableNode->getRows();
         $headers = array_shift($expectedRows);
+        $rows = $table->getRows();
 
         foreach ($expectedRows as $rowKey => $expectedRow) {
             self::assertEquals($expectedRow, $rows[$rowKey]->getCellValues($headers));

@@ -32,7 +32,6 @@ define([
      * @param {string} options.host is required
      * @param {number=} options.port default is 80
      * @param {number=} options.retryDelay time before next reconnection attempt, default is 5000 (5s)
-     * @param {number=} options.maxRetries quantity of attempts before stop reconnection, default is 10
      * @param {boolean=} options.skipSubprotocolCheck, default is false
      * @param {boolean=} options.skipSubprotocolAnnounce, default is false
      * @param {boolean=} options.debug, default is false
@@ -67,9 +66,6 @@ define([
     Wamp.prototype = {
         // number of retry reconnects
         retryCount: 0,
-
-        // quantity of attempts before stop reconnection
-        maxRetries: 0,
 
         /**
          * Initiate connection process
@@ -157,7 +153,6 @@ define([
          * @param {string} msg text message
          * @param {Object} details
          * @param {number} details.delay in ms, before next reconnect attempt
-         * @param {number} details.maxretries max number of attempts
          * @param {number} details.retries number of scheduled attempt
          */
         onHangup: function(code, msg, details) {
@@ -165,24 +160,18 @@ define([
             // change the callback retries parameter to real attempt
             details = _.extend(
                 details || {},
-                {retries: this.retryCount, maxretries: this.maxRetries, delay: this.options.retryDelay}
+                {retries: this.retryCount, delay: this.options.retryDelay}
             );
-
-            if (code === ab.CONNECTION_RETRIES_EXCEEDED) {
-                if (this.retryCount <= this.maxRetries) {
-                    var that = this;
-                    window.setTimeout(function() {
-                        that.connect();
-                    }, this.options.retryDelay);
-                } else {
-                    // set the retries to null in case if was reached maximum number of retries
-                    details.retries = null;
-                }
-            }
 
             if (code !== ab.CONNECTION_CLOSED) {
                 this.trigger('connection_lost', _.extend({code: code}, details));
+
+                var that = this;
+                window.setTimeout(function() {
+                    that.connect();
+                }, this.retryCount * this.options.retryDelay);
             }
+
             this.session = null;
         },
 
@@ -192,6 +181,7 @@ define([
          */
         onConnect: function(session) {
             this.session = session;
+            this.retryCount = 0;
             this.trigger('connection_established');
             _.each(this.channels, function(callbacks, channel) {
                 _.each(callbacks, function(callback) {

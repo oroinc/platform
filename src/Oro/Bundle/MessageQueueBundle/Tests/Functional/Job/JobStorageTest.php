@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\DataFixtures\LoadJobData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\MessageQueue\Job\DuplicateJobException;
 use Oro\Component\MessageQueue\Job\JobStorage;
 
 /**
@@ -147,9 +148,8 @@ class JobStorageTest extends WebTestCase
 
     /**
      * @dataProvider entityManagerStateDataProvider
-     * @expectedException \Oro\Component\MessageQueue\Job\DuplicateJobException
      */
-    public function testShouldThrowIfDuplicateJob($closed)
+    public function testShouldThrowIfDuplicateJobOwnerIdAndName(bool $closed)
     {
         $existingJob = $this->getJobReference(LoadJobData::JOB_1);
 
@@ -163,6 +163,8 @@ class JobStorageTest extends WebTestCase
         if ($closed) {
             $this->getEntityManager()->close();
         }
+
+        $this->expectException(DuplicateJobException::class);
         $this->jobStorage->saveJob($job);
     }
 

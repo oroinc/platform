@@ -39,7 +39,8 @@ define(function(require) {
             'end-loading model': 'onLoadingEnd',
 
             'layout:reposition mediator': 'adjustMaxHeight',
-            'widget_dialog:open mediator': 'onWidgetDialogOpen'
+            'widget_dialog:open mediator': 'onWidgetDialogOpen',
+            'updatePosition': 'updatePosition'
         },
 
         /**
@@ -104,6 +105,7 @@ define(function(require) {
             var changedAttrs = _.keys(model.changedAttributes());
             if (_.difference(changedAttrs, ignoreAttrs).length) {
                 this.render();
+                this.updatePosition();
             }
         },
 
@@ -180,7 +182,7 @@ define(function(require) {
                 return;
             }
             this.model.toggleHoverState();
-            this.adjustMaxHeight();
+            this.updatePosition();
         },
 
         onWidgetDialogOpen: function() {
@@ -194,6 +196,17 @@ define(function(require) {
         onLoadingEnd: function() {
             this.$('[data-role="sidebar-widget-header-icon"]').removeClass('loading');
             this.adjustMaxHeight();
+        },
+
+        updatePosition: function() {
+            if (this.model.get('state') === constants.WIDGET_MAXIMIZED_HOVER ||
+                this.model.get('state') === constants.WIDGET_MAXIMIZED
+            ) {
+                this.$('[data-role="sidebar-widget-popup-wrapper"]').css({
+                    top: this.$el.offset().top + this.$el.outerHeight()
+                });
+                this.adjustMaxHeight();
+            }
         }
     });
 

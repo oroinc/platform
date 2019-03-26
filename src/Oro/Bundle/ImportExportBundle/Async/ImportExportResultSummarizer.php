@@ -9,6 +9,9 @@ use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Router;
 
+/**
+ * Prepared import and export data by forming a single structure for future use
+ */
 class ImportExportResultSummarizer
 {
     const TEMPLATE_IMPORT_RESULT = 'import_result';
@@ -71,10 +74,7 @@ class ImportExportResultSummarizer
         $data = $this->getExportResultAsArray($job);
         $data['fileName'] = $fileName;
 
-        $url = $this->configManager->get('oro_ui.application_url') .
-            $this->router->generate('oro_importexport_export_download', ['fileName' => basename($fileName)]);
-
-        $data['url'] = $url;
+        $data['url'] = $this->getDownloadUrl($job->getId());
         $data['downloadLogUrl'] = $this->getDownloadErrorLogUrl($job->getId());
         if (! $data['success']) {
             $data['url'] = $data['downloadLogUrl'];
@@ -126,6 +126,20 @@ class ImportExportResultSummarizer
             $this->router->generate('oro_importexport_job_error_log', ['jobId' => $jobId]);
 
         return $url;
+    }
+
+    /**
+     * @param integer $jobId
+     *
+     * @return string
+     */
+    protected function getDownloadUrl($jobId)
+    {
+        return sprintf(
+            '%s%s',
+            $this->configManager->get('oro_ui.application_url'),
+            $this->router->generate('oro_importexport_export_download', ['jobId' => $jobId])
+        );
     }
 
     /**

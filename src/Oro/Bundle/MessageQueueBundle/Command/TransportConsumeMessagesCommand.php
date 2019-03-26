@@ -8,6 +8,7 @@ use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Log\ConsumerState;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -43,7 +44,10 @@ class TransportConsumeMessagesCommand extends ConsumeMessagesCommand
      */
     protected function getLoggerExtension(InputInterface $input, OutputInterface $output)
     {
-        return new LoggerExtension($this->container->get('logger'));
+        /** @var LoggerInterface $logger */
+        $logger = $this->container->get('monolog.logger.consumer');
+
+        return new LoggerExtension($logger);
     }
 
     /**

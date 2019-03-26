@@ -342,7 +342,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
 
         $messageData = \is_array($data) ? implode(' ', $data) : $data;
 
-        return trim(strip_tags($messageData));
+        return trim(html_entity_decode(strip_tags($messageData), ENT_QUOTES));
     }
 
     /**
@@ -384,7 +384,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             return;
         }
 
-        $pattern = sprintf('/<a\s+href\s*=\s*"(.+)">%s<\/a>/', $linkCaption);
+        $pattern = sprintf('/<a\s+href\s*=\s*"([^"]+)".*>%s<\/a>/', $linkCaption);
         $matches = [];
 
         /** @var \Swift_Mime_Message $message */

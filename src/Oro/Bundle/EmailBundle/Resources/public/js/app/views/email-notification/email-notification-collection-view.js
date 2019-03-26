@@ -120,6 +120,7 @@ define(function(require) {
 
         _markAsRead: function(ids) {
             $.ajax({
+                method: 'POST',
                 url: routing.generate('oro_email_mark_all_as_seen', ids),
                 success: _.bind(function(response) {
                     this.collection.markAllAsRead();

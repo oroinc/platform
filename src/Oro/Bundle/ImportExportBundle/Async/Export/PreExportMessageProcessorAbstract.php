@@ -3,6 +3,7 @@ namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -46,6 +47,11 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
     protected $logger;
 
     /**
+     * @var ExportHandler
+     */
+    protected $exportHandler;
+
+    /**
      * @var int
      */
     protected $batchSize;
@@ -56,7 +62,8 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
      * @param TokenStorageInterface $tokenStorage
      * @param DependentJobService $dependentJob
      * @param LoggerInterface $logger
-     * @param int $sizeOfBatch
+     * @param ExportHandler $exportHandler
+     * @param $sizeOfBatch
      */
     public function __construct(
         JobRunner $jobRunner,
@@ -64,6 +71,7 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
         TokenStorageInterface $tokenStorage,
         DependentJobService $dependentJob,
         LoggerInterface $logger,
+        ExportHandler $exportHandler,
         $sizeOfBatch
     ) {
         $this->jobRunner = $jobRunner;
@@ -71,6 +79,7 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
         $this->tokenStorage = $tokenStorage;
         $this->logger = $logger;
         $this->dependentJob = $dependentJob;
+        $this->exportHandler = $exportHandler;
         $this->batchSize = $sizeOfBatch;
     }
 
@@ -106,7 +115,6 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
             $exportingEntityIds = $this->getExportingEntityIds($body);
 
             $ids = $this->splitOnBatch($exportingEntityIds);
-
             if (empty($ids)) {
                 $jobRunner->createDelayed(
                     sprintf('%s.chunk.%s', $jobUniqueName, 1),
@@ -178,6 +186,11 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
             'outputFormat' => $body['outputFormat'],
             'notificationTemplate' =>
                 $body['notificationTemplate'] ?? ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
+        ]);
+        $context->addDependentJob(Topics::SAVE_IMPORT_EXPORT_RESULT, [
+            'jobId' => $rootJob->getId(),
+            'type' => $body['exportType'],
+            'entity' => $body['entity']
         ]);
 
         $this->dependentJob->saveDependentJob($context);

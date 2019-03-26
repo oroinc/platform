@@ -49,7 +49,6 @@ Feature: Workflow transition notifications
     Given I click on User in grid
     When I fill form with:
       | Workflow | Second Workflow |
-    And I fill form with:
       | Transition | Second Workflow Transition (start_transition) |
       | Template   | user_reset_password                           |
     And I save and close form

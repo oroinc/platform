@@ -26,7 +26,6 @@ define(function(require) {
                 zoomControl: true
             },
             apiVersion: '3.exp',
-            sensor: false,
             apiKey: null,
             showWeather: true
         },
@@ -126,7 +125,7 @@ define(function(require) {
         },
 
         loadGoogleMaps: function() {
-            var googleMapsSettings = 'sensor=' + (this.options.sensor ? 'true' : 'false');
+            var googleMapsSettings = '';
 
             if (this.options.showWeather) {
                 googleMapsSettings += '&libraries=weather';

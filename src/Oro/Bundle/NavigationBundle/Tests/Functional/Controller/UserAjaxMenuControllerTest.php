@@ -33,7 +33,7 @@ class UserAjaxMenuControllerTest extends WebTestCase
             ]
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'POST',
             $this->getUrl('oro_navigation_user_menu_ajax_create', $parameters),
             [
@@ -56,7 +56,7 @@ class UserAjaxMenuControllerTest extends WebTestCase
             ]
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'DELETE',
             $this->getUrl('oro_navigation_user_menu_ajax_delete', $parameters),
             ['ownerId' => 0]
@@ -77,7 +77,7 @@ class UserAjaxMenuControllerTest extends WebTestCase
             ]
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'PUT',
             $this->getUrl('oro_navigation_user_menu_ajax_show', $parameters),
             ['ownerId' => 0]
@@ -98,7 +98,7 @@ class UserAjaxMenuControllerTest extends WebTestCase
             ]
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'PUT',
             $this->getUrl('oro_navigation_user_menu_ajax_hide', $parameters),
             ['ownerId' => 0]
@@ -118,7 +118,7 @@ class UserAjaxMenuControllerTest extends WebTestCase
             ]
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'PUT',
             $this->getUrl('oro_navigation_user_menu_ajax_move', $parameters),
             [
@@ -143,7 +143,7 @@ class UserAjaxMenuControllerTest extends WebTestCase
             ]
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'DELETE',
             $this->getUrl('oro_navigation_user_menu_ajax_reset', $parameters),
             ['ownerId' => 0]

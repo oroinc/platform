@@ -194,23 +194,24 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessExportData()
     {
+        $jobId = 1;
         $expectedResult = [
             'exportResult' => [
                 'success' => true,
-                'url' => '127.0.0.1/export.log',
+                'url' => sprintf('127.0.0.1/%s', $jobId),
                 'readsCount' => 10,
                 'errorsCount' => 0,
                 'entities' => 'TestEntity',
                 'fileName' => 'export_result',
-                'downloadLogUrl' => '127.0.0.1/1.log'
+                'downloadLogUrl' => sprintf('127.0.0.1/%s.log', $jobId)
             ],
             'jobName' => 'test.job.name',
         ];
 
-        $consolidateService = $this->createConsolidatedService();
+        $consolidateService = $this->createConsolidatedService($jobId);
 
         $rootJob = new Job();
-        $rootJob->setId(1);
+        $rootJob->setId($jobId);
         $rootJob->setName('test.job.name');
         $childJob = new Job();
         $chunkJob = new Job();
@@ -288,21 +289,27 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param int $jobId
+     *
      * @return ImportExportResultSummarizer
      */
-    private function createConsolidatedService()
+    private function createConsolidatedService($jobId = 1)
     {
         $routerMock = $this->createRouterMock();
         $routerMock
             ->expects($this->at(0))
             ->method('generate')
-            ->with('oro_importexport_export_download', ['fileName' => 'export_result'])
-            ->willReturn('/export.log');
+            ->with('oro_importexport_export_download', ['jobId' => $jobId])
+            ->willReturnCallback(function ($route, $args) {
+                return sprintf('/%s', $args['jobId']);
+            });
         $routerMock
             ->expects($this->at(1))
             ->method('generate')
-            ->with('oro_importexport_job_error_log', ['jobId' => 1])
-            ->willReturn('/1.log');
+            ->with('oro_importexport_job_error_log', ['jobId' => $jobId])
+            ->willReturnCallback(function ($route, $args) {
+                return sprintf('/%s.log', $args['jobId']);
+            });
 
         $configManagerMock = $this->createConfigManagerMock();
         $configManagerMock

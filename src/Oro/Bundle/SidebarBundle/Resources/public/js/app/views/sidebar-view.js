@@ -3,8 +3,6 @@ define(function(require) {
 
     var SidebarView;
 
-    require('jquery-ui');
-    var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
@@ -14,8 +12,8 @@ define(function(require) {
     var WidgetPickerModal = require('orosidebar/js/app/views/widget-picker-modal-view');
     var WidgetSetupModalView = require('orosidebar/js/app/views/widget-setup-modal-view');
     var constants = require('orosidebar/js/sidebar-constants');
-    require('jquery.mCustomScrollbar');
     require('jquery-ui');
+    require('styled-scroll-bar');
 
     SidebarView = BaseCollectionView.extend({
         optionNames: BaseView.prototype.optionNames.concat([
@@ -27,28 +25,6 @@ define(function(require) {
         itemView: require('orosidebar/js/app/views/sidebar-widget-container/widget-container-view'),
 
         listSelector: '[data-role="sidebar-content"]',
-
-        /**
-         * mCustomScrollbar initialization options
-         * @type {Object}
-         */
-        mcsOptions: {
-            axis: 'y',
-            contentTouchScroll: 10,
-            scrollInertia: 0,
-            documentTouchScroll: true,
-            theme: 'inset-dark',
-            advanced: {
-                autoExpandVerticalScroll: 3,
-                updateOnContentResize: true,
-                updateOnImageLoad: false
-            },
-            callbacks: {
-                whileScrolling: function() {
-                    $(this).trigger('mCSB.scroll');
-                }
-            }
-        },
 
         events: {
             'click [data-role="sidebar-add-widget"]': 'onClickAddWidget',
@@ -120,6 +96,12 @@ define(function(require) {
                 revert: true,
                 tolerance: 'pointer',
                 handle: '[data-role="sidebar-widget-icon"]',
+                forceHelperSize: true,
+                forcePlaceholderSize: true,
+                scrollSensitivity: 50,
+                sort: function() {
+                    this.updatedWidgetsPosition();
+                }.bind(this),
                 start: function(event, ui) {
                     var model = this.collection.get(ui.item.data('cid'));
                     if (model) {
@@ -127,15 +109,24 @@ define(function(require) {
                     }
                 }.bind(this),
                 stop: function(event, ui) {
-                    var model = this.collection.get(ui.item.data('cid'));
+                    var cid = ui.item.data('cid');
+                    var model = this.collection.get(cid);
                     if (model) {
                         model.isDragged = false;
                     }
                     this.reorderWidgets();
+                    this.updatedWidgetsPosition();
                 }.bind(this)
             });
 
-            this.$('[data-role="sidebar-scroll-container"]').mCustomScrollbar(this.mcsOptions);
+            this.$('[data-role="sidebar-scroll-container"]').styledScrollBar({
+                overflowBehavior: {
+                    x: 'hidden'
+                },
+                callbacks: {
+                    onScroll: _.debounce(this.updatedWidgetsPosition.bind(this), 5)
+                }
+            });
 
             mediator.trigger('layout:adjustHeight');
 
@@ -178,6 +169,12 @@ define(function(require) {
             });
 
             this.collection.sort();
+        },
+
+        updatedWidgetsPosition: function() {
+            _.each(this.getItemViews(), function(view) {
+                view.trigger('updatePosition');
+            });
         },
 
         onSidebarStateChange: function() {

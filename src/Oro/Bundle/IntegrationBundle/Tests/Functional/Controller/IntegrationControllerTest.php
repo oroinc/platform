@@ -23,7 +23,7 @@ class IntegrationControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient([], array_merge($this->generateBasicAuthHeader(), ['HTTP_X-CSRF-Header' => 1]));
+        $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
 
         $this->entityManager = $this->client->getContainer()->get('doctrine')
@@ -55,7 +55,7 @@ class IntegrationControllerTest extends WebTestCase
         $channel = $this->createChannel();
         $this->entityManager->persist($channel);
         $this->entityManager->flush();
-        $this->client->request('GET', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
+        $this->ajaxRequest('POST', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
@@ -175,7 +175,7 @@ class IntegrationControllerTest extends WebTestCase
         $this->entityManager->persist($channel);
         $this->entityManager->flush();
 
-        $this->client->request('GET', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
+        $this->ajaxRequest('POST', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 

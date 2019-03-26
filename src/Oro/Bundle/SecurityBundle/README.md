@@ -62,3 +62,7 @@ See [Permissions](./Resources/doc/permissions.md) for details.
 ## Configurable Permissions
 
 See [Configurable Permissions](./Resources/doc/configurable-permissions.md) for details.
+
+## CSRF protection
+You can find additional information about the CSRF protection in the dedicated section:
+- [CSRF Protection](./Resources/doc/csrf-protection.md)

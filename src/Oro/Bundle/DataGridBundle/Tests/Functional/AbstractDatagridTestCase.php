@@ -27,7 +27,7 @@ abstract class AbstractDatagridTestCase extends WebTestCase
     {
         $this->initClient(
             [],
-            array_merge($this->generateBasicAuthHeader(), ['HTTP_X-CSRF-Header' => 1])
+            $this->generateBasicAuthHeader()
         );
     }
 

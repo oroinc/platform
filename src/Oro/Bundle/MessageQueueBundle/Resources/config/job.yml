@@ -11,6 +11,11 @@ services:
         arguments:
             - '@doctrine'
             - 'Oro\Bundle\MessageQueueBundle\Entity\Job'
+            - '@oro_message_queue.job.unique_job_handler'
+
+    oro_message_queue.job.unique_job_handler:
+        class: 'Oro\Component\MessageQueue\Job\UniqueJobHandler'
+        arguments:
             - '%oro_message_queue.job.unique_job_table_name%'
 
     oro_message_queue.job.processor:

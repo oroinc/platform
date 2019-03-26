@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\Util;
 
+/**
+ * Tool to parse date from different formats.
+ */
 class DateTimeParser
 {
     /**
@@ -19,6 +22,8 @@ class DateTimeParser
     public static function parse($value)
     {
         $originalVal = $value;
+        // removed zero timezone, which may broke date parsing
+        $value = preg_replace('# 0+$#', '', $value);
 
         // remove "quoted-printable" encoded spaces if any
         $pos = strpos($value, '=20');
@@ -82,6 +87,13 @@ class DateTimeParser
                     );
                 }
             }
+        }
+
+        // Validate date. Will not pass dates with incorrect year, month or day.
+        if (!checkdate($date->format('n'), $date->format('d'), $date->format('Y'))) {
+            throw new \InvalidArgumentException(
+                sprintf('Invalid date. Original value: "%s".', $originalVal)
+            );
         }
 
         return $date;

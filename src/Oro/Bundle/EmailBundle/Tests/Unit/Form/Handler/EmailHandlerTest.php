@@ -4,6 +4,9 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\EmailBundle\Form\Handler\EmailHandler;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -11,16 +14,16 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
 {
     const FORM_DATA = ['field' => 'value'];
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Form|\PHPUnit\Framework\MockObject\MockObject */
     protected $form;
 
     /** @var Request */
     protected $request;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Processor|\PHPUnit\Framework\MockObject\MockObject */
     protected $emailProcessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
     /** @var EmailHandler */
@@ -31,20 +34,14 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->form                = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->form = $this->createMock(Form::class);
 
-        $this->request             = new Request();
+        $this->request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
 
-        $this->emailProcessor      = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\Processor')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->logger              = $this->createMock('Psr\Log\LoggerInterface');
-
+        $this->emailProcessor = $this->createMock(Processor::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
         $this->model = new Email();
 
         $this->handler = new EmailHandler(
@@ -55,9 +52,25 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessGetRequestWithEmptyQueryString()
+    public function testProcessGetRequest()
     {
         $this->request->setMethod('GET');
+
+        $this->form->expects($this->once())
+            ->method('setData')
+            ->with($this->model);
+
+        $this->form->expects($this->never())
+            ->method('submit');
+
+        $this->assertFalse($this->handler->process($this->model));
+    }
+
+    public function testProcessPostRequestWithInitParam()
+    {
+        $this->request->initialize([], self::FORM_DATA);
+        $this->request->setMethod('POST');
+        $this->request->query->set('_widgetInit', true);
 
         $this->form->expects($this->once())
             ->method('setData')
@@ -157,6 +170,9 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->handler->process($this->model));
     }
 
+    /**
+     * @return array
+     */
     public function processData()
     {
         return [
@@ -171,6 +187,9 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    /**
+     * @return array
+     */
     public function methodsData()
     {
         return [

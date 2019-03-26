@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Handles the action of sending an email from dialog widget.
+ */
 class EmailHandler
 {
     use RequestHandlerTrait;
@@ -63,7 +66,7 @@ class EmailHandler
         $this->form->setData($model);
 
         $request = $this->requestStack->getCurrentRequest();
-        if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
+        if (in_array($request->getMethod(), ['POST', 'PUT'], true) && !$request->get('_widgetInit')) {
             $this->submitPostPutRequest($this->form, $request);
 
             if ($this->form->isValid()) {

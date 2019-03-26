@@ -28,6 +28,7 @@ config:
         'oro/filter/date-filter': 'bundles/orofilter/js/filter/date-filter.js'
         'oro/filter/datetime-filter': 'bundles/orofilter/js/filter/datetime-filter.js'
         'oro/filter/empty-filter': 'bundles/orofilter/js/filter/empty-filter.js'
+        'oro/filter/boolean-filter': 'bundles/orofilter/js/filter/boolean-filter.js'
         'oro/filter/multiselect-filter': 'bundles/orofilter/js/filter/multiselect-filter.js'
         'oro/filter/none-filter': 'bundles/orofilter/js/filter/none-filter.js'
         'oro/filter/number-filter': 'bundles/orofilter/js/filter/number-filter.js'

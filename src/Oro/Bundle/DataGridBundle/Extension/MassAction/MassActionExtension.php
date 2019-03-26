@@ -11,8 +11,10 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
+/**
+ * Data grid mass action extension
+ */
 class MassActionExtension extends AbstractExtension
 {
     const METADATA_ACTION_KEY = 'massActions';
@@ -29,9 +31,6 @@ class MassActionExtension extends AbstractExtension
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
-    /** @var CsrfTokenManagerInterface */
-    protected $tokenManager;
-
     /** @var bool */
     protected $isMetadataVisited = false;
 
@@ -44,18 +43,15 @@ class MassActionExtension extends AbstractExtension
      * @param MassActionFactory             $actionFactory
      * @param MassActionMetadataFactory     $actionMetadataFactory
      * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param CsrfTokenManagerInterface     $tokenManager
      */
     public function __construct(
         MassActionFactory $actionFactory,
         MassActionMetadataFactory $actionMetadataFactory,
-        AuthorizationCheckerInterface $authorizationChecker,
-        CsrfTokenManagerInterface $tokenManager
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->actionFactory = $actionFactory;
         $this->actionMetadataFactory = $actionMetadataFactory;
         $this->authorizationChecker = $authorizationChecker;
-        $this->tokenManager = $tokenManager;
     }
 
     /**
@@ -137,8 +133,6 @@ class MassActionExtension extends AbstractExtension
      */
     protected function createAction($actionName, array $actionConfig)
     {
-        $actionConfig['token'] = $this->tokenManager->getToken($actionName)->getValue();
-
         $action = $this->actionFactory->createAction($actionName, $actionConfig);
         $configuredTypes = $action->getOptions()->offsetGetByPath(self::ALLOWED_REQUEST_TYPES);
 

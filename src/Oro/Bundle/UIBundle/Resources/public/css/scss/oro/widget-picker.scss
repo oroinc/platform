@@ -99,6 +99,7 @@
         width: $widget-picker-actions-column-width;
         padding-#{$end}: $widget-picker-actions-column-padding-end;
         flex-grow: 0;
+        flex-shrink: 0;
     }
 
     &__description-toggler {

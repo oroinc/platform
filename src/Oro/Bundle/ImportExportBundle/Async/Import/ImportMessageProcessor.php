@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
-use Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler;
+use Oro\Bundle\ImportExportBundle\Handler\ImportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -22,7 +22,7 @@ use Psr\Log\LoggerInterface;
 class ImportMessageProcessor implements MessageProcessorInterface
 {
     /**
-     * @var AbstractImportHandler
+     * @var ImportHandler
      */
     protected $importHandler;
 
@@ -62,7 +62,7 @@ class ImportMessageProcessor implements MessageProcessorInterface
      * @param JobStorage                   $jobStorage
      * @param LoggerInterface              $logger
      * @param FileManager                  $fileManager
-     * @param AbstractImportHandler        $importHandler
+     * @param ImportHandler                $importHandler
      * @param PostponedRowsHandler         $postponedRowsHandler
      */
     public function __construct(
@@ -71,7 +71,7 @@ class ImportMessageProcessor implements MessageProcessorInterface
         JobStorage $jobStorage,
         LoggerInterface $logger,
         FileManager $fileManager,
-        AbstractImportHandler $importHandler,
+        ImportHandler $importHandler,
         PostponedRowsHandler $postponedRowsHandler
     ) {
         $this->importHandler = $importHandler;
@@ -124,7 +124,8 @@ class ImportMessageProcessor implements MessageProcessorInterface
             $body['processorAlias'],
             $body['jobId'],
             $body['process'],
-            $body['originFileName']
+            $body['originFileName'],
+            $body['userId']
         )) {
             return null;
         }

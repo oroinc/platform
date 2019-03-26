@@ -16,7 +16,7 @@ class ControllersTest extends WebTestCase
     {
         $this->initClient(
             [],
-            array_merge($this->generateBasicAuthHeader(), ['HTTP_X-CSRF-Header' => 1])
+            $this->generateBasicAuthHeader()
         );
         $this->client->useHashNavigation(true);
     }
@@ -68,7 +68,7 @@ class ControllersTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
         if ($report['oro_segment_form[type]'] == 'static') {
-            $this->client->request(
+            $this->ajaxRequest(
                 'POST',
                 $this->getUrl('oro_api_post_segment_run', ['id' => $id])
             );
@@ -116,7 +116,7 @@ class ControllersTest extends WebTestCase
         $this->assertContains("Segment saved", $crawler->html());
 
         if ($report['oro_segment_form[type]'] == 'static') {
-            $this->client->request(
+            $this->ajaxRequest(
                 'POST',
                 $this->getUrl('oro_api_post_segment_run', ['id' => $id])
             );
@@ -204,7 +204,7 @@ class ControllersTest extends WebTestCase
         $result = reset($result['data']);
         $id = $result['id'];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'DELETE',
             $this->getUrl('oro_api_delete_segment', ['id' => $id])
         );
