@@ -372,7 +372,6 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * Assert that field is not required
      * Example: Then Opportunity Name is not required field
-     * Example: Then Opportunity Name is not required field
      *
      * @Then /^(?P<label>[\w\s]+) is not required field$/
      */
