@@ -259,40 +259,38 @@
             }
         </style>
         <div class="workflow-step-viewer row-fluid clearfix">
-            <div class="{% if isMobileVersion() %}span12{% else %}span5{% endif %}">
-                <div class="workflow-table-container">
-                    <div class="workflow-definition-steps-list-container clearfix">
-                        <div class="grid-container steps-list">
-                            <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
-                                <thead>
-                                    <tr>
-                                        <th class="label-column"><span>{{ "Step"|trans }}</span></th>
-                                        <th><span>{{ "Transitions"|trans }}</span></th>
-                                        <th>
-                                            <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans }}">
-                                                {{ "Position"|trans }}
-                                            </span>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="item-container">
-                                {%- for stepName, stepData in entity.configuration.steps -%}
-                                    {#
-                                        System workflows wont have (Start) step stored into database.
-                                        So we need to force show it for UI.
-                                    #}
-                                    {% set stepData = stepData|merge({'name': stepName}) %}
-                                    {% if loop.first and entity.isSystem %}
-                                        {{ _self.view_start_step_row(entity) }}
-                                    {% endif %}
-
-                                    {{ _self.view_step_row(stepData, entity, translateLinks) }}
-                                {%- else -%}
+            <div class="workflow-table-container">
+                <div class="workflow-definition-steps-list-container clearfix">
+                    <div class="grid-container steps-list">
+                        <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+                            <thead>
+                                <tr>
+                                    <th class="label-column"><span>{{ "Step"|trans }}</span></th>
+                                    <th><span>{{ "Transitions"|trans }}</span></th>
+                                    <th>
+                                        <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans }}">
+                                            {{ "Position"|trans }}
+                                        </span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="item-container">
+                            {%- for stepName, stepData in entity.configuration.steps -%}
+                                {#
+                                    System workflows wont have (Start) step stored into database.
+                                    So we need to force show it for UI.
+                                #}
+                                {% set stepData = stepData|merge({'name': stepName}) %}
+                                {% if loop.first and entity.isSystem %}
                                     {{ _self.view_start_step_row(entity) }}
-                                {%- endfor -%}
-                                </tbody>
-                            </table>
-                        </div>
+                                {% endif %}
+
+                                {{ _self.view_step_row(stepData, entity, translateLinks) }}
+                            {%- else -%}
+                                {{ _self.view_start_step_row(entity) }}
+                            {%- endfor -%}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

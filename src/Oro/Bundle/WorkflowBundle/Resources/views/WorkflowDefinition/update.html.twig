@@ -573,16 +573,14 @@
     </div>
 
     <div class="workflow-step-editor row-fluid clearfix">
-        <div class="{% if isMobileVersion() %}span12{% else %}span5{% endif %}">
-            <div class="workflow-table-container">
-                <div class="workflow-definition-steps-list-container clearfix"></div>
-            </div>
+        <div class="workflow-table-container">
+            <div class="workflow-definition-steps-list-container clearfix"></div>
         </div>
         {% if not isMobileVersion() %}
-            <div {{ UI.renderPageComponentAttributes({
-                'view': 'oroworkflow/js/app/views/flowchart/flowchart-container-view',
-                'name': 'flowchart-container'
-            }) }}></div>
+        <div {{ UI.renderPageComponentAttributes({
+            'view': 'oroworkflow/js/app/views/flowchart/flowchart-container-view',
+            'name': 'flowchart-container'
+        }) }}></div>
         {% endif %}
     </div>
     {% endset %}
