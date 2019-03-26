@@ -160,6 +160,18 @@ define(function(require) {
 
             if (!event.isDefaultPrevented()) {
                 $(this._menu).trigger(HIDING_EVENT);
+
+                //  removing popper scroll listeners when dropdown is hidden.
+                //  new popper will be created on toggle anyway
+                this._popperDestroy();
+            }
+        },
+
+        _popperDestroy: function() {
+            if (this._popper !== null) {
+                // the fix deletes previews instance to prevent memory leaks
+                this._popper.destroy();
+                this._popper = null;
             }
         },
 
@@ -204,12 +216,8 @@ define(function(require) {
             _.extend(config.modifiers, _.pick(this._config.modifiers, 'shift', 'offset', 'preventOverflow',
                 'keepTogether', 'arrow', 'flip', 'inner', 'hide', 'computeStyle', 'applyStyle'));
 
-            if (this._popper !== null) {
-                // the fix deletes previews instance to prevent memory leaks
-                // _getPopperConfig is invoked only before creating a new Popper instance
-                this._popper.destroy();
-                this._popper = null;
-            }
+            // _getPopperConfig is invoked only before creating a new Popper instance
+            this._popperDestroy();
 
             if (this._displayArrow()) {
                 var menu = this._getMenuElement();
