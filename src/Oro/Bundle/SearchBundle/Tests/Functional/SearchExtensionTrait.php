@@ -6,13 +6,10 @@ use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
-use Oro\Bundle\SearchBundle\Entity\IndexDatetime;
-use Oro\Bundle\SearchBundle\Entity\IndexDecimal;
-use Oro\Bundle\SearchBundle\Entity\IndexInteger;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
-use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 trait SearchExtensionTrait
 {
@@ -70,11 +67,13 @@ trait SearchExtensionTrait
 
     /**
      * Remove all data added in fixtures
+     *
+     * @param string $entity
      */
-    protected function clearTestData()
+    protected function clearTestData(string $entity = Item::class)
     {
         $manager = $this->getContainer()->get('doctrine')->getManager();
-        $repository = $manager->getRepository('Oro\Bundle\TestFrameworkBundle\Entity\Item');
+        $repository = $manager->getRepository($entity);
         $repository->createQueryBuilder('qb')
             ->delete()
             ->getQuery()

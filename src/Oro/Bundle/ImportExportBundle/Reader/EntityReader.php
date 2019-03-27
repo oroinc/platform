@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
@@ -18,6 +19,11 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Specifies and rules how to read data from a source
+ * Prepares the list of entities for export.
+ * Responsible for creating a list for each batch during export
+ */
 class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterface
 {
     /** @var ManagerRegistry */
@@ -172,6 +178,32 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
             ));
         }
 
+        $queryBuilder = $this->createQueryBuilderByEntityNameAndIdentifier(
+            $entityManager,
+            $entityName,
+            $options
+        );
+        $organization = isset($options['organization']) ? $options['organization'] : null;
+        $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
+        $this->applyAcl($queryBuilder);
+        $result = $queryBuilder->getQuery()->getResult(AbstractQuery::HYDRATE_ARRAY);
+
+        return array_keys($result);
+    }
+
+    /**
+     * @param ObjectManager $entityManager
+     * @param string $entityName
+     * @param array $options
+     *
+     * @return QueryBuilder
+     */
+    protected function createQueryBuilderByEntityNameAndIdentifier(
+        ObjectManager $entityManager,
+        string $entityName,
+        array $options = []
+    ): QueryBuilder {
+        $metadata = $entityManager->getClassMetadata($entityName);
         $identifierName = $metadata->getSingleIdentifierFieldName();
         $queryBuilder = $entityManager
             ->getRepository($entityName)
@@ -179,12 +211,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         $queryBuilder->select(sprintf('partial o.{%s}', $identifierName));
         $queryBuilder->orderBy('o.' . $identifierName, 'ASC');
 
-        $organization = isset($options['organization']) ? $options['organization'] : null;
-        $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
-        $this->applyAcl($queryBuilder);
-        $result = $queryBuilder->getQuery()->getResult(AbstractQuery::HYDRATE_ARRAY);
-
-        return array_keys($result);
+        return $queryBuilder;
     }
 
     /**

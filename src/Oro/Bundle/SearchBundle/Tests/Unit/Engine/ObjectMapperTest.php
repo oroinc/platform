@@ -51,6 +51,10 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         self::ENTITY_MANUFACTURER => [
             'fields' => [
                 [
+                    'name' => 'name',
+                    'target_type' => 'text',
+                ],
+                [
                     'name'            => 'products',
                     'relation_type'   => 'one-to-many',
                     'relation_fields' => [
@@ -300,6 +304,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests the following features:
      * * one-to-many relation
+     * * field without 'target_fields' mappings
      * * relation without 'target_fields' mappings
      * * nested one-to-many relation
      * * nested one-to-many relation without 'target_fields' mappings
@@ -310,10 +315,16 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 
         $expectedMapping = [
             'text' => $this->clearTextData([
+                'name'                       => '<p>adidas</p>',
                 'products'                   => $productName,
                 'categories'                 => implode(' ', $this->categories),
                 'category'                   => implode(' ', $this->categories),
-                Indexer::TEXT_ALL_DATA_FIELD => $productName . ' ' . implode(' ', $this->categories)
+                Indexer::TEXT_ALL_DATA_FIELD => sprintf(
+                    '%s %s %s',
+                    $this->manufacturer->getName(),
+                    $productName,
+                    implode(' ', $this->categories)
+                )
             ])
         ];
         $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->manufacturer));
