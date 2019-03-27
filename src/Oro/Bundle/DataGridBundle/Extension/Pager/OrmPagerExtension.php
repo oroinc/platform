@@ -56,7 +56,7 @@ class OrmPagerExtension extends AbstractPagerExtension
         if ((!$perPageLimit && $onePage) || $mode === ModeExtension::MODE_CLIENT) {
             // no restrictions applied
             $this->pager->setPage(0);
-            $this->pager->setMaxPerPage(0);
+            $this->pager->setMaxPerPage(self::SOFT_LIMIT);
         } elseif ($onePage && $perPageLimit) {
             // one page with limit
             $this->pager->setPage(0);
