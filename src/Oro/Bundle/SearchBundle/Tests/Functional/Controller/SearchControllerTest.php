@@ -3,7 +3,9 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData;
+use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchProductData;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use Oro\Bundle\TestFrameworkBundle\Entity\Product;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 
 /**
@@ -17,14 +19,32 @@ class SearchControllerTest extends SearchBundleWebTestCase
         parent::setUp();
 
         $this->initClient([], $this->generateBasicAuthHeader());
+        $this->loadFixture(Item::class, LoadSearchItemData::class, LoadSearchItemData::COUNT);
+        $this->loadFixture(Product::class, LoadSearchProductData::class, count(LoadSearchProductData::PRODUCTS));
+    }
 
-        $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
-        $this->getSearchIndexer()->resetIndex(Item::class);
+    protected function tearDown()
+    {
+        $this->getSearchIndexer()->resetIndex(Product::class);
+        $this->clearTestData(Product::class);
+
+        parent::tearDown();
+    }
+
+    /**
+     * @param string $entity
+     * @param string $fixture
+     * @param int $count
+     */
+    private function loadFixture(string $entity, string $fixture, int $count): void
+    {
+        $alias = $this->getSearchObjectMapper()->getEntityAlias($entity);
+        $this->getSearchIndexer()->resetIndex($entity);
         $this->ensureItemsLoaded($alias, 0);
 
-        $this->loadFixtures([LoadSearchItemData::class]);
-        $this->getSearchIndexer()->reindex(Item::class);
-        $this->ensureItemsLoaded($alias, LoadSearchItemData::COUNT);
+        $this->loadFixtures([$fixture]);
+        $this->getSearchIndexer()->reindex($entity);
+        $this->ensureItemsLoaded($alias, $count);
     }
 
     /**
