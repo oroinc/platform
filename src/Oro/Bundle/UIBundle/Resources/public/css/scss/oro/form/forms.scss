@@ -223,16 +223,6 @@ input[type='checkbox'] + label {
     display: inline-block;
 }
 
-.form-pass-reset {
-    margin: 0 auto 20px;
-    max-width: 400px;
-    padding: 19px 29px 29px;
-    background: $form-pass-reset-background;
-    border: $form-pass-reset-border;
-    border-radius: $border-radius;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, .065);
-}
-
 .form-row {
     padding: 0 0 $margin-bottom-box/2;
 }
