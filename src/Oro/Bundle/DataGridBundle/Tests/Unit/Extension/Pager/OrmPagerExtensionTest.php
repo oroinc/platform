@@ -102,7 +102,7 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'page' => 0,
-                'maxPerPage' => 0,
+                'maxPerPage' => 1000,
             ],
             'client mode' => [
                 'config' => [
@@ -111,7 +111,7 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'page' => 0,
-                'maxPerPage' => 0,
+                'maxPerPage' => 1000,
             ],
         ];
     }
