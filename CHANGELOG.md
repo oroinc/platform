@@ -49,7 +49,8 @@ The current file describes significant changes in the code that may affect the u
     - `Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass`
     - `Oro\Component\DependencyInjection\Exception\UnknownAliasException`
 
-## 4.0.0-beta
+## 4.0.0-beta (2019-03-28)
+[Show detailed list of changes](incompatibilities-4-0-beta.md)
 
 ### Changed
 #### EmailBundle

@@ -108,7 +108,7 @@
         "npm-asset/xregexp": "3.2.*",
         "robloach/component-installer": "0.2.*",
         "jms/cg": "1.2.*",
-        "oro/redis-config": "3.1-dev",
+        "oro/redis-config": "4.0.x-dev",
         "brick/math": "0.8.*",
         "bower-asset/fuse": "3.2.*"
     },
@@ -128,7 +128,7 @@
         "phpunit/phpcov": "4.0.*",
         "symfony/phpunit-bridge": "3.4.*",
         "friendsofphp/php-cs-fixer": "2.12.*",
-        "oro/twig-inspector": "3.1-dev"
+        "oro/twig-inspector": "1.0.*"
     },
     "repositories": {
         "monorepo": {
@@ -148,7 +148,7 @@
     "prefer-stable": true,
     "extra": {
         "branch-alias": {
-            "dev-master": "3.1-dev"
+            "dev-master": "4.0-dev"
         }
     },
     "autoload": {
