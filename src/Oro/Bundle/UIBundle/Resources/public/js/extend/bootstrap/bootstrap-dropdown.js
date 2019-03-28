@@ -109,6 +109,7 @@ define(function(require) {
             }.bind(this));
 
             $(parent).on(HIDE_EVENT, this._onHide.bind(this));
+            $(parent).on(HIDDEN_EVENT, this._onHidden.bind(this));
             $(document).on('mCSB.scroll' + EVENT_KEY, this._popperUpdate);
 
             if (this._dialog) {
