@@ -18,6 +18,7 @@ define(function(require) {
     var HIDE_EVENT = 'hide' + EVENT_KEY;
     var TO_HIDE_EVENT = 'tohide' + EVENT_KEY;
     var HIDING_EVENT = 'hiding' + EVENT_KEY;
+    var HIDDEN_EVENT = 'hidden' + EVENT_KEY;
     var GRID_SCROLLABLE_CONTAINER = '.grid-scrollable-container';
     var DIALOG_SCROLLABLE_CONTAINER = '.ui-dialog-content';
     var SCROLLABLE_CONTAINER = [
@@ -160,11 +161,12 @@ define(function(require) {
 
             if (!event.isDefaultPrevented()) {
                 $(this._menu).trigger(HIDING_EVENT);
-
-                //  removing popper scroll listeners when dropdown is hidden.
-                //  new popper will be created on toggle anyway
-                this._popperDestroy();
             }
+        },
+
+        _onHidden: function(event) {
+            //  removing popper scroll listeners when dropdown is hidden.
+            this._popperDestroy();
         },
 
         _popperDestroy: function() {
@@ -215,9 +217,6 @@ define(function(require) {
             _.extend(config, _.pick(this._config, 'placement', 'positionFixed', 'eventsEnabled'));
             _.extend(config.modifiers, _.pick(this._config.modifiers, 'shift', 'offset', 'preventOverflow',
                 'keepTogether', 'arrow', 'flip', 'inner', 'hide', 'computeStyle', 'applyStyle'));
-
-            // _getPopperConfig is invoked only before creating a new Popper instance
-            this._popperDestroy();
 
             if (this._displayArrow()) {
                 var menu = this._getMenuElement();
