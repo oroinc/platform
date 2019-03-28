@@ -113,7 +113,8 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
 
         $response = $context->getResult();
 
-        $this->assertEquals(new Response('content3'), $response);
+        $this->assertEquals('content3', $response->getContent());
+        $this->assertEquals(200, $response->getStatusCode());
         $this->assertTrue($context->isProcessed());
     }
 
