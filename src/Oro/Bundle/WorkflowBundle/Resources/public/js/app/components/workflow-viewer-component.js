@@ -43,7 +43,6 @@ define(function(require) {
 
             if (subComponentPromise) {
                 this._initPromises.push(subComponentPromise);
-                this.flowchartEnabled = true;
                 this.flowchartState = new FlowchartStateModel();
 
                 var flowchartOptions = _.extend({
@@ -54,8 +53,8 @@ define(function(require) {
                 }, _.pick(options, 'connectionOptions', 'chartOptions'));
 
                 subComponentPromise.then(function(flowchartContainerComponent) {
-                    flowchartContainerComponent.view
-                        .createFlowchartView(this.FlowchartWorkflowView, flowchartOptions);
+                    this.flowchartContainerView = flowchartContainerComponent.view;
+                    this.flowchartContainerView.createFlowchartView(this.FlowchartWorkflowView, flowchartOptions);
                 }.bind(this));
             }
 
@@ -66,6 +65,19 @@ define(function(require) {
                     this._resolveDeferredInit();
                 }.bind(this));
             }
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
+            delete this.flowchartContainerView;
+
+            WorkflowViewerComponent.__super__.dispose.call(this);
         }
     });
 
