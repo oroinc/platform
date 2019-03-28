@@ -2,6 +2,12 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## 3.1.5
+
+### Added
+#### MessageQueueBundle
+* Added detailed log on message processing failure, follow the instructions described in [documentation](./src/Oro/Bundle/MessageQueueBundle/Resources/doc/logging.md#example-of-consoleerrorhandler-configuration).
+
 ## 3.1.4 
 [Show detailed list of changes](incompatibilities-3-1-4.md)
 
