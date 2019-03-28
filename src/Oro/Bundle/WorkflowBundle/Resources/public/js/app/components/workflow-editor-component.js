@@ -63,7 +63,7 @@ define(function(require) {
                 filterPreset: 'workflow'
             };
 
-            var entity = _.result(options, 'entity') || {};
+            var entity = _.result(options, 'entity');
             if (entity) {
                 providerOptions.rootEntity = _.result(entity, 'entity');
             }
@@ -101,9 +101,8 @@ define(function(require) {
          * Automatically organizes steps on flowchart. Fits flowchart to screen.
          */
         refreshChart: function() {
-            if (this.flowchartEnabled) {
-                this.flowchartView.jsPlumbManager.organizeBlocks();
-                this.flowchartView.$el.trigger('autozoom');
+            if (this.flowchartContainerView) {
+                this.flowchartContainerView.refresh();
             }
         },
 
