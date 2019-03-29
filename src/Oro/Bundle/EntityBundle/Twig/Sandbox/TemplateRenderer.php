@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\Twig\Sandbox;
 
 use Doctrine\Common\Inflector\Inflector;
-use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface as ConfigProvider;
 
 /**
@@ -17,7 +16,6 @@ abstract class TemplateRenderer
     private const COMPUTED_SECTION = 'computed';
     private const ENTITY_PREFIX    = self::ENTITY_SECTION . self::PATH_SEPARATOR;
     private const COMPUTED_PREFIX  = self::COMPUTED_SECTION . self::PATH_SEPARATOR;
-    private const PROCESSOR        = 'processor';
 
     /** @var \Twig_Environment */
     protected $environment;
@@ -25,14 +23,17 @@ abstract class TemplateRenderer
     /** @var ConfigProvider */
     private $configProvider;
 
-    /** @var VariableProcessorRegistry */
-    private $variableProcessors;
-
     /** @var array [variable path => filter, ...] */
     private $systemVariableDefaultFilters = [];
 
     /** @var bool */
     private $sandboxConfigured = false;
+
+    /** @var EntityVariableComputer */
+    private $entityVariableComputer;
+
+    /** @var EntityDataAccessor */
+    private $entityDataAccessor;
 
     /**
      * @param \Twig_Environment         $environment
@@ -46,7 +47,12 @@ abstract class TemplateRenderer
     ) {
         $this->environment = $environment;
         $this->configProvider = $configProvider;
-        $this->variableProcessors = $variableProcessors;
+        $this->entityDataAccessor = new EntityDataAccessor($configProvider);
+        $this->entityVariableComputer = new EntityVariableComputer(
+            $configProvider,
+            $variableProcessors,
+            $this->entityDataAccessor
+        );
     }
 
     /**
@@ -84,14 +90,7 @@ abstract class TemplateRenderer
     {
         $this->ensureSandboxConfigured();
 
-        $templateParams[self::SYSTEM_SECTION] = $this->configProvider->getSystemVariableValues();
-        $data = new TemplateData(
-            $templateParams,
-            self::SYSTEM_SECTION,
-            self::ENTITY_SECTION,
-            self::COMPUTED_SECTION
-        );
-
+        $data = $this->createTemplateData($templateParams);
         $template = $this->prepareTemplate($template, $data);
 
         return $this->environment->render($template, $data->getData());
@@ -140,6 +139,27 @@ abstract class TemplateRenderer
     }
 
     /**
+     * Creates new instance of TemplateData that is used as the context for rendering of TWIG template.
+     *
+     * @param array $templateParams
+     *
+     * @return TemplateData
+     */
+    protected function createTemplateData(array $templateParams): TemplateData
+    {
+        $templateParams[self::SYSTEM_SECTION] = $this->configProvider->getSystemVariableValues();
+
+        return new TemplateData(
+            $templateParams,
+            $this->entityVariableComputer,
+            $this->entityDataAccessor,
+            self::SYSTEM_SECTION,
+            self::ENTITY_SECTION,
+            self::COMPUTED_SECTION
+        );
+    }
+
+    /**
      * Prepares the given TWIG template to render.
      *
      * @param string       $template
@@ -151,7 +171,7 @@ abstract class TemplateRenderer
     {
         $template = $this->processDefaultFiltersForSystemVariables($template);
 
-        if ($data->hasEntityData()) {
+        if ($data->hasRootEntity()) {
             $template = $this->processEntityVariables($template, $data);
             $template = $this->processDefaultFiltersForEntityVariables($template, $data);
         }
@@ -192,7 +212,7 @@ abstract class TemplateRenderer
         $errorMessage = $this->getVariableNotFoundMessage();
 
         return \preg_replace_callback(
-            '/{{\s([\w\_\-\.]*?)\s}}/u',
+            '/{{\s([\w\_\-\.]+?)\s}}/u',
             function ($match) use ($formatExtension, $errorMessage, $data) {
                 list($result, $variable) = $match;
                 $variablePath = $variable;
@@ -200,15 +220,11 @@ abstract class TemplateRenderer
                     $variablePath = $data->getVariablePath($variable);
                 }
                 if (\strpos($variablePath, self::ENTITY_PREFIX) === 0) {
-                    $lastDelimiterPos = \strrpos($variablePath, self::PATH_SEPARATOR);
-                    $parentVariable = \substr($variablePath, 0, $lastDelimiterPos);
-                    if ($data->hasComputedVariable($parentVariable)) {
-                        $parentVariable = $data->getComputedVariablePath($parentVariable);
-                    }
+                    $lastSeparatorPos = \strrpos($variablePath, self::PATH_SEPARATOR);
                     $result = $formatExtension->getSafeFormatExpression(
-                        \lcfirst(Inflector::classify(\substr($variablePath, $lastDelimiterPos + 1))),
+                        \lcfirst(Inflector::classify(\substr($variablePath, $lastSeparatorPos + 1))),
                         $variable,
-                        $parentVariable,
+                        $this->getFinalVariable(\substr($variablePath, 0, $lastSeparatorPos), $data),
                         $errorMessage
                     );
                 }
@@ -235,7 +251,7 @@ abstract class TemplateRenderer
             function ($match) use ($data) {
                 list($result, $prefix, $variable, $suffix) = $match;
                 if (\strpos($variable, self::ENTITY_PREFIX) === 0) {
-                    $computedPath = $this->tryComputeEntityVariable($variable, $data);
+                    $computedPath = $this->entityVariableComputer->computeEntityVariable($variable, $data);
                     if ($computedPath) {
                         $result = $prefix . $computedPath . $suffix;
                     }
@@ -251,157 +267,28 @@ abstract class TemplateRenderer
      * @param string       $variable
      * @param TemplateData $data
      *
-     * @return string|null
+     * @return string
      */
-    private function tryComputeEntityVariable(string $variable, TemplateData $data): ?string
+    private function getFinalVariable(string $variable, TemplateData $data): string
     {
         if ($data->hasComputedVariable($variable)) {
             return $data->getComputedVariablePath($variable);
         }
 
-        $path = \explode(self::PATH_SEPARATOR, $variable);
-        if (\count($path) === 2) {
-            $result = null;
-            if ($this->tryProcessEntityVariable($variable, $data->getEntityData(), $path[1], $data)
-                && $data->hasComputedVariable($variable)
-            ) {
-                $result = $data->getComputedVariablePath($variable);
+        $prefix = $variable;
+        $suffix = '';
+        $lastSeparatorPos = \strrpos($variable, self::PATH_SEPARATOR);
+        while (false !== $lastSeparatorPos) {
+            $suffix = \substr($variable, $lastSeparatorPos) . $suffix;
+            $variable = \substr($variable, 0, $lastSeparatorPos);
+            if ($data->hasComputedVariable($variable)) {
+                $prefix = $data->getComputedVariablePath($variable);
+                break;
             }
-
-            return $result;
+            $prefix = $variable;
+            $lastSeparatorPos = \strrpos($variable, self::PATH_SEPARATOR);
         }
 
-        return $this->tryComputeNestedEntityVariable(
-            $variable,
-            $data,
-            $path[0],
-            $data->getEntityData(),
-            \array_slice($path, 1)
-        );
-    }
-
-    /**
-     * @param string       $variable
-     * @param TemplateData $data
-     * @param string       $rootVariable
-     * @param object       $rootEntity
-     * @param string[]     $path
-     *
-     * @return string|null
-     */
-    private function tryComputeNestedEntityVariable(
-        string $variable,
-        TemplateData $data,
-        $rootVariable,
-        $rootEntity,
-        array $path
-    ): ?string {
-        $pathCount = \count($path);
-        if (1 === $pathCount) {
-            $result = null;
-            if ($this->tryProcessEntityVariable($variable, $rootEntity, $path[0], $data)) {
-                if ($data->hasComputedVariable($variable)) {
-                    $result = $data->getComputedVariablePath($variable);
-                }
-            } elseif ($data->hasComputedVariable($rootVariable)) {
-                $result = $data->getComputedVariablePath($rootVariable) . self::PATH_SEPARATOR . $path[0];
-            }
-
-            return $result;
-        }
-
-        $propertyPath = \implode(self::PATH_SEPARATOR, $path);
-        $propertyVariable = \substr($variable, 0, -\strlen($propertyPath))
-            . \str_replace(self::PATH_SEPARATOR, '_', $propertyPath);
-        if ($this->tryProcessEntityVariable($propertyVariable, $rootEntity, $propertyPath, $data)
-            && $data->hasComputedVariable($propertyVariable)
-        ) {
-            return $data->getComputedVariablePath($propertyVariable);
-        }
-
-        $parentValue = null;
-        $parentVariable = $rootVariable . self::PATH_SEPARATOR . $path[0];
-        if ($data->hasComputedVariable($parentVariable)) {
-            $parentValue = $data->getComputedVariable($parentVariable);
-        } elseif (!$this->tryProcessEntityVariable($parentVariable, $rootEntity, $path[0], $data)) {
-            $parentValue = $this->getEntityFieldValue($rootEntity, $path[0]);
-        } elseif ($data->hasComputedVariable($parentVariable)) {
-            $parentValue = $data->getComputedVariable($parentVariable);
-        }
-        if (!\is_object($parentValue)) {
-            return null;
-        }
-
-        return $this->tryComputeNestedEntityVariable(
-            $variable,
-            $data,
-            $parentVariable,
-            $parentValue,
-            \array_slice($path, 1)
-        );
-    }
-
-    /**
-     * @param string       $variable
-     * @param object       $entity
-     * @param string       $propertyName
-     * @param TemplateData $data
-     *
-     * @return bool
-     */
-    private function tryProcessEntityVariable(
-        string $variable,
-        $entity,
-        string $propertyName,
-        TemplateData $data
-    ): bool {
-        $processorDefinitions = $this->configProvider->getEntityVariableProcessors(ClassUtils::getClass($entity));
-        if (!isset($processorDefinitions[$propertyName][self::PROCESSOR])) {
-            return false;
-        }
-
-        $processorDefinition = $processorDefinitions[$propertyName];
-        if (!$this->variableProcessors->has($processorDefinition[self::PROCESSOR])) {
-            return false;
-        }
-
-        if (!$data->hasComputedVariable($variable)) {
-            $this->variableProcessors->get($processorDefinition[self::PROCESSOR])
-                ->process($variable, $processorDefinition, $data);
-        }
-
-        return true;
-    }
-
-    /**
-     * @param object $entity
-     * @param string $propertyName
-     *
-     * @return mixed
-     */
-    private function getEntityFieldValue($entity, string $propertyName)
-    {
-        $result = null;
-        $entityClass = ClassUtils::getClass($entity);
-        $config = $this->configProvider->getConfiguration();
-        if (isset($config[ConfigProvider::ACCESSORS][$entityClass])) {
-            $accessors = $config[ConfigProvider::ACCESSORS][$entityClass];
-            if (\array_key_exists($propertyName, $accessors)) {
-                $accessor = $accessors[$propertyName];
-                try {
-                    if ($accessor) {
-                        // method
-                        $result = $entity->{$accessor}();
-                    } else {
-                        // property
-                        $result = $entity->{$accessor};
-                    }
-                } catch (\Throwable $e) {
-                    // ignore any errors here
-                }
-            }
-        }
-
-        return $result;
+        return $prefix . $suffix;
     }
 }

@@ -73,7 +73,6 @@ class AdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\TestCase
             ->with($entityClass)
             ->willReturn($em);
 
-
         self::assertEquals([], $this->provider->getAssociations($entityClass));
     }
 
@@ -112,15 +111,12 @@ class AdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                'association1' => ['translated_association_1', 'Test\TargetEntity1'],
-                'association2' => ['Association2', 'Test\TargetEntity2'],
-                'association3' => ['Association3', 'Test\TargetEntity3']
+                'association1' => ['label' => 'translated_association_1', 'target_class' => 'Test\TargetEntity1'],
+                'association2' => ['label' => 'Association2', 'target_class' => 'Test\TargetEntity2'],
+                'association3' => ['label' => 'Association3', 'target_class' => 'Test\TargetEntity3']
             ],
             $this->provider->getAssociations($entityClass)
         );
-        // check that the second call getAssociations with the same class takes data from the class cache
-        // (do not increase internal methods call)
-        $this->provider->getAssociations($entityClass);
     }
 
     public function testIsAssociationSupportedForSupportedEntity()

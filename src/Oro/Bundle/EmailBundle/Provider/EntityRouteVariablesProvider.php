@@ -32,12 +32,8 @@ class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getVariableDefinitions(string $entityClass = null): array
+    public function getVariableDefinitions(): array
     {
-        if ($entityClass) {
-            return $this->getEntityVariableDefinitions($entityClass);
-        }
-
         $result = [];
         $entityIds = $this->configManager->getIds('entity');
         foreach ($entityIds as $entityId) {
@@ -54,17 +50,17 @@ class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getVariableProcessors(string $entityClass): array
+    public function getVariableGetters(): array
     {
-        return $this->getEntityVariableProcessors($entityClass);
+        return [];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getVariableGetters(): array
+    public function getVariableProcessors(string $entityClass): array
     {
-        return [];
+        return $this->getEntityVariableProcessors($entityClass);
     }
 
     /**
@@ -78,8 +74,8 @@ class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
         $routes = $this->getEntityRoutes($entityClass);
         foreach ($routes as $name => $route) {
             $result['url.' . $name] = [
-                'type'      => 'string',
-                'label'     => $this->translator->trans($this->getVariableLabel($name)),
+                'type'  => 'string',
+                'label' => $this->translator->trans($this->getVariableLabel($name)),
             ];
         }
 

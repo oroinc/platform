@@ -25,7 +25,7 @@ The current file describes significant changes in the code that may affect the u
 * The interface `Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface` was moved to
   `Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariablesProviderInterface`.
   The method `getVariableDefinitions` was changed from `getVariableDefinitions($entityClass = null)`
-  to `getVariableDefinitions(string $entityClass = null): array`.
+  to `getVariableDefinitions(): array`.
   The method `getVariableGetters` was changed from `getVariableGetters($entityClass = null)`
   to `getVariableGetters(): array`.
   By performance reasons new method `getVariableProcessors(string $entityClass): array` was added.

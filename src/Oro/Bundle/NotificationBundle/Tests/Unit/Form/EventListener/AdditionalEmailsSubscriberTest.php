@@ -49,21 +49,36 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
                 [
                     \stdClass::class,
                     [
-                        'non_email_holder_entity_field'=> ['nonEmailField', FakeEntity::class],
-                        'email_holder_entity_field'=> ['EmailField', EmailHolderTestEntity::class],
+                        'non_email_holder_entity_field' => [
+                            'label'        => 'nonEmailField',
+                            'target_class' => FakeEntity::class
+                        ],
+                        'email_holder_entity_field'     => [
+                            'label'        => 'EmailField',
+                            'target_class' => EmailHolderTestEntity::class
+                        ]
                     ]
                 ],
                 [
                     FakeEntity::class,
                     [
-                        'non_email_holder_entity_field1'=> ['nonEmailField1', \stdClass::class],
-                        'email_holder_entity_field1'=> ['EmailField1', EmailHolderTestEntity::class],
+                        'non_email_holder_entity_field1' => [
+                            'label'        => 'nonEmailField1',
+                            'target_class' => \stdClass::class
+                        ],
+                        'email_holder_entity_field1'     => [
+                            'label'        => 'EmailField1',
+                            'target_class' => EmailHolderTestEntity::class
+                        ]
                     ]
                 ],
                 [
                     EmailHolderTestEntity::class,
                     [
-                        'email_holder_entity_field2'=> ['EmailField2', EmailHolderTestEntity::class],
+                        'email_holder_entity_field2' => [
+                            'label'        => 'EmailField2',
+                            'target_class' => EmailHolderTestEntity::class
+                        ]
                     ]
                 ]
             ]);
@@ -74,16 +89,16 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
                 'additionalEmailAssociations',
                 ChoiceType::class,
                 [
-                    'label' => 'oro.notification.emailnotification.additional_email_associations.label',
+                    'label'    => 'oro.notification.emailnotification.additional_email_associations.label',
                     'required' => false,
                     'multiple' => true,
                     'expanded' => true,
-                    'choices' => [
+                    'choices'  => [
                         'nonEmailField > EmailField1' => 'non_email_holder_entity_field.email_holder_entity_field1',
-                        'EmailField' => 'email_holder_entity_field',
-                        'EmailField > EmailField2' => 'email_holder_entity_field.email_holder_entity_field2'
+                        'EmailField'                  => 'email_holder_entity_field',
+                        'EmailField > EmailField2'    => 'email_holder_entity_field.email_holder_entity_field2'
                     ],
-                    'tooltip'     => 'oro.notification.emailnotification.additional_associations.tooltip',
+                    'tooltip'  => 'oro.notification.emailnotification.additional_associations.tooltip'
                 ]
             );
 
@@ -111,12 +126,12 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
                 'additionalEmailAssociations',
                 ChoiceType::class,
                 [
-                    'label' => 'oro.notification.emailnotification.additional_email_associations.label',
+                    'label'    => 'oro.notification.emailnotification.additional_email_associations.label',
                     'required' => false,
                     'multiple' => true,
                     'expanded' => true,
-                    'choices' => [],
-                    'tooltip'     => 'oro.notification.emailnotification.additional_associations.tooltip',
+                    'choices'  => [],
+                    'tooltip'  => 'oro.notification.emailnotification.additional_associations.tooltip'
                 ]
             );
 
@@ -142,12 +157,12 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
                 'additionalEmailAssociations',
                 ChoiceType::class,
                 [
-                    'label' => 'oro.notification.emailnotification.additional_email_associations.label',
+                    'label'    => 'oro.notification.emailnotification.additional_email_associations.label',
                     'required' => false,
                     'multiple' => true,
                     'expanded' => true,
-                    'choices' => [],
-                    'tooltip'     => 'oro.notification.emailnotification.additional_associations.tooltip',
+                    'choices'  => [],
+                    'tooltip'  => 'oro.notification.emailnotification.additional_associations.tooltip'
                 ]
             );
 
@@ -171,21 +186,36 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
                 [
                     \stdClass::class,
                     [
-                        'non_email_holder_entity_field'=> ['nonEmailField', FakeEntity::class],
-                        'email_holder_entity_field'=> ['EmailField', EmailHolderTestEntity::class],
+                        'non_email_holder_entity_field' => [
+                            'label'        => 'nonEmailField',
+                            'target_class' => FakeEntity::class
+                        ],
+                        'email_holder_entity_field'     => [
+                            'label'        => 'EmailField',
+                            'target_class' => EmailHolderTestEntity::class
+                        ]
                     ]
                 ],
                 [
                     FakeEntity::class,
                     [
-                        'non_email_holder_entity_field1'=> ['nonEmailField1', \stdClass::class],
-                        'email_holder_entity_field1'=> ['EmailField1', EmailHolderTestEntity::class],
+                        'non_email_holder_entity_field1' => [
+                            'label'        => 'nonEmailField1',
+                            'target_class' => \stdClass::class
+                        ],
+                        'email_holder_entity_field1'     => [
+                            'label'        => 'EmailField1',
+                            'target_class' => EmailHolderTestEntity::class
+                        ]
                     ]
                 ],
                 [
                     EmailHolderTestEntity::class,
                     [
-                        'email_holder_entity_field2'=> ['EmailField2', EmailHolderTestEntity::class],
+                        'email_holder_entity_field2' => [
+                            'label'        => 'EmailField2',
+                            'target_class' => EmailHolderTestEntity::class
+                        ]
                     ]
                 ]
             ]);
@@ -196,16 +226,16 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
                 'additionalEmailAssociations',
                 ChoiceType::class,
                 [
-                    'label' => 'oro.notification.emailnotification.additional_email_associations.label',
+                    'label'    => 'oro.notification.emailnotification.additional_email_associations.label',
                     'required' => false,
                     'multiple' => true,
                     'expanded' => true,
-                    'choices' => [
+                    'choices'  => [
                         'nonEmailField > EmailField1' => 'non_email_holder_entity_field.email_holder_entity_field1',
-                        'EmailField' => 'email_holder_entity_field',
-                        'EmailField > EmailField2' => 'email_holder_entity_field.email_holder_entity_field2'
+                        'EmailField'                  => 'email_holder_entity_field',
+                        'EmailField > EmailField2'    => 'email_holder_entity_field.email_holder_entity_field2'
                     ],
-                    'tooltip'     => 'oro.notification.emailnotification.additional_associations.tooltip',
+                    'tooltip'  => 'oro.notification.emailnotification.additional_associations.tooltip'
                 ]
             );
 
@@ -231,12 +261,12 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
                 'additionalEmailAssociations',
                 ChoiceType::class,
                 [
-                    'label' => 'oro.notification.emailnotification.additional_email_associations.label',
+                    'label'    => 'oro.notification.emailnotification.additional_email_associations.label',
                     'required' => false,
                     'multiple' => true,
                     'expanded' => true,
-                    'choices' => [],
-                    'tooltip'     => 'oro.notification.emailnotification.additional_associations.tooltip',
+                    'choices'  => [],
+                    'tooltip'  => 'oro.notification.emailnotification.additional_associations.tooltip'
                 ]
             );
 

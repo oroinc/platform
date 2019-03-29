@@ -10,34 +10,14 @@ interface EntityVariablesProviderInterface
     /**
      * Gets definitions of variables available in sandboxed TWIG templates.
      *
-     * @param string|null $entityClass The FQCN of an entity.
-     *                                 If it is not specified the definitions for all entities are returned.
-     *
-     * @return array The list of variables in the following format:
-     *                  variable name => array
-     *                      'type'  => variable data type
-     *                      'label' => translated variable name
+     * @return array [entity class => [variable name => definition, ...], ...]
+     *               The definition should has the following attributes:
+     *                  'type'  => variable data type
+     *                  'label' => translated variable name
      *               If a field represents a relation:
-     *                      'related_entity_name' => FQCN of related entity
-     *               If $entityClass is NULL variables are grouped by entity class:
-     *                  entity class => array
-     *                      variable name => array of attributes described above
+     *                  'related_entity_name' => FQCN of related entity
      */
-    public function getVariableDefinitions(string $entityClass = null): array;
-
-    /**
-     * Gets processors for variables available in sandboxed TWIG templates.
-     * @see \Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorInterface
-     *
-     * @param string $entityClass The FQCN of an entity.
-     *
-     * @return array The list of variables in the following format:
-     *                  variable name => array
-     *                      'processor' => processor name
-     *               Also any additional attributes required to a specific processor are allowed,
-     *               they will be passed to "process()" method.
-     */
-    public function getVariableProcessors(string $entityClass): array;
+    public function getVariableDefinitions(): array;
 
     /**
      * Gets getters of variables available in sandboxed TWIG templates.
@@ -54,4 +34,16 @@ interface EntityVariablesProviderInterface
      *                      'default_formatter' => formatter name or [formatter name, formatter parameters]
      */
     public function getVariableGetters(): array;
+
+    /**
+     * Gets processors for variables available in sandboxed TWIG templates.
+     * @see \Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorInterface
+     *
+     * @param string $entityClass The FQCN of an entity.
+     *
+     * @return array [variable name => ['processor' => processor name, any additional attributes], ...]
+     *               The additional attributes depends on a specific processor,
+     *               they will be passed to "process()" method.
+     */
+    public function getVariableProcessors(string $entityClass): array;
 }

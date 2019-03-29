@@ -979,4 +979,178 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
     }
+
+    public function testRenderTemplateForFirstLevelComputedArray()
+    {
+        $template = '{{ entity.computedField.field1 }}';
+        $expectedRenderedResult = $this->getEntityVariableTemplate(
+            'field1',
+            'computed.entity__computedField.field1',
+            'computed.entity__computedField'
+        );
+
+        $entity = new TestMainEntity();
+        $computedValue = ['field1' => 'value1'];
+
+        $this->configProvider->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn([
+                'properties'         => [],
+                'methods'            => [get_class($entity) => ['getField1']],
+                'accessors'          => [get_class($entity) => ['field1' => 'getField1']],
+                'default_formatters' => []
+            ]);
+        $this->expectVariables([
+            get_class($entity)  => [
+                'computedField' => [
+                    'processor' => 'computedField_processor'
+                ]
+            ]
+        ]);
+
+        $this->variablesProcessorRegistry->expects(self::once())
+            ->method('has')
+            ->with('computedField_processor')
+            ->willReturn(true);
+        $computedFieldProcessor = $this->createMock(VariableProcessorInterface::class);
+        $this->variablesProcessorRegistry->expects(self::once())
+            ->method('get')
+            ->with('computedField_processor')
+            ->willReturn($computedFieldProcessor);
+        $computedFieldProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(function ($variable, $definition, TemplateData $data) use ($computedValue) {
+                $data->setComputedVariable($variable, $computedValue);
+            });
+
+        $this->environment->expects(self::any())
+            ->method('render')
+            ->willReturnCallback(function ($template, array $data) use ($computedValue) {
+                self::assertEquals(['entity__computedField'], array_keys($data['computed']));
+                self::assertSame($computedValue, $data['computed']['entity__computedField']);
+
+                return $template;
+            });
+
+        $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
+        self::assertSame($expectedRenderedResult, $result);
+    }
+
+    public function testRenderTemplateForSecondLevelComputedArray()
+    {
+        $template = '{{ entity.field1.computedField.field11.field111.field1111 }}';
+        $expectedRenderedResult = $this->getEntityVariableTemplate(
+            'field1111',
+            'computed.entity__field1__computedField.field11.field111.field1111',
+            'computed.entity__field1__computedField.field11.field111'
+        );
+
+        $entity1 = new TestSubEntity1();
+        $entity = new TestMainEntity();
+        $entity->setField1($entity1);
+        $computedValue = ['field11' => ['field111' => []]];
+
+        $this->configProvider->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn([
+                'properties'         => [],
+                'methods'            => [get_class($entity) => ['getField1']],
+                'accessors'          => [get_class($entity) => ['field1' => 'getField1']],
+                'default_formatters' => []
+            ]);
+        $this->expectVariables([
+            get_class($entity)  => [],
+            get_class($entity1) => [
+                'computedField' => [
+                    'processor' => 'computedField_processor'
+                ]
+            ]
+        ]);
+
+        $this->variablesProcessorRegistry->expects(self::once())
+            ->method('has')
+            ->with('computedField_processor')
+            ->willReturn(true);
+        $computedFieldProcessor = $this->createMock(VariableProcessorInterface::class);
+        $this->variablesProcessorRegistry->expects(self::once())
+            ->method('get')
+            ->with('computedField_processor')
+            ->willReturn($computedFieldProcessor);
+        $computedFieldProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(function ($variable, $definition, TemplateData $data) use ($computedValue) {
+                $data->setComputedVariable($variable, $computedValue);
+            });
+
+        $this->environment->expects(self::any())
+            ->method('render')
+            ->willReturnCallback(function ($template, array $data) use ($computedValue) {
+                self::assertEquals(['entity__field1__computedField'], array_keys($data['computed']));
+                self::assertSame($computedValue, $data['computed']['entity__field1__computedField']);
+
+                return $template;
+            });
+
+        $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
+        self::assertSame($expectedRenderedResult, $result);
+    }
+
+    public function testRenderTemplateForSecondLevelComputedFieldWhenParentEntityIsAccessedAsPropertyNotByMethod()
+    {
+        $template = '{{ entity.field2.computedField }}';
+        $expectedRenderedResult = $this->getEntityVariableTemplate(
+            'computedField',
+            'computed.entity__field2__computedField',
+            'entity.field2'
+        );
+
+        $entity1 = new TestSubEntity1();
+        $entity = new TestMainEntity();
+        $entity->field2 = $entity1;
+        $computedValue = 'testVal';
+
+        $this->configProvider->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn([
+                'properties'         => [get_class($entity) => ['field2']],
+                'methods'            => [],
+                'accessors'          => [get_class($entity) => ['field2' => null]],
+                'default_formatters' => []
+            ]);
+        $this->expectVariables([
+            get_class($entity)  => [],
+            get_class($entity1) => [
+                'computedField' => [
+                    'processor' => 'computedField_processor'
+                ]
+            ]
+        ]);
+
+        $this->variablesProcessorRegistry->expects(self::once())
+            ->method('has')
+            ->with('computedField_processor')
+            ->willReturn(true);
+        $computedFieldProcessor = $this->createMock(VariableProcessorInterface::class);
+        $this->variablesProcessorRegistry->expects(self::once())
+            ->method('get')
+            ->with('computedField_processor')
+            ->willReturn($computedFieldProcessor);
+        $computedFieldProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(function ($variable, $definition, TemplateData $data) use ($computedValue) {
+                $data->setComputedVariable($variable, $computedValue);
+            });
+
+        $this->environment->expects(self::any())
+            ->method('render')
+            ->willReturnCallback(function ($template, array $data) use ($computedValue) {
+                self::assertEquals(['entity__field2__computedField'], array_keys($data['computed']));
+                self::assertEquals($computedValue, $data['computed']['entity__field2__computedField']);
+
+                return $template;
+            });
+
+        $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
+        self::assertSame($expectedRenderedResult, $result);
+    }
 }

@@ -40,16 +40,24 @@ class EntityRouteVariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVariableGetters()
+    public function testGetVariableDefinitions()
     {
-        $this->assertEquals([], $this->provider->getVariableGetters());
-    }
+        $entityData = [
+            'url.index' => [
+                'type'  => 'string',
+                'label' => 'oro.email.emailtemplate.variables.url.index.label'
+            ],
+            'url.view'  => [
+                'type'  => 'string',
+                'label' => 'oro.email.emailtemplate.variables.url.view.label'
+            ]
+        ];
+        $extendEntityData = $entityData;
+        $expected = [
+            self::TEST_ENTITY_NAME        => $entityData,
+            self::TEST_EXTEND_ENTITY_NAME => $extendEntityData
+        ];
 
-    /**
-     * @dataProvider variableDefinitionsDataProvider
-     */
-    public function testGetVariableDefinitions(?string $entityClass, array $expected)
-    {
         $entityMetadata = null;
         $config = new Config(
             new EntityConfigId('extend', self::TEST_ENTITY_NAME),
@@ -75,49 +83,20 @@ class EntityRouteVariablesProviderTest extends \PHPUnit\Framework\TestCase
                 return $metadata;
             });
 
-        if (null === $entityClass) {
-            $this->configManager->expects($this->once())
-                ->method('getIds')
-                ->with('entity')
-                ->willReturn([
-                    new EntityConfigId('entity', self::TEST_ENTITY_NAME),
-                    new EntityConfigId('entity', self::TEST_EXTEND_ENTITY_NAME)
-                ]);
-        }
+        $this->configManager->expects($this->once())
+            ->method('getIds')
+            ->with('entity')
+            ->willReturn([
+                new EntityConfigId('entity', self::TEST_ENTITY_NAME),
+                new EntityConfigId('entity', self::TEST_EXTEND_ENTITY_NAME)
+            ]);
 
-        $this->assertEquals($expected, $this->provider->getVariableDefinitions($entityClass));
+        $this->assertEquals($expected, $this->provider->getVariableDefinitions());
     }
 
-    /**
-     * @return array
-     */
-    public function variableDefinitionsDataProvider()
+    public function testGetVariableGetters()
     {
-        $entityData = [
-            'url.index' => [
-                'type'  => 'string',
-                'label' => 'oro.email.emailtemplate.variables.url.index.label'
-            ],
-            'url.view'  => [
-                'type'  => 'string',
-                'label' => 'oro.email.emailtemplate.variables.url.view.label'
-            ]
-        ];
-        $extendEntityData = $entityData;
-
-        return [
-            'empty entity class'   => [
-                'entityClass' => null,
-                'expected'    => [
-                    self::TEST_ENTITY_NAME        => $entityData,
-                    self::TEST_EXTEND_ENTITY_NAME => $extendEntityData
-                ]
-            ],
-            'with entity class' => [
-                'entityClass' => self::TEST_ENTITY_NAME,
-                'expected'    => $entityData
-            ]
-        ];
+        $this->assertEquals([], $this->provider->getVariableGetters());
     }
 
     /**

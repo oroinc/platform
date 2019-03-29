@@ -56,25 +56,10 @@ class VariablesProvider
      * Returned variables are sorted by name.
      * @see \Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariablesProviderInterface::getVariableDefinitions
      *
-     * @param string|null $entityClass
-     *
      * @return array
      */
-    public function getEntityVariableDefinitions(string $entityClass = null): array
+    public function getEntityVariableDefinitions(): array
     {
-        if ($entityClass) {
-            $result = [];
-            foreach ($this->entityProviders as $providerName) {
-                $this->mergeVariableDefinitions(
-                    $result,
-                    $this->getEntityVariablesProvider($providerName)->getVariableDefinitions($entityClass)
-                );
-            }
-            ksort($result);
-
-            return $result;
-        }
-
         $result = [];
         foreach ($this->entityProviders as $providerName) {
             $allVariables = $this->getEntityVariablesProvider($providerName)->getVariableDefinitions();

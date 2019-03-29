@@ -31,25 +31,25 @@ class ChainAdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\Tes
         $this->provider1->expects(self::once())
             ->method('getAssociations')
             ->willReturn([
-                'commonAssociation' => ['commonField_association_1', 'Acme\Demo\Entity1'],
-                'association_1_1'   => ['association_label_1_1', 'Acme\Demo\Entity1_1'],
-                'association_1_2'   => ['association_label_1_2', 'Acme\Demo\Entity1_2']
+                'commonAssociation' => ['label' => 'commonField_association_1', 'target_class' => 'Test\Entity1'],
+                'association_1_1'   => ['label' => 'association_label_1_1', 'target_class' => 'Test\Entity1_1'],
+                'association_1_2'   => ['label' => 'association_label_1_2', 'target_class' => 'Test\Entity1_2']
             ]);
         $this->provider2->expects(self::once())
             ->method('getAssociations')
             ->willReturn([
-                'commonAssociation' => ['commonField_association_2', 'Acme\Demo\Entity2'],
-                'association_2_1'   => ['association_label_2_1', 'Acme\Demo\Entity2_1'],
-                'association_2_2'   => ['association_label_2_2', 'Acme\Demo\Entity2_2']
+                'commonAssociation' => ['label' => 'commonField_association_2', 'target_class' => 'Test\Entity2'],
+                'association_2_1'   => ['label' => 'association_label_2_1', 'target_class' => 'Test\Entity2_1'],
+                'association_2_2'   => ['label' => 'association_label_2_2', 'target_class' => 'Test\Entity2_2']
             ]);
 
         self::assertEquals(
             [
-                'commonAssociation' => ['commonField_association_1', 'Acme\Demo\Entity1'],
-                'association_1_1'   => ['association_label_1_1', 'Acme\Demo\Entity1_1'],
-                'association_1_2'   => ['association_label_1_2', 'Acme\Demo\Entity1_2'],
-                'association_2_1'   => ['association_label_2_1', 'Acme\Demo\Entity2_1'],
-                'association_2_2'   => ['association_label_2_2', 'Acme\Demo\Entity2_2']
+                'commonAssociation' => ['label' => 'commonField_association_1', 'target_class' => 'Test\Entity1'],
+                'association_1_1'   => ['label' => 'association_label_1_1', 'target_class' => 'Test\Entity1_1'],
+                'association_1_2'   => ['label' => 'association_label_1_2', 'target_class' => 'Test\Entity1_2'],
+                'association_2_1'   => ['label' => 'association_label_2_1', 'target_class' => 'Test\Entity2_1'],
+                'association_2_2'   => ['label' => 'association_label_2_2', 'target_class' => 'Test\Entity2_2']
             ],
             $this->chainProvider->getAssociations(\stdClass::class)
         );

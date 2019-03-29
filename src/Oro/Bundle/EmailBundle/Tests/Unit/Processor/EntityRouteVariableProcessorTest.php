@@ -11,9 +11,6 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityRouteVariableProcessor */
-    private $processor;
-
     /** @var  DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
@@ -23,11 +20,18 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
+    /** @var TemplateData|\PHPUnit\Framework\MockObject\MockObject */
+    private $data;
+
+    /** @var EntityRouteVariableProcessor */
+    private $processor;
+
     protected function setUp()
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->urlProvider = $this->createMock(UrlProvider::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $this->data = $this->createMock(TemplateData::class);
 
         $this->processor = new EntityRouteVariableProcessor(
             $this->doctrineHelper,
@@ -36,22 +40,24 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param array $data
-     *
-     * @return TemplateData
-     */
-    private function getTemplateData(array $data): TemplateData
-    {
-        return new TemplateData($data, 'system', 'entity', 'computed');
-    }
-
     public function testProcessForRouteThatDoesNotRequireEntityId()
     {
-        $variable = 'entity.url.index';
+        $variable = 'entity.url_index';
+        $parentVariable = 'entity';
         $definition = ['route' => 'route_index'];
-        $data = $this->getTemplateData(['entity' => new \stdClass()]);
         $url = 'http://example.com/entity';
+
+        $this->data->expects(self::once())
+            ->method('getParentVariablePath')
+            ->with($variable)
+            ->willReturn($parentVariable);
+        $this->data->expects(self::once())
+            ->method('getEntityVariable')
+            ->with($parentVariable)
+            ->willReturn(new \stdClass());
+        $this->data->expects(self::once())
+            ->method('setComputedVariable')
+            ->with($variable, $url);
 
         $this->doctrineHelper->expects(self::never())
             ->method('getSingleEntityIdentifier');
@@ -61,18 +67,28 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($definition['route'])
             ->willReturn($url);
 
-        $this->processor->process($variable, $definition, $data);
-
-        self::assertEquals($url, $data->getComputedVariable($variable));
+        $this->processor->process($variable, $definition, $this->data);
     }
 
     public function testProcessForRouteThatRequiresEntityId()
     {
-        $variable = 'entity.url.update';
+        $variable = 'entity.url_update';
+        $parentVariable = 'entity';
         $definition = ['route' => 'route_update'];
-        $data = $this->getTemplateData(['entity' => new \stdClass()]);
         $entityId = 123;
         $url = 'http://example.com/entity/123';
+
+        $this->data->expects(self::once())
+            ->method('getParentVariablePath')
+            ->with($variable)
+            ->willReturn($parentVariable);
+        $this->data->expects(self::once())
+            ->method('getEntityVariable')
+            ->with($parentVariable)
+            ->willReturn(new \stdClass());
+        $this->data->expects(self::once())
+            ->method('setComputedVariable')
+            ->with($variable, $url);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getSingleEntityIdentifier')
@@ -83,16 +99,26 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($definition['route'], ['id' => $entityId])
             ->willReturn($url);
 
-        $this->processor->process($variable, $definition, $data);
-
-        self::assertEquals($url, $data->getComputedVariable($variable));
+        $this->processor->process($variable, $definition, $this->data);
     }
 
     public function testProcessWithWrongEntity()
     {
-        $variable = 'entity.url.update';
+        $variable = 'entity.url_update';
+        $parentVariable = 'entity';
         $definition = ['route' => 'route_update'];
-        $data = $this->getTemplateData(['entity' => new \stdClass()]);
+
+        $this->data->expects(self::once())
+            ->method('getParentVariablePath')
+            ->with($variable)
+            ->willReturn($parentVariable);
+        $this->data->expects(self::once())
+            ->method('getEntityVariable')
+            ->with($parentVariable)
+            ->willReturn(new \stdClass());
+        $this->data->expects(self::once())
+            ->method('setComputedVariable')
+            ->with($variable, self::isNull());
 
         $this->doctrineHelper->expects(self::once())
             ->method('getSingleEntityIdentifier')
@@ -105,16 +131,26 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('error')
             ->with(sprintf('The variable "%s" cannot be resolved.', $variable));
 
-        $this->processor->process($variable, $definition, $data);
-
-        self::assertNull($data->getComputedVariable($variable));
+        $this->processor->process($variable, $definition, $this->data);
     }
 
     public function testProcessWithWrongRoute()
     {
-        $variable = 'entity.url.index';
+        $variable = 'entity.url_index';
+        $parentVariable = 'entity';
         $definition = ['route' => 'route_index'];
-        $data = $this->getTemplateData(['entity' => new \stdClass()]);
+
+        $this->data->expects(self::once())
+            ->method('getParentVariablePath')
+            ->with($variable)
+            ->willReturn($parentVariable);
+        $this->data->expects(self::once())
+            ->method('getEntityVariable')
+            ->with($parentVariable)
+            ->willReturn(new \stdClass());
+        $this->data->expects(self::once())
+            ->method('setComputedVariable')
+            ->with($variable, self::isNull());
 
         $this->doctrineHelper->expects(self::never())
             ->method('getSingleEntityIdentifier');
@@ -128,8 +164,6 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('error')
             ->with(sprintf('The variable "%s" cannot be resolved.', $variable));
 
-        $this->processor->process($variable, $definition, $data);
-
-        self::assertNull($data->getComputedVariable($variable));
+        $this->processor->process($variable, $definition, $this->data);
     }
 }

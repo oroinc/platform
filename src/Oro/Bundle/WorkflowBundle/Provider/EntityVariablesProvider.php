@@ -13,15 +13,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getVariableDefinitions(string $entityClass = null): array
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVariableProcessors(string $entityClass): array
+    public function getVariableDefinitions(): array
     {
         return [];
     }
@@ -41,5 +33,13 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
                 'transitionDate' => 'getTransitionDate'
             ]
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVariableProcessors(string $entityClass): array
+    {
+        return [];
     }
 }

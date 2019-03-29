@@ -18,12 +18,6 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetVariableDefinitions()
     {
         $this->assertSame([], $this->provider->getVariableDefinitions());
-        $this->assertSame([], $this->provider->getVariableDefinitions(WorkflowTransitionRecord::class));
-    }
-
-    public function testGetVariableProcessors()
-    {
-        self::assertSame([], $this->provider->getVariableProcessors(WorkflowTransitionRecord::class));
     }
 
     public function testGetVariableGetters()
@@ -41,5 +35,10 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
             ],
             $this->provider->getVariableGetters()
         );
+    }
+
+    public function testGetVariableProcessors()
+    {
+        self::assertSame([], $this->provider->getVariableProcessors(WorkflowTransitionRecord::class));
     }
 }

@@ -6,6 +6,8 @@ class TestEntity1
 {
     private $field1;
 
+    public $field2;
+
     /**
      * @return mixed
      */

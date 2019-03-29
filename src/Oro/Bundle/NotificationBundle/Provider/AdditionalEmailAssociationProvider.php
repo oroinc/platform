@@ -46,22 +46,18 @@ class AdditionalEmailAssociationProvider implements AdditionalEmailAssociationPr
      */
     public function getAssociations(string $entityClass): array
     {
-        if (!isset($this->collectedAssociations[$entityClass])) {
-            $result = [];
-            $metadata = $this->getEntityMetadata($entityClass);
-            if (null !== $metadata) {
-                foreach ($metadata->getAssociationMappings() as $fieldName => $mapping) {
-                    $result[$fieldName] = [
-                        $this->getFieldLabel($entityClass, $fieldName),
-                        $mapping['targetEntity']
-                    ];
-                }
+        $associations = [];
+        $metadata = $this->getEntityMetadata($entityClass);
+        if (null !== $metadata) {
+            foreach ($metadata->getAssociationMappings() as $fieldName => $mapping) {
+                $associations[$fieldName] = [
+                    'label'        => $this->getFieldLabel($entityClass, $fieldName),
+                    'target_class' => $mapping['targetEntity']
+                ];
             }
-
-            $this->collectedAssociations[$entityClass] = $result;
         }
 
-        return $this->collectedAssociations[$entityClass];
+        return $associations;
     }
 
     /**

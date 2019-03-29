@@ -2,10 +2,24 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig\Sandbox;
 
+use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityDataAccessor;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariableComputer;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateData;
 
 class TemplateDataTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var EntityVariableComputer|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityVariableComputer;
+
+    /** @var EntityDataAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityDataAccessor;
+
+    protected function setUp()
+    {
+        $this->entityVariableComputer = $this->createMock(EntityVariableComputer::class);
+        $this->entityDataAccessor = $this->createMock(EntityDataAccessor::class);
+    }
+
     /**
      * @param array $data
      *
@@ -13,7 +27,14 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
      */
     private function getTemplateData(array $data): TemplateData
     {
-        return new TemplateData($data, 'system', 'entity', 'computed');
+        return new TemplateData(
+            $data,
+            $this->entityVariableComputer,
+            $this->entityDataAccessor,
+            'system',
+            'entity',
+            'computed'
+        );
     }
 
     public function testGetData()
@@ -23,42 +44,227 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertSame($data, $templateData->getData());
     }
 
-    public function testHasSystemDataWhenItDoesNotExist()
+    public function testHasSystemVariablesWhenTheyDoNotExist()
     {
         $templateData = $this->getTemplateData([]);
-        self::assertFalse($templateData->hasSystemData());
+        self::assertFalse($templateData->hasSystemVariables());
     }
 
-    public function testHasSystemDataWhenItExists()
+    public function testHasSystemVariablesWhenTheyExist()
     {
         $templateData = $this->getTemplateData(['system' => ['key' => 'val']]);
-        self::assertTrue($templateData->hasSystemData());
+        self::assertTrue($templateData->hasSystemVariables());
     }
 
-    public function testGetSystemData()
-    {
-        $systemData = ['key' => 'val'];
-        $templateData = $this->getTemplateData(['system' => $systemData]);
-        self::assertSame($systemData, $templateData->getSystemData());
-    }
-
-    public function testHasEntityDataWhenItDoesNotExist()
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage This object does not contain values of system variables.
+     */
+    public function testGetSystemVariablesWhenTheyDoNotExist()
     {
         $templateData = $this->getTemplateData([]);
-        self::assertFalse($templateData->hasEntityData());
+        $templateData->getSystemVariables();
     }
 
-    public function testHasEntityDataWhenItExists()
+    public function testGetSystemVariablesTheyExist()
+    {
+        $systemVariables = ['key' => 'val'];
+        $templateData = $this->getTemplateData(['system' => $systemVariables]);
+        self::assertSame($systemVariables, $templateData->getSystemVariables());
+    }
+
+    public function testHasRootEntityWhenItDoesNotExist()
+    {
+        $templateData = $this->getTemplateData([]);
+        self::assertFalse($templateData->hasRootEntity());
+    }
+
+    public function testHasRootEntityWhenItExists()
     {
         $templateData = $this->getTemplateData(['entity' => new \stdClass()]);
-        self::assertTrue($templateData->hasEntityData());
+        self::assertTrue($templateData->hasRootEntity());
     }
 
-    public function testGetEntityData()
+    public function testGetRootEntityWhenItExists()
     {
-        $entityData = new \stdClass();
-        $templateData = $this->getTemplateData(['entity' => $entityData]);
-        self::assertSame($entityData, $templateData->getEntityData());
+        $entity = new \stdClass();
+        $templateData = $this->getTemplateData(['entity' => $entity]);
+        self::assertSame($entity, $templateData->getRootEntity());
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage This object does not contain the root entity.
+     */
+    public function testGetRootEntityWhenTheyDoNotExist()
+    {
+        $templateData = $this->getTemplateData([]);
+        $templateData->getRootEntity();
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Expected "entity" variable, got "system".
+     */
+    public function testGetEntityVariableForNotRootEntity()
+    {
+        $templateData = $this->getTemplateData([]);
+        $templateData->getEntityVariable('system');
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage The variable "system.test" must start with "entity.".
+     */
+    public function testGetEntityVariableForNotEntityRelatedVariablePath()
+    {
+        $templateData = $this->getTemplateData([]);
+        $templateData->getEntityVariable('system.test');
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage This object does not contain the root entity.
+     */
+    public function testGetEntityVariableForRootEntityWhenItDoesNotExist()
+    {
+        $templateData = $this->getTemplateData([]);
+        $templateData->getEntityVariable('entity');
+    }
+
+    public function testGetEntityVariableForRootEntity()
+    {
+        $entity = new \stdClass();
+        $templateData = $this->getTemplateData(['entity' => $entity]);
+        self::assertSame($entity, $templateData->getEntityVariable('entity'));
+    }
+
+    public function testGetEntityVariableForFirstLevelChildEntity()
+    {
+        $entity = new \stdClass();
+        $entity1 = new \stdClass();
+        $templateData = $this->getTemplateData(['entity' => $entity]);
+        $this->entityDataAccessor->expects(self::once())
+            ->method('tryGetValue')
+            ->with(self::identicalTo($entity), 'entity1')
+            ->willReturnCallback(function ($parentValue, $propertyName, &$value) use ($entity1) {
+                $value = $entity1;
+
+                return true;
+            });
+        self::assertSame($entity1, $templateData->getEntityVariable('entity.entity1'));
+    }
+
+    public function testGetEntityVariableForFirstLevelChildEntityWhenItCannotBeResolved()
+    {
+        $entity = new \stdClass();
+        $templateData = $this->getTemplateData(['entity' => $entity]);
+        $this->entityDataAccessor->expects(self::once())
+            ->method('tryGetValue')
+            ->with(self::identicalTo($entity), 'entity1')
+            ->willReturn(false);
+        self::assertNull($templateData->getEntityVariable('entity.entity1'));
+    }
+
+    public function testGetEntityVariableForComputedFirstLevelChildEntity()
+    {
+        $entity = new \stdClass();
+        $entity1 = new \stdClass();
+        $templateData = $this->getTemplateData(['entity' => $entity]);
+        $templateData->setComputedVariable('entity.entity1', $entity1);
+        $this->entityDataAccessor->expects(self::never())
+            ->method('tryGetValue');
+        self::assertSame($entity1, $templateData->getEntityVariable('entity.entity1'));
+    }
+
+    public function testGetEntityVariableForSecondLevelChildEntity()
+    {
+        $entity = new \stdClass();
+        $entity1 = new \stdClass();
+        $entity2 = new \stdClass();
+        $templateData = $this->getTemplateData(['entity' => $entity]);
+        $this->entityDataAccessor->expects(self::at(0))
+            ->method('tryGetValue')
+            ->with(self::identicalTo($entity), 'entity1')
+            ->willReturnCallback(function ($parentValue, $propertyName, &$value) use ($entity1) {
+                $value = $entity1;
+
+                return true;
+            });
+        $this->entityDataAccessor->expects(self::at(1))
+            ->method('tryGetValue')
+            ->with(self::identicalTo($entity1), 'entity2')
+            ->willReturnCallback(function ($parentValue, $propertyName, &$value) use ($entity2) {
+                $value = $entity2;
+
+                return true;
+            });
+        self::assertSame($entity2, $templateData->getEntityVariable('entity.entity1.entity2'));
+    }
+
+    public function testGetEntityVariableForSecondLevelChildEntityWhenFirstLevelChildEntityCannotBeResolved()
+    {
+        $entity = new \stdClass();
+        $templateData = $this->getTemplateData(['entity' => $entity]);
+        $this->entityDataAccessor->expects(self::once())
+            ->method('tryGetValue')
+            ->with(self::identicalTo($entity), 'entity1')
+            ->willReturn(false);
+        self::assertNull($templateData->getEntityVariable('entity.entity1.entity2'));
+    }
+
+    public function testGetEntityVariableForSecondLevelChildEntityWhenItCannotBeResolved()
+    {
+        $entity = new \stdClass();
+        $entity1 = new \stdClass();
+        $templateData = $this->getTemplateData(['entity' => $entity]);
+        $this->entityDataAccessor->expects(self::at(0))
+            ->method('tryGetValue')
+            ->with(self::identicalTo($entity), 'entity1')
+            ->willReturnCallback(function ($parentValue, $propertyName, &$value) use ($entity1) {
+                $value = $entity1;
+
+                return true;
+            });
+        $this->entityDataAccessor->expects(self::at(1))
+            ->method('tryGetValue')
+            ->with(self::identicalTo($entity1), 'entity2')
+            ->willReturn(false);
+        self::assertNull($templateData->getEntityVariable('entity.entity1.entity2'));
+    }
+
+    public function testGetEntityVariableForSecondLevelChildEntityWhenFirstLevelEntityIsComputedOne()
+    {
+        $entity = new \stdClass();
+        $entity1 = new \stdClass();
+        $entity2 = new \stdClass();
+        $templateData = $this->getTemplateData(['entity' => $entity]);
+        $templateData->setComputedVariable('entity.entity1', $entity1);
+        $this->entityDataAccessor->expects(self::once())
+            ->method('tryGetValue')
+            ->with(self::identicalTo($entity1), 'entity2')
+            ->willReturnCallback(function ($parentValue, $propertyName, &$value) use ($entity2) {
+                $value = $entity2;
+
+                return true;
+            });
+        self::assertSame($entity2, $templateData->getEntityVariable('entity.entity1.entity2'));
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage The variable "entity" must have at least 2 elements delimited by ".".
+     */
+    public function testGetParentVariablePathForInvalidVariable()
+    {
+        $templateData = $this->getTemplateData([]);
+        $templateData->getParentVariablePath('entity');
+    }
+
+    public function testGetParentVariablePath()
+    {
+        $templateData = $this->getTemplateData([]);
+        self::assertEquals('entity', $templateData->getParentVariablePath('entity.field'));
     }
 
     public function testHasComputedVariableWhenNoAnyComputedVariablesExist()

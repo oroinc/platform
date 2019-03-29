@@ -108,24 +108,40 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
         array $currentPath = [],
         array $currentLabelPath = []
     ): void {
-        $fields = $this->associationProvider->getAssociations($entityName);
-        foreach ($fields as $fieldName => list($fieldLabel, $targetClass)) {
+        $associations = $this->associationProvider->getAssociations($entityName);
+        foreach ($associations as $associationName => $association) {
+            $associationLabel = $association['label'];
+            $targetClass = $association['target_class'];
             if (is_a($targetClass, EmailHolderInterface::class, true)) {
-                $fieldPath = ($currentPath ? implode('.', $currentPath) . '.' : '') . $fieldName;
-                $fieldLabelPath =
-                    ($currentLabelPath ? implode(self::LABEL_GLUE, $currentLabelPath) . self::LABEL_GLUE : '')
-                    . $fieldLabel;
-                $choices[$fieldLabelPath] = $fieldPath;
+                $associationPath = $this->buildPath($currentPath, $associationName, '.');
+                $associationLabelPath = $this->buildPath($currentLabelPath, $associationLabel, self::LABEL_GLUE);
+                $choices[$associationLabelPath] = $associationPath;
             }
 
             if (count($currentPath) < self::MAX_NESTING_LEVEL - 1) {
                 $this->collectEmailFieldsRecursive(
                     $targetClass,
                     $choices,
-                    array_pad($currentPath, count($currentPath) + 1, $fieldName),
-                    array_pad($currentLabelPath, count($currentLabelPath) + 1, $fieldLabel)
+                    array_pad($currentPath, count($currentPath) + 1, $associationName),
+                    array_pad($currentLabelPath, count($currentLabelPath) + 1, $associationLabel)
                 );
             }
         }
+    }
+
+    /**
+     * @param array  $parentPath
+     * @param string $association
+     * @param string $glue
+     *
+     * @return string
+     */
+    private function buildPath(array $parentPath, string $association, string $glue): string
+    {
+        if (!$parentPath) {
+            return $association;
+        }
+
+        return implode($glue, array_merge($parentPath, [$association]));
     }
 }

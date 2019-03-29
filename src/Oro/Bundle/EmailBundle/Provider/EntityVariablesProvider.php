@@ -53,12 +53,8 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getVariableDefinitions(string $entityClass = null): array
+    public function getVariableDefinitions(): array
     {
-        if ($entityClass) {
-            return $this->getEntityVariableDefinitions($entityClass);
-        }
-
         $result = [];
         $entityIds = $this->configManager->getProvider('entity')->getIds();
         foreach ($entityIds as $entityId) {
@@ -70,14 +66,6 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         }
 
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVariableProcessors(string $entityClass): array
-    {
-        return [];
     }
 
     /**
@@ -96,6 +84,14 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVariableProcessors(string $entityClass): array
+    {
+        return [];
     }
 
     /**

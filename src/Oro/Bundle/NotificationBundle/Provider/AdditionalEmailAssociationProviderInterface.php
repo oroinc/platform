@@ -12,7 +12,7 @@ interface AdditionalEmailAssociationProviderInterface
      *
      * @param string $entityClass
      *
-     * @return array [association name => [translated label, target class], ...]
+     * @return array [association name => ['label' => translated label, 'target_class' => FQCN of target entity], ...]
      */
     public function getAssociations(string $entityClass): array;
 

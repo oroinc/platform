@@ -51,56 +51,7 @@ class VariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityVariableDefinitionsForOneEntity()
-    {
-        $entityClass = 'TestEntity';
-
-        $provider1 = $this->createMock(EntityVariablesProviderInterface::class);
-        $provider1->expects($this->once())
-            ->method('getVariableDefinitions')
-            ->with($entityClass)
-            ->willReturn([
-                'var1' => ['type' => 'string', 'label' => 'var1'],
-                'var3' => ['type' => 'string', 'label' => 'var3'],
-                'a1'   => ['type' => 'string', 'label' => 'a1', 'params' => ['key' => 'val']]
-            ]);
-
-        $provider2 = $this->createMock(EntityVariablesProviderInterface::class);
-        $provider2->expects($this->once())
-            ->method('getVariableDefinitions')
-            ->with($entityClass)
-            ->willReturn([
-                'var2' => ['type' => 'string', 'label' => 'var2'],
-                'var3' => ['label' => 'var3_updated'],
-                'a1'   => ['params' => ['key_updated' => 'val_updated']]
-            ]);
-
-        $chainProvider = new VariablesProvider(
-            new ServiceLocator([
-                'provider1' => function () use ($provider1) {
-                    return $provider1;
-                },
-                'provider2' => function () use ($provider2) {
-                    return $provider2;
-                }
-            ]),
-            [],
-            ['provider1', 'provider2']
-        );
-
-        $result = $chainProvider->getEntityVariableDefinitions($entityClass);
-        $this->assertSame(
-            [
-                'a1'   => ['type' => 'string', 'label' => 'a1', 'params' => ['key_updated' => 'val_updated']],
-                'var1' => ['type' => 'string', 'label' => 'var1'],
-                'var2' => ['type' => 'string', 'label' => 'var2'],
-                'var3' => ['type' => 'string', 'label' => 'var3_updated']
-            ],
-            $result
-        );
-    }
-
-    public function testGetEntityVariableDefinitionsForAllEntities()
+    public function testGetEntityVariableDefinitions()
     {
         $entity1Class = 'TestEntity1';
         $entity2Class = 'TestEntity2';
@@ -108,7 +59,6 @@ class VariablesProviderTest extends \PHPUnit\Framework\TestCase
         $provider1 = $this->createMock(EntityVariablesProviderInterface::class);
         $provider1->expects($this->once())
             ->method('getVariableDefinitions')
-            ->with(null)
             ->willReturn([
                 $entity1Class => [
                     'var1' => ['type' => 'string', 'label' => 'var1'],
@@ -120,7 +70,6 @@ class VariablesProviderTest extends \PHPUnit\Framework\TestCase
         $provider2 = $this->createMock(EntityVariablesProviderInterface::class);
         $provider2->expects($this->once())
             ->method('getVariableDefinitions')
-            ->with(null)
             ->willReturn([
                 $entity1Class => ['var2' => ['type' => 'string', 'label' => 'var2']]
             ]);
@@ -128,7 +77,6 @@ class VariablesProviderTest extends \PHPUnit\Framework\TestCase
         $provider3 = $this->createMock(EntityVariablesProviderInterface::class);
         $provider3->expects($this->once())
             ->method('getVariableDefinitions')
-            ->with(null)
             ->willReturn([
                 $entity1Class => [
                     'var2' => ['type' => 'string', 'label' => 'var2'],

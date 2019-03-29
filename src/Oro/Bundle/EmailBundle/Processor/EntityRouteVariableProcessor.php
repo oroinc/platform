@@ -55,10 +55,7 @@ class EntityRouteVariableProcessor implements VariableProcessorInterface
      */
     private function getUrl(string $routeName, string $variable, TemplateData $data): ?string
     {
-        $entity = null;
-        if ($data->hasEntityData()) {
-            $entity = $data->getEntityData();
-        }
+        $entity = $data->getEntityVariable($data->getParentVariablePath($variable));
 
         $url = null;
         try {
