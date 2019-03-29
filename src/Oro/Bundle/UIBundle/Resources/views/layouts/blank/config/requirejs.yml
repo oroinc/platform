@@ -169,6 +169,7 @@ config:
         'oroui/js/app/views/tab-collection-view': 'bundles/oroui/js/app/views/tab-collection-view.js'
         'oroui/js/app/views/flash-message-view': 'bundles/oroui/js/app/views/flash-message-view.js'
         'oroui/js/app/views/swipeable-view': 'bundles/oroui/js/app/views/swipeable-view.js'
+        'oroui/js/app/views/element-value-copy-to-clipboard-view': 'bundles/oroui/js/app/views/element-value-copy-to-clipboard-view.js'
 
         'oroui/js/viewport-manager': 'bundles/oroui/js/viewport-manager.js'
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
@@ -193,7 +194,6 @@ config:
         'oroui/js/app/components/widget-component': 'bundles/oroui/js/app/components/widget-component.js'
         'oroui/js/app/components/widget-form-component': 'bundles/oroui/js/app/components/widget-form-component.js'
         'oroui/js/app/components/widget-picker-component': 'bundles/oroui/js/app/components/widget-picker-component.js'
-        'oroui/js/app/components/element-value-copy-to-clipboard-component': 'bundles/oroui/js/app/components/element-value-copy-to-clipboard-component.js'
         'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'
         'oroui/js/widget/abstract-widget': 'bundles/oroui/js/widget/abstract-widget.js'
         'oroui/js/widget/collapse-widget': 'bundles/oroui/js/widget/collapse-widget.js'

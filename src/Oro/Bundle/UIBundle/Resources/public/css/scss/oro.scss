@@ -646,10 +646,14 @@ label.radio.error {
     }
 }
 
-pre.email-body {
-    width: 100%;
-    min-height: 5em;
-    overflow: auto;
+pre {
+    white-space: pre-wrap;
+
+    .email-body {
+        width: 100%;
+        min-height: 5em;
+        overflow: auto;
+    }
 }
 
 iframe.email-body {
