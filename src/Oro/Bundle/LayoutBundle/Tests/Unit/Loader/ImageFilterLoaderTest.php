@@ -97,6 +97,28 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
         $this->imageFilterLoader->load();
     }
 
+    public function testLoadWhenNoNewCustomImageFilterProviderAdded()
+    {
+        $this->imageTypeProvider->getImageDimensions()->shouldBeCalledTimes(2)->willReturn([]);
+
+        $this->imageFilterLoader->load();
+
+        $customFilterProvider = $this->prophesize(CustomImageFilterProviderInterface::class);
+        $this->imageFilterLoader->addCustomImageFilterProvider($customFilterProvider->reveal());
+
+        $this->imageFilterLoader->load();
+    }
+
+    public function testLoadWhenNewCustomImageFilterProviderAdded()
+    {
+        $this->imageTypeProvider->getImageDimensions()->shouldBeCalledTimes(1)->willReturn([]);
+
+        $this->imageFilterLoader->load();
+
+        // Try to load configuration again when nothing has changed
+        $this->imageFilterLoader->load();
+    }
+
     /**
      * @param int $width
      * @param int $height
