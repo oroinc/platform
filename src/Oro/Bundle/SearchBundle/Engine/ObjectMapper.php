@@ -246,8 +246,8 @@ class ObjectMapper extends AbstractMapper
                 );
             }
         } else {
-            if (empty($fieldConfig['target_fields']) && $parentFieldName) {
-                $fieldConfig['target_fields'] = [$parentFieldName];
+            if (empty($fieldConfig['target_fields'])) {
+                $fieldConfig['target_fields'] = [$parentFieldName ?? $fieldConfig['name']];
             }
             $objectData = $this->setDataValue($alias, $objectData, $fieldConfig, $fieldValue, $isArray);
         }

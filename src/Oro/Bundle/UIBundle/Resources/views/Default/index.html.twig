@@ -165,47 +165,7 @@
                             {% block page_container %}
                                 {% placeholder content_before %}
                                 {% block content %}
-                                    <div class="container" style="background: #fff">
-                                        <div class="row">
-                                            <div class="span4">
-                                                <hr />
-                                                <h3>Layout pages</h3>
-                                                <ul>
-                                                    <li><a href="{{ path('oro_ui_1column') }}">1 column </a></li>
-                                                    <li><a href="{{ path('oro_ui_1column_menu') }}">1 column with menu</a></li>
-                                                    <li><a href="{{ path('oro_ui_grid_page') }}">grid page</a></li>
-                                                    <li><a href="{{ path('oro_ui_grid_without_bar_page') }}">grid page without bar</a></li>
-                                                    <li><a href="{{ path('oro_ui_2columns_left') }}">2 columns - left</a></li>
-                                                    <li><a href="{{ path('oro_ui_2columns_right') }}">2 columns - right</a></li>
-                                                    <li><a href="{{ path('oro_ui_3columns') }}">3 columns</a></li>
-                                                </ul>
-                                                <h3>Static pages</h3>
-                                                <ul>
-                                                    <li><a href="{{ path('oro_ui_forgot_password') }}">Forgot password</a></li>
-                                                    <li><a href="{{ path('oro_ui_login') }}">Login page</a></li>
-                                                    <li><a href="{{ path('oro_ui_registration') }}">Registration page</a></li>
-                                                    <li><a href="{{ path('oro_ui_404') }}">404</a></li>
-                                                    <li><a href="{{ path('oro_ui_503') }}">503</a></li>
-                                                </ul>
-                                                <h3>Example pages</h3>
-                                                <ul>
-                                                    <li><a href="{{ path('oro_ui_form_elements') }}">Form elements</a></li>
-                                                    <li><a href="{{ path('oro_ui_form_horizontal') }}">Form Horizontal</a></li>
-                                                    <li><a href="{{ path('oro_ui_messages') }}">System messages</a></li>
-                                                    <li><a href="{{ path('oro_ui_title_bar') }}">Entity Title Bar</a></li>
-                                                    <li><a href="{{ path('oro_ui_buttons') }}">Buttons</a></li>
-                                                    <li><a href="#">Print page</a></li>
-                                                    <li><a href="{{ path('oro_ui_tables') }}">Tables</a></li>
-                                                    <li><a href="{{ path('oro_ui_general_elements') }}">General elements</a></li>
-                                                    <li><a href="{{ path('oro_ui_record_edit') }}">Record Edit</a></li>
-                                                </ul>
-                                                <h3>Js use page</h3>
-                                                <ul>
-                                                    <li><a href="{{ path('oro_ui_dialog_styled') }}">jQuery Dialog styled</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    {# Dynamic content empty by default #}
                                 {% endblock content %}
                                 {% placeholder content_after %}
                             {% endblock page_container %}
