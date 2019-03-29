@@ -14,70 +14,99 @@ use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRepository;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\FieldConfigModelRepository;
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Manager for working with entity attributes
+ */
 class AttributeManager
 {
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    /** @var ConfigTranslationHelper */
+    private $configTranslationHelper;
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     private $extendConfigProvider;
+
+    /** @var FieldConfigModel[] */
+    private $attributesByGroup = [];
+
+    /** @var FieldConfigModel[] */
+    private $attributesByFamily = [];
+
+    /** @var FieldConfigModel[] */
+    private $attributesByClass = [];
+
+    /** @var FieldConfigModel[] */
+    private $activeAttributesByClass = [];
+
+    /** @var FieldConfigModel[] */
+    private $systemAttributesByClass = [];
+
+    /** @var FieldConfigModel[] */
+    private $nonSystemAttributesByClass = [];
+
+    /** @var AttributeFamily[] */
+    private $familiesByAttributeId = [];
 
     /**
      * @param ConfigManager $configManager
      * @param DoctrineHelper $doctrineHelper
-     * @param TranslatorInterface $translator
+     * @param ConfigTranslationHelper $configTranslationHelper
      */
     public function __construct(
         ConfigManager $configManager,
         DoctrineHelper $doctrineHelper,
-        TranslatorInterface $translator
+        ConfigTranslationHelper $configTranslationHelper
     ) {
         $this->configManager = $configManager;
         $this->doctrineHelper = $doctrineHelper;
-        $this->translator = $translator;
+        $this->configTranslationHelper = $configTranslationHelper;
     }
 
     /**
      * @param AttributeGroup $group
+     *
      * @return FieldConfigModel[]
      */
     public function getAttributesByGroup(AttributeGroup $group)
     {
-        $this->checkDatabase();
+        if (!isset($this->attributesByGroup[$group->getId()])) {
+            $this->checkDatabase();
 
-        return $this->getRepository()->getAttributesByIds($this->getAttributeIdsByGroup($group));
+            $this->attributesByGroup[$group->getId()] = $this->getRepository()
+                ->getAttributesByIds($this->getAttributeIdsByGroup($group));
+        }
+
+        return $this->attributesByGroup[$group->getId()];
     }
 
     /**
      * @param AttributeFamily $family
+     *
      * @return FieldConfigModel[]
      */
     public function getAttributesByFamily(AttributeFamily $family)
     {
-        $this->checkDatabase();
+        if (!isset($this->attributesByFamily[$family->getId()])) {
+            $this->checkDatabase();
 
-        return $this->getRepository()->getAttributesByIds($this->getAttributeIdsByFamily($family));
+            $this->attributesByFamily[$family->getId()] = $this->getRepository()
+                ->getAttributesByIds($this->getAttributeIdsByFamily($family));
+        }
+
+        return $this->attributesByFamily[$family->getId()];
     }
 
     /**
      * @param array $ids
+     *
      * @return FieldConfigModel[]
      */
     public function getAttributesByIdsWithIndex(array $ids)
@@ -89,59 +118,89 @@ class AttributeManager
 
     /**
      * @param string $className
+     *
      * @return FieldConfigModel[]
      */
     public function getAttributesByClass($className)
     {
-        $this->checkDatabase();
+        if (!isset($this->attributesByClass[$className])) {
+            $this->checkDatabase();
 
-        return $this->getRepository()->getAttributesByClass($className);
+            $this->attributesByClass[$className] = $this->getRepository()->getAttributesByClass($className);
+        }
+
+        return $this->attributesByClass[$className];
     }
 
     /**
      * @param string $className
+     *
      * @return FieldConfigModel[]
      */
     public function getActiveAttributesByClass($className)
     {
-        $this->checkDatabase();
+        if (!isset($this->activeAttributesByClass[$className])) {
+            $this->checkDatabase();
 
-        return $this->getRepository()->getActiveAttributesByClass($className);
+            $this->activeAttributesByClass[$className] = $this->getRepository()
+                ->getActiveAttributesByClass($className);
+        }
+
+        return $this->activeAttributesByClass[$className];
     }
 
     /**
      * @param string $className
+     *
      * @return FieldConfigModel[]
      */
     public function getSystemAttributesByClass($className)
     {
-        $this->checkDatabase();
+        if (!isset($this->systemAttributesByClass[$className])) {
+            $this->checkDatabase();
 
-        return $this->getRepository()->getAttributesByClassAndIsSystem($className, 1);
+            $this->systemAttributesByClass[$className] = $this->getRepository()
+                ->getAttributesByClassAndIsSystem($className, 1);
+        }
+
+        return $this->systemAttributesByClass[$className];
     }
 
     /**
      * @param string $className
+     *
      * @return FieldConfigModel[]
      */
     public function getNonSystemAttributesByClass($className)
     {
-        $this->checkDatabase();
+        if (!isset($this->nonSystemAttributesByClass[$className])) {
+            $this->checkDatabase();
 
-        return $this->getRepository()->getAttributesByClassAndIsSystem($className, 0);
+            $this->nonSystemAttributesByClass[$className] = $this->getRepository()
+                ->getAttributesByClassAndIsSystem($className, 0);
+        }
+
+        return $this->nonSystemAttributesByClass[$className];
     }
 
     /**
      * @param integer $attributeId
+     *
      * @return AttributeFamily[]
      */
     public function getFamiliesByAttributeId($attributeId)
     {
-        return $this->getAttributeFamilyRepository()->getFamiliesByAttributeId($attributeId);
+        if (!isset($this->familiesByAttributeId[$attributeId])) {
+            $this->familiesByAttributeId[$attributeId] = $this->getAttributeFamilyRepository()
+                ->getFamiliesByAttributeId($attributeId);
+        }
+
+        return $this->familiesByAttributeId[$attributeId];
     }
 
     /**
      * @param FieldConfigModel $attribute
+     *
      * @return bool
      */
     public function isSystem(FieldConfigModel $attribute)
@@ -149,18 +208,6 @@ class AttributeManager
         return $this->getExtendConfigProvider()
             ->getConfig($attribute->getEntity()->getClassName(), $attribute->getFieldName())
             ->is('owner', ExtendScope::OWNER_SYSTEM);
-    }
-
-    /**
-     * @return ConfigProvider
-     */
-    private function getExtendConfigProvider()
-    {
-        if (!$this->extendConfigProvider) {
-            $this->extendConfigProvider = $this->configManager->getProvider('extend');
-        }
-
-        return $this->extendConfigProvider;
     }
 
     /**
@@ -176,6 +223,7 @@ class AttributeManager
 
     /**
      * @param FieldConfigModel $attribute
+     *
      * @return string
      */
     public function getAttributeLabel(FieldConfigModel $attribute)
@@ -185,18 +233,15 @@ class AttributeManager
             ->getConfig($attribute->getEntity()->getClassName(), $attribute->getFieldName())
             ->get('label');
 
-        //TODO: Extract this translation logic to a separate helper class and reuse in ConfigSubscriber
-        if ($this->translator->hasTrans($labelValue)) {
-            $labelTranslation = $this->translator->trans($labelValue);
-        } else {
-            $labelTranslation = $attribute->getFieldName();
-        }
+        $labelTranslation = $this->configTranslationHelper
+            ->translateWithFallback($labelValue, $attribute->getFieldName());
 
         return $labelTranslation;
     }
 
     /**
      * @param array $groupIds
+     *
      * @return array, [group_id => [attribute_id_1, attribute_id_2, ...], ...]
      */
     public function getAttributesMapByGroupIds(array $groupIds)
@@ -206,6 +251,7 @@ class AttributeManager
 
     /**
      * @param AttributeFamily $attributeFamily
+     *
      * @return array [['group' => $group1, 'attributes' => [$attribute1, $attribute2, ...]], ...]
      */
     public function getGroupsWithAttributes(AttributeFamily $attributeFamily)
@@ -230,7 +276,27 @@ class AttributeManager
     }
 
     /**
+     * @param AttributeFamily $attributeFamily
+     * @param $attributeName
+     *
+     * @return null|FieldConfigModel
+     */
+    public function getAttributeByFamilyAndName(AttributeFamily $attributeFamily, $attributeName)
+    {
+        $attributes = $this->getAttributesByFamily($attributeFamily);
+
+        foreach ($attributes as $attribute) {
+            if ($attribute->getFieldName() === $attributeName) {
+                return $attribute;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @param AttributeFamily $family
+     *
      * @return array
      */
     private function getAttributeIdsByFamily(AttributeFamily $family)
@@ -245,6 +311,7 @@ class AttributeManager
 
     /**
      * @param AttributeGroup $group
+     *
      * @return array
      */
     private function getAttributeIdsByGroup(AttributeGroup $group)
@@ -293,20 +360,14 @@ class AttributeManager
     }
 
     /**
-     * @param AttributeFamily $attributeFamily
-     * @param $attributeName
-     * @return null|FieldConfigModel
+     * @return ConfigProvider
      */
-    public function getAttributeByFamilyAndName(AttributeFamily $attributeFamily, $attributeName)
+    private function getExtendConfigProvider()
     {
-        $attributes = $this->getAttributesByFamily($attributeFamily);
-
-        foreach ($attributes as $attribute) {
-            if ($attribute->getFieldName() === $attributeName) {
-                return $attribute;
-            }
+        if (!$this->extendConfigProvider) {
+            $this->extendConfigProvider = $this->configManager->getProvider('extend');
         }
 
-        return null;
+        return $this->extendConfigProvider;
     }
 }
