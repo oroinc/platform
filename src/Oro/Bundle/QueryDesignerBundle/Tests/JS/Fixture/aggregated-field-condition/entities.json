@@ -6,7 +6,7 @@
             {
                 "name": "id",
                 "type": "integer",
-                "label": "NUMBER OF LEADS"
+                "label": "Number of Leads"
             }
         ]
     }

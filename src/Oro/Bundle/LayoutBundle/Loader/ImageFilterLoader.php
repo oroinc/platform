@@ -32,6 +32,9 @@ class ImageFilterLoader
     /** @var CustomImageFilterProviderInterface[]  */
     protected $customFilterProviders = [];
 
+    /** @var bool */
+    private $shouldBeLoaded = true;
+
     /**
      * @param ImageTypeProvider $imageTypeProvider
      * @param FilterConfiguration $filterConfiguration
@@ -49,6 +52,10 @@ class ImageFilterLoader
 
     public function load()
     {
+        if (!$this->shouldBeLoaded) {
+            return;
+        }
+
         foreach ($this->imageTypeProvider->getImageDimensions() as $dimension) {
             $filterName = $dimension->getName();
             $this->filterConfiguration->set(
@@ -56,6 +63,8 @@ class ImageFilterLoader
                 $this->buildFilterFromDimension($dimension)
             );
         }
+
+        $this->shouldBeLoaded = false;
     }
 
     /**
@@ -64,6 +73,7 @@ class ImageFilterLoader
     public function addCustomImageFilterProvider(CustomImageFilterProviderInterface $provider)
     {
         $this->customFilterProviders[] = $provider;
+        $this->shouldBeLoaded = true;
     }
 
     /**

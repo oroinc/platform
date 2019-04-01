@@ -352,14 +352,20 @@
         <div class="row-oro oro-multiselect-holder{% if not allow_delete %} not-removable{% endif %}">
             {{ form_widget(form, {disabled: disabled}) }}
             {% if allow_delete %}
-            <button class="removeRow btn btn-icon btn-square-light" type="button" data-related="{{ name }}">
-                <span class="fa-close"></span>
-            </button>
+                <button class="removeRow btn btn-icon btn-square-light"
+                    aria-label="{{ 'oro.form.collection.remove'|trans }}"
+                    type="button"
+                    data-related="{{ name }}">
+                    <span class="fa-trash-o" aria-hidden="true"></span>
+                </button>
             {% endif %}
             {% if allow_add_after %}
-            <button class="addAfterRow btn btn-icon btn-square-light" type="button" data-related="{{ name }}">
-                <span class="fa-plus"></span>
-            </button>
+                <button class="addAfterRow btn btn-icon btn-square-light"
+                    aria-label="{{ 'oro.form.collection.add'|trans }}"
+                    type="button"
+                    data-related="{{ name }}">
+                    <span class="fa-plus" aria-hidden="true"></span>
+                </button>
             {% endif %}
         </div>
     </div>

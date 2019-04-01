@@ -71,57 +71,58 @@ In addition to it, each bundle may have their own menu which must be located in 
 Both types of declaration files have the same format:
 
 ```yaml
-menu_config:
-    templates:
-        <menu_type>:                          # menu type code
-            template: <template>              # path to custom template for renderer
-            clear_matcher: <option_value>
-            depth: <option_value>
-            current_as_link: <option_value>
-            current_class: <option_value>
-            ancestor_class: <option_value>
-            first_class: <option_value>
-            last_class: <option_value>
-            compressed: <option_value>
-            block: <option_value>
-            root_class: <option_value>
-            is_dropdown: <option_value>
+navigation:
+    menu_config:
+        templates:
+            <menu_type>:                          # menu type code
+                template: <template>              # path to custom template for renderer
+                clear_matcher: <option_value>
+                depth: <option_value>
+                current_as_link: <option_value>
+                current_class: <option_value>
+                ancestor_class: <option_value>
+                first_class: <option_value>
+                last_class: <option_value>
+                compressed: <option_value>
+                block: <option_value>
+                root_class: <option_value>
+                is_dropdown: <option_value>
 
-    items: #menu items
-        <key>: # menu item identifier. used as default value for name, route and label, if it not set in options
-            acl_resource_id: <string>           # ACL resource Id
-            translate_domain: <domain_name>     # translation domain
-            translate_parameters:               # translation parameters
-            label: <label>                      # label text or translation string template
-            name:  <name>                       # name of menu item, used as default for route
-            uri: <uri_string>                   # uri string, if no route parameter set
-            read_only: <boolean>                # disable ability to edit menu item in UI
-            route: <route_name>                 # route name for uri generation, if not set and uri not set - loads from key
-            route_parameters:                   # router parameters
-            attributes: <attr_list>             # <li> item attributes
-            link_attributes: <attr_list>        # <a> anchor attributes
-            label_attributes: <attr_list>       # <span> attributes for text items without link
-            children_attributes: <attr_list>    # <ul> item attributes for nested lists
-            show_non_authorized: <boolean>      # show for non-authorized users
-            display: <boolean>                  # disable showing of menu item
-            display_children: <boolean>         # disable showing of menu item children
-            position: <integer>                 # menu item position
-            extras:                             # extra parameters for container renderer
-                brand: <string>
-                brandLink: <string>
+        items: #menu items
+            <key>: # menu item identifier. used as default value for name, route and label, if it not set in options
+                acl_resource_id: <string>           # ACL resource Id
+                translate_domain: <domain_name>     # translation domain
+                translate_parameters:               # translation parameters
+                label: <label>                      # label text or translation string template
+                name:  <name>                       # name of menu item, used as default for route
+                uri: <uri_string>                   # uri string, if no route parameter set
+                read_only: <boolean>                # disable ability to edit menu item in UI
+                route: <route_name>                 # route name for uri generation, if not set and uri not set - loads from key
+                route_parameters:                   # router parameters
+                attributes: <attr_list>             # <li> item attributes
+                link_attributes: <attr_list>        # <a> anchor attributes
+                label_attributes: <attr_list>       # <span> attributes for text items without link
+                children_attributes: <attr_list>    # <ul> item attributes for nested lists
+                show_non_authorized: <boolean>      # show for non-authorized users
+                display: <boolean>                  # disable showing of menu item
+                display_children: <boolean>         # disable showing of menu item children
+                position: <integer>                 # menu item position
+                extras:                             # extra parameters for container renderer
+                    brand: <string>
+                    brandLink: <string>
 
-    tree:
-        <menu_alias>                            # menu alias
-            type: <menu_type>                   # menu type code. Link to menu template section.
-            scope_type: <string>                # menu scope type identifier
-            read_only: <boolean>                # disable ability to edit menu in UI
-            max_nesting_level: <integer>        # menu max nesting level
-            children:                           # submenu items
-                <links to items hierarchy>
-                <key>:
-                    merge_strategy: <strategy>  # node merge strategy. possible strategies are replace|move
-                    children:
-                        <links to items hierarchy>
+        tree:
+            <menu_alias>                            # menu alias
+                type: <menu_type>                   # menu type code. Link to menu template section.
+                scope_type: <string>                # menu scope type identifier
+                read_only: <boolean>                # disable ability to edit menu in UI
+                max_nesting_level: <integer>        # menu max nesting level
+                children:                           # submenu items
+                    <links to items hierarchy>
+                    <key>:
+                        merge_strategy: <strategy>  # node merge strategy. possible strategies are replace|move
+                        children:
+                            <links to items hierarchy>
 ```
 
 To change merge strategy of tree node there are 2 possible options:
