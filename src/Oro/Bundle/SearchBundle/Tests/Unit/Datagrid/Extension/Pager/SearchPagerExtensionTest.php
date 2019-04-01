@@ -12,13 +12,19 @@ use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
 class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  \PHPUnit\Framework\MockObject\MockObject | DatagridConfiguration */
+    /**
+     * @var  \PHPUnit\Framework\MockObject\MockObject | DatagridConfiguration
+     */
     protected $datagridConfig;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject | IndexerPager */
+    /**
+     * @var  \PHPUnit\Framework\MockObject\MockObject | IndexerPager
+     */
     protected $pager;
 
-    /** @var SearchPagerExtension */
+    /**
+     * @var SearchPagerExtension
+     */
     protected $pagerExtension;
 
     protected function setUp()
@@ -97,7 +103,7 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->pager->expects($this->once())->method('setQuery')->with($searchQuery);
 
         if ($onePageEnable) {
-            $this->pager->expects($this->once())->method('setMaxPerPage')->with(0);
+            $this->pager->expects($this->once())->method('setMaxPerPage')->with(1000);
         } else {
             $this->pager->expects($this->once())->method('setMaxPerPage')->with(20);
         }
@@ -121,6 +127,78 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
                 'perPage' => 20,
                 'onePageEnable' => false
             ]
+        ];
+    }
+
+    /**
+     * @dataProvider datagridPageSizesDataProvider
+     *
+     * @param array $parameters
+     * @param integer|null $expectedPageSize
+     */
+    public function testProcessConfigs(array $parameters, $expectedPageSize)
+    {
+        $config = [
+            'options' => [
+                'toolbarOptions' => [
+                    'pageSize' => [
+                        'default_per_page' => 25,
+                        'items' => [10, 25, 50, 100]
+                    ]
+                ]
+            ]
+        ];
+
+        $datagridConfiguration = DatagridConfiguration::create($config);
+        $parameterBag = new ParameterBag($parameters);
+
+        $this->pagerExtension->setParameters($parameterBag);
+        $this->pagerExtension->processConfigs($datagridConfiguration);
+
+        $pagerParameters = $parameterBag->get('_pager');
+        $this->assertEquals($expectedPageSize, $pagerParameters['_per_page']);
+    }
+
+    /**
+     * @return array
+     */
+    public function datagridPageSizesDataProvider(): array
+    {
+        return [
+            'empty page size param' => [
+                'parameters' => [
+                    '_pager' => [
+                        '_per_page' => '',
+                    ]
+                ],
+                'expectedPageSize' => 25,
+            ],
+            'wrong page size param' => [
+                'parameters' => [
+                    '_pager' => [
+                        '_per_page' => 1,
+                    ]
+                ],
+                'expectedPageSize' => 25,
+            ],
+            'correct page size param' => [
+                'parameters' => [
+                    '_pager' => [
+                        '_per_page' => 10,
+                    ]
+                ],
+                'expectedPageSize' => 10,
+            ],
+            'page size param does not exists' => [
+                'parameters' => [
+                    '_pager' => []
+                ],
+                'expectedPageSize' => 25,
+            ],
+            'page size param without pager' => [
+                'parameters' => [],
+                'expectedPageSize' => null,
+            ],
         ];
     }
 }

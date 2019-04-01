@@ -12,23 +12,20 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Form listener to update configs and translatable values
+ */
 class ConfigSubscriber implements EventSubscriberInterface
 {
     const NEW_PENDING_VALUE_KEY = 1;
 
-    /**
-     * @var ConfigTranslationHelper
-     */
+    /** @var ConfigTranslationHelper */
     protected $translationHelper;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var Translator
-     */
+    /** @var Translator */
     protected $translator;
 
     /**
@@ -216,13 +213,14 @@ class ConfigSubscriber implements EventSubscriberInterface
                 $translatable = $provider->getPropertyConfig()->getTranslatableValues($configId);
                 foreach ($data[$scope] as $code => $value) {
                     if (in_array($code, $translatable, true)) {
-                        if ($this->translator->hasTrans($value)) {
-                            $data[$scope][$code] = $this->translator->trans($value);
-                        } elseif (!$configModel->getId() && $configModel instanceof FieldConfigModel) {
-                            $data[$scope][$code] = $configModel->getFieldName();
-                        } else {
-                            $data[$scope][$code] = '';
-                        }
+                        $translationFallback = !$configModel->getId() && $configModel instanceof FieldConfigModel
+                            ? $configModel->getFieldName()
+                            : '';
+
+                        $data[$scope][$code] = $this->translationHelper->translateWithFallback(
+                            $value,
+                            $translationFallback
+                        );
                     }
                 }
             }

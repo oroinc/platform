@@ -148,15 +148,6 @@ footer {
     margin-#{$end}: 5px;
 }
 
-.brand-extra {
-    font-size: 18px;
-    font-weight: bold;
-    margin-top: 12px;
-    margin-#{$start}: 15px;
-    line-height: 24px;
-    color: $body-color;
-}
-
 .navigation {
     position: relative;
 
@@ -655,10 +646,14 @@ label.radio.error {
     }
 }
 
-pre.email-body {
-    width: 100%;
-    min-height: 5em;
-    overflow: auto;
+pre {
+    white-space: pre-wrap;
+
+    .email-body {
+        width: 100%;
+        min-height: 5em;
+        overflow: auto;
+    }
 }
 
 iframe.email-body {
