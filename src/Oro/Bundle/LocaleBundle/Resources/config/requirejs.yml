@@ -40,6 +40,7 @@ config:
         'orolocale/js/app/views/localization-select-view': 'bundles/orolocale/js/app/views/localization-select-view.js'
         'orolocale/js/app/views/localizations-select-view': 'bundles/orolocale/js/app/views/localizations-select-view.js'
         'orolocale/js/app/modules/locale-module': 'bundles/orolocale/js/app/modules/locale-module.js'
+        'oro/select2-autocomplete-enabledlocalization-component': 'bundles/orolocale/js/app/components/select2-autocomplete-enabledlocalization-component.js'
 
     appmodules:
         - orolocale/js/app/modules/locale-module
