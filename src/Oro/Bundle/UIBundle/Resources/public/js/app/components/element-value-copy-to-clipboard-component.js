@@ -1,26 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var error = require('oroui/js/error');
-
     var ElementValueCopyToClipboardComponent;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var ViewComponent = require('oroui/js/app/components/view-component');
+    var ElementValueCopyToClipboardView = require('oroui/js/app/views/element-value-copy-to-clipboard-view');
 
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var messenger = require('oroui/js/messenger');
-
-    ElementValueCopyToClipboardComponent = BaseComponent.extend({
-
-        options: {
-            elementSelector: '',
-            messages: {
-                copy_not_supported: 'oro.ui.element_value.messages.copy_not_supported',
-                copied: 'oro.ui.element_value.messages.copied',
-                copy_not_successful: 'oro.ui.element_value.messages.copy_not_successful'
-            }
-        },
-
+    ElementValueCopyToClipboardComponent = ViewComponent.extend({
         /**
          * @inheritDoc
          */
@@ -32,45 +19,22 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            this.options = _.defaults(options || {}, this.options);
+            var subPromises = _.values(options._subPromises);
+            var viewOptions = _.defaults(
+                _.omit(options, '_sourceElement', '_subPromises'),
+                {el: options._sourceElement}
+            );
 
-            this.$button = options._sourceElement;
+            this._deferredInit();
 
-            this.initListeners();
-        },
-
-        initListeners: function() {
-            this.$button.on('click', this.buttonClickHandler.bind(this));
-        },
-
-        buttonClickHandler: function() {
-            var element = document.querySelector(this.options.elementSelector);
-            var range = document.createRange();
-            range.selectNode(element);
-            window.getSelection().addRange(range);
-            try {
-                var copied = document.execCommand('copy');
-                if (copied) {
-                    messenger.notificationFlashMessage('success', __(this.options.messages.copied));
-                } else {
-                    messenger.notificationFlashMessage('warning', __(this.options.messages.copy_not_successful));
-                }
-            } catch (err) {
-                error.showErrorInConsole(err);
-                messenger.notificationFlashMessage('warning', __(this.options.messages.copy_not_supported));
+            if (subPromises.length) {
+                // ensure that all nested components are already initialized
+                $.when.apply($, subPromises).then(function() {
+                    this._initializeView(viewOptions, ElementValueCopyToClipboardView);
+                });
+            } else {
+                this._initializeView(viewOptions, ElementValueCopyToClipboardView);
             }
-
-            window.getSelection().removeAllRanges();
-        },
-
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-
-            this.$button.off('click');
-
-            ElementValueCopyToClipboardComponent.__super__.dispose.call(this);
         }
     });
 

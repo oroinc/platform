@@ -112,23 +112,12 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getProvider')
             ->with('extend')
             ->will($this->returnValue($provider1));
-        $this->translator->expects($this->any())
-            ->method('hasTrans')
-            ->will(
-                $this->returnCallback(
-                    function ($id) use (&$trans) {
-                        return isset($trans[$id]);
-                    }
-                )
-            );
-        $this->translator->expects($this->any())
-            ->method('trans')
-            ->will(
-                $this->returnCallback(
-                    function ($id) use (&$trans) {
-                        return $trans[$id];
-                    }
-                )
+        $this->translationHelper->expects($this->any())
+            ->method('translateWithFallback')
+            ->willReturnCallback(
+                function ($id, $fallback) use (&$trans) {
+                    return isset($trans[$id]) ? $trans[$id] : $fallback;
+                }
             );
 
         $event = $this->getFormEvent($data, $model);

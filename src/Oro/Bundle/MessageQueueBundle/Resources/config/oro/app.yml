@@ -26,6 +26,7 @@ oro_message_queue:
 
 monolog:
     channels:
+        - 'consumer'
         - 'mq_job_transitive' # internal channel, do not use it directly
     handlers:
         # write all log records to the consume CLI command console output

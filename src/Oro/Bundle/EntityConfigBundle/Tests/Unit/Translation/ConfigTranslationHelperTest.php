@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Translation;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -14,7 +14,7 @@ class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslationManager */
     protected $translationManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Translator */
     protected $translator;
 
     /** @var ConfigTranslationHelper */
@@ -22,7 +22,7 @@ class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock(Translator::class);
 
         $this->translationManager = $this
             ->getMockBuilder(TranslationManager::class)
@@ -165,5 +165,40 @@ class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
         $this->translator->expects($this->once())
             ->method('getLocale')
             ->willReturn(self::LOCALE);
+    }
+
+    public function testTranslateWithFallbackTranslationExists()
+    {
+        $id = 'string';
+        $translation = 'translation';
+        $fallback = 'fallback';
+
+        $this->translator->expects(self::once())
+            ->method('hasTrans')
+            ->with($id)
+            ->willReturn(true);
+
+        $this->translator->expects(self::once())
+            ->method('trans')
+            ->with($id)
+            ->willReturn($translation);
+
+        self::assertEquals($translation, $this->helper->translateWithFallback($id, $fallback));
+    }
+
+    public function testTranslateWithFallbackTranslationDoesntExist()
+    {
+        $id = 'string';
+        $fallback = 'fallback';
+
+        $this->translator->expects(self::once())
+            ->method('hasTrans')
+            ->with($id)
+            ->willReturn(false);
+
+        $this->translator->expects(self::never())
+            ->method('trans');
+
+        self::assertEquals($fallback, $this->helper->translateWithFallback($id, $fallback));
     }
 }

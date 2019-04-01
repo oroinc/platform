@@ -862,3 +862,8 @@ services:
             - '@oro_security.owner.metadata_provider.chain'
         tags:
             - { name: oro_security.access_rule }
+
+    oro_security.form.extension.autocomplete_password_type:
+        class: 'Oro\Bundle\SecurityBundle\Form\Extension\AutocompletePasswordTypeExtension'
+        tags:
+            - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\PasswordType }

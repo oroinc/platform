@@ -74,7 +74,7 @@ class OroEncodedPlaceholderPasswordType extends AbstractType
 
         if (false === $options['browser_autocomplete']) {
             // Use soft merge ("+" operator) to preserve 'autocomplete' value if it was already specified.
-            $view->vars['attr'] += ['autocomplete' => 'new-password'];
+            $view->vars['attr'] += ['autocomplete' => 'off'];
         }
     }
 

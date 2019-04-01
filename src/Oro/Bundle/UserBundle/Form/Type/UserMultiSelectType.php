@@ -9,6 +9,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type that provides choice several users
+ */
 class UserMultiSelectType extends AbstractType
 {
     const NAME = 'oro_user_multiselect';
@@ -40,7 +43,6 @@ class UserMultiSelectType extends AbstractType
                 'autocomplete_alias'  => 'users',
                 'configs'             => array(
                     'multiple'                   => true,
-                    'width'                      => '400px',
                     'placeholder'                => 'oro.user.form.choose_user',
                     'allowClear'                 => true,
                     'result_template_twig'       => 'OroUserBundle:User:Autocomplete/result.html.twig',

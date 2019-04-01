@@ -48,7 +48,7 @@ class MultipleChoice extends AbstractGridFilterItem
      */
     protected function getWidget()
     {
-        $widgets = $this->getPage()->findAll('css', 'body div.select-filter-widget ul.ui-multiselect-checkboxes');
+        $widgets = $this->getPage()->findAll('css', 'body div.filter-container ul.ui-multiselect-checkboxes');
 
         /** @var NodeElement $widget */
         foreach ($widgets as $widget) {

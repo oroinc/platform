@@ -1,0 +1,3 @@
+config:
+    paths:
+        'oro/filter/search-boolean-filter': 'bundles/orosearch/js/filter/search-boolean-filter.js'

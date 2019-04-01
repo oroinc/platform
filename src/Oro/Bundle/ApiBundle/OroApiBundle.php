@@ -99,8 +99,16 @@ class OroApiBundle extends Bundle
         // Do it only if extended entity proxies are ready.
         // Skip for "cache:clear" and "cache:warmup" commands to avoid premature warming up caches;
         // in this case caches are warmed up by cache warmers
-        // Skip for "oro:install" and "oro:platform:update" commands to avoid
-        // "Class Extend\Entity\... does not exist" exceptions for case when custom entities are created
+        // Skip the following commands:
+        // * oro:install
+        // * oro:platform:update
+        // * oro:migration:load
+        // * oro:entity-config:update
+        // * oro:entity-config:cache:*
+        // * oro:entity-extend:update-config
+        // * oro:entity-extend:migration:update-config
+        // * oro:entity-extend:cache:*
+        // to avoid "Class Extend\Entity\... does not exist" exceptions for case when custom entities are created
         // via migrations and has some configuration in "Resources/config/oro/api.yml"
         if ($this->kernel->isDebug()
             && ExtendClassLoadingUtils::aliasesExist($this->kernel->getCacheDir())
@@ -108,6 +116,12 @@ class OroApiBundle extends Bundle
             && !CommandExecutor::isCurrentCommand('cache:warmup')
             && !CommandExecutor::isCurrentCommand('oro:install')
             && !CommandExecutor::isCurrentCommand('oro:platform:update')
+            && !CommandExecutor::isCurrentCommand('oro:migration:load')
+            && !CommandExecutor::isCurrentCommand('oro:entity-config:update')
+            && !CommandExecutor::isCurrentCommand('oro:entity-config:cache:', true)
+            && !CommandExecutor::isCurrentCommand('oro:entity-extend:update-config')
+            && !CommandExecutor::isCurrentCommand('oro:entity-extend:migration:update-config')
+            && !CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
         ) {
             $this->getCacheManager()->warmUpDirtyCaches();
         }

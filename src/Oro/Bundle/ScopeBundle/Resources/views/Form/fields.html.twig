@@ -1,16 +1,14 @@
 {% block oro_scope_widget %}
-    <table class="table-condensed">
-        <tr>
-            {% for child in form.children %}
-                <td>
-                    {% if child.vars.label is not empty %}
-                        {{ form_label(child) }}
-                    {% endif %}
-                    {{ form_widget(child) }}
-                </td>
-            {% endfor %}
-        </tr>
-    </table>
+    <div class="form-horizontal">
+        {% for child in form.children %}
+            <div class="control-group">
+                {% if child.vars.label is not empty %}
+                    <div class="control-label wrap">{{ form_label(child) }}</div>
+                {% endif %}
+                <div class="controls">{{ form_widget(child) }}</div>
+            </div>
+        {% endfor %}
+    </div>
     <div>
         {{ form_errors(form) }}
     </div>
