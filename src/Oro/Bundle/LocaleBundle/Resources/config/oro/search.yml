@@ -9,6 +9,10 @@ search:
         search_template:       OroLocaleBundle:Localization:searchResult.html.twig
         fields:
             -
+                name:          id
+                target_type:   integer
+                target_fields: [id]
+            -
                 name:          name
                 target_type:   text
                 target_fields: [name]
