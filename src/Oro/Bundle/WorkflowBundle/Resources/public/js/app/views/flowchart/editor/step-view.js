@@ -36,10 +36,14 @@ define(function(require) {
             // add element as source to jsPlumb
             if (this.model.get('draggable') !== false) {
                 instance.draggable(this.$el, {
-                    stop: _.bind(function(e) {
+                    start: function(obj) {
+                        instance.eventBus.trigger('step:drag-start', obj, this.model);
+                    }.bind(this),
+                    stop: function(obj) {
                         // update model position when dragging stops
-                        this.model.set({position: e.pos});
-                    }, this)
+                        this.model.set({position: obj.pos});
+                        instance.eventBus.trigger('step:drag-stop', obj, this.model);
+                    }.bind(this)
                 });
             }
             FlowchartEditorStepView.__super__.connect.apply(this, arguments);

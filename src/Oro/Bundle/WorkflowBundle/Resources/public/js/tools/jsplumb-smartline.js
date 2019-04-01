@@ -265,6 +265,14 @@ define(function(require) {
         }
 
         this._compute = function(paintInfo, params) {
+            try {
+                this._computeSmartLine(paintInfo, params);
+            } catch (error) {
+                this._jsPlumb.instance.eventBus.trigger('smartline:error', error);
+            }
+        };
+
+        this._computeSmartLine = function(paintInfo, params) {
             if (params.sourceEndpoint.isTemporarySource || params.sourceEndpoint.getAttachedElements().length === 0 ||
                 params.targetEndpoint.getAttachedElements().length === 0) {
                 // in case this connection is new one or is moving to another target or source
@@ -275,7 +283,7 @@ define(function(require) {
 
             // compute the rest of the line
             var points = this.smartlineManager.getConnectionPath(this, paintInfo);
-            if (!points || points.length === 0) {
+            if (points.length === 0) {
                 // leave everything as is
                 return;
             }
