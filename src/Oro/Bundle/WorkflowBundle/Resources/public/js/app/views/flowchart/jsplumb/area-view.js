@@ -3,6 +3,7 @@ define(function(require) {
 
     var FlowchartJsPlumbAreaView;
     var _ = require('underscore');
+    var Backbone = require('backbone');
     var $ = require('jquery');
     var jsPlumb = require('jsplumb');
     var JPManager = require('../../../../tools/jsplumb-manager');
@@ -76,8 +77,19 @@ define(function(require) {
                 options.chartOptions || {}
             );
             this.flowchartState = options.flowchartState;
+            _.extend(this, _.pick(options, 'chartHandlers'));
 
             FlowchartJsPlumbAreaView.__super__.initialize.apply(this, arguments);
+        },
+
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
+            delete this.chartHandlers;
+
+            FlowchartJsPlumbAreaView.__super__.dispose.call(this);
         },
 
         delegateEvents: function() {
@@ -106,6 +118,10 @@ define(function(require) {
                 container: this.id()
             }, this.defaultsChartOptions);
             this.jsPlumbInstance = jsPlumb.getInstance(chartOptions);
+            this.jsPlumbInstance.eventBus = Object.create(Backbone.Events);
+            if (this.chartHandlers) {
+                this.listenTo(this.jsPlumbInstance.eventBus, this.chartHandlers);
+            }
             this.debouncedRepaintEverything = _.debounce(this.repaintEverything.bind(this), 0);
             this.jsPlumbManager = new JPManager(this.jsPlumbInstance, this.model);
             var stepWithPosition = this.model.get('steps').find(function(step) {

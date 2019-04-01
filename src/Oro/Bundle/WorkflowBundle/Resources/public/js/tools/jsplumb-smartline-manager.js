@@ -80,6 +80,16 @@ define(function(require) {
         },
 
         refreshCache: function() {
+            try {
+                this._refreshCache();
+            } catch (error) {
+                this.cache.state = this.getState();
+                this.cache.connections = {};
+                throw error;
+            }
+        },
+
+        _refreshCache: function() {
             var _this = this;
             var connections = [];
             var rects = {};
