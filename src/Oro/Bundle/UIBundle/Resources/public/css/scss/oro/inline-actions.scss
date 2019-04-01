@@ -35,6 +35,7 @@
         display: inline-flex;
         .inline-actions-element_wrapper {
             padding: 0;
+            margin: 0;
             @include text-line-truncate(200px, true);
         }
     }

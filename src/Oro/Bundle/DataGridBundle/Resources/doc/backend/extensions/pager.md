@@ -9,7 +9,7 @@ Now implemented only paging for ORM datasource. It's enabled always for ORM data
 One Page Pagination
 -------------------
 
-This feature allows to render all grid content in one page (no matter how many rows grid has).
+This feature allows to render all grid content in one page (up to 1000 rows).
 To activate this feature developer has to use option "onePage":
 
 ```

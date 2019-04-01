@@ -10,6 +10,7 @@ See below the list of key highlights how to handle errors, work with logs and lo
 * [Consumer Interruption](#consumer-interruption)
 * [Errors and Crashes](#errors-and-crashes)
 * [Profiling](#profiling)
+* [Separate Message Queue Consumer Logs](#separate-message-queue-consumer-logs)
 
 ## Logs, Output and Verbosity
 
@@ -29,6 +30,15 @@ Console option    | Output Errors
 All logs `LogLevel::ERROR` and higher also will be printed to the `prod.log` file. 
 You can change minimal log level that should be printed to the `prod.log` file using command `oro:logger:level`,
  for more details read doc ["Temporarily Decrease Log Level"](../../../LoggerBundle/README.md#temporarily-decrease-log-level).
+ 
+_NOTICE: `prod.log` it is an example, your log file name may differ depending on your Monolog handlers configuration._
+
+#### Console Messages Output
+
+Message Queue Consumer provides [ConsoleHandler](../../Log/Handler/ConsoleHandler.php) that listens to console events and writes log messages to the console output depending on the console verbosity. It uses a [ConsoleFormatter](../../Log/Formatter/ConsoleFormatter.php) to format the record before logging it. Record format pattern is described below:
+```php
+"%datetime% %start_tag%%channel%.%level_name%%end_tag%: %message%%context%%extra%\n"
+```
 
 ### How to Add extra Data to Log Messages via a Processor
 
@@ -51,9 +61,9 @@ An administrator must be informed about the state of consumers in the system (wh
 
 This is covered by the Consumer Heartbeat functionality that works in the following way:
 
-- On start and after every configured time period, each consumer calls the `tick` method of the [ConsumerHeartbeat](./Consumption/ConsumerHeartbeat.php)
+- On start and after every configured time period, each consumer calls the `tick` method of the [ConsumerHeartbeat](../../Consumption/ConsumerHeartbeat.php)
 service that informs the system that the consumer is alive.
-- The cron command [oro:cron:message-queue:consumer_heartbeat_check](./Command/ConsumerHeartbeatCommand.php)
+- The cron command [oro:cron:message-queue:consumer_heartbeat_check](../../Command/ConsumerHeartbeatCommand.php)
 is periodically executed to check consumers' state. If it does not find any alive consumers, the `oro/message_queue_state`
 socket message is sent notifying all logged-in users that the system may work incorrectly (because consumers are not available).
 - The same check is also performed when a user logs in. This is done to notify users about the problem as soon as possible.                                 
@@ -73,6 +83,8 @@ To disable the Consumer Heartbeat functionality, set the `heartbeat_update_perio
 
 ## Consumer Interruption
 
+### Friendly Consumer Interruption
+
 During the consuming and processing message sometimes it is necessary to interrupt consumer, to avoid such cases as 
  **not actual cached data**, **maintenance mode** or **memory leaks**, also limit messages or processing time during **debugging**
  or any other reason when consumer should be stopped. Below is a list of friendly consumer interruption:
@@ -89,6 +101,37 @@ Output                                                                          
 
 The normal interruption occurs only after a message was processed. If an event was fired during a message processing a 
 consumer completes the message processing and interrupts after the processing is done.
+
+### Unfriendly Consumer Interruption
+
+If the consumer interrupts abruptly, check the prod.log file. It should contain the following message.
+
+```bash
+app.ERROR: Consuming interrupted, reason: Something went wrong.
+```
+
+The **full exception stack trace** will be printed in the console output.
+
+To find out the reason for consumer interruption, use [ConsoleErrorHandler](../../Log/Handler/ConsoleErrorHandler.php) in the monolog configuration. It collects all logs in the buffer depending on the configured log level and prints them to the `prod.log` if an error occurs (the error is triggered by the `console.error` event).
+
+_NOTICE: Buffer of all logs that collected before error has occurred will be earased before message was received. It will contains logs only in context of one message._
+
+#### Example of ConsoleErrorHandler Configuration
+
+To log in all environments, add the following code to `config.yml`. To log only in `prod`, add the code to `config_prod.yml`:
+
+```yml
+# config/config_prod.yml
+
+monolog:
+    handlers:
+        # ...
+        message_queue.consumer.console_error:
+            type: service
+            id: oro_message_queue.log.handler.console_error
+            handler: nested # name of main handler with "stream` type
+            level: debug # minimal log level 
+```
 
 ### Example how to interrupt consumer from own extension
 
@@ -163,3 +206,45 @@ Variable             | Description
 `elapsed_time`       | Time passed since the consumer started processing current message
 
 To add own variables to **extra** that should be shown in the output read the [doc](#how-to-add-extra-data-to-log-messages-via-a-processor).
+
+## Separate Message Queue Consumer Logs
+
+If you want to log the **consumer** channel to a different file, create a new handler and configure it to log only messages from the **consumer** channel. You can add this to `config.yml` to log in all environments, or just `config_prod.yml` to log only in `prod`:
+
+```yml
+monolog:
+    handlers:
+        detailed_logs:
+            type:           service
+            id:             oro_logger.monolog.detailed_logs.handler
+            handler:        nested
+            channels:       ['!consumer'] # Exclude 'consumer' channel for 'detailed_logs' handler
+
+        nested:
+            type:           stream
+            path:           "%kernel.logs_dir%/%kernel.environment%.log"
+            level:          debug
+            channels:       ['!consumer'] # Exclude 'consumer' channel for main 'prod.log' stream
+        
+        # ...
+        
+        # only records with level 'notice' and higher should pass to `consumer.log` file
+        filter_consumer:
+            type:           filter
+            min_level:      notice
+            handler:        consumer
+
+        # collect all log records to buffer and write them to 'consumer.log' file on CLI command error
+        message_queue.consumer.console_error:
+            type:           service
+            id:             oro_message_queue.log.handler.console_error
+            handler:        consumer
+            level:          debug
+
+        # write all records from 'consumer' consumer channel to 'consumer.log'
+        consumer:
+            type:           stream
+            path:           "%kernel.logs_dir%/consumer.log"
+            level:          debug
+            channels:       ["consumer"]
+```

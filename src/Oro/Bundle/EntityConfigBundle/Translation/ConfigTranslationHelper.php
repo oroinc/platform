@@ -6,6 +6,9 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Contains methods related to translations
+ */
 class ConfigTranslationHelper
 {
     /** @var TranslationManager */
@@ -75,5 +78,19 @@ class ConfigTranslationHelper
         $this->translationManager->invalidateCache($locale);
 
         $this->translationManager->flush();
+    }
+
+    /**
+     * @param string $id
+     * @param string $fallback
+     * @return string
+     */
+    public function translateWithFallback(string $id, string $fallback)
+    {
+        if ($this->translator->hasTrans($id)) {
+            return $this->translator->trans($id);
+        }
+
+        return $fallback;
     }
 }

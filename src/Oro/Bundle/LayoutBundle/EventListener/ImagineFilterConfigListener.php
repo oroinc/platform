@@ -8,6 +8,8 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * Loads dynamic Imagine filters
+ *
+ * @deprecated will be remove in 4.0 in favor of on demand filter configuration loading
  */
 class ImagineFilterConfigListener
 {

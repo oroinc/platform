@@ -3,6 +3,7 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 {% oro_title_set({params : {"%report.name%": entity.name, "%report.group%": reportGroup|trans} }) %}
 {% set pageTitle = entity.name %}
+{% set displaySQL = oro_config_value('oro_report.display_sql_query') and isDesktopVersion() %}
 
 {% block navButtons %}
     {% if isDesktopVersion() and is_granted('EDIT', entity) %}
@@ -47,7 +48,7 @@
             </div>
         {% endif %}
         {% set renderParams = renderParams|default({})|merge({
-            enableFullScreenLayout: true,
+            enableFullScreenLayout: not displaySQL,
             enableViews: true,
             showViewsInCustomElement: '.page-title > .navbar-extra .pull-left-extra .grid-views-holder'
         }) %}
@@ -55,7 +56,7 @@
             '_grid_view': {},
             '_tags'     : {'_disabled': true},
         } %}
-        {% if oro_config_value('oro_report.display_sql_query') %}
+        {% if displaySQL %}
             {% set gridParams = gridParams|merge({'display_sql_query': true}) %}
         {% endif %}
         {% set params = params|default({})|merge(gridParams)
@@ -71,3 +72,10 @@
         </div>
     {% endif %}
 {% endblock content_data %}
+
+{% block content %}
+    {{ parent() }}
+    {% if displaySQL %}
+        <div class="sql-query-panel" data-role="sql-query-panel"></div>
+    {% endif %}
+{% endblock content %}

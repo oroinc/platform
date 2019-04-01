@@ -7,6 +7,7 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildDestinationM
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProcessorRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageToArrayConverterPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMonologHandlersPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaSubscribersPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureClearersPass;
@@ -21,6 +22,10 @@ use Oro\Component\MessageQueue\Job\Topics;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * OroMessageQueueBundle incorporates the OroMessageQueue component into OroPlatform
+ * and thereby provides message queue processing capabilities for all application components
+ */
 class OroMessageQueueBundle extends Bundle
 {
     /**
@@ -35,6 +40,7 @@ class OroMessageQueueBundle extends Bundle
         $container->addCompilerPass(new BuildTopicMetaSubscribersPass());
         $container->addCompilerPass(new BuildDestinationMetaRegistryPass());
         $container->addCompilerPass(new BuildMessageToArrayConverterPass());
+        $container->addCompilerPass(new BuildMonologHandlersPass());
         $container->addCompilerPass(new ConfigureClearersPass());
         $container->addCompilerPass(new MakeLoggerServicesPersistentPass());
         $container->addCompilerPass(new MakeAnnotationReaderServicesPersistentPass());

@@ -164,14 +164,6 @@ services:
             - '@liip_imagine.filter.configuration'
             - '@oro_entity.doctrine_helper'
 
-
-    oro_layout.request.listener.imagine_filter_config:
-        class: Oro\Bundle\LayoutBundle\EventListener\ImagineFilterConfigListener
-        arguments:
-            - '@service_container'
-        tags:
-            - { name: kernel.event_listener, event: kernel.request }
-
     oro_layout.block_view_serializer:
         class: Symfony\Component\Serializer\Serializer
         arguments: [{}, {'json': '@oro_layout.block_view_serializer.json_encoder'}]
@@ -212,3 +204,14 @@ services:
     oro_layout.method_phpdoc_extractor:
         class: Oro\Bundle\LayoutBundle\Command\Util\MethodPhpDocExtractor
         public: false
+
+    oro_layout.loader.image_filter.link:
+        tags:
+            - { name: oro_service_link, service: oro_layout.loader.image_filter }
+
+    oro_layout.loader.imagine_filter_configuration_decorator:
+        class: Oro\Bundle\LayoutBundle\Loader\ImagineFilterConfigurationDecorator
+        decorates: liip_imagine.filter.configuration
+        arguments:
+            - '@oro_layout.loader.imagine_filter_configuration_decorator.inner'
+            - '@oro_layout.loader.image_filter.link'
