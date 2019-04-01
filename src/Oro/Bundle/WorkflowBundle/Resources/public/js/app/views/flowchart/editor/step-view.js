@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     var FlowchartEditorStepView;
-    var _ = require('underscore');
     var FlowchartViewerStepView = require('../viewer/step-view');
 
     FlowchartEditorStepView = FlowchartViewerStepView.extend({
