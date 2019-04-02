@@ -21,6 +21,29 @@
     }
 }
 
+@-webkit-keyframes fade-out {
+    from {
+        height: 0;
+        margin: 0;
+        opacity: 0;
+    }
+    to {
+        height: auto;
+        margin: auto;
+        opacity: 1;
+    }
+}
+@keyframes fade-out {
+    from {
+        opacity: 0;
+        transform: translate3d(0, -100%, 0);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
 /* styles */
 ._jsPlumb_drag_select *,
 .workflow-step,
@@ -45,6 +68,7 @@
     .workflow-flowchart-container {
         background-color: #fafafa;
         border: 1px solid #f1f1f1;
+        overflow: hidden;
 
         &.failed {
             border-width: 0;
@@ -55,6 +79,11 @@
 
             .workflow-flowchart-wrapper {
                 animation: fade-in .5s both;
+            }
+        }
+        &.fixed {
+            .workflow-flowchart-wrapper {
+                animation: fade-out .5s both;
             }
         }
     }

@@ -85,8 +85,10 @@ define(function(require) {
             } catch (error) {
                 this.cache.state = this.getState();
                 this.cache.connections = {};
-                throw error;
+                this.jsPlumbInstance.eventBus.trigger('smartline:compute-error', error);
+                return;
             }
+            this.jsPlumbInstance.eventBus.trigger('smartline:compute-success');
         },
 
         _refreshCache: function() {

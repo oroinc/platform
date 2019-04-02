@@ -43,7 +43,8 @@ define(function(require) {
                 autoRender: true,
                 el: this.$('[data-role="flowchart"]'),
                 chartHandlers: {
-                    'smartline:error': _.once(this.handleFlowchartError.bind(this)),
+                    'smartline:compute-error': this.handleFlowchartComputeError.bind(this),
+                    'smartline:compute-success': this.handleFlowchartComputeSuccess.bind(this),
                     'step:drag-start': function() {
                         this._isUnderDragAction = true;
                     }.bind(this),
@@ -76,8 +77,13 @@ define(function(require) {
             }
         },
 
-        handleFlowchartError: function(error) {
+        handleFlowchartComputeError: function(error) {
             var data;
+
+            if (this._isUnderComputeError) {
+                return;
+            }
+            this._isUnderComputeError = true;
 
             if (error instanceof ComplexityError) {
                 data = {
@@ -100,18 +106,32 @@ define(function(require) {
         },
 
         _showFlowchartError: function(data) {
+            if (!this._isUnderComputeError) {
+                return;
+            }
+
             this.subview('loading', new LoadingMaskView({
                 container: this.$('[data-role="flowchart-container"]')
             }));
             this.subview('loading').show();
 
             _.delay(function() {
-                this.$('[data-role="flowchart-container"]')
-                    .before(errorMessageTemplate(data))
-                    .addClass('failed');
+                this.$('[data-role="flowchart-container"]').removeClass('fixed').addClass('failed');
+                this.$('[data-role="flowchart-error"]').html(errorMessageTemplate(data));
                 this.subview('loading').hide();
-                this.subviews.forEach(this.removeSubview.bind(this));
             }.bind(this), 1000);
+        },
+
+        handleFlowchartComputeSuccess: function() {
+            if (!this._isUnderComputeError) {
+                return;
+            }
+            delete this._isUnderComputeError;
+
+            if (this.$('[data-role="flowchart-container"]').is('.failed')) {
+                this.$('[data-role="flowchart-container"]').removeClass('failed').addClass('fixed');
+                this.$('[data-role="flowchart-error"]').html('');
+            }
         }
     });
 
