@@ -29,6 +29,8 @@ define(function(require) {
      * @augments WorkflowViewerComponent
      */
     WorkflowEditorComponent = WorkflowViewerComponent.extend(/** @lends WorkflowEditorComponent.prototype */{
+        FlowchartWorkflowView: FlowchartEditorWorkflowView,
+
         /**
          * @inheritDoc
          */
@@ -57,26 +59,35 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            this._deferredInit();
             var providerOptions = {
                 filterPreset: 'workflow'
             };
-            var entity = _.result(options, 'entity') || _.result(this.options, 'entity');
+
+            var entity = _.result(options, 'entity');
             if (entity) {
                 providerOptions.rootEntity = _.result(entity, 'entity');
             }
-            EntityStructureDataProvider.createDataProvider(providerOptions, this).then(function(provider) {
-                this.entityFieldsProvider = provider;
-                this._resolveDeferredInit();
-            }.bind(this));
+
+            var providerPromise = EntityStructureDataProvider.createDataProvider(providerOptions, this)
+                .then(function(provider) {
+                    this.entityFieldsProvider = provider;
+                    this.initManagementView(options._sourceElement);
+                }.bind(this));
+
+            this._initPromises.push(providerPromise);
 
             WorkflowEditorComponent.__super__.initialize.call(this, options);
+
+            this.historyManager = new HistoryNavigationComponent({
+                observedModel: this.model,
+                _sourceElement: options._sourceElement.find('.workflow-history-container')
+            });
         },
 
         /**
          * @inheritDoc
          */
-        initViews: function($el, flowchartOptions) {
+        initManagementView: function($el) {
             this.workflowManagementView = new WorkflowManagementView({
                 autoRender: true,
                 el: $el,
@@ -84,23 +95,14 @@ define(function(require) {
                 model: this.model,
                 entityFieldsProvider: this.entityFieldsProvider
             });
-            this.historyManager = new HistoryNavigationComponent({
-                observedModel: this.model,
-                _sourceElement: $el.find('.workflow-history-container')
-            });
-            if (this.flowchartEnabled) {
-                this.FlowchartWorkflowView = FlowchartEditorWorkflowView;
-            }
-            WorkflowEditorComponent.__super__.initViews.call(this, $el, flowchartOptions);
         },
 
         /**
          * Automatically organizes steps on flowchart. Fits flowchart to screen.
          */
         refreshChart: function() {
-            if (this.flowchartEnabled) {
-                this.flowchartView.jsPlumbManager.organizeBlocks();
-                this.flowchartView.$el.trigger('autozoom');
+            if (this.flowchartContainerView) {
+                this.flowchartContainerView.refresh();
             }
         },
 

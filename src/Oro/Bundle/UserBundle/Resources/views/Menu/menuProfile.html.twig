@@ -11,7 +11,7 @@
             {% else %}
                 {{ app.user|oro_format_name|escape }}
                 {% if app.user.avatar %}
-                    <img class="avatar" src="{{ filtered_image_url(app.user.avatar, 'avatar_med') }}" alt="{{ app.user|oro_format_name|escape }}"/>
+                    <img class="avatar" src="{{ filtered_image_url(app.user.avatar, 'avatar_med') }}" alt="{{ app.user|oro_format_name }}"/>
                 {%  endif %}
             {% endif %}
         </button>
