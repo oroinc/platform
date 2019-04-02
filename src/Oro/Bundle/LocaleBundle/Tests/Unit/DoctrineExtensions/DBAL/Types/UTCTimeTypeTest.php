@@ -41,6 +41,7 @@ class UTCTimeTypeTest extends \PHPUnit\Framework\TestCase
      */
     public function testConvertToDatabaseValue($source, $expected)
     {
+        $this->markTestSkipped('Unskip after BAP-16821 is done');
         $this->assertEquals($expected, $this->type->convertToDatabaseValue($source, $this->platform));
     }
 
