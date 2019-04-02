@@ -6,6 +6,7 @@ use Doctrine\ORM\Query\Expr\Func;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\DictionaryFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
@@ -14,6 +15,11 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class TagsDictionaryFilter extends DictionaryFilter
 {
+    protected $emptyFilterTypes = [
+        FilterUtility::TYPE_EMPTY,
+        FilterUtility::TYPE_NOT_EMPTY
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -54,23 +60,32 @@ class TagsDictionaryFilter extends DictionaryFilter
         QueryBuilderUtil::checkIdentifier($entityClassParam);
         $expr = false;
 
-        if (empty($data['value'])) {
-            return $expr;
-        }
-
         $qb            = $ds->getQueryBuilder();
         $entityIdAlias = $this->getDataFieldName();
 
         $taggingAlias = $ds->generateParameterName('tagging');
         $tagAlias     = $ds->generateParameterName('tag');
 
-        $subQueryDQL = $qb->getEntityManager()->getRepository('OroTagBundle:Tagging')
-            ->createQueryBuilder($taggingAlias)
-            ->select($taggingAlias . '.recordId')
-            ->join($taggingAlias . '.tag', $tagAlias)
-            ->where(sprintf('%s.entityName = :%s', $taggingAlias, $entityClassParam))
-            ->andWhere($qb->expr()->in($tagAlias . '.id', $data['value']))
-            ->getDQL();
+        $taggingRepository = $qb->getEntityManager()->getRepository('OroTagBundle:Tagging');
+        if (in_array($data['type'], $this->emptyFilterTypes) === false) {
+            if (empty($data['value'])) {
+                return $expr;
+            }
+            $subQueryDQL = $taggingRepository
+                ->createQueryBuilder($taggingAlias)
+                ->select($taggingAlias . '.recordId')
+                ->join($taggingAlias . '.tag', $tagAlias)
+                ->where(sprintf('%s.entityName = :%s', $taggingAlias, $entityClassParam))
+                ->andWhere($qb->expr()->in($tagAlias . '.id', $data['value']))
+                ->getDQL();
+        } else {
+            $subQueryDQL = $taggingRepository
+                ->createQueryBuilder($taggingAlias)
+                ->select($taggingAlias . '.id')
+                ->where(sprintf('%s.entityName = :%s', $taggingAlias, $entityClassParam))
+                ->andWhere("$taggingAlias.recordId = $entityIdAlias")
+                ->getDQL();
+        }
 
         switch ($comparisonType) {
             case DictionaryFilterType::TYPE_IN:
@@ -78,6 +93,12 @@ class TagsDictionaryFilter extends DictionaryFilter
                 break;
             case DictionaryFilterType::TYPE_NOT_IN:
                 $expr = $ds->expr()->notIn($entityIdAlias, $subQueryDQL);
+                break;
+            case FilterUtility::TYPE_NOT_EMPTY:
+                $expr = new Func('EXISTS', [$subQueryDQL]);
+                break;
+            case FilterUtility::TYPE_EMPTY:
+                $expr = new Func('NOT EXISTS', [$subQueryDQL]);
                 break;
             default:
                 break;
@@ -108,17 +129,20 @@ class TagsDictionaryFilter extends DictionaryFilter
      */
     protected function parseData($data)
     {
-        if (!isset($data['value']) || empty($data['value'])) {
+        $type = array_key_exists('type', $data) ? $data['type'] : null;
+        if (!in_array($type, $this->emptyFilterTypes, true)
+            && (!isset($data['value']) || empty($data['value']))
+        ) {
             return false;
         }
         $value = $data['value'];
 
-        if (!is_array($value)) {
+        if (!in_array($type, $this->emptyFilterTypes, true) && !is_array($value)) {
             return false;
         }
 
         $data['type']  = isset($data['type']) ? $data['type'] : DictionaryFilterType::TYPE_IN;
-        $data['value'] = $value;
+        $data['value'] = (array) $value;
 
         return $data;
     }
