@@ -4,7 +4,7 @@
             <b>{{ address.label|escape }}</b>
             <br />
         {% endif %}
-        {{ address|oro_format_address|escape|nl2br }}
+        {{ address|oro_format_address|nl2br }}
     {% else %}
         {{ 'oro.ui.empty'|trans }}
     {% endif %}

@@ -9,6 +9,9 @@ use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Localization related twig filters
+ */
 class LocalizationExtension extends \Twig_Extension
 {
     const NAME = 'oro_locale_localization';
@@ -56,18 +59,15 @@ class LocalizationExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFilter(
                 'oro_language_code_title',
-                [$this, 'getLanguageTitleByCode'],
-                ['is_safe' => ['html']]
+                [$this, 'getLanguageTitleByCode']
             ),
             new \Twig_SimpleFilter(
                 'oro_locale_code_title',
-                [$this, 'formatLocale'],
-                ['is_safe' => ['html']]
+                [$this, 'formatLocale']
             ),
             new \Twig_SimpleFilter(
                 'oro_formatting_code_title',
-                [$this, 'getFormattingTitleByCode'],
-                ['is_safe' => ['html']]
+                [$this, 'getFormattingTitleByCode']
             ),
             new \Twig_SimpleFilter(
                 'localized_value',

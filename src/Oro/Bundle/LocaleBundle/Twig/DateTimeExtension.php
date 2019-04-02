@@ -5,6 +5,9 @@ namespace Oro\Bundle\LocaleBundle\Twig;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Twig extension for DateTime formatting
+ */
 class DateTimeExtension extends \Twig_Extension
 {
     /** @var ContainerInterface */
@@ -47,23 +50,19 @@ class DateTimeExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFilter(
                 'oro_format_datetime',
-                [$this, 'formatDateTime'],
-                ['is_safe' => ['html']]
+                [$this, 'formatDateTime']
             ),
             new \Twig_SimpleFilter(
                 'oro_format_date',
-                [$this, 'formatDate'],
-                ['is_safe' => ['html']]
+                [$this, 'formatDate']
             ),
             new \Twig_SimpleFilter(
                 'oro_format_day',
-                [$this, 'formatDay'],
-                ['is_safe' => ['html']]
+                [$this, 'formatDay']
             ),
             new \Twig_SimpleFilter(
                 'oro_format_time',
-                [$this, 'formatTime'],
-                ['is_safe' => ['html']]
+                [$this, 'formatTime']
             ),
         ];
     }
