@@ -106,9 +106,11 @@ define(function(require) {
 
         render: function() {
             // do nothing except connect()
-            if (!this.isConnected) {
+            if (!this.isConnected && !this.isConnecting) {
+                this.isConnecting = true;
                 this.connect();
                 this.isConnected = true;
+                delete this.isConnecting;
             }
             return this;
         },
