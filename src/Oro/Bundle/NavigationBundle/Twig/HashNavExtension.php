@@ -7,6 +7,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
 
+/**
+ * Hash navigation related twig extension
+ */
 class HashNavExtension extends \Twig_Extension
 {
     /** @var Request */
@@ -34,13 +37,11 @@ class HashNavExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFunction(
                 'oro_is_hash_navigation',
-                [$this, 'checkIsHashNavigation'],
-                ['is_safe' => ['html']]
+                [$this, 'checkIsHashNavigation']
             ),
             new \Twig_SimpleFunction(
                 'oro_hash_navigation_header',
-                [$this, 'getHashNavigationHeaderConst'],
-                ['is_safe' => ['html']]
+                [$this, 'getHashNavigationHeaderConst']
             ),
         ];
     }

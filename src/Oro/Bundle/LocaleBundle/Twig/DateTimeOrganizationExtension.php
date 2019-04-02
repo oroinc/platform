@@ -40,8 +40,7 @@ class DateTimeOrganizationExtension extends DateTimeExtension
         $filters = parent::getFilters();
         $filters[] = new \Twig_SimpleFilter(
             'oro_format_datetime_organization',
-            [$this, 'formatDateTimeOrganization'],
-            ['is_safe' => ['html']]
+            [$this, 'formatDateTimeOrganization']
         );
 
         return $filters;
