@@ -80,6 +80,18 @@ define(function(require) {
         },
 
         refreshCache: function() {
+            try {
+                this._refreshCache();
+            } catch (error) {
+                this.cache.state = this.getState();
+                this.cache.connections = {};
+                this.jsPlumbInstance.eventBus.trigger('smartline:compute-error', error);
+                return;
+            }
+            this.jsPlumbInstance.eventBus.trigger('smartline:compute-success');
+        },
+
+        _refreshCache: function() {
             var _this = this;
             var connections = [];
             var rects = {};

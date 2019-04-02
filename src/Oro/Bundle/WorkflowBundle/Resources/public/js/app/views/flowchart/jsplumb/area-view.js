@@ -3,6 +3,7 @@ define(function(require) {
 
     var FlowchartJsPlumbAreaView;
     var _ = require('underscore');
+    var Backbone = require('backbone');
     var $ = require('jquery');
     var jsPlumb = require('jsplumb');
     var JPManager = require('../../../../tools/jsplumb-manager');
@@ -76,8 +77,19 @@ define(function(require) {
                 options.chartOptions || {}
             );
             this.flowchartState = options.flowchartState;
+            _.extend(this, _.pick(options, 'chartHandlers'));
 
             FlowchartJsPlumbAreaView.__super__.initialize.apply(this, arguments);
+        },
+
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
+            delete this.chartHandlers;
+
+            FlowchartJsPlumbAreaView.__super__.dispose.call(this);
         },
 
         delegateEvents: function() {
@@ -94,9 +106,11 @@ define(function(require) {
 
         render: function() {
             // do nothing except connect()
-            if (!this.isConnected) {
-                this.isConnected = true;
+            if (!this.isConnected && !this.isConnecting) {
+                this.isConnecting = true;
                 this.connect();
+                this.isConnected = true;
+                delete this.isConnecting;
             }
             return this;
         },
@@ -106,8 +120,11 @@ define(function(require) {
                 container: this.id()
             }, this.defaultsChartOptions);
             this.jsPlumbInstance = jsPlumb.getInstance(chartOptions);
-            this.debouncedRepaintEverything = _.debounce(
-                _.bind(this.jsPlumbInstance.repaintEverything, this.jsPlumbInstance), 0);
+            this.jsPlumbInstance.eventBus = Object.create(Backbone.Events);
+            if (this.chartHandlers) {
+                this.listenTo(this.jsPlumbInstance.eventBus, this.chartHandlers);
+            }
+            this.debouncedRepaintEverything = _.debounce(this.repaintEverything.bind(this), 0);
             this.jsPlumbManager = new JPManager(this.jsPlumbInstance, this.model);
             var stepWithPosition = this.model.get('steps').find(function(step) {
                 var position = step.get('position');
@@ -116,6 +133,12 @@ define(function(require) {
             // if positions of step wasn't defined
             if (_.isUndefined(stepWithPosition)) {
                 this.jsPlumbManager.organizeBlocks();
+            }
+        },
+
+        repaintEverything: function() {
+            if (this.isConnected) {
+                this.jsPlumbInstance.repaintEverything();
             }
         },
 
