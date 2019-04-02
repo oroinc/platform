@@ -342,7 +342,6 @@ class MailboxType extends AbstractType
                     'route_name'              => 'oro_email_mailbox_users_search',
                     'route_parameters'        => ['organizationId' => $data->getOrganization()->getId()],
                     'multiple'                => true,
-                    'width'                   => '400px',
                     'placeholder'             => 'oro.user.form.choose_user',
                     'allowClear'              => true,
                     'result_template_twig'    => 'OroUserBundle:User:Autocomplete/result.html.twig',

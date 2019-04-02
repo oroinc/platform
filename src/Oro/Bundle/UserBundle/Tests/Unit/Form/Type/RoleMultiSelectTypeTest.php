@@ -63,7 +63,6 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
                     'autocomplete_alias' => 'roles',
                     'configs' => [
                         'multiple' => true,
-                        'width' => '400px',
                         'placeholder' => 'oro.user.form.choose_role',
                         'allowClear' => true,
                     ]

@@ -62,7 +62,6 @@ class BusinessUnitType extends AbstractType
                     'configs' => [
                         'multiple' => false,
                         'component'   => 'tree-autocomplete',
-                        'width'       => '400px',
                         'placeholder' => 'oro.dashboard.form.choose_business_unit',
                         'allowClear'  => true
                     ]
@@ -148,7 +147,6 @@ class BusinessUnitType extends AbstractType
                     'configs' => [
                         'multiple' => false,
                         'component'   => 'parent-business-units-autocomplete',
-                        'width'       => '400px',
                         'placeholder' => 'oro.dashboard.form.choose_business_unit',
                         'allowClear'  => true,
                         'entity_id' => $entity->getId()
