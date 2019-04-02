@@ -108,6 +108,10 @@ abstract class BaseMultiChoiceFilter extends AbstractFilter
                 return $ds->expr()->eq($fieldName, $parameterName, true);
             case DictionaryFilterType::NOT_EQUAL:
                 return $ds->expr()->neq($fieldName, $parameterName, true);
+            case FilterUtility::TYPE_NOT_EMPTY:
+                return $ds->expr()->isNotNull($fieldName);
+            case FilterUtility::TYPE_EMPTY:
+                return $ds->expr()->isNull($fieldName);
             default:
                 return $ds->expr()->in($fieldName, $parameterName, true);
         }
