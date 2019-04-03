@@ -63,6 +63,7 @@
     .map-address-list {
         width: 40%;
         overflow: hidden;
+        max-height: inherit;
         margin-#{$end}: $address-box-margin-small/2;
         padding-#{$end}: $address-box-margin-small/2;
 
