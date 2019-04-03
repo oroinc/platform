@@ -28,16 +28,6 @@ class ImageLinkFormatterTest extends \PHPUnit\Framework\TestCase
         $this->formatter  = new ImageLinkFormatter($this->manager, $this->translator);
     }
 
-    public function testGetFormatterName()
-    {
-        $this->assertEquals('image_link', $this->formatter->getFormatterName());
-    }
-
-    public function testGetSupportedTypes()
-    {
-        $this->assertEquals(['image'], $this->formatter->getSupportedTypes());
-    }
-
     public function testGetDefaultValue()
     {
         $this->translator

@@ -2,58 +2,81 @@
 
 namespace Oro\Bundle\EmailBundle\DependencyInjection\Compiler;
 
-use Doctrine\Common\Inflector\Inflector;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Collects all email template variable providers and add them to the chain provider.
+ */
 class EmailTemplateVariablesPass implements CompilerPassInterface
 {
-    const SERVICE_KEY = 'oro_email.emailtemplate.variable_provider';
-    const TAG         = 'oro_email.emailtemplate.variable_provider';
+    private const CHAIN_PROVIDER_SERVICE = 'oro_email.emailtemplate.variable_provider';
+    private const PROVIDER_TAG           = 'oro_email.emailtemplate.variable_provider';
+
+    private const SCOPE_SYSTEM  = 'system';
+    private const SCOPE_ENTITY  = 'entity';
+    private const SCOPE_ATTR    = 'scope';
+    private const PRIORITY_ATTR = 'priority';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::SERVICE_KEY)) {
-            return;
-        }
-
-        // find providers
-        $providers      = [];
-        $taggedServices = $container->findTaggedServiceIds(self::TAG);
-        foreach ($taggedServices as $id => $attributes) {
-            if (empty($attributes[0]['scope'])) {
-                throw new InvalidConfigurationException(
-                    sprintf('Tag attribute "scope" is required for "%s" service', $id)
-                );
+        $providers = [];
+        $systemProviders = [];
+        $entityProviders = [];
+        $taggedServices = $container->findTaggedServiceIds(self::PROVIDER_TAG);
+        foreach ($taggedServices as $serviceId => $tags) {
+            $attributes = $tags[0];
+            if (empty($attributes[self::SCOPE_ATTR])) {
+                throw new \InvalidArgumentException(sprintf(
+                    'The tag attribute "%s" is required for service "%s".',
+                    self::SCOPE_ATTR,
+                    $serviceId
+                ));
             }
 
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $scope    = $attributes[0]['scope'];
+            $priority = $attributes[self::PRIORITY_ATTR] ?? 0;
+            $scope = $attributes[self::SCOPE_ATTR];
+            if (self::SCOPE_SYSTEM === $scope) {
+                $systemProviders[$priority][] = $serviceId;
+            } elseif (self::SCOPE_ENTITY === $scope) {
+                $entityProviders[$priority][] = $serviceId;
+            } else {
+                throw new \InvalidArgumentException(sprintf(
+                    'The value "%s" is invalid for the tag attribute "%s" for service "%s", expected "%s" or "%s".',
+                    $scope,
+                    self::SCOPE_ATTR,
+                    $serviceId,
+                    self::SCOPE_SYSTEM,
+                    self::SCOPE_ENTITY
+                ));
+            }
 
-            $providers[$scope][$priority][] = new Reference($id);
-        }
-        if (empty($providers)) {
-            return;
+            $providers[$serviceId] = new Reference($serviceId);
         }
 
-        // add to chain
-        $serviceDef = $container->getDefinition(self::SERVICE_KEY);
-        foreach ($providers as $scope => $items) {
-            // sort by priority and flatten
+        $container->getDefinition(self::CHAIN_PROVIDER_SERVICE)
+            ->replaceArgument(0, ServiceLocatorTagPass::register($container, $providers))
+            ->replaceArgument(1, $this->sortByPriorityAndFlatten($systemProviders))
+            ->replaceArgument(2, $this->sortByPriorityAndFlatten($entityProviders));
+    }
+
+    /**
+     * @param array $items [priority => item, ...]
+     *
+     * @return array [item, ...]
+     */
+    private function sortByPriorityAndFlatten(array $items): array
+    {
+        if ($items) {
             krsort($items);
-            $items = call_user_func_array('array_merge', $items);
-            // register
-            foreach ($items as $provider) {
-                $serviceDef->addMethodCall(
-                    sprintf('add%sVariablesProvider', Inflector::classify($scope)),
-                    [$provider]
-                );
-            }
+            $items = array_merge(...$items);
         }
+
+        return $items;
     }
 }

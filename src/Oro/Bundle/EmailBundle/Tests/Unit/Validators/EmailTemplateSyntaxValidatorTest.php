@@ -1,92 +1,68 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit\Validator;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Validators;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
 use Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSyntax;
 use Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class EmailTemplateSyntaxValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_SUBJECT       = '{{entity.subject}}';
-    const TEST_TRANS_SUBJECT = '{{entity.trans.subject}}';
-    const TEST_CONTENT       = '{{entity.content}}';
-
-    const ENTITY_CLASS          = 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity';
-    const ABSTRACT_ENTITY_CLASS = 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeAbstractEntity';
+    private const TEST_SUBJECT       = '{{entity.subject}}';
+    private const TEST_TRANS_SUBJECT = '{{entity.trans.subject}}';
+    private const TEST_CONTENT       = '{{entity.content}}';
 
     /** @var EmailTemplateSyntax */
-    protected $constraint;
+    private $constraint;
 
     /** @var EmailTemplate */
-    protected $template;
+    private $template;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $twig;
+    private $emailRenderer;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $context;
+    private $context;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $localeSettings;
+    private $localeSettings;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityConfigProvider;
+    private $entityConfigProvider;
 
     protected function setUp()
     {
         $this->constraint = new EmailTemplateSyntax();
-
-        $this->twig = $this
-            ->getMockBuilder('\Twig_Environment')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->emailRenderer = $this->createMock(EmailRenderer::class);
         $this->context = $this->createMock(ExecutionContextInterface::class);
-
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->template = new EmailTemplate();
     }
 
     public function testValidateNoErrors()
     {
-        $subjectTokenStream = $this->getMockBuilder('\Twig_TokenStream')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $contentTokenStream = $this->getMockBuilder('\Twig_TokenStream')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $tokenizeMap = [
-            [self::TEST_SUBJECT, null, $subjectTokenStream],
-            [self::TEST_CONTENT, null, $contentTokenStream]
-        ];
-        $this->twig->expects($this->exactly(count($tokenizeMap)))
-            ->method('tokenize')
-            ->will($this->returnValueMap($tokenizeMap));
-        $parseMap = [
-            [$subjectTokenStream, null],
-            [$contentTokenStream, null]
-        ];
-        $this->twig->expects($this->exactly(count($parseMap)))
-            ->method('parse')
-            ->will($this->returnValueMap($parseMap));
+        $this->emailRenderer->expects($this->at(0))
+            ->method('validateTemplate')
+            ->with(self::TEST_SUBJECT);
+        $this->emailRenderer->expects($this->at(1))
+            ->method('validateTemplate')
+            ->with(self::TEST_CONTENT);
 
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $validator = $this->getValidator(self::ENTITY_CLASS);
+        $validator = $this->getValidator(SomeEntity::class);
         $validator->validate($this->template, $this->constraint);
     }
 
@@ -99,30 +75,9 @@ class EmailTemplateSyntaxValidatorTest extends \PHPUnit\Framework\TestCase
             ->setContent(self::TEST_TRANS_SUBJECT);
         $this->template->getTranslations()->add($trans);
 
-        $subjectTokenStream      = $this->getMockBuilder('\Twig_TokenStream')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $contentTokenStream      = $this->getMockBuilder('\Twig_TokenStream')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $transSubjectTokenStream = $this->getMockBuilder('\Twig_TokenStream')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $tokenizeMap = [
-            [self::TEST_SUBJECT, null, $subjectTokenStream],
-            [self::TEST_CONTENT, null, $contentTokenStream],
-            [self::TEST_TRANS_SUBJECT, null, $transSubjectTokenStream]
-        ];
-        $this->twig->expects($this->exactly(count($tokenizeMap)))
-            ->method('tokenize')
-            ->will($this->returnValueMap($tokenizeMap));
-
-        $this->twig->expects($this->exactly(count($tokenizeMap)))
-            ->method('parse')
-            ->will(
-                $this->throwException(new \Twig_Error_Syntax('message'))
-            );
+        $this->emailRenderer->expects($this->exactly(3))
+            ->method('validateTemplate')
+            ->willThrowException(new \Twig_Error_Syntax('message'));
 
         $this->entityConfigProvider->expects($this->exactly(3))
             ->method('hasConfig')
@@ -186,7 +141,7 @@ class EmailTemplateSyntaxValidatorTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $validator = $this->getValidator(self::ENTITY_CLASS);
+        $validator = $this->getValidator(SomeEntity::class);
         $validator->validate($this->template, $this->constraint);
     }
 
@@ -194,37 +149,20 @@ class EmailTemplateSyntaxValidatorTest extends \PHPUnit\Framework\TestCase
      * @param string $className
      * @return EmailTemplateSyntaxValidator
      */
-    protected function getValidator($className)
+    private function getValidator($className)
     {
         $this->template
             ->setContent(self::TEST_CONTENT)
             ->setSubject(self::TEST_SUBJECT)
             ->setEntityName($className);
 
-        $sandbox = $this->getMockBuilder('\Twig_Extension_Sandbox')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $sandbox->expects($this->once())
-            ->method('enableSandbox');
-
-        $sandbox->expects($this->once())
-            ->method('disableSandbox');
-
-        $this->twig->expects($this->once())
-            ->method('getExtension')
-            ->with($this->equalTo('sandbox'))
-            ->will($this->returnValue($sandbox));
-
-        $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
             ->will($this->returnArgument(0));
 
         $validator = new EmailTemplateSyntaxValidator(
-            $this->twig,
+            $this->emailRenderer,
             $this->localeSettings,
             $this->entityConfigProvider,
             $translator

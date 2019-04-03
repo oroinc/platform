@@ -22,9 +22,6 @@ parameters:
 
     oro_locale.locale_listener.class:   Oro\Bundle\LocaleBundle\EventListener\LocaleListener
 
-    oro_locale.formatter.datetime.class: Oro\Bundle\LocaleBundle\Formatter\DateTimeValueFormatter
-    oro_locale.formatter.date.class: Oro\Bundle\LocaleBundle\Formatter\DateValueFormatter
-
     oro_locale.entity_generator.extension.class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
 
 services:
@@ -245,27 +242,30 @@ services:
             - { name: twig.extension }
 
     oro_locale.format.datetime:
-        class: '%oro_locale.formatter.datetime.class%'
+        class: Oro\Bundle\LocaleBundle\Formatter\DateTimeValueFormatter
+        public: false
         arguments:
             - '@oro_locale.formatter.date_time'
             - '@translator'
         tags:
-            - { name: oro_formatter, formatter: datetime }
+            - { name: oro_formatter, formatter: datetime, data_type: datetime }
 
     oro_locale.format.date:
-        class: '%oro_locale.formatter.date.class%'
+        class: Oro\Bundle\LocaleBundle\Formatter\DateValueFormatter
+        public: false
         arguments:
             - '@oro_locale.formatter.date_time'
             - '@translator'
         tags:
-            - { name: oro_formatter, formatter: date }
+            - { name: oro_formatter, formatter: date, data_type: date }
 
     oro_locale.format.currency:
         class: Oro\Bundle\LocaleBundle\Formatter\CurrencyFormatter
+        public: false
         arguments:
             - '@oro_locale.formatter.number'
         tags:
-            - { name: oro_formatter, formatter: currency }
+            - { name: oro_formatter, formatter: currency, data_type: money }
 
     oro_locale.entity_name_provider:
         class: '%oro_locale.entity_name_provider.class%'

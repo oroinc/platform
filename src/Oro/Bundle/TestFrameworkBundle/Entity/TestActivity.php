@@ -9,6 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Model\ExtendTestActivity;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
+ * The entity for test purposes.
  * @ORM\Table(
  *     name="test_activity",
  *     indexes={@ORM\Index(name="idx_test_activity_owner_id", columns={"owner_id"})}
@@ -169,5 +170,13 @@ class TestActivity extends ExtendTestActivity implements TestFrameworkEntityInte
         $this->owner = $owner;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->description;
     }
 }

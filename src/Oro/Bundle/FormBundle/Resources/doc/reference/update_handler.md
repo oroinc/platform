@@ -68,6 +68,7 @@ Among usual arguments there are two most valuable from the point of reuse.
             - { name: oro_form.form.handler, alias: user_handler }
     my_bundle.form.user_update_data_provider:
         class: MyBundle\Form\UserUpdateDataProvider
+        public: false
         tags:
             - { name: oro_form.form_template_data_provider, alias: user_update_data }
  ```
