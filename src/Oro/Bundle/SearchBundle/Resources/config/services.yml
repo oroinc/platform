@@ -360,3 +360,8 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
         public: false
+
+    oro_search.event_listener.limit_results:
+        class: 'Oro\Bundle\SearchBundle\EventListener\LimitResultsListener'
+        tags:
+            - { name: kernel.event_listener, event: oro_search.before_search, method: onBeforeSearch, priority: -255 }

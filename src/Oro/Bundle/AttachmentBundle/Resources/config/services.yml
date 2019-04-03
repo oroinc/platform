@@ -20,10 +20,6 @@ parameters:
 
     oro_attachment.provider.attachment.class:                    Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
 
-    oro_attachment.formatter.image_encoded.class:                Oro\Bundle\AttachmentBundle\Formatter\ImageEncodedFormatter
-    oro_attachment.formatter.image_link.class:                   Oro\Bundle\AttachmentBundle\Formatter\ImageLinkFormatter
-    oro_attachment.formatter.image_src.class:                    Oro\Bundle\AttachmentBundle\Formatter\ImageSrcFormatter
-
     oro_attachment.attachments_dir:                              attachment
     oro_attachment.media_cache_dir:                              media/cache
     oro_attachment.filesystem_name:                              attachments
@@ -221,15 +217,17 @@ services:
             - { name: oro_entity.exclusion_provider.api }
 
     oro_attachment.formatter.image_encoded:
-        class: '%oro_attachment.formatter.image_encoded.class%'
+        class: Oro\Bundle\AttachmentBundle\Formatter\ImageEncodedFormatter
+        public: false
         arguments:
           - '@oro_attachment.file_manager'
           - '@file_locator'
         tags:
-          - { name: oro_formatter, formatter: image_encoded }
+          - { name: oro_formatter, formatter: image_encoded, data_type: image }
 
     oro_attachment.formatter.image_link:
-        class: '%oro_attachment.formatter.image_link.class%'
+        class: Oro\Bundle\AttachmentBundle\Formatter\ImageLinkFormatter
+        public: false
         arguments:
           - '@oro_attachment.manager'
           - '@translator'
@@ -237,7 +235,8 @@ services:
           - { name: oro_formatter, formatter: image_link }
 
     oro_attachment.formatter.image_src:
-        class: '%oro_attachment.formatter.image_src.class%'
+        class: Oro\Bundle\AttachmentBundle\Formatter\ImageSrcFormatter
+        public: false
         arguments:
           - '@oro_attachment.manager'
         tags:

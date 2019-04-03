@@ -29,11 +29,6 @@ class DateValueFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFormatterName()
-    {
-        $this->assertEquals('date', $this->formatter->getFormatterName());
-    }
-
     public function testFormat()
     {
         $parameter = new \DateTime();
@@ -43,16 +38,6 @@ class DateValueFormatterTest extends \PHPUnit\Framework\TestCase
             ->with($parameter)
             ->will($this->returnValue('01 Jan 2016'));
         $this->assertEquals('01 Jan 2016', $this->formatter->format($parameter));
-    }
-
-    public function testGetSupportedTypes()
-    {
-        $this->assertEquals(['date'], $this->formatter->getSupportedTypes());
-    }
-
-    public function testIsDefaultFormatter()
-    {
-        $this->assertTrue($this->formatter->isDefaultFormatter());
     }
 
     public function testGetDefaultValue()

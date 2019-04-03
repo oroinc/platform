@@ -10,12 +10,18 @@ Formatters is the set of filters what can be assigned to some data.
 Formatters implementation
 -------------------------
 
-To create own formatter, programmer should create new service that should be tagged with `oro_formatter` tag name and
-should have the name of this formatter. For example:
+To create own formatter, programmer should create new service that should be tagged with `oro_formatter` tag.
+
+This tag has the following attributes:
+
+* **formatter** - The formatter name. It is mandatory attribute.
+* **data_type** - The data type name for which the formatter should be used by default.
+
+Example:
   
 ```
       acme_demo.formatter.some_formatter:
-          class: %acme_demo.formatter.some_formatter.class%
+          class: Acme\Bundle\AcmeBundle\Formatter\SomeFormatter
           tags:
             - { name: oro_formatter, formatter: some_formatter }    
 ```

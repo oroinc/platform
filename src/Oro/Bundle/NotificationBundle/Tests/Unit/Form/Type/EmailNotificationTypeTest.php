@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\FormBundle\Form\Type\Select2EntityType;
@@ -19,6 +18,7 @@ use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSub
 use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationEntityChoiceType;
 use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType;
 use Oro\Bundle\NotificationBundle\Form\Type\RecipientListType;
+use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Form\Type\Stub\Select2TranslatableEntityTypeStub;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -81,14 +81,12 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($entityManager);
-        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
-        $configManager = $this->createMock(ConfigManager::class);
 
         $contactInformationEmailsProvider = $this->createMock(ContactInformationEmailsProvider::class);
 
         $this->formType = new EmailNotificationType(
             new BuildTemplateFormSubscriber($tokenStorage),
-            new AdditionalEmailsSubscriber($this->registry, $this->getTranslator(), $configManager),
+            new AdditionalEmailsSubscriber($this->createMock(ChainAdditionalEmailAssociationProvider::class)),
             $router,
             new ContactInformationEmailsSubscriber($contactInformationEmailsProvider)
         );

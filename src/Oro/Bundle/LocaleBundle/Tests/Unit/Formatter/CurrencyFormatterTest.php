@@ -55,23 +55,8 @@ class CurrencyFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSupportedTypes()
-    {
-        $this->assertEquals(['money'], $this->formatter->getSupportedTypes());
-    }
-
-    public function getIsDefaultFormatter()
-    {
-        $this->assertTrue($this->formatter->isDefaultFormatter());
-    }
-
     public function testGetDefaultValue()
     {
         $this->assertEquals(0, $this->formatter->getDefaultValue());
-    }
-
-    public function testGetFormatterName()
-    {
-        $this->assertEquals('currency', $this->formatter->getFormatterName());
     }
 }

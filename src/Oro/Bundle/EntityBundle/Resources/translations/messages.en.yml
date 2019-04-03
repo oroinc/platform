@@ -12,6 +12,9 @@ oro:
             choose_entity_fields:   Choose fields...
             entity_fields:          Fields
             entity_related:         Related
+        formatter:
+            simple_array:
+                default: N/A
 
         plural_label: Entities
         item: "Item #%id%"

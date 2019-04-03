@@ -9,6 +9,9 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * Enum filter provides possibility to create filter form and build an expression by passed enum data
+ */
 class EnumFilter extends BaseMultiChoiceFilter
 {
     const FILTER_TYPE_NAME = 'enum';
@@ -60,15 +63,28 @@ class EnumFilter extends BaseMultiChoiceFilter
     {
         $metadata = parent::getMetadata();
         if ($metadata['class']) {
-            $this->dictionaryApiEntityManager->setClass(
-                $this->dictionaryApiEntityManager->resolveEntityClass($metadata['class'], true)
-            );
+            $resolvedEntityClass = $this->resolveMetadataClass($metadata);
+            $this->dictionaryApiEntityManager->setClass($resolvedEntityClass);
             $metadata['initialData'] = $this->dictionaryApiEntityManager->findValueByPrimaryKey(
                 $this->getForm()->get('value')->getData()
             );
         }
 
         return $metadata;
+    }
+
+    /**
+     * @param array $metadata
+     *
+     * @return string
+     */
+    private function resolveMetadataClass(array $metadata)
+    {
+        if (array_key_exists('class', $metadata) && strpos($metadata['class'], ExtendHelper::ENTITY_NAMESPACE) === 0) {
+            return $metadata['class'];
+        }
+
+        return $this->dictionaryApiEntityManager->resolveEntityClass($metadata['class'], true);
     }
 
     /**

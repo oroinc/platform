@@ -8,6 +8,7 @@ use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\TemplateEmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
+use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
@@ -37,6 +38,9 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
+    /** @var ChainAdditionalEmailAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $additionalEmailAssociationProvider;
+
     /** @var WorkflowNotificationHandler */
     private $handler;
 
@@ -56,11 +60,14 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getManager')
             ->willReturn($this->em);
 
+        $this->additionalEmailAssociationProvider = $this->createMock(ChainAdditionalEmailAssociationProvider::class);
+
         $this->handler = new WorkflowNotificationHandler(
             $this->manager,
             $doctrine,
             new PropertyAccessor(),
-            $this->eventDispatcher
+            $this->eventDispatcher,
+            $this->additionalEmailAssociationProvider
         );
     }
 
@@ -79,7 +86,8 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
                     $notification,
                     $this->em,
                     new PropertyAccessor(),
-                    $this->eventDispatcher
+                    $this->eventDispatcher,
+                    $this->additionalEmailAssociationProvider
                 );
             },
             $expected

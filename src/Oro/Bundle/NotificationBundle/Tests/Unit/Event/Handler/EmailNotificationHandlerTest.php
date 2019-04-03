@@ -9,6 +9,7 @@ use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler;
 use Oro\Bundle\NotificationBundle\Event\Handler\TemplateEmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
+use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -34,6 +35,8 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
         /** @var EntityManager $em */
         $em = $this->createMock(EntityManager::class);
 
+        $additionalEmailAssociationProvider = $this->createMock(ChainAdditionalEmailAssociationProvider::class);
+
         /** @var EmailNotification $notification */
         $notification = $this->createMock(EmailNotification::class);
         $notifications = [$notification];
@@ -43,7 +46,8 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
                 $notification,
                 $em,
                 $this->getPropertyAccessor(),
-                $dispatcher
+                $dispatcher,
+                $additionalEmailAssociationProvider
             )
         ];
 
@@ -58,7 +62,13 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getManager')
             ->willReturn($em);
 
-        $handler = new EmailNotificationHandler($manager, $doctrine, $this->getPropertyAccessor(), $dispatcher);
+        $handler = new EmailNotificationHandler(
+            $manager,
+            $doctrine,
+            $this->getPropertyAccessor(),
+            $dispatcher,
+            $additionalEmailAssociationProvider
+        );
         $handler->handle($event, $notifications);
     }
 }

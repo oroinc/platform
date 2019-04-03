@@ -35,7 +35,7 @@ then search will be performed for all entities.
 
 * **setFirstResult()** - set the first result offset
 
-* **setMaxResults()** - set max results of records in result.
+* **setMaxResults()** - set max results of records in result. Please note that there's a hard limit of 1000 on quantity of results which search query can return.
 
 * **addAggregate()** - add aggregating function for field.
     * First argument - aggregate result name. It will be present as separated `key` with aggregating value in the response.

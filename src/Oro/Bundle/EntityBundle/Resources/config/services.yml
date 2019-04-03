@@ -229,6 +229,14 @@ services:
             - '@oro_entity.entity_provider'
             - '@oro_entity_config.helper.entity_config'
 
+    oro_entity.format.simple_array:
+        class: Oro\Bundle\EntityBundle\Formatter\SimpleArrayFormatter
+        public: false
+        arguments:
+            - '@translator'
+        tags:
+            - { name: oro_formatter, formatter: simple_array, data_type: simple_array }
+
     oro_entity.twig.extension.entity:
         class: Oro\Bundle\EntityBundle\Twig\EntityExtension
         public: false
