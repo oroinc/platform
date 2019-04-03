@@ -250,12 +250,11 @@ class ImportExportControllerTest extends WebTestCase
             $files
         );
         $this->assertJsonResponseSuccess();
-        $importedFiles = glob($this->getImportDir() . DIRECTORY_SEPARATOR . '*.csv');
-        $diffFiles = array_diff($importedFiles, $this->existingFiles);
-        $importedFile = reset($diffFiles);
+        $message = $this->getSentMessage(Topics::PRE_IMPORT);
+        $importedFilePath = $this->getImportDir() . DIRECTORY_SEPARATOR . $message['fileName'];
         $this->assertEquals(
             substr_count(file_get_contents($file), "\n"),
-            substr_count(file_get_contents($importedFile), "\r\n")
+            substr_count(file_get_contents($importedFilePath), "\r\n")
         );
     }
 
