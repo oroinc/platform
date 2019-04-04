@@ -100,6 +100,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'TestEntity';
         $properties = [$entityClass => ['field2']];
         $methods = [$entityClass => ['getField1']];
+        $allowedMethods = [$entityClass => ['getField1', '__toString']];
 
         $this->configProvider->expects(self::once())
             ->method('getConfiguration')
@@ -114,7 +115,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
             ->with($properties);
         $this->securityPolicy->expects(self::once())
             ->method('setAllowedMethods')
-            ->with($methods);
+            ->with($allowedMethods);
 
         $this->configProvider->expects(self::once())
             ->method('getSystemVariableValues')
