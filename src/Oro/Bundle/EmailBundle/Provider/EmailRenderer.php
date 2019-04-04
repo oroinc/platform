@@ -143,6 +143,7 @@ class EmailRenderer extends \Twig_Environment
 
             $configuration['properties'][$className] = $properties;
             $configuration['methods'][$className]    = $methods;
+            $configuration['methods'][$className][]    = '__toString';
 
             $configuration['formatters'][$className]        = $formatters;
             $configuration['default_formatter'][$className] = $defaultFormatters;
