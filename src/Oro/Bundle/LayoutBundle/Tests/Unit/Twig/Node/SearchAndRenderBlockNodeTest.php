@@ -56,7 +56,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             sprintf(
-                self::RENDER_CALL . '(%s, \'widget\', ["foo" => "bar"])',
+                self::RENDER_CALL . '(%s, \'widget\', array("foo" => "bar"))',
                 $this->getVariableGetter('block')
             ),
             trim($compiler->compile($node)->getSource())
@@ -81,7 +81,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             sprintf(
-                self::RENDER_CALL . '(%s, \'label\', ["label" => "my label"])',
+                self::RENDER_CALL . '(%s, \'label\', array("label" => "my label"))',
                 $this->getVariableGetter('block')
             ),
             trim($compiler->compile($node)->getSource())
@@ -194,7 +194,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
         // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
-                self::RENDER_CALL . '(%s, \'label\', ["foo" => "bar"])',
+                self::RENDER_CALL . '(%s, \'label\', array("foo" => "bar"))',
                 $this->getVariableGetter('block')
             ),
             trim($compiler->compile($node)->getSource())
@@ -228,7 +228,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             sprintf(
-                self::RENDER_CALL . '(%s, \'label\', ["foo" => "bar", "label" => "value in argument"])',
+                self::RENDER_CALL . '(%s, \'label\', array("foo" => "bar", "label" => "value in argument"))',
                 $this->getVariableGetter('block')
             ),
             trim($compiler->compile($node)->getSource())
@@ -305,7 +305,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             sprintf(
                 self::RENDER_CALL . '(%s, \'label\', '
-                . '["foo" => "bar", "label" => "value in attributes"] '
+                . 'array("foo" => "bar", "label" => "value in attributes") '
                 . '+ (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
                 $this->getVariableGetter('block')
             ),

@@ -131,25 +131,11 @@ abstract class TemplateRenderer
         /** @var \Twig_Sandbox_SecurityPolicy $security */
         $security = $sandbox->getSecurityPolicy();
         $security->setAllowedProperties($config[ConfigProvider::PROPERTIES]);
-        $methods = $this->enableToStringMethod($config[ConfigProvider::METHODS]);
-        $security->setAllowedMethods($methods);
+        $security->setAllowedMethods($config[ConfigProvider::METHODS]);
 
         $formatExtension = new EntityFormatExtension();
         $formatExtension->setFormatters($config[ConfigProvider::DEFAULT_FORMATTERS]);
         $this->environment->addExtension($formatExtension);
-    }
-
-    /**
-     * @param array $configMethods
-     * @return array
-     */
-    private function enableToStringMethod(array $configMethods): array
-    {
-        foreach ($configMethods as $className => &$methods) {
-            $methods[] = '__toString';
-        }
-
-        return $configMethods;
     }
 
     /**
