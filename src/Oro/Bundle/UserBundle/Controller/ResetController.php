@@ -138,6 +138,9 @@ class ResetController extends Controller
                 $translator->trans('oro.user.password.force_reset.success.message', ['%email%' => $user->getEmail()])
             );
 
+            if ($this->getUser() && $this->getUser()->getId() === $user->getId()) {
+                return $this->redirectToRoute('oro_user_security_login');
+            }
             return $params;
         }
 

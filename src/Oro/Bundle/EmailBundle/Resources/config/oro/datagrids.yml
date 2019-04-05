@@ -184,7 +184,7 @@ datagrids:
                 mailbox: { data_name: originId }
             default: { receivedAt: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC' }
         options:
-            entityHint: emails
+            entityHint: oro.email.entity_plural_label
 
     simplified-email-grid:
         extends: base-email-grid
@@ -344,7 +344,7 @@ datagrids:
                 route: oro_email_email_reply
                 params: { id: emailId }
         options:
-            entityHint: emails
+            entityHint: oro.email.entity_plural_label
             toolbarOptions:
                 hide: true
                 pagination:
@@ -594,7 +594,7 @@ datagrids:
                 link:         delete_link
         options:
             entity_pagination: true
-            entityHint: email template
+            entityHint: oro.email.emailtemplate.entity_plural_label
         action_configuration: "@oro_email.emailtemplate.datagrid_helper->getActionConfigurationClosure"
         views_list : "@oro_email.emailtemplate.datagrid_view_list"
 
@@ -664,7 +664,7 @@ datagrids:
     email-for-context-grid:
         extends: email-grid
         options:
-            entityHint: emails
+            entityHint: oro.email.entity_plural_label
             entity_pagination: true
             toolbarOptions:
                 pageSize:

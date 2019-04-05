@@ -758,6 +758,11 @@ define(function(require) {
                 return;
             }
 
+            if (jqxhr.status === 401) {
+                this.remove();
+                return;
+            }
+
             var message = __('oro.ui.widget_loading_failed');
 
             if (jqxhr.status === 403) {

@@ -2,7 +2,7 @@ datagrids:
     # Entity config entities grid
     entityconfig-grid:
         options:
-            entityHint: entities
+            entityHint: oro.entity_config.entity.plural_label
         acl_resource: oro_entityconfig_manage
         features:
             entity_class_name_path: ce.className
@@ -63,7 +63,7 @@ datagrids:
     base-entityfields-grid:
         options:
             mode: client
-            entityHint: fields
+            entityHint: oro.entity_config.field_config.entity_plural_label
             toolbarOptions:
                 pageSize:
                     default_per_page: 50
@@ -171,7 +171,7 @@ datagrids:
     # Audit entity log grid
     entity-audit-grid:
         options:
-            entityHint: histories
+            entityHint: oro.entity_config.config_log.entity_plyral_label
         acl_resource: oro_entityconfig_manage
         source:
             type: orm

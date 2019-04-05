@@ -8,24 +8,24 @@ use Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCTimeType;
 class UTCTimeTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var UTCTimeType
+     * @var UTCTimeType|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $type;
 
     /**
-     * @var AbstractPlatform
+     * @var AbstractPlatform|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $platform;
 
     protected function setUp()
     {
         // class has private constructor
-        $this->type = $this->getMockBuilder('Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCTimeType')
+        $this->type = $this->getMockBuilder(UTCTimeType::class)
             ->setMethods(null)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->platform = $this->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
+        $this->platform = $this->getMockBuilder(AbstractPlatform::class)
             ->disableOriginalConstructor()
             ->setMethods(['getTimeFormatString'])
             ->getMockForAbstractClass();
@@ -35,58 +35,87 @@ class UTCTimeTypeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \DateTime $source
+     * @param string $sourceTime
+     * @param string $sourceTimeZone
      * @param string $expected
-     * @dataProvider convertToDatabaseValueDataProvider
+     *
+     * @dataProvider convertToDatabaseValueWhenNoDstDataProvider
      */
-    public function testConvertToDatabaseValue($source, $expected)
+    public function testConvertToDatabaseValueWhenNoDst(?string $sourceTime, ?string $sourceTimeZone, ?string $expected)
     {
-        $this->markTestSkipped('Unskip after BAP-16821 is done');
+        $source = new \DateTime('01 Jan 2019 ' . $sourceTime, new \DateTimeZone($sourceTimeZone));
         $this->assertEquals($expected, $this->type->convertToDatabaseValue($source, $this->platform));
-    }
-
-    /**
-     * @param string $tzId
-     * @return bool
-     */
-    protected function timezoneExhibitsDST($tzId)
-    {
-        $date = new \DateTime('now', new \DateTimeZone($tzId));
-
-        return $date->format('I');
     }
 
     /**
      * @return array
      */
-    public function convertToDatabaseValueDataProvider()
+    public function convertToDatabaseValueWhenNoDstDataProvider()
     {
         return [
-            'null' => [
-                'source'   => null,
-                'expected' => null,
-            ],
             'UTC' => [
-                'source' => new \DateTime('08:00:00', new \DateTimeZone('UTC')),
+                'sourceTime' => '08:00:00',
+                'sourceTimeZone' => 'UTC',
                 'expected' => '08:00:00',
             ],
             'positive shift' => [
-                'source' => new \DateTime('10:00:00', new \DateTimeZone('Asia/Tokyo')), // UTC+9
+                'sourceTime' => '10:00:00',
+                'sourceTimeZone' => 'Asia/Tokyo', // UTC+9
                 'expected' => '01:00:00',
             ],
             'negative shift' => [
-                'source' => new \DateTime('10:00:00', new \DateTimeZone('America/Jamaica')), // UTC-5
+                'sourceTime' => '10:00:00',
+                'sourceTimeZone' => 'America/Jamaica', // UTC-5
                 'expected' => '15:00:00',
             ],
             'positive shift with DST' => [
-                'source' => new \DateTime('08:00:00', new \DateTimeZone('Europe/Athens')),
-                'expected' => $this->timezoneExhibitsDST('Europe/Athens') ? '05:00:00' : '06:00:00',
+                'sourceTime' => '08:00:00',
+                'sourceTimeZone' => 'Europe/Athens',
+                'expected' => '06:00:00',
             ],
             'negative shift with DST' => [
-                'source' => new \DateTime('08:00:00', new \DateTimeZone('America/Los_Angeles')),
-                'expected' => $this->timezoneExhibitsDST('America/Los_Angeles') ? '15:00:00' : '16:00:00',
+                'sourceTime' => '08:00:00',
+                'sourceTimeZone' => 'America/Los_Angeles',
+                'expected' => '16:00:00',
             ],
         ];
+    }
+
+    /**
+     * @param string $sourceTime
+     * @param string $sourceTimeZone
+     * @param string $expected
+     *
+     * @dataProvider convertToDatabaseValueWhenDstDataProvider
+     */
+    public function testConvertToDatabaseValueWhenDst(?string $sourceTime, ?string $sourceTimeZone, ?string $expected)
+    {
+        $source = new \DateTime('01 Jun 2019 ' . $sourceTime, new \DateTimeZone($sourceTimeZone));
+        $this->assertEquals($expected, $this->type->convertToDatabaseValue($source, $this->platform));
+    }
+
+    /**
+     * @return array
+     */
+    public function convertToDatabaseValueWhenDstDataProvider()
+    {
+        return [
+            'positive shift with DST' => [
+                'sourceTime' => '08:00:00',
+                'sourceTimeZone' => 'Europe/Athens',
+                'expected' => '05:00:00',
+            ],
+            'negative shift with DST' => [
+                'sourceTime' => '08:00:00',
+                'sourceTimeZone' => 'America/Los_Angeles',
+                'expected' => '15:00:00',
+            ],
+        ];
+    }
+
+    public function testConvertToDatabaseValueWhenNull()
+    {
+        $this->assertNull($this->type->convertToDatabaseValue(null, $this->platform));
     }
 
     public function testConvertToPHPValue()

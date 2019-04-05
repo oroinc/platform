@@ -1,5 +1,4 @@
 @ticket-BAP-15136
-@skip
 
 Feature: User reset password
   In order to manage own profile
