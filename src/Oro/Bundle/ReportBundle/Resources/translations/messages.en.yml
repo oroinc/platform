@@ -103,6 +103,11 @@ oro:
 
         action:
             view_sql.label: View SQL query of a report/segment
+            clone:
+                button:
+                    label: Clone
+                    title: Clone Report
+                name_format: Copy of {name}
         system_configuration:
             groups:
                 report_settings.title: Reports settings
