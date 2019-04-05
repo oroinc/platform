@@ -7,20 +7,20 @@ Feature: Translation cache actualization
     Given I login as administrator
     When I go to System/Emails/Maintenance Notifications
     And I reload the page
-    Then I should see "There are no entities"
+    Then I should see "There are no maintenance notifications"
     When I go to System/Localization/Translations
-    And I filter Key as is equal to "oro.datagrid.no.entities"
+    And I filter Key as is equal to "oro.notification.massnotification.entity_plural_label"
     And I edit first record from grid:
-      | Translated Value | Nothing to show |
+      | Translated Value |  Entities |
     And I click "Update Cache"
     And I go to System/Emails/Maintenance Notifications
     And I reload the page
-    Then I should see "Nothing to show"
+    Then I should see "There are no entities"
     # Change back to prevent other's features failures
     When I go to System/Localization/Translations
-    And I filter Key as is equal to "oro.datagrid.no.entities"
+    And I filter Key as is equal to "oro.notification.massnotification.entity_plural_label"
     And I edit first record from grid:
-      | Translated Value | No records found |
+      | Translated Value | Maintenance Notifications |
     And I click "Update Cache"
-    Then I should see oro.datagrid.no.entities in grid with following data:
-      | Translated Value | No records found |
+    Then I should see oro.notification.massnotification.entity_plural_label in grid with following data:
+      | Translated Value | Maintenance Notifications |

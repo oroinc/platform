@@ -1,4 +1,6 @@
 oro:
+    calendardate:
+        entity_plural_label: Calendar Dates
     query_designer:
         aggregates:
             identifier:
