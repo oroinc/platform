@@ -121,10 +121,10 @@ operations:
                 attribute: $.date                                   # action parameters
 
         preconditions:                                              # (optional) pre conditions for display Action button
-            @gt: [$updatedAt, $.date]                               # condition definition
+            - "@gt: [$updatedAt, $.date]"                               # condition definition
             
         conditions:                                                 # (optional) conditions for execution Action button
-            @equal: [$expired, false]                               # condition definition
+            - "@equal: [$expired, false]"                               # condition definition
 
         actions:                                                    # (optional) any needed actions which will execute after click on th button
             - @assign_value: [$expired, true]                       # action definition
