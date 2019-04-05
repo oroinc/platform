@@ -45,6 +45,9 @@ oro:
             record_id.label:     Record
             tag.label:           Tag
 
+            datagrid:
+                entity_hint: Results
+
         tags_label: Tags
 
         config:
@@ -72,6 +75,9 @@ oro:
             updated:
                 label:              Updated at
                 description:        The date and time when a taxonomic unit was last updated.
+
+            datagrid:
+                entity_hint: Taxonomies
 
         system_configuration:
             groups:

@@ -107,4 +107,4 @@ datagrids:
                 launcherOptions:
                     className: 'no-hash mobile-hide'
         options:
-            entityHint: reports
+            entityHint: oro.report.entity_plural_label

@@ -2,7 +2,7 @@ datagrids:
     audit-grid:
         acl_resource: oro_dataaudit_view
         options:
-            entityHint: audits
+            entityHint: oro.dataaudit.abstractaudit.entity_plural_label
         source:
             type: orm
             query:

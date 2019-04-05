@@ -3,7 +3,7 @@ datagrids:
     oro-cron-schedules-grid:
         acl_resource: oro_cron_schedule_view
         options:
-            entityHint: schedules
+            entityHint: oro.cron.schedule.entity_plural_label
         source:
             type: orm
             query_builder: "@oro_cron.repository.schedule->getEnabledSchedulesQb"
