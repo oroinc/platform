@@ -57,7 +57,8 @@ class ToManyToOneEqualAndEqual implements FixtureInterface
             ->setOwner($businessUnitA)
             ->setBusinessUnits(new ArrayCollection([
                 $businessUnitA,
-            ]));
+            ]))
+            ->setOrganization($organization);
         $user2 = (new User())
             ->setUsername('u2')
             ->setEmail('u2@example.com')
@@ -70,7 +71,8 @@ class ToManyToOneEqualAndEqual implements FixtureInterface
             ->setBusinessUnits(new ArrayCollection([
                 $businessUnitA,
                 $businessUnitB,
-            ]));
+            ]))
+            ->setOrganization($organization);
 
         $em->persist($businessUnitA);
         $em->persist($businessUnitB);

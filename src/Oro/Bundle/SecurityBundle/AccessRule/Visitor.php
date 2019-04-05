@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\AccessRule;
 
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\AccessDenied;
+use Oro\Bundle\SecurityBundle\AccessRule\Expr\Association;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Comparison;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\CompositeExpression;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Exists;
@@ -91,6 +92,15 @@ abstract class Visitor
     abstract public function walkNullComparison(NullComparison $comparison);
 
     /**
+     * Converts an association expression into the target query language output.
+     *
+     * @param Association $association
+     *
+     * @return mixed
+     */
+    abstract public function walkAssociation(Association $association);
+
+    /**
      * Dispatches walking an expression to the appropriate handler.
      *
      * @param ExpressionInterface $expr
@@ -125,6 +135,9 @@ abstract class Visitor
 
             case ($expr instanceof NullComparison):
                 return $this->walkNullComparison($expr);
+
+            case ($expr instanceof Association):
+                return $this->walkAssociation($expr);
 
             default:
                 throw new \RuntimeException('Unknown Expression ' . get_class($expr));

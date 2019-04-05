@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Walker that apply access rule conditions to DBAL query.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AccessRuleWalker extends TreeWalkerAdapter
 {
@@ -46,75 +48,100 @@ class AccessRuleWalker extends TreeWalkerAdapter
 
         $context = $query->getHint(self::CONTEXT);
 
+        $this->processSelectStatement($AST, $context, $em);
+    }
+
+    /**
+     * Process select or subselect expression.
+     *
+     * @param SelectStatement|Subselect $select
+     * @param AccessRuleWalkerContext $context
+     * @param ObjectManager $em
+     */
+    private function processSelectStatement(Node $select, AccessRuleWalkerContext $context, ObjectManager $em): void
+    {
         if ($context->getOption(AclHelper::CHECK_ROOT_ENTITY, true)) {
-            $this->processSelect($AST, $context, $em);
+            $this->processSelect($select, $context, $em);
         }
         if ($context->getOption(AclHelper::CHECK_RELATIONS, true)) {
-            $this->processJoins($AST, $context, $em);
+            $this->processJoins($select, $context, $em);
         }
 
-        if ($AST->whereClause) {
-            $this->processSubselects($AST, $this->getSubselectContext($context), $em);
+        if ($select->whereClause) {
+            $this->findAndProcessSubselects(
+                $select->whereClause->conditionalExpression,
+                $this->getSubselectContext($context),
+                $em
+            );
         }
+        $this->processSubselectsInJoins($select, $this->getSubselectContext($context), $em);
 
         $this->applyNewQueryComponents();
     }
 
     /**
-     * @param SelectStatement $AST
+     * Process subselext expressions in join expressions.
+     *
+     * @param SelectStatement|Subselect $select
      * @param AccessRuleWalkerContext $context
      * @param ObjectManager $em
      */
-    private function processSubselects(
-        SelectStatement $AST,
+    private function processSubselectsInJoins(
+        Node $select,
         AccessRuleWalkerContext $context,
         ObjectManager $em
     ): void {
-        $conditionalExpression = $AST->whereClause->conditionalExpression;
+        $fromClause = $select instanceof SelectStatement ? $select->fromClause : $select->subselectFromClause;
+        foreach ($fromClause->identificationVariableDeclarations as $fromKey => $identificationVariableDeclaration) {
+            if (!empty($identificationVariableDeclaration->joins)) {
+                $i = 0;
+                /** @var $join Join */
+                while ($i < count($identificationVariableDeclaration->joins)) {
+                    $keys = array_keys($identificationVariableDeclaration->joins);
+                    $join = $identificationVariableDeclaration->joins[$keys[$i]];
+
+                    if (isset($join->conditionalExpression)) {
+                        $this->findAndProcessSubselects($join->conditionalExpression, $context, $em);
+                    }
+                    $i++;
+                }
+            }
+        }
+    }
+
+    /**
+     * Finds and processes subselects in given expression.
+     *
+     * @param Node $conditionalExpression
+     * @param AccessRuleWalkerContext $context
+     * @param ObjectManager $em
+     */
+    private function findAndProcessSubselects(
+        Node $conditionalExpression,
+        AccessRuleWalkerContext $context,
+        ObjectManager $em
+    ): void {
         if (isset($conditionalExpression->conditionalPrimary)) {
             $conditionalExpression = $conditionalExpression->conditionalPrimary;
         }
 
         if ($conditionalExpression instanceof ConditionalPrimary) {
-            // we have request with only one where condition
             $expression = $conditionalExpression->simpleConditionalExpression;
-            if (isset($expression->subselect)
+            if ($expression && isset($expression->subselect)
                 && $expression->subselect instanceof Subselect
             ) {
-                $this->processSelect($expression->subselect, $context, $em);
-                $this->processJoins($expression->subselect, $context, $em);
+                $this->processSelectStatement($expression->subselect, $context, $em);
+            } elseif (isset($conditionalExpression->conditionalExpression)) {
+                $this->findAndProcessSubselects($conditionalExpression->conditionalExpression, $context, $em);
             }
         } else {
-            // we have request with many where conditions
             if (isset($conditionalExpression->conditionalFactors)) {
                 $factors = $conditionalExpression->conditionalFactors;
             } else {
                 $factors = $conditionalExpression->conditionalTerms;
             }
-            foreach ($factors as $factorId => $expression) {
-                if ($expression instanceof ConditionalPrimary) {
-                    $conditionalExpression = $expression->conditionalExpression;
-                    if (isset($conditionalExpression->simpleConditionalExpression->subselect)
-                        && $conditionalExpression->simpleConditionalExpression->subselect instanceof Subselect
-                    ) {
-                        $this->processSelect(
-                            $conditionalExpression->simpleConditionalExpression->subselect,
-                            $context,
-                            $em
-                        );
-                        $this->processJoins(
-                            $conditionalExpression->simpleConditionalExpression->subselect,
-                            $context,
-                            $em
-                        );
-                    }
-                }
-                if (isset($expression->simpleConditionalExpression->subselect)
-                    && $expression->simpleConditionalExpression->subselect instanceof Subselect
-                ) {
-                    $this->processSelect($expression->simpleConditionalExpression->subselect, $context, $em);
-                    $this->processJoins($expression->simpleConditionalExpression->subselect, $context, $em);
-                }
+            foreach ($factors as $expression) {
+                $this->findAndProcessSubselects($expression, $context, $em);
             }
         }
     }
@@ -147,13 +174,13 @@ class AccessRuleWalker extends TreeWalkerAdapter
                     $visitor->dispatch($criteria->getExpression()),
                     $whereExpression
                 );
-                $this->queryComponents = $visitor->getQueryComponents();
-
                 if (null === $AST->whereClause) {
                     $AST->whereClause = new WhereClause($conditionalExpression);
                 } else {
                     $AST->whereClause->conditionalExpression = $conditionalExpression;
                 }
+
+                $this->queryComponents = $visitor->getQueryComponents();
             }
         }
     }
@@ -168,9 +195,12 @@ class AccessRuleWalker extends TreeWalkerAdapter
         $fromClause = $select instanceof SelectStatement ? $select->fromClause : $select->subselectFromClause;
         foreach ($fromClause->identificationVariableDeclarations as $fromKey => $identificationVariableDeclaration) {
             if (!empty($identificationVariableDeclaration->joins)) {
-
+                $i = 0;
                 /** @var $join Join */
-                foreach ($identificationVariableDeclaration->joins as $joinKey => $join) {
+                while ($i < count($identificationVariableDeclaration->joins)) {
+                    $keys = array_keys($identificationVariableDeclaration->joins);
+                    $join = $identificationVariableDeclaration->joins[$keys[$i]];
+
                     $joinAlias = $join->joinAssociationDeclaration->aliasIdentificationVariable;
 
                     $parentClass = null;
@@ -211,8 +241,10 @@ class AccessRuleWalker extends TreeWalkerAdapter
                             $visitor->dispatch($criteria->getExpression()),
                             $join->conditionalExpression
                         );
+
                         $this->queryComponents = $visitor->getQueryComponents();
                     }
+                    $i++;
                 }
             }
         }
