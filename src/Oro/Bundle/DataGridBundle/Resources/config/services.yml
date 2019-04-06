@@ -91,13 +91,19 @@ services:
     oro_datagrid.configuration.provider:
         class: Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider
         public: false
+        arguments:
+            - '@oro_datagrid.configuration.provider.raw'
+            - '@oro_datagrid.provider.resolver'
+        tags:
+            - { name: oro_datagrid.configuration.provider, priority: -10 }
+
+    oro_datagrid.configuration.provider.raw:
+        class: Oro\Bundle\DataGridBundle\Provider\RawConfigurationProvider
+        public: false
         parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/datagrids'
             - '%kernel.debug%'
-            - '@oro_datagrid.provider.resolver'
-        tags:
-            - { name: oro_datagrid.configuration.provider, priority: -10 }
 
     oro_datagrid.configuration.provider.chain:
         class: Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider

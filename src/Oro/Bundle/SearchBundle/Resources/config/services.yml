@@ -287,7 +287,7 @@ services:
     oro_search.extension.search_filter:
         class: '%oro_search.extension.search_filter.class%'
         arguments:
-            - '@oro_datagrid.configuration.provider'
+            - '@oro_datagrid.configuration.provider.raw'
             - '@oro_search.extension.search_filter_bag'
             - '@oro_filter.provider.state.filters'
             - '@translator'
