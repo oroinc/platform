@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\UIBundle\Route\Router;
 use Symfony\Component\DomCrawler\Crawler;
@@ -134,8 +135,6 @@ class ControllersTest extends AbstractConfigControllerTest
      */
     public function testCreateFieldRelation($id)
     {
-        $configManager = $this->getContainer()->get('oro_entity_config.config_manager');
-
         foreach (static::RELATION_FIELDS as $type => $relation) {
             $crawler = $this->client->request(
                 'GET',
@@ -175,7 +174,8 @@ class ControllersTest extends AbstractConfigControllerTest
             $this->assertHtmlResponseStatusCodeEquals($result, 200);
             $this->assertContains('Field saved', $result->getContent());
 
-            $isBidirectional = $configManager->getFieldConfig('extend', 'Extend\Entity\testExtendedEntity', $name)
+            $isBidirectional = $this->getEntityConfigManager()
+                ->getFieldConfig('extend', 'Extend\Entity\testExtendedEntity', $name)
                 ->get('bidirectional');
 
             $this->assertEquals($relation['readonly'], (bool)$readOnlyValue);
@@ -308,5 +308,13 @@ class ControllersTest extends AbstractConfigControllerTest
         $this->client->followRedirects(true);
 
         return $this->client->submit($form, [Router::ACTION_PARAMETER => $continueButton->attr('data-action')]);
+    }
+
+    /**
+     * @return ConfigManager
+     */
+    private function getEntityConfigManager()
+    {
+        return self::getContainer()->get('oro_entity_config.config_manager');
     }
 }
