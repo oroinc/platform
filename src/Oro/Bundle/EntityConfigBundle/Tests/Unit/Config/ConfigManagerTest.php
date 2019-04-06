@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
+use Metadata\MetadataFactory;
+use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -15,9 +19,12 @@ use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderBagMock;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -26,54 +33,44 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
  */
 class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CLASS = 'Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity';
+    private const ENTITY_CLASS = DemoEntity::class;
 
     /** @var ConfigManager */
-    protected $configManager;
+    private $configManager;
 
     /** @var ConfigProviderBagMock */
-    protected $configProviderBag;
+    private $configProviderBag;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $metadataFactory;
+    private $metadataFactory;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
+    private $configProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $modelManager;
+    private $modelManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $auditManager;
+    private $auditManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configCache;
+    private $configCache;
 
     protected function setUp()
     {
-        $this->configProvider = $this->getConfigProviderMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->configProvider->expects($this->any())
             ->method('getScope')
             ->willReturn('entity');
 
-        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadataFactory = $this->getMockBuilder('Metadata\MetadataFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->modelManager    = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->auditManager    = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Audit\AuditManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configCache     = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigCache')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
+        $this->metadataFactory = $this->createMock(MetadataFactory::class);
+        $this->modelManager = $this->createMock(ConfigModelManager::class);
+        $this->auditManager = $this->createMock(AuditManager::class);
+        $this->configCache = $this->createMock(ConfigCache::class);
 
         $this->configManager = new ConfigManager(
             $this->eventDispatcher,
@@ -305,7 +302,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->modelManager->expects($this->never())
             ->method('checkDatabase');
-        $propertyConfigContainer = $this->getPropertyConfigContainerMock();
+        $propertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
         $propertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
             ->with(PropertyConfigContainer::TYPE_ENTITY)
@@ -807,6 +804,23 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->configManager->clearConfigurableCache();
     }
 
+    public function testClearModelCache()
+    {
+        $this->modelManager->expects($this->once())
+            ->method('clearCache');
+        $this->configCache->expects($this->once())
+            ->method('deleteAll')
+            ->with(true);
+        $this->configManager->clearModelCache();
+    }
+
+    public function testFlushAllCaches()
+    {
+        $this->configCache->expects($this->once())
+            ->method('deleteAll');
+        $this->configManager->flushAllCaches();
+    }
+
     public function testHasConfigEntityModelWithNoModel()
     {
         $this->modelManager->expects($this->once())
@@ -976,7 +990,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadataForClass')
             ->with(self::ENTITY_CLASS)
             ->willReturn($metadata);
-        $propertyConfigContainer = $this->getPropertyConfigContainerMock();
+        $propertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
         $propertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
             ->with(PropertyConfigContainer::TYPE_ENTITY)
@@ -1179,7 +1193,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadataForClass')
             ->with(self::ENTITY_CLASS)
             ->willReturn($metadata);
-        $propertyConfigContainer = $this->getPropertyConfigContainerMock();
+        $propertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
         $propertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
             ->with(PropertyConfigContainer::TYPE_FIELD, 'int')
@@ -1340,7 +1354,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadataForClass')
             ->with(self::ENTITY_CLASS)
             ->willReturn($metadata);
-        $propertyConfigContainer = $this->getPropertyConfigContainerMock();
+        $propertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
         $propertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
             ->with(PropertyConfigContainer::TYPE_ENTITY)
@@ -1409,7 +1423,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadataForClass')
             ->with(self::ENTITY_CLASS)
             ->willReturn($metadata);
-        $propertyConfigContainer = $this->getPropertyConfigContainerMock();
+        $propertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
         $propertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
             ->with(PropertyConfigContainer::TYPE_ENTITY)
@@ -1477,7 +1491,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadataForClass')
             ->with(self::ENTITY_CLASS)
             ->willReturn($metadata);
-        $propertyConfigContainer = $this->getPropertyConfigContainerMock();
+        $propertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
         $propertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
             ->with(PropertyConfigContainer::TYPE_ENTITY)
@@ -1505,7 +1519,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->with(Events::UPDATE_ENTITY);
         $extendConfig = $this->getConfig(new EntityConfigId('extend', self::ENTITY_CLASS));
         $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
-        $extendConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $extendConfigProvider->expects($this->any())
             ->method('getScope')
             ->willReturn('extend');
@@ -1518,7 +1532,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS)
             ->willReturn($extendConfig);
-        $extendPropertyConfigContainer = $this->getPropertyConfigContainerMock();
+        $extendPropertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
         $extendPropertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
             ->with(PropertyConfigContainer::TYPE_ENTITY)
@@ -1570,7 +1584,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadataForClass')
             ->with(self::ENTITY_CLASS)
             ->willReturn($metadata);
-        $propertyConfigContainer = $this->getPropertyConfigContainerMock();
+        $propertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
         $propertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
             ->with(PropertyConfigContainer::TYPE_FIELD, 'int')
@@ -1634,7 +1648,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadataForClass')
             ->with(self::ENTITY_CLASS)
             ->willReturn($metadata);
-        $propertyConfigContainer = $this->getPropertyConfigContainerMock();
+        $propertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
         $propertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
             ->with(PropertyConfigContainer::TYPE_FIELD, 'int')
@@ -1698,7 +1712,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadataForClass')
             ->with(self::ENTITY_CLASS)
             ->willReturn($metadata);
-        $propertyConfigContainer = $this->getPropertyConfigContainerMock();
+        $propertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
         $propertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
             ->with(PropertyConfigContainer::TYPE_FIELD, 'int')
@@ -1724,7 +1738,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 
         $extendConfig = $this->getConfig(new FieldConfigId('extend', self::ENTITY_CLASS, 'id'));
         $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
-        $extendConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $extendConfigProvider->expects($this->any())
             ->method('getScope')
             ->willReturn('extend');
@@ -1737,7 +1751,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, 'id')
             ->willReturn($extendConfig);
-        $extendPropertyConfigContainer = $this->getPropertyConfigContainerMock();
+        $extendPropertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
         $extendPropertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
             ->with(PropertyConfigContainer::TYPE_FIELD)
@@ -1806,7 +1820,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($data, $fieldConfig->getValues());
     }
 
-    protected function createEntityConfigModel(
+    private function createEntityConfigModel(
         $className,
         $mode = ConfigModel::MODE_DEFAULT
     ) {
@@ -1816,7 +1830,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    protected function createFieldConfigModel(
+    private function createFieldConfigModel(
         EntityConfigModel $entityConfigModel,
         $fieldName,
         $fieldType,
@@ -1835,7 +1849,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
      *
      * @return EntityMetadata
      */
-    protected function getEntityMetadata($className, $defaultValues = null)
+    private function getEntityMetadata($className, $defaultValues = null)
     {
         $metadata       = new EntityMetadata($className);
         $metadata->mode = ConfigModel::MODE_DEFAULT;
@@ -1853,7 +1867,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
      *
      * @return FieldMetadata
      */
-    protected function getFieldMetadata($className, $fieldName, $defaultValues = null)
+    private function getFieldMetadata($className, $fieldName, $defaultValues = null)
     {
         $metadata = new FieldMetadata($className, $fieldName);
         if (null !== $defaultValues) {
@@ -1869,7 +1883,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
      *
      * @return Config
      */
-    protected function getConfig(ConfigIdInterface $configId, array $values = null)
+    private function getConfig(ConfigIdInterface $configId, array $values = null)
     {
         $config = new Config($configId);
         if (null !== $values) {
@@ -1877,26 +1891,6 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         }
 
         return $config;
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getPropertyConfigContainerMock()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProviderMock()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 
     public function emptyNameProvider()
