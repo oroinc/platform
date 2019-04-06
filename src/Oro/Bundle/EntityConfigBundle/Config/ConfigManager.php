@@ -76,9 +76,9 @@ class ConfigManager
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->metadataFactory = $metadataFactory;
-        $this->modelManager    = $modelManager;
-        $this->auditManager    = $auditManager;
-        $this->cache           = $cache;
+        $this->modelManager = $modelManager;
+        $this->auditManager = $auditManager;
+        $this->cache = $cache;
     }
 
     /**
@@ -251,7 +251,8 @@ class ConfigManager
 
     /**
      * @param FieldConfigModel $fieldConfigModel
-     * @param string $scope
+     * @param string           $scope
+     *
      * @return ConfigInterface
      */
     public function createFieldConfigByModel(FieldConfigModel $fieldConfigModel, string $scope)
@@ -385,9 +386,9 @@ class ConfigManager
      * Gets a list of ids for all configurable entities (if $className is not specified)
      * or all configurable fields of the given $className.
      *
-     * @param string $scope
+     * @param string      $scope
      * @param string|null $className
-     * @param bool $withHidden Set true if you need ids of all configurable entities,
+     * @param bool        $withHidden Set true if you need ids of all configurable entities,
      *                                including entities marked as ConfigModel::MODE_HIDDEN
      *
      * @return ConfigIdInterface[]
@@ -480,8 +481,7 @@ class ConfigManager
     public function clearModelCache()
     {
         $this->modelManager->clearCache();
-        $this->cache->deleteAllConfigurable(true);
-        $this->cache->deleteAllConfigs(true);
+        $this->cache->deleteAll(true);
     }
 
     /**
@@ -500,8 +500,7 @@ class ConfigManager
          * entity config cache. But if a developer call flushAll method for any of these cache all cached entries
          * from all caches will be removed
          */
-        $this->cache->deleteAllConfigurable();
-        $this->cache->deleteAllConfigs();
+        $this->cache->deleteAll();
     }
 
     /**
@@ -536,7 +535,7 @@ class ConfigManager
         $models = [];
         $this->prepareFlush($models);
 
-        $em  = $this->getEntityManager();
+        $em = $this->getEntityManager();
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
 
         $logEntry = $this->auditManager->buildEntity($this);
@@ -566,7 +565,7 @@ class ConfigManager
             $this->cache->deleteAllConfigurable();
         }
 
-        $this->persistConfigs   = [];
+        $this->persistConfigs = [];
         $this->configChangeSets = [];
     }
 
@@ -577,19 +576,13 @@ class ConfigManager
      */
     protected function prepareFlush(&$models)
     {
-        $groupedConfigs = [];
         $persistConfigsCount = count($this->persistConfigs);
+        $groupedConfigs = $this->getGroupedPersistConfigs();
 
-        foreach ($this->persistConfigs as $config) {
-            $this->calculateConfigChangeSet($config);
-
-            $configId = $config->getId();
-            $modelKey = $configId instanceof FieldConfigId
-                ? $configId->getClassName() . '.' . $configId->getFieldName()
-                : $configId->getClassName();
-
-            $groupedConfigs[$modelKey][$configId->getScope()] = $config;
-        }
+        /** @var array $toDeleteFromEntityCache [class => TRUE, ...] */
+        $toDeleteFromEntityCache = [];
+        /** @var array $toDeleteFromFieldCache [class => [field => TRUE, ...], ...] */
+        $toDeleteFromFieldCache = [];
 
         /** @var ConfigInterface[] $configs */
         foreach ($groupedConfigs as $modelKey => $configs) {
@@ -598,32 +591,51 @@ class ConfigManager
                 new Event\PreFlushConfigEvent($configs, $this)
             );
             foreach ($configs as $scope => $config) {
-                $configId  = $config->getId();
+                $configId = $config->getId();
                 $className = $configId->getClassName();
-                $fieldName = $configId instanceof FieldConfigId
-                    ? $configId->getFieldName()
-                    : null;
-
-                if (isset($models[$modelKey])) {
-                    $model = $models[$modelKey];
+                $model = $models[$modelKey] ?? null;
+                $propertyConfig = $this->getPropertyConfig($scope);
+                if ($configId instanceof FieldConfigId) {
+                    $fieldName = $configId->getFieldName();
+                    if (null === $model) {
+                        $model = $this->modelManager->getFieldModel($className, $fieldName);
+                        $models[$modelKey] = $model;
+                    }
+                    $model->fromArray(
+                        $scope,
+                        $config->getValues(),
+                        $propertyConfig->getIndexedValues(PropertyConfigContainer::TYPE_FIELD)
+                    );
+                    $toDeleteFromFieldCache[$className][$fieldName] = true;
                 } else {
-                    $model             = null !== $fieldName
-                        ? $this->modelManager->getFieldModel($className, $fieldName)
-                        : $this->modelManager->getEntityModel($className);
-                    $models[$modelKey] = $model;
-                }
-
-                $indexedValues = $this->getPropertyConfig($scope)->getIndexedValues(
-                    null !== $fieldName ? PropertyConfigContainer::TYPE_FIELD : PropertyConfigContainer::TYPE_ENTITY
-                );
-                $model->fromArray($scope, $config->getValues(), $indexedValues);
-
-                if (null !== $fieldName) {
-                    $this->cache->deleteFieldConfig($className, $fieldName);
-                } else {
-                    $this->cache->deleteEntityConfig($className);
+                    if (null === $model) {
+                        $model = $this->modelManager->getEntityModel($className);
+                        $models[$modelKey] = $model;
+                    }
+                    $model->fromArray(
+                        $scope,
+                        $config->getValues(),
+                        $propertyConfig->getIndexedValues(PropertyConfigContainer::TYPE_ENTITY)
+                    );
+                    $toDeleteFromEntityCache[$className] = true;
                 }
             }
+        }
+
+        $this->cache->beginBatch();
+        try {
+            foreach ($toDeleteFromEntityCache as $className => $flag) {
+                $this->cache->deleteEntityConfig($className);
+            }
+            foreach ($toDeleteFromFieldCache as $className => $fields) {
+                foreach ($fields as $fieldName => $flag) {
+                    $this->cache->deleteFieldConfig($className, $fieldName);
+                }
+            }
+            $this->cache->saveBatch();
+        } catch (\Throwable $e) {
+            $this->cache->cancelBatch();
+            throw $e;
         }
 
         // First we are comparing persistConfigs size to configChangeSets size in case one of them was changed.
@@ -1090,6 +1102,26 @@ class ConfigManager
         }
 
         return $config;
+    }
+
+    /**
+     * @return array [model key => [scope => config, ...], ...]
+     */
+    protected function getGroupedPersistConfigs()
+    {
+        $groupedConfigs = [];
+        foreach ($this->persistConfigs as $config) {
+            $this->calculateConfigChangeSet($config);
+
+            $configId = $config->getId();
+            $modelKey = $configId instanceof FieldConfigId
+                ? $configId->getClassName() . '.' . $configId->getFieldName()
+                : $configId->getClassName();
+
+            $groupedConfigs[$modelKey][$configId->getScope()] = $config;
+        }
+
+        return $groupedConfigs;
     }
 
     /**
