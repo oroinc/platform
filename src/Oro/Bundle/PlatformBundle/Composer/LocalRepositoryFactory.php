@@ -5,30 +5,21 @@ namespace Oro\Bundle\PlatformBundle\Composer;
 use Composer\Json\JsonFile;
 use Composer\Repository\InstalledFilesystemRepository;
 use Composer\Repository\WritableRepositoryInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * The factory to create composer repository by a specific local JSON file.
+ */
 class LocalRepositoryFactory
 {
-    /**
-     * @var string
-     */
-    protected $file;
+    /** @var string */
+    private $file;
 
     /**
-     * @param Filesystem $fs
-     * @param string     $file
-     *
-     * @throws \RuntimeException
+     * @param string $file
      */
-    public function __construct(Filesystem $fs, $file)
+    public function __construct(string $file)
     {
         $this->file = $file;
-
-        if (!$fs->exists($this->file)) {
-            throw new \RuntimeException(
-                sprintf('File "%s" does not exists', $this->file)
-            );
-        }
     }
 
     /**
@@ -36,8 +27,11 @@ class LocalRepositoryFactory
      */
     public function getLocalRepository()
     {
-        return new InstalledFilesystemRepository(
-            new JsonFile($this->file)
-        );
+        $repositoryFile = new JsonFile($this->file);
+        if (!$repositoryFile->exists()) {
+            throw new \RuntimeException(sprintf('File "%s" does not exists.', $this->file));
+        }
+
+        return new InstalledFilesystemRepository($repositoryFile);
     }
 }

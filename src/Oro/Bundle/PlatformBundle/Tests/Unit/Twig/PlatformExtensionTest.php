@@ -34,12 +34,14 @@ class PlatformExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetVersion()
     {
+        $undefinedVersion = 'N/A';
+
         $this->versionHelper->expects($this->once())
             ->method('getVersion')
-            ->will($this->returnValue(VersionHelper::UNDEFINED_VERSION));
+            ->willReturn($undefinedVersion);
 
         $this->assertEquals(
-            VersionHelper::UNDEFINED_VERSION,
+            $undefinedVersion,
             self::callTwigFunction($this->extension, 'oro_version', [])
         );
     }

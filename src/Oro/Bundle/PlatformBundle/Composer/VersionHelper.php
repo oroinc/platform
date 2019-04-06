@@ -2,81 +2,74 @@
 
 namespace Oro\Bundle\PlatformBundle\Composer;
 
-use Composer\Package\PackageInterface;
-use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\PlatformBundle\OroPlatformBundle;
 
+/**
+ * The helper class that can be used to get the version of a package registered in the Composer.
+ */
 class VersionHelper
 {
-    const UNDEFINED_VERSION = 'N/A';
+    private const UNDEFINED_VERSION = 'N/A';
 
-    /**
-     * @var LocalRepositoryFactory
-     */
-    protected $factory;
+    /** @var LocalRepositoryFactory */
+    private $factory;
 
-    /**
-     * @var CacheProvider
-     */
-    protected $cache;
+    /** @var Cache|null */
+    private $cache;
 
-    /**
-     * @var array
-     */
-    protected $packageVersions = [];
+    /** @var array */
+    private $packageVersions = [];
 
     /**
      * @param LocalRepositoryFactory $factory
+     * @param Cache|null             $cache
      */
-    public function __construct(LocalRepositoryFactory $factory)
+    public function __construct(LocalRepositoryFactory $factory, Cache $cache = null)
     {
         $this->factory = $factory;
-    }
-
-    /**
-     * Set cache instance
-     *
-     * @param CacheProvider $cache
-     */
-    public function setCache(CacheProvider $cache)
-    {
         $this->cache = $cache;
     }
 
     /**
      * @param string $packageName
+     *
      * @return string
      */
-    public function getVersion($packageName = OroPlatformBundle::PACKAGE_NAME)
+    public function getVersion(string $packageName = OroPlatformBundle::PACKAGE_NAME): string
     {
-        // Get package version from local cache if any
         if (isset($this->packageVersions[$packageName])) {
             return $this->packageVersions[$packageName];
         }
 
-        // Try to get package version from persistent cache
-        if ($this->cache && $this->cache->contains($packageName)) {
-            $version = $this->cache->fetch($packageName);
+        if (null === $this->cache) {
+            $version = $this->getPackageVersion($packageName);
         } else {
-            // Get package version from composer repository
-            $packages = $this->factory->getLocalRepository()->findPackages($packageName);
-
-            if ($package = current($packages)) {
-                /** @var PackageInterface $package */
-                $version = $package->getPrettyVersion();
-            } else {
-                $version = self::UNDEFINED_VERSION;
-            }
-
-            //Save package version to persistent cache
-            if ($this->cache) {
+            $version = $this->cache->fetch($packageName);
+            if (false === $version) {
+                $version = $this->getPackageVersion($packageName);
                 $this->cache->save($packageName, $version);
             }
         }
 
-        // Save package version to local cache
         $this->packageVersions[$packageName] = $version;
 
         return $version;
+    }
+
+    /**
+     * @param string $packageName
+     *
+     * @return string
+     */
+    private function getPackageVersion(string $packageName): string
+    {
+        $packages = $this->factory->getLocalRepository()->findPackages($packageName);
+        $package = current($packages);
+        if (!$package) {
+            return self::UNDEFINED_VERSION;
+        }
+
+        return $package->getPrettyVersion();
     }
 }
