@@ -22,9 +22,6 @@ parameters:
 
     oro_locale.locale_listener.class:   Oro\Bundle\LocaleBundle\EventListener\LocaleListener
 
-    oro_locale.formatter.datetime.class: Oro\Bundle\LocaleBundle\Formatter\DateTimeValueFormatter
-    oro_locale.formatter.date.class: Oro\Bundle\LocaleBundle\Formatter\DateValueFormatter
-
     oro_locale.entity_generator.extension.class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
 
 services:
@@ -274,27 +271,30 @@ services:
             - { name: twig.extension }
 
     oro_locale.format.datetime:
-        class: '%oro_locale.formatter.datetime.class%'
+        class: Oro\Bundle\LocaleBundle\Formatter\DateTimeValueFormatter
+        public: false
         arguments:
             - '@oro_locale.formatter.date_time'
             - '@translator'
         tags:
-            - { name: oro_formatter, formatter: datetime }
+            - { name: oro_formatter, formatter: datetime, data_type: datetime }
 
     oro_locale.format.date:
-        class: '%oro_locale.formatter.date.class%'
+        class: Oro\Bundle\LocaleBundle\Formatter\DateValueFormatter
+        public: false
         arguments:
             - '@oro_locale.formatter.date_time'
             - '@translator'
         tags:
-            - { name: oro_formatter, formatter: date }
+            - { name: oro_formatter, formatter: date, data_type: date }
 
     oro_locale.format.currency:
         class: Oro\Bundle\LocaleBundle\Formatter\CurrencyFormatter
+        public: false
         arguments:
             - '@oro_locale.formatter.number'
         tags:
-            - { name: oro_formatter, formatter: currency }
+            - { name: oro_formatter, formatter: currency, data_type: money }
 
     oro_locale.entity_name_provider:
         class: '%oro_locale.entity_name_provider.class%'
@@ -403,3 +403,21 @@ services:
             - '@doctrine'
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
+
+    oro_locale.datagrid.event_listener.enabled_localizations_grid:
+        class: Oro\Bundle\LocaleBundle\Datagrid\EventListener\EnabledLocalizationsGridListener
+        arguments:
+            - '@oro_config.manager'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.enabled-localizations-select-grid, method: onPreBuild }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.enabled-localizations-select-grid, method: onBuildAfter }
+
+    oro_locale.autocomplete.enabled_localizations.search_handler:
+        parent: oro_form.autocomplete.search_handler
+        class: Oro\Bundle\LocaleBundle\Autocomplete\EnabledLocalizationsSearchHandler
+        arguments:
+            - '%oro_locale.entity.localization.class%'
+            - ['name']
+            - '@oro_config.manager'
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: oro_enabled_localization, acl_resource: oro_locale_localization_view }

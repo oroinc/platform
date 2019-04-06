@@ -5,13 +5,16 @@ namespace Oro\Bundle\LocaleBundle\Formatter;
 use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * The formatter for date time values.
+ */
 class DateTimeValueFormatter implements FormatterInterface
 {
     /** @var DateTimeFormatter */
-    protected $formatter;
+    private $formatter;
 
     /** @var TranslatorInterface */
-    protected $translator;
+    private $translator;
 
     /**
      * @param DateTimeFormatter   $dateTimeFormatter
@@ -26,33 +29,9 @@ class DateTimeValueFormatter implements FormatterInterface
     /**
      * {@inheritdoc}
      */
-    public function getFormatterName()
+    public function format($value, array $formatterArguments = [])
     {
-        return 'datetime';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function format($parameter, array $formatterArguments = [])
-    {
-        return $this->formatter->format($parameter);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedTypes()
-    {
-        return ['datetime'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isDefaultFormatter()
-    {
-        return true;
+        return $this->formatter->format($value);
     }
 
     /**

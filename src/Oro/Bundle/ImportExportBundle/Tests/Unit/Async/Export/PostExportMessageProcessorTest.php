@@ -184,24 +184,34 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessWhenRecipientUserIdGiven()
     {
+        $jobId = 123;
         /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject */
         $session = $this->createMock(SessionInterface::class);
         /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject */
         $message = $this->createMock(MessageInterface::class);
         $messageBody = [
-            'jobId' => '1',
+            'jobId' => $jobId,
             'jobName' => 'job-name',
             'exportType' => 'type',
             'outputFormat' => 'csv',
             'email' => 'test@example.com',
-            'recipientUserId' => self::USER_ID
+            'recipientUserId' => self::USER_ID,
         ];
         $message
             ->expects(self::once())
             ->method('getBody')
             ->willReturn(json_encode($messageBody));
 
+        /** @var Job|\PHPUnit\Framework\MockObject\MockObject */
         $job = $this->createMock(Job::class);
+        $job->expects($this->any())
+            ->method('getId')
+            ->willReturn($jobId);
+
+        $job->expects($this->any())
+            ->method('getData')
+            ->willReturn(['file' => 'file.csv']);
+
         $this->jobStorage
             ->expects(self::once())
             ->method('findJobById')

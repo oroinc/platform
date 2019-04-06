@@ -564,6 +564,7 @@ services:
 
     oro_workflow.transition_form.data_provider.transition_page_form:
         class: 'Oro\Bundle\WorkflowBundle\Provider\TransitionPageFormTemplateDataProvider'
+        public: false
         tags:
             - { name: oro_form.form_template_data_provider, alias: transition_page_form }
 
@@ -592,16 +593,15 @@ services:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }
 
     oro_workflow.emailtemplate.variable_provider.entity:
-        class: 'Oro\Bundle\WorkflowBundle\Provider\EntityVariablesProvider'
-        lazy: true
+        class: Oro\Bundle\WorkflowBundle\Provider\EntityVariablesProvider
         public: false
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: entity }
 
     oro_workflow.formatter.workflow_variable:
-        class: 'Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter'
+        class: Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter
         arguments:
-            - "@translator"
+            - '@translator'
 
     oro_workflow.workflow_step_to_audit_field_converter:
         class: Oro\Bundle\WorkflowBundle\DataAudit\WorkflowStepToAuditFieldConverter

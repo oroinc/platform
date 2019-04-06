@@ -83,7 +83,7 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->messageProducer->expects($this->once())
             ->method('send')
             ->with(
-                Topics::HTTP_IMPORT,
+                Topics::IMPORT,
                 $expectedMessage
             );
 
@@ -144,7 +144,7 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->messageProducer->expects($this->once())
             ->method('send')
             ->with(
-                Topics::HTTP_IMPORT,
+                Topics::IMPORT,
                 $expectedMessage
             );
 

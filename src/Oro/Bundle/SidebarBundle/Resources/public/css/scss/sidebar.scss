@@ -17,31 +17,20 @@
     height: 100%;
     position: relative;
     user-select: none;
-    padding-bottom: 44px;
+    padding-bottom: 88px;
 
     &.maximized {
         width: $sidebar-maximized-width;
     }
 
     &__scroll-container {
-        box-sizing: border-box;
         max-height: 100%;
-        padding-bottom: 44px;
         overflow: auto;
         background-color: transparent;
-
-        &:after {
-            content: '';
-            position: absolute;
-            background-color: transparent;
-            width: 100%;
-            height: 44px;
-            bottom: 44px;
-        }
     }
 
     &__content {
-        box-sizing: border-box;
+        height: 100%;
         background-color: transparent;
     }
 
@@ -89,6 +78,7 @@
         width: 100%;
         padding: 14px 0;
         color: $sidebar-color;
+        z-index: 1;
 
         &:hover {
             background-color: $sidebar-active-color;
@@ -113,8 +103,6 @@
     // add-widget element
     &__add-widget {
         @include fa-icon($sidebar-icon-add-widget);
-
-        margin-top: -44px;
     }
 
     // toggle element
@@ -136,34 +124,6 @@
 
     &.sidebar-left.maximized &__toggle {
         @include fa-icon($sidebar-icon-left);
-    }
-
-    .mCSB_container {
-        margin-#{$end}: 0;
-    }
-
-    @include if-rtl() {
-        .mCS-dir-rtl > .mCSB_inside > .mCSB_container {
-            margin-#{$end}: 0;
-        }
-    }
-
-    .mCSB_scrollTools {
-        width: 10px;
-        .mCSB_dragger {
-            .mCSB_dragger_bar {
-                margin: 2px !important;
-                background-color: $sidebar-scroll-bar-background-color !important;
-            }
-
-            &:hover .mCSB_dragger_bar {
-                background-color: $sidebar-scroll-bar-background-color-hover !important;
-            }
-        }
-
-        .mCSB_draggerRail {
-            background-color: transparent !important;
-        }
     }
 }
 
@@ -394,11 +354,12 @@
 
 // sidebar widget icon
 .sidebar-widget-icon {
+    display: block;
     background-color: transparent;
     position: relative;
     font-size: 16px;
-    line-height: 14px;
-    vertical-align: middle;
+    height: 16px;
+    line-height: 1;
 
     &.highlight,
     &.highlight:before {
@@ -441,7 +402,7 @@
         }
 
         .item-counter {
-            top: -11px;
+            top: -10px;
             margin-#{$start}: -20px;
             margin-#{$end}: 0;
         }

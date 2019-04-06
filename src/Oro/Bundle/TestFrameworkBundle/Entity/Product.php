@@ -3,10 +3,14 @@
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
+ * Entity for testing search engine
+ *
  * @ORM\Table(name="test_search_product")
  * @ORM\Entity
+ * @Config()
  */
 class Product implements TestFrameworkEntityInterface
 {
@@ -45,7 +49,7 @@ class Product implements TestFrameworkEntityInterface
     /**
      * @return string
      */
-    public function __getName()
+    public function getName()
     {
         return $this->name;
     }

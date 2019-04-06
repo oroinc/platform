@@ -17,7 +17,7 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
      */
     public function load(ObjectManager $manager)
     {
-        for ($ind = 1; $ind <= self::COUNT; $ind++) {
+        for ($ind = 1; $ind <= static::COUNT; $ind++) {
             //create item
             /** @var $item Item */
             $item = new Item();

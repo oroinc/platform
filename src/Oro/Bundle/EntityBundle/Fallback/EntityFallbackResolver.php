@@ -21,6 +21,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
+ * Resolver for entity field`s fallback values
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityFallbackResolver
@@ -102,7 +103,7 @@ class EntityFallbackResolver
     }
 
     /**
-     * @param object $object
+     * @param object|string $object
      * @param string $objectFieldName
      * @return string
      * @throws FallbackFieldConfigurationMissingException
@@ -127,7 +128,7 @@ class EntityFallbackResolver
     }
 
     /**
-     * @param object $object
+     * @param object|string $object
      * @param string $objectFieldName
      * @return array
      */
@@ -161,6 +162,26 @@ class EntityFallbackResolver
     public function isFallbackSupported($object, $objectFieldName, $fallbackId)
     {
         return $this->getFallbackProvider($fallbackId)->isFallbackSupported($object, $objectFieldName);
+    }
+
+    /**
+     * @param string $fallbackId
+     * @param object|string $object
+     * @param string $objectFieldName
+     * @return bool
+     */
+    public function isFallbackConfigured(string $fallbackId, $object, string $objectFieldName): bool
+    {
+        try {
+            $fallbackList = $this->getFallbackConfig(
+                $object,
+                $objectFieldName,
+                EntityFieldFallbackValue::FALLBACK_LIST
+            );
+        } catch (FallbackFieldConfigurationMissingException $e) {
+            return false;
+        }
+        return array_key_exists($fallbackId, $fallbackList);
     }
 
     /**

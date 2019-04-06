@@ -1,0 +1,181 @@
+<?php
+
+namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig\Sandbox;
+
+use Doctrine\Common\Cache\Cache;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProvider;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider;
+
+class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
+{
+    private const CONFIG_CACHE_KEY = 'test_config_cache_key';
+
+    /** @var VariablesProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $variablesProvider;
+
+    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
+    private $cache;
+
+    /** @var TemplateRendererConfigProvider */
+    private $configProvider;
+
+    protected function setUp()
+    {
+        $this->variablesProvider = $this->createMock(VariablesProvider::class);
+        $this->cache = $this->createMock(Cache::class);
+
+        $this->configProvider = new TemplateRendererConfigProvider(
+            $this->variablesProvider,
+            $this->cache,
+            self::CONFIG_CACHE_KEY
+        );
+    }
+
+    public function testGetConfigurationWhenCachedConfigExists()
+    {
+        $cachedConfig = [
+            'properties'         => ['Test\Entity' => ['field2']],
+            'methods'            => ['Test\Entity' => ['getField1']],
+            'accessors'          => ['Test\Entity' => ['field1' => 'getField1', 'field2' => null]],
+            'default_formatters' => ['Test\Entity' => ['field1' => 'formatter1']]
+        ];
+
+        $this->cache->expects(self::once())
+            ->method('fetch')
+            ->with(self::CONFIG_CACHE_KEY)
+            ->willReturn($cachedConfig);
+        $this->cache->expects(self::never())
+            ->method('save');
+
+        self::assertSame($cachedConfig, $this->configProvider->getConfiguration());
+        // test local cache
+        self::assertSame($cachedConfig, $this->configProvider->getConfiguration());
+    }
+
+    public function testGetConfigurationWhenCachedConfigDoesNotExist()
+    {
+        $entityVariableGetters = [
+            'Test\Entity' => [
+                'field1' => 'getField1',
+                'field2' => null,
+                'field3' => [
+                    'property_path'     => 'getField3',
+                    'default_formatter' => 'formatter3'
+                ],
+                'field4' => ['property_path' => null]
+            ]
+        ];
+        $config = [
+            'default_formatters' => ['Test\Entity' => ['field3' => 'formatter3']],
+            'properties'         => ['Test\Entity' => ['field2', 'field4']],
+            'methods'            => ['Test\Entity' => ['getField1', 'getField3']],
+            'accessors'          => [
+                'Test\Entity' => [
+                    'field1' => 'getField1',
+                    'field2' => null,
+                    'field3' => 'getField3',
+                    'field4' => null
+                ]
+            ]
+        ];
+
+        $this->variablesProvider->expects(self::once())
+            ->method('getEntityVariableGetters')
+            ->willReturn($entityVariableGetters);
+
+        $this->cache->expects(self::once())
+            ->method('fetch')
+            ->with(self::CONFIG_CACHE_KEY)
+            ->willReturn(false);
+        $this->cache->expects(self::once())
+            ->method('save')
+            ->with(self::CONFIG_CACHE_KEY, $config);
+
+        self::assertSame($config, $this->configProvider->getConfiguration());
+        // test local cache
+        self::assertSame($config, $this->configProvider->getConfiguration());
+    }
+
+    public function testGetSystemVariableValues()
+    {
+        $systemVariableValues = ['variable1' => 'value1'];
+
+        $this->variablesProvider->expects(self::once())
+            ->method('getSystemVariableValues')
+            ->willReturn($systemVariableValues);
+
+        self::assertSame($systemVariableValues, $this->configProvider->getSystemVariableValues());
+        // test local cache
+        self::assertSame($systemVariableValues, $this->configProvider->getSystemVariableValues());
+    }
+
+    public function testGetEntityVariableProcessors()
+    {
+        $entityClass1 = 'Test\Entity1';
+        $entityClass2 = 'Test\Entity2';
+        $entityClass3 = 'Test\Entity3';
+        $definitions = [
+            $entityClass1 => ['prop1' => ['processor' => 'processor1']],
+            $entityClass2 => ['prop2' => ['processor' => 'processor2', 'param2' => 'val2']],
+            $entityClass3 => []
+        ];
+
+        $this->variablesProvider->expects(self::exactly(3))
+            ->method('getEntityVariableProcessors')
+            ->willReturnMap([
+                [$entityClass1, $definitions[$entityClass1]],
+                [$entityClass2, $definitions[$entityClass2]],
+                [$entityClass3, $definitions[$entityClass3]]
+            ]);
+
+        foreach ($definitions as $entityClass => $definition) {
+            self::assertSame(
+                $definition,
+                $this->configProvider->getEntityVariableProcessors($entityClass),
+                $entityClass
+            );
+        }
+        // test local cache
+        foreach ($definitions as $entityClass => $definition) {
+            self::assertSame(
+                $definition,
+                $this->configProvider->getEntityVariableProcessors($entityClass),
+                $entityClass
+            );
+        }
+    }
+
+    public function testClearCache()
+    {
+        $this->cache->expects(self::once())
+            ->method('delete')
+            ->with(self::CONFIG_CACHE_KEY);
+
+        $this->cache->expects(self::exactly(2))
+            ->method('fetch')
+            ->with(self::CONFIG_CACHE_KEY)
+            ->willReturn(false);
+        $this->cache->expects(self::exactly(2))
+            ->method('save')
+            ->with(self::CONFIG_CACHE_KEY);
+        $this->variablesProvider->expects(self::exactly(2))
+            ->method('getSystemVariableValues')
+            ->willReturn([]);
+        $this->variablesProvider->expects(self::exactly(2))
+            ->method('getEntityVariableProcessors')
+            ->with('Test\Entity')
+            ->willReturn([]);
+
+        // warmup local cache
+        $this->configProvider->getConfiguration();
+        $this->configProvider->getSystemVariableValues();
+        $this->configProvider->getEntityVariableProcessors('Test\Entity');
+
+        $this->configProvider->clearCache();
+
+        // test that local cache was cleared
+        $this->configProvider->getConfiguration();
+        $this->configProvider->getSystemVariableValues();
+        $this->configProvider->getEntityVariableProcessors('Test\Entity');
+    }
+}

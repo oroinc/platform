@@ -120,6 +120,7 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
                 'workflowItemId' => null
             ],
             'executionRoute' => $this->buttonContext->getExecutionRoute(),
+            'requestMethod' => 'POST',
             'dialogRoute' => null,
             'additionalData' => [],
             'jsDialogWidget' => TransitionButton::TRANSITION_JS_DIALOG_WIDGET,

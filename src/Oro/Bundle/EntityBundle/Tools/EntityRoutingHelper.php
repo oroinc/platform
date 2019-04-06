@@ -77,7 +77,7 @@ class EntityRoutingHelper
      */
     public function getAction(Request $request)
     {
-        return $request->query->get(self::PARAM_ACTION);
+        return $request->get(self::PARAM_ACTION);
     }
 
     /**
@@ -90,7 +90,7 @@ class EntityRoutingHelper
      */
     public function getEntityClassName(Request $request, $paramName = self::PARAM_ENTITY_CLASS)
     {
-        $className = $request->query->get($paramName);
+        $className = $request->get($paramName);
         if ($className) {
             $className = $this->resolveEntityClass($className);
         }
@@ -108,7 +108,7 @@ class EntityRoutingHelper
      */
     public function getEntityId(Request $request, $paramName = self::PARAM_ENTITY_ID)
     {
-        return $request->query->get($paramName);
+        return $request->get($paramName);
     }
 
     /**

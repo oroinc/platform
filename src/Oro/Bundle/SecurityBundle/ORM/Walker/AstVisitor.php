@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\AST\ArithmeticExpression;
 use Doctrine\ORM\Query\AST\ComparisonExpression;
 use Doctrine\ORM\Query\AST\ConditionalExpression;
@@ -21,7 +22,9 @@ use Doctrine\ORM\Query\AST\SimpleSelectExpression;
 use Doctrine\ORM\Query\AST\Subselect;
 use Doctrine\ORM\Query\AST\SubselectFromClause;
 use Doctrine\ORM\Query\AST\WhereClause;
+use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\AccessDenied;
+use Oro\Bundle\SecurityBundle\AccessRule\Expr\Association;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Comparison;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\CompositeExpression;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Exists;
@@ -176,6 +179,67 @@ class AstVisitor extends Visitor
         $primaryConditional->simpleConditionalExpression = $expression;
 
         return $primaryConditional;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function walkAssociation(Association $association)
+    {
+        $alias = $this->alias;
+        $associationName = $association->getAssociationName();
+
+        /** @var ClassMetadataInfo $sourceMetadata */
+        $sourceMetadata = $this->queryComponents[$alias]->getMetadata();
+        if (empty($sourceMetadata->associationMappings[$associationName])) {
+            throw new \RuntimeException(sprintf(
+                'Parameter of Association expression should be the name of existing association'
+                . ' for alias \'%s\'. Given name: \'%s\'.',
+                $alias,
+                $associationName
+            ));
+        }
+        $associationMapping = $sourceMetadata->associationMappings[$associationName];
+        if (!in_array($associationMapping['type'], [ClassMetadataInfo::ONE_TO_ONE, ClassMetadataInfo::MANY_TO_ONE])) {
+            throw new \RuntimeException(sprintf(
+                'Parameter of Association expression should be to-one association. Given name: \'%s\'.',
+                $associationName
+            ));
+        }
+        $targetEntityAlias = sprintf('_%s__%s_', $alias, $associationName);
+        $targetEntityClass = $associationMapping['targetEntity'];
+
+        /** @var ClassMetadataInfo $targetEntityMetadata */
+        $targetMetadata = $this->em->getClassMetadata($targetEntityClass);
+
+        $queryComponent = new QueryComponent();
+        $queryComponent->setRelation($associationMapping);
+        $queryComponent->setMetadata($targetMetadata);
+        $this->queryComponents[$targetEntityAlias] = $queryComponent;
+
+        if (!$associationMapping['isOwningSide']) {
+            $queryComponent->setRelation($targetMetadata->associationMappings[$associationMapping['mappedBy']]);
+            $leftPathExpression = new Path($targetMetadata->getSingleIdentifierFieldName(), $alias);
+            $rightPathExpression = new Path($associationMapping['mappedBy'], $targetEntityAlias);
+        } else {
+            $leftPathExpression = new Path($targetMetadata->getSingleIdentifierFieldName(), $targetEntityAlias);
+            $rightPathExpression = new Path($associationName, $alias);
+        }
+
+        $subqueryCriteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, $targetEntityClass, $targetEntityAlias);
+        $subqueryCriteria->andExpression(
+            new Comparison($leftPathExpression, Comparison::EQ, $rightPathExpression)
+        );
+
+        $existExpression = new Exists(
+            new Subquery(
+                $targetEntityClass,
+                $targetEntityAlias,
+                $subqueryCriteria
+            )
+        );
+
+        return $existExpression->visit($this);
     }
 
     /**

@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Job\UniqueJobHandler;
 use Oro\Component\MessageQueue\Tests\Unit\Mock\JobEntity;
 
 class JobStorageTest extends \PHPUnit\Framework\TestCase
@@ -17,14 +18,18 @@ class JobStorageTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     private $doctrine;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|UniqueJobHandler */
+    private $handler;
+
     /** @var JobStorage */
     private $storage;
 
     protected function setUp()
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->handler = $this->createMock(UniqueJobHandler::class);
 
-        $this->storage = new JobStorage($this->doctrine, JobEntity::class, 'unique_table');
+        $this->storage = new JobStorage($this->doctrine, JobEntity::class, $this->handler);
     }
 
     public function testShouldCreateJobObject()
@@ -129,46 +134,6 @@ class JobStorageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\MessageQueue\Job\DuplicateJobException
-     * @expectedExceptionMessage Duplicate job. ownerId:"owner-id", name:"job-name"
-     */
-    public function testShouldCatchUniqueConstraintViolationExceptionAndThrowDuplicateJobException()
-    {
-        $job = new JobEntity();
-        $job->setOwnerId('owner-id');
-        $job->setName('job-name');
-        $job->setUnique(true);
-
-        $connection = $this->createConnectionMock();
-        $connection->expects($this->once())
-            ->method('getTransactionNestingLevel')
-            ->will($this->returnValue(0));
-        $connection->expects($this->once())
-            ->method('transactional')
-            ->will($this->returnCallback(function ($callback) use ($connection) {
-                $callback($connection);
-            }));
-        $connection->expects($this->once())
-            ->method('insert')
-            ->will($this->throwException($this->createUniqueConstraintViolationExceptionMock()));
-
-        $em = $this->createEntityManagerMock();
-        $em->expects($this->once())
-            ->method('isOpen')
-            ->will($this->returnValue(true));
-        $em->expects($this->exactly(2))
-            ->method('getConnection')
-            ->will($this->returnValue($connection));
-
-        $this->doctrine->expects($this->once())
-            ->method('getManagerForClass')
-            ->with(JobEntity::class)
-            ->will($this->returnValue($em));
-
-        $this->storage->saveJob($job);
-    }
-
-    /**
      * @expectedException \LogicException
      * @expectedExceptionMessage Is not possible to create new job with lock, only update is allowed
      */
@@ -241,12 +206,10 @@ class JobStorageTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnCallback(function ($callback) use ($connection) {
                 $callback($connection);
             }));
-        $connection->expects($this->at(1))
+        $this->handler
+            ->expects($this->once())
             ->method('insert')
-            ->with('unique_table', ['name' => 'owner-id']);
-        $connection->expects($this->at(2))
-            ->method('insert')
-            ->with('unique_table', ['name' => 'job-name']);
+            ->with($connection, $job);
 
         $em = $this->createEntityManagerMock();
         $em->expects($this->once())
@@ -291,12 +254,10 @@ class JobStorageTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnCallback(function ($callback) use ($connection) {
                 $callback($connection);
             }));
-        $connection->expects($this->at(1))
+        $this->handler
+            ->expects($this->once())
             ->method('delete')
-            ->with('unique_table', ['name' => 'owner-id']);
-        $connection->expects($this->at(2))
-            ->method('delete')
-            ->with('unique_table', ['name' => 'job-name']);
+            ->with($connection, $job);
 
         $em = $this->createEntityManagerMock();
         $em->expects($this->once())

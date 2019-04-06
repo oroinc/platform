@@ -46,7 +46,7 @@ class CmsArticle
 
     /**
      * @ORM\OneToOne(targetEntity="CmsOrganization", inversedBy="address")
-     * @ORM\JoinColumn(name="organization", referencedColumnName="id")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id")
      */
     public $organization;
 

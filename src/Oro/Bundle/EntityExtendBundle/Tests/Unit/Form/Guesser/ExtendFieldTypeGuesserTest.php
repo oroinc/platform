@@ -324,8 +324,21 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
                     'block' => 'general',
                     'constraints' => [
                         new Decimal(['precision' => 8, 'scale' => 2])
-                    ]
+                    ],
+                    'grouping' => true
                 ]
+            ],
+            'float' => [
+                'fieldType' => 'float',
+                'extendConfig' => [
+                    'owner' => ExtendScope::ORIGIN_CUSTOM,
+                ],
+                'expectedOptions' => [
+                    'label' => self::SOME_LABEL,
+                    'required' => false,
+                    'block' => 'general',
+                    'grouping' => true
+                ],
             ]
         ];
     }

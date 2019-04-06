@@ -7,87 +7,11 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var $ = require('jquery');
     var _ = require('underscore');
-    var PLUGIN_PFX = 'mCS';
 
-    function onBeforeCustomScrollUpdate() {
-        var instance = $(this).data(PLUGIN_PFX);
-        var options = instance.opt;
-        var mCustomScrollBox = $('#mCSB_' + instance.idx);
-        var container = $('#mCSB_' + instance.idx + '_container');
-
-        // Logic is copied from libs method `_expandContentHorizontally` to take in account width changing during update
-        if (options.advanced.autoExpandHorizontalScroll && options.axis !== 'y') {
-            container.css({
-                'width': 'auto',
-                'min-width': 0,
-                'overflow-x': 'scroll'
-            });
-
-            var w = Math.ceil(container[0].scrollWidth);
-
-            if (
-                options.advanced.autoExpandHorizontalScroll === 3 ||
-                options.advanced.autoExpandHorizontalScroll !== 2 && w > container.parent().width()
-            ) {
-                container.css({
-                    'width': w,
-                    'min-width': '100%',
-                    'overflow-x': 'inherit'
-                });
-            }
-        }
-
-        var contentWidth = instance.overflowed == null ? container.width() : container.outerWidth(false);
-
-        contentWidth = Math.max(contentWidth, container[0].scrollWidth);
-
-        var difference = contentWidth - mCustomScrollBox.width();
-
-        // Fix to avoid unnecessary showing of scrollbar when mCustomScrollBox has fractional width
-        if (difference < 1 && difference > 0) {
-            mCustomScrollBox.css({
-                'max-width': 'none',
-                'min-width': 0,
-                'width': contentWidth
-            });
-        }
-    }
-
-    function onCustomScrollUpdate() {
-        var instance = $(this).data(PLUGIN_PFX);
-        var mCustomScrollBox = $('#mCSB_' + instance.idx);
-
-        mCustomScrollBox.css({
-            'max-width': '',
-            'min-width': '',
-            'width': ''
-        });
-    }
-
-    require('jquery.mCustomScrollbar');
     require('jquery.mousewheel');
+    require('styled-scroll-bar');
 
     StickedScrollbarPlugin = BasePlugin.extend({
-        /**
-         * mCustomScrollbar initialization options
-         * @type {Object}
-         */
-        mcsOptions: {
-            axis: 'x',
-            contentTouchScroll: 10,
-            documentTouchScroll: true,
-            theme: 'inset-dark',
-            advanced: {
-                autoExpandHorizontalScroll: 3,
-                updateOnContentResize: false,
-                updateOnImageLoad: false
-            },
-            callbacks: {
-                onBeforeUpdate: onBeforeCustomScrollUpdate,
-                onUpdate: onCustomScrollUpdate
-            }
-        },
-
         viewport: {
             minScreenType: 'any'
         },
@@ -122,9 +46,25 @@ define(function(require) {
             }
 
             this.setupDomCache();
-            this.domCache.$container.mCustomScrollbar(this.mcsOptions);
-            this.domCache.$scrollbar = this.domCache.$container.find('.mCSB_scrollTools');
+
+            this.domCache.$container.styledScrollBar({
+                overflowBehavior: {
+                    y: 'hidden'
+                },
+                callbacks: {
+                    onScroll: _.debounce(function(event) {
+                        this.domCache.$container.trigger('updateScroll', event);
+                    }.bind(this), 5)
+                }
+            });
+            this.domCache.$scrollbar = $(this.domCache.$container
+                .styledScrollBar('getElements').scrollbarHorizontal.scrollbar);
+
             this.delegateEvents();
+
+            var displayScrollbar = this.checkScrollbarDisplay();
+
+            this.domCache.$container.styledScrollBar(displayScrollbar ? 'update': 'sleep');
 
             StickedScrollbarPlugin.__super__.enable.apply(this, arguments);
         },
@@ -138,7 +78,7 @@ define(function(require) {
             }
 
             this.undelegateEvents();
-            this.domCache.$container.mCustomScrollbar('destroy');
+            this.domCache.$container.styledScrollBar('dispose');
 
             return StickedScrollbarPlugin.__super__.disable.apply(this, arguments);
         },
@@ -186,7 +126,7 @@ define(function(require) {
             this.domCache.$collapsible.on('shown' + this.eventNamespace(), manageScroll);
             this.domCache.$document.on('scroll' + this.eventNamespace(), manageScroll);
             this.domCache.$window.on('resize' + this.eventNamespace(), updateCustomScrollbar);
-            this.domCache.$oroTabs.on('show' + this.eventNamespace(), updateCustomScrollbar);
+            this.domCache.$oroTabs.on('shown' + this.eventNamespace(), updateCustomScrollbar);
 
             this.listenTo(mediator, 'layout:reposition', this.updateCustomScrollbar);
             this.listenTo(mediator, 'gridHeaderCellWidth:beforeUpdate', this.onGridHeaderCellWidthBeforeUpdate);
@@ -277,11 +217,15 @@ define(function(require) {
 
         updateCustomScrollbar: function() {
             this.manageScroll();
-            this.domCache.$container.mCustomScrollbar('update', false, 3);
+            if (this.domCache.$container.data('oro.styledScrollBar')) {
+                this.domCache.$container.styledScrollBar('update');
+            }
         },
 
         onGridHeaderCellWidthBeforeUpdate: function() {
-            this.domCache.$grid.parents('.mCSB_container:first').css({width: ''});
+            if (this.domCache.$container.data('oro.styledScrollBar')) {
+                this.domCache.$container.styledScrollBar('update');
+            }
         },
 
         onViewportChange: function(viewport) {

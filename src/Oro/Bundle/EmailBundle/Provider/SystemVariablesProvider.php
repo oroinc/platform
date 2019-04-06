@@ -3,22 +3,27 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\SystemVariablesProviderInterface;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Provides access to the system variables for email templates
+ * Provides the following system variables for email templates:
+ * * appURL
+ * * currentDateTime
+ * * currentDate
+ * * currentTime
  */
 class SystemVariablesProvider implements SystemVariablesProviderInterface
 {
     /** @var TranslatorInterface */
-    protected $translator;
+    private $translator;
 
     /** @var ConfigManager */
-    protected $configManager;
+    private $configManager;
 
     /** @var DateTimeFormatter */
-    protected $dateTimeFormatter;
+    private $dateTimeFormatter;
 
     /**
      * @param TranslatorInterface $translator
@@ -30,15 +35,15 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
         ConfigManager $configManager,
         DateTimeFormatter $dateTimeFormatter
     ) {
-        $this->translator        = $translator;
-        $this->configManager     = $configManager;
+        $this->translator = $translator;
+        $this->configManager = $configManager;
         $this->dateTimeFormatter = $dateTimeFormatter;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getVariableDefinitions()
+    public function getVariableDefinitions(): array
     {
         return $this->getVariables(false);
     }
@@ -46,7 +51,7 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getVariableValues()
+    public function getVariableValues(): array
     {
         return $this->getVariables(true);
     }
@@ -56,7 +61,7 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
      *
      * @return array
      */
-    protected function getVariables($addValue)
+    private function getVariables(bool $addValue): array
     {
         $result = [];
 
@@ -70,7 +75,7 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
      * @param array $result
      * @param bool  $addValue
      */
-    protected function addApplicationUrl(array &$result, $addValue)
+    private function addApplicationUrl(array &$result, bool $addValue): void
     {
         if ($addValue) {
             $val = $this->configManager->get('oro_ui.application_url');
@@ -87,7 +92,7 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
      * @param array $result
      * @param bool  $addValue
      */
-    protected function addCurrentDateAndTime(array &$result, $addValue)
+    private function addCurrentDateAndTime(array &$result, bool $addValue): void
     {
         if ($addValue) {
             $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));

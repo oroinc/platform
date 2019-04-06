@@ -78,7 +78,9 @@ class OroSelenium2Driver extends Selenium2Driver
                 return;
             }
         } elseif ('textarea' === $elementName && 'true' === $element->attribute('aria-hidden')) {
-            $this->fillTinyMce($element, $value);
+            if (!$this->fillTinyMce($element, $value)) {
+                $this->setTextInputElement($element, $value);
+            }
             $this->triggerEvent($xpath, 'keyup');
             $this->triggerEvent($xpath, 'change');
 
@@ -110,6 +112,8 @@ class OroSelenium2Driver extends Selenium2Driver
      *
      * @param Element $element Form element that was replaced by TinyMCE
      * @param string  $value   Text for set into tiny
+     *
+     * @return bool TRUE if the given element is TinyMCE; otherwise, FALSE
      */
     protected function fillTinyMce(Element $element, $value)
     {
@@ -119,16 +123,16 @@ class OroSelenium2Driver extends Selenium2Driver
             sprintf('null != tinyMCE.get("%s");', $fieldId)
         );
 
-        self::assertNotNull(
-            $isTinyMce,
-            sprintf('Field was guessed as tinymce, but can\'t find tiny with id "%s" on page', $fieldId)
-        );
+        if (!$isTinyMce) {
+            return false;
+        }
 
         $this->executeScript(
             sprintf('tinyMCE.get("%s").setContent("%s");', $fieldId, $value)
         );
-    }
 
+        return true;
+    }
 
     /**
      * @param Element $element

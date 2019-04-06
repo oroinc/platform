@@ -16,8 +16,6 @@ parameters:
     oro_ui.html_tag_helper.class:                          Oro\Bundle\UIBundle\Tools\HtmlTagHelper
     oro_ui.user_agent_provider.class:                      Oro\Bundle\UIBundle\Provider\UserAgentProvider
 
-    oro_ui.formatter.class:                                Oro\Bundle\UIBundle\Formatter\FormatterManager
-
 services:
     # Placeholder services
     oro_ui.placeholder.provider:
@@ -149,7 +147,10 @@ services:
             - '@request_stack'
 
     oro_ui.formatter:
-        class: '%oro_ui.formatter.class%'
+        class: Oro\Bundle\UIBundle\Formatter\FormatterManager
+        arguments:
+            - ~ # formatters. Set by Oro\Bundle\UIBundle\DependencyInjection\Compiler\FormattersPass
+            - [] # typesMap. Set by Oro\Bundle\UIBundle\DependencyInjection\Compiler\FormattersPass
 
     oro_ui.config_extension.feature:
         class: 'Oro\Bundle\UIBundle\Configuration\FeatureConfigurationExtension'

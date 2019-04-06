@@ -963,6 +963,7 @@ class OroMainContext extends MinkContext implements
      * Example: And I should see "file.jpg" file link with the url matches "/folder/"
      *
      * @Then /^(?:|I )should see "(?P<text>[^"]+)" link with the url matches (?P<url>"[^"]+")$/
+     * @Then /^(?:|I )should see '(?P<text>[^']+)' link with the url matches (?P<url>"[^"]+")$/
      */
     public function iShouldSeeLinkWithUrl($text, $url)
     {
@@ -1016,6 +1017,7 @@ class OroMainContext extends MinkContext implements
      * Example: When I click "Save and Close"
      *
      * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )click '(?P<button>(?:[^']|\\')*)'$/
      */
     public function pressButton($button)
     {

@@ -136,7 +136,7 @@ class ConfigurationType extends AbstractType
                 'required' => true,
                 'attr' => [
                     'class' => 'check-connection',
-                    'autocomplete' => 'new-password'
+                    'autocomplete' => 'off'
                 ]
             ]);
         if ($options['add_check_button']) {

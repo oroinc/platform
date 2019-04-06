@@ -149,9 +149,6 @@ define(function(require) {
                     confirm.on('cancel', function() {
                         $entityChoice.val(oldVal).change();
                     });
-                    confirm.once('hidden', function() {
-                        _.defer(confirm.dispose.bind(confirm));
-                    });
                     confirm.open();
                 } else {
                     handleEntityChange();
@@ -327,7 +324,7 @@ define(function(require) {
             });
 
             // setup confirmation dialog for delete item
-            var confirm = new DeleteConfirmation({content: ''});
+            var confirm = new DeleteConfirmation({content: '', disposeOnHidden: false});
             confirm.on('ok', function() {
                 collection.remove(this.model);
             });
@@ -450,7 +447,7 @@ define(function(require) {
             });
 
             // setup confirmation dialog for delete item
-            var confirm = new DeleteConfirmation({content: ''});
+            var confirm = new DeleteConfirmation({content: '', disposeOnHidden: false});
             confirm.on('ok', function() {
                 collection.remove(this.model);
             });

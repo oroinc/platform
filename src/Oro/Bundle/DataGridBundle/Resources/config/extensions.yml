@@ -103,7 +103,6 @@ services:
             - '@oro_datagrid.extension.mass_action.factory'
             - '@oro_datagrid.extension.mass_action.metadata_factory'
             - '@security.authorization_checker'
-            - '@security.csrf.token_manager'
         tags:
             - { name: oro_datagrid.extension }
 
@@ -218,3 +217,13 @@ services:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.no_data_messages:
+        class: Oro\Bundle\DataGridBundle\Extension\NoDataMessages\NoDataMessagesExtension
+        arguments:
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_search.provider.search_mapping'
+            - '@translator'
+        tags:
+            - { name: oro_datagrid.extension }
+

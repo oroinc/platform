@@ -238,6 +238,14 @@ services:
             - '@oro_entity.entity_provider'
             - '@oro_entity_config.helper.entity_config'
 
+    oro_entity.format.simple_array:
+        class: Oro\Bundle\EntityBundle\Formatter\SimpleArrayFormatter
+        public: false
+        arguments:
+            - '@translator'
+        tags:
+            - { name: oro_formatter, formatter: simple_array, data_type: simple_array }
+
     oro_entity.twig.extension.entity:
         class: Oro\Bundle\EntityBundle\Twig\EntityExtension
         public: false
@@ -574,7 +582,30 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_entity.structure.options, method: onOptionsRequest }
 
+    oro_entity.importexport.event_listeners.entity_fallback_value_headers_listener:
+        class: Oro\Bundle\EntityBundle\ImportExport\EventListeners\EntityFieldFallbackValueHeadersListener
+        tags:
+            - { name: kernel.event_listener, event: oro.import_export.after_load_entity_rules_and_backend_headers, method: afterLoadEntityRulesAndBackendHeaders }
+
+    oro_entity.importexport.event_listeners.entity_fallback_value_clean_listener:
+        class: Oro\Bundle\EntityBundle\ImportExport\EventListeners\EntityFieldFallbackValueMergeListener
+        arguments:
+             - '@oro_entity.helper.field_helper'
+             - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }
+
     oro_entity.importexport.normalizer.entity_fallback_value:
         class: 'Oro\Bundle\EntityBundle\ImportExport\Serializer\EntityFieldFallbackValueNormalizer'
+        arguments:
+             - '@oro_entity.fallback.resolver.entity_fallback_resolver'
+             - '@oro_locale.settings'
         tags:
             - { name: oro_importexport.normalizer, priority: 20 }
+
+    oro_entity.validator.constraint.related_entity_field_fallback_value:
+        class: Oro\Bundle\EntityBundle\Validator\Constraints\RelatedEntityFieldFallbackValueConstraintValidator
+        arguments:
+            - '@oro_entity.fallback.resolver.entity_fallback_resolver'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity.related_entity_field_fallback_value_validator}

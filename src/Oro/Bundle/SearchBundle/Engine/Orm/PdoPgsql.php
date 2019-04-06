@@ -109,7 +109,8 @@ class PdoPgsql extends BaseDriver
             $qb->setParameter('field' . $index, $searchCondition['fieldName']);
         }
 
-        if ($setOrderBy) {
+        // contains is the only operator that calculates relevance in postgresql
+        if ($setOrderBy && $condition === Query::OPERATOR_CONTAINS) {
             $this->setTextOrderBy($qb, $index);
         }
 
@@ -277,9 +278,8 @@ class PdoPgsql extends BaseDriver
            ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
 
         $parameter = $qb->getParameter(sprintf('value%s', $index));
-        $quotedValue = sprintf('\'%s\'', $parameter->getValue());
 
-        $qb->setParameter(sprintf('quotedValue%s', $index), $quotedValue);
+        $qb->setParameter(sprintf('quotedValue%s', $index), $parameter->getValue());
     }
 
     /**

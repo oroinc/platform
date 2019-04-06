@@ -74,7 +74,7 @@ class SuiteController implements Controller
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $tested = $this->featureStatisticManager->getTested();
+        $tested = $input->getOption('available-suite-sets') ? [] : $this->featureStatisticManager->getTested();
         $skipped = [];
 
         $suiteName = $input->getOption('suite');
@@ -114,7 +114,7 @@ class SuiteController implements Controller
      */
     private function registerSuiteConfigs(array $suiteConfigs, array $tested)
     {
-        $skipped = [];
+        $skipped = [[]];
 
         foreach ($suiteConfigs as $suiteConfig) {
             $settings = $suiteConfig->getSettings();

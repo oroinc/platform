@@ -7,6 +7,9 @@ use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 
+/**
+ * This trait is designed to add relations between existing entities and EntityFieldFallbackValue
+ */
 trait AddFallbackRelationTrait
 {
     /**
@@ -16,7 +19,7 @@ trait AddFallbackRelationTrait
      * @param string $fieldName
      * @param string $label
      * @param array $fallbackList
-     * @param string|null $fallbackType
+     * @param array $options
      */
     protected function addFallbackRelation(
         Schema $schema,
@@ -25,23 +28,17 @@ trait AddFallbackRelationTrait
         $fieldName,
         $label,
         $fallbackList,
-        $fallbackType = null
+        array $options = []
     ) {
         $table = $schema->getTable($tableName);
         $fallbackTable = $schema->getTable('oro_entity_fallback_value');
-
-        $fallbackConfig = ['fallbackList' => $fallbackList];
-        if ($fallbackType) {
-            $fallbackConfig['fallbackType'] = $fallbackType;
-        }
-
         $extendExtension->addManyToOneRelation(
             $schema,
             $table,
             $fieldName,
             $fallbackTable,
             'id',
-            [
+            array_merge_recursive([
                 'entity' => [
                     'label' => $label,
                 ],
@@ -58,8 +55,10 @@ trait AddFallbackRelationTrait
                 'datagrid' => [
                     'is_visible' => DatagridScope::IS_VISIBLE_FALSE,
                 ],
-                'fallback' => $fallbackConfig
-            ]
+                'fallback' => [
+                    'fallbackList' => $fallbackList
+                ]
+            ], $options)
         );
     }
 }

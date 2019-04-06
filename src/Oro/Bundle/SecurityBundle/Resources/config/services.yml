@@ -723,6 +723,33 @@ services:
         tags:
             - { name: oro_platform.console.global_options_provider }
 
+    oro_security.csrf.cookie_token_storage:
+        class: Oro\Bundle\SecurityBundle\Csrf\CookieTokenStorage
+        public: false
+        arguments:
+            - '@request_stack'
+
+    oro_security.csrf_token_manager:
+        class: Symfony\Component\Security\Csrf\CsrfTokenManager
+        public: false
+        arguments:
+            - '@security.csrf.token_generator'
+            - '@oro_security.csrf.cookie_token_storage'
+
+    oro_security.csrf_request_manager:
+        class: Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager
+        public: true
+        arguments:
+            - '@oro_security.csrf_token_manager'
+
+    oro_security.event_listener.csrf_protection_request_listener:
+        class: Oro\Bundle\SecurityBundle\EventListener\CsrfProtectionRequestListener
+        arguments:
+            - '@oro_security.csrf_request_manager'
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -10 }
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse, priority: -10 }
+
     oro_security.access_rule.chain_access_rule:
         class: Oro\Bundle\SecurityBundle\AccessRule\ChainAccessRule
 
@@ -743,3 +770,8 @@ services:
             - '@oro_security.owner.metadata_provider.chain'
         tags:
             - { name: oro_security.access_rule }
+
+    oro_security.form.extension.autocomplete_password_type:
+        class: 'Oro\Bundle\SecurityBundle\Form\Extension\AutocompletePasswordTypeExtension'
+        tags:
+            - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\PasswordType }

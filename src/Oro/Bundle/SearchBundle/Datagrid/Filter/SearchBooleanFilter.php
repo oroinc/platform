@@ -25,6 +25,15 @@ class SearchBooleanFilter extends BooleanFilter
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function init($name, array $params)
+    {
+        $params[FilterUtility::FRONTEND_TYPE_KEY] = 'search-boolean';
+        parent::init($name, $params);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)

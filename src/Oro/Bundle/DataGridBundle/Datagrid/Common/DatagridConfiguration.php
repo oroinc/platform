@@ -23,6 +23,10 @@ class DatagridConfiguration extends ConfigObject
     const DATASOURCE_PATH = '[source]';
     const DATASOURCE_TYPE_PATH = '[source][type]';
     const BASE_DATAGRID_CLASS_PATH  = '[options][base_datagrid_class]';
+    const FROM_PATH = '[source][query][from]';
+    const ENTITY_HINT_PATH = '[options][entityHint]';
+    const EMPTY_GRID_MESSAGE_PATH = '[options][noDataMessages][emptyGrid]';
+    const EMPTY_FILTERED_GRID_MESSAGE_PATH = '[options][noDataMessages][emptyFilteredGrid]';
 
     const EXTENDED_ENTITY_NAME = 'extended_entity_name';
 

@@ -18,9 +18,11 @@ use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Testing\DbIsolationExtension;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
@@ -750,6 +752,43 @@ abstract class WebTestCase extends BaseWebTestCase
             $data,
             $replaceOroDefaultPrefixCallback
         );
+    }
+
+    /**
+     * Calls a URI with emulation of AJAX request.
+     *
+     * @param string $method        The request method
+     * @param string $uri           The URI to fetch
+     * @param array  $parameters    The Request parameters
+     * @param array  $files         The files
+     * @param array  $server        The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
+     * @param string $content       The raw body data
+     * @param bool   $changeHistory Whether to update the history or not
+     *                              (only used internally for back(), forward(), and reload())
+     *
+     * @return Crawler
+     */
+    public function ajaxRequest(
+        $method,
+        $uri,
+        array $parameters = [],
+        array $files = [],
+        array $server = [],
+        $content = null,
+        $changeHistory = true
+    ) {
+        $csrfToken = 'nochecks';
+        $csrfTokenCookie = $this->client->getCookieJar()->get('_csrf', '/', 'localhost');
+        if ($csrfTokenCookie) {
+            $csrfToken = $csrfTokenCookie->getValue();
+        } else {
+            $this->client->getCookieJar()->set(new Cookie('_csrf', $csrfToken, null, '/', 'localhost'));
+        }
+        $server['HTTP_X-Requested-With'] = 'XMLHttpRequest';
+        $server['HTTP_Content-type'] = 'application/json';
+        $server['HTTP_X-CSRF-Header'] = $csrfToken;
+
+        return $this->client->request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
     }
 
     /**

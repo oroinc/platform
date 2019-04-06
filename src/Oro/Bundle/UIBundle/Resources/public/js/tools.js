@@ -6,6 +6,7 @@ define(function(require) {
     var tools = {};
     var iOS = /(iPad|iPhone)/.test(navigator.userAgent);
     var edge = /(Edge\/)/.test(navigator.userAgent);
+    var ie11 = /(Trident\/)/.test(navigator.userAgent);
 
     /**
      * @export oroui/js/tools
@@ -244,6 +245,13 @@ define(function(require) {
          */
         isIOS: function() {
             return iOS;
+        },
+
+        /**
+         * Are we currently on IE 11 browser
+         */
+        isIE11: function() {
+            return ie11;
         },
 
         /**

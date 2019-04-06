@@ -19,7 +19,7 @@ class TicketControllerTest extends WebTestCase
     public function testSyncTicketAction(): void
     {
         $url = $this->getUrl('oro_sync_ticket');
-        $this->client->request('POST', $url);
+        $this->ajaxRequest('POST', $url);
 
         $response = self::getJsonResponseContent($this->client->getResponse(), 200);
         self::assertNotEmpty($response['ticket']);

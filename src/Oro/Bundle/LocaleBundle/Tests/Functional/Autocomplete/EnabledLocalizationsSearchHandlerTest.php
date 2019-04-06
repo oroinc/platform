@@ -1,0 +1,83 @@
+<?php
+
+namespace Oro\Bundle\LocaleBundle\Tests\Functional\Autocomplete;
+
+use Oro\Bundle\LocaleBundle\Autocomplete\EnabledLocalizationsSearchHandler;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+
+class EnabledLocalizationsSearchHandlerTest extends WebTestCase
+{
+    /**
+     * @var EnabledLocalizationsSearchHandler
+     */
+    private $searchHandler;
+
+    protected function setUp()
+    {
+        $this->initClient([], static::generateBasicAuthHeader());
+        $this->loadFixtures([LoadLocalizationData::class]);
+        $this->searchHandler = self::getContainer()
+            ->get('oro_locale.autocomplete.enabled_localizations.search_handler');
+        self::getContainer()->get('oro_search.search.engine.indexer')->reindex(Localization::class);
+    }
+
+    public function testSearch()
+    {
+        $result = $this->searchHandler->search('', 1, 10, false);
+        $this->assertSearchResult($result, []);
+
+        $result = $this->searchHandler->search(';', 1, 10, false);
+        $this->assertSearchResult(
+            $result,
+            [
+                self::getContainer()
+                    ->get('doctrine')
+                    ->getManagerForClass(Localization::class)
+                    ->getRepository(Localization::class)
+                    ->findOneBy([], ['id' => 'ASC'])->getId(),
+                $this->getReference('en_US')->getId(),
+                $this->getReference('en_CA')->getId(),
+                $this->getReference('es')->getId(),
+            ]
+        );
+
+        // Check with scope identifier
+        self::getContainer()->get('oro_config.manager')->set(
+            Configuration::getConfigKeyByName(Configuration::ENABLED_LOCALIZATIONS),
+            [
+                $this->getReference('en_CA')->getId(),
+                $this->getReference('es')->getId(),
+            ],
+            2
+        );
+        self::getContainer()->get('oro_config.manager')->flush(2);
+
+        $result = $this->searchHandler->search(';2', 1, 10, false);
+        $this->assertSearchResult(
+            $result,
+            [
+                $this->getReference('en_CA')->getId(),
+                $this->getReference('es')->getId(),
+            ]
+        );
+    }
+
+    /**
+     * @param Localization[] $result
+     * @param array $expected
+     */
+    private function assertSearchResult(array $result, array $expected)
+    {
+        $searchItems = $result['results'];
+        $this->assertCount(count($expected), $searchItems);
+        $result = [];
+        array_map(function (array $searchResult) use (&$result) {
+            $result[] = $searchResult['id'];
+        }, $searchItems);
+
+        $this->assertEquals(sort($expected), sort($result));
+    }
+}

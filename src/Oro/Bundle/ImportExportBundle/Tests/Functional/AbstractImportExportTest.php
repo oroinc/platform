@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Functional;
 
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
+use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -46,13 +47,24 @@ abstract class AbstractImportExportTest extends WebTestCase
             ])
         );
 
-        $this->client->followRedirect();
+        // Take the name of the file from the header because there is no alternative way to know the filename
+        $contentDisposition = $this->client->getResponse()->headers->get('Content-Disposition');
+        preg_match('/^.*"(export_template_[a-z0-9_]+.csv)"$/', $contentDisposition, $matches);
 
-        $this->assertExportFileData(
-            $expectedCsvFilePath,
-            $this->client->getRequest()->attributes->get('fileName'),
-            $skippedColumns
-        );
+        $actualExportContent = $this->client->getResponse()->getContent();
+        $exportFileContent = $this->getFileContent($expectedCsvFilePath);
+
+        $expectedData = $this->getParsedDataFromCSVContent($actualExportContent);
+        $exportedData = $this->getParsedDataFromCSVContent($exportFileContent);
+
+        if ($skippedColumns) {
+            $this->removedIgnoredColumnsFromData(
+                $expectedData,
+                $skippedColumns
+            );
+        }
+        static::assertEquals($expectedData, $exportedData);
+        $this->deleteImportExportFile($matches[1]);
     }
 
     /**
@@ -86,10 +98,31 @@ abstract class AbstractImportExportTest extends WebTestCase
             $exportMessageData
         );
 
-        $job = $this->findJob($jobId);
-        $exportedFilename = $job->getData()['file'];
+        $this->assertMessageProcessorExecuted(
+            'oro_importexport.async.post_export',
+            array_merge($exportMessageData, ['email' => 'acme@example.com'])
+        );
 
-        $this->assertExportFileData($expectedCsvFilePath, $exportedFilename, $skippedColumns);
+        $job = $this->findJob($jobId);
+        $job = $job->isRoot() ? $job : $job->getRootJob();
+
+        $saveResultMessageData = $this->getOneSentMessageWithTopic(Topics::SAVE_IMPORT_EXPORT_RESULT);
+        $this->clearMessageCollector();
+
+        $this->assertMessageProcessorExecuted(
+            'oro_importexport.async.save_import_export_result_processor',
+            array_merge(
+                $saveResultMessageData,
+                [
+                    'jobId' => $job->getId(),
+                    'type' => ProcessorRegistry::TYPE_EXPORT,
+                    'entity' => ImportExportResult::class
+                ]
+            )
+        );
+
+        $exportedFilename = $job->getData()['file'];
+        $this->assertExportFileData($job->getId(), $expectedCsvFilePath, $exportedFilename, $skippedColumns);
     }
 
     /**
@@ -102,21 +135,21 @@ abstract class AbstractImportExportTest extends WebTestCase
     ) {
         $this->assertPreImportActionExecuted($configuration, $importFilePath);
 
-        $preImportMessageData = $this->getOneSentMessageWithTopic(Topics::PRE_HTTP_IMPORT);
+        $preImportMessageData = $this->getOneSentMessageWithTopic(Topics::PRE_IMPORT);
         $this->clearMessageCollector();
 
         $this->assertMessageProcessorExecuted(
-            'oro_importexport.async.pre_http_import',
+            'oro_importexport.async.pre_import',
             $preImportMessageData
         );
 
-        static::assertMessageSent(Topics::HTTP_IMPORT);
+        static::assertMessageSent(Topics::IMPORT);
 
-        $importMessageData = $this->getOneSentMessageWithTopic(Topics::HTTP_IMPORT);
+        $importMessageData = $this->getOneSentMessageWithTopic(Topics::IMPORT);
         $this->clearMessageCollector();
 
         $this->assertMessageProcessorExecuted(
-            'oro_importexport.async.http_import',
+            'oro_importexport.async.import',
             $importMessageData
         );
 
@@ -138,20 +171,20 @@ abstract class AbstractImportExportTest extends WebTestCase
 
         $this->assertPreImportValidationActionExecuted($configuration, $importCsvFilePath);
 
-        $preImportValidateMessageData = $this->getOneSentMessageWithTopic(Topics::PRE_HTTP_IMPORT);
+        $preImportValidateMessageData = $this->getOneSentMessageWithTopic(Topics::PRE_IMPORT);
         $this->clearMessageCollector();
 
         $this->assertMessageProcessorExecuted(
-            'oro_importexport.async.pre_http_import',
+            'oro_importexport.async.pre_import',
             $preImportValidateMessageData
         );
 
-        $importValidateMessageData = $this->getOneSentMessageWithTopic(Topics::HTTP_IMPORT);
+        $importValidateMessageData = $this->getOneSentMessageWithTopic(Topics::IMPORT);
         $jobId = $importValidateMessageData['jobId'];
         $this->clearMessageCollector();
 
         static::getContainer()
-            ->get('oro_importexport.async.http_import')
+            ->get('oro_importexport.async.import')
             ->process(
                 $this->createNullMessage($importValidateMessageData),
                 $this->createSessionInterfaceMock()
@@ -168,7 +201,7 @@ abstract class AbstractImportExportTest extends WebTestCase
 
         static::assertSame(
             json_decode($this->getFileContent($errorsFilePath)),
-            json_decode($this->getImportExportFileContent($jobData['errorLogFile']))
+            json_decode($this->getImportExportFileContent($jobId))
         );
 
         $this->deleteTmpFile($preImportValidateMessageData['fileName']);
@@ -238,8 +271,8 @@ abstract class AbstractImportExportTest extends WebTestCase
      */
     protected function assertPreExportActionExecuted(ImportExportConfigurationInterface $configuration)
     {
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'POST',
             $this->getUrl('oro_importexport_export_instant', [
                 'processorAlias' => $configuration->getExportProcessorAlias(),
                 'exportJob' => $configuration->getExportJobName(),
@@ -274,8 +307,8 @@ abstract class AbstractImportExportTest extends WebTestCase
             ->get('oro_importexport.file.file_manager')
             ->saveImportingFile($file);
 
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'POST',
             $this->getUrl('oro_importexport_import_process', [
                 'processorAlias' => $configuration->getImportProcessorAlias(),
                 'importJob' => $configuration->getImportJobName(),
@@ -288,7 +321,7 @@ abstract class AbstractImportExportTest extends WebTestCase
         $response = static::getJsonResponseContent($this->client->getResponse(), 200);
         static::assertTrue($response['success']);
 
-        static::assertMessageSent(Topics::PRE_HTTP_IMPORT, [
+        static::assertMessageSent(Topics::PRE_IMPORT, [
             'fileName' => $fileName,
             'process' => ProcessorRegistry::TYPE_IMPORT,
             'userId' => $this->getCurrentUser()->getId(),
@@ -326,7 +359,7 @@ abstract class AbstractImportExportTest extends WebTestCase
         $response = static::getJsonResponseContent($this->client->getResponse(), 200);
         static::assertTrue($response['success']);
 
-        static::assertMessageSent(Topics::PRE_HTTP_IMPORT, [
+        static::assertMessageSent(Topics::PRE_IMPORT, [
             'fileName' => $fileName,
             'process' => ProcessorRegistry::TYPE_IMPORT_VALIDATION,
             'userId' => $this->getCurrentUser()->getId(),
@@ -351,6 +384,37 @@ abstract class AbstractImportExportTest extends WebTestCase
             );
 
         static::assertEquals(MessageProcessorInterface::ACK, $processorResult);
+    }
+
+    /**
+     * @param int $jobId
+     * @param string $expectedCsvFilePath
+     * @param string $exportedFilename
+     * @param array $skippedColumns
+     */
+    protected function assertExportFileData(int $jobId, $expectedCsvFilePath, $exportedFilename, array $skippedColumns)
+    {
+        $exportFileContent = $this->getImportExportFileContent($jobId);
+        $this->deleteImportExportFile($exportedFilename);
+
+        if (empty($skippedColumns)) {
+            static::assertContains(
+                $this->getFileContent($expectedCsvFilePath),
+                $exportFileContent
+            );
+        } else {
+            $expectedData = $this->getParsedDataFromCSVFile($expectedCsvFilePath);
+            $exportedData = $this->getParsedDataFromCSVContent($exportFileContent);
+            $this->removedIgnoredColumnsFromData(
+                $exportedData,
+                $skippedColumns
+            );
+
+            static::assertEquals(
+                $expectedData,
+                $exportedData
+            );
+        }
     }
 
     /**
@@ -394,15 +458,15 @@ abstract class AbstractImportExportTest extends WebTestCase
     }
 
     /**
-     * @param string $filename
+     * @param int $jobId
      *
      * @return string
      */
-    protected function getImportExportFileContent(string $filename): string
+    protected function getImportExportFileContent(int $jobId): string
     {
         $this->client->request(
             'GET',
-            $this->getUrl('oro_importexport_export_download', ['fileName' => $filename])
+            $this->getUrl('oro_importexport_export_download', ['jobId' => $jobId])
         );
 
         return $this->client->getResponse()->getContent();
@@ -471,35 +535,5 @@ abstract class AbstractImportExportTest extends WebTestCase
     protected function deleteTmpFile(string $filename)
     {
         unlink(FileManager::generateTmpFilePath($filename));
-    }
-
-    /**
-     * @param string $expectedCsvFilePath
-     * @param string $exportedFilename
-     * @param array $skippedColumns
-     */
-    protected function assertExportFileData($expectedCsvFilePath, $exportedFilename, array $skippedColumns)
-    {
-        $exportFileContent = $this->getImportExportFileContent($exportedFilename);
-        $this->deleteImportExportFile($exportedFilename);
-
-        if (empty($skippedColumns)) {
-            static::assertContains(
-                $this->getFileContent($expectedCsvFilePath),
-                $exportFileContent
-            );
-        } else {
-            $expectedData = $this->getParsedDataFromCSVFile($expectedCsvFilePath);
-            $exportedData = $this->getParsedDataFromCSVContent($exportFileContent);
-            $this->removedIgnoredColumnsFromData(
-                $exportedData,
-                $skippedColumns
-            );
-
-            static::assertEquals(
-                $expectedData,
-                $exportedData
-            );
-        }
     }
 }

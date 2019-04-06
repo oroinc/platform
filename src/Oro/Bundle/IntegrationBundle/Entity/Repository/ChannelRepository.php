@@ -9,6 +9,7 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 /**
  * Doctrine repository for Channel entity
@@ -16,6 +17,19 @@ use Oro\Bundle\IntegrationBundle\Entity\Status;
 class ChannelRepository extends EntityRepository
 {
     const BUFFER_SIZE = 100;
+
+    /**
+     * @var AclHelper
+     */
+    private $aclHelper;
+
+    /**
+     * @param AclHelper $aclHelper
+     */
+    public function setAclHelper(AclHelper $aclHelper)
+    {
+        $this->aclHelper = $aclHelper;
+    }
 
     /**
      * Returns latest status for integration's connector and code if it exists.
@@ -73,7 +87,7 @@ class ChannelRepository extends EntityRepository
         if ($code) {
             $queryBuilder->andWhere('status.code = :code')
                 ->setParameter('code', (string)$code);
-        };
+        }
 
         return $queryBuilder;
     }
@@ -204,6 +218,6 @@ class ChannelRepository extends EntityRepository
                 ->setParameter('channels', $excludedChannels);
         }
 
-        return $qb->getQuery()->getResult();
+        return $this->aclHelper->apply($qb)->getResult();
     }
 }

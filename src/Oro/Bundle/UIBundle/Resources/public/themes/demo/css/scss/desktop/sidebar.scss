@@ -12,18 +12,6 @@
             background-color: $sidebar-active-color;
         }
     }
-
-    .mCSB_scrollTools {
-        .mCSB_dragger {
-            .mCSB_dragger_bar {
-                background-color: rgba($primary-400, 0.2) !important;
-            }
-
-            &:hover .mCSB_dragger_bar {
-                background-color: rgba($primary-400, 0.7) !important;
-            }
-        }
-    }
 }
 
 // sidebar-widget

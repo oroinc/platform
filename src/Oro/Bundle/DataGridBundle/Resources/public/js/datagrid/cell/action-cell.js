@@ -269,7 +269,10 @@ define(function(require) {
                 }
 
                 if (launchers.withIcons.length && launchers.withoutIcons.length) {
-                    $listsContainer.append('<li class="divider"></li>');
+                    var divider = document.createElement($listsContainer[0].tagName === 'UL' ? 'li' : 'span');
+
+                    divider.classList.add('divider');
+                    $listsContainer.append(divider);
                 }
 
                 if (launchers.withoutIcons.length) {

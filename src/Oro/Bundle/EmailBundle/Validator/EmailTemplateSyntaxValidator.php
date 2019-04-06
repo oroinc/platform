@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Validator;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSyntax;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
@@ -11,36 +12,39 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+/**
+ * Validates email template syntax.
+ */
 class EmailTemplateSyntaxValidator extends ConstraintValidator
 {
-    /** @var \Twig_Environment */
-    protected $twig;
+    /** @var EmailRenderer */
+    private $emailRenderer;
 
     /** @var LocaleSettings */
-    protected $localeSettings;
+    private $localeSettings;
 
     /** @var ConfigProvider */
-    protected $entityConfigProvider;
+    private $entityConfigProvider;
 
     /** @var TranslatorInterface */
-    protected $translator;
+    private $translator;
 
     /**
-     * @param \Twig_Environment   $twig
+     * @param EmailRenderer       $emailRenderer
      * @param LocaleSettings      $localeSettings
      * @param ConfigProvider      $entityConfigProvider
      * @param TranslatorInterface $translator
      */
     public function __construct(
-        \Twig_Environment $twig,
+        EmailRenderer $emailRenderer,
         LocaleSettings $localeSettings,
         ConfigProvider $entityConfigProvider,
         TranslatorInterface $translator
     ) {
-        $this->twig                 = $twig;
-        $this->localeSettings       = $localeSettings;
+        $this->emailRenderer = $emailRenderer;
+        $this->localeSettings = $localeSettings;
         $this->entityConfigProvider = $entityConfigProvider;
-        $this->translator           = $translator;
+        $this->translator = $translator;
     }
 
     /**
@@ -54,9 +58,9 @@ class EmailTemplateSyntaxValidator extends ConstraintValidator
             ['field' => 'subject', 'locale' => null, 'template' => $value->getSubject()],
             ['field' => 'content', 'locale' => null, 'template' => $value->getContent()],
         ];
-        $translations    = $value->getTranslations();
+        $translations = $value->getTranslations();
         foreach ($translations as $trans) {
-            if (in_array($trans->getField(), ['subject', 'content'])) {
+            if (in_array($trans->getField(), ['subject', 'content'], true)) {
                 $itemsToValidate[] = [
                     'field'    => $trans->getField(),
                     'locale'   => $trans->getLocale(),
@@ -65,15 +69,14 @@ class EmailTemplateSyntaxValidator extends ConstraintValidator
             }
         }
 
-        /** @var \Twig_Extension_Sandbox $sandbox */
-        $sandbox = $this->twig->getExtension('sandbox');
-        $sandbox->enableSandbox();
-
-        // validate templates' syntax
         $errors = [];
-        foreach ($itemsToValidate as &$item) {
+        foreach ($itemsToValidate as $item) {
+            if (!$item['template']) {
+                continue;
+            }
+
             try {
-                $this->twig->parse($this->twig->tokenize($item['template']));
+                $this->emailRenderer->validateTemplate($item['template']);
             } catch (\Twig_Error_Syntax $e) {
                 $errors[] = [
                     'field'  => $item['field'],
@@ -82,8 +85,6 @@ class EmailTemplateSyntaxValidator extends ConstraintValidator
                 ];
             }
         }
-
-        $sandbox->disableSandbox();
 
         // add violations for found errors
         if (!empty($errors)) {
@@ -108,7 +109,7 @@ class EmailTemplateSyntaxValidator extends ConstraintValidator
      *
      * @return string
      */
-    protected function getFieldLabel($className, $fieldName)
+    private function getFieldLabel($className, $fieldName)
     {
         if (!$this->entityConfigProvider->hasConfig($className, $fieldName)) {
             return $fieldName;
@@ -126,10 +127,10 @@ class EmailTemplateSyntaxValidator extends ConstraintValidator
      *
      * @return string
      */
-    protected function getLocaleName($locale)
+    private function getLocaleName($locale)
     {
         $currentLang = $this->localeSettings->getLanguage();
-        if (empty($locale)) {
+        if (!$locale) {
             $locale = $currentLang;
         }
 

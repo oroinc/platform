@@ -2,64 +2,75 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Model\CategorizedRecipient;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Model\RecipientEntity;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
+use Oro\Bundle\EmailBundle\Tests\Unit\Stub\CustomerStub;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ReflectionProperty;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
 {
+    use EntityTrait;
+
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $aclHelper;
+
+    /** @var DQLNameFormatter|\PHPUnit\Framework\MockObject\MockObject */
     protected $dqlNameFormatter;
+
+    /** @var NameFormatter|\PHPUnit\Framework\MockObject\MockObject */
     protected $nameFormatter;
+
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
+
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
+
+    /** @var EmailOwnerProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $emailOwnerProvider;
+
+    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
+
+    /** @var EmailAddressHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $addressHelper;
 
+    /** @var EmailRecipientsHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $emailRecipientsHelper;
+
+    /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
     protected $indexer;
 
     public function setUp()
     {
-        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->dqlNameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->emailOwnerProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->addressHelper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Tools\EmailAddressHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->indexer = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->aclHelper = $this->createMock(AclHelper::class);
+        $this->dqlNameFormatter = $this->createMock(DQLNameFormatter::class);
+        $this->nameFormatter = $this->createMock(NameFormatter::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->emailOwnerProvider = $this->createMock(EmailOwnerProvider::class);
+        $this->registry = $this->createMock(Registry::class);
+        $this->addressHelper = $this->createMock(EmailAddressHelper::class);
+        $this->indexer = $this->createMock(Indexer::class);
 
         $this->emailRecipientsHelper = new EmailRecipientsHelper(
             $this->aclHelper,
@@ -138,6 +149,9 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         $this->emailRecipientsHelper->getRecipients($args, $userRepository, 'u', 'Oro\Bundle\UserBundle\Entity\User');
     }
 
+    /**
+     * @return array
+     */
     public function getRecipientsDataProvider()
     {
         return [
@@ -163,6 +177,9 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, EmailRecipientsHelper::filterRecipients($args, $recipients));
     }
 
+    /**
+     * @return array
+     */
     public function filterRecipientsDataProvider()
     {
         return [
@@ -203,6 +220,9 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, EmailRecipientsHelper::prepareFormRecipientIds($ids));
     }
 
+    /**
+     * @return array
+     */
     public function prepareFormRecipientIdsDataProvider()
     {
         return [
@@ -226,6 +246,9 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, EmailRecipientsHelper::extractFormRecipientIds($value));
     }
 
+    /**
+     * @return array
+     */
     public function extractFormRecipientIdsDataProvider()
     {
         return [
@@ -258,6 +281,9 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function recipientsFromResultProvider()
     {
         return [
@@ -290,14 +316,17 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider plainRecipientsFromResultProvider
      */
-    public function testRlainRecipientsFromResult(array $result, $entityClass, array $expectedRecipients)
+    public function testRlainRecipientsFromResult(array $result, array $expectedRecipients)
     {
         $this->assertEquals(
             $expectedRecipients,
-            $this->emailRecipientsHelper->plainRecipientsFromResult($result, $entityClass)
+            $this->emailRecipientsHelper->plainRecipientsFromResult($result)
         );
     }
 
+    /**
+     * @return array
+     */
     public function plainRecipientsFromResultProvider()
     {
         return [
@@ -310,7 +339,6 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
                         'organization' => 'org',
                     ],
                 ],
-                'Class',
                 [
                     'recipient@example.com' => new CategorizedRecipient(
                         'recipient@example.com',
@@ -319,5 +347,149 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
         ];
+    }
+
+    public function testCreateRecipientsFromEmails()
+    {
+        $emails = [
+            'admin@example.com' => '"John Doe" <admin@example.com>',
+        ];
+        $organization = (new Organization())->setName('ORO');
+        $object = new CustomerStub('Customer Name', $organization);
+        $objectClass = get_class($object);
+
+        $em = $this->createMock(ObjectManager::class);
+        $objectMetadata = $this->getEntity(ClassMetadata::class, [
+            'name' => CustomerStub::class,
+            'identifier' => ['id'],
+            'reflFields' => [
+                'id' => new ReflectionProperty(CustomerStub::class, 'id', [spl_object_hash($object) => 1])
+            ],
+        ]);
+
+        $this->registry->expects(self::once())
+            ->method('getManagerForClass')
+            ->with($objectClass)
+            ->willReturn($em);
+
+        $em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with($objectClass)
+            ->willReturn($objectMetadata);
+
+        $this->nameFormatter->expects(self::once())
+            ->method('format')
+            ->with($object)
+            ->willReturn('Customer Name');
+
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(CustomerStub::class)
+            ->willReturn(true);
+
+        $config = $this->createMock(ConfigInterface::class);
+
+        $this->configManager->expects(self::once())
+            ->method('getConfig')
+            ->with(new EntityConfigId('entity', CustomerStub::class))
+            ->willReturn($config);
+
+        $config->expects(self::once())
+            ->method('get')
+            ->with('label')
+            ->willReturn('CustomerStub');
+
+        $this->translator->expects(self::once())
+            ->method('trans')
+            ->with('CustomerStub')
+            ->willReturn('Customer Stub');
+
+        $expected = [
+            '"John Doe" <admin@example.com>|Oro\Bundle\EmailBundle\Tests\Unit\Stub\CustomerStub|ORO' => new Recipient(
+                'admin@example.com',
+                '"John Doe" <admin@example.com>',
+                new RecipientEntity(
+                    CustomerStub::class,
+                    1,
+                    'Customer Name (Customer Stub)',
+                    'ORO'
+                )
+            ),
+        ];
+
+        $this->assertEquals(
+            $expected,
+            $this->emailRecipientsHelper->createRecipientsFromEmails($emails, $object)
+        );
+    }
+
+    public function testCreateRecipientsFromEmailsNoRecipientEntity()
+    {
+        $emails = [
+            'admin@example.com' => '"John Doe" <admin@example.com>',
+        ];
+        $object = new \stdClass();
+        $objectClass = get_class($object);
+
+        $em = $this->createMock(ObjectManager::class);
+        $objectMetadata = $this->createMock(ClassMetadata::class);
+        $objectMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with(self::identicalTo($object))
+            ->willReturn([]);
+
+        $this->registry->expects(self::once())
+            ->method('getManagerForClass')
+            ->with($objectClass)
+            ->willReturn($em);
+
+        $em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with($objectClass)
+            ->willReturn($objectMetadata);
+
+        $expected = [
+            'admin@example.com' => new Recipient(
+                'admin@example.com',
+                '"John Doe" <admin@example.com>',
+                null
+            ),
+        ];
+
+        $this->assertEquals(
+            $expected,
+            $this->emailRecipientsHelper->createRecipientsFromEmails($emails, $object)
+        );
+    }
+
+    public function testCreateRecipientsFromEmailsEmptyEmails()
+    {
+        $emails = [];
+        $object = new \stdClass();
+        $objectClass = get_class($object);
+
+        $em = $this->createMock(ObjectManager::class);
+        $objectMetadata = $this->createMock(ClassMetadata::class);
+        $objectMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with(self::identicalTo($object))
+            ->willReturn([]);
+
+        $this->registry->expects(self::once())
+            ->method('getManagerForClass')
+            ->with($objectClass)
+            ->willReturn($em);
+
+        $em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with($objectClass)
+            ->willReturn($objectMetadata);
+
+        $expected = [];
+
+        $this->assertEquals(
+            $expected,
+            $this->emailRecipientsHelper->createRecipientsFromEmails($emails, $object)
+        );
     }
 }

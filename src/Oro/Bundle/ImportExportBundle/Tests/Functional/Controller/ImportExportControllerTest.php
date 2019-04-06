@@ -3,7 +3,9 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
+use Oro\Bundle\ImportExportBundle\Tests\Functional\DataFixtures\LoadImportExportResultData;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -16,16 +18,38 @@ class ImportExportControllerTest extends WebTestCase
     use MessageQueueExtension;
     use TempDirExtension;
 
+    /**
+     * @var array
+     */
+    private $existingFiles = [];
+
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
+
+        $this->loadFixtures([
+            LoadImportExportResultData::class
+        ]);
+
+        $this->existingFiles = glob($this->getImportDir() . DIRECTORY_SEPARATOR . '*.csv');
+    }
+
+    public function tearDown()
+    {
+        $tempFiles = glob($this->getImportDir() . DIRECTORY_SEPARATOR . '*.csv');
+        $diffFiles = array_diff($tempFiles, $this->existingFiles);
+        foreach ($diffFiles as $file) {
+            if ($file && file_exists($file)) {
+                unlink($file);
+            }
+        }
     }
 
     public function testShouldSendExportMessageOnInstantExportActionWithDefaultParameters()
     {
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'POST',
             $this->getUrl('oro_importexport_export_instant', ['processorAlias' => 'oro_account'])
         );
 
@@ -46,8 +70,8 @@ class ImportExportControllerTest extends WebTestCase
 
     public function testShouldSendExportMessageOnInstantExportActionWithPassedParameters()
     {
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'POST',
             $this->getUrl('oro_importexport_export_instant', [
                 'processorAlias' => 'oro_account',
                 'exportJob' => JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV,
@@ -77,36 +101,15 @@ class ImportExportControllerTest extends WebTestCase
         ]);
     }
 
-    public function testDownloadFileSuccess()
-    {
-        $this->client->followRedirects(true);
-
-        $importFileName = tempnam($this->getImportDir(), 'download.txt');
-        $parts = explode('/', $importFileName);
-        $fileName = array_pop($parts);
-
-        try {
-            $this->client->request(
-                'GET',
-                $this->getUrl('oro_importexport_export_download', [
-                    'fileName' => $fileName
-                ])
-            );
-
-            $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 200);
-        } finally {
-            unlink($importFileName);
-        }
-    }
-
     public function testDownloadFileReturns404IfFileDoesntExist()
     {
+        $undefinedJobId = 999;
         $this->client->followRedirects(true);
 
         $this->client->request(
             'GET',
             $this->getUrl('oro_importexport_export_download', [
-                'fileName' => 'non_existing_file.txt'
+                'jobId' => $undefinedJobId
             ])
         );
 
@@ -119,8 +122,8 @@ class ImportExportControllerTest extends WebTestCase
             'first' => 'first value',
             'second' => 'second value',
         ];
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'POST',
             $this->getUrl(
                 'oro_importexport_import_process',
                 [
@@ -136,7 +139,7 @@ class ImportExportControllerTest extends WebTestCase
         $this->assertJsonResponseSuccess();
 
         $this->assertMessageSent(
-            Topics::PRE_HTTP_IMPORT,
+            Topics::PRE_IMPORT,
             [
                 'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
                 'process' => 'import',
@@ -155,8 +158,8 @@ class ImportExportControllerTest extends WebTestCase
             'first' => 'first value',
             'second' => 'second value',
         ];
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'POST',
             $this->getUrl(
                 'oro_importexport_import_validate',
                 [
@@ -172,7 +175,7 @@ class ImportExportControllerTest extends WebTestCase
         $this->assertJsonResponseSuccess();
 
         $this->assertMessageSent(
-            Topics::PRE_HTTP_IMPORT,
+            Topics::PRE_IMPORT,
             [
                 'jobName' => JobExecutor::JOB_IMPORT_VALIDATION_FROM_CSV,
                 'processorAlias' => 'oro_account',
@@ -189,75 +192,70 @@ class ImportExportControllerTest extends WebTestCase
     {
         $fileName = 'oro_testLineEndings.csv';
         $importedFilePath = null;
-        try {
-            $file = $this->copyToTempDir('import_export', __DIR__ . '/Import/fixtures')
-                . DIRECTORY_SEPARATOR
-                . $fileName;
-            $csvFile = new UploadedFile(
-                $file,
-                $fileName,
-                'text/csv'
-            );
-            $this->assertEquals(
-                substr_count(file_get_contents($file), "\r\n"),
-                substr_count(file_get_contents($csvFile->getPathname()), "\r\n")
-            );
-            $this->assertEquals(
-                substr_count(file_get_contents($file), "\n"),
-                substr_count(file_get_contents($csvFile->getPathname()), "\n")
-            );
 
-            $crawler = $this->client->request(
-                'GET',
-                $this->getUrl(
-                    'oro_importexport_import_form',
-                    [
-                        '_widgetContainer' => 'dialog',
-                        '_wid' => 'test',
-                        'entity' => User::class,
-                    ]
-                )
-            );
-            $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+        $file = $this->copyToTempDir('import_export', __DIR__ . '/Import/fixtures')
+            . DIRECTORY_SEPARATOR
+            . $fileName;
+        $csvFile = new UploadedFile(
+            $file,
+            $fileName,
+            'text/csv'
+        );
+        $this->assertEquals(
+            substr_count(file_get_contents($file), "\r\n"),
+            substr_count(file_get_contents($csvFile->getPathname()), "\r\n")
+        );
+        $this->assertEquals(
+            substr_count(file_get_contents($file), "\n"),
+            substr_count(file_get_contents($csvFile->getPathname()), "\n")
+        );
 
-            $uploadFileNode = $crawler->selectButton('Submit');
-            $uploadFileForm = $uploadFileNode->form();
-            $values = [
-                'oro_importexport_import' => [
-                    '_token' => $uploadFileForm['oro_importexport_import[_token]']->getValue(),
-                    'processorAlias' => 'oro_user.add_or_replace'
-                ],
-            ];
-            $files = [
-                'oro_importexport_import' => [
-                    'file' => $csvFile
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_importexport_import_form',
+                [
+                    '_widgetContainer' => 'dialog',
+                    '_wid' => 'test',
+                    'entity' => User::class,
                 ]
-            ];
-            $this->client->request(
-                $uploadFileForm->getMethod(),
-                $this->getUrl(
-                    'oro_importexport_import_form',
-                    [
-                        '_widgetContainer' => 'dialog',
-                        '_wid' => 'test',
-                        'entity' => User::class,
-                    ]
-                ),
-                $values,
-                $files
-            );
-            $this->assertJsonResponseSuccess();
-            $importedFiles = glob($this->getImportDir() . DIRECTORY_SEPARATOR . '*.csv');
-            $importedFilePath = $importedFiles[count($importedFiles)-1];
-            $this->assertEquals(
-                substr_count(file_get_contents($file), "\n"),
-                substr_count(file_get_contents($importedFilePath), "\r\n")
-            );
-        } finally {
-            if ($importedFilePath && file_exists($importedFilePath)) {
-                unlink($importedFilePath);
-            }
-        }
+            )
+        );
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+
+        $uploadFileNode = $crawler->selectButton('Submit');
+        $uploadFileForm = $uploadFileNode->form();
+        $values = [
+            'oro_importexport_import' => [
+                '_token' => $uploadFileForm['oro_importexport_import[_token]']->getValue(),
+                'processorAlias' => 'oro_user.add_or_replace'
+            ],
+        ];
+        $files = [
+            'oro_importexport_import' => [
+                'file' => $csvFile
+            ]
+        ];
+        $this->client->request(
+            $uploadFileForm->getMethod(),
+            $this->getUrl(
+                'oro_importexport_import_form',
+                [
+                    '_widgetContainer' => 'dialog',
+                    '_wid' => 'test',
+                    'entity' => User::class,
+                ]
+            ),
+            $values,
+            $files
+        );
+        $this->assertJsonResponseSuccess();
+        $message = $this->getSentMessage(Topics::PRE_IMPORT);
+        $importedFilePath = $this->getImportDir() . DIRECTORY_SEPARATOR . $message['fileName'];
+        $this->assertEquals(
+            substr_count(file_get_contents($file), "\n"),
+            substr_count(file_get_contents($importedFilePath), "\r\n")
+        );
     }
 
     public function testImportValidateExportTemplateFormNoAlias()
@@ -288,6 +286,38 @@ class ImportExportControllerTest extends WebTestCase
         static::assertContains('Validate', $response->getContent());
         static::assertContains('Import file', $response->getContent());
     }
+
+
+    public function testDownloadExportResultActionExpiredResult()
+    {
+        /** @var ImportExportResult $expiredImportExportResult */
+        $expiredImportExportResult = $this->getReference('expiredImportExportResult');
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_importexport_export_download', [
+                'jobId' => $expiredImportExportResult->getJobId()
+            ])
+        );
+
+        $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 410);
+    }
+
+    public function testImportExportJobErrorLogActionExpiredResult()
+    {
+        /** @var ImportExportResult $expiredImportExportResult */
+        $expiredImportExportResult = $this->getReference('expiredImportExportResult');
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_importexport_job_error_log', [
+                'jobId' => $expiredImportExportResult->getJobId()
+            ])
+        );
+
+        $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 410);
+    }
+
 
     /**
      * @return string

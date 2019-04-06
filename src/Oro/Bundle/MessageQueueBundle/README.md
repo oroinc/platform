@@ -29,6 +29,7 @@ OroMessageQueueBundle incorporates the OroMessageQueue component into OroPlatfor
     * [Consumer Interruption](./Resources/doc/logging.md#consumer-interruption)
     * [Errors and Crashes](./Resources/doc/logging.md#errors-and-crashes)
     * [Profiling](./Resources/doc/logging.md#profiling)
+    * [Separate Message Queue Consumer Logs](./Resources/doc/logging.md#separate-message-queue-consumer-logs)
 
 ## Overview
 

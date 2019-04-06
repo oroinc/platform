@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Controller;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Util\ObfuscatedEmailTrait;
@@ -137,6 +138,9 @@ class ResetController extends Controller
                 $translator->trans('oro.user.password.force_reset.success.message', ['%email%' => $user->getEmail()])
             );
 
+            if ($this->getUser() && $this->getUser()->getId() === $user->getId()) {
+                return $this->redirectToRoute('oro_user_security_login');
+            }
             return $params;
         }
 
@@ -154,6 +158,7 @@ class ResetController extends Controller
      *     name="oro_user_mass_password_reset"
      * )
      * @AclAncestor("password_management")
+     * @CsrfProtection()
      */
     public function massPasswordResetAction(Request $request)
     {

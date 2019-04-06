@@ -2,25 +2,23 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
-use Doctrine\Common\Cache\Cache;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 
+/**
+ * Clears email renderer configuration cache when related entity configuration is changed.
+ */
 class EntityConfigListener
 {
-    /** @var Cache */
-    protected $cache;
-
-    /** @var  string */
-    protected $cacheKey;
+    /** @var TemplateRendererConfigProviderInterface */
+    private $emailRendererConfigProvider;
 
     /**
-     * @param Cache  $cache
-     * @param string $cacheKey
+     * @param TemplateRendererConfigProviderInterface $emailRendererConfigProvider
      */
-    public function __construct(Cache $cache, $cacheKey)
+    public function __construct(TemplateRendererConfigProviderInterface $emailRendererConfigProvider)
     {
-        $this->cache    = $cache;
-        $this->cacheKey = $cacheKey;
+        $this->emailRendererConfigProvider = $emailRendererConfigProvider;
     }
 
     /**
@@ -35,7 +33,7 @@ class EntityConfigListener
 
         $changeSet = $event->getConfigManager()->getConfigChangeSet($config);
         if (isset($changeSet['available_in_template'])) {
-            $this->cache->delete($this->cacheKey);
+            $this->emailRendererConfigProvider->clearCache();
         }
     }
 }

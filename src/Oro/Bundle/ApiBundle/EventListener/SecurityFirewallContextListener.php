@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\EventListener;
 
+use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -11,7 +12,7 @@ use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 
 /**
  * Give an additional chance to authorise user from session context if
- * the current request is AJAX request (has "X-CSRF-Header" header)
+ * the current request is AJAX request (has valid "X-CSRF-Header" header)
  * and it has session identifier in cookies.
  * This is required because API can work in two modes, stateless and statefull.
  * The statefull mode is used when API is called internally from web pages as AJAX request.
@@ -26,6 +27,9 @@ class SecurityFirewallContextListener implements ListenerInterface
 
     /** @var SessionInterface|null */
     private $session;
+
+    /** @var CsrfRequestManager */
+    private $csrfRequestManager;
 
     /**
      * @param ListenerInterface     $innerListener
@@ -43,6 +47,14 @@ class SecurityFirewallContextListener implements ListenerInterface
     }
 
     /**
+     * @param CsrfRequestManager $csrfRequestManager
+     */
+    public function setCsrfRequestManager(CsrfRequestManager $csrfRequestManager)
+    {
+        $this->csrfRequestManager = $csrfRequestManager;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function handle(GetResponseEvent $event): void
@@ -50,11 +62,11 @@ class SecurityFirewallContextListener implements ListenerInterface
         $token = $this->tokenStorage->getToken();
         if (null === $token) {
             if ($this->isAjaxRequest($event->getRequest())) {
-                $this->innerListener->handle($event);
+                $this->processEvent($event);
             }
         } elseif ($token instanceof AnonymousToken) {
             if ($this->isAjaxRequest($event->getRequest())) {
-                $this->innerListener->handle($event);
+                $this->processEvent($event);
                 if (null === $this->tokenStorage->getToken()) {
                     $this->tokenStorage->setToken($token);
                 }
@@ -64,7 +76,7 @@ class SecurityFirewallContextListener implements ListenerInterface
 
     /**
      * Checks whether the request is AJAX request
-     * (cookies has the session cookie and the request has "X-CSRF-Header" header).
+     * (cookies has the session cookie and the request has "X-CSRF-Header" header with valid CSRF token).
      *
      * @param Request $request
      *
@@ -72,9 +84,23 @@ class SecurityFirewallContextListener implements ListenerInterface
      */
     private function isAjaxRequest(Request $request)
     {
+        $isGetRequest = $request->isMethod('GET');
+
         return
             null !== $this->session
             && $request->cookies->has($this->session->getName())
-            && $request->headers->has('X-CSRF-Header');
+            && (
+                (!$isGetRequest && $this->csrfRequestManager->isRequestTokenValid($request, false))
+                || ($isGetRequest && $request->headers->has('X-CSRF-Header'))
+            );
+    }
+
+    /**
+     * @param GetResponseEvent $event
+     */
+    protected function processEvent(GetResponseEvent $event): void
+    {
+        $this->innerListener->handle($event);
+        $this->csrfRequestManager->refreshRequestToken();
     }
 }

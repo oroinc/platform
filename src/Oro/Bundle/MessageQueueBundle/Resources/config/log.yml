@@ -65,6 +65,9 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
+    oro_message_queue.log.handler.console_error:
+        class: Oro\Bundle\MessageQueueBundle\Log\Handler\ConsoleErrorHandler
+
     oro_message_queue.log.handler.resend_job:
         class: Oro\Component\MessageQueue\Log\Handler\ResendJobHandler
         public: false

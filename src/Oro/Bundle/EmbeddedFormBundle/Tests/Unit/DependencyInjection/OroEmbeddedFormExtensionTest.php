@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\EmbeddedFormBundle\DependencyInjection\OroEmbeddedFormExtension;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -99,5 +100,39 @@ class OroEmbeddedFormExtensionTest extends \PHPUnit\Framework\TestCase
             $container->getDefinition(OroEmbeddedFormExtension::CSRF_TOKEN_STORAGE_SERVICE_ID)
                 ->getArgument(0)
         );
+    }
+
+    public function testPrepend()
+    {
+        $securityConfig = [
+            'clickjacking' => [
+                'paths' => [
+                    '^/.*' => 'DENY'
+                ]
+            ]
+        ];
+
+        $expectedConfig = [
+            'clickjacking' => [
+                'paths' => [
+                    '/embedded-form/submit' => 'ALLOW',
+                    '/embedded-form/success' => 'ALLOW',
+                    '^/.*' => 'DENY'
+                ]
+            ]
+        ];
+
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ExtendedContainerBuilder $container */
+        $container = $this->createMock(ExtendedContainerBuilder::class);
+        $container->expects($this->once())
+            ->method('getExtensionConfig')
+            ->with('nelmio_security')
+            ->willReturn([$securityConfig]);
+        $container->expects($this->once())
+            ->method('setExtensionConfig')
+            ->with('nelmio_security', [$expectedConfig]);
+
+        $extension = new OroEmbeddedFormExtension();
+        $extension->prepend($container);
     }
 }

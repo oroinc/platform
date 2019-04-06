@@ -2,52 +2,44 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariablesProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Provides definitions of entity route variables.
+ */
 class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
 {
-    const PREFIX = 'url';
-
     /** @var TranslatorInterface */
-    protected $translator;
+    private $translator;
 
-    /** @var EntityConfigManager */
-    protected $entityConfigManager;
+    /** @var ConfigManager */
+    private $configManager;
 
     /**
-     * EntityVariablesProvider constructor.
-     *
      * @param TranslatorInterface $translator
-     * @param EntityConfigManager $entityConfigManager
+     * @param ConfigManager       $configManager
      */
-    public function __construct(
-        TranslatorInterface $translator,
-        EntityConfigManager $entityConfigManager
-    ) {
+    public function __construct(TranslatorInterface $translator, ConfigManager $configManager)
+    {
         $this->translator = $translator;
-        $this->entityConfigManager = $entityConfigManager;
+        $this->configManager = $configManager;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getVariableDefinitions($entityClass = null)
+    public function getVariableDefinitions(): array
     {
-        if ($entityClass) {
-            // process the specified entity only
-            return $this->getEntityVariableDefinitions($entityClass);
-        }
-
-        // process all entities
         $result = [];
-        $entityIds = $this->entityConfigManager->getProvider('entity')->getIds();
+        $entityIds = $this->configManager->getIds('entity');
         foreach ($entityIds as $entityId) {
             $className = $entityId->getClassName();
             $entityData = $this->getEntityVariableDefinitions($className);
-            if (!empty($entityData)) {
+            if ($entityData) {
                 $result[$className] = $entityData;
             }
         }
@@ -58,9 +50,17 @@ class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getVariableGetters($entityClass = null)
+    public function getVariableGetters(): array
     {
         return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVariableProcessors(string $entityClass): array
+    {
+        return $this->getEntityVariableProcessors($entityClass);
     }
 
     /**
@@ -68,27 +68,14 @@ class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
      *
      * @return array
      */
-    protected function getEntityVariableDefinitions($entityClass)
+    private function getEntityVariableDefinitions(string $entityClass): array
     {
-        $entityClass = ClassUtils::getRealClass($entityClass);
-        $extendConfigProvider = $this->entityConfigManager->getProvider('extend');
-        if (!$extendConfigProvider->hasConfig($entityClass)
-            || !ExtendHelper::isEntityAccessible($extendConfigProvider->getConfig($entityClass))
-        ) {
-            return [];
-        }
-
         $result = [];
-
-        foreach ($this->getEntityRoutes($entityClass) as $name => $route) {
-            if ($name === 'name') {
-                $name = 'index';
-            }
-            $result[self::PREFIX . '.' . $name] = [
-                'type' => 'string',
-                'label' => $this->translator->trans(sprintf('oro.email.emailtemplate.variables.url.%s.label', $name)),
-                'processor' => 'entity_routes',
-                'route' => $route,
+        $routes = $this->getEntityRoutes($entityClass);
+        foreach ($routes as $name => $route) {
+            $result['url.' . $name] = [
+                'type'  => 'string',
+                'label' => $this->translator->trans($this->getVariableLabel($name)),
             ];
         }
 
@@ -100,24 +87,70 @@ class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
      *
      * @return array
      */
-    protected function getEntityRoutes($entityClass)
+    private function getEntityVariableProcessors(string $entityClass): array
     {
-        $routes = [];
-
-        $metadata = $this->entityConfigManager->getEntityMetadata($entityClass);
-
-        if ($metadata) {
-            $routes = $metadata->getRoutes();
+        $result = [];
+        $routes = $this->getEntityRoutes($entityClass);
+        foreach ($routes as $name => $route) {
+            $result['url.' . $name] = [
+                'processor' => 'entity_routes',
+                'route'     => $route
+            ];
         }
 
+        return $result;
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return string[]
+     */
+    private function getEntityRoutes(string $entityClass): array
+    {
+        $metadata = $this->getEntityMetadata($entityClass);
+        $routes = null !== $metadata
+            ? $metadata->getRoutes()
+            : [];
+
         if (ExtendHelper::isCustomEntity($entityClass)) {
-            $extendedRoutes = [
+            $routes = array_merge($routes, [
                 'name' => 'oro_entity_index',
-                'view' => 'oro_entity_view',
-            ];
-            $routes = array_merge($routes, $extendedRoutes);
+                'view' => 'oro_entity_view'
+            ]);
+        }
+
+        if (isset($routes['name'])) {
+            $routes['index'] = $routes['name'];
+            unset($routes['name']);
         }
 
         return $routes;
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return EntityMetadata|null
+     */
+    private function getEntityMetadata(string $entityClass): ?EntityMetadata
+    {
+        if (!$this->configManager->hasConfig($entityClass)
+            || !ExtendHelper::isEntityAccessible($this->configManager->getEntityConfig('extend', $entityClass))
+        ) {
+            return null;
+        }
+
+        return $this->configManager->getEntityMetadata($entityClass);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    private function getVariableLabel(string $name): string
+    {
+        return sprintf('oro.email.emailtemplate.variables.url.%s.label', $name);
     }
 }

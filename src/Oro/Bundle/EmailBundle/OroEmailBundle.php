@@ -4,32 +4,23 @@ namespace Oro\Bundle\EmailBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\EmailBundle\Async\Topics;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailBodyLoaderPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailFlagManagerLoaderPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailRecipientsProviderPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailSynchronizerPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailTemplateVariablesPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\MailboxProcessPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\OverrideServiceSwiftMailer;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
-use Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass;
 use Oro\Component\PhpUtils\ClassLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * The EmailBundle bundle class.
+ */
 class OroEmailBundle extends Bundle
 {
-    const ENTITY_PROXY_NAMESPACE   = 'OroEntityProxy\OroEmailBundle';
-    const CACHED_ENTITIES_DIR_NAME = 'oro_entities';
-    const VARIABLE_PROCESSOR_TAG = 'oro_email.emailtemplate.variable_processor';
+    private const ENTITY_PROXY_NAMESPACE   = 'OroEntityProxy\OroEmailBundle';
+    private const CACHED_ENTITIES_DIR_NAME = 'oro_entities';
 
     /**
-     * Constructor
-     *
      * @param KernelInterface $kernel
      */
     public function __construct(KernelInterface $kernel)
@@ -49,23 +40,17 @@ class OroEmailBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new EmailOwnerConfigurationPass());
+        $container->addCompilerPass(new Compiler\EmailOwnerConfigurationPass());
         $this->addDoctrineOrmMappingsPass($container);
-        $container->addCompilerPass(new EmailBodyLoaderPass());
-        $container->addCompilerPass(new EmailFlagManagerLoaderPass());
-        $container->addCompilerPass(new EmailSynchronizerPass());
-        $container->addCompilerPass(new EmailTemplateVariablesPass());
-        $container->addCompilerPass(new TwigSandboxConfigurationPass());
-        $container->addCompilerPass(new EmailRecipientsProviderPass());
-        $container->addCompilerPass(new MailboxProcessPass());
-        $container->addCompilerPass(new OverrideServiceSwiftMailer());
-
-        $container->addCompilerPass(
-            new TaggedServiceLinkRegistryCompilerPass(
-                self::VARIABLE_PROCESSOR_TAG,
-                'oro_email.emailtemplate.variable_processor'
-            )
-        );
+        $container->addCompilerPass(new Compiler\EmailBodyLoaderPass());
+        $container->addCompilerPass(new Compiler\EmailFlagManagerLoaderPass());
+        $container->addCompilerPass(new Compiler\EmailSynchronizerPass());
+        $container->addCompilerPass(new Compiler\EmailTemplateVariablesPass());
+        $container->addCompilerPass(new Compiler\TwigSandboxConfigurationPass());
+        $container->addCompilerPass(new Compiler\EmailRecipientsProviderPass());
+        $container->addCompilerPass(new Compiler\MailboxProcessPass());
+        $container->addCompilerPass(new Compiler\OverrideServiceSwiftMailer());
+        $container->addCompilerPass(new Compiler\VariableProcessorPass());
 
         $addTopicPass = AddTopicMetaPass::create()
             ->add(Topics::SEND_AUTO_RESPONSE, 'Send auto response for single email')
@@ -87,7 +72,7 @@ class OroEmailBundle extends Bundle
      *
      * @param ContainerBuilder $container
      */
-    protected function addDoctrineOrmMappingsPass(ContainerBuilder $container)
+    private function addDoctrineOrmMappingsPass(ContainerBuilder $container)
     {
         $entityCacheDir = sprintf(
             '%s%s%s%s%s',

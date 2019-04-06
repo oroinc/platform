@@ -38,6 +38,8 @@
                         {{ 'The page you requested could not be found. Please make sure the path you used is correct.'|trans }}
                     {% elseif status_code == 403 %}
                         {{ "You don't have permission to access this page."|trans }}
+                    {% elseif status_code == 410 %}
+                        {{ "The link has expired."|trans }}
                     {% else %}
                         {{ 'The System is currently under maintenance and should be available in a few minutes.'|trans }}
                     {% endif %}

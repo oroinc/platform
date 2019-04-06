@@ -4,3 +4,5 @@ services:
         parent: oro_entity.abstract_repository
         arguments:
             - 'Oro\Bundle\IntegrationBundle\Entity\Channel'
+        calls:
+            - [setAclHelper, ['@oro_security.acl_helper']]

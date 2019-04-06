@@ -27,6 +27,10 @@ datagrids:
                 type:       url
                 route:      oro_report_update
                 params:     [ id ]
+            clone_link:
+                type:       url
+                route:      oro_report_clone
+                params:     [ id ]
             delete_link:
                 type:       url
                 route:      oro_api_delete_report
@@ -86,6 +90,14 @@ datagrids:
                 link:          update_link
                 launcherOptions:
                     className: 'no-hash mobile-hide'
+            clone:
+                type:          navigate
+                acl_resource:  oro_report_create
+                label:         oro.report.action.clone.button.label
+                icon:          files-o
+                link:          clone_link
+                launcherOptions:
+                    className: 'no-hash mobile-hide'
             delete:
                 type:          delete
                 acl_resource:  oro_report_delete
@@ -95,4 +107,4 @@ datagrids:
                 launcherOptions:
                     className: 'no-hash mobile-hide'
         options:
-            entityHint: reports
+            entityHint: oro.report.entity_plural_label

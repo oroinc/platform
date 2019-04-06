@@ -2,15 +2,33 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailAddressRecipientsTypeTest extends TypeTestCase
 {
-    public function testFormShouldBeSubmittendAndViewShouldContainsRouteParameters()
+    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    private $configManager;
+
+    protected function setUp()
+    {
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->configManager->expects($this->any())
+            ->method('get')
+            ->with('oro_email.minimum_input_length')
+                ->willReturn(2);
+
+        parent::setUp();
+    }
+
+
+    public function testFormShouldBeSubmittendAndViewShouldContainsRouteParameters(): void
     {
         $email = new Email();
         $email->setEntityClass('entityClass_param');
@@ -36,13 +54,42 @@ class EmailAddressRecipientsTypeTest extends TypeTestCase
         $this->assertEquals($configs['route_parameters'], $expectedRouteParameters);
     }
 
+    public function testConfigureOptions(): void
+    {
+        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */
+        $resolver = $this->createMock(OptionsResolver::class);
+        $resolver->expects($this->once())
+            ->method('setDefaults')
+            ->with(
+                [
+                    'tooltip' => false,
+                    'error_bubbling' => false,
+                    'empty_data' => [],
+                    'configs' => [
+                        'allowClear' => true,
+                        'multiple' => true,
+                        'separator' => EmailRecipientsHelper::EMAIL_IDS_SEPARATOR,
+                        'route_name' => 'oro_email_autocomplete_recipient',
+                        'type' => 'POST',
+                        'minimumInputLength' => 2,
+                        'per_page' => 100,
+                        'containerCssClass' => 'taggable-email',
+                        'tags' => [],
+                        'component' => 'email-recipients',
+                    ],
+                ]
+            );
+
+        $form = new EmailAddressRecipientsType($this->configManager);
+        $form->configureOptions($resolver);
+    }
+
+    /**
+     * @return array
+     */
     protected function getExtensions()
     {
-        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $emailAddressRecipients = new EmailAddressRecipientsType($configManager);
+        $emailAddressRecipients = new EmailAddressRecipientsType($this->configManager);
 
         return [
             new PreloadedExtension(

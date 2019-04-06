@@ -680,3 +680,11 @@ services:
             - '@oro_entity_extend.db_id_name_generator'
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.field_name_length }
+
+    oro_entity_extend.validator.attribute_field_validator:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\AttributeFieldValidator
+        arguments:
+            - '@oro_entity_extend.extend.field_name_validation_helper'
+            - '@oro_entity_config.provider.attribute'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.attribute_field }

@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\DependencyInjection;
 
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-class OroEmbeddedFormExtension extends Extension
+class OroEmbeddedFormExtension extends Extension implements PrependExtensionInterface
 {
     const SESSION_ID_FIELD_NAME_PARAM = 'oro_embedded_form.session_id_field_name';
     const CSRF_TOKEN_LIFETIME_PARAM   = 'oro_embedded_form.csrf_token_lifetime';
@@ -54,5 +56,28 @@ class OroEmbeddedFormExtension extends Extension
         $container
             ->getDefinition(self::CSRF_TOKEN_STORAGE_SERVICE_ID)
             ->replaceArgument(0, new Reference($csrfTokenCacheServiceId));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        // X-Frame-Options header should be removed from embedded forms
+        $securityConfig = $container->getExtensionConfig('nelmio_security');
+
+        $embeddedFormPaths = [
+            '/embedded-form/submit' => 'ALLOW',
+            '/embedded-form/success' => 'ALLOW'
+        ];
+
+        if (isset($securityConfig[0]['clickjacking']['paths'])
+            && is_array($securityConfig[0]['clickjacking']['paths'])) {
+            $securityConfig[0]['clickjacking']['paths']
+                = $embeddedFormPaths + $securityConfig[0]['clickjacking']['paths'];
+        }
+
+        /** @var ExtendedContainerBuilder $container */
+        $container->setExtensionConfig('nelmio_security', $securityConfig);
     }
 }

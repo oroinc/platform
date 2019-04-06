@@ -53,12 +53,7 @@ parameters:
     oro_email.event_listener.email_user_listener.class: Oro\Bundle\EmailBundle\EventListener\EmailUserListener
 
     # Providers
-    oro_email.emailtemplate.variable_provider.class: Oro\Bundle\EmailBundle\Provider\VariablesProvider
-    oro_email.emailtemplate.variable_provider.entity.class: Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider
-    oro_email.emailtemplate.variable_provider.system.class: Oro\Bundle\EmailBundle\Provider\SystemVariablesProvider
-    oro_email.emailtemplate.variable_provider.user.class: Oro\Bundle\EmailBundle\Provider\LoggedUserVariablesProvider
     oro_email.activity_list.provider.class: Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider
-    oro_email.related_emails.provider.class: Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider
     oro_email.email_recipients.provider.class: Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider
     oro_email.recent_email_recipients.provider.class: Oro\Bundle\EmailBundle\Provider\RecentEmailRecipientsProvider
     oro_email.context_email_recipients.provider.class: Oro\Bundle\EmailBundle\Provider\ContextEmailRecipientsProvider
@@ -67,13 +62,6 @@ parameters:
 
     # Managers
     oro_email.manager.notification.class: Oro\Bundle\EmailBundle\Manager\EmailNotificationManager
-
-    # Cache keys
-    oro_email.cache.available_in_template_key: 'oro_email.available_in_template_fields'
-
-    # Email renderer, twig instance
-    oro_email.email_renderer.class: Oro\Bundle\EmailBundle\Provider\EmailRenderer
-    oro_email.twig.email_security_policy.class: Twig_Sandbox_SecurityPolicy
 
     oro_email.helper.datagrid.emails.class:           Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper
     oro_email.datagrid_query_factory.class:           Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory
@@ -94,11 +82,6 @@ parameters:
     oro_email.listener.search_listener.class: Oro\Bundle\EmailBundle\EventListener\SearchListener
     oro_email.listener.email_body_add_listener.class: Oro\Bundle\EmailBundle\EventListener\EmailBodyAddListener
     oro_email.listener.replace_embedded_attachments_listener.class: Oro\Bundle\EmailBundle\EventListener\ReplaceEmbeddedAttachmentsListener
-
-    # Validators
-    oro_email.validator.email_template_syntax_validator.class: Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator
-    oro_email.validator.email_address_validator.class: Oro\Bundle\EmailBundle\Validator\EmailAddressValidator
-    oro_email.validator.email_recipients_validator.class: Oro\Bundle\EmailBundle\Validator\EmailRecipientsValidator
 
     oro_email.manager.email_attachment_manager.class: Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager
     oro_email.provider.email_attachment_provider.class: Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider
@@ -455,35 +438,35 @@ services:
           calls:
               - [setNamespace, [ 'oro_email' ] ]
 
-    # Available variables services
     oro_email.listener.config_listener:
         class: Oro\Bundle\EmailBundle\EventListener\EntityConfigListener
         arguments:
-            - '@oro_email.cache'
-            - '%oro_email.cache.available_in_template_key%'
+            - '@oro_email.email_renderer_configuration'
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
 
-    # email template twig instance
-    oro_email.twig.string_loader:
-        class: Twig_Loader_String
-
     oro_email.email_renderer:
-        class: '%oro_email.email_renderer.class%'
+        class: Oro\Bundle\EmailBundle\Provider\EmailRenderer
         arguments:
-            - '@oro_email.twig.string_loader'
-            -  # twig environment options
-              strict_variables: true
-            - '@oro_email.emailtemplate.variable_provider'
-            - '@oro_email.cache'
-            - '%oro_email.cache.available_in_template_key%'
-            - '@oro_email.twig.email_sandbox'
-            - '@translator'
+            - '@oro_email.twig.email_environment'
+            - '@oro_email.email_renderer_configuration'
             - '@oro_email.emailtemplate.variable_processor'
+            - '@translator'
+        calls:
+            - [addSystemVariableDefaultFilter, ['userSignature', 'oro_html_sanitize']]
         lazy: true
 
+    oro_email.email_renderer_configuration:
+        class: Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProvider
+        public: false
+        arguments:
+            - '@oro_email.emailtemplate.variable_provider'
+            - '@oro_email.cache'
+            - 'oro_email.available_in_template_fields'
+
     oro_email.twig.email_security_policy:
-        class: '%oro_email.twig.email_security_policy.class%'
+        class: Twig_Sandbox_SecurityPolicy
+        public: false
         arguments:
             # tags
             - [ 'app', 'for', 'if', 'spaceless' ]
@@ -494,65 +477,81 @@ services:
             # properties
             - []
             # functions
-            - [ 'date' ]
+            - [ '_entity_var', 'date' ]
 
     oro_email.twig.email_sandbox:
         class: Twig_Extension_Sandbox
+        public: false
         arguments:
             - '@oro_email.twig.email_security_policy'
             - true # use sandbox globally in instance
 
+    oro_email.twig.string_loader:
+        class: Twig_Loader_String
+        public: false
+
+    oro_email.twig.email_environment:
+        class: Twig_Environment
+        public: false
+        arguments:
+            - '@oro_email.twig.string_loader'
+            - { strict_variables: true }
+        calls:
+            - [addExtension, ['@oro_email.twig.email_sandbox']]
+
     oro_email.emailtemplate.variable_provider:
-        class: '%oro_email.emailtemplate.variable_provider.class%'
+        class: Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider
+        arguments:
+            # All arguments are set by Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailTemplateVariablesPass
+            - ~ # providers
+            - [] # names of system variables providers
+            - [] # names of entity variables providers
 
     oro_email.emailtemplate.variable_provider.entity:
-        class: '%oro_email.emailtemplate.variable_provider.entity.class%'
+        class: Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider
+        public: false
         arguments:
             - '@translator'
             - '@oro_entity_config.config_manager'
             - '@doctrine'
             - '@oro_ui.formatter'
-        lazy: true
-        public: false
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: entity }
 
     oro_email.emailtemplate.variable_provider.entity_routes:
-        class: 'Oro\Bundle\EmailBundle\Provider\EntityRouteVariablesProvider'
+        class: Oro\Bundle\EmailBundle\Provider\EntityRouteVariablesProvider
+        public: false
         arguments:
             - '@translator'
             - '@oro_entity_config.config_manager'
             - '@oro_config.user'
-        lazy: true
-        public: false
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: entity }
 
     oro_email.emailtemplate.variable_provider.system:
-        class: '%oro_email.emailtemplate.variable_provider.system.class%'
-        lazy: true
+        class: Oro\Bundle\EmailBundle\Provider\SystemVariablesProvider
+        public: false
         arguments:
             - '@translator'
             - '@oro_config.user'
             - '@oro_locale.formatter.date_time'
-        public: false
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: system }
 
     oro_email.emailtemplate.variable_provider.user:
-        class: '%oro_email.emailtemplate.variable_provider.user.class%'
-        lazy: true
+        class: Oro\Bundle\EmailBundle\Provider\LoggedUserVariablesProvider
+        public: false
         arguments:
             - '@translator'
             - '@oro_security.token_accessor'
             - '@oro_entity.entity_name_resolver'
             - '@oro_config.user'
-        public: false
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: system }
 
     oro_email.validator.email_template_syntax:
-        class: '%oro_email.validator.email_template_syntax_validator.class%'
+        class: Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator
+        public: false
         arguments:
             - '@oro_email.email_renderer'
             - '@oro_locale.settings'
@@ -562,19 +561,22 @@ services:
             - { name: validator.constraint_validator, alias: oro_email.email_template_syntax_validator }
 
     oro_email.validator.email_address_validator:
-        class: '%oro_email.validator.email_address_validator.class%'
+        class: Oro\Bundle\EmailBundle\Validator\EmailAddressValidator
+        public: false
         arguments:
             - '@oro_email.email.address.helper'
         tags:
             - { name: validator.constraint_validator, alias: oro_email.email_address_validator }
 
     oro_email.validator.email_recipients:
-        class: '%oro_email.validator.email_recipients_validator.class%'
+        class: Oro\Bundle\EmailBundle\Validator\EmailRecipientsValidator
+        public: false
         tags:
             - { name: validator.constraint_validator, alias: oro_email.email_recipients_validator }
 
     oro_email.validator.mailbox_origin:
         class: Oro\Bundle\EmailBundle\Validator\MailboxOriginValidator
+        public: false
         arguments:
             - '@translator'
         tags:
@@ -835,16 +837,21 @@ services:
            - { name: oro_featuretogle.feature, feature: email }
 
     oro_email.related_emails.provider:
-        class: '%oro_email.related_emails.provider.class%'
+        class: Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider
+        arguments:
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
+            - '@oro_email.provider.email_recipients.helper'
+            - '@oro_entity.entity_field_provider'
+            - '@oro_email.email_attribute.provider'
+
+    oro_email.email_attribute.provider:
+        class: Oro\Bundle\EmailBundle\Provider\EmailAttributeProvider
         arguments:
             - '@doctrine'
             - '@oro_entity_config.config_manager'
-            - '@security.authorization_checker'
-            - '@oro_security.token_accessor'
             - '@oro_locale.formatter.name'
             - '@oro_email.email.address.helper'
-            - '@oro_email.provider.email_recipients.helper'
-            - '@oro_entity.entity_field_provider'
 
     oro_email.related_emails.provider.link:
         tags:
@@ -1273,18 +1280,18 @@ services:
           - { name: oro_featuretogle.feature, feature: email }
 
     oro_email.emailtemplate.variable_processor:
-        class: 'Oro\Bundle\EmailBundle\Processor\VariableProcessorRegistry'
+        class: Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorRegistry
         public: false
+        arguments:
+            - ~ # processors. Set by Oro\Bundle\EmailBundle\DependencyInjection\Compiler\VariableProcessorPass
 
     oro_email.emailtemplate.variable_processor.entity_routes:
-        class: 'Oro\Bundle\EmailBundle\Processor\EntityRouteVariableProcessor'
-        arguments:
-            - '@router'
-            - '@oro_entity.doctrine_helper'
-            - '@oro_entity_config.config_manager'
-            - '@oro_email.provider.url_provider'
-        lazy: true
+        class: Oro\Bundle\EmailBundle\Processor\EntityRouteVariableProcessor
         public: false
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_email.provider.url_provider'
+            - '@logger'
         tags:
             - { name: oro_email.emailtemplate.variable_processor, alias: entity_routes }
 
@@ -1360,6 +1367,7 @@ services:
 
     oro_email.validator.connection_configuration.smtp:
         class: 'Oro\Bundle\EmailBundle\Validator\SmtpConnectionConfigurationValidator'
+        public: false
         arguments:
             - '@oro_email.mailer.checker.smtp_settings'
             - '@oro_email.smtp_settings_factory'

@@ -5,14 +5,33 @@ namespace Oro\Bundle\ImportExportBundle\Command\Cron;
 use Gaufrette\File;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\ImportExportBundle\Manager\ImportExportResultManager;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CleanupStorageCommand extends ContainerAwareCommand implements CronCommandInterface
+/**
+ * Responsible for deleting temporary files with a given periodicity
+ */
+class CleanupStorageCommand extends Command implements CronCommandInterface
 {
     const DEFAULT_PERIOD = 14; // days
+
+    /**
+     * @var string
+     */
+    protected static $defaultName = 'oro:cron:import-clean-up-storage';
+
+    /**
+     * @var FileManager
+     */
+    private $fileManager;
+
+    /**
+     * @var ImportExportResultManager
+     */
+    private $importExportResultManager;
 
     /**
      * Set up Adapters that support old files removing. If empty then  all adapters files will be removed.
@@ -20,6 +39,18 @@ class CleanupStorageCommand extends ContainerAwareCommand implements CronCommand
      * @var array
      */
     private static $supportedAdapters = [];
+
+    /**
+     * @param FileManager $fileManager
+     * @param ImportExportResultManager $importExporResultManager
+     */
+    public function __construct(FileManager $fileManager, ImportExportResultManager $importExporResultManager)
+    {
+        $this->fileManager = $fileManager;
+        $this->importExportResultManager = $importExporResultManager;
+
+        parent::__construct();
+    }
 
     /**
      * @inheritdoc
@@ -34,7 +65,7 @@ class CleanupStorageCommand extends ContainerAwareCommand implements CronCommand
      */
     public function isActive()
     {
-        $classAdapter = get_class($this->getFileManager()->getAdapter());
+        $classAdapter = get_class($this->fileManager->getAdapter());
         if (empty(self::$supportedAdapters)) {
             return true;
         }
@@ -48,7 +79,6 @@ class CleanupStorageCommand extends ContainerAwareCommand implements CronCommand
     protected function configure()
     {
         $this
-            ->setName('oro:cron:import-clean-up-storage')
             ->setDescription('Clear old files from import storage.')
             ->addOption(
                 'interval',
@@ -61,19 +91,22 @@ class CleanupStorageCommand extends ContainerAwareCommand implements CronCommand
     }
 
     /**
-     * {@internaldoc}
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     *
+     * @return int|null|void
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $period = (int)$input->getOption('interval');
 
         list($from, $to) = $this->getDateRangeByPeriod($period);
-        $fileManager = $this->getFileManager();
-        $files = $fileManager->getFilesByPeriod($from, $to);
+        $this->importExportResultManager->markResultsAsExpired($from, $to);
 
+        $files = $this->fileManager->getFilesByPeriod($from, $to);
         /** @var File $file*/
         foreach ($files as $fileName => $file) {
-            $fileManager->deleteFile($file);
+            $this->fileManager->deleteFile($file);
             $output->writeln(
                 sprintf('<info> File "%s" was removed.</info>', $fileName),
                 OutputInterface::VERBOSITY_DEBUG
@@ -96,13 +129,5 @@ class CleanupStorageCommand extends ContainerAwareCommand implements CronCommand
         $fromDate = new \DateTime('@0');
 
         return [$fromDate, $toDate];
-    }
-
-    /**
-     * @return FileManager
-     */
-    private function getFileManager()
-    {
-        return $this->getContainer()->get('oro_importexport.file.file_manager');
     }
 }

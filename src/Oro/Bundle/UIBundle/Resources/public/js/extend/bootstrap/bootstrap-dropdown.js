@@ -18,6 +18,7 @@ define(function(require) {
     var HIDE_EVENT = 'hide' + EVENT_KEY;
     var TO_HIDE_EVENT = 'tohide' + EVENT_KEY;
     var HIDING_EVENT = 'hiding' + EVENT_KEY;
+    var HIDDEN_EVENT = 'hidden' + EVENT_KEY;
     var GRID_SCROLLABLE_CONTAINER = '.grid-scrollable-container';
     var DIALOG_SCROLLABLE_CONTAINER = '.ui-dialog-content';
     var SCROLLABLE_CONTAINER = [
@@ -52,7 +53,6 @@ define(function(require) {
         dispose: function() {
             var parent = Dropdown._getParentFromElement(this._element);
             $(parent).off(EVENT_KEY);
-            $(document).off('mCSB.scroll' + EVENT_KEY, this._popperUpdate);
 
             if (this._dialog) {
                 $(this._dialog).off(EVENT_KEY);
@@ -108,7 +108,7 @@ define(function(require) {
             }.bind(this));
 
             $(parent).on(HIDE_EVENT, this._onHide.bind(this));
-            $(document).on('mCSB.scroll' + EVENT_KEY, this._popperUpdate);
+            $(parent).on(HIDDEN_EVENT, this._onHidden.bind(this));
 
             if (this._dialog) {
                 $(this._dialog).on(
@@ -163,6 +163,19 @@ define(function(require) {
             }
         },
 
+        _onHidden: function(event) {
+            //  removing popper scroll listeners when dropdown is hidden.
+            this._popperDestroy();
+        },
+
+        _popperDestroy: function() {
+            if (this._popper !== null) {
+                // the fix deletes previews instance to prevent memory leaks
+                this._popper.destroy();
+                this._popper = null;
+            }
+        },
+
         _getPopperConfig: function() {
             var config = original._getPopperConfig.call(this);
 
@@ -203,13 +216,6 @@ define(function(require) {
             _.extend(config, _.pick(this._config, 'placement', 'positionFixed', 'eventsEnabled'));
             _.extend(config.modifiers, _.pick(this._config.modifiers, 'shift', 'offset', 'preventOverflow',
                 'keepTogether', 'arrow', 'flip', 'inner', 'hide', 'computeStyle', 'applyStyle'));
-
-            if (this._popper !== null) {
-                // the fix deletes previews instance to prevent memory leaks
-                // _getPopperConfig is invoked only before creating a new Popper instance
-                this._popper.destroy();
-                this._popper = null;
-            }
 
             if (this._displayArrow()) {
                 var menu = this._getMenuElement();

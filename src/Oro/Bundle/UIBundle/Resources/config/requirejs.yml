@@ -141,7 +141,8 @@ config:
         'jquery.simplecolorpicker': 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.js'
         'jquery.minicolors': 'bundles/oroui/lib/minicolors/jquery.minicolors.js'
         'jquery.cookie': 'bundles/bowerassets/jquery-cookie/jquery.cookie.js'
-        'jquery.mCustomScrollbar': 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js'
+        'overlayScrollbars': 'bundles/npmassets/overlayscrollbars/js/OverlayScrollbars.js'
+        'styled-scroll-bar': 'bundles/oroui/js/app/plugins/styled-scroll-bar.js'
         'jquery.jstree': 'bundles/components/jstree/dist/jstree.js'
         'popper': 'oroui/js/extend/bootstrap/vendor/popper'
         'bootstrap-util': 'bundles/bowerassets/bootstrap/js/dist/util.js'
@@ -190,6 +191,7 @@ config:
         'oroui/js/app/modules/component-shortcuts-module': 'bundles/oroui/js/app/modules/component-shortcuts-module.js'
         'oroui/js/app/modules/resizable-area-module': 'bundles/oroui/js/app/modules/resizable-area-module.js'
         'oroui/js/app/modules/responsive-layout-module': 'bundles/oroui/js/app/modules/responsive-layout-module.js'
+        'oroui/js/app/modules/styled-scroll-bar-module': 'bundles/oroui/js/app/modules/styled-scroll-bar-module'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/services/registry': 'bundles/oroui/js/app/services/registry.js'
@@ -245,7 +247,7 @@ config:
         'oroui/js/app/views/sticky-element/sticky-element-mixin': 'bundles/oroui/js/app/views/sticky-element/sticky-element-mixin.js'
         'oroui/js/app/views/sticky-element/sticky-element-view': 'bundles/oroui/js/app/views/sticky-element/sticky-element-view.js'
         'oroui/js/app/components/widget-picker-component': 'bundles/oroui/js/app/components/widget-picker-component.js'
-        'oroui/js/app/components/element-value-copy-to-clipboard-component': 'bundles/oroui/js/app/components/element-value-copy-to-clipboard-component.js'
+        'oroui/js/app/views/element-value-copy-to-clipboard-view': 'bundles/oroui/js/app/views/element-value-copy-to-clipboard-view.js'
         'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'
         'oroui/js/widget/abstract-widget': 'bundles/oroui/js/widget/abstract-widget.js'
         'oroui/js/widget/collapse-widget': 'bundles/oroui/js/widget/collapse-widget.js'
@@ -308,6 +310,7 @@ config:
         - oroui/js/app/modules/viewport-module
         - oroui/js/app/modules/resizable-area-module
         - oroui/js/app/modules/responsive-layout-module
+        - oroui/js/app/modules/styled-scroll-bar-module
 
 build:
     paths:

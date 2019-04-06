@@ -15,6 +15,11 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Combines the basic logic of exports.
+ * Responsible for combining the components of reader, processor and writer of export data.
+ * Processes and creates statistics on the export result.
+ */
 class ExportHandler implements StepExecutionWarningHandlerInterface
 {
     /**
@@ -143,5 +148,19 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
         $idFetcher->setImportExportContext($context);
 
         return $idFetcher->getGridDataIds();
+    }
+
+    /**
+     * @param DatagridExportIdFetcher $idFetcher
+     * @param array $parameters
+     *
+     * @return string
+     */
+    public function getEntityName(DatagridExportIdFetcher $idFetcher, array $parameters): string
+    {
+        $context  = new Context($parameters);
+        $idFetcher->setImportExportContext($context);
+
+        return $idFetcher->getGridRootEntity();
     }
 }
