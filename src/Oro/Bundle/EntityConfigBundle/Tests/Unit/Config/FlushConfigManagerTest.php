@@ -3,76 +3,70 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
 use Doctrine\ORM\EntityManager;
+use Metadata\MetadataFactory;
+use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderBagMock;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CLASS = 'Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity';
+    private const ENTITY_CLASS = DemoEntity::class;
 
     /** @var ConfigManager */
-    protected $configManager;
+    private $configManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $metadataFactory;
+    private $metadataFactory;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityConfigProvider;
+    private $entityConfigProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $testConfigProvider;
+    private $testConfigProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $modelManager;
+    private $modelManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $auditManager;
+    private $auditManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configCache;
+    private $configCache;
 
     protected function setUp()
     {
-        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
         $this->entityConfigProvider->expects($this->atLeast(1))
             ->method('getScope')
             ->will($this->returnValue('entity'));
 
-        $this->testConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->testConfigProvider = $this->createMock(ConfigProvider::class);
         $this->testConfigProvider->expects($this->atLeast(1))
             ->method('getScope')
             ->will($this->returnValue('test'));
 
-        $this->eventDispatcher    = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadataFactory    = $this->getMockBuilder('Metadata\MetadataFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->modelManager       = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->auditManager       = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Audit\AuditManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configCache        = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigCache')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
+        $this->metadataFactory = $this->createMock(MetadataFactory::class);
+        $this->modelManager = $this->createMock(ConfigModelManager::class);
+        $this->auditManager = $this->createMock(AuditManager::class);
+        $this->configCache = $this->createMock(ConfigCache::class);
 
         $this->configManager = new ConfigManager(
             $this->eventDispatcher,
@@ -88,67 +82,107 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->configManager->setProviderBag($configProviderBag);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testFlush()
     {
         $model = new EntityConfigModel(self::ENTITY_CLASS);
+        $fieldModel = new FieldConfigModel('field1', 'string');
 
         $entityConfigId = new EntityConfigId('entity', self::ENTITY_CLASS);
-        $entityConfig   = new Config($entityConfigId);
+        $entityConfig = new Config($entityConfigId);
         $entityConfig->set('icon', 'test_icon');
         $entityConfig->set('label', 'test_label');
-        $entityPropertyConfig = new PropertyConfigContainer(
-            [
+
+        $testConfigId = new EntityConfigId('test', self::ENTITY_CLASS);
+        $testConfig = new Config($testConfigId);
+        $testConfig->set('attr1', 'test_attr1');
+
+        $entityFieldConfigId = new FieldConfigId('entity', 'Test\AnotherEntity', 'field1', 'string');
+        $entityFieldConfig = new Config($entityFieldConfigId);
+        $entityFieldConfig->set('label', 'test_field_label');
+
+        $testFieldConfigId = new FieldConfigId('test', 'Test\AnotherEntity', 'field1', 'string');
+        $testFieldConfig = new Config($testFieldConfigId);
+        $testFieldConfig->set('attr1', 'test_field_attr1');
+
+        $this->entityConfigProvider->expects($this->exactly(2))
+            ->method('getPropertyConfig')
+            ->willReturn(new PropertyConfigContainer([
                 'entity' => [
                     'items' => [
                         'icon'  => [],
                         'label' => ['options' => ['indexed' => true]]
                     ]
+                ],
+                'field'  => [
+                    'items' => [
+                        'label' => ['options' => ['indexed' => true]]
+                    ]
                 ]
-            ]
-        );
-        $this->entityConfigProvider->expects($this->once())
+            ]));
+        $this->testConfigProvider->expects($this->exactly(2))
             ->method('getPropertyConfig')
-            ->will($this->returnValue($entityPropertyConfig));
-
-        $testConfigId = new EntityConfigId('test', self::ENTITY_CLASS);
-        $testConfig   = new Config($testConfigId);
-        $testConfig->set('attr1', 'test_attr1');
-        $testPropertyConfig = new PropertyConfigContainer(
-            [
+            ->willReturn(new PropertyConfigContainer([
                 'entity' => [
                     'items' => [
                         'attr1' => []
                     ]
+                ],
+                'field'  => [
+                    'items' => [
+                        'attr1' => []
+                    ]
                 ]
-            ]
-        );
-        $this->testConfigProvider->expects($this->once())
-            ->method('getPropertyConfig')
-            ->will($this->returnValue($testPropertyConfig));
+            ]));
 
         $this->modelManager->expects($this->once())
             ->method('getEntityModel')
             ->with($entityConfigId->getClassName())
-            ->will($this->returnValue($model));
+            ->willReturn($model);
+        $this->modelManager->expects($this->once())
+            ->method('getFieldModel')
+            ->with($entityFieldConfigId->getClassName(), $entityFieldConfigId->getFieldName())
+            ->willReturn($fieldModel);
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
         $this->modelManager->expects($this->atLeast(1))
             ->method('getEntityManager')
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
-        $this->setFlushExpectations($em, [$model]);
+        $this->setFlushExpectations($em, [$model, $fieldModel]);
 
         $this->eventDispatcher->expects($this->at(0))
             ->method('dispatch')
             ->with(
                 Events::PRE_FLUSH,
-                new PreFlushConfigEvent(['entity' => $entityConfig, 'test' => $testConfig], $this->configManager)
+                new PreFlushConfigEvent(
+                    ['entity' => $entityConfig, 'test' => $testConfig],
+                    $this->configManager
+                )
             );
+        $this->eventDispatcher->expects($this->at(1))
+            ->method('dispatch')
+            ->with(
+                Events::PRE_FLUSH,
+                new PreFlushConfigEvent(
+                    ['entity' => $entityFieldConfig, 'test' => $testFieldConfig],
+                    $this->configManager
+                )
+            );
+
+        $this->configCache->expects($this->once())
+            ->method('deleteEntityConfig')
+            ->with($entityConfigId->getClassName());
+        $this->configCache->expects($this->once())
+            ->method('deleteFieldConfig')
+            ->with($entityFieldConfigId->getClassName(), $entityFieldConfigId->getFieldName());
 
         $this->configManager->persist($entityConfig);
         $this->configManager->persist($testConfig);
+        $this->configManager->persist($entityFieldConfig);
+        $this->configManager->persist($testFieldConfig);
         $this->configManager->flush();
 
         $this->assertEquals(
@@ -163,6 +197,18 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
                 'attr1' => 'test_attr1'
             ],
             $model->toArray('test')
+        );
+        $this->assertEquals(
+            [
+                'label' => 'test_field_label'
+            ],
+            $fieldModel->toArray('entity')
+        );
+        $this->assertEquals(
+            [
+                'attr1' => 'test_field_attr1'
+            ],
+            $fieldModel->toArray('test')
         );
 
         $this->assertCount(3, $model->getIndexedValues());
@@ -179,11 +225,10 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
         $model = new EntityConfigModel(self::ENTITY_CLASS);
 
         $entityConfigId = new EntityConfigId('entity', self::ENTITY_CLASS);
-        $entityConfig   = new Config($entityConfigId);
+        $entityConfig = new Config($entityConfigId);
 
-        $testEntityConfigId = new EntityConfigId('test', self::ENTITY_CLASS);
-        $testEntityConfig   = new Config($testEntityConfigId);
-
+        $testConfigId = new EntityConfigId('test', self::ENTITY_CLASS);
+        $testConfig = new Config($testConfigId);
 
         $entityPropertyConfig = new PropertyConfigContainer(
             [
@@ -234,10 +279,10 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects(self::at(0))
             ->method('dispatch')
             ->with(Events::PRE_FLUSH, new PreFlushConfigEvent($configs, $this->configManager))
-            ->willReturnCallback(function (string $eventName, PreFlushConfigEvent $event) use ($testEntityConfig) {
+            ->willReturnCallback(function (string $eventName, PreFlushConfigEvent $event) use ($testConfig) {
                 $configManager = $event->getConfigManager();
-                $configManager->persist($testEntityConfig);
-                $configManager->calculateConfigChangeSet($testEntityConfig);
+                $configManager->persist($testConfig);
+                $configManager->calculateConfigChangeSet($testConfig);
             });
 
         $this->configManager->persist($entityConfig);
@@ -248,7 +293,7 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
      * @param \PHPUnit\Framework\MockObject\MockObject $em
      * @param ConfigModel[]                            $models
      */
-    protected function setFlushExpectations($em, $models)
+    private function setFlushExpectations($em, $models)
     {
         $this->configCache->expects($this->once())
             ->method('deleteAllConfigurable');

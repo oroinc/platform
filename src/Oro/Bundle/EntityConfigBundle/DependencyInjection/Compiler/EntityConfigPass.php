@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\EntityConfigBundle\Config\DebugConfigCache;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
@@ -14,6 +13,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Configures entity config manager and providers based on the configuration loaded
+ * from "Resources/config/oro/entity_config.yml".
+ */
 class EntityConfigPass implements CompilerPassInterface
 {
     const CONFIG_MANAGER_SERVICE         = 'oro_entity_config.config_manager';
@@ -68,11 +71,9 @@ class EntityConfigPass implements CompilerPassInterface
             $container->setDefinition(self::CONFIG_PROVIDER_SERVICE_PREFIX . $scope, $provider);
         }
 
-        // use a special implementation of the config cache in the debug mode
-        if ($container->getParameter('kernel.debug')) {
-            $container->getDefinition(self::CONFIG_CACHE_SERVICE)
-                ->setClass(DebugConfigCache::class);
-        }
+        // add scopes to the config cache
+        $configCache = $container->getDefinition(self::CONFIG_CACHE_SERVICE);
+        $configCache->replaceArgument(2, array_combine($scopes, $scopes));
     }
 
     /**

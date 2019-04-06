@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Entity\Repository;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -22,7 +23,7 @@ class OrganizationRepository extends EntityRepository
     {
         return $this->createQueryBuilder('org')
             ->select('org')
-            ->orderBy('org.id')
+            ->orderBy('org.id', Criteria::ASC)
             ->getQuery()
             ->setMaxResults(1)
             ->getSingleResult();
