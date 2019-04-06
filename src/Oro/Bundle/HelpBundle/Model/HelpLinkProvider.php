@@ -7,6 +7,7 @@ use Oro\Bundle\HelpBundle\Annotation\Help;
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * The help link URL provider.
@@ -17,6 +18,11 @@ class HelpLinkProvider
      * @var array
      */
     protected $rawConfiguration;
+
+    /**
+     * @var RequestStack
+     */
+    protected $requestStack;
 
     /**
      * @var ControllerNameParser
@@ -69,22 +75,20 @@ class HelpLinkProvider
     protected $format = '%server%/%vendor%/%bundle%/%controller%_%action%';
 
     /**
+     * @param RequestStack $requestStack
      * @param ControllerNameParser $parser
      * @param VersionHelper $helper
-     */
-    public function __construct(ControllerNameParser $parser, VersionHelper $helper)
-    {
-        $this->parser = $parser;
-        $this->helper = $helper;
-    }
-
-    /**
-     * Set cache instance
-     *
      * @param CacheProvider $cache
      */
-    public function setCache(CacheProvider $cache)
-    {
+    public function __construct(
+        RequestStack $requestStack,
+        ControllerNameParser $parser,
+        VersionHelper $helper,
+        CacheProvider $cache
+    ) {
+        $this->requestStack = $requestStack;
+        $this->parser = $parser;
+        $this->helper = $helper;
         $this->cache = $cache;
     }
 
@@ -113,19 +117,34 @@ class HelpLinkProvider
      */
     public function getHelpLinkUrl()
     {
+        $this->ensureRequestSet();
+
         $helpLink = false;
-        if ($this->cache && $this->requestRoute) {
+        if ($this->requestRoute) {
             $helpLink = $this->cache->fetch($this->requestRoute);
         }
         if (false === $helpLink) {
             $helpLink = $this->constructedHelpLinkUrl();
 
-            if ($this->cache && $this->requestRoute) {
+            if ($this->requestRoute) {
                 $this->cache->save($this->requestRoute, $helpLink);
             }
         }
 
         return $helpLink;
+    }
+
+    /**
+     * Makes sure that request depended properties are set.
+     */
+    private function ensureRequestSet()
+    {
+        if (null === $this->request) {
+            $request = $this->requestStack->getMasterRequest();
+            if (null !== $request) {
+                $this->setRequest($request);
+            }
+        }
     }
 
     /**

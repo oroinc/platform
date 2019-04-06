@@ -1,7 +1,3 @@
-parameters:
-    oro_help.model.help_link_provider.class: Oro\Bundle\HelpBundle\Model\HelpLinkProvider
-    oro_help.listener.help_link.class: Oro\Bundle\HelpBundle\EventListener\HelpLinkRequestListener
-
 services:
     oro_help.help_link.cache:
         parent: oro.cache.abstract
@@ -9,12 +5,12 @@ services:
             - [ setNamespace, [ 'oro_help_link' ] ]
 
     oro_help.model.help_link_provider:
-        class: '%oro_help.model.help_link_provider.class%'
-        calls:
-            - [ setCache, [ '@oro_help.help_link.cache' ] ]
+        class: Oro\Bundle\HelpBundle\Model\HelpLinkProvider
         arguments:
+            - '@request_stack'
             - '@controller_name_converter'
             - '@oro_platform.composer.version_helper'
+            - '@oro_help.help_link.cache'
 
     oro_help.twig.extension:
         class: Oro\Bundle\HelpBundle\Twig\HelpExtension
@@ -23,10 +19,3 @@ services:
             - '@service_container'
         tags:
             - { name: twig.extension }
-
-    oro_help.listener.help_link:
-        class: '%oro_help.listener.help_link.class%'
-        arguments:
-            - '@service_container'
-        tags:
-            - { name: kernel.event_listener, priority: -200, event: kernel.controller, method: onKernelController }

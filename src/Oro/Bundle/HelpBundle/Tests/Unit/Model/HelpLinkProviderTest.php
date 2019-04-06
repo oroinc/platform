@@ -1,41 +1,42 @@
 <?php
 
-namespace Oro\Bundle\HelpBundle\Unit\Model;
+namespace Oro\Bundle\HelpBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\HelpBundle\Annotation\Help;
 use Oro\Bundle\HelpBundle\Model\HelpLinkProvider;
+use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const VERSION = '1.0';
+    private const VERSION = '1.0';
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $parser;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $helper;
+    /** @var ControllerNameParser|\PHPUnit\Framework\MockObject\MockObject */
+    private $parser;
 
-    /**
-     * @var HelpLinkProvider
-     */
-    protected $provider;
+    /** @var VersionHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $helper;
+
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $cache;
+
+    /** @var HelpLinkProvider */
+    private $provider;
     
     protected function setUp()
     {
-        $this->parser = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->helper = $this
-            ->getMockBuilder('Oro\Bundle\PlatformBundle\Composer\VersionHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->provider = new HelpLinkProvider($this->parser, $this->helper);
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->parser = $this->createMock(ControllerNameParser::class);
+        $this->helper = $this->createMock(VersionHelper::class);
+        $this->cache = $this->createMock(CacheProvider::class);
+
+        $this->provider = new HelpLinkProvider($this->requestStack, $this->parser, $this->helper, $this->cache);
     }
 
     public function testGetHelpLinkCached()
@@ -43,24 +44,18 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
         $expectedLink = 'http://test.com/help/test?v=1.1';
         $routeName = 'test_route';
 
-        $cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
-            ->disableOriginalConstructor()
-            ->setMethods(array('save', 'fetch'))
-            ->getMockForAbstractClass();
-
-        $cache->expects($this->once())
+        $this->cache->expects($this->once())
             ->method('fetch')
             ->with($routeName)
             ->will($this->returnValue($expectedLink));
-        $cache->expects($this->never())
+        $this->cache->expects($this->never())
             ->method('save');
-        $this->provider->setCache($cache);
 
         $request = new Request();
-        $request->attributes->add(
-            array('_route' => $routeName)
-        );
-        $this->provider->setRequest($request);
+        $request->attributes->add(['_route' => $routeName]);
+        $this->requestStack->expects($this->any())
+            ->method('getMasterRequest')
+            ->willReturn($request);
 
         $this->assertEquals($expectedLink, $this->provider->getHelpLinkUrl());
     }
@@ -69,14 +64,9 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
     {
         $expectedLink = 'http://example.com/';
 
-        $cache = $this->getMockBuilder(CacheProvider::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['save', 'fetch'])
-            ->getMockForAbstractClass();
-
-        $cache->expects($this->never())
+        $this->cache->expects($this->never())
             ->method('fetch');
-        $cache->expects($this->never())
+        $this->cache->expects($this->never())
             ->method('save');
 
         $this->provider->setConfiguration([
@@ -91,17 +81,11 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
     {
         $expectedLink = 'http://example.com/';
 
-        $cache = $this->getMockBuilder(CacheProvider::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['save', 'fetch'])
-            ->getMockForAbstractClass();
-
-        $cache->expects($this->never())
+        $this->cache->expects($this->never())
             ->method('fetch');
-        $cache->expects($this->never())
+        $this->cache->expects($this->never())
             ->method('save');
 
-        $this->provider->setCache($cache);
         $this->provider->setConfiguration([
             'defaults' => [
                 'link' => 'http://example.com/',
@@ -112,18 +96,12 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider configurationDataProvider
-     * @param array $configuration
-     * @param array $requestAttributes
-     * @param array $parserResults
-     * @param string $expectedLink
-     * @param bool $hasCache
      */
     public function testGetHelpLinkUrl(
         array $configuration,
         array $requestAttributes,
         array $parserResults,
-        $expectedLink,
-        $hasCache = false
+        string $expectedLink
     ) {
         if (isset($parserResults['buildResult'])) {
             $this->assertArrayHasKey('_controller', $requestAttributes);
@@ -150,24 +128,18 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
 
         $request = new Request();
         $request->attributes->add($requestAttributes);
+        $this->requestStack->expects($this->any())
+            ->method('getMasterRequest')
+            ->willReturn($request);
 
-        $this->provider->setRequest($request);
-
-        if ($hasCache) {
-            $cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
-                ->disableOriginalConstructor()
-                ->setMethods(array('save', 'fetch'))
-                ->getMockForAbstractClass();
-
-            $cache->expects($this->once())
+        if (isset($requestAttributes['_route'])) {
+            $this->cache->expects($this->once())
                 ->method('fetch')
                 ->with($requestAttributes['_route'])
-                ->will($this->returnValue(false));
-            $cache->expects($this->once())
+                ->willReturn(false);
+            $this->cache->expects($this->once())
                 ->method('save')
                 ->with($requestAttributes['_route'], $expectedLink);
-
-            $this->provider->setCache($cache);
         }
 
         $this->assertEquals($expectedLink, $this->provider->getHelpLinkUrl());
@@ -204,8 +176,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                     '_route' => 'test_route'
                 ),
                 'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://test.com/wiki/Acme/AcmeDemoBundle/Test_run?v=' . self::VERSION,
-                true
+                'expectedLink' => 'http://test.com/wiki/Acme/AcmeDemoBundle/Test_run?v=' . self::VERSION
             ),
             'simple default with controller short name' => array(
                 'configuration' => array(
