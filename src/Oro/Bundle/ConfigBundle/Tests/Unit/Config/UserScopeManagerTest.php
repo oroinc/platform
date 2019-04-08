@@ -4,6 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\UserScopeManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -83,9 +84,13 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
      *
      * @return UserScopeManager
      */
-    protected function createManager(ManagerRegistry $doctrine, CacheProvider $cache, EventDispatcher $eventDispatcher)
-    {
-        return new UserScopeManager($doctrine, $cache, $eventDispatcher);
+    protected function createManager(
+        ManagerRegistry $doctrine,
+        CacheProvider $cache,
+        EventDispatcher $eventDispatcher,
+        ConfigBag $configBag
+    ) {
+        return new UserScopeManager($doctrine, $cache, $eventDispatcher, $configBag);
     }
 
     /**
