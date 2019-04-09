@@ -17,16 +17,16 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
     /** @var LoginListener */
     protected $listener;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConsumerHeartbeat|\PHPUnit\Framework\MockObject\MockObject */
     protected $consumerHeartbeat;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     /** @var FlashBag */
     protected $flashBag;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
     protected $request;
 
     protected function setUp()
