@@ -122,35 +122,20 @@ class EnumSynchronizer
      */
     public function applyEnumNameTrans($enumCode, $enumName, $locale)
     {
-        if (strlen($enumCode) === 0) {
-            throw new \InvalidArgumentException('$enumCode must not be empty.');
-        }
-        if (strlen($enumName) === 0) {
-            throw new \InvalidArgumentException('$enumName must not be empty.');
-        }
-        if (empty($locale)) {
-            throw new \InvalidArgumentException('$locale must not be empty.');
-        }
-
-        // add translations for an entity will be used to store enum values
         $labelsToBeUpdated = [];
         $labelKey          = ExtendHelper::getEnumTranslationKey('label', $enumCode);
         $pluralLabelKey    = ExtendHelper::getEnumTranslationKey('plural_label', $enumCode);
         $descriptionKey    = ExtendHelper::getEnumTranslationKey('description', $enumCode);
-        $currentLabelTrans = $this->translator->trans($labelKey, [], null, $locale);
-        if ($currentLabelTrans === $labelKey) {
-            // labels initialization
-            $labelsToBeUpdated[$labelKey]       = $enumName;
-            $labelsToBeUpdated[$pluralLabelKey] = $enumName;
-            if ($locale === Translator::DEFAULT_LOCALE) {
-                // set empty description only for default locale
-                $labelsToBeUpdated[$descriptionKey] = '';
-            }
-        } elseif ($enumName != $currentLabelTrans) {
-            // update existing labels
-            $labelsToBeUpdated[$labelKey]       = $enumName;
-            $labelsToBeUpdated[$pluralLabelKey] = $enumName;
+
+        // Checks if translations need to be updated for a entity
+        $locale = $locale ?? Translator::DEFAULT_LOCALE;
+        if ($enumName === $this->translator->trans($labelKey, [], null, $locale)) {
+            return;
         }
+
+        $labelsToBeUpdated[$labelKey]       = $enumName ?: $labelKey;
+        $labelsToBeUpdated[$pluralLabelKey] = $enumName ?: $pluralLabelKey;
+        $labelsToBeUpdated[$descriptionKey] = $enumName ?: $descriptionKey;
 
         $this->translationHelper->saveTranslations($labelsToBeUpdated);
     }
