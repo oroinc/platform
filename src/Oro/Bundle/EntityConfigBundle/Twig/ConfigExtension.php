@@ -14,6 +14,9 @@ use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * The TWIG extension that provides entity config related functions.
+ */
 class ConfigExtension extends \Twig_Extension
 {
     const NAME = 'oro_entity_config';
@@ -108,6 +111,10 @@ class ConfigExtension extends \Twig_Extension
      */
     public function getClassConfig($className, $scope = 'entity')
     {
+        if (!$className) {
+            return [];
+        }
+
         $configManager = $this->getConfigManager();
         if (!$configManager->hasConfig($className)) {
             return [];
@@ -127,6 +134,10 @@ class ConfigExtension extends \Twig_Extension
      */
     public function getClassConfigValue($className, $attrName, $scope = 'entity')
     {
+        if (!$className) {
+            return null;
+        }
+
         $configManager = $this->getConfigManager();
         if (!$configManager->hasConfig($className)) {
             return null;
@@ -145,6 +156,10 @@ class ConfigExtension extends \Twig_Extension
      */
     public function getFieldConfig($className, $fieldName, $scope = 'entity')
     {
+        if (!$className) {
+            return [];
+        }
+
         $configManager = $this->getConfigManager();
         if (!$configManager->hasConfig($className, $fieldName)) {
             return [];
@@ -162,6 +177,10 @@ class ConfigExtension extends \Twig_Extension
      */
     public function getFieldConfigValue($className, $fieldName, $attrName, $scope = 'entity')
     {
+        if (!$className) {
+            return null;
+        }
+
         $configManager = $this->getConfigManager();
         if (!$configManager->hasConfig($className, $fieldName)) {
             return null;
@@ -177,6 +196,10 @@ class ConfigExtension extends \Twig_Extension
      */
     public function getClassMetadataValue($className, $attrName)
     {
+        if (!$className) {
+            return null;
+        }
+
         $configManager = $this->getConfigManager();
         if (!$configManager->hasConfig($className)) {
             return null;
@@ -198,6 +221,10 @@ class ConfigExtension extends \Twig_Extension
      */
     public function getClassRoute($className, $routeType = 'view', $strict = false)
     {
+        if (!$className) {
+            return null;
+        }
+
         $configManager = $this->getConfigManager();
         if (!$configManager->hasConfig($className)) {
             return null;

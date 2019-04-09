@@ -5,113 +5,75 @@ namespace Oro\Bundle\EmailBundle\Processor;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EmailBundle\Provider\UrlProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Symfony\Component\Routing\RouterInterface;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateData;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorInterface;
+use Psr\Log\LoggerInterface;
 
 /**
- * Processes route variables (see ::supports) from email template to corresponding entity url
+ * Processes entity route variables.
  */
 class EntityRouteVariableProcessor implements VariableProcessorInterface
 {
-    /** @var RouterInterface */
-    protected $router;
-
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var EntityConfigManager */
-    protected $entityConfigManager;
+    private $doctrineHelper;
 
     /** @var UrlProvider */
     private $urlProvider;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     /**
-     * @param RouterInterface $router
-     * @param DoctrineHelper $doctrineHelper
-     * @param EntityConfigManager $entityConfigManager
-     * @param UrlProvider $urlProvider
+     * @param DoctrineHelper  $doctrineHelper
+     * @param UrlProvider     $urlProvider
+     * @param LoggerInterface $logger
      */
     public function __construct(
-        RouterInterface $router,
         DoctrineHelper $doctrineHelper,
-        EntityConfigManager $entityConfigManager,
-        UrlProvider $urlProvider
+        UrlProvider $urlProvider,
+        LoggerInterface $logger
     ) {
-        $this->router = $router;
         $this->doctrineHelper = $doctrineHelper;
-        $this->entityConfigManager = $entityConfigManager;
         $this->urlProvider = $urlProvider;
+        $this->logger = $logger;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function process($variable, array $definition, array $data = [])
+    public function process(string $variable, array $processorArguments, TemplateData $data): void
     {
-        if (!$this->isValid($variable, $definition, $data)) {
-            return sprintf('{{ \'%s\' }}', $variable);
-        }
-
-        $params = [];
-
-        if (!preg_match('/^.*(_index|_create)$/', $definition['route'])) {
-            $params = [
-                'id' => $this->doctrineHelper->getSingleEntityIdentifier($data['entity'], false),
-            ];
-        }
-
-        $websiteUrl = $this->urlProvider->getAbsoluteUrl($definition['route'], $params);
-
-        return sprintf('{{ \'%s\' }}', $websiteUrl);
+        $data->setComputedVariable($variable, $this->getUrl($processorArguments['route'], $variable, $data));
     }
 
     /**
-     * @param string $variable
+     * @param string       $routeName
+     * @param string       $variable
+     * @param TemplateData $data
      *
-     * @return bool
+     * @return string|null
      */
-    protected function supports($variable)
+    private function getUrl(string $routeName, string $variable, TemplateData $data): ?string
     {
-        return in_array($variable, [
-            'entity.url.index',
-            'entity.url.view',
-            'entity.url.create',
-            'entity.url.update',
-            'entity.url.delete',
-        ], true);
-    }
+        $entity = $data->getEntityVariable($data->getParentVariablePath($variable));
 
-    /**
-     * @param $variable
-     * @param array $definition
-     * @param array $data
-     *
-     * @return bool
-     */
-    protected function isValid($variable, array $definition, array $data = [])
-    {
-        if (!$this->supports($variable)) {
-            return false;
+        $url = null;
+        try {
+            $params = [];
+            if (!preg_match('/^.*(_index|_create)$/', $routeName)) {
+                $params['id'] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            }
+            $url = $this->urlProvider->getAbsoluteUrl($routeName, $params);
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                sprintf('The variable "%s" cannot be resolved.', $variable),
+                [
+                    'exception' => $e,
+                    'entity'    => is_object($entity) ? ClassUtils::getClass($entity) : gettype($entity)
+                ]
+            );
         }
 
-        if (!isset($definition['route']) || !$this->router->getRouteCollection()->get($definition['route'])) {
-            return false;
-        }
-
-        if (!isset($data['entity']) || !$this->doctrineHelper->isManageableEntity($data['entity'])) {
-            return false;
-        }
-
-
-        $entityClass = ClassUtils::getRealClass(get_class($data['entity']));
-        $extendConfigProvider = $this->entityConfigManager->getProvider('extend');
-        if (!$extendConfigProvider->hasConfig($entityClass)
-            || !ExtendHelper::isEntityAccessible($extendConfigProvider->getConfig($entityClass))
-        ) {
-            return false;
-        }
-
-        return true;
+        return $url;
     }
 }

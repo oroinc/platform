@@ -1,7 +1,7 @@
 datagrids:
     process-definitions-grid:
         options:
-            entityHint: processes
+            entityHint: oro.workflow.processdefinition.entity_plural_label
             export:     false
         acl_resource: oro_process_definition_view
         source:
@@ -98,7 +98,7 @@ datagrids:
 
     workflow-definitions-grid:
         options:
-            entityHint: workflows
+            entityHint: oro.workflow.workflowdefinition.entity_plural_label
             export:     false
             mass_actions:
                 delete:

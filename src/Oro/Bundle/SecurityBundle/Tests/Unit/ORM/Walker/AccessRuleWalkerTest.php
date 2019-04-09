@@ -8,6 +8,7 @@ use Doctrine\ORM\Query;
 use Oro\Bundle\SecurityBundle\AccessRule\ChainAccessRule;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\AccessDenied;
+use Oro\Bundle\SecurityBundle\AccessRule\Expr\Association;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Comparison;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\CompositeExpression;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Exists;
@@ -19,12 +20,17 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalkerContext;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\AccessRule\DynamicAccessRule;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsOrganization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class AccessRuleWalkerTest extends OrmTestCase
 {
     /** @var EntityManagerMock */
@@ -68,23 +74,13 @@ class AccessRuleWalkerTest extends OrmTestCase
             return;
         });
 
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 1);
-
         $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
             ->select('address.id')
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $context);
+        $expectedQuery = 'SELECT c0_.id AS id_0 FROM cms_addresses c0_';
 
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0'
-            . ' FROM cms_addresses c0_',
-            $query->getSQL()
-        );
+        $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
     public function testWalkerWithSimpleComparisonExpression()
@@ -93,24 +89,15 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1,2,3,4,5]));
         });
 
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 2);
-
         $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
             ->select('address.id')
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $context);
-
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0'
+        $expectedQuery = 'SELECT c0_.id AS id_0'
             . ' FROM cms_addresses c0_'
-            . ' WHERE c0_.user_id IN (1, 2, 3, 4, 5)',
-            $query->getSQL()
-        );
+            . ' WHERE c0_.user_id IN (1, 2, 3, 4, 5)';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
     public function testWalkerQueryWithWhereAndWithSimpleComparisonExpression()
@@ -119,26 +106,17 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->orExpression(new Comparison(new Path('user'), Comparison::IN, [1,2,3,4,5]));
         });
 
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 3);
-
         $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
             ->select('address.id')
             ->where('address.country = :country')
             ->setParameter('country', 'US')
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $context);
-
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0'
+        $expectedQuery = 'SELECT c0_.id AS id_0'
             . ' FROM cms_addresses c0_'
-            . ' WHERE c0_.country = ? AND c0_.user_id IN (1, 2, 3, 4, 5)',
-            $query->getSQL()
-        );
+            . ' WHERE c0_.country = ? AND c0_.user_id IN (1, 2, 3, 4, 5)';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
     public function testWalkerQueryWithWhereAndWithCompositeExpression()
@@ -149,27 +127,18 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->orExpression(new Comparison(new Path('user'), Comparison::EQ, 20));
         });
 
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 4);
-
         $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
             ->select('address.id')
             ->where('address.country = :country')
             ->setParameter('country', 'US')
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $context);
-
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0'
+        $expectedQuery = 'SELECT c0_.id AS id_0'
             . ' FROM cms_addresses c0_'
             . ' WHERE c0_.country = ?'
-            . ' AND ((c0_.user_id IN (1, 2, 3, 4, 5) AND c0_.organization = 1) OR c0_.user_id = 20)',
-            $query->getSQL()
-        );
+            . ' AND ((c0_.user_id IN (1, 2, 3, 4, 5) AND c0_.organization_id = 1) OR c0_.user_id = 20)';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
     public function testWalkerQueryWithWhereAndWithOrCompositeExpression()
@@ -179,26 +148,17 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->orExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 5);
-
         $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
             ->select('address.id')
             ->where('address.country = :country')
             ->setParameter('country', 'US')
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $context);
-
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0'
+        $expectedQuery = 'SELECT c0_.id AS id_0'
             . ' FROM cms_addresses c0_'
-            . ' WHERE c0_.country = ? AND (c0_.user_id IN (1, 2, 3, 4, 5) OR c0_.organization = 1)',
-            $query->getSQL()
-        );
+            . ' WHERE c0_.country = ? AND (c0_.user_id IN (1, 2, 3, 4, 5) OR c0_.organization_id = 1)';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
     public function testWalkerQueryWithMultiplyWhereAndWithComplicatedCompositeExpression()
@@ -216,8 +176,6 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 6);
-
         $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
             ->select('address.id')
             ->where('address.country = :country')
@@ -226,20 +184,13 @@ class AccessRuleWalkerTest extends OrmTestCase
             ->setParameter('zip', '61000')
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $context);
-
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0'
+        $expectedQuery = 'SELECT c0_.id AS id_0'
             . ' FROM cms_addresses c0_'
             . ' WHERE (c0_.country = ? OR c0_.zip = ?)'
             . ' AND (c0_.user_id NOT IN (1, 2, 3, 4, 5) OR c0_.user_id >= 20)'
-            . ' AND c0_.organization = 1',
-            $query->getSQL()
-        );
+            . ' AND c0_.organization_id = 1';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
     public function testWalkerQueryWithJoinByPathAndWithComplicatedCompositeExpression()
@@ -259,28 +210,19 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 7);
-
         $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
             ->select('user.id, address.country')
             ->join('user.address', 'address', 'WITH', 'address.id > 0')
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $context);
-
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0, c1_.country AS country_1'
+        $expectedQuery = 'SELECT c0_.id AS id_0, c1_.country AS country_1'
             . ' FROM cms_users c0_'
             . ' INNER JOIN cms_addresses c1_'
-            . ' ON c0_.id = c1_.user_id'
-            . ' AND (c1_.id > 0 AND (c1_.user_id < 5 OR c1_.user_id <> 85) AND c1_.organization = 1)'
-            . ' WHERE c0_.organization = 1',
-            $query->getSQL()
-        );
+            . ' ON c0_.id = c1_.user_id AND (c1_.id > 0'
+            . ' AND (c1_.user_id < 5 OR c1_.user_id <> 85) AND c1_.organization_id = 1)'
+            . ' WHERE c0_.organization_id = 1';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
     public function testWalkerQueryWithJoinByPathAndWithAccessDeniedInJoin()
@@ -293,28 +235,18 @@ class AccessRuleWalkerTest extends OrmTestCase
             }
         });
 
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 8);
-
         $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
             ->select('user.id, address.country')
             ->join('user.address', 'address', 'WITH', 'address.id > 0')
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $context);
-
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0, c1_.country AS country_1'
+        $expectedQuery = 'SELECT c0_.id AS id_0, c1_.country AS country_1'
             . ' FROM cms_users c0_'
             . ' INNER JOIN cms_addresses c1_'
-            . ' ON c0_.id = c1_.user_id'
-            . ' AND (c1_.id > 0 AND 1 = 0)'
-            . ' WHERE c0_.organization = 1',
-            $query->getSQL()
-        );
+            . ' ON c0_.id = c1_.user_id AND (c1_.id > 0 AND 1 = 0)'
+            . ' WHERE c0_.organization_id = 1';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
     public function testWalkerQueryWithJoin()
@@ -327,8 +259,6 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 9);
-
         $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
             ->select('user.id, address.country')
             ->join(
@@ -339,20 +269,13 @@ class AccessRuleWalkerTest extends OrmTestCase
             )
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $context);
-
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0, c1_.country AS country_1'
+        $expectedQuery = 'SELECT c0_.id AS id_0, c1_.country AS country_1'
             . ' FROM cms_users c0_'
             . ' INNER JOIN cms_addresses c1_'
-            . ' ON (c1_.user_id = c0_.id AND c1_.id = 1 AND c1_.user_id < 5 AND c1_.organization = 1)'
-            . ' WHERE c0_.organization = 1',
-            $query->getSQL()
-        );
+            . ' ON (c1_.user_id = c0_.id AND c1_.id = 1 AND c1_.user_id < 5 AND c1_.organization_id = 1)'
+            . ' WHERE c0_.organization_id = 1';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
     public function testWalkerQueryWithJoinAndDisabledCheckRootEntity()
@@ -365,9 +288,6 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 9);
-        $context->setOption(AclHelper::CHECK_ROOT_ENTITY, false);
-
         $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
             ->select('user.id, address.country')
             ->join(
@@ -378,19 +298,13 @@ class AccessRuleWalkerTest extends OrmTestCase
             )
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $context);
-
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0, c1_.country AS country_1'
+        $expectedQuery = 'SELECT c0_.id AS id_0, c1_.country AS country_1'
             . ' FROM cms_users c0_'
             . ' INNER JOIN cms_addresses c1_'
-            . ' ON (c1_.user_id = c0_.id AND c1_.id = 1 AND c1_.user_id < 5 AND c1_.organization = 1)',
-            $query->getSQL()
-        );
+            . ' ON (c1_.user_id = c0_.id AND c1_.id = 1'
+            . ' AND c1_.user_id < 5 AND c1_.organization_id = 1)';
+
+        $this->assertResultQueryEquals($expectedQuery, $query, [AclHelper::CHECK_ROOT_ENTITY => false]);
     }
 
     public function testWalkerQueryWithJoinAndDisabledCheckRelationships()
@@ -403,9 +317,6 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 9);
-        $context->setOption(AclHelper::CHECK_RELATIONS, false);
-
         $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
             ->select('user.id, address.country')
             ->join(
@@ -416,20 +327,13 @@ class AccessRuleWalkerTest extends OrmTestCase
             )
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $context);
-
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0, c1_.country AS country_1'
+        $expectedQuery = 'SELECT c0_.id AS id_0, c1_.country AS country_1'
             . ' FROM cms_users c0_'
             . ' INNER JOIN cms_addresses c1_'
             . ' ON (c1_.user_id = c0_.id AND c1_.id = 1)'
-            . ' WHERE c0_.organization = 1',
-            $query->getSQL()
-        );
+            . ' WHERE c0_.organization_id = 1';
+
+        $this->assertResultQueryEquals($expectedQuery, $query, [AclHelper::CHECK_RELATIONS => false]);
     }
 
     public function testWalkerQueryWithSubselect()
@@ -441,8 +345,6 @@ class AccessRuleWalkerTest extends OrmTestCase
 
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
-
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 9);
 
         $qb = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('u');
         $query = $qb->select('u.id')
@@ -457,23 +359,15 @@ class AccessRuleWalkerTest extends OrmTestCase
             )
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $context);
-
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0'
+        $expectedQuery = 'SELECT c0_.id AS id_0'
             . ' FROM cms_users c0_'
             . ' WHERE c0_.id IN '
             . '(SELECT c1_.id FROM cms_users c1_'
-            . ' INNER JOIN cms_articles c2_ ON c1_.id = c2_.user_id AND (c2_.organization = 1)'
-            . ' WHERE c2_.id IN (1, 2, 3) AND c1_.organization = 1'
-            . ')'
-            . ' AND c0_.organization = 1',
-            $query->getSQL()
-        );
+            . ' INNER JOIN cms_articles c2_ ON c1_.id = c2_.user_id'
+            . ' AND (c2_.organization_id = 1) WHERE c2_.id IN (1, 2, 3) AND c1_.organization_id = 1)'
+            . ' AND c0_.organization_id = 1';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
     public function testWalkerQueryWithSubselectAndMultipleWhereConditions()
@@ -485,8 +379,6 @@ class AccessRuleWalkerTest extends OrmTestCase
 
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
-
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 9);
 
         $qb = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('u');
         $query = $qb->select('u.id')
@@ -500,23 +392,16 @@ class AccessRuleWalkerTest extends OrmTestCase
             )
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $context);
-
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0'
+        $expectedQuery = 'SELECT c0_.id AS id_0'
             . ' FROM cms_users c0_'
             . ' WHERE c0_.id > 0'
             . ' AND (EXISTS '
             . '(SELECT c1_.id FROM cms_users c1_'
-            . ' INNER JOIN cms_articles c2_ ON c1_.id = c2_.user_id AND (c2_.organization = 1)'
-            . ' WHERE c2_.id IN (1, 2, 3) AND c1_.organization = 1))'
-            . ' AND c0_.organization = 1',
-            $query->getSQL()
-        );
+            . ' INNER JOIN cms_articles c2_ ON c1_.id = c2_.user_id'
+            . ' AND (c2_.organization_id = 1) WHERE c2_.id IN (1, 2, 3) AND c1_.organization_id = 1))'
+            . ' AND c0_.organization_id = 1';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
     public function testWalkerQueryWithSubselectAndDisabledCheckRootEntityAndCheckRelationships()
@@ -560,8 +445,8 @@ class AccessRuleWalkerTest extends OrmTestCase
             . ' INNER JOIN cms_addresses c1_ ON c0_.id = c1_.user_id'
             . ' WHERE c0_.id IN '
             . '(SELECT c2_.id FROM cms_users c2_'
-            . ' INNER JOIN cms_articles c3_ ON c2_.id = c3_.user_id AND (c3_.organization = 1)'
-            . ' WHERE c3_.id IN (1, 2, 3) AND c2_.organization = 1'
+            . ' INNER JOIN cms_articles c3_ ON c2_.id = c3_.user_id AND (c3_.organization_id = 1)'
+            . ' WHERE c3_.id IN (1, 2, 3) AND c2_.organization_id = 1'
             . ')',
             $query->getSQL()
         );
@@ -573,96 +458,91 @@ class AccessRuleWalkerTest extends OrmTestCase
     public function testWalkerQueryWithSubselectAccessRule()
     {
         $this->rule->setRule(function (Criteria $criteria) {
-            $subqueryCriteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'users');
-            $subqueryCriteria->andExpression(
-                new Comparison(new Path('user', 'article'), Comparison::EQ, new Path('id', 'users'))
-            );
-            $subqueryCriteria->andExpression(
-                new Comparison(new Path('name', 'users'), Comparison::EQ, 'test')
-            );
+            if ($criteria->getEntityClass() === CmsArticle::class) {
+                $subqueryCriteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'users');
+                $subqueryCriteria->andExpression(
+                    new Comparison(new Path('user', 'article'), Comparison::EQ, new Path('id', 'users'))
+                );
+                $subqueryCriteria->andExpression(
+                    new Comparison(new Path('name', 'users'), Comparison::EQ, 'test')
+                );
 
-            $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1,2,3,4,5]));
-            $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
-            $criteria->orExpression(
-                new Exists(
-                    new Subquery(
-                        CmsUser::class,
-                        'users',
-                        $subqueryCriteria
+                $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1,2,3,4,5]));
+                $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
+                $criteria->orExpression(
+                    new Exists(
+                        new Subquery(
+                            CmsUser::class,
+                            'users',
+                            $subqueryCriteria
+                        )
                     )
-                )
-            );
-            $criteria->andExpression(new Comparison(new Path('user'), Comparison::LT, 5));
-        });
+                );
+                $criteria->andExpression(new Comparison(new Path('user'), Comparison::LT, 5));
+            }
 
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 10);
+            if ($criteria->getEntityClass() === CmsUser::class) {
+                $criteria->andExpression(new Comparison(new Path('status'), Comparison::EQ, 'enabled'));
+            }
+        });
 
         $query = $this->em->getRepository('Test:CmsArticle')->createQueryBuilder('article')
             ->select('article.id')
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $context);
-
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0'
+        $expectedQuery = 'SELECT c0_.id AS id_0'
             . ' FROM cms_articles c0_'
-            . ' WHERE ((c0_.user_id IN (1, 2, 3, 4, 5) AND c0_.organization = 1)'
-            . ' OR EXISTS (SELECT 1 AS sclr_1 FROM cms_users c1_ WHERE c0_.user_id = c1_.id AND c1_.name = \'test\'))'
-            . ' AND c0_.user_id < 5',
-            $query->getSQL()
-        );
+            . ' WHERE ((c0_.user_id IN (1, 2, 3, 4, 5) AND c0_.organization_id = 1)'
+            . ' OR EXISTS (SELECT 1 AS sclr_1 FROM cms_users c1_'
+            . ' WHERE c0_.user_id = c1_.id AND c1_.name = \'test\' AND c1_.status = \'enabled\'))'
+            . ' AND c0_.user_id < 5';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
     public function testWalkerQueryWithNotExistsSubselectAccessRule()
     {
         $this->rule->setRule(function (Criteria $criteria) {
-            $SubqueryCriteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'users');
-            $SubqueryCriteria->andExpression(
-                new Comparison(new Path('user', 'article'), Comparison::EQ, new Path('id', 'users'))
-            );
-            $SubqueryCriteria->andExpression(
-                new Comparison(new Path('name', 'users'), Comparison::EQ, 'test')
-            );
+            if ($criteria->getEntityClass() === CmsArticle::class) {
+                $SubqueryCriteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'users');
+                $SubqueryCriteria->andExpression(
+                    new Comparison(new Path('user', 'article'), Comparison::EQ, new Path('id', 'users'))
+                );
+                $SubqueryCriteria->andExpression(
+                    new Comparison(new Path('name', 'users'), Comparison::EQ, 'test')
+                );
 
-            $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1,2,3,4,5]));
-            $criteria->orExpression(
-                new Exists(
-                    new Subquery(
-                        CmsUser::class,
-                        'users',
-                        $SubqueryCriteria
-                    ),
-                    true
-                )
-            );
-            $criteria->orExpression(new Comparison(new Path('user'), Comparison::LT, 5));
+                $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1,2,3,4,5]));
+                $criteria->orExpression(
+                    new Exists(
+                        new Subquery(
+                            CmsUser::class,
+                            'users',
+                            $SubqueryCriteria
+                        ),
+                        true
+                    )
+                );
+                $criteria->orExpression(new Comparison(new Path('user'), Comparison::LT, 5));
+            }
+            if ($criteria->getEntityClass() === CmsUser::class) {
+                $criteria->andExpression(new Comparison(new Path('status'), Comparison::EQ, 'enabled'));
+            }
         });
-
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 11);
 
         $query = $this->em->getRepository('Test:CmsArticle')->createQueryBuilder('article')
             ->select('article.id')
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $context);
-
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0'
+        $expectedQuery = 'SELECT c0_.id AS id_0'
             . ' FROM cms_articles c0_'
             . ' WHERE (c0_.user_id IN (1, 2, 3, 4, 5)'
             . ' OR NOT EXISTS'
-            . ' (SELECT 1 AS sclr_1 FROM cms_users c1_ WHERE c0_.user_id = c1_.id AND c1_.name = \'test\'))'
-            . ' OR c0_.user_id < 5',
-            $query->getSQL()
-        );
+            . ' (SELECT 1 AS sclr_1 FROM cms_users c1_'
+            . ' WHERE c0_.user_id = c1_.id AND c1_.name = \'test\' AND c1_.status = \'enabled\'))'
+            . ' OR c0_.user_id < 5';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
     public function testWalkerQueryWithNullComparisonExpression()
@@ -672,22 +552,13 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->orExpression(new Comparison(new Path('user'), Comparison::LT, 5));
         });
 
-        $infoContainer = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 12);
-
         $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
             ->select('address.id')
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $infoContainer);
+        $expectedQuery = 'SELECT c0_.id AS id_0 FROM cms_addresses c0_ WHERE c0_.user_id IS NULL OR c0_.user_id < 5';
 
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0 FROM cms_addresses c0_ WHERE c0_.user_id IS NULL OR c0_.user_id < 5',
-            $query->getSQL()
-        );
+        $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
     public function testWalkerQueryWithNotNullComparisonExpression()
@@ -697,21 +568,247 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('user'), Comparison::LT, 5));
         });
 
-        $infoContainer = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 13);
+        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
+            ->select('address.id')
+            ->getQuery();
+
+        $expectedQuery = 'SELECT c0_.id AS id_0 FROM cms_addresses c0_'
+            . ' WHERE c0_.user_id IS NOT NULL AND c0_.user_id < 5';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Parameter of Association expression should be the name of existing association for alias 'address'. Given name: 'city'.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testWalkerWithAssociationRuleExpressionWithWrongParameter()
+    {
+        $this->rule->setRule(function (Criteria $criteria) {
+            if ($criteria->getEntityClass() === CmsAddress::class) {
+                $criteria->andExpression(new Association('city'));
+            }
+        });
+
+        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 1);
+        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')->getQuery();
+        $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [AccessRuleWalker::class]);
+        $query->setHint(AccessRuleWalker::CONTEXT, $context);
+        $query->getSQL();
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Parameter of Association expression should be to-one association. Given name: 'articles'.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testWalkerWithAssociationRuleExpressionWithOneToManyParameter()
+    {
+        $this->rule->setRule(function (Criteria $criteria) {
+            if ($criteria->getEntityClass() === CmsUser::class) {
+                $criteria->andExpression(new Association('articles'));
+            }
+        });
+
+        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 1);
+        $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('u')->getQuery();
+        $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [AccessRuleWalker::class]);
+        $query->setHint(AccessRuleWalker::CONTEXT, $context);
+        $query->getSQL();
+    }
+
+    public function testWalkerWithAssociationRuleExpressionOnSimpleQuery()
+    {
+        $this->rule->setRule(function (Criteria $criteria) {
+            if ($criteria->getEntityClass() === CmsAddress::class) {
+                $criteria->andExpression(new Association('user'));
+            }
+            if ($criteria->getEntityClass() === CmsUser::class) {
+                $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
+                $criteria->andExpression(new Comparison(new Path('status'), Comparison::EQ, 'enabled'));
+            }
+        });
 
         $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
             ->select('address.id')
             ->getQuery();
 
-        $query->setHint(
-            Query::HINT_CUSTOM_TREE_WALKERS,
-            [AccessRuleWalker::class]
-        );
-        $query->setHint(AccessRuleWalker::CONTEXT, $infoContainer);
+        $expectedQuery = 'SELECT c0_.id AS id_0'
+            . ' FROM cms_addresses c0_'
+            . ' WHERE EXISTS (SELECT 1 AS sclr_1 FROM cms_users c1_'
+            . ' WHERE c1_.id = c0_.user_id AND c1_.organization_id = 1 AND c1_.status = \'enabled\')';
 
-        $this->assertEquals(
-            'SELECT c0_.id AS id_0 FROM cms_addresses c0_ WHERE c0_.user_id IS NOT NULL AND c0_.user_id < 5',
-            $query->getSQL()
-        );
+        $this->assertResultQueryEquals($expectedQuery, $query);
+    }
+
+    public function testWalkerWithAssociationRuleExpressionInJoinByPath()
+    {
+        $this->rule->setRule(function (Criteria $criteria) {
+            if ($criteria->getEntityClass() === CmsAddress::class) {
+                $criteria->andExpression(new Association('user'));
+            }
+            if ($criteria->getEntityClass() === CmsUser::class) {
+                $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
+                $criteria->andExpression(new Comparison(new Path('status'), Comparison::EQ, 'enabled'));
+            }
+        });
+
+        $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
+            ->select('user.id, address.country')
+            ->join('user.address', 'address', 'WITH', 'address.id > 0')
+            ->getQuery();
+
+        $expectedQuery = 'SELECT c0_.id AS id_0, c1_.country AS country_1'
+            . ' FROM cms_users c0_'
+            . ' INNER JOIN cms_addresses c1_ ON c0_.id = c1_.user_id AND (c1_.id > 0 AND'
+            . ' EXISTS (SELECT 1 AS sclr_2 FROM cms_users c2_ WHERE c2_.id = c1_.user_id'
+            . ' AND c2_.organization_id = 1 AND c2_.status = \'enabled\'))'
+            . ' WHERE c0_.organization_id = 1 AND c0_.status = \'enabled\'';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
+    }
+
+    public function testWalkerWithAssociationRuleExpressionInJoin()
+    {
+        $this->rule->setRule(function (Criteria $criteria) {
+            if ($criteria->getEntityClass() === CmsAddress::class) {
+                $criteria->andExpression(new Association('user'));
+            }
+            if ($criteria->getEntityClass() === CmsUser::class) {
+                $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
+                $criteria->andExpression(new Comparison(new Path('status'), Comparison::EQ, 'enabled'));
+            }
+        });
+
+        $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
+            ->select('user.id, address.country')
+            ->join(
+                'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress',
+                'address',
+                'WITH',
+                'address.user = user.id AND address = 1'
+            )
+            ->getQuery();
+
+        $expectedQuery = 'SELECT c0_.id AS id_0, c1_.country AS country_1'
+            . ' FROM cms_users c0_'
+            . ' INNER JOIN cms_addresses c1_ ON'
+            . ' (c1_.user_id = c0_.id AND c1_.id = 1 AND'
+            . ' EXISTS (SELECT 1 AS sclr_2 FROM cms_users c2_ WHERE c2_.id = c1_.user_id'
+            . ' AND c2_.organization_id = 1 AND c2_.status = \'enabled\'))'
+            . ' WHERE c0_.organization_id = 1 AND c0_.status = \'enabled\'';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
+    }
+
+    public function testWalkerWithAssociationRuleExpressionOnQueryWithSubselect()
+    {
+        $this->rule->setRule(function (Criteria $criteria) {
+            if ($criteria->getEntityClass() === CmsUser::class) {
+                $criteria->andExpression(new Association('organization'));
+                $criteria->andExpression(new Comparison(new Path('status'), Comparison::EQ, 'enabled'));
+            }
+            if ($criteria->getEntityClass() === CmsOrganization::class) {
+                $criteria->andExpression(new Comparison(new Path('text'), Comparison::EQ, 'test'));
+            }
+        });
+
+        $qb = $this->em->getRepository('Test:CmsArticle')->createQueryBuilder('a');
+        $query = $qb->select('a.id')
+            ->where($qb->expr()->in('a.user', 'SELECT users.id FROM ' . CmsUser::class . ' users'))
+            ->getQuery();
+
+        $expectedQuery = 'SELECT c0_.id AS id_0'
+            . ' FROM cms_articles c0_'
+            . ' WHERE c0_.user_id IN ('
+            . 'SELECT c1_.id FROM cms_users c1_'
+            . ' WHERE EXISTS (SELECT 1 AS sclr_1 FROM cms_organization c2_'
+            . ' WHERE c2_.id = c1_.organization_id AND c2_.text = \'test\')'
+            . ' AND c1_.status = \'enabled\')';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
+    }
+
+    public function testWalkerQueryWithSubselectInJoin()
+    {
+        $this->rule->setRule(function (Criteria $criteria) {
+            if ($criteria->getEntityClass() === CmsAddress::class) {
+                $criteria->andExpression(new Comparison(new Path('user'), Comparison::LT, 5));
+            }
+
+            $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
+        });
+
+        $qb = $this->em->getRepository('Test:CmsArticle')->createQueryBuilder('article');
+        $query = $qb->select('article.id')
+            ->join(
+                'article.user',
+                'u',
+                'WITH',
+                $qb->expr()->in(
+                    'u.id',
+                    'SELECT users.id FROM ' . CmsUser::class . ' users
+                       JOIN users.articles articles
+                       WHERE articles.id in (1,2,3)
+                    '
+                )
+            )
+            ->getQuery();
+
+        $expectedQuery = 'SELECT c0_.id AS id_0'
+            . ' FROM cms_articles c0_'
+            . ' INNER JOIN cms_users c1_ ON'
+            . ' c0_.user_id = c1_.id AND ('
+            . 'c1_.id IN ('
+            . 'SELECT c2_.id FROM cms_users c2_'
+            . ' INNER JOIN cms_articles c3_ ON c2_.id = c3_.user_id AND (c3_.organization_id = 1)'
+            . ' WHERE c3_.id IN (1, 2, 3) AND c2_.organization_id = 1'
+            . ') AND c1_.organization_id = 1)'
+            . ' WHERE c0_.organization_id = 1';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
+    }
+
+    public function testWalkerWithAssociationRuleExpressionOnInverseMappedRelation()
+    {
+        $this->rule->setRule(function (Criteria $criteria) {
+            if ($criteria->getEntityClass() === CmsUser::class) {
+                $criteria->andExpression(new Association('address'));
+            }
+            if ($criteria->getEntityClass() === CmsAddress::class) {
+                $criteria->andExpression(new Comparison(new Path('country'), Comparison::EQ, 'US'));
+            }
+        });
+
+        $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
+            ->select('user.id')
+            ->getQuery();
+
+        $expectedQuery = 'SELECT c0_.id AS id_0'
+            . ' FROM cms_users c0_'
+            . ' WHERE EXISTS (SELECT 1 AS sclr_1 FROM cms_addresses c1_'
+            . ' WHERE c0_.id = c1_.user_id AND c1_.country = \'US\')';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
+    }
+
+    /**
+     * @param string $expectedQuery
+     * @param Query $dqlQuery
+     * @param array $contextOptions
+     */
+    private function assertResultQueryEquals(string $expectedQuery, Query $dqlQuery, array $contextOptions = []): void
+    {
+        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 1);
+        foreach ($contextOptions as $optionName => $optionValue) {
+            $context->setOption($optionName, $optionValue);
+        }
+        $dqlQuery->setHint(AccessRuleWalker::CONTEXT, $context);
+        $dqlQuery->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [AccessRuleWalker::class]);
+
+        $this->assertEquals($expectedQuery, $dqlQuery->getSQL());
     }
 }

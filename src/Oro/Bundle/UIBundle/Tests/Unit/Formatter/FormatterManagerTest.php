@@ -2,63 +2,70 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Formatter;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\Formatter\TestDefaultFormatter;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\Formatter\TestFormatter;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class FormatterManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FormatterManager */
-    protected $manager;
+    private $manager;
 
     protected function setUp()
     {
-        $this->manager = new FormatterManager;
-        $testDefaultFormatter = new TestDefaultFormatter();
-        $testFormatter = new TestFormatter();
-        $this->manager->addFormatter($testDefaultFormatter->getFormatterName(), $testDefaultFormatter);
-        $this->manager->addFormatter($testFormatter->getFormatterName(), $testFormatter);
+        $formatters = new ServiceLocator([
+            'test_default_format_name' => function () {
+                return new TestDefaultFormatter();
+            },
+            'test_format_name'         => function () {
+                return new TestFormatter();
+            }
+        ]);
+
+        $this->manager = new FormatterManager(
+            $formatters,
+            ['string' => 'test_default_format_name']
+        );
     }
 
     public function testFormat()
     {
         $arguments = ['argument1', 'argument2'];
 
-        $this->assertEquals(
-            'parameter:test_parameter,arguments:argument1,argument2',
-            $this->manager->format('test_parameter', 'test_format_name', $arguments)
+        self::assertEquals('test_default_value', $this->manager->format(null, 'test_default_format_name'));
+        self::assertEquals(
+            'value:test_value,arguments:argument1,argument2',
+            $this->manager->format('test_value', 'test_format_name', $arguments)
         );
-        $this->assertEquals('test_value', $this->manager->format(null, 'test_format_name'));
-        $this->expectException('Oro\Bundle\UIBundle\Exception\InvalidFormatterException');
-        $this->expectExceptionMessage('Formatter not_existing_formatter not found');
-        $this->manager->format('test_parameter', 'not_existing_formatter');
+        self::assertEquals('test_value', $this->manager->format(null, 'test_format_name'));
     }
 
     /**
-     * @dataProvider guessFormattersDataProvider
-     * @param FieldConfigId $fieldConfigId
-     * @param               $expected
+     * @expectedException \Oro\Bundle\UIBundle\Exception\InvalidFormatterException
+     * @expectedExceptionMessage The formatter "not_existing_formatter" does not exist.
      */
-    public function testGuessFormatters(FieldConfigId $fieldConfigId, $expected)
+    public function testFormatByNotExistingFormatter()
     {
-        $this->assertEquals($expected, $this->manager->guessFormatters($fieldConfigId));
+        $this->manager->format('test_value', 'not_existing_formatter');
     }
 
-    public static function guessFormattersDataProvider()
+    /**
+     * @dataProvider guessFormatterDataProvider
+     */
+    public function testGuessFormatter($type, $expected)
+    {
+        self::assertSame(
+            $expected,
+            $this->manager->guessFormatter($type)
+        );
+    }
+
+    public static function guessFormatterDataProvider()
     {
         return [
-            'test formatters' => [
-                new FieldConfigId('test', 'TestClass', 'testField', 'string'),
-                [
-                    'formatters' => ['test_default_format_name', 'test_format_name'],
-                    'default_formatter' => 'test_default_format_name'
-                ]
-            ],
-            'formatter not quessed[not supported type]' => [
-                new FieldConfigId('test', 'TestClass', 'testField', 'datetime'),
-                null
-            ]
+            ['string', 'test_default_format_name'],
+            ['datetime', null]
         ];
     }
 }

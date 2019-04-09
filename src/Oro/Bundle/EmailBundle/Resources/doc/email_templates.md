@@ -65,18 +65,166 @@ Also there are additional Twig functions, filters, and tags, that registered and
 Extend available data in email templates
 ----------------------------------------
 
-Currently, there is only one way to extend available data (variables) in Email templates: to create a Twig function and register this function in the Email templates Twig environment.
+To extend the available data (variables) in Email templates, you can create your own variable provider and processor.
+The variable provider must implement
+[EntityVariablesProviderInterface](../../../EntityBundle/Twig/Sandbox/EntityVariablesProviderInterface.php)
+and be registered in the DI container with the `oro_email.emailtemplate.variable_provider` tag.
+The variable processor must implement
+[VariableProcessorInterface](../../../EntityBundle/Twig/Sandbox/VariableProcessorInterface.php)
+and be registered in the DI container with the `oro_email.emailtemplate.variable_processor` tag.
 
-An example on how to do this - the "order_line_items" twig function:
+An example:
 
-* There is a Class of [custom Twig Extension](https://symfony.com/doc/3.4/templating/twig_extension.html) [Oro\Bundle\CheckoutBundle\Twig\LineItemsExtension](https://github.com/laboro/dev/blob/master/package/commerce/src/Oro/Bundle/CheckoutBundle/Twig/LineItemsExtension.php#L47) that declares the Twig function "order_line_items"
-* This class [registered, actually, as the Twig Extension in DI container](https://github.com/laboro/dev/blob/master/package/commerce/src/Oro/Bundle/CheckoutBundle/Resources/config/services.yml#L115)
-* This Twig Extension added to the Email Twig Environment in the [Oro\Bundle\CheckoutBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass](https://github.com/laboro/dev/blob/master/package/commerce/src/Oro/Bundle/CheckoutBundle/DependencyInjection/Compiler/TwigSandboxConfigurationPass.php#L33)
-* The "order_line_items" function [registered as allowed in the Email Templates](https://github.com/laboro/dev/blob/master/package/commerce/src/Oro/Bundle/CheckoutBundle/DependencyInjection/Compiler/TwigSandboxConfigurationPass.php#L24)
+1. Create a variable provider:
 
-After these steps, the Twig function "order_line_items" became available for usage in Email templates.
+```php
+class MyVariablesProvider implements EntityVariablesProviderInterface
+{
+    public function getVariableDefinitions(string $entityClass = null): array
+    {
+        return [
+            MyEntity::class => [
+                'someVariable' => [
+                    'type'  => RelationType::TO_ONE,
+                    'label' => $this->translator->trans('acme.my_entity.some_variable')
+                ]
+            ]
+        ];
+    }
 
-Please note, that in Emails Templates could be iterated only data sets that contained in plain PHP arrays, not objects or collections. Thereby the custom twig function has to return an array if you need to iterate through this dataset in your Email Templates.
+    public function getVariableGetters(): array
+    {
+        return [];
+    }
+
+    public function getVariableProcessors(string $entityClass): array
+    {
+        if (MyEntity::class === $entityClass) {
+            return [
+                'someVariable'  => [
+                    'processor' => 'my_processor'
+                ]
+            ];
+        }
+
+        return [];
+    }
+}
+```
+
+2. Create a variable processor:
+
+```php
+class MyVariableProcessor implements VariableProcessorInterface
+{
+    public function process(string $variable, array $processorArguments, TemplateData $data): void
+    {
+        $someObject = new SomeObject();
+        $someObject->setName('test')
+
+        $data->setComputedVariable($variable, $someObject);
+    }
+}
+```
+
+3. Register variable provider and processor in the DI container:
+
+```yaml
+services:
+    acme.emailtemplate.my_variable_provider:
+        class: Acme\Bundle\AcmeBundle\Provider\MyVariablesProvider
+        public: false
+        tags:
+            - { name: oro_email.emailtemplate.variable_provider, scope: entity }
+
+    acme.emailtemplate.my_variable_processor:
+        class: Acme\Bundle\AcmeBundle\Provider\MyVariableProcessor
+        public: false
+        tags:
+            - { name: oro_email.emailtemplate.variable_processor, alias: my_processor }
+```
+
+Another way to extend the available data is to create a Twig function and register this function in the Email templates
+Twig environment.
+
+An example:
+
+1. Create a Twig extension:
+
+```php
+class MyExtension extends \Twig_Extension
+{
+    public function getFunctions()
+    {
+        return [new \Twig_SimpleFunction('some_function', [$this, 'getSomeVariableValue'])];
+    }
+
+    public function getSomeVariableValue(MyEntity $entity): array
+    {
+        $result = [];
+        foreach ($entity->getProducts() as $product) {
+            $result[] = [
+                'productName' => $product->getName()
+            ];
+        }
+
+        return $result;
+    }
+}
+```
+
+2. Register the Twig extension in the DI container:
+
+```yaml
+services:
+    acme.twig.my_extension:
+        class: Acme\Bundle\AcmeBundle\Twig\MyExtension
+        public: false
+        tags:
+            - { name: twig.extension }
+```
+
+3. Create a DI compiler pass to register the created extension and function in the Email Twig Environment:
+
+```php
+class TwigSandboxConfigurationPass implements CompilerPassInterface
+{
+    const EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY = 'oro_email.twig.email_security_policy';
+    const EMAIL_TEMPLATE_RENDERER_SERVICE_KEY = 'oro_email.email_renderer';
+
+    /**
+     * {@inheritDoc}
+     */
+    public function process(ContainerBuilder $container)
+    {
+        $securityPolicyDef = $container->getDefinition('oro_email.twig.email_security_policy');
+        $securityPolicyDef->replaceArgument(
+            4,
+            array_merge($securityPolicyDef->getArgument(4), ['some_function'])
+        );
+
+        $container->getDefinition('oro_email.email_renderer')
+            ->addMethodCall('addExtension', [new Reference('acme.twig.my_extension')]);
+    }
+}
+```
+
+4. Register the created compiler pass:
+
+```php
+class AcmeMyBundle extends Bundle
+{
+    public function build(ContainerBuilder $container)
+    {
+        $container->addCompilerPass(new TwigSandboxConfigurationPass());
+
+        parent::build($container);
+    }
+}
+```
+
+Once you complete these steps, the "some_function" Twig function becomes available in Email templates.
+
 
 Basic email template structure
 ------------------------------

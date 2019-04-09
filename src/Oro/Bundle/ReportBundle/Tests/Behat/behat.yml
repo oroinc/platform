@@ -28,6 +28,9 @@ oro_behat_extension:
         locator: '//div[@class="sql-query-container"]//a[text()="Copy to Clipboard"]'
         type: xpath
 
+    Clone Report Button:
+      selector: 'a[title="Clone Report"]'
+
   suites:
     OroReportBundle:
       contexts:

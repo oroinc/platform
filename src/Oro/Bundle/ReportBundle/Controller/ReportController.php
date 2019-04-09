@@ -14,17 +14,24 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Covers the CRUD functionality and the additional operation clone for the Report entity.
+ */
 class ReportController extends Controller
 {
     /**
-     * @Route("/view/{id}", name="oro_report_view", requirements={"id"="\d+"}, defaults={"id"=0})
+     * @Route("/view/{id}", name="oro_report_view", requirements={"id"="\d+"})
      * @Acl(
      *      id="oro_report_view",
      *      type="entity",
      *      permission="VIEW",
      *      class="OroReportBundle:Report"
      * )
+     *
+     * @param Report $entity
+     * @return Response
      */
     public function viewAction(Report $entity)
     {
@@ -114,7 +121,7 @@ class ReportController extends Controller
     }
 
     /**
-     * @Route("/update/{id}", name="oro_report_update", requirements={"id"="\d+"}, defaults={"id"=0})
+     * @Route("/update/{id}", name="oro_report_update", requirements={"id"="\d+"})
      *
      * @Template
      * @Acl(
@@ -123,12 +130,40 @@ class ReportController extends Controller
      *      permission="EDIT",
      *      class="OroReportBundle:Report"
      * )
+     *
+     * @param Report $entity
+     * @return array
      */
     public function updateAction(Report $entity)
     {
         $this->checkReport($entity);
 
         return $this->update($entity);
+    }
+
+    /**
+     * @Route("/clone/{id}", name="oro_report_clone", requirements={"id"="\d+"})
+     * @Template("OroReportBundle:Report:update.html.twig")
+     * @AclAncestor("oro_report_create")
+     *
+     * @param Report $entity
+     * @return array
+     */
+    public function cloneAction(Report $entity)
+    {
+        $this->checkReport($entity);
+
+        $clonedEntity = clone $entity;
+        $clonedEntity->setName(
+            $this->get('translator')->trans(
+                'oro.report.action.clone.name_format',
+                [
+                    '{name}' => $clonedEntity->getName()
+                ]
+            )
+        );
+
+        return $this->update($clonedEntity);
     }
 
     /**

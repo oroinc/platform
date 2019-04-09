@@ -151,6 +151,14 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
      */
     protected $recordsLimit;
 
+    public function __clone()
+    {
+        $this->id = null;
+        $this->lastRun = null;
+        $this->createdAt = null;
+        $this->updatedAt = null;
+    }
+
     /**
      * {@inheritdoc}
      */

@@ -93,6 +93,10 @@ If the value of the expression on the left or right is not the expression object
 
 [Subquery](../../AccessRule/Expr/Subquery.php) is used to build a subquery.
 
+### Association
+
+[Association](../../AccessRule/Expr/Association.php) is used to make a check of access rules by related association.
+
 ## Add a New Access Rule
 
 To add a new access rule, create a new class that implements [AccessRuleInterface](../../AccessRule/AccessRuleInterface.php), for example:

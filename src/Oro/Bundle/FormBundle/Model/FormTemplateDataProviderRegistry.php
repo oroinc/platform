@@ -2,48 +2,48 @@
 
 namespace Oro\Bundle\FormBundle\Model;
 
-use Oro\Bundle\FormBundle\Exception\UnknownProviderException;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
-use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
-use Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface;
-use Oro\Component\DependencyInjection\ServiceLinkRegistryAwareTrait;
+use Psr\Container\ContainerInterface;
 
 /**
- * Registry of form template data provider services by their aliases.
- *
- * Has late construction (instantiation) mechanism (internal resolving from service links registry),
- * as all instances of providers not needed in a single request runtime.
+ * The container for form template data providers.
  */
-class FormTemplateDataProviderRegistry implements ServiceLinkRegistryAwareInterface
+class FormTemplateDataProviderRegistry
 {
-    const DEFAULT_PROVIDER_NAME = 'default';
+    public const DEFAULT_PROVIDER_NAME = 'default';
 
-    use ServiceLinkRegistryAwareTrait;
+    /** @var ContainerInterface */
+    private $providers;
+
+    /**
+     * @param ContainerInterface $providers
+     */
+    public function __construct(ContainerInterface $providers)
+    {
+        $this->providers = $providers;
+    }
+
+    /**
+     * @param string $alias
+     *
+     * @return bool
+     */
+    public function has(string $alias): bool
+    {
+        return $this->providers->has($alias);
+    }
 
     /**
      * @param string $alias
      *
      * @return FormTemplateDataProviderInterface
      */
-    public function get($alias)
+    public function get(string $alias): FormTemplateDataProviderInterface
     {
-        try {
-            $provider = $this->serviceLinkRegistry->get($alias);
-        } catch (UnknownAliasException $parent) {
-            throw new UnknownProviderException($alias, $parent);
+        if (!$this->providers->has($alias)) {
+            throw new \LogicException(sprintf('Unknown provider with alias "%s".', $alias));
         }
 
-        if (!$provider instanceof FormTemplateDataProviderInterface) {
-            throw new \DomainException(
-                sprintf(
-                    'Form data provider `%s` with `%s` alias must implement %s.',
-                    get_class($provider),
-                    $alias,
-                    FormTemplateDataProviderInterface::class
-                )
-            );
-        }
-
-        return $provider;
+        return $this->providers->get($alias);
     }
 }

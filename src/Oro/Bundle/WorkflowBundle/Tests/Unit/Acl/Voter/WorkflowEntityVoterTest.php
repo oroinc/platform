@@ -230,7 +230,7 @@ class WorkflowEntityVoterTest extends \PHPUnit\Framework\TestCase
                 ->getMock();
         if ($entityClass && $entityIdentifier) {
             $aclIdentityRepository->expects($this->any())
-                ->method('findByClassAndIdentifier')
+                ->method('findByClassAndIdentifierAndActiveWorkflows')
                 ->with($entityClass, $entityIdentifier)
                 ->will($this->returnValue($aclIdentities));
         }

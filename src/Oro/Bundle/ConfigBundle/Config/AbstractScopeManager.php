@@ -23,6 +23,9 @@ abstract class AbstractScopeManager
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var ConfigBag */
+    protected $configBag;
+
     /** @var array */
     protected $changedSettings = [];
 
@@ -30,15 +33,18 @@ abstract class AbstractScopeManager
      * @param ManagerRegistry          $doctrine
      * @param CacheProvider            $cache
      * @param EventDispatcherInterface $eventDispatcher
+     * @param ConfigBag                $configBag
      */
     public function __construct(
         ManagerRegistry $doctrine,
         CacheProvider $cache,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        ConfigBag $configBag
     ) {
         $this->doctrine = $doctrine;
         $this->cache    = $cache;
         $this->eventDispatcher = $eventDispatcher;
+        $this->configBag = $configBag;
     }
 
     /**
@@ -402,7 +408,57 @@ abstract class AbstractScopeManager
             return [];
         }
 
-        return SettingsConverter::convertToSettings($config);
+        return $this->normalizeSettings(SettingsConverter::convertToSettings($config));
+    }
+
+    /**
+     * @param array $settings
+     * @return array
+     */
+    protected function normalizeSettings(array $settings): array
+    {
+        $configFields = $this->configBag->getConfig()['fields'];
+        foreach ($settings as $section => $sectionSettings) {
+            foreach ($sectionSettings as $key => $setting) {
+                $settingPath = sprintf('%s.%s', $section, $key);
+                if (empty($configFields[$settingPath])
+                    || $setting['value'] === null
+                    || empty($configFields[$settingPath]['data_type'])
+                ) {
+                    continue;
+                }
+
+                $normalizedValue = $this->normalizeSettingValue(
+                    $configFields[$settingPath]['data_type'],
+                    $setting['value']
+                );
+
+                if ($normalizedValue !== null) {
+                    $settings[$section][$key]['value'] = $normalizedValue;
+                }
+            }
+        }
+
+        return $settings;
+    }
+
+    /**
+     * @param string $dataType
+     * @param mixed $value
+     * @return mixed
+     */
+    protected function normalizeSettingValue(string $dataType, $value)
+    {
+        switch ($dataType) {
+            case 'integer':
+                return (integer) $value;
+            case 'decimal':
+                return (float) $value;
+            case 'boolean':
+                return (boolean) $value;
+            default:
+                return null;
+        }
     }
 
     /**

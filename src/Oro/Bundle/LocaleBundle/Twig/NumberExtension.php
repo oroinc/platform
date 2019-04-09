@@ -38,23 +38,19 @@ class NumberExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFunction(
                 'oro_locale_number_attribute',
-                [$this, 'getAttribute'],
-                ['is_safe' => ['html']]
+                [$this, 'getAttribute']
             ),
             new \Twig_SimpleFunction(
                 'oro_locale_number_text_attribute',
-                [$this, 'getTextAttribute'],
-                ['is_safe' => ['html']]
+                [$this, 'getTextAttribute']
             ),
             new \Twig_SimpleFunction(
                 'oro_locale_number_symbol',
-                [$this, 'getSymbol'],
-                ['is_safe' => ['html']]
+                [$this, 'getSymbol']
             ),
             new \Twig_SimpleFunction(
                 'oro_currency_symbol_prepend',
-                [$this, 'isCurrencySymbolPrepend'],
-                ['is_safe' => ['html']]
+                [$this, 'isCurrencySymbolPrepend']
             )
         ];
     }
@@ -67,8 +63,7 @@ class NumberExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFilter(
                 'oro_format_number',
-                [$this, 'format'],
-                ['is_safe' => ['html']]
+                [$this, 'format']
             ),
             new \Twig_SimpleFilter(
                 'oro_format_currency',
@@ -77,28 +72,23 @@ class NumberExtension extends \Twig_Extension
             ),
             new \Twig_SimpleFilter(
                 'oro_format_decimal',
-                [$this, 'formatDecimal'],
-                ['is_safe' => ['html']]
+                [$this, 'formatDecimal']
             ),
             new \Twig_SimpleFilter(
                 'oro_format_percent',
-                [$this, 'formatPercent'],
-                ['is_safe' => ['html']]
+                [$this, 'formatPercent']
             ),
             new \Twig_SimpleFilter(
                 'oro_format_spellout',
-                [$this, 'formatSpellout'],
-                ['is_safe' => ['html']]
+                [$this, 'formatSpellout']
             ),
             new \Twig_SimpleFilter(
                 'oro_format_duration',
-                [$this, 'formatDuration'],
-                ['is_safe' => ['html']]
+                [$this, 'formatDuration']
             ),
             new \Twig_SimpleFilter(
                 'oro_format_ordinal',
-                [$this, 'formatOrdinal'],
-                ['is_safe' => ['html']]
+                [$this, 'formatOrdinal']
             ),
         ];
     }
@@ -111,7 +101,7 @@ class NumberExtension extends \Twig_Extension
      * @param string|null $locale
      * @param array $attributes
      *
-     * @return int
+     * @return bool|int
      */
     public function getAttribute($attribute, $style = null, $locale = null, $attributes = [])
     {
@@ -125,7 +115,7 @@ class NumberExtension extends \Twig_Extension
      * @param string|null $style
      * @param string|null $locale
      *
-     * @return string
+     * @return bool|int
      */
     public function getTextAttribute($attribute, $style = null, $locale = null)
     {
@@ -139,7 +129,7 @@ class NumberExtension extends \Twig_Extension
      * @param string|null $style
      * @param string|null $locale
      *
-     * @return string
+     * @return bool|int
      */
     public function getSymbol($symbol, $style = null, $locale = null)
     {
@@ -217,8 +207,10 @@ class NumberExtension extends \Twig_Extension
         $symbols = (array)$this->getOption($options, 'symbols', []);
         $locale = $this->getOption($options, 'locale');
 
-        return $this->getNumberFormatter()
+        $formattedValue = $this->getNumberFormatter()
             ->formatCurrency($value, $currency, $attributes, $textAttributes, $symbols, $locale);
+
+        return strip_tags($formattedValue);
     }
 
     /**

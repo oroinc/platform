@@ -23,11 +23,6 @@ class ImageSrcFormatterTest extends \PHPUnit\Framework\TestCase
         $this->formatter = new ImageSrcFormatter($this->manager);
     }
 
-    public function testGetFormatterName()
-    {
-        $this->assertEquals('image_src', $this->formatter->getFormatterName());
-    }
-
     public function testFormat()
     {
         $file = new File();
@@ -38,16 +33,6 @@ class ImageSrcFormatterTest extends \PHPUnit\Framework\TestCase
             ->with($file, 100, 100)
             ->willReturn('http://test.com/image.png');
         $this->assertEquals('http://test.com/image.png', $this->formatter->format($file));
-    }
-
-    public function testGetSupportedTypes()
-    {
-        $this->assertEquals(['image'], $this->formatter->getSupportedTypes());
-    }
-
-    public function testIsDefaultFormatter()
-    {
-        $this->assertFalse($this->formatter->isDefaultFormatter());
     }
 
     public function testGetDefaultValue()

@@ -9,7 +9,11 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
+/**
+ * Covers the CRUD functionality and the additional operation clone for the Segment entity.
+ */
 class SegmentController extends Controller
 {
     /**
@@ -30,7 +34,7 @@ class SegmentController extends Controller
     }
 
     /**
-     * @Route("/view/{id}", name="oro_segment_view", requirements={"id"="\d+"}, defaults={"id"=0})
+     * @Route("/view/{id}", name="oro_segment_view", requirements={"id"="\d+"})
      * @Acl(
      *      id="oro_segment_view",
      *      type="entity",
@@ -38,6 +42,9 @@ class SegmentController extends Controller
      *      class="OroSegmentBundle:Segment"
      * )
      * @Template
+     *
+     * @param Segment $entity
+     * @return array
      */
     public function viewAction(Segment $entity)
     {
@@ -78,7 +85,7 @@ class SegmentController extends Controller
     }
 
     /**
-     * @Route("/update/{id}", name="oro_segment_update", requirements={"id"="\d+"}, defaults={"id"=0})
+     * @Route("/update/{id}", name="oro_segment_update", requirements={"id"="\d+"})
      *
      * @Template
      * @Acl(
@@ -87,6 +94,9 @@ class SegmentController extends Controller
      *      permission="EDIT",
      *      class="OroSegmentBundle:Segment"
      * )
+     *
+     * @param Segment $entity
+     * @return array
      */
     public function updateAction(Segment $entity)
     {
@@ -96,11 +106,36 @@ class SegmentController extends Controller
     }
 
     /**
-     * @Route("/refresh/{id}", name="oro_segment_refresh", requirements={"id"="\d+"}, defaults={"id"=0})
+     * @Route("/clone/{id}", name="oro_segment_clone", requirements={"id"="\d+"})
+     * @Template("OroSegmentBundle:Segment:update.html.twig")
+     * @AclAncestor("oro_segment_create")
      *
      * @param Segment $entity
      * @return array
+     */
+    public function cloneAction(Segment $entity)
+    {
+        $this->checkSegment($entity);
+
+        $clonedEntity = clone $entity;
+        $clonedEntity->setName(
+            $this->get('translator')->trans(
+                'oro.segment.action.clone.name_format',
+                [
+                    '{name}' => $clonedEntity->getName()
+                ]
+            )
+        );
+
+        return $this->update($clonedEntity);
+    }
+
+    /**
+     * @Route("/refresh/{id}", name="oro_segment_refresh", requirements={"id"="\d+"})
      * @AclAncestor("oro_segment_update")
+     *
+     * @param Segment $entity
+     * @return RedirectResponse
      */
     public function refreshAction(Segment $entity)
     {

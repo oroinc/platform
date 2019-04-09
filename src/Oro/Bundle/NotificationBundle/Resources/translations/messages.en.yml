@@ -43,6 +43,9 @@ oro:
             additional_associations.tooltip: "<b>Additional Associations</b>: Additional notification may be sent to the emails available in the associated entities records, if selected."
             additional_emails.tooltip: "<b>Contact Emails</b>: A list of the selected entity fields marked as email contact information."
 
+            datagrid:
+                entity_hint: transactional emails
+
         massnotification:
             entity_label:         Maintenance Notification
             entity_plural_label:  Maintenance Notifications

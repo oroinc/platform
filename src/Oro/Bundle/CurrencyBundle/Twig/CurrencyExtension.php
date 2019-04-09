@@ -121,8 +121,10 @@ class CurrencyExtension extends \Twig_Extension
         $symbols = (array)$this->getOption($options, 'symbols', []);
         $locale = $this->getOption($options, 'locale');
 
-        return $this->getNumberFormatter()
+        $formattedValue = $this->getNumberFormatter()
             ->formatCurrency($value, $currency, $attributes, $textAttributes, $symbols, $locale);
+
+        return strip_tags($formattedValue);
     }
 
     /**

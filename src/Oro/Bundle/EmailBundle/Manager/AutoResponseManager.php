@@ -25,9 +25,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class AutoResponseManager
+ * Provides methods to manage auto-response rules.
  *
- * @package Oro\Bundle\EmailBundle\Manager
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class AutoResponseManager
@@ -223,9 +222,6 @@ class AutoResponseManager
      */
     protected function applyTemplate(EmailModel $emailModel, EmailTemplate $template, Email $email)
     {
-        $locales        = array_merge($email->getAcceptedLocales(), [$this->defaultLocale]);
-        $flippedLocales = array_flip($locales);
-
         $translatedSubjects = [];
         $translatedContents = [];
         foreach ($template->getTranslations() as $translation) {
@@ -239,22 +235,26 @@ class AutoResponseManager
             }
         }
 
-        $comparator = ArrayUtil::createOrderedComparator($flippedLocales);
+        $locales = array_flip(array_merge($email->getAcceptedLocales(), [$this->defaultLocale]));
+        $comparator = ArrayUtil::createOrderedComparator($locales);
         uksort($translatedSubjects, $comparator);
         uksort($translatedContents, $comparator);
 
-        $validContents = array_intersect_key($translatedContents, $flippedLocales);
-        $validsubjects = array_intersect_key($translatedSubjects, $flippedLocales);
+        $subjects = array_intersect_key($translatedSubjects, $locales);
+        $subject = reset($subjects);
+        if (false === $subject) {
+            $subject = $template->getSubject() ?? '';
+        }
 
-        $content = reset($validContents);
-        $subject = reset($validsubjects);
-
-        $content = $content === false ? $template->getContent() : $content;
-        $subject = $subject === false ? $template->getSubject() : $subject;
+        $contents = array_intersect_key($translatedContents, $locales);
+        $content = reset($contents);
+        if (false === $content) {
+            $content = $template->getContent() ?? '';
+        }
 
         $emailModel
-            ->setSubject($this->emailRender->renderWithDefaultFilters($subject, ['entity' => $email]))
-            ->setBody($this->emailRender->renderWithDefaultFilters($content, ['entity' => $email]))
+            ->setSubject($this->emailRender->renderTemplate($subject, ['entity' => $email]))
+            ->setBody($this->emailRender->renderTemplate($content, ['entity' => $email]))
             ->setType($template->getType());
     }
 

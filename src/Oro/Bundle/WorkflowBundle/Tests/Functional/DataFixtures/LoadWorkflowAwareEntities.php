@@ -27,6 +27,7 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
     {
         $this->generateEntities($manager, [LoadWorkflowDefinitions::NO_START_STEP, LoadWorkflowDefinitions::MULTISTEP]);
         $this->generateEntities($manager, [LoadWorkflowDefinitions::WITH_START_STEP]);
+        $this->generateEntities($manager, ['test_active_flow1', 'test_active_flow2']);
     }
 
     /**

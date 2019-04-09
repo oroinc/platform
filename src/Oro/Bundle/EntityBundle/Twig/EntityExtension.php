@@ -10,6 +10,9 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
+/**
+ * Entity related twig functions and filters
+ */
 class EntityExtension extends \Twig_Extension
 {
     /** @var ContainerInterface */
@@ -83,7 +86,7 @@ class EntityExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('oro_format_name', [$this, 'getEntityName'], ['is_safe' => ['html']])
+            new \Twig_SimpleFilter('oro_format_name', [$this, 'getEntityName'])
         ];
     }
 

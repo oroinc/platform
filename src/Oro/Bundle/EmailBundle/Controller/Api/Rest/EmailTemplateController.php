@@ -10,7 +10,7 @@ use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
-use Oro\Bundle\EmailBundle\Provider\VariablesProvider;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;

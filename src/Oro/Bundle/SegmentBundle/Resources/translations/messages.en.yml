@@ -2,6 +2,11 @@ oro:
     segment:
         action:
             refresh: Refresh segment
+            clone:
+                button:
+                    label: Clone
+                    title: Clone Segment
+                name_format: Copy of {name}
 
         menu:
             reports_tab.label: Reports & Segments

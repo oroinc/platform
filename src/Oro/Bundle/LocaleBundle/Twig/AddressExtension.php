@@ -6,6 +6,9 @@ use Oro\Bundle\LocaleBundle\Formatter\AddressFormatter;
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Twig extension for Address manipulations
+ */
 class AddressExtension extends \Twig_Extension
 {
     /** @var ContainerInterface */
@@ -35,8 +38,7 @@ class AddressExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFilter(
                 'oro_format_address',
-                [$this, 'formatAddress'],
-                ['is_safe' => ['html']]
+                [$this, 'formatAddress']
             )
         ];
     }

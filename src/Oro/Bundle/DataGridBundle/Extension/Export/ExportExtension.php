@@ -11,6 +11,9 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * This extension is responsible for export-related configurations management in datagrid
+ */
 class ExportExtension extends AbstractExtension
 {
     const EXPORT_OPTION_PATH = '[options][export]';
@@ -100,6 +103,7 @@ class ExportExtension extends AbstractExtension
         // query builder, some functional also uses Grid building without security context set
         return
             null !== $this->tokenStorage->getToken()
-            && $this->authorizationChecker->isGranted('oro_datagrid_gridview_export');
+            && $this->authorizationChecker->isGranted('oro_datagrid_gridview_export')
+            && $this->authorizationChecker->isGranted('VIEW;entity:OroImportExportBundle:ImportExportResult');
     }
 }
