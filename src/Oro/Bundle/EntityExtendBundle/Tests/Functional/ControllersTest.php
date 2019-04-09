@@ -3,9 +3,13 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\UIBundle\Route\Router;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @group dist
@@ -127,6 +131,35 @@ class ControllersTest extends AbstractConfigControllerTest
             $result = $this->client->getResponse();
             $this->assertHtmlResponseStatusCodeEquals($result, 200);
             $this->assertContains('Field saved', $result->getContent());
+        }
+    }
+
+    /**
+     * @depends testView
+     */
+    public function testCreateEnumField($id)
+    {
+        $types = ['multiEnum', 'enum'];
+        $entityName = $this->getEntityConfigModelById($id)->getClassName();
+
+        foreach ($types as $type) {
+            $crawler = $this->client->request(
+                Request::METHOD_GET,
+                $this->getUrl("oro_entityextend_field_create", ['id' => $id])
+            );
+
+            $name = "name" . strtolower($type);
+            $translationKeys = $this->generateTranslationKeysByEntityField($entityName, $name);
+            $crawler = $this->getCrawlerAfterSubmittingFieldRelationForm($crawler, $name, $type);
+
+            $result = $this->client->getResponse();
+            $this->assertHtmlResponseStatusCodeEquals($result, 200);
+            $form = $crawler->selectButton('Save and Close')->form();
+            $this->client->submit($form);
+            $result = $this->client->getResponse();
+            $this->assertHtmlResponseStatusCodeEquals($result, 200);
+            $this->assertContains('Field saved', $result->getContent());
+            $this->assertEntityTranslations($translationKeys);
         }
     }
 
@@ -293,6 +326,19 @@ class ControllersTest extends AbstractConfigControllerTest
         );
     }
 
+    public function assertEntityTranslations($translationKeys)
+    {
+        /** @var TranslationManager $translationManager */
+        $translationManager = $this->getContainer()->get('oro_translation.manager.translation');
+
+        foreach ($translationKeys as $key) {
+            $translationKey = $translationManager->findTranslationKey($key);
+            $this->assertNotNull($translationKey->getId());
+            $this->assertEquals($key, $translationKey->getKey());
+            $this->assertEquals(TranslationManager::DEFAULT_DOMAIN, $translationKey->getDomain());
+        }
+    }
+
     /**
      * @param Crawler $crawler
      * @param string $name
@@ -308,6 +354,38 @@ class ControllersTest extends AbstractConfigControllerTest
         $this->client->followRedirects(true);
 
         return $this->client->submit($form, [Router::ACTION_PARAMETER => $continueButton->attr('data-action')]);
+    }
+
+    /**
+     * @param $id
+     *
+     * @return EntityConfigModel
+     */
+    private function getEntityConfigModelById($id): EntityConfigModel
+    {
+        $configManager = $this->getContainer()->get('oro_entity_config.config_manager');
+
+        return $configManager
+            ->getEntityManager()
+            ->getRepository(EntityConfigModel::class)
+            ->find($id);
+    }
+
+    /**
+     * @param $entityName
+     * @param $entityField
+     *
+     * @return array
+     */
+    private function generateTranslationKeysByEntityField($entityName, $entityField): array
+    {
+        $enumCode = ExtendHelper::generateEnumCode($entityName, $entityField);
+
+        return [
+            ExtendHelper::getEnumTranslationKey('label', $enumCode),
+            ExtendHelper::getEnumTranslationKey('plural_label', $enumCode),
+            ExtendHelper::getEnumTranslationKey('description', $enumCode),
+        ];
     }
 
     /**
