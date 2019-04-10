@@ -281,33 +281,6 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $enumCode must not be empty.
-     */
-    public function testApplyEnumNameTransWithEmptyEnumCode()
-    {
-        $this->synchronizer->applyEnumNameTrans('', 'Test Enum', 'fr');
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $enumName must not be empty.
-     */
-    public function testApplyEnumNameTransWithEmptyEnumName()
-    {
-        $this->synchronizer->applyEnumNameTrans('test_enum', '', 'fr');
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $locale must not be empty.
-     */
-    public function testApplyEnumNameTransWithEmptyLocale()
-    {
-        $this->synchronizer->applyEnumNameTrans('test_enum', 'Test Enum', null);
-    }
-
     public function testApplyEnumNameTransNoChanges()
     {
         $enumCode = 'test_enum';
@@ -326,7 +299,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrine->expects($this->never())
             ->method('getManagerForClass');
-        $this->translationHelper->expects($this->once())
+        $this->translationHelper->expects($this->never())
             ->method('saveTranslations')
             ->with([]);
 
@@ -356,6 +329,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->with([
                 ExtendHelper::getEnumTranslationKey('label', $enumCode) => $enumName,
                 ExtendHelper::getEnumTranslationKey('plural_label', $enumCode) => $enumName,
+                ExtendHelper::getEnumTranslationKey('description', $enumCode) => $enumName,
             ]);
 
         $this->synchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
@@ -382,6 +356,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->with([
                 ExtendHelper::getEnumTranslationKey('label', $enumCode) => $enumName,
                 ExtendHelper::getEnumTranslationKey('plural_label', $enumCode) => $enumName,
+                ExtendHelper::getEnumTranslationKey('description', $enumCode) => $enumName,
             ]);
 
         $this->synchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
@@ -408,7 +383,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->with([
                 ExtendHelper::getEnumTranslationKey('label', $enumCode) => $enumName,
                 ExtendHelper::getEnumTranslationKey('plural_label', $enumCode) => $enumName,
-                ExtendHelper::getEnumTranslationKey('description', $enumCode) => '',
+                ExtendHelper::getEnumTranslationKey('description', $enumCode) => $enumName,
             ]);
 
         $this->synchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
