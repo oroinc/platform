@@ -1120,20 +1120,73 @@ define(function(require) {
             };
 
             if (this.noColumnsFlag || _.isEmpty(this.collection.state.filters)) {
-                var translation = this.noColumnsFlag
-                    ? this.noDataTranslations.noColumns : this.noDataTranslations.noEntities;
-
-                messageHTML = this.noDataTemplate({
-                    text: __(translation, placeholders)
-                });
+                if (_.has(this.noDataMessages, 'emptyGrid')) {
+                    messageHTML = this.getEmptyGridCustomMessage(this.noDataMessages.emptyGrid);
+                } else {
+                    messageHTML = this.getEmptyGridMessage(placeholders);
+                }
             } else {
-                messageHTML = this.noSearchResultsTemplate({
-                    title: __(this.noDataTranslations.noResultsTitle),
-                    text: __(this.noDataTranslations.noResults, placeholders)
-                });
+                if (_.has(this.noDataMessages, 'emptyFilteredGrid')) {
+                    messageHTML = this.getEmptySearchResultCustomMessage(this.noDataMessages.emptyFilteredGrid);
+                } else {
+                    messageHTML = this.getEmptySearchResultMessage(placeholders);
+                }
             }
 
             this.$(this.selectors.noDataBlock).html(messageHTML);
+        },
+
+        /**
+         * Custom not found entities message when grid result is empty after applying the filters
+         *
+         * @param {String} message
+         * @returns {String}
+         */
+        getEmptySearchResultCustomMessage: function(message) {
+            return this.noSearchResultsTemplate({
+                title: __(this.noDataTranslations.noResultsTitle),
+                text: message
+            });
+        },
+
+        /**
+         * Not found entities message when grid result is empty
+         *
+         * @param {Object} placeholders
+         * @returns {String}
+         */
+        getEmptyGridMessage: function(placeholders) {
+            var translation = this.noColumnsFlag
+                ? this.noDataTranslations.noColumns : this.noDataTranslations.noEntities;
+
+            return this.noDataTemplate({
+                text: __(translation, placeholders)
+            });
+        },
+
+        /**
+         * Custom not found entities message when grid result is empty
+         *
+         * @param {String} message
+         * @returns {String}
+         */
+        getEmptyGridCustomMessage: function(message) {
+            return this.noDataTemplate({
+                text: message
+            });
+        },
+
+        /**
+         * Not found entities message when grid result is empty after applying the filters
+         *
+         * @param {Object} placeholders
+         * @returns {String}
+         */
+        getEmptySearchResultMessage: function(placeholders) {
+            return this.noSearchResultsTemplate({
+                title: __(this.noDataTranslations.noResultsTitle),
+                text: __(this.noDataTranslations.noResults, placeholders)
+            });
         },
 
         /**

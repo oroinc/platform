@@ -9,6 +9,9 @@ oro_behat_extension:
           Entity: oro_segment_form[entity]
           Segment Type: oro_segment_form[type]
 
+    Clone Segment Button:
+      selector: 'a[title="Clone Segment"]'
+
   suites:
     OroSegmentBundle:
       contexts:

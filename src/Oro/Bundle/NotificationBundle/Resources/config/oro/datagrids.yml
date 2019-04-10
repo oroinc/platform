@@ -85,7 +85,7 @@ datagrids:
 
     email-notification-grid:
         options:
-            entityHint: transactional emails
+            entityHint: oro.notification.emailnotification.datagrid.entity_hint
             entity_pagination: true
         acl_resource: oro_notification_emailnotification_view
         extended_entity_name: 'Oro\Bundle\NotificationBundle\Entity\EmailNotification'

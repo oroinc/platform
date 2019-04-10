@@ -1,5 +1,9 @@
 datagrids:
     items-grid:
+        options:
+            noDataMessages:
+                emptyGrid: translation.trans1
+                emptyFilteredGrid: translation.trans2
         source:
             type: orm
             query:

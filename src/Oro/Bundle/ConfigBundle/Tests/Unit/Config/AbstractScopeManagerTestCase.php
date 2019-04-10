@@ -7,6 +7,7 @@ use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ConfigBundle\Config\AbstractScopeManager;
+use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository;
@@ -14,6 +15,9 @@ use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+/**
+ * Abstract test case for scope manager unit tests.
+ */
 abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
@@ -29,6 +33,9 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
 
     /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
     protected $dispatcher;
+
+    /** @var ConfigBag|\PHPUnit\Framework\MockObject\MockObject */
+    protected $configBag;
 
     /** @var CacheProvider */
     protected $cache;
@@ -47,8 +54,9 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $this->cache = new ArrayCache();
 
         $this->dispatcher = $this->createMock(EventDispatcher::class);
+        $this->configBag = $this->createMock(ConfigBag::class);
 
-        $this->manager = $this->createManager($doctrine, $this->cache, $this->dispatcher);
+        $this->manager = $this->createManager($doctrine, $this->cache, $this->dispatcher, $this->configBag);
     }
 
     /**
@@ -91,6 +99,82 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->manager->getSettingValue('oro_user.greeting'));
         $this->assertNull($this->manager->getSettingValue('oro_test.nosetting'));
         $this->assertNull($this->manager->getSettingValue('noservice.nosetting'));
+    }
+
+    /**
+     * @dataProvider getInfoLoadedWithNormalizationProvider
+     *
+     * @param string $rawValue
+     * @param string $dataType
+     * @param mixed $expectedValue
+     */
+    public function testGetInfoLoadedWithNormalization(string $rawValue, string $dataType, $expectedValue)
+    {
+        /** @var ConfigValue $configValue1 */
+        $configValue1 = $this->getEntity(
+            ConfigValue::class,
+            [
+                'section' => 'oro_user',
+                'name' => 'level',
+                'value' => $rawValue,
+                'type' => 'scalar',
+            ]
+        );
+
+        $config = new Config();
+        $config->getValues()->add($configValue1);
+
+        $this->repo->expects($this->once())
+            ->method('findByEntity')
+            ->with($this->getScopedEntityName(), 0)
+            ->willReturn($config);
+
+        $key = $this->getScopedEntityName() . '_0';
+        $this->assertFalse($this->cache->contains($key));
+
+        $settingPath = 'oro_user.level';
+        $this->configBag->expects($this->any())
+            ->method('getConfig')
+            ->willReturn([
+                'fields' => [
+                    $settingPath => [
+                        'data_type' => $dataType,
+                    ],
+                ],
+            ]);
+        $this->manager->getInfo($settingPath);
+
+        $fromCache = $this->cache->fetch($key);
+        $fromConfig = $this->getCachedConfig($config);
+        $this->assertEquals($fromCache, $fromConfig);
+        $this->assertNotSame($fromCache['oro_user']['level']['value'], $fromConfig['oro_user']['level']['value']);
+        $this->assertSame($expectedValue, $fromCache['oro_user']['level']['value']);
+    }
+
+    public function getInfoLoadedWithNormalizationProvider()
+    {
+        return [
+            'integer' => [
+                'rawValue' => '1000',
+                'dataType' => 'integer',
+                'expectedValue' => 1000,
+            ],
+            'decimal' => [
+                'rawValue' => '1000.42',
+                'dataType' => 'decimal',
+                'expectedValue' => 1000.42,
+            ],
+            'boolean' => [
+                'rawValue' => '1',
+                'dataType' => 'boolean',
+                'expectedValue' => true,
+            ],
+            'boolean negative' => [
+                'rawValue' => '',
+                'dataType' => 'boolean',
+                'expectedValue' => false,
+            ],
+        ];
     }
 
     /**
@@ -283,13 +367,15 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
      * @param ManagerRegistry $doctrine
      * @param CacheProvider $cache
      * @param EventDispatcher $eventDispatcher
+     * @param ConfigBag $configBag
      *
      * @return AbstractScopeManager
      */
     abstract protected function createManager(
         ManagerRegistry $doctrine,
         CacheProvider $cache,
-        EventDispatcher $eventDispatcher
+        EventDispatcher $eventDispatcher,
+        ConfigBag $configBag
     );
 
     /**

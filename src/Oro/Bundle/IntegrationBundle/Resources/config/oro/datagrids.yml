@@ -81,7 +81,7 @@ datagrids:
                 order:        30
         action_configuration: ['@oro_integration.datagrid.action_configuration', 'getIsSyncAvailableCondition']
         options:
-            entityHint: channels
+            entityHint: oro.integration.channel.entity_plural_label
             entity_pagination: true
             mass_actions:
                 delete:

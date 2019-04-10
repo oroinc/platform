@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-
+/**
+ * Outdated class that is kept to avoid BC break.
+ * @deprecated will be removed in v4.0
+ */
 class DebugConfigCache extends ConfigCache
 {
     /**
@@ -11,20 +13,6 @@ class DebugConfigCache extends ConfigCache
      */
     public function saveConfig(ConfigInterface $config, $localCacheOnly = false)
     {
-        $configId = $config->getId();
-        if ($configId instanceof FieldConfigId && null === $configId->getFieldType()) {
-            // undefined field type can cause unpredictable logical bugs
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'A field config "%s::%s" with undefined field type cannot be cached.'
-                    . ' It seems that there is some critical bug in entity config core functionality.'
-                    . ' Please contact ORO team if you see this error.',
-                    $configId->getClassName(),
-                    $configId->getFieldName()
-                )
-            );
-        }
-
         return parent::saveConfig($config, $localCacheOnly);
     }
 
@@ -33,19 +21,6 @@ class DebugConfigCache extends ConfigCache
      */
     public function saveFieldConfigValues(array $values, $className, $fieldName, $fieldType)
     {
-        if (!$fieldType) {
-            // undefined field type can cause unpredictable logical bugs
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'A field config "%s::%s" with undefined field type cannot be cached.'
-                    . ' It seems that there is some critical bug in entity config core functionality.'
-                    . ' Please contact ORO team if you see this error.',
-                    $className,
-                    $fieldName
-                )
-            );
-        }
-
         return parent::saveFieldConfigValues($values, $className, $fieldName, $fieldType);
     }
 }

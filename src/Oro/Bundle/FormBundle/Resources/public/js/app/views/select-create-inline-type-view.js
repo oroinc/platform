@@ -8,6 +8,7 @@ define(function(require) {
     var routing = require('routing');
     var DialogWidget = require('oro/dialog-widget');
     var BaseView = require('oroui/js/app/views/base/view');
+    var PageableCollection = require('orodatagrid/js/pageable-collection');
 
     SelectCreateInlineTypeView = BaseView.extend({
         autoRender: true,
@@ -28,6 +29,11 @@ define(function(require) {
             'click .entity-select-btn': 'onSelect',
             'click .entity-create-btn': 'onCreate'
         },
+
+        listen: {
+            'grid_load:complete mediator': 'onGridLoadComplete'
+        },
+
         /**
          * @inheritDoc
          */
@@ -73,6 +79,67 @@ define(function(require) {
 
             this.dialogWidget.once('grid-row-select', _.bind(this.onGridRowSelect, this));
             this.dialogWidget.render();
+        },
+
+        /**
+         * Add query_additional_params to select datagrid AJAX request to have them passed in both cases
+         * when grid is loaded in widget and when grid data is loaded with AJAX requests like pager, search, etc.
+         *
+         * @param {Object} collection
+         */
+        onGridLoadComplete: function(collection) {
+            var routeParams = this.buildRouteParams('grid');
+            if (collection.inputName === routeParams.gridName) {
+                var additionalParameters = _.extend(
+                    {},
+                    this.select2QueryAdditionalParams,
+                    this.$(this.inputSelector).data('select2_query_additional_params')
+                );
+                this._patchGridCollectionUrl(collection, additionalParameters);
+            }
+        },
+
+        /**
+         * @param {Object} collection
+         * @param {Object} params
+         * @private
+         */
+        _patchGridCollectionUrl: function(collection, params) {
+            if (!_.isUndefined(collection)) {
+                var url = collection.url;
+                if (_.isUndefined(url)) {
+                    return;
+                }
+                var newParams = _.extend(this._getQueryParamsFromUrl(url), params);
+                if (url.indexOf('?') !== -1) {
+                    url = url.substring(0, url.indexOf('?'));
+                }
+                if (!_.isEmpty(newParams)) {
+                    collection.url = url + '?' + $.param(newParams);
+                }
+            }
+        },
+
+        /**
+         * @param {String} url
+         * @return {Object}
+         * @private
+         */
+        _getQueryParamsFromUrl: function(url) {
+            if (_.isUndefined(url)) {
+                return {};
+            }
+
+            if (url.indexOf('?') === -1) {
+                return {};
+            }
+
+            var query = url.substring(url.indexOf('?') + 1, url.length);
+            if (!query.length) {
+                return {};
+            }
+
+            return PageableCollection.decodeStateData(query);
         },
 
         onDialogClose: function() {

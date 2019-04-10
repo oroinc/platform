@@ -28,6 +28,10 @@ datagrids:
                 type:       url
                 route:      oro_segment_update
                 params:     [ id ]
+            clone_link:
+                type:       url
+                route:      oro_segment_clone
+                params:     [ id ]
             delete_link:
                 type:       url
                 route:      oro_api_delete_segment
@@ -94,6 +98,14 @@ datagrids:
                 link:          update_link
                 launcherOptions:
                     className: 'no-hash mobile-hide'
+            clone:
+                type:          navigate
+                acl_resource:  oro_segment_create
+                label:         oro.segment.action.clone.button.label
+                icon:          files-o
+                link:          clone_link
+                launcherOptions:
+                    className: 'no-hash mobile-hide'
             delete:
                 type:          delete
                 acl_resource:  oro_segment_delete
@@ -103,4 +115,4 @@ datagrids:
                 launcherOptions:
                     className: 'no-hash mobile-hide'
         options:
-            entityHint: segments
+            entityHint: oro.segment.entity_plural_label

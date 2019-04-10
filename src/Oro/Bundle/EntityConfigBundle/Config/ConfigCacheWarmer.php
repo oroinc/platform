@@ -52,6 +52,9 @@ class ConfigCacheWarmer
     /** @var array|null */
     private $emptyData;
 
+    /** @var array|null */
+    private $configurableEntitiesMap;
+
     /**
      * @param ConfigManager                    $configManager
      * @param ConfigCache                      $cache
@@ -68,11 +71,11 @@ class ConfigCacheWarmer
         VirtualFieldProviderInterface $virtualFieldProvider,
         VirtualRelationProviderInterface $virtualRelationProvider
     ) {
-        $this->configManager           = $configManager;
-        $this->cache                   = $cache;
-        $this->configModelLockObject   = $configModelLockObject;
-        $this->entityManagerBag        = $entityManagerBag;
-        $this->virtualFieldProvider    = $virtualFieldProvider;
+        $this->configManager = $configManager;
+        $this->cache = $cache;
+        $this->configModelLockObject = $configModelLockObject;
+        $this->entityManagerBag = $entityManagerBag;
+        $this->virtualFieldProvider = $virtualFieldProvider;
         $this->virtualRelationProvider = $virtualRelationProvider;
     }
 
@@ -87,16 +90,24 @@ class ConfigCacheWarmer
             return;
         }
 
-        $this->loadConfigurable($mode === self::MODE_CONFIGURABLE_ENTITY_ONLY);
-        if ($mode === self::MODE_ALL) {
-            // disallow to load new models
-            $this->configModelLockObject->lock();
-            try {
-                $this->loadNonConfigurable();
-                $this->loadVirtualFields();
-            } finally {
-                $this->configModelLockObject->unlock();
+        $this->cache->beginBatch();
+        try {
+            $this->loadConfigurable($mode === self::MODE_CONFIGURABLE_ENTITY_ONLY);
+            if ($mode === self::MODE_ALL) {
+                // disallow to load new models
+                $this->configModelLockObject->lock();
+                try {
+                    $this->loadNonConfigurable();
+                    $this->loadVirtualFields();
+                } finally {
+                    $this->configModelLockObject->unlock();
+                    $this->configurableEntitiesMap = null;
+                }
             }
+            $this->cache->saveBatch();
+        } catch (\Throwable $e) {
+            $this->cache->cancelBatch();
+            throw $e;
         }
     }
 
@@ -122,18 +133,16 @@ class ConfigCacheWarmer
      */
     protected function loadConfigurable($skipFields)
     {
-        $classMap = $this->loadConfigurableEntities();
-        if ($skipFields) {
-            foreach ($classMap as $className) {
-                $this->cache->saveConfigurable(true, $className);
-            }
-        } else {
-            $fieldFlags = $this->loadConfigurableFields($classMap);
-            foreach ($classMap as $entityId => $className) {
+        if (null === $this->configurableEntitiesMap) {
+            $this->configurableEntitiesMap = $this->loadConfigurableEntities();
+        }
+        if (!$skipFields) {
+            $fieldFlags = $this->loadConfigurableFields($this->configurableEntitiesMap);
+            foreach ($this->configurableEntitiesMap as $entityId => $className) {
                 $this->cache->saveConfigurableValues(
                     $className,
                     true,
-                    isset($fieldFlags[$entityId]) ? $fieldFlags[$entityId] : []
+                    $fieldFlags[$entityId] ?? []
                 );
             }
         }
@@ -149,20 +158,26 @@ class ConfigCacheWarmer
             ->executeQuery('SELECT id, class_name, mode, data FROM oro_entity_config');
 
         $classMap = [];
+        $configValues = [];
         $entities = [];
         foreach ($entityRows as $row) {
-            $entityId  = (int)$row['id'];
+            $entityId = (int)$row['id'];
             $className = $row['class_name'];
-            $isHidden  = $row['mode'] === ConfigModel::MODE_HIDDEN;
-            $data      = array_merge($this->getEmptyData(), $connection->convertToPHPValue($row['data'], 'array'));
+            $isHidden = $row['mode'] === ConfigModel::MODE_HIDDEN;
 
-            $classMap[$entityId]  = $className;
+            $configs = array_merge($this->getEmptyData(), $connection->convertToPHPValue($row['data'], 'array'));
+            foreach ($configs as $scope => $config) {
+                $configValues[$scope][$className] = $config;
+            }
+
+            $classMap[$entityId] = $className;
             $entities[$className] = [
                 'i' => $entityId,
                 'h' => $isHidden
             ];
-
-            $this->cache->saveEntityConfigValues($data, $className);
+        }
+        foreach ($configValues as $scope => $values) {
+            $this->cache->saveEntityConfigValuesNew($values, $scope);
         }
         $this->cache->saveEntities($entities);
 
@@ -177,31 +192,52 @@ class ConfigCacheWarmer
     protected function loadConfigurableFields(array $classMap)
     {
         $connection = $this->configManager->getEntityManager()->getConnection();
-        $fieldRows  = $connection
+        $fieldRows = $connection
             ->executeQuery('SELECT id, entity_id, field_name, type, mode, data FROM oro_entity_config_field');
 
         $configurable = [];
-        $fields       = [];
+        $configValues = [];
+        $fields = [];
         foreach ($fieldRows as $row) {
-            $fieldId  = (int)$row['id'];
             $entityId = (int)$row['entity_id'];
             if (!isset($classMap[$entityId])) {
                 continue;
             }
+
+            $fieldId = (int)$row['id'];
             $className = $classMap[$entityId];
             $fieldName = $row['field_name'];
             $fieldType = $row['type'];
-            $isHidden  = $row['mode'] === ConfigModel::MODE_HIDDEN;
-            $data      = array_merge($this->getEmptyData(), $connection->convertToPHPValue($row['data'], 'array'));
+            $isHidden = $row['mode'] === ConfigModel::MODE_HIDDEN;
+
+            if (!$fieldType) {
+                // undefined field type can cause unpredictable logical bugs
+                throw new \InvalidArgumentException(sprintf(
+                    'A field config "%s::%s" with undefined field type cannot be cached.'
+                    . ' It seems that there is some critical bug in entity config core functionality.'
+                    . ' Please contact ORO team if you see this error.',
+                    $className,
+                    $fieldName
+                ));
+            }
+
+            $configs = array_merge($this->getEmptyData(), $connection->convertToPHPValue($row['data'], 'array'));
+            foreach ($configs as $scope => $config) {
+                $configValues[$className][$scope][$fieldName] = [$config, $fieldType];
+            }
 
             $configurable[$entityId][$fieldName] = true;
-            $fields[$className][$fieldName]      = [
+            $fields[$className][$fieldName] = [
                 'i' => $fieldId,
                 'h' => $isHidden,
                 't' => $fieldType
             ];
+        }
 
-            $this->cache->saveFieldConfigValues($data, $className, $fieldName, $fieldType);
+        foreach ($configValues as $className => $classValues) {
+            foreach ($classValues as $scope => $values) {
+                $this->cache->saveFieldConfigValuesNew($values, $scope, $className);
+            }
         }
         foreach ($fields as $className => $values) {
             $this->cache->saveFields($className, $values);

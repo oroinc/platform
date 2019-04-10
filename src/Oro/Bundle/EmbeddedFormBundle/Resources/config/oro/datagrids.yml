@@ -71,5 +71,5 @@ datagrids:
                 icon: trash-o
                 link: delete_link
         options:
-            entityHint: embedded forms
+            entityHint: oro.embeddedform.entity_plural_label
             entity_pagination: true

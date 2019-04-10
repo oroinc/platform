@@ -56,13 +56,18 @@ define(function(require) {
             FiltersManager = this.modules.FiltersManager || FiltersManager;
 
             var filtersList;
-            var $filterContainer;
+            var filterContainer;
             var options = methods.combineOptions.call(this);
 
-            if (this.filterContainerSelector && this.$el.find(this.filterContainerSelector).length) {
-                $filterContainer = this.$el.find(this.filterContainerSelector);
-            } else {
-                $filterContainer = this.$el;
+            if (this.filterContainerSelector) {
+                // Since potentially filter container can be moved outside grid container by another component
+                // we try to find it everywhere before deciding to use grid container instead
+                filterContainer = this.$el.find(this.filterContainerSelector)[0] ||
+                    $(this.filterContainerSelector)[0];
+            }
+
+            if (!filterContainer) {
+                filterContainer = this.$el[0];
             }
 
             options.collection = this.collection;
@@ -80,13 +85,13 @@ define(function(require) {
                     var $container = this.$el.closest('body, .ui-dialog').find(options.filtersStateElement).first();
 
                     options.filtersStateElement = $container.length
-                        ? $container : $('<div/>').prependTo($filterContainer);
+                        ? $container : $('<div/>').prependTo(filterContainer);
                 }
             }
 
             filtersList = new FiltersManager(options);
             filtersList.render();
-            filtersList.$el.prependTo($filterContainer);
+            filtersList.$el.prependTo(filterContainer);
 
             mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
             this.metadata.state.filters = this.metadata.state.filters || [];
