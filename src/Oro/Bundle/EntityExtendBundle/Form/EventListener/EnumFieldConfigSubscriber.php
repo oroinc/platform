@@ -148,13 +148,13 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
         $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
         $enumConfigProvider = $this->configManager->getProvider('enum');
 
+        // add default translations
+        $this->enumSynchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
+
         if ($enumConfigProvider->hasConfig($enumValueClassName)) {
             try {
                 // existing enum
                 if ($configModel->getId()) {
-                    if ($enumName !== null) {
-                        $this->enumSynchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
-                    }
                     $enumOptions = $this->getValue($data['enum'], 'enum_options');
                     if ($enumOptions !== null) {
                         $this->enumSynchronizer->applyEnumOptions($enumValueClassName, $enumOptions, $locale);
