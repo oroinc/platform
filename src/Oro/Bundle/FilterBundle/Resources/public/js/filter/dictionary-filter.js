@@ -156,7 +156,7 @@ define(function(require) {
                         }
                     ),
                     data: {
-                        keys: !this.isEmptyType(this.value.type) ? this.value.value : []
+                        keys: this.isEmptyType(this.value.type) ? [] : this.value.value
                     },
                     success: function(response) {
                         $container.removeClass('loading');
@@ -240,7 +240,7 @@ define(function(require) {
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
                 var foundChoice = _.find(this.choices, function(choice) {
-                    return (parseInt(choice.value) === parseInt(value.type) || value.type === choice.value);
+                    return value.type === choice.value;
                 });
                 selectedChoiceLabel = foundChoice.label;
             }

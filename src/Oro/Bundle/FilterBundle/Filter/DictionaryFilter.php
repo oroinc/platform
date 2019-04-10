@@ -113,4 +113,23 @@ class DictionaryFilter extends BaseMultiChoiceFilter
 
         return $field;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildComparisonExpr(
+        FilterDatasourceAdapterInterface $ds,
+        $comparisonType,
+        $fieldName,
+        $parameterName
+    ) {
+        switch ($comparisonType) {
+            case FilterUtility::TYPE_NOT_EMPTY:
+                return $ds->expr()->isNotNull($fieldName);
+            case FilterUtility::TYPE_EMPTY:
+                return $ds->expr()->isNull($fieldName);
+            default:
+                return parent::buildComparisonExpr($ds, $comparisonType, $fieldName, $parameterName);
+        }
+    }
 }

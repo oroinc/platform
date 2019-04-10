@@ -15,6 +15,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class TagsDictionaryFilter extends DictionaryFilter
 {
+    /** @var array */
     protected $emptyFilterTypes = [
         FilterUtility::TYPE_EMPTY,
         FilterUtility::TYPE_NOT_EMPTY
@@ -67,7 +68,7 @@ class TagsDictionaryFilter extends DictionaryFilter
         $tagAlias     = $ds->generateParameterName('tag');
 
         $taggingRepository = $qb->getEntityManager()->getRepository('OroTagBundle:Tagging');
-        if (in_array($data['type'], $this->emptyFilterTypes) === false) {
+        if (!in_array($data['type'], $this->emptyFilterTypes, true)) {
             if (empty($data['value'])) {
                 return $expr;
             }
@@ -95,10 +96,10 @@ class TagsDictionaryFilter extends DictionaryFilter
                 $expr = $ds->expr()->notIn($entityIdAlias, $subQueryDQL);
                 break;
             case FilterUtility::TYPE_NOT_EMPTY:
-                $expr = new Func('EXISTS', [$subQueryDQL]);
+                $expr = $ds->expr()->exists($subQueryDQL);
                 break;
             case FilterUtility::TYPE_EMPTY:
-                $expr = new Func('NOT EXISTS', [$subQueryDQL]);
+                $expr = $ds->expr()->not($ds->expr()->exists($subQueryDQL));
                 break;
             default:
                 break;
@@ -129,20 +130,22 @@ class TagsDictionaryFilter extends DictionaryFilter
      */
     protected function parseData($data)
     {
-        $type = array_key_exists('type', $data) ? $data['type'] : null;
-        if (!in_array($type, $this->emptyFilterTypes, true)
-            && (!isset($data['value']) || empty($data['value']))
-        ) {
+        $type = $data['type'] ?? null;
+        if (in_array($type, $this->emptyFilterTypes, true)) {
+            return $data;
+        }
+
+        if (!isset($data['value']) || empty($data['value'])) {
             return false;
         }
         $value = $data['value'];
 
-        if (!in_array($type, $this->emptyFilterTypes, true) && !is_array($value)) {
+        if (!is_array($value)) {
             return false;
         }
 
-        $data['type']  = isset($data['type']) ? $data['type'] : DictionaryFilterType::TYPE_IN;
-        $data['value'] = (array) $value;
+        $data['type'] = $type ?: DictionaryFilterType::TYPE_IN;
+        $data['value'] = $value;
 
         return $data;
     }
