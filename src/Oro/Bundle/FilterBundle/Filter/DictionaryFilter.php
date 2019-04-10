@@ -123,6 +123,8 @@ class DictionaryFilter extends BaseMultiChoiceFilter
         $fieldName,
         $parameterName
     ) {
+        QueryBuilderUtil::checkField($fieldName);
+
         switch ($comparisonType) {
             case FilterUtility::TYPE_NOT_EMPTY:
                 return $ds->expr()->isNotNull($fieldName);
