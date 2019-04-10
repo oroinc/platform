@@ -64,27 +64,26 @@ class TagsDictionaryFilter extends DictionaryFilter
         $qb            = $ds->getQueryBuilder();
         $entityIdAlias = $this->getDataFieldName();
 
-        $taggingAlias = $ds->generateParameterName('tagging');
-        $tagAlias     = $ds->generateParameterName('tag');
+        $taggingAlias = QueryBuilderUtil::generateParameterName('tagging');
+        $tagAlias     = QueryBuilderUtil::generateParameterName('tag');
 
         $taggingRepository = $qb->getEntityManager()->getRepository('OroTagBundle:Tagging');
         if (!in_array($data['type'], $this->emptyFilterTypes, true)) {
             if (empty($data['value'])) {
                 return $expr;
             }
-            $subQueryDQL = $taggingRepository
-                ->createQueryBuilder($taggingAlias)
-                ->select($taggingAlias . '.recordId')
-                ->join($taggingAlias . '.tag', $tagAlias)
-                ->where(sprintf('%s.entityName = :%s', $taggingAlias, $entityClassParam))
-                ->andWhere($qb->expr()->in($tagAlias . '.id', $data['value']))
+
+            $subQueryDQL = $taggingRepository->createQueryBuilder($taggingAlias)
+                ->select(QueryBuilderUtil::getField($taggingAlias, 'recordId'))
+                ->join(QueryBuilderUtil::getField($taggingAlias, 'tag'), $tagAlias)
+                ->where(QueryBuilderUtil::sprintf('%s.entityName = :%s', $taggingAlias, $entityClassParam))
+                ->andWhere($qb->expr()->in(QueryBuilderUtil::getField($tagAlias, 'id'), $data['value']))
                 ->getDQL();
         } else {
-            $subQueryDQL = $taggingRepository
-                ->createQueryBuilder($taggingAlias)
-                ->select($taggingAlias . '.id')
-                ->where(sprintf('%s.entityName = :%s', $taggingAlias, $entityClassParam))
-                ->andWhere("$taggingAlias.recordId = $entityIdAlias")
+            $subQueryDQL = $taggingRepository->createQueryBuilder($taggingAlias)
+                ->select(QueryBuilderUtil::getField($taggingAlias, 'id'))
+                ->where(QueryBuilderUtil::sprintf('%s.entityName = :%s', $taggingAlias, $entityClassParam))
+                ->andWhere(QueryBuilderUtil::sprintf('%s.recordId = %s', $taggingAlias, $entityIdAlias))
                 ->getDQL();
         }
 
