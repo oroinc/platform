@@ -11,7 +11,7 @@ use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 class ProfilingEntityManager extends OroEntityManager
 {
     /** @var OrmLogger */
-    private $logger;
+    private $ormLogger;
 
     /** @var array */
     private $loggingHydrators;
@@ -152,20 +152,20 @@ class ProfilingEntityManager extends OroEntityManager
      */
     private function getProfilingLogger()
     {
-        if ($this->logger) {
-            return $this->logger;
+        if ($this->ormLogger) {
+            return $this->ormLogger;
         }
 
-        if (false === $this->logger) {
+        if (false === $this->ormLogger) {
             return null;
         }
 
         $config = $this->getConfiguration();
 
-        $this->logger = $config instanceof OrmConfiguration
+        $this->ormLogger = $config instanceof OrmConfiguration
             ? $config->getAttribute('OrmProfilingLogger', false)
             : false;
 
-        return $this->logger;
+        return $this->ormLogger;
     }
 }

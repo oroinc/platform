@@ -55,6 +55,7 @@ class OroEntityBundle extends Bundle
         $container->addCompilerPass(new Compiler\EntityFieldHandlerPass());
         $container->addCompilerPass(new Compiler\CustomGridFieldValidatorCompilerPass());
         $container->addCompilerPass(new Compiler\ManagerRegistryCompilerPass());
+        $container->addCompilerPass(new Compiler\EntityManagerPass());
         $container->addCompilerPass(new Compiler\DataCollectorCompilerPass());
         $container->addCompilerPass(new Compiler\EntityFallbackCompilerPass());
         $container->addCompilerPass(new Compiler\SqlWalkerPass());
