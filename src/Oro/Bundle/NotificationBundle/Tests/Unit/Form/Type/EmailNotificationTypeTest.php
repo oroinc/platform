@@ -19,6 +19,7 @@ use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSub
 use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationEntityChoiceType;
 use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType;
 use Oro\Bundle\NotificationBundle\Form\Type\RecipientListType;
+use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Form\Type\Stub\Select2TranslatableEntityTypeStub;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -86,9 +87,14 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
 
         $contactInformationEmailsProvider = $this->createMock(ContactInformationEmailsProvider::class);
 
+        $subscriber = new AdditionalEmailsSubscriber($this->registry, $this->getTranslator(), $configManager);
+        $subscriber->setAdditionalEmailAssociationProvider(
+            $this->createMock(ChainAdditionalEmailAssociationProvider::class)
+        );
+
         $this->formType = new EmailNotificationType(
             new BuildTemplateFormSubscriber($tokenStorage),
-            new AdditionalEmailsSubscriber($this->registry, $this->getTranslator(), $configManager),
+            $subscriber,
             $router,
             new ContactInformationEmailsSubscriber($contactInformationEmailsProvider)
         );

@@ -7,6 +7,7 @@ use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
+use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -27,6 +28,9 @@ class EmailNotificationHandler implements EventHandlerInterface
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var ChainAdditionalEmailAssociationProvider */
+    private $additionalEmailAssociationProvider;
+
     /**
      * @param EmailNotificationManager $manager
      * @param ManagerRegistry          $doctrine
@@ -43,6 +47,14 @@ class EmailNotificationHandler implements EventHandlerInterface
         $this->doctrine = $doctrine;
         $this->propertyAccessor = $propertyAccessor;
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * @param ChainAdditionalEmailAssociationProvider $provider
+     */
+    public function setAdditionalEmailAssociationProvider(ChainAdditionalEmailAssociationProvider $provider)
+    {
+        $this->additionalEmailAssociationProvider = $provider;
     }
 
     /**
@@ -70,12 +82,15 @@ class EmailNotificationHandler implements EventHandlerInterface
         NotificationEvent $event,
         EmailNotification $notification
     ): TemplateEmailNotificationInterface {
-        return new TemplateEmailNotificationAdapter(
+        $adapter = new TemplateEmailNotificationAdapter(
             $event->getEntity(),
             $notification,
             $this->doctrine->getManager(),
             $this->propertyAccessor,
             $this->eventDispatcher
         );
+        $adapter->setAdditionalEmailAssociationProvider($this->additionalEmailAssociationProvider);
+
+        return $adapter;
     }
 }
