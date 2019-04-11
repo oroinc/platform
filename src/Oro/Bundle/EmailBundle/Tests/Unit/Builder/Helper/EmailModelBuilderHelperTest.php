@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
@@ -148,6 +149,36 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getEmailAddressRepository');
 
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId);
+        $this->assertEquals($expected, $emailAddress);
+    }
+
+    public function testPreciseFullEmailAddressWithEmailOwnerAwareInterface()
+    {
+        $emailAddress = 'someaddress@example.com';
+        $expected     = '"Admin" <someaddress@example.com>';
+
+        $ownerClass = 'Oro\Bundle\UserBundle\Entity\User';
+        $ownerId    = 1;
+        /** @var EmailOwnerInterface $owner */
+        $owner      = $this->createMock($ownerClass);
+        $ownerName  = 'Admin';
+
+        $emailOwnerAwareStub = new EmailOwnerAwareStub($owner);
+
+        $this->entityRoutingHelper->expects($this->once())
+            ->method('getEntity')
+            ->with(EmailOwnerAwareStub::class, $ownerId)
+            ->willReturn($emailOwnerAwareStub);
+
+        $this->entityNameResolver->expects($this->once())
+            ->method('getName')
+            ->with($owner)
+            ->willReturn($ownerName);
+
+        $this->emailAddressManager->expects($this->never())
+            ->method('getEmailAddressRepository');
+
+        $this->helper->preciseFullEmailAddress($emailAddress, EmailOwnerAwareStub::class, $ownerId);
         $this->assertEquals($expected, $emailAddress);
     }
 
