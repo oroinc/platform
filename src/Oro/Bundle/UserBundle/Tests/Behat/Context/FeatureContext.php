@@ -136,4 +136,19 @@ class FeatureContext extends OroFeatureContext implements
         // need to be skiped ajax wait, because we have redirect to login page and no ajax requests
         $this->oroMainContext->applySkipWait();
     }
+
+    /**
+     * @When /^(?:|I )open User view page with id (?P<id>[\w\s]+)/
+     *
+     * @param string $id
+     */
+    public function openUserViewPage($id)
+    {
+        $url = $this->getContainer()
+            ->get('router')
+            ->generate('oro_user_view', ['id' => $id]);
+
+        $this->visitPath($url);
+        $this->waitForAjax();
+    }
 }
