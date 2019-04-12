@@ -36,6 +36,9 @@ The current file describes significant changes in the code that may affect the u
   Use `data_type` attribute of `oro_formatter` tag to specify the default formatter for the data type.
 
 ### Removed
+#### MessageQueueBundle
+* The `DefaultTransportFactory` and related configuration option `oro_message_queue.transport.defaut` was removed. Check `config/config.yml` in your application.
+
 #### DependencyInjection component
 * The `ServiceLinkRegistry` and all relates classes was removed.
   To define a bag of lazy loaded services use Symfony [Service Locator](https://symfony.com/doc/3.4/service_container/service_subscribers_locators.html#defining-a-service-locator).

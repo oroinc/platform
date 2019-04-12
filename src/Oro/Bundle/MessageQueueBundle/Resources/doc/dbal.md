@@ -5,7 +5,6 @@
 ```yaml
 oro_message_queue:
   transport:
-    default: 'dbal'
     dbal:
       connection: default                  # doctrine dbal connection name
       table: oro_message_queue             # table name where messages will be stored

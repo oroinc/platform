@@ -1,15 +1,17 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection;
 
-use Oro\Component\MessageQueue\DependencyInjection\TransportFactoryInterface;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\TransportFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * This class contains the configuration information.
+ */
 class Configuration implements ConfigurationInterface
 {
-    /**
-     * @var TransportFactoryInterface[]
-     */
+    /** @var TransportFactoryInterface[] */
     private $factories;
 
     /**
@@ -25,17 +27,17 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $tb = new TreeBuilder();
-        $rootNode = $tb->root('oro_message_queue');
+        $builder = new TreeBuilder();
+        $rootNode = $builder->root('oro_message_queue');
         
-        $transportChildren = $rootNode->children()
-            ->arrayNode('transport')->isRequired()->children();
-            
+        $transportNode = $rootNode->children()
+            ->arrayNode('transport')
+            ->addDefaultsIfNotSet()
+            ->info('List of available transports with their configurations.');
         foreach ($this->factories as $factory) {
-            $factory->addConfiguration(
-                $transportChildren->arrayNode($factory->getName())
-            );
+            $factory->addConfiguration($transportNode);
         }
+        $transportNode->end();
 
         $rootNode->children()
             ->arrayNode('client')->children()
@@ -102,6 +104,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end();
-        return $tb;
+
+        return $builder;
     }
 }
