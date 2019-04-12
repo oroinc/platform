@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailBodyLoaderPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailEntityPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailFlagManagerLoaderPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailRecipientsProviderPass;
@@ -21,6 +22,9 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * The EmailBundle bundle class.
+ */
 class OroEmailBundle extends Bundle
 {
     const ENTITY_PROXY_NAMESPACE   = 'OroEntityProxy\OroEmailBundle';
@@ -49,8 +53,8 @@ class OroEmailBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new EmailOwnerConfigurationPass());
         $this->addDoctrineOrmMappingsPass($container);
+        $container->addCompilerPass(new EmailOwnerConfigurationPass());
         $container->addCompilerPass(new EmailBodyLoaderPass());
         $container->addCompilerPass(new EmailFlagManagerLoaderPass());
         $container->addCompilerPass(new EmailSynchronizerPass());
@@ -98,10 +102,6 @@ class OroEmailBundle extends Bundle
             str_replace('\\', DIRECTORY_SEPARATOR, self::ENTITY_PROXY_NAMESPACE)
         );
 
-        $container->setParameter('oro_email.entity.cache_dir', $entityCacheDir);
-        $container->setParameter('oro_email.entity.cache_namespace', self::ENTITY_PROXY_NAMESPACE);
-        $container->setParameter('oro_email.entity.proxy_name_template', '%sProxy');
-
         // Ensure the cache directory exists
         $fs = new Filesystem();
         if (!is_dir($entityCacheDir)) {
@@ -113,5 +113,10 @@ class OroEmailBundle extends Bundle
                 [$entityCacheDir => self::ENTITY_PROXY_NAMESPACE]
             )
         );
+
+        $container->addCompilerPass(new EmailEntityPass(
+            self::ENTITY_PROXY_NAMESPACE,
+            $entityCacheDir
+        ));
     }
 }

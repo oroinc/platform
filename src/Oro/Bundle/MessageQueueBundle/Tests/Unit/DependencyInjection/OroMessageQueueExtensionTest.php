@@ -43,16 +43,6 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->addTransportFactory(new FooTransportFactory(null));
     }
 
-    public function testThrowIfTransportFactoryWithSameNameAlreadyAdded()
-    {
-        $extension = new OroMessageQueueExtension();
-
-        $extension->addTransportFactory(new FooTransportFactory('foo'));
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Transport factory with such name already added. Name foo');
-        $extension->addTransportFactory(new FooTransportFactory('foo'));
-    }
-
     public function testShouldConfigureNullTransport()
     {
         $container = new ContainerBuilder();
