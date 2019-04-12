@@ -6,6 +6,7 @@ use Doctrine\ORM\Query\Expr\Func;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\DictionaryFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
@@ -14,6 +15,12 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class TagsDictionaryFilter extends DictionaryFilter
 {
+    /** @var array */
+    protected $emptyFilterTypes = [
+        FilterUtility::TYPE_EMPTY,
+        FilterUtility::TYPE_NOT_EMPTY
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -54,23 +61,31 @@ class TagsDictionaryFilter extends DictionaryFilter
         QueryBuilderUtil::checkIdentifier($entityClassParam);
         $expr = false;
 
-        if (empty($data['value'])) {
-            return $expr;
-        }
-
         $qb            = $ds->getQueryBuilder();
         $entityIdAlias = $this->getDataFieldName();
 
-        $taggingAlias = $ds->generateParameterName('tagging');
-        $tagAlias     = $ds->generateParameterName('tag');
+        $taggingAlias = QueryBuilderUtil::generateParameterName('tagging');
+        $tagAlias     = QueryBuilderUtil::generateParameterName('tag');
 
-        $subQueryDQL = $qb->getEntityManager()->getRepository('OroTagBundle:Tagging')
-            ->createQueryBuilder($taggingAlias)
-            ->select($taggingAlias . '.recordId')
-            ->join($taggingAlias . '.tag', $tagAlias)
-            ->where(sprintf('%s.entityName = :%s', $taggingAlias, $entityClassParam))
-            ->andWhere($qb->expr()->in($tagAlias . '.id', $data['value']))
-            ->getDQL();
+        $taggingRepository = $qb->getEntityManager()->getRepository('OroTagBundle:Tagging');
+        if (!in_array($data['type'], $this->emptyFilterTypes, true)) {
+            if (empty($data['value'])) {
+                return $expr;
+            }
+
+            $subQueryDQL = $taggingRepository->createQueryBuilder($taggingAlias)
+                ->select(QueryBuilderUtil::getField($taggingAlias, 'recordId'))
+                ->join(QueryBuilderUtil::getField($taggingAlias, 'tag'), $tagAlias)
+                ->where(QueryBuilderUtil::sprintf('%s.entityName = :%s', $taggingAlias, $entityClassParam))
+                ->andWhere($qb->expr()->in(QueryBuilderUtil::getField($tagAlias, 'id'), $data['value']))
+                ->getDQL();
+        } else {
+            $subQueryDQL = $taggingRepository->createQueryBuilder($taggingAlias)
+                ->select(QueryBuilderUtil::getField($taggingAlias, 'id'))
+                ->where(QueryBuilderUtil::sprintf('%s.entityName = :%s', $taggingAlias, $entityClassParam))
+                ->andWhere(QueryBuilderUtil::sprintf('%s.recordId = %s', $taggingAlias, $entityIdAlias))
+                ->getDQL();
+        }
 
         switch ($comparisonType) {
             case DictionaryFilterType::TYPE_IN:
@@ -78,6 +93,12 @@ class TagsDictionaryFilter extends DictionaryFilter
                 break;
             case DictionaryFilterType::TYPE_NOT_IN:
                 $expr = $ds->expr()->notIn($entityIdAlias, $subQueryDQL);
+                break;
+            case FilterUtility::TYPE_NOT_EMPTY:
+                $expr = $ds->expr()->exists($subQueryDQL);
+                break;
+            case FilterUtility::TYPE_EMPTY:
+                $expr = $ds->expr()->not($ds->expr()->exists($subQueryDQL));
                 break;
             default:
                 break;
@@ -108,6 +129,11 @@ class TagsDictionaryFilter extends DictionaryFilter
      */
     protected function parseData($data)
     {
+        $type = $data['type'] ?? null;
+        if (in_array($type, $this->emptyFilterTypes, true)) {
+            return $data;
+        }
+
         if (!isset($data['value']) || empty($data['value'])) {
             return false;
         }
@@ -117,7 +143,7 @@ class TagsDictionaryFilter extends DictionaryFilter
             return false;
         }
 
-        $data['type']  = isset($data['type']) ? $data['type'] : DictionaryFilterType::TYPE_IN;
+        $data['type'] = $type ?: DictionaryFilterType::TYPE_IN;
         $data['value'] = $value;
 
         return $data;

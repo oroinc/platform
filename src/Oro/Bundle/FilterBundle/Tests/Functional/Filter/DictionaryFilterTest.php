@@ -5,6 +5,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Functional\Filter;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\DictionaryFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Tests\Functional\Fixtures\LoadUserWithBUAndOrganization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -98,6 +99,23 @@ class DictionaryFilterTest extends WebTestCase
                     ],
                 ],
             ],
+            'Filter "is empty"' => [
+                'join' => 'businessUnits',
+                'dataName' => 'businessUnits.id',
+                'filterFormData' => $this->getFilterFormDataCallback(FilterUtility::TYPE_EMPTY, null),
+                'expectedResult' => [
+                    ['username' => 'u3'],
+                ],
+            ],
+            'Filter "is not empty"' => [
+                'join' => 'businessUnits',
+                'dataName' => 'businessUnits.id',
+                'filterFormData' => $this->getFilterFormDataCallback(FilterUtility::TYPE_NOT_EMPTY, null),
+                'expectedResult' => [
+                    ['username' => 'u1'],
+                    ['username' => 'u2'],
+                ],
+            ],
         ];
     }
 
@@ -112,7 +130,7 @@ class DictionaryFilterTest extends WebTestCase
         return function () use ($type, $reference) {
             return [
                 'type' => $type,
-                'value' => $this->getReference($reference)->getId(),
+                'value' => $reference ? $this->getReference($reference)->getId() : null,
             ];
         };
     }
