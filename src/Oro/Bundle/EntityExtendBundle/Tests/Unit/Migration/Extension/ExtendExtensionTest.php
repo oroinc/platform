@@ -370,6 +370,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                                     'description' => 'oro.entityextend.enumvalue.id.description',
                                 ],
                                 'importexport' => ['identity' => true],
+                                'extend' => ['length' => 32],
                             ],
                             'type'    => 'string'
                         ],
@@ -380,6 +381,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                                     'description' => 'oro.entityextend.enumvalue.name.description',
                                 ],
                                 'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+                                'extend' => ['length' => 255],
                             ],
                             'type'    => 'string'
                         ],
@@ -485,6 +487,9 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                                 'importexport' => [
                                     'identity' => true,
                                 ],
+                                'extend' => [
+                                    'length' => 32,
+                                ],
                             ],
                             'type'    => 'string',
                         ],
@@ -496,6 +501,9 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                                 ],
                                 'datagrid' => [
                                     'is_visible' => DatagridScope::IS_VISIBLE_FALSE
+                                ],
+                                'extend' => [
+                                    'length' => 255,
                                 ],
                             ],
                             'type'    => 'string',
