@@ -2,101 +2,58 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit;
 
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildDestinationMetaRegistryPass;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPass;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProcessorRegistryPass;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageToArrayConverterPass;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMonologHandlersPass;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaSubscribersPass;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureClearersPass;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureDbalTransportExtensionsPass;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeAnnotationReaderServicesPersistentPass;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeLoggerServicesPersistentPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\DbalTransportFactory;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\NullTransportFactory;
 use Oro\Bundle\MessageQueueBundle\OroMessageQueueBundle;
-use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
-use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
+use Oro\Component\MessageQueue\Job\Topics;
+use Symfony\Component\DependencyInjection\Compiler\RegisterEnvVarProcessorsPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Kernel;
 
 class OroMessageQueueBundleTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OroMessageQueueBundle */
-    private $bundle;
-
-    /** @var Kernel|\PHPUnit\Framework\MockObject\MockObject */
-    private $kernel;
-
-    protected function setUp()
+    public function testBuild()
     {
-        $this->kernel = $this->createMock(Kernel::class);
-        $this->bundle = new OroMessageQueueBundle($this->kernel);
-    }
+        $addTopicPass = Compiler\AddTopicMetaPass::create()
+            ->add(Topics::CALCULATE_ROOT_JOB_STATUS, 'Calculate root job status')
+            ->add(Topics::ROOT_JOB_STOPPED, 'Root job stopped');
 
-    public function testShouldRegisterExpectedCompilerPasses()
-    {
-        $container = $this->createMock(ContainerBuilder::class);
-        $container->expects($this->at(0))
-            ->method('addCompilerPass')
-            ->with($this->isInstanceOf(ConfigureDbalTransportExtensionsPass::class));
-        $container->expects($this->at(1))
-            ->method('addCompilerPass')
-            ->with($this->isInstanceOf(BuildExtensionsPass::class));
-        $container->expects($this->at(2))
-            ->method('addCompilerPass')
-            ->with($this->isInstanceOf(BuildRouteRegistryPass::class));
-        $container->expects($this->at(3))
-            ->method('addCompilerPass')
-            ->with($this->isInstanceOf(BuildMessageProcessorRegistryPass::class));
-        $container->expects($this->at(4))
-            ->method('addCompilerPass')
-            ->with($this->isInstanceOf(BuildTopicMetaSubscribersPass::class));
-        $container->expects($this->at(5))
-            ->method('addCompilerPass')
-            ->with($this->isInstanceOf(BuildDestinationMetaRegistryPass::class));
-        $container->expects($this->at(6))
-            ->method('addCompilerPass')
-            ->with($this->isInstanceOf(BuildMessageToArrayConverterPass::class));
-        $container->expects($this->at(7))
-            ->method('addCompilerPass')
-            ->with($this->isInstanceOf(BuildMonologHandlersPass::class));
-        $container->expects($this->at(8))
-            ->method('addCompilerPass')
-            ->with($this->isInstanceOf(ConfigureClearersPass::class));
-        $container->expects($this->at(9))
-            ->method('addCompilerPass')
-            ->with($this->isInstanceOf(MakeLoggerServicesPersistentPass::class));
-        $container->expects($this->at(10))
-            ->method('addCompilerPass')
-            ->with($this->isInstanceOf(MakeAnnotationReaderServicesPersistentPass::class));
-
-        $container->expects($this->once())
-            ->method('getExtension')
-            ->willReturn($this->createMock(OroMessageQueueExtension::class));
-
-        $bundle = new OroMessageQueueBundle($this->kernel);
-        $bundle->build($container);
-    }
-
-    public function testShouldRegisterExpectedTransportFactories()
-    {
+        $bundle = new OroMessageQueueBundle();
+        /** @var OroMessageQueueExtension|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this->createMock(OroMessageQueueExtension::class);
-
-        $extension->expects($this->at(0))
+        $extension->expects($this->once())
+            ->method('getAlias')
+            ->willReturn('oro_message_queue');
+        $extension->expects($this->exactly(2))
             ->method('addTransportFactory')
-            ->with($this->isInstanceOf(DefaultTransportFactory::class));
-        $extension->expects($this->at(1))
-            ->method('addTransportFactory')
-            ->with($this->isInstanceOf(NullTransportFactory::class));
+            ->withConsecutive(
+                [new NullTransportFactory()],
+                [new DbalTransportFactory()]
+            );
 
-        $container = $this->createMock(ContainerBuilder::class);
-        $container->expects($this->once())
-            ->method('getExtension')
-            ->with('oro_message_queue')
-            ->willReturn($extension);
-
-        $bundle = new OroMessageQueueBundle($this->kernel);
+        $container = new ContainerBuilder();
+        $container->registerExtension($extension);
         $bundle->build($container);
+
+        $this->assertArraySubset([
+            new ResolveClassPass(),
+            new ResolveInstanceofConditionalsPass(),
+            new RegisterEnvVarProcessorsPass(),
+            new Compiler\ConfigureDbalTransportExtensionsPass(),
+            new Compiler\BuildExtensionsPass(),
+            new Compiler\BuildRouteRegistryPass(),
+            new Compiler\BuildMessageProcessorRegistryPass(),
+            new Compiler\BuildTopicMetaSubscribersPass(),
+            new Compiler\BuildDestinationMetaRegistryPass(),
+            new Compiler\BuildMessageToArrayConverterPass(),
+            new Compiler\BuildMonologHandlersPass(),
+            new Compiler\ConfigureClearersPass(),
+            new Compiler\MakeLoggerServicesPersistentPass(),
+            new Compiler\MakeAnnotationReaderServicesPersistentPass(),
+            $addTopicPass,
+        ], $container->getCompilerPassConfig()->getBeforeOptimizationPasses());
     }
 }

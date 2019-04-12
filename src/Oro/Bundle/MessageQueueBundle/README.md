@@ -51,7 +51,6 @@ First, you have to configure a transport layer and set one to be default. For th
 
 oro_message_queue:
     transport:
-        default: '%message_queue_transport%'
         '%message_queue_transport%': '%message_queue_transport_config%'
     client: ~
 ```
