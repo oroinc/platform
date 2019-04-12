@@ -1,0 +1,7 @@
+<% if (translations) { %>
+<div class="organization-modal-content">
+    <% _.each(translations, function(translation) {  %>
+        <p class="organization-modal-content__text"><%- translation %></p>
+    <% }) %>
+</div>
+<% } %>
