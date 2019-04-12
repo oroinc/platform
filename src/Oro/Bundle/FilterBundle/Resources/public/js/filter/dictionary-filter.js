@@ -55,7 +55,8 @@ define(function(require) {
          * @property
          */
         criteriaValueSelectors: {
-            type: 'input[type="hidden"]:last'
+            type: 'input[type="hidden"]:last',
+            value: '.select-values-autocomplete'
         },
 
         filterParams: null,
@@ -155,7 +156,7 @@ define(function(require) {
                         }
                     ),
                     data: {
-                        keys: this.value.value
+                        keys: this.isEmptyType(this.value.type) ? [] : this.value.value
                     },
                     success: function(response) {
                         $container.removeClass('loading');
@@ -187,6 +188,7 @@ define(function(require) {
             this._writeDOMValue(this.value);
             this.applySelect2();
             this._updateCriteriaHint();
+            this._updateDOMValue();
             this.renderDeferred.resolve();
             this.trigger('update');
         },
@@ -238,7 +240,7 @@ define(function(require) {
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
                 var foundChoice = _.find(this.choices, function(choice) {
-                    return (parseInt(choice.value) === parseInt(value.type));
+                    return value.type === choice.value;
                 });
                 selectedChoiceLabel = foundChoice.label;
             }
@@ -359,6 +361,9 @@ define(function(require) {
          * @inheritDoc
          */
         isEmptyValue: function() {
+            if (this.isEmptyType(this.value.type)) {
+                return false;
+            }
             var value = this.getValue();
 
             return !value.value || value.value.length === 0;
@@ -402,7 +407,7 @@ define(function(require) {
             this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
             this._updateDOMValue();
 
-            if (this.valueIsLoaded(value.value)) {
+            if (this.valueIsLoaded(value.value) || this.isEmptyType(value.type)) {
                 this._onValueUpdated(this.value, oldValue);
             } else {
                 this.loadValuesById('updateCriteriaLabels');

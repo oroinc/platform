@@ -3,3 +3,7 @@ trusted_data:
     safe_methods:
         Oro\Bundle\TagBundle\Filter\TagsDictionaryFilter:
             getDataFieldName: true
+    variables:
+        Oro\Bundle\TagBundle\Filter\TagsDictionaryFilter:
+            buildFilterExpr:
+                subQueryDQL: true
