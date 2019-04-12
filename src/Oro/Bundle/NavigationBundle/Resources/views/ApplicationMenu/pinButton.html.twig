@@ -49,10 +49,6 @@
                                 el: '#pinbar .list-bar',
                                 listSelector: 'ul',
                                 fallbackSelector: '.pin-bar-empty'
-                            },
-                            pageStateOptions: {
-                                el: '#container',
-                                keepElement: true
                             }
                         }
                     }) }}>
@@ -65,3 +61,11 @@
 </div>
 
 {% endif %}
+<script {{ UI.renderPageComponentAttributes({
+    view: 'oronavigation/js/app/views/page-state-view',
+    name: 'page-state-component',
+    options: {
+        el: '#container',
+        keepElement: true
+    }
+}) }}></script>

@@ -4,3 +4,7 @@ config:
             exports: 'window.Routing'
     paths:
         'routing': 'bundles/fosjsrouting/js/router.js'
+        'oronavigation/js/app/modules/navigation-module': 'bundles/oronavigation/js/app/modules/navigation-module.js'
+
+    appmodules:
+        - oronavigation/js/app/modules/navigation-module
