@@ -81,6 +81,10 @@ $input-focus-border-color: $secondary;
 $input-btn-mobile-padding-y: 0;
 $input-btn-mobile-padding-x: 16px;
 
+$custom-select-padding-x: .375rem; // set original bootstrap value because chain value in 'px'
+$custom-control-indicator-size: 16px; // default 1rem it is equal to default font size 16px;
+$custom-control-gutter: 8px; // default .5rem it is equal to half of default font size 16px;
+
 $btn-line-height: 32px;
 $btn-square-line-height: 28px;
 
