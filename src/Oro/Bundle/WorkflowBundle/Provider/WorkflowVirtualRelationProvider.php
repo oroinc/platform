@@ -46,7 +46,8 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
      */
     public function isVirtualRelation($className, $fieldName)
     {
-        return in_array($fieldName, [self::ITEMS_RELATION_NAME, self::STEPS_RELATION_NAME], true)
+        return
+            (self::ITEMS_RELATION_NAME === $fieldName || self::STEPS_RELATION_NAME === $fieldName)
             && $this->hasEntityActiveWorkflow($className);
     }
 

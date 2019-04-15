@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -12,7 +15,7 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Implements VirtualFieldProviderInterface for relations to dictionary entities
+ * Provides virtual fields for associations to dictionary entities.
  */
 class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
 {
@@ -31,25 +34,23 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var CacheProvider */
+    private $cache;
+
     /** @var array */
     protected $virtualFields = [];
 
-    /**
-     * @var array
-     *      key   = class name
-     *      value = array of fields
-     *          key =   fieldName
-     *          value = fieldType
-     */
+    /** @var array */
+    private $virtualFieldQueries = [];
+
+    /** @var array [class name => [field name, ...], ...] */
     protected $dictionaries;
 
     /**
-     * Constructor
-     *
-     * @param ConfigProvider $groupingConfigProvider
-     * @param ConfigProvider $dictionaryConfigProvider
-     * @param ConfigProvider $entityConfigProvider
-     * @param ManagerRegistry $doctrine
+     * @param ConfigProvider      $groupingConfigProvider
+     * @param ConfigProvider      $dictionaryConfigProvider
+     * @param ConfigProvider      $entityConfigProvider
+     * @param ManagerRegistry     $doctrine
      * @param TranslatorInterface $translator
      */
     public function __construct(
@@ -59,11 +60,19 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
         ManagerRegistry $doctrine,
         TranslatorInterface $translator
     ) {
-        $this->groupingConfigProvider   = $groupingConfigProvider;
+        $this->groupingConfigProvider = $groupingConfigProvider;
         $this->dictionaryConfigProvider = $dictionaryConfigProvider;
-        $this->entityConfigProvider     = $entityConfigProvider;
-        $this->doctrine                 = $doctrine;
-        $this->translator               = $translator;
+        $this->entityConfigProvider = $entityConfigProvider;
+        $this->doctrine = $doctrine;
+        $this->translator = $translator;
+    }
+
+    /**
+     * @param CacheProvider $cache
+     */
+    public function setCache(CacheProvider $cache): void
+    {
+        $this->cache = $cache;
     }
 
     /**
@@ -93,9 +102,20 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
      */
     public function getVirtualFieldQuery($className, $fieldName)
     {
-        $this->ensureVirtualFieldsInitialized($className);
+        $this->ensureVirtualFieldQueriesInitialized($className);
 
-        return $this->virtualFields[$className][$fieldName]['query'];
+        return $this->virtualFieldQueries[$className][$fieldName]['query'];
+    }
+
+    /**
+     * Removes all entries from the cache.
+     */
+    public function clearCache()
+    {
+        $this->virtualFields = [];
+        $this->virtualFieldQueries = [];
+        $this->dictionaries = null;
+        $this->cache->deleteAll();
     }
 
     /**
@@ -105,67 +125,100 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
      */
     protected function ensureVirtualFieldsInitialized($className)
     {
-        if (!isset($this->virtualFields[$className])) {
-            $em = $this->getManagerForClass($className);
-            if (!$em) {
-                return;
-            }
+        if (isset($this->virtualFields[$className])) {
+            return;
+        }
 
-            $this->ensureDictionariesInitialized();
-            $this->virtualFields[$className] = [];
+        $em = $this->getManagerForClass($className);
+        if (!$em) {
+            return;
+        }
 
-            $metadata = $em->getClassMetadata($className);
-            $associationNames = $metadata->getAssociationNames();
-            foreach ($associationNames as $associationName) {
-                $targetClassName = $metadata->getAssociationTargetClass($associationName);
-                if (isset($this->dictionaries[$targetClassName])) {
-                    $fields = $this->dictionaries[$targetClassName];
-                    $isCombinedLabelName = count($fields) > 1;
-                    $fieldNames = array_keys($fields);
-                    foreach ($fieldNames as $fieldName) {
-                        $virtualFieldName = Inflector::tableize(sprintf('%s_%s', $associationName, $fieldName));
-                        $label = $isCombinedLabelName
-                            ? $virtualFieldName
-                            : Inflector::tableize($associationName);
-                        $label = ConfigHelper::getTranslationKey('entity', 'label', $className, $label);
+        $this->virtualFields[$className] = $this->loadVirtualFields($em->getClassMetadata($className));
+    }
 
-                        if ($this->translator->trans($label) === $label) {
-                            $multiple = false;
-                            $associationMapping = $metadata->getAssociationMapping($associationName);
+    /**
+     * @param string $className
+     */
+    private function ensureVirtualFieldQueriesInitialized($className)
+    {
+        if (isset($this->virtualFieldQueries[$className])) {
+            return;
+        }
 
-                            if (($associationMapping['type'] & ClassMetadataInfo::TO_MANY)) {
-                                $multiple = true;
-                            }
+        $this->ensureVirtualFieldsInitialized($className);
+        if (isset($this->virtualFields[$className])) {
+            $this->virtualFieldQueries[$className] = $this->loadVirtualFieldQueries(
+                $className,
+                $this->virtualFields[$className]
+            );
+        }
+    }
 
-                            $entityConfig = $this->entityConfigProvider->getConfig($targetClassName);
-                            $labelOption  = $multiple ? 'plural_label' : 'label';
-                            if ($entityConfig->has($labelOption)) {
-                                $label = $entityConfig->get($labelOption);
-                            }
-                        }
+    /**
+     * @param ClassMetadata $metadata
+     *
+     * @return array [virtualFieldName => [targetClass, associationName, fieldName, combinedLabel], ...]
+     */
+    private function loadVirtualFields(ClassMetadata $metadata)
+    {
+        $this->ensureDictionariesInitialized();
 
-                        $this->virtualFields[$className][$virtualFieldName] = [
-                            'query' => [
-                                'select' => [
-                                    'expr'                => 'target.' . $fieldName,
-                                    'label'               => $label,
-                                    'return_type'         => 'dictionary',
-                                    'related_entity_name' => $targetClassName
-                                ],
-                                'join' => [
-                                    'left' => [
-                                        [
-                                            'join'  => 'entity.' . $associationName,
-                                            'alias' => 'target'
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ];
-                    }
+        $result = [];
+        $associationMappings = $metadata->getAssociationMappings();
+        foreach ($associationMappings as $associationName => $associationMapping) {
+            $targetClass = $associationMapping['targetEntity'];
+            if (isset($this->dictionaries[$targetClass])) {
+                $fieldNames = $this->dictionaries[$targetClass];
+                $combinedLabel = count($fieldNames) > 1;
+                foreach ($fieldNames as $fieldName) {
+                    $name = Inflector::tableize(sprintf('%s_%s', $associationName, $fieldName));
+                    $result[$name] = [$targetClass, $associationName, $fieldName, $combinedLabel];
                 }
             }
         }
+
+        return $result;
+    }
+
+    /**
+     * @param string $className
+     * @param array  $virtualFields [virtualFieldName => [targetClass, associationName, fieldName, combinedLabel], ...]
+     *
+     * @return array [virtualFieldName => query, ...]
+     */
+    private function loadVirtualFieldQueries($className, array $virtualFields)
+    {
+        $result = [];
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManagerForClass($className);
+        foreach ($virtualFields as $name => list($targetClass, $associationName, $fieldName, $combinedLabel)) {
+            $result[$name] = [
+                'query' => [
+                    'select' => [
+                        'expr'                => 'target.' . $fieldName,
+                        'label'               => $this->resolveLabel(
+                            $em,
+                            $className,
+                            $associationName,
+                            $combinedLabel ? $name : Inflector::tableize($associationName)
+                        ),
+                        'return_type'         => 'dictionary',
+                        'related_entity_name' => $targetClass
+                    ],
+                    'join'   => [
+                        'left' => [
+                            [
+                                'join'  => 'entity.' . $associationName,
+                                'alias' => 'target'
+                            ]
+                        ]
+                    ]
+                ]
+            ];
+        }
+
+        return $result;
     }
 
     /**
@@ -174,39 +227,75 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
     protected function ensureDictionariesInitialized()
     {
         if (null === $this->dictionaries) {
-            $this->dictionaries = [];
-            $configs            = $this->groupingConfigProvider->getConfigs();
-            foreach ($configs as $config) {
-                $groups = $config->get('groups');
-                if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups, true)) {
-                    $className  = $config->getId()->getClassName();
-                    $metadata   = $this->getManagerForClass($className)->getClassMetadata($className);
-                    $fields     = [];
-                    $fieldNames = $this->dictionaryConfigProvider->hasConfig($className)
-                        ? $this->dictionaryConfigProvider->getConfig($className)->get('virtual_fields', false, [])
-                        : [];
-                    if (!empty($fieldNames)) {
-                        foreach ($fieldNames as $fieldName) {
-                            $fields[$fieldName] = $metadata->getTypeOfField($fieldName);
-                        }
-                    } else {
-                        $fieldNames = $metadata->getFieldNames();
-                        foreach ($fieldNames as $fieldName) {
-                            if (!$metadata->isIdentifier($fieldName)) {
-                                $fields[$fieldName] = $metadata->getTypeOfField($fieldName);
-                            }
-                        }
-                    }
-                    $this->dictionaries[$className] = $fields;
-                }
+            $this->dictionaries = $this->cache->fetch('dictionaries');
+            if (false === $this->dictionaries) {
+                $this->dictionaries = $this->loadDictionaries();
+                $this->cache->save('dictionaries', $this->dictionaries);
             }
         }
+    }
+
+    /**
+     * @return array [class name => [field name, ...], ...]
+     */
+    private function loadDictionaries()
+    {
+        $result = [];
+        $configs = $this->groupingConfigProvider->getConfigs();
+        foreach ($configs as $config) {
+            $groups = $config->get('groups');
+            if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups, true)) {
+                $className = $config->getId()->getClassName();
+                $fieldNames = $this->dictionaryConfigProvider->hasConfig($className)
+                    ? $this->dictionaryConfigProvider->getConfig($className)->get('virtual_fields', false, [])
+                    : [];
+                if (empty($fieldNames)) {
+                    $metadata = $this->getManagerForClass($className)->getClassMetadata($className);
+                    $allFieldNames = $metadata->getFieldNames();
+                    foreach ($allFieldNames as $fieldName) {
+                        if (!$metadata->isIdentifier($fieldName)) {
+                            $fieldNames[] = $fieldName;
+                        }
+                    }
+                }
+                $result[$className] = $fieldNames;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param EntityManagerInterface $em
+     * @param string                 $className
+     * @param string                 $associationName
+     * @param string                 $labelKey
+     *
+     * @return string
+     */
+    private function resolveLabel(EntityManagerInterface $em, $className, $associationName, $labelKey)
+    {
+        $label = ConfigHelper::getTranslationKey('entity', 'label', $className, $labelKey);
+        if ($this->translator->trans($label) === $label) {
+            $metadata = $em->getClassMetadata($className);
+            $associationMapping = $metadata->getAssociationMapping($associationName);
+
+            $entityConfig = $this->entityConfigProvider->getConfig($associationMapping['targetEntity']);
+            $multiple = $associationMapping['type'] & ClassMetadataInfo::TO_MANY;
+            $labelOption = $multiple ? 'plural_label' : 'label';
+            if ($entityConfig->has($labelOption)) {
+                $label = $entityConfig->get($labelOption);
+            }
+        }
+
+        return $label;
     }
 
     /**
      * Gets doctrine entity manager for the given class
      *
      * @param string $className
+     *
      * @return EntityManager|null
      */
     protected function getManagerForClass($className)
