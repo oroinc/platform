@@ -3,15 +3,18 @@
 namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\Common\EventManager;
+use Doctrine\Common\Proxy\AbstractProxyFactory;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Proxy\ProxyFactory;
+use Doctrine\ORM\UnitOfWork;
+use Doctrine\ORM\Utility\IdentifierFlattener;
 use Oro\Bundle\EntityBundle\ORM\Event\PreCloseEventArgs;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 
 /**
  * This entity manager has the following improvements:
@@ -19,14 +22,23 @@ use Psr\Log\LoggerAwareTrait;
  * * adds the default lifetime of cached ORM queries
  * * adds a possibility to use custom factory for metadata
  */
-class OroEntityManager extends EntityManager implements LoggerAwareInterface
+class OroEntityManager extends EntityManager
 {
-    use LoggerAwareTrait;
-
     private const SQL_STATE_NUMERIC_VALUE_OUT_OF_RANGE = '22003';
 
     /** @var int|null */
     private $defaultQueryCacheLifetime = false;
+
+    /** @var LoggerInterface */
+    private $logger;
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
 
     /**
      * {@inheritdoc}
@@ -72,9 +84,30 @@ class OroEntityManager extends EntityManager implements LoggerAwareInterface
         $metadataFactory->setEntityManager($this);
         $metadataFactory->setCacheDriver($this->getConfiguration()->getMetadataCacheImpl());
 
-        $reflProperty = new \ReflectionProperty(EntityManager::class, 'metadataFactory');
-        $reflProperty->setAccessible(true);
-        $reflProperty->setValue($this, $metadataFactory);
+        // $this->metadataFactory = $metadataFactory;
+        $this->setPrivateMetadataFactory(
+            EntityManager::class,
+            $this,
+            $metadataFactory
+        );
+        // $this->getProxyFactory()->metadataFactory = $metadataFactory;
+        $this->setPrivateMetadataFactory(
+            AbstractProxyFactory::class,
+            $this->getProxyFactory(),
+            $metadataFactory
+        );
+        // $this->getProxyFactory()->identifierFlattener->metadataFactory = $metadataFactory;
+        $this->setPrivateMetadataFactory(
+            IdentifierFlattener::class,
+            $this->getPrivateIdentifierFlattener(ProxyFactory::class, $this->getProxyFactory()),
+            $metadataFactory
+        );
+        // $this->getUnitOfWork()->identifierFlattener->metadataFactory = $metadataFactory;
+        $this->setPrivateMetadataFactory(
+            IdentifierFlattener::class,
+            $this->getPrivateIdentifierFlattener(UnitOfWork::class, $this->getUnitOfWork()),
+            $metadataFactory
+        );
     }
 
     /**
@@ -109,24 +142,54 @@ class OroEntityManager extends EntityManager implements LoggerAwareInterface
 
     /**
      * @param DriverException $exception
-     * @param string $entityName
-     * @param string $id
-     * @return null
+     * @param string          $entityName
+     * @param mixed           $id
+     *
+     * @return mixed
+     *
      * @throws DriverException
      */
-    protected function handleDriverException(DriverException $exception, string $entityName, string $id)
+    private function handleDriverException(DriverException $exception, string $entityName, $id)
     {
         // handle the situation when we try to get the entity with id that the database doesn't support
         if ($exception->getSQLState() === self::SQL_STATE_NUMERIC_VALUE_OUT_OF_RANGE) {
             if ($this->logger) {
-                $this->logger->warning(
-                    \sprintf('Out of range value "%s" for identity column of the "%s" entity.', $id, $entityName)
-                );
+                $this->logger->warning(sprintf(
+                    'Out of range value "%s" for identity column of the "%s" entity.',
+                    $id,
+                    $entityName
+                ));
             }
 
             return null;
         }
 
         throw $exception;
+    }
+
+    /**
+     * @param string $class
+     * @param object $object
+     *
+     * @return object
+     */
+    private function getPrivateIdentifierFlattener($class, $object)
+    {
+        $property = new \ReflectionProperty($class, 'identifierFlattener');
+        $property->setAccessible(true);
+
+        return $property->getValue($object);
+    }
+
+    /**
+     * @param string               $class
+     * @param object               $object
+     * @param ClassMetadataFactory $metadataFactory
+     */
+    private function setPrivateMetadataFactory($class, $object, ClassMetadataFactory $metadataFactory)
+    {
+        $property = new \ReflectionProperty($class, 'metadataFactory');
+        $property->setAccessible(true);
+        $property->setValue($object, $metadataFactory);
     }
 }
