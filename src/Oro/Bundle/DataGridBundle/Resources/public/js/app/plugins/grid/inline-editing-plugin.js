@@ -142,7 +142,7 @@ define(function(require) {
         },
 
         beforePageChange: function(e) {
-            if (this.hasChanges()) {
+            if (!e.prevented && this.hasChanges()) {
                 e.prevented = !window.confirm(__('oro.ui.leave_page_with_unsaved_data_confirm'));
             }
         },

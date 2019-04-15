@@ -126,7 +126,7 @@ define(function(require) {
          */
         beforePageChange: function(e) {
             var action = $(e.target).data('action');
-            if (action !== 'cancel' && !this._isStateTraceRequired() && this._isStateChanged()) {
+            if (!e.prevented && action !== 'cancel' && !this._isStateTraceRequired() && this._isStateChanged()) {
                 e.prevented = !window.confirm(__('oro.ui.leave_page_with_unsaved_data_confirm'));
             }
         },
