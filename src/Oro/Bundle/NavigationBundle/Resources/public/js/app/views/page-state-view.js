@@ -156,7 +156,7 @@ define(function(require) {
          * if page changes is not preserved and the state is changed from initial
          */
         onWindowUnload: function() {
-            if (!this._isStateTraceRequired() && this._isStateChanged()) {
+            if (!this._isStateTraceRequired() && this._isStateChanged() && !pageStateChecker.hasChangesIgnored()) {
                 return __('oro.ui.leave_page_with_unsaved_data_confirm');
             }
         },
