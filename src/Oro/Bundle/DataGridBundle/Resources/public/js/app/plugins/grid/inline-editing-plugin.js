@@ -148,7 +148,7 @@ define(function(require) {
         },
 
         onWindowUnload: function() {
-            if (this.hasChanges()) {
+            if (this.hasChanges() && !pageStateChecker.hasChangesIgnored()) {
                 return __('oro.ui.leave_page_with_unsaved_data_confirm');
             }
         },

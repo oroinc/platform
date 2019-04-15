@@ -11,6 +11,11 @@ define(function(require) {
         _checkers: [],
 
         /**
+         * @type {boolean}
+         */
+        _isIgnored: false,
+
+        /**
          * Registers checker function in service
          *
          * @param {Function} checker
@@ -42,6 +47,29 @@ define(function(require) {
             return _.some(pageStateChecker._checkers, function(checker) {
                 return checker();
             });
+        },
+
+        /**
+         * Check if user has already decided to ignore page state changes
+         *
+         * @return {boolean}
+         */
+        hasChangesIgnored: function() {
+            return this._isIgnored;
+        },
+
+        /**
+         * Sets flag that user has decided to ignore page state changes
+         */
+        ignoreChanges: function() {
+            this._isIgnored = true;
+        },
+
+        /**
+         * Removes flag that user has decided to ignore page state changes
+         */
+        notIgnoreChanges: function() {
+            this._isIgnored = false;
         }
     };
 

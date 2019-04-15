@@ -9,6 +9,7 @@ define(function(require) {
     var toolsRouting = require('oronavigation/js/tools/routing');
     var modalContentTemplate = require('tpl!orosecurity/templates/organization-modal-content.html');
     var BaseComponent = require('oroui/js/app/components/base/component');
+    var pageStateChecker = require('oronavigation/js/app/services/page-state-checker');
     var Modal = require('oroui/js/modal');
 
     var defaults = {
@@ -109,6 +110,7 @@ define(function(require) {
          * Callback for leave current organization
          */
         switchOrganization: function() {
+            pageStateChecker.ignoreChanges();
             mediator.execute('showLoading');
             mediator.execute('redirectTo', {url: this.lastLink}, {redirect: true, fullRedirect: true});
         },
