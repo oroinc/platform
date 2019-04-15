@@ -23,15 +23,14 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        listen: {
-            'openLink:before mediator': 'beforeOpenLink'
-        },
-
-        /**
-         * @inheritDoc
-         */
         constructor: function ChangeOrganizationComponent() {
             ChangeOrganizationComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        delegateListeners: function() {
+            ChangeOrganizationComponent.__super__.delegateListeners.call(this);
+
+            this.firstListenTo(mediator, 'openLink:before', this.beforeOpenLink);
         },
 
         /**
