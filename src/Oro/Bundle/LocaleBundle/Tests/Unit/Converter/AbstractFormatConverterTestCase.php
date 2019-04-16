@@ -56,10 +56,7 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
      */
     protected function setUp()
     {
-        $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
-            ->disableOriginalConstructor()
-            ->setMethods(['getPattern'])
-            ->getMock();
+        $this->formatter = $this->createMock('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface');
 
         $this->formatter->expects($this->any())
             ->method('getPattern')

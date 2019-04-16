@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -22,7 +22,7 @@ class DateTimeExtension extends \Twig_Extension
     }
 
     /**
-     * @return DateTimeFormatter
+     * @return DateTimeFormatterInterface
      */
     protected function getDateTimeFormatter()
     {

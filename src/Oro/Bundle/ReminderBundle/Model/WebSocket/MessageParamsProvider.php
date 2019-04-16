@@ -3,17 +3,20 @@
 namespace Oro\Bundle\ReminderBundle\Model\WebSocket;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\UrlProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Realized functionality to get message parameters
+ */
 class MessageParamsProvider
 {
     const DEFAULT_IDENTIFIER = 'default';
 
     /**
-     * @var DateTimeFormatter
+     * @var DateTimeFormatterInterface
      */
     protected $dateTimeFormatter;
 
@@ -34,13 +37,13 @@ class MessageParamsProvider
 
     /**
      * @param TranslatorInterface $translator
-     * @param DateTimeFormatter   $dateTimeFormatter
-     * @param UrlProvider         $urlProvider
-     * @param ConfigProvider      $provider
+     * @param DateTimeFormatterInterface $dateTimeFormatter
+     * @param UrlProvider $urlProvider
+     * @param ConfigProvider $provider
      */
     public function __construct(
         TranslatorInterface $translator,
-        DateTimeFormatter $dateTimeFormatter,
+        DateTimeFormatterInterface $dateTimeFormatter,
         UrlProvider $urlProvider,
         ConfigProvider $provider
     ) {
