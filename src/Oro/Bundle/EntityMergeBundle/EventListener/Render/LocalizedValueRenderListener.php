@@ -14,6 +14,9 @@ use Oro\Bundle\LocaleBundle\Model\MiddleNameInterface;
 use Oro\Bundle\LocaleBundle\Model\NamePrefixInterface;
 use Oro\Bundle\LocaleBundle\Model\NameSuffixInterface;
 
+/**
+ * The event listener responsible for converting value before rendering.
+ */
 class LocalizedValueRenderListener
 {
     /**
