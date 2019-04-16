@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * The form extension that adds "contexts" field to forms for activity entities.
@@ -45,25 +46,31 @@ class ContextsExtension extends AbstractTypeExtension
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
     /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param ActivityManager     $activityManager
+     * @param DoctrineHelper $doctrineHelper
+     * @param ActivityManager $activityManager
      * @param EntityAliasResolver $entityAliasResolver
      * @param EntityRoutingHelper $entityRoutingHelper
-     * @param RequestStack        $requestStack
+     * @param RequestStack $requestStack
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ActivityManager $activityManager,
         EntityAliasResolver $entityAliasResolver,
         EntityRoutingHelper $entityRoutingHelper,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->doctrineHelper      = $doctrineHelper;
         $this->activityManager     = $activityManager;
         $this->entityAliasResolver = $entityAliasResolver;
         $this->entityRoutingHelper = $entityRoutingHelper;
         $this->requestStack        = $requestStack;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -133,7 +140,7 @@ class ContextsExtension extends AbstractTypeExtension
                 $contexts[] = $this->entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
             }
 
-            $form->get('contexts')->setData($contexts);
+            $form->get('contexts')->setData($this->getAccessibleContexts($contexts));
         }
     }
 
@@ -149,8 +156,9 @@ class ContextsExtension extends AbstractTypeExtension
         $form   = $event->getForm();
 
         if ($entity && $form->isSubmitted() && $form->isValid() && $form->has('contexts')) {
-            $contexts = $form->get('contexts')->getData();
-            $this->activityManager->setActivityTargets($entity, $contexts);
+            $contexts = $this->getAccessibleContexts($form->get('contexts')->getData());
+            $inaccessibleContexts = $this->getInaccessibleContexts($entity->getActivityTargets());
+            $this->activityManager->setActivityTargets($entity, array_merge($contexts, $inaccessibleContexts));
         }
     }
 
@@ -198,5 +206,35 @@ class ContextsExtension extends AbstractTypeExtension
         $activities = $this->activityManager->getActivityTypes();
 
         return in_array($className, $activities, true);
+    }
+
+    /**
+     * @param iterable|object[] $contexts
+     * @return array
+     */
+    protected function getAccessibleContexts($contexts): array
+    {
+        $result = [];
+        foreach ($contexts as $context) {
+            if ($this->authorizationChecker->isGranted('VIEW', $context)) {
+                $result[] = $context;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param iterable|object[] $contexts
+     * @return array
+     */
+    protected function getInaccessibleContexts($contexts): array
+    {
+        $result = [];
+        foreach ($contexts as $context) {
+            if (!$this->authorizationChecker->isGranted('VIEW', $context)) {
+                $result[] = $context;
+            }
+        }
+        return $result;
     }
 }
