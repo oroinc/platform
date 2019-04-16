@@ -22,6 +22,8 @@ services:
             - '@oro_entity.entity_alias_resolver'
             - '@oro_entity.routing_helper'
             - '@request_stack'
+        calls:
+            - [setAuthorizationChecker, ['@security.authorization_checker']]
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 

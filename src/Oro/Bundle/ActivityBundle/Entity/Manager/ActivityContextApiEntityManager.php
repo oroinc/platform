@@ -15,7 +15,11 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Provide API resources for activity context
+ */
 class ActivityContextApiEntityManager extends ApiEntityManager
 {
     /** @var ActivityManager */
@@ -38,6 +42,9 @@ class ActivityContextApiEntityManager extends ApiEntityManager
 
     /** @var FeatureChecker */
     protected $featureChecker;
+
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /**
      * @param ObjectManager                 $om
@@ -71,6 +78,14 @@ class ActivityContextApiEntityManager extends ApiEntityManager
     }
 
     /**
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     */
+    public function setAuthorizationChecker(AuthorizationCheckerInterface $authorizationChecker)
+    {
+        $this->authorizationChecker = $authorizationChecker;
+    }
+
+    /**
      * Returns the context for the given activity class and id
      *
      * @param string $class The FQCN of the activity entity
@@ -91,6 +106,10 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         $entityProvider = $this->configManager->getProvider('entity');
 
         foreach ($targets as $target) {
+            if ($this->authorizationChecker && !$this->authorizationChecker->isGranted('VIEW', $target)) {
+                continue;
+            }
+
             $targetClass = ClassUtils::getClass($target);
             $targetId = $target->getId();
 

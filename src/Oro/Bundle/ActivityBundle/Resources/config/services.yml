@@ -194,6 +194,7 @@ services:
             - '@oro_featuretoggle.checker.feature_checker'
         calls:
             - [setEventDispatcher, ['@event_dispatcher']]
+            - [setAuthorizationChecker, ['@security.authorization_checker']]
 
     oro_activity.grid.contexts_extension:
         class: Oro\Bundle\ActivityBundle\Grid\Extension\ContextsExtension
