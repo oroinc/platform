@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\SystemVariablesProviderInterface;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -22,18 +22,18 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
     /** @var ConfigManager */
     private $configManager;
 
-    /** @var DateTimeFormatter */
+    /** @var DateTimeFormatterInterface */
     private $dateTimeFormatter;
 
     /**
      * @param TranslatorInterface $translator
-     * @param ConfigManager       $configManager
-     * @param DateTimeFormatter   $dateTimeFormatter
+     * @param ConfigManager $configManager
+     * @param DateTimeFormatterInterface $dateTimeFormatter
      */
     public function __construct(
         TranslatorInterface $translator,
         ConfigManager $configManager,
-        DateTimeFormatter $dateTimeFormatter
+        DateTimeFormatterInterface $dateTimeFormatter
     ) {
         $this->translator = $translator;
         $this->configManager = $configManager;

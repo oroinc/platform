@@ -10,17 +10,17 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class DateTimeValueFormatter implements FormatterInterface
 {
-    /** @var DateTimeFormatter */
+    /** @var DateTimeFormatterInterface */
     private $formatter;
 
     /** @var TranslatorInterface */
     private $translator;
 
     /**
-     * @param DateTimeFormatter   $dateTimeFormatter
+     * @param DateTimeFormatterInterface $dateTimeFormatter
      * @param TranslatorInterface $translator
      */
-    public function __construct(DateTimeFormatter $dateTimeFormatter, TranslatorInterface $translator)
+    public function __construct(DateTimeFormatterInterface $dateTimeFormatter, TranslatorInterface $translator)
     {
         $this->formatter = $dateTimeFormatter;
         $this->translator = $translator;

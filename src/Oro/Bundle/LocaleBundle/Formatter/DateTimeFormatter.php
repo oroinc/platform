@@ -8,7 +8,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * Format dates based on locale settings
  */
-class DateTimeFormatter
+class DateTimeFormatter implements DateTimeFormatterInterface
 {
     const DEFAULT_DATE_TYPE = \IntlDateFormatter::MEDIUM;
     const DEFAULT_TIME_TYPE = \IntlDateFormatter::SHORT;
@@ -36,15 +36,7 @@ class DateTimeFormatter
     }
 
     /**
-     * Formats date time
-     *
-     * @param \DateTime|string|int $date
-     * @param string|int|null $dateType
-     * @param string|int|null $timeType
-     * @param string|null $locale
-     * @param string|null $timeZone
-     * @param string|null $pattern
-     * @return string
+     * {@inheritdoc}
      */
     public function format($date, $dateType = null, $timeType = null, $locale = null, $timeZone = null, $pattern = null)
     {
@@ -62,13 +54,7 @@ class DateTimeFormatter
     }
 
     /**
-     * Formats date without time
-     *
-     * @param \DateTime|string|int $date
-     * @param string|int|null $dateType
-     * @param string|null $locale
-     * @param string|null $timeZone
-     * @return string
+     * {@inheritdoc}
      */
     public function formatDate($date, $dateType = null, $locale = null, $timeZone = null)
     {
@@ -76,12 +62,7 @@ class DateTimeFormatter
     }
 
     /**
-     * @param \DateTime|string|int $date
-     * @param string|int|null      $dateType
-     * @param string|null          $locale
-     * @param string|null          $timeZone
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function formatYear($date, $dateType = null, $locale = null, $timeZone = null)
     {
@@ -91,12 +72,7 @@ class DateTimeFormatter
     }
 
     /**
-     * @param \DateTime|string|int $date
-     * @param string|int|null      $dateType
-     * @param string|null          $locale
-     * @param string|null          $timeZone
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function formatQuarter($date, $dateType = null, $locale = null, $timeZone = null)
     {
@@ -107,12 +83,7 @@ class DateTimeFormatter
 
 
     /**
-     * @param \DateTime|string|int $date
-     * @param string|int|null      $dateType
-     * @param string|null          $locale
-     * @param string|null          $timeZone
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function formatMonth($date, $dateType = null, $locale = null, $timeZone = null)
     {
@@ -122,13 +93,7 @@ class DateTimeFormatter
     }
 
     /**
-     * Formats day without time and year
-     *
-     * @param \DateTime|string|int $date
-     * @param string|int|null $dateType
-     * @param string|null $locale
-     * @param string|null $timeZone
-     * @return string
+     * {@inheritdoc}
      */
     public function formatDay($date, $dateType = null, $locale = null, $timeZone = null)
     {
@@ -138,13 +103,7 @@ class DateTimeFormatter
     }
 
     /**
-     * Formats time without date
-     *
-     * @param \DateTime|string|int $date
-     * @param string|int|null $timeType
-     * @param string|null $locale
-     * @param string|null $timeZone
-     * @return string
+     * {@inheritdoc}
      */
     public function formatTime($date, $timeType = null, $locale = null, $timeZone = null)
     {
@@ -152,14 +111,7 @@ class DateTimeFormatter
     }
 
     /**
-     * Get the pattern used for the IntlDateFormatter
-     *
-     * @param int|string  $dateType Constant of IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
-     * @param int|string  $timeType Constant IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
-     * @param string|null $locale
-     * @param string|null $value
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getPattern($dateType, $timeType, $locale = null, $value = null)
     {
@@ -255,11 +207,7 @@ class DateTimeFormatter
     }
 
     /**
-     * Returns DateTime by $data and $timezone and false otherwise
-     *
-     * @param \DateTimeInterface|string|int $date
-     *
-     * @return \DateTimeInterface|false
+     * {@inheritdoc}
      */
     public function getDateTime($date)
     {
