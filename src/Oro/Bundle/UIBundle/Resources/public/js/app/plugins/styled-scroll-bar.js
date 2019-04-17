@@ -79,6 +79,9 @@ define(function(require) {
          * Proxy for OverlayScrollBars.update method
          */
         update: function() {
+            if (this.disposed) {
+                return;
+            }
             this.scrollBar.update.apply(this.scrollBar, arguments);
         },
 
