@@ -93,7 +93,7 @@ datagrids:
     acme-demo-grid:
         ... # previous configuration
         options:
-            entityHint: account
+            entityHint: oro.account.plural_label
             rowSelection:
                 dataField: id
                 columnName: isAssigned    # frontend column name
@@ -128,7 +128,7 @@ datagrids:
             bind_parameters:
                 - groupId
         options:
-            entityHint: user
+            entityHint: oro.user.plural_label
         properties:
             id: ~
         columns:
@@ -334,3 +334,79 @@ class BudgetColumnsListener
     }
 }
 ```
+
+#### Problem:
+*I want to override the default "no data messages" for empty grid and empty filtered grid.*
+
+#### Solution:
+
+There are 2 cases, when `noDataMessage` shown:
+* grid is empty because there are no entities to show
+* grid is empty because no entities were found to match the search criteria, after applying filters.
+
+There are several ways to configure these messages.
+
+* If the `entityHint` option is set in the grid configuration, it will be used to compile `noDataMessage`.
+    For example:
+    ``` yml
+    datagrids:
+        acme-demo-grid:
+            source:
+                type: orm
+                query:
+                    select:
+                        - u.id
+                        - u.username
+                    from:
+                        { table: AcmeDemoBundle:User, alias:u }
+            options:
+                entityHint: oro.user.plural_label
+       ...
+    ```
+    
+    "There are no users" message will be shown for empty grid and "No users were found to match your search. Try modifying your search criteria..." will be shown for empty filtered grid.
+
+* If `entityHint` is not set in the grid configuration, then it is automatically taken from the entity on the basis of which this grid is built.
+    For example:
+    ``` yml
+    datagrids:
+        acme-demo-grid:
+            source:
+                type: orm
+                query:
+                    select:
+                        - u.id
+                        - u.username
+                    from:
+                        { table: AcmeDemoBundle:User, alias:u }
+        options:
+       ...
+    ```
+    "There are no users" message will be shown for empty grid and "No users were found to match your search. Try modifying your search criteria..." will be shown for empty filtered grid.
+
+* If `noDataMessages` option is set in the grid configuration, then corresponding messages for empty grid and empty filtered grid are taken from the specified translation keys.
+    For example:
+    ``` yml
+    datagrids:
+        acme-demo-grid:
+            source:
+                type: orm
+                query:
+                    select:
+                        - u.id
+                        - u.username
+                    from:
+                        { table: AcmeDemoBundle:User, alias:u }
+        options:
+            noDataMessages:
+                emptyGrid: acme.my_custom_empty_grid_message
+                emptyFilteredGrid: acme.my_custom_empty_filtered_grid_message
+       ...
+    ```
+
+    messages.en.yml:
+    ``` yml
+    acme:
+        my_custom_empty_grid_message: 'There are no users'
+        my_custom_empty_filtered_grid_message: 'No users were found to match your search. Try modifying your search criteria...'
+    ```
