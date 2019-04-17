@@ -45,7 +45,7 @@ oro:
             associations.label:  Communication & Collaboration
 
         config_log:
-            entity_plyral_label: Histories
+            entity_plural_label: Histories
             user.label:      Author
             diffs.label:     Diffs
             logged_at.label: Logged at
