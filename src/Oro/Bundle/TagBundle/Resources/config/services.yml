@@ -9,7 +9,6 @@ parameters:
     oro_tag.tag.manager.class:  Oro\Bundle\TagBundle\Entity\TagManager
 
     oro_tag.provider.search_provider.class: Oro\Bundle\TagBundle\Provider\SearchProvider
-    oro_tag.provider.virtual_relation.tags.class: Oro\Bundle\TagBundle\Provider\TagVirtualRelationProvider
     oro_tag.security_provider.class: Oro\Bundle\TagBundle\Security\SecurityProvider
 
     oro_tag.event_listener.search_results_grid_listener.class: Oro\Bundle\TagBundle\EventListener\TagSearchResultsGridListener
@@ -106,7 +105,8 @@ services:
           - { name: kernel.event_listener, event: oro.entity_merge.after_merge_entity, method: afterMergeEntity }
 
     oro_tag.provider.virtual_relation.tags:
-        class: '%oro_tag.provider.virtual_relation.tags.class%'
+        class: Oro\Bundle\TagBundle\Provider\TagVirtualRelationProvider
+        public: false
         arguments:
             - '@oro_tag.helper.taggable_helper'
             - '@oro_entity.doctrine_helper'
@@ -115,6 +115,7 @@ services:
 
     oro_tag.virtual_field_provider:
         class: Oro\Bundle\TagBundle\Provider\TagVirtualFieldProvider
+        public: false
         arguments:
             - '@oro_tag.helper.taggable_helper'
             - '@oro_entity.doctrine_helper'

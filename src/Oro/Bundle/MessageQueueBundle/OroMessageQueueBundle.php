@@ -15,9 +15,8 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureDbalTran
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeAnnotationReaderServicesPersistentPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeLoggerServicesPersistentPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
-use Oro\Component\MessageQueue\DependencyInjection\DbalTransportFactory;
-use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
-use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\DbalTransportFactory;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\NullTransportFactory;
 use Oro\Component\MessageQueue\Job\Topics;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -47,7 +46,6 @@ class OroMessageQueueBundle extends Bundle
 
         /** @var OroMessageQueueExtension $extension */
         $extension = $container->getExtension('oro_message_queue');
-        $extension->addTransportFactory(new DefaultTransportFactory());
         $extension->addTransportFactory(new NullTransportFactory());
         $extension->addTransportFactory(new DbalTransportFactory());
 

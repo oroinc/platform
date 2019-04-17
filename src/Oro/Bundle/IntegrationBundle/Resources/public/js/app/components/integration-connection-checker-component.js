@@ -7,6 +7,7 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
     var messenger = require('oroui/js/messenger');
+    var systemAccessModeOrganizationProvider = require('oroorganization/js/app/tools/system-access-mode-organization-provider');
 
     IntegrationConnectionCheckerComponent = BaseComponent.extend({
         /**
@@ -62,11 +63,18 @@ define(function(require) {
 
         checkConnection: function() {
             var self = this;
+            var data = this.$form.serialize();
+
+            var organizationId = systemAccessModeOrganizationProvider.getOrganizationId();
+
+            if (organizationId) {
+                data += '&_sa_org_id=' + organizationId;
+            }
 
             $.ajax({
                 url: this.backendUrl,
                 type: 'POST',
-                data: this.$form.serialize(),
+                data: data,
                 beforeSend: function() {
                     self.loadingMaskView.show();
                 },

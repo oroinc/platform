@@ -22,8 +22,8 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
     public function iAddTheFollowingColumns(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
-            list($column, $functionName) = array_pad($row, 2, null);
-            $this->addColumns(explode('->', $column), $functionName);
+            list($column, $functionName, $label) = array_pad($row, 3, null);
+            $this->addColumns(explode('->', $column), $functionName, $label);
         }
     }
 
@@ -57,14 +57,18 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
 
     /**
      * @param string[] $columns
-     * @param string   $functionName
+     * @param string $functionName
+     * @param string $label
      */
-    private function addColumns($columns, $functionName)
+    private function addColumns($columns, $functionName, $label)
     {
         $this->clickLinkInColumnDesigner('Choose a field');
         $this->selectField($columns);
         if ($functionName) {
             $this->setFunctionValue($functionName);
+        }
+        if ($label) {
+            $this->setLabel($label);
         }
         $this->clickLinkInColumnDesigner('Add');
     }
@@ -127,5 +131,14 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
     {
         $columnFunction = $this->createElement('Column Function');
         $columnFunction->selectOption($value);
+    }
+
+    /**
+     * @param string $value
+     */
+    private function setLabel(string $value)
+    {
+        $columnLabel = $this->createElement('Column Label');
+        $columnLabel->setValue($value);
     }
 }

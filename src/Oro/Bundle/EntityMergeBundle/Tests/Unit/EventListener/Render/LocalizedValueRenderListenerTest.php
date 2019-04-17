@@ -46,7 +46,8 @@ class LocalizedValueRenderListenerTest extends \PHPUnit\Framework\TestCase
         $this->addressFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\AddressFormatter')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->dateTimeFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
+        $this->dateTimeFormatter = $this
+            ->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface')
             ->disableOriginalConstructor()
             ->getMock();
         $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
