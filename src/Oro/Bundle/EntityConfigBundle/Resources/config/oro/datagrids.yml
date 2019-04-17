@@ -131,6 +131,8 @@ datagrids:
     attributes-grid:
         extends: base-entityfields-grid
         acl_resource: oro_attributes_manage
+        options:
+            entityHint: oro.entity_config.attribute.entity_plural_label
         source:
             type: orm
             query:
@@ -171,7 +173,7 @@ datagrids:
     # Audit entity log grid
     entity-audit-grid:
         options:
-            entityHint: oro.entity_config.config_log.entity_plyral_label
+            entityHint: oro.entity_config.config_log.entity_plural_label
         acl_resource: oro_entityconfig_manage
         source:
             type: orm
