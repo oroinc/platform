@@ -3,12 +3,10 @@
 namespace Oro\Bundle\NotificationBundle\Form\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
+use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormEvent;
@@ -17,32 +15,15 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Add additional recipient choices
+ * Adds additional recipients field to the email notification form.
  */
 class AdditionalEmailsSubscriber implements EventSubscriberInterface
 {
     const MAX_NESTING_LEVEL = 2;
     const LABEL_GLUE = ' > ';
 
-    /**
-     * @var ManagerRegistry
-     */
-    private $registry;
-
-    /**
-     * @var ConfigManager
-     */
-    private $configManager;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var ClassMetadata[]
-     */
-    private $entityMetadataCache = [];
+    /** @var ChainAdditionalEmailAssociationProvider */
+    private $associationProvider;
 
     /**
      * @param ManagerRegistry $registry
@@ -54,9 +35,14 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
         TranslatorInterface $translator,
         ConfigManager $configManager
     ) {
-        $this->registry = $registry;
-        $this->translator = $translator;
-        $this->configManager = $configManager;
+    }
+
+    /**
+     * @param ChainAdditionalEmailAssociationProvider $provider
+     */
+    public function setAdditionalEmailAssociationProvider(ChainAdditionalEmailAssociationProvider $provider)
+    {
+        $this->associationProvider = $provider;
     }
 
     /**
@@ -66,7 +52,7 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
     {
         return [
             FormEvents::PRE_SET_DATA => 'preSetData',
-            FormEvents::PRE_SUBMIT   => 'preSubmit',
+            FormEvents::PRE_SUBMIT   => 'preSubmit'
         ];
     }
 
@@ -75,12 +61,12 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
      */
     public function preSetData(FormEvent $event)
     {
-        /** @var EmailNotification $eventObject */
-        $eventObject = $event->getData();
+        /** @var EmailNotification|null $notification */
+        $notification = $event->getData();
 
         $entityName = null;
-        if (null !== $eventObject && $eventObject->hasEntityName()) {
-            $entityName = $eventObject->getEntityName();
+        if (null !== $notification && $notification->hasEntityName()) {
+            $entityName = $notification->getEntityName();
         }
 
         $this->initAdditionalRecipientChoices($entityName, $event->getForm());
@@ -101,13 +87,13 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param $entityName
+     * @param string|null   $entityName
      * @param FormInterface $form
      */
-    private function initAdditionalRecipientChoices($entityName, FormInterface $form)
+    private function initAdditionalRecipientChoices(?string $entityName, FormInterface $form): void
     {
         $choices = [];
-        if ($entityName !== null) {
+        if (null !== $entityName) {
             $this->collectEmailFieldsRecursive($entityName, $choices);
         }
 
@@ -115,92 +101,62 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
             'additionalEmailAssociations',
             ChoiceType::class,
             [
-                'label' => 'oro.notification.emailnotification.additional_email_associations.label',
+                'label'    => 'oro.notification.emailnotification.additional_email_associations.label',
+                'tooltip'  => 'oro.notification.emailnotification.additional_associations.tooltip',
                 'required' => false,
                 'multiple' => true,
                 'expanded' => true,
-                'choices' => $choices,
-                'tooltip'     => 'oro.notification.emailnotification.additional_associations.tooltip',
+                'choices'  => $choices
             ]
         );
     }
 
     /**
-     * @param string $entityName
-     * @param array $choices
-     * @param array $currentPath
-     * @param array $currentLabelPath
+     * @param string   $entityName
+     * @param array    $choices
+     * @param string[] $currentPath
+     * @param string[] $currentLabelPath
      */
-    private function collectEmailFieldsRecursive($entityName, &$choices, $currentPath = [], $currentLabelPath = [])
-    {
-        foreach ($this->getEntityMetadata($entityName)->getAssociationMappings() as $fieldName => $mapping) {
-            $fieldLabel = $this->getFieldLabel($entityName, $fieldName);
-
-            if (array_key_exists(EmailHolderInterface::class, class_implements($mapping['targetEntity']))) {
-                $fieldPath = ($currentPath ? implode('.', $currentPath).'.' : ''). $fieldName;
-                $fieldLabelPath =
-                    ($currentLabelPath ? implode(self::LABEL_GLUE, $currentLabelPath).self::LABEL_GLUE : '').
-                    $fieldLabel;
-                $choices[$fieldLabelPath] = $fieldPath;
+    private function collectEmailFieldsRecursive(
+        string $entityName,
+        array &$choices,
+        array $currentPath = [],
+        array $currentLabelPath = []
+    ): void {
+        $associations = $this->associationProvider->getAssociations($entityName);
+        foreach ($associations as $associationName => $association) {
+            $associationLabel = $association['label'];
+            $targetClass = $association['target_class'];
+            if (is_a($targetClass, EmailHolderInterface::class, true)) {
+                $associationPath = $this->buildPath($currentPath, $associationName, '.');
+                $associationLabelPath = $this->buildPath($currentLabelPath, $associationLabel, self::LABEL_GLUE);
+                $choices[$associationLabelPath] = $associationPath;
             }
 
             if (count($currentPath) < self::MAX_NESTING_LEVEL - 1) {
                 $this->collectEmailFieldsRecursive(
-                    $mapping['targetEntity'],
+                    $targetClass,
                     $choices,
-                    array_pad($currentPath, count($currentPath) + 1, $fieldName),
-                    array_pad($currentLabelPath, count($currentLabelPath) + 1, $fieldLabel)
+                    array_pad($currentPath, count($currentPath) + 1, $associationName),
+                    array_pad($currentLabelPath, count($currentLabelPath) + 1, $associationLabel)
                 );
             }
         }
     }
 
     /**
-     * @param string $entityName
-     * @return ClassMetadata
-     */
-    private function getEntityMetadata($entityName)
-    {
-        if (!isset($this->entityMetadataCache[$entityName])) {
-            /** @var EntityManager $manager */
-            $manager = $this->registry->getManagerForClass($entityName);
-            $this->entityMetadataCache[$entityName] = $manager->getClassMetadata($entityName);
-        }
-
-        return $this->entityMetadataCache[$entityName];
-    }
-
-    /**
-     * @param string $entityName
-     * @param string $fieldName
-     * @return string|null
-     */
-    private function getFieldLabel($entityName, $fieldName)
-    {
-        if (!$this->configManager->hasConfig($entityName, $fieldName)) {
-            return $this->prettifyFieldName($fieldName);
-        }
-
-        /** @var ConfigProvider $entityProvider */
-        $entityConfigProvider = $this->configManager->getProvider('entity');
-        $fieldConfig = $entityConfigProvider->getConfig($entityName, $fieldName);
-
-        return $this->translator->trans($fieldConfig->get('label'));
-    }
-
-    /**
-     * @param string $fieldName
+     * @param array  $parentPath
+     * @param string $association
+     * @param string $glue
+     *
      * @return string
      */
-    private function prettifyFieldName($fieldName)
+    private function buildPath(array $parentPath, string $association, string $glue): string
     {
-        $fieldLabel = ucfirst($fieldName);
-        if (preg_match('/_[a-z0-9]{8}$/', $fieldLabel)) {
-            $fieldLabel = preg_replace('/_[a-z0-9]{8}$/', '', $fieldLabel);
+        if (!$parentPath) {
+            return $association;
         }
-        $fieldLabel = str_replace('_', ' ', $fieldLabel);
-        $fieldLabel = preg_replace('/([a-z])([A-Z])/', '$1 $2', $fieldLabel);
 
-        return $fieldLabel;
+        return implode($glue, array_merge($parentPath, [$association]));
     }
 }

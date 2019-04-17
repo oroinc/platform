@@ -235,7 +235,8 @@ define(function(require) {
                     theadRect = this.domCache.thead[0].getBoundingClientRect();
                     this.domCache.thead.css({
                         width: '',
-                        top: visibleRect.top - tableRect.top
+                        top: visibleRect.top - tableRect.top,
+                        left: ''
                     });
                     this.domCache.theadTr.css({
                         marginLeft: tableRect.left - theadRect.left

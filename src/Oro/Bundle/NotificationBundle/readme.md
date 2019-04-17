@@ -43,3 +43,57 @@ More info about configuring such fields [here](https://oroinc.com/doc/orocrm/cur
 **Please note:**
 After rule was created, after firing specified in it events will be created jobs for consumer to submit emails chosen in `Recipient list` group.
 Please check that consumer is running.
+
+## Extend Additional Associations
+
+To add new associations to `Additional Associations` group, you need to create a class that implements
+[AdditionalEmailAssociationProviderInterface](Provider/AdditionalEmailAssociationProviderInterface.php)
+and registered in the DI container with the `oro_notification.additional_email_association_provider` tag.
+
+An example:
+
+1. Create an additional associations provider:
+
+```php
+class MyAdditionalEmailAssociationProvider implements AdditionalEmailAssociationProviderInterface
+{
+    public function getAssociations(string $entityClass): array
+    {
+        if (!is_a($entityClass, MyEntity::class, true)) {
+            return [];
+        }
+
+        return [
+            'someAccociation' => [
+                'label'        => $this->translator->trans('acme.my_entity.some_accociation'),
+                'target_class' => MyTargetEntity::class
+            ]
+        ];
+    }
+
+    public function isAssociationSupported($entity, string $associationName): bool
+    {
+        return
+            $entity instanceof MyEntity
+            && 'someAccociation' === $associationName;
+    }
+
+    public function getAssociationValue($entity, string $associationName)
+    {
+        $targetEntity = get target entity logic
+
+        return $targetEntity;
+    }
+}
+```
+
+2. Register the provider in the DI container:
+
+```yaml
+services:
+    acme.additional_email_association_provider.my:
+        class: Acme\Bundle\AcmeBundle\Provider\MyAdditionalEmailAssociationProvider
+        public: false
+        tags:
+            - { name: oro_notification.additional_email_association_provider }
+```

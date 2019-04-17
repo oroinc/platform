@@ -11,6 +11,8 @@ use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 use Oro\Bundle\ReportBundle\Model\ExtendReport;
 
 /**
+ * Holds report configuration.
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\ReportBundle\Entity\Repository\ReportRepository")
  * @ORM\Table(name="oro_report")
  * @ORM\HasLifecycleCallbacks()
@@ -138,6 +140,13 @@ class Report extends ExtendReport implements GridQueryDesignerInterface
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    public function __clone()
+    {
+        $this->id = null;
+        $this->createdAt = null;
+        $this->updatedAt = null;
+    }
 
     /**
      * {@inheritdoc}

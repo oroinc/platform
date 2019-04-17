@@ -69,6 +69,8 @@ class LoadUserWithBUAndOrganization extends AbstractFixture
 
             $manager->persist($email);
             $manager->persist($user);
+
+            $this->setReference($data['email'], $user);
         }
 
         $manager->flush();

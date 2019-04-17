@@ -42,6 +42,24 @@ services:
             - '@doctrine'
             - '@translator'
             - '@oro_entity_config.config_manager'
+        calls:
+            - [ setAdditionalEmailAssociationProvider, ['@oro_notification.additional_email_association_provider'] ]
+
+    oro_notification.additional_email_association_provider:
+        class: Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider
+        public: false
+        arguments:
+            - !tagged oro_notification.additional_email_association_provider
+
+    oro_notification.additional_email_association_provider.default:
+        class: Oro\Bundle\NotificationBundle\Provider\AdditionalEmailAssociationProvider
+        public: false
+        arguments:
+            - '@doctrine'
+            - '@oro_entity_config.provider.entity'
+            - '@translator'
+        tags:
+            - { name: oro_notification.additional_email_association_provider, priority: -100 }
 
     oro_notification.email_notification.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -115,6 +133,8 @@ services:
             - '@doctrine'
             - '@property_accessor'
             - '@event_dispatcher'
+        calls:
+            - [ setAdditionalEmailAssociationProvider, ['@oro_notification.additional_email_association_provider'] ]
         tags:
             - { name: notification.handler, alias: email_notification_handler }
 

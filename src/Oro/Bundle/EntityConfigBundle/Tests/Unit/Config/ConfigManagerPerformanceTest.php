@@ -454,12 +454,15 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
         $lockObject = new LockObject();
         $databaseChecker = new ConfigDatabaseChecker($lockObject, $doctrine, [], true);
 
+        $configCache = new ConfigCache(new ArrayCache(), new ArrayCache());
+        $configCache->setScopes(['test' => 'test']);
+
         return new ConfigManager(
             $this->eventDispatcher,
             $this->metadataFactory,
             new ConfigModelManager($emLink, $lockObject, $databaseChecker),
             new AuditManager($securityTokenStorage, $doctrine),
-            new ConfigCache(new ArrayCache(), new ArrayCache())
+            $configCache
         );
     }
 

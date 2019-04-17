@@ -144,7 +144,14 @@ workflows:
             active: true
         priority: 10
         steps:
-            step1: ~
+            step1:
+                entity_acl:
+                    name:
+                        update: false
+                        delete: false
+        attributes:
+            name:
+                property_path: entity.name
         transitions:
             transition1:
                 step_to: step1
@@ -164,7 +171,14 @@ workflows:
             active: true
         priority: 20
         steps:
-            step1: ~
+            step1:
+                entity_acl:
+                    name:
+                        update: false
+                        delete: false
+        attributes:
+            name:
+                property_path: entity.name
         transitions:
             transition1:
                 step_to: step1

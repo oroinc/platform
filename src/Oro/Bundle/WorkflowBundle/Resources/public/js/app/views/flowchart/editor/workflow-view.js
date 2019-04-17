@@ -11,8 +11,6 @@ define(function(require) {
     var FlowchartEditorStepView = require('./step-view');
 
     FlowchartEditorWorkflowView = FlowchartViewerWorkflowView.extend({
-        autoRender: true,
-
         isConnected: false,
 
         transitionOverlayView: FlowChartEditorTransitionOverlayView,

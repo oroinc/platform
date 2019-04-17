@@ -41,6 +41,8 @@ services:
             - '@doctrine'
             - '@oro_config.cache'
             - '@event_dispatcher'
+        calls:
+            - [setConfigBag, ['@oro_config.config_bag']]
 
     oro_config.scope.user:
         class: '%oro_config.user.class%'

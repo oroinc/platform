@@ -10,6 +10,7 @@ use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\NotificationBundle\Event\NotificationProcessRecipientsEvent;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
+use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -44,6 +45,9 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
      */
     private $eventDispatcher;
 
+    /** @var ChainAdditionalEmailAssociationProvider */
+    private $additionalEmailAssociationProvider;
+
     /**
      * @param object $entity
      * @param EmailNotification $notification
@@ -63,6 +67,14 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
         $this->entityManager = $entityManager;
         $this->propertyAccessor = $propertyAccessor;
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * @param ChainAdditionalEmailAssociationProvider $provider
+     */
+    public function setAdditionalEmailAssociationProvider(ChainAdditionalEmailAssociationProvider $provider)
+    {
+        $this->additionalEmailAssociationProvider = $provider;
     }
 
     /**
@@ -177,9 +189,11 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
             foreach ($associationComponents as $associationComponent) {
                 $newEntities = [];
                 foreach ($associationEntities as $associationEntity) {
-                    $subEntities = $this->propertyAccessor->getValue($associationEntity, $associationComponent);
-                    $subEntities = is_array($subEntities) || $subEntities instanceof \Traversable ?
-                        $subEntities : [$subEntities];
+                    $subEntities = $this->additionalEmailAssociationProvider
+                        ->getAssociationValue($associationEntity, $associationComponent);
+                    $subEntities = is_array($subEntities) || $subEntities instanceof \Traversable
+                        ? $subEntities
+                        : [$subEntities];
                     if (!is_array($subEntities)) {
                         $subEntities = iterator_to_array($subEntities);
                     }

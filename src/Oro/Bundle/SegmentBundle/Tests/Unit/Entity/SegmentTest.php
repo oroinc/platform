@@ -1,13 +1,17 @@
 <?php
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class SegmentTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
+    use EntityTrait;
 
     /** @var Segment */
     protected $entity;
@@ -115,5 +119,57 @@ class SegmentTest extends \PHPUnit\Framework\TestCase
         $segment->setType($segmentType);
 
         $this->assertTrue($segment->isDynamic());
+    }
+
+    public function testClone(): void
+    {
+        /** @var Segment $entity */
+        $entity = $this->getEntity(
+            Segment::class,
+            [
+                'id' => 123,
+                'name' => 'test_name',
+                'description' => 'test_description',
+                'type' => new SegmentType('test_type'),
+                'entity' => \stdClass::class,
+                'definition' => 'test_definition',
+                'owner' => new BusinessUnit(),
+                'lastRun' => new \DateTime(),
+                'createdAt' => new \DateTime(),
+                'updatedAt' => new \DateTime(),
+                'organization' => new Organization(),
+                'recordsLimit' => 456,
+            ]
+        );
+
+        $this->assertNotEmpty($entity->getId());
+        $this->assertNotEmpty($entity->getName());
+        $this->assertNotEmpty($entity->getNameLowercase());
+        $this->assertNotEmpty($entity->getDescription());
+        $this->assertNotEmpty($entity->getType());
+        $this->assertNotEmpty($entity->getEntity());
+        $this->assertNotEmpty($entity->getOwner());
+        $this->assertNotEmpty($entity->getDefinition());
+        $this->assertNotEmpty($entity->getLastRun());
+        $this->assertNotEmpty($entity->getCreatedAt());
+        $this->assertNotEmpty($entity->getUpdatedAt());
+        $this->assertNotEmpty($entity->getOrganization());
+        $this->assertNotEmpty($entity->getRecordsLimit());
+
+        /** @var Segment $newEntity */
+        $newEntity = clone $entity;
+
+        $this->assertNull($newEntity->getId());
+        $this->assertSame($entity->getName(), $newEntity->getName());
+        $this->assertSame($entity->getDescription(), $newEntity->getDescription());
+        $this->assertSame($entity->getType(), $newEntity->getType());
+        $this->assertSame($entity->getEntity(), $newEntity->getEntity());
+        $this->assertSame($entity->getOwner(), $newEntity->getOwner());
+        $this->assertSame($entity->getDefinition(), $newEntity->getDefinition());
+        $this->assertNull($newEntity->getLastRun());
+        $this->assertNull($newEntity->getCreatedAt());
+        $this->assertNull($newEntity->getUpdatedAt());
+        $this->assertSame($entity->getOrganization(), $newEntity->getOrganization());
+        $this->assertSame($entity->getRecordsLimit(), $newEntity->getRecordsLimit());
     }
 }

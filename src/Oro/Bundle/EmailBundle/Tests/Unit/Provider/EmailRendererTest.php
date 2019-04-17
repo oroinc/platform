@@ -93,7 +93,7 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
                                 $entityClass => ['field2']
                             ],
                             'methods'    => [
-                                $entityClass => ['getField1']
+                                $entityClass => ['getField1', '__toString']
                             ]
                         ]
                     )
@@ -130,7 +130,7 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
                             $entityClass => ['field2']
                         ],
                         'methods'    => [
-                            $entityClass => ['getField1']
+                            $entityClass => ['getField1', '__toString']
                         ],
                         'default_formatter' => [
                             $entityClass => []

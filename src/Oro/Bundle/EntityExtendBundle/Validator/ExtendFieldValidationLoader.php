@@ -8,9 +8,12 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AbstractLoader;
 
+/**
+ * Loads validation metadata for configurable entity fields.
+ */
 class ExtendFieldValidationLoader extends AbstractLoader
 {
-    /** @var array assoc array [fieldType => contraints]*/
+    /** @var array assoc array [fieldType => [constraint, ...], ...] */
     protected $constraintsMapping;
 
     /** @var ConfigProvider */
@@ -48,11 +51,11 @@ class ExtendFieldValidationLoader extends AbstractLoader
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {
-        $className   = $metadata->getClassName();
-        if (empty($this->constraintsMapping) || !$this->formConfigProvider->hasConfig($className)) {
+        if (empty($this->constraintsMapping) || !$this->isConfigurableEntity($metadata)) {
             return false;
         }
 
+        $className = $metadata->getClassName();
         $formConfigs = $this->formConfigProvider->getConfigs($className);
         foreach ($formConfigs as $formConfig) {
             if (!$formConfig->is('is_enabled')) {
@@ -145,5 +148,21 @@ class ExtendFieldValidationLoader extends AbstractLoader
         }
 
         return $constraints;
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     *
+     * @return bool
+     */
+    private function isConfigurableEntity(ClassMetadata $metadata)
+    {
+        // do preliminary checks to avoid unneeded calls of hasConfig() method
+        $refl = $metadata->getReflectionClass();
+        if ($refl->isInterface() || $refl->isAbstract()) {
+            return false;
+        }
+
+        return $this->formConfigProvider->hasConfig($metadata->getClassName());
     }
 }

@@ -10,8 +10,8 @@ class ControllersTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient(
-            array(),
-            $this->generateBasicAuthHeader()
+            [],
+            array_merge(self::generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
         $this->client->useHashNavigation(true);
     }
@@ -20,7 +20,7 @@ class ControllersTest extends WebTestCase
     {
         $this->client->request('GET', $this->getUrl('oro_business_unit_index'));
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
     /**
@@ -29,20 +29,20 @@ class ControllersTest extends WebTestCase
     protected function getUser()
     {
         $request = array(
-            "user" => array(
-                "username" => 'user_' . mt_rand(),
-                "email" => 'test_'  . mt_rand() . '@test.com',
-                "enabled" => '1',
-                "plainPassword" => '1231231q',
-                "firstName" => "firstName",
-                "lastName" => "lastName",
-                "roles" => array("3"),
-                "owner" => "1"
+            'user' => array(
+                'username' => 'user_' . mt_rand(),
+                'email' => 'test_'  . mt_rand() . '@test.com',
+                'enabled' => '1',
+                'plainPassword' => '1231231q',
+                'firstName' => 'firstName',
+                'lastName' => 'lastName',
+                'roles' => array('3'),
+                'owner' => '1'
             )
         );
         $this->ajaxRequest('POST', $this->getUrl('oro_api_post_user'), $request);
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 201);
         $result['request'] = $request;
 
         return $result;
@@ -65,8 +65,8 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Business Unit saved", $crawler->html());
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertContains('Business Unit saved', $crawler->html());
 
         return $user;
     }
@@ -82,7 +82,7 @@ class ControllersTest extends WebTestCase
             array('business-unit-grid[_filter][name][value]' => 'testBU')
         );
 
-        $result = $this->getJsonResponseContent($response, 200);
+        $result = self::getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
         $crawler = $this->client->request(
@@ -98,15 +98,15 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
 
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Business Unit saved", $crawler->html());
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertContains('Business Unit saved', $crawler->html());
 
         $response = $this->client->requestGrid(
             'business-unit-grid',
             array('business-unit-grid[_filter][name][value]' => 'testBU_Updated')
         );
 
-        $result = $this->getJsonResponseContent($response, 200);
+        $result = self::getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
         return $result['id'];
@@ -124,8 +124,8 @@ class ControllersTest extends WebTestCase
         );
 
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("testBU_Updated - Business Units - User Management - System", $crawler->html());
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertContains('testBU_Updated - Business Units - User Management - System', $crawler->html());
     }
 
     /**
@@ -141,9 +141,9 @@ class ControllersTest extends WebTestCase
             array('bu-view-users-grid[business_unit_id]' => $id)
         );
 
-        $result = $this->getJsonResponseContent($response, 200);
+        $result = self::getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
-        $this->assertEquals($user['request']['user']['username'], $result['username']);
+        self::assertEquals($user['request']['user']['username'], $result['username']);
     }
 }

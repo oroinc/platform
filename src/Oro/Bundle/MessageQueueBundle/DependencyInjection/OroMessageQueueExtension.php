@@ -16,6 +16,11 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+/**
+ * This is the class that loads and manages your bundle configuration
+ *
+ * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
+ */
 class OroMessageQueueExtension extends Extension
 {
     const HEARTBEAT_UPDATE_PERIOD_PARAMETER_NAME = 'oro_message_queue.consumer_heartbeat_update_period';
@@ -39,9 +44,6 @@ class OroMessageQueueExtension extends Extension
 
         if (empty($name)) {
             throw new \LogicException('Transport factory name cannot be empty');
-        }
-        if (array_key_exists($name, $this->factories)) {
-            throw new \LogicException(sprintf('Transport factory with such name already added. Name %s', $name));
         }
 
         $this->factories[$name] = $transportFactory;
