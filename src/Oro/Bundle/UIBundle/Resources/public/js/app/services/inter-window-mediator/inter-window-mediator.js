@@ -46,10 +46,10 @@ define(function(require) {
 
         /**
          * @param {string} eventName
-         * @param {object} [eventData] - optional data that will be passed to a handler as an argument
+         * @param {...(Object|Array|number|string|boolean|null}} - optional data that will be passed to a handler as arguments
          */
-        trigger: function(eventName, eventData) {
-            eventData = _.extend({targetId: this.id}, eventData);
+        trigger: function(eventName) {
+            var eventData = {targetId: this.id, args: _.rest(arguments)};
             localStorage.setItem(eventName, JSON.stringify(eventData));
             localStorage.removeItem(eventName);
         },
@@ -60,12 +60,8 @@ define(function(require) {
 
                 // Since IE11 triggers `storage` event on current window lets check and skip it
                 if (eventData.targetId !== this.id) {
-                    eventData = _.omit(eventData, 'targetId');
                     var triggerArguments = [e.key];
-
-                    if (Object.keys(eventData).length) {
-                        triggerArguments.push(eventData);
-                    }
+                    triggerArguments.push.apply(triggerArguments, eventData.args);
 
                     InterWindowMediator.__super__.trigger.apply(this, triggerArguments);
                 }

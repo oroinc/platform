@@ -13,7 +13,10 @@
     {% if organizations|length > 1 %}
         <div class="nav logo-wrapper dropdown"
             {{ UI.renderPageComponentAttributes({
-                module: 'orosecurity/js/app/components/switch-organization-component'
+                module: 'orosecurity/js/app/components/switch-organization-component',
+                options: {
+                    currentOrganizationId: curr_organization.getId()
+                }
             }) }}
         >
             {{ UI.app_logo(organization_name) }}
@@ -52,7 +55,10 @@
     {% if organizations|length > 1 %}
         <div class="organization-switcher dropdown"
             {{ UI.renderPageComponentAttributes({
-                module: 'orosecurity/js/app/components/switch-organization-component'
+                module: 'orosecurity/js/app/components/switch-organization-component',
+                options: {
+                    currentOrganizationId: curr_organization.getId()
+                }
             }) }}
         >
             {% set togglerId = 'dropdown-'|uniqid %}

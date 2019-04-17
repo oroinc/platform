@@ -66,6 +66,10 @@ define(function(require) {
             var img = new Image();
             img.src = this.favicon.href;
             img.onload = function() {
+                if (this.disposed || !this.favicon.parentNode) {
+                    return;
+                }
+
                 var faviconSize = this.faviconSize;
                 var circleRadius = this.circleRadius;
                 var circleColor = this.circleColor;
