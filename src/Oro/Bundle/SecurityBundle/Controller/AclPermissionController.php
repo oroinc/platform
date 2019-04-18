@@ -13,7 +13,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -72,11 +71,10 @@ class AclPermissionController extends Controller
      * )
      *
      * @param Organization $organization
-     * @param Request $request
      *
      * @return RedirectResponse , AccessDeniedException
      */
-    public function switchOrganizationAction(Organization $organization, Request $request)
+    public function switchOrganizationAction(Organization $organization)
     {
         $token = $this->container->get('security.token_storage')->getToken();
         $user  = $token->getUser();
@@ -108,6 +106,8 @@ class AclPermissionController extends Controller
         $token->setOrganizationContext($organization);
         $event = new OrganizationSwitchAfter($user, $organization);
         $this->get('event_dispatcher')->dispatch(OrganizationSwitchAfter::NAME, $event);
+
+        $request = $this->container->get('request_stack')->getCurrentRequest();
         $request->attributes->set('_fullRedirect', true);
 
         return $this->redirect($this->generateUrl('oro_default'));
