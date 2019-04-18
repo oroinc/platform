@@ -83,6 +83,11 @@ class LocalizationManager
     }
 
     /**
+     * The application must have possibility to get available localizations data without warming Doctrine metadata.
+     * It requires for building the applications cache from the scratch, because in any time the application may need to
+     * get this data. But after loading Doctrine metadata for some entities, extended functionality for this entities
+     * will not work.
+     *
      * @param int $id
      * @param bool $useCache disable using cache, if you like to persist, delete, or assign Localization objects.
      *                       Cache should be enabled, only if you want to read from the Localization.
@@ -93,7 +98,19 @@ class LocalizationManager
     {
         $cache = !$useCache ? false : $this->cacheProvider->fetch(self::SIMPLE_CACHE_NAMESPACE);
         if ($cache === false) {
-            $cache = $this->getRepository()->getLocalizationsData();
+            $sql = 'SELECT loc.id, loc.formatting_code AS formatting, lang.code AS language ' .
+                'FROM oro_localization AS loc ' .
+                'INNER JOIN oro_language AS lang ON lang.id = loc.language_id';
+            $stmt = $this->doctrineHelper->getEntityManager(Localization::class)
+                ->getConnection()
+                ->executeQuery($sql);
+            $cache = [];
+            foreach ($stmt->fetchAll() as $row) {
+                $cache[$row['id']] = [
+                    'languageCode' => $row['language'],
+                    'formattingCode' => $row['formatting'],
+                ];
+            }
         }
 
         if ($useCache) {

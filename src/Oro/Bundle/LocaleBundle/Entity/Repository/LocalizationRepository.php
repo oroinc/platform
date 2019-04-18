@@ -83,6 +83,9 @@ class LocalizationRepository extends EntityRepository implements BatchIteratorIn
      * get this data. But after loading Doctrine metadata for some entities, extended functionality for this entities
      * will not work.
      *
+     * @deprecated Will be removed in 4.0
+     * Use \Oro\Bundle\LocaleBundle\Manager\LocalizationManager::getLocalizationData() instead
+     *
      * @return array
      */
     public function getLocalizationsData(): array
