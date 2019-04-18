@@ -32,6 +32,11 @@ class ExtendOptionsParserTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
+        $this->entityMetadataHelper->expects($this->any())
+            ->method('isEntityClassContainsColumn')
+            ->with('Test\Entity1', 'column1')
+            ->willReturn(true);
+
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
