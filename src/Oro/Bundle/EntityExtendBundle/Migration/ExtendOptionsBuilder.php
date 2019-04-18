@@ -7,6 +7,9 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Extend options builder
+ */
 class ExtendOptionsBuilder
 {
     /** @var EntityMetadataHelper */
@@ -84,6 +87,14 @@ class ExtendOptionsBuilder
     public function addColumnOptions($tableName, $columnName, $options)
     {
         $entityClassNames = $this->getEntityClassNames($tableName, null, false);
+
+        // Filtering entities by contains only the required column
+        if (!isset($options['extend']['is_extend'])) {
+            $entityClassNames = array_filter($entityClassNames, function ($className) use ($columnName) {
+                return $this->entityMetadataHelper->isEntityClassContainsColumn($className, $columnName);
+            });
+        }
+
         if (!$entityClassNames) {
             return;
         }
