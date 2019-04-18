@@ -102,6 +102,16 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
      */
     public function testSchema()
     {
+        $this->entityMetadataHelper->expects($this->exactly(3))
+            ->method('isEntityClassContainsColumn')
+            ->willReturnMap(
+                [
+                    ['Acme\AcmeBundle\Entity\Entity1', 'ref_column1', true],
+                    ['Acme\AcmeBundle\Entity\Entity1', 'ref_column2', true],
+                    ['Acme\AcmeBundle\Entity\Entity1', 'configurable_column1', true],
+                ]
+            );
+
         $schema = new ExtendSchema(
             $this->extendOptionsManager,
             $this->nameGenerator

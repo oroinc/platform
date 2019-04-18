@@ -396,7 +396,7 @@ services:
             - '@oro_email.email_renderer'
             - '@logger'
             - '@translator'
-            - '%locale%'
+            - '%oro_locale.language%'
 
     oro_email.link.autoresponserule_manager:
         deprecated: The "%service_id%" service is deprecated since 2.1.
