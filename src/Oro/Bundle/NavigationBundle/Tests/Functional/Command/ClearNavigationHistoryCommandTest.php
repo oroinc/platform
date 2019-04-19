@@ -17,7 +17,6 @@ class ClearNavigationHistoryCommandTest extends WebTestCase
 
     public function testExecuteWithNonValidInterval()
     {
-        $this->markTestSkipped('Due to BAP-18721');
         $this->assertContains(
             "Value 'invalid' should be valid date interval",
             $this->runCommand('oro:navigation:history:clear', ['--interval' => 'invalid'])
