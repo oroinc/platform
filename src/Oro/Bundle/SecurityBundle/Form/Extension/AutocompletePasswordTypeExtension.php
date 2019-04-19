@@ -26,7 +26,7 @@ class AutocompletePasswordTypeExtension extends AbstractTypeExtension
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setNormalizer('attr', function (Options $options, $value) {
-            $value['autocomplete'] = 'off';
+            $value['autocomplete'] = $value['autocomplete'] ?? 'off';
 
             return $value;
         });
