@@ -4,6 +4,7 @@ config:
             exports: 'window.Routing'
     paths:
         'routing': 'bundles/fosjsrouting/js/router.js'
+        'oronavigation/js/tools/routing': 'bundles/oronavigation/js/tools/routing.js'
         'oronavigation/js/app/views/shortcuts-view': 'bundles/oronavigation/js/app/views/shortcuts-view.js'
         'oronavigation/js/app/components/favorite-component': 'bundles/oronavigation/js/app/components/favorite-component.js'
         'oronavigation/js/app/components/pin-component': 'bundles/oronavigation/js/app/components/pin-component.js'
