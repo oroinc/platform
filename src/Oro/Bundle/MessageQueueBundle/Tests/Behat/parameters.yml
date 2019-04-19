@@ -14,11 +14,6 @@ services:
             - '@oro_message_queue.client.mock_lifecycle_message_producer.inner'
             - '@oro_message_queue.mock_lifecycle_message.cache'
 
-    oro_message_queue.client.delay_redelivered_message_extension.decorator:
-        class: Oro\Bundle\MessageQueueBundle\Tests\Behat\Mock\Client\ConsumptionExtension\DelayRedeliveredMessageExtensionDecorator
-        decorates: oro_message_queue.client.delay_redelivered_message_extension
-        public: false
-
     oro_message_queue.client.mock_lifecycle_message_extension:
         class: Oro\Bundle\MessageQueueBundle\Tests\Behat\Mock\Client\ConsumptionExtension\MockLifecycleMessageExtension
         public: false

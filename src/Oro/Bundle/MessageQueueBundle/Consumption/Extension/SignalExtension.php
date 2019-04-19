@@ -1,12 +1,17 @@
 <?php
 
-namespace Oro\Component\MessageQueue\Consumption\Extension;
+namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Exception\LogicException;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Pending to SIGTERM, SIGQUIT or SIGINT signal on before receive, post receive or on idle steps,
+ * if signal was received, interrupt consumer execution.
+ * Optional extension, will be enabled only if php pcntl extension is available.
+ */
 class SignalExtension extends AbstractExtension
 {
     /** @var bool */

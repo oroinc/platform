@@ -51,11 +51,6 @@ class OroMessageQueueExtension extends Extension
         $loader->load('job.yml');
         $loader->load('commands.yml');
 
-        // php pcntl extension available only for UNIX like systems
-        if (extension_loaded('pcntl')) {
-            $loader->load('signal_extension.yml');
-        }
-
         if (isset($config['client'])) {
             $loader->load('client.yml');
 
@@ -82,11 +77,6 @@ class OroMessageQueueExtension extends Extension
                     ->addArgument(new Reference('oro_message_queue.client.traceable_message_producer.inner'))
                 ;
             }
-
-            $delayRedeliveredExtension = $container->getDefinition(
-                'oro_message_queue.client.delay_redelivered_message_extension'
-            );
-            $delayRedeliveredExtension->replaceArgument(1, $config['client']['redelivered_delay_time']);
         }
 
         if (isset($config['consumer'])) {
@@ -97,6 +87,7 @@ class OroMessageQueueExtension extends Extension
         }
 
         $this->createTransport($config, $container);
+        $this->buildOptionalExtensions($config, $container);
         $this->setPersistenceServicesAndProcessors($config, $container);
         $this->setSecurityAgnosticTopicsAndProcessors($config, $container);
         $this->setJobConfigurationProvider($config, $container);
@@ -142,6 +133,26 @@ class OroMessageQueueExtension extends Extension
         $connectionId = $transportFactory->create($container, $config['transport'][$transportKey]);
 
         $container->setAlias('oro_message_queue.transport.connection', $connectionId);
+    }
+
+    /**
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    private function buildOptionalExtensions(array $config, ContainerBuilder $container)
+    {
+        if ($config['client']['redelivery']['enabled']) {
+            $redeliveryExtension = $container
+                ->getDefinition('oro_message_queue.consumption.redelivery_message_extension');
+            $redeliveryExtension->replaceArgument(1, $config['client']['redelivery']['delay_time']);
+            $redeliveryExtension->addTag('oro_message_queue.consumption.extension');
+        }
+
+        // php pcntl extension available only for UNIX like systems
+        if (extension_loaded('pcntl')) {
+            $signalExtension = $container->getDefinition('oro_message_queue.consumption.signal_extension');
+            $signalExtension->addTag('oro_message_queue.consumption.extension', ['persistent' => true]);
+        }
     }
 
     /**
