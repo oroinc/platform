@@ -22,6 +22,10 @@ OroMessageQueueBundle incorporates the OroMessageQueue component into OroPlatfor
  - [Resetting Symfony Container in consumer](Resources/doc/container_in_consumer.md)
  - [Security Context in consumer](Resources/doc/secutity_context.md)
  - [Buffering Messages](Resources/doc/buffering_messages.md)
+ * [Delayed Messages](./Resources/doc/delayed_messages.md)
+
+    * [Redelivery Process](./Resources/doc/delayed_messages.md#redelivery-process)
+
 * [Logging, Error Handling and Debugging](./Resources/doc/logging.md)
 
     * [Logs, Output and Verbosity](./Resources/doc/logging.md#logs-output-and-verbosity)

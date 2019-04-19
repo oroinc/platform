@@ -1,0 +1,7 @@
+<% if (paragraphs) { %>
+<div class="organization-modal-content">
+    <% _.each(paragraphs, function(paragraph) {  %>
+        <p class="organization-modal-content__text"><%- paragraph %></p>
+    <% }) %>
+</div>
+<% } %>

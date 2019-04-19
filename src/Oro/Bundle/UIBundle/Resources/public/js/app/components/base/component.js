@@ -26,6 +26,8 @@ define(function(require) {
         this.delegateListeners();
     };
 
+    BaseComponent.prototype = Object.create(Backbone.Events);
+    BaseComponent.prototype.constructor = BaseComponent;
     BaseComponent.prototype.optionNames = ['model', 'collection', 'name'];
 
     // defines static methods
@@ -82,11 +84,9 @@ define(function(require) {
         }
     });
 
-    // lends methods from Backbone and Chaplin
     _.extend(
         BaseComponent.prototype,
-        // extends BaseComponent.prototype with some Backbone's and Chaplin's functionality
-        Backbone.Events,
+        // extends BaseComponent.prototype with some Chaplin's functionality
         Chaplin.EventBroker,
         // lends useful methods Chaplin.View
         _.pick(Chaplin.View.prototype, ['delegateListeners', 'delegateListener'])

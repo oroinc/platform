@@ -57,7 +57,10 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 'router_destination' => 'default',
                 'default_destination' => 'default',
                 'default_topic' => 'default',
-                'redelivered_delay_time' => 10,
+                'redelivery' => [
+                    'enabled' => true,
+                    'delay_time' => 10,
+                ],
             ]
         ];
 

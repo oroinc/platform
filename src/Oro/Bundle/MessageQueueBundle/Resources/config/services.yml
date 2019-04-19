@@ -92,6 +92,21 @@ services:
         tags:
             - { name: oro_message_queue.consumption.extension, priority: -255, persistent: true }
 
+    # Optional cunsumtion extension with tag `oro_message_queue.consumption.extension`
+    # see Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension::buildOptionalExtensions
+    oro_message_queue.consumption.redelivery_message_extension:
+        class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\RedeliveryMessageExtension
+        public: false
+        arguments:
+            - '@oro_message_queue.client.driver'
+            - ~
+
+    # Optional cunsumtion extension with tag `oro_message_queue.consumption.extension`
+    # see Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension::buildOptionalExtensions
+    oro_message_queue.consumption.signal_extension:
+        class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\SignalExtension
+        public: false
+
     oro_message_queue.consumption.database_connections_clearer:
         class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\DatabaseConnectionsClearer
         public: false

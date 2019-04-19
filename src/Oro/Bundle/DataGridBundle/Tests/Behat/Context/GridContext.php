@@ -1792,7 +1792,7 @@ TEXT;
         $gridSettingsButton->click();
 
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
-        $filterButton->click();
+        $filterButton->clickForce();
 
         // Actually element "GridFilterManager" points to all filter dropdowns, so we have to find out
         // which one is the actual filter manager dropdown.

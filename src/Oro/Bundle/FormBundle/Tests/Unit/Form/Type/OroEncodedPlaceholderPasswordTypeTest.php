@@ -108,7 +108,7 @@ class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
     public function browserAutocompleteDataProvider()
     {
         return [
-            'autocomplete disabled' => [false, ['autocomplete' => 'off']],
+            'autocomplete disabled' => [false, ['autocomplete' => 'new-password']],
             'autocomplete enabled' => [true, []],
         ];
     }
