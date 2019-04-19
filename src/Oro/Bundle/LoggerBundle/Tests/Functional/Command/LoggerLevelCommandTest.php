@@ -80,6 +80,7 @@ class LoggerLevelCommandTest extends WebTestCase
      */
     public function testRunCommandWithFailedValidation($expectedContent, $params)
     {
+        $this->markTestSkipped('Due to BAP-18721');
         $result = $this->runCommand('oro:logger:level', $params);
 
         $this->assertContains($expectedContent, $result);
