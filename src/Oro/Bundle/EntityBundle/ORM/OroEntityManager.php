@@ -59,11 +59,7 @@ class OroEntityManager extends EntityManager implements LoggerAwareInterface
      */
     public function find($entityName, $id, $lockMode = null, $lockVersion = null)
     {
-        try {
-            return parent::find($entityName, $id, $lockMode, $lockVersion);
-        } catch (DriverException $e) {
-            return $this->handleDriverException($e, $entityName, $id);
-        }
+        return parent::find($entityName, $id, $lockMode, $lockVersion);
     }
 
     /**
