@@ -13,6 +13,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Updates logger level configuration.
+ */
 class LoggerLevelCommand extends ContainerAwareCommand
 {
     const LEVEL_PARAM         = 'level';
@@ -146,7 +149,13 @@ class LoggerLevelCommand extends ContainerAwareCommand
     {
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $disableAfter = clone $now;
+
+        // Starting from 7.1.28 and 7.2.17 PHP versions, a PHP Warning will be thrown if the value is not correct.
+        // Disable error reporting to display own error without PHP Warning.
+        $errorLevel = error_reporting();
+        error_reporting(0);
         $disableAfter->add(\DateInterval::createFromDateString($value));
+        error_reporting($errorLevel);
 
         if ($disableAfter <= $now) {
             throw new \InvalidArgumentException(

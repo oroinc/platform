@@ -502,13 +502,16 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $element->check();
     }
 
+    //@codingStandardsIgnoreStart
     /**
      * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select:$/
+     * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)":$/
      *
      * @param string $field
      * @param TableNode $options
      * @param string $formName
      */
+    //@codingStandardsIgnoreEnd
     public function shouldSeeTheFollowingOptionsForSelect($field, TableNode $options, $formName = 'OroForm')
     {
         $optionLabels = array_merge(...$options->getRows());
@@ -525,13 +528,16 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         }
     }
 
+    //@codingStandardsIgnoreStart
     /**
      * @Then /^(?:|I )should not see the following options for "(?P<field>[^"]*)" select:$/
+     * @Then /^(?:|I )should not see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)":$/
      *
      * @param string $field
      * @param TableNode $options
      * @param string $formName
      */
+    //@codingStandardsIgnoreEnd
     public function shouldNotSeeTheFollowingOptionsForSelect($field, TableNode $options, $formName = 'OroForm')
     {
         $optionLabels = array_merge(...$options->getRows());

@@ -40,8 +40,8 @@ class OroEmailBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new Compiler\EmailOwnerConfigurationPass());
         $this->addDoctrineOrmMappingsPass($container);
+        $container->addCompilerPass(new Compiler\EmailOwnerConfigurationPass());
         $container->addCompilerPass(new Compiler\EmailBodyLoaderPass());
         $container->addCompilerPass(new Compiler\EmailFlagManagerLoaderPass());
         $container->addCompilerPass(new Compiler\EmailSynchronizerPass());
@@ -83,10 +83,6 @@ class OroEmailBundle extends Bundle
             str_replace('\\', DIRECTORY_SEPARATOR, self::ENTITY_PROXY_NAMESPACE)
         );
 
-        $container->setParameter('oro_email.entity.cache_dir', $entityCacheDir);
-        $container->setParameter('oro_email.entity.cache_namespace', self::ENTITY_PROXY_NAMESPACE);
-        $container->setParameter('oro_email.entity.proxy_name_template', '%sProxy');
-
         // Ensure the cache directory exists
         $fs = new Filesystem();
         if (!is_dir($entityCacheDir)) {
@@ -98,5 +94,10 @@ class OroEmailBundle extends Bundle
                 [$entityCacheDir => self::ENTITY_PROXY_NAMESPACE]
             )
         );
+
+        $container->addCompilerPass(new Compiler\EmailEntityPass(
+            self::ENTITY_PROXY_NAMESPACE,
+            $entityCacheDir
+        ));
     }
 }

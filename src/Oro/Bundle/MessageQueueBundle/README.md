@@ -22,6 +22,10 @@ OroMessageQueueBundle incorporates the OroMessageQueue component into OroPlatfor
  - [Resetting Symfony Container in consumer](Resources/doc/container_in_consumer.md)
  - [Security Context in consumer](Resources/doc/security_context.md)
  - [Buffering Messages](Resources/doc/buffering_messages.md)
+ * [Delayed Messages](./Resources/doc/delayed_messages.md)
+
+    * [Redelivery Process](./Resources/doc/delayed_messages.md#redelivery-process)
+
 * [Logging, Error Handling and Debugging](./Resources/doc/logging.md)
 
     * [Logs, Output and Verbosity](./Resources/doc/logging.md#logs-output-and-verbosity)
@@ -51,7 +55,6 @@ First, you have to configure a transport layer and set one to be default. For th
 
 oro_message_queue:
     transport:
-        default: '%message_queue_transport%'
         '%message_queue_transport%': '%message_queue_transport_config%'
     client: ~
 ```

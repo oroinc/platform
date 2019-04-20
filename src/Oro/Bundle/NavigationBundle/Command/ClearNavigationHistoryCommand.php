@@ -10,6 +10,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Clears `oro_navigation_history` depending on datetime interval.
+ */
 class ClearNavigationHistoryCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     const CLEAN_BEFORE_PARAM = 'interval';
@@ -45,8 +48,8 @@ class ClearNavigationHistoryCommand extends ContainerAwareCommand implements Cro
                 'i',
                 InputOption::VALUE_OPTIONAL,
                 'All records taken earlier than now minus specified interval will be deleted. '.
-                '(default: "' . self::DEFAULT_INTERVAL . '") Interval examples: "630 seconds", "P1D", etc. '. PHP_EOL .
-                'See: <info>http://php.net/manual/en/datetime.formats.relative.php<info>'
+                '(default: "' . self::DEFAULT_INTERVAL . '") Interval examples: "630 seconds", "1 day", etc. ' . PHP_EOL
+                . 'See: <info>http://php.net/manual/en/datetime.formats.relative.php<info>'
             )
             ->setDescription('Clears `oro_navigation_history` depending on datetime interval.');
     }
@@ -61,9 +64,15 @@ class ClearNavigationHistoryCommand extends ContainerAwareCommand implements Cro
 
             $now = new \DateTime('now', new \DateTimeZone('UTC'));
             $cleanBefore = clone $now;
+
+            // Starting from 7.1.28 and 7.2.17 PHP versions, a PHP Warning will be thrown if the value is not correct.
+            // Disable error reporting to display own error without PHP Warning.
+            $errorLevel = error_reporting();
+            error_reporting(0);
             $cleanBefore->sub(
                 \DateInterval::createFromDateString($interval)
             );
+            error_reporting($errorLevel);
 
             if ($cleanBefore >= $now) {
                 throw new \InvalidArgumentException(

@@ -3,11 +3,15 @@
 namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\Common\EventManager;
+use Doctrine\Common\Proxy\AbstractProxyFactory;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Proxy\ProxyFactory;
+use Doctrine\ORM\UnitOfWork;
+use Doctrine\ORM\Utility\IdentifierFlattener;
 use Oro\Bundle\EntityBundle\ORM\Event\PreCloseEventArgs;
 
 /**
@@ -53,9 +57,30 @@ class OroEntityManager extends EntityManager
         $metadataFactory->setEntityManager($this);
         $metadataFactory->setCacheDriver($this->getConfiguration()->getMetadataCacheImpl());
 
-        $reflProperty = new \ReflectionProperty(EntityManager::class, 'metadataFactory');
-        $reflProperty->setAccessible(true);
-        $reflProperty->setValue($this, $metadataFactory);
+        // $this->metadataFactory = $metadataFactory;
+        $this->setPrivateMetadataFactory(
+            EntityManager::class,
+            $this,
+            $metadataFactory
+        );
+        // $this->getProxyFactory()->metadataFactory = $metadataFactory;
+        $this->setPrivateMetadataFactory(
+            AbstractProxyFactory::class,
+            $this->getProxyFactory(),
+            $metadataFactory
+        );
+        // $this->getProxyFactory()->identifierFlattener->metadataFactory = $metadataFactory;
+        $this->setPrivateMetadataFactory(
+            IdentifierFlattener::class,
+            $this->getPrivateIdentifierFlattener(ProxyFactory::class, $this->getProxyFactory()),
+            $metadataFactory
+        );
+        // $this->getUnitOfWork()->identifierFlattener->metadataFactory = $metadataFactory;
+        $this->setPrivateMetadataFactory(
+            IdentifierFlattener::class,
+            $this->getPrivateIdentifierFlattener(UnitOfWork::class, $this->getUnitOfWork()),
+            $metadataFactory
+        );
     }
 
     /**
@@ -86,5 +111,31 @@ class OroEntityManager extends EntityManager
         $query->setQueryCacheLifetime($this->defaultQueryCacheLifetime);
 
         return $query;
+    }
+
+    /**
+     * @param string $class
+     * @param object $object
+     *
+     * @return object
+     */
+    private function getPrivateIdentifierFlattener($class, $object)
+    {
+        $property = new \ReflectionProperty($class, 'identifierFlattener');
+        $property->setAccessible(true);
+
+        return $property->getValue($object);
+    }
+
+    /**
+     * @param string               $class
+     * @param object               $object
+     * @param ClassMetadataFactory $metadataFactory
+     */
+    private function setPrivateMetadataFactory($class, $object, ClassMetadataFactory $metadataFactory)
+    {
+        $property = new \ReflectionProperty($class, 'metadataFactory');
+        $property->setAccessible(true);
+        $property->setValue($object, $metadataFactory);
     }
 }

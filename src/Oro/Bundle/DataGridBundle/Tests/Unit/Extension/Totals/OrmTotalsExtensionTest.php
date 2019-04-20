@@ -16,7 +16,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Totals\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\Totals\OrmTotalsExtension;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
@@ -37,7 +37,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
     /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
     protected $numberFormatter;
 
-    /** @var DateTimeFormatter|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $dateTimeFormatter;
 
     /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
@@ -51,7 +51,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
             ->willReturnArgument(0);
 
         $this->numberFormatter = $this->createMock(NumberFormatter::class);
-        $this->dateTimeFormatter = $this->createMock(DateTimeFormatter::class);
+        $this->dateTimeFormatter = $this->createMock(DateTimeFormatterInterface::class);
         $this->aclHelper = $this->createMock(AclHelper::class);
 
         $this->config = $this->getTestConfig();

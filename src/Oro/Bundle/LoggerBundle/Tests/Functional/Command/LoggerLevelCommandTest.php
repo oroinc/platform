@@ -92,7 +92,7 @@ class LoggerLevelCommandTest extends WebTestCase
     {
         return [
             'should show failed config update without required arguments' => [
-                '$expectedContent' => "Not enough arguments (missing: \"level, disable-after\")",
+                '$expectedContent' => 'Not enough arguments (missing: "level, disable-after")',
                 '$params'          => [],
             ],
             'should show failed config update with wrong level argument' => [
@@ -114,6 +114,6 @@ class LoggerLevelCommandTest extends WebTestCase
     {
         $result = $this->runCommand('oro:logger:level', ['--help']);
 
-        $this->assertContains("Usage: oro:logger:level [options] [--] <level> <disable-after>", $result);
+        $this->assertContains('Usage: oro:logger:level [options] [--] <level> <disable-after>', $result);
     }
 }

@@ -318,6 +318,9 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testCreateEnum()
     {
         $schema = $this->getExtendSchema();
@@ -329,6 +332,17 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $this->entityMetadataHelper->expects($this->once())
             ->method('registerEntityClass')
             ->with($expectedTableName, $expectedClassName);
+
+        $this->entityMetadataHelper->expects($this->exactly(4))
+            ->method('isEntityClassContainsColumn')
+            ->willReturnMap(
+                [
+                    [$expectedClassName, 'id', true],
+                    [$expectedClassName, 'name', true],
+                    [$expectedClassName, 'priority', true],
+                    [$expectedClassName, 'is_default', true],
+                ]
+            );
 
         $extension->createEnum($schema, 'test_status');
 
@@ -374,6 +388,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                                     'description' => 'oro.entityextend.enumvalue.id.description',
                                 ],
                                 'importexport' => ['identity' => true],
+                                'extend' => ['length' => 32],
                             ],
                             'type'    => 'string'
                         ],
@@ -384,6 +399,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                                     'description' => 'oro.entityextend.enumvalue.name.description',
                                 ],
                                 'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+                                'extend' => ['length' => 255],
                             ],
                             'type'    => 'string'
                         ],
@@ -427,6 +443,17 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $this->entityMetadataHelper->expects($this->once())
             ->method('registerEntityClass')
             ->with($expectedTableName, $expectedClassName);
+
+        $this->entityMetadataHelper->expects($this->exactly(4))
+            ->method('isEntityClassContainsColumn')
+            ->willReturnMap(
+                [
+                    [$expectedClassName, 'id', true],
+                    [$expectedClassName, 'name', true],
+                    [$expectedClassName, 'priority', true],
+                    [$expectedClassName, 'is_default', true],
+                ]
+            );
 
         $extension->createEnum(
             $schema,
@@ -489,6 +516,9 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                                 'importexport' => [
                                     'identity' => true,
                                 ],
+                                'extend' => [
+                                    'length' => 32,
+                                ],
                             ],
                             'type'    => 'string',
                         ],
@@ -500,6 +530,9 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                                 ],
                                 'datagrid' => [
                                     'is_visible' => DatagridScope::IS_VISIBLE_FALSE
+                                ],
+                                'extend' => [
+                                    'length' => 255,
                                 ],
                             ],
                             'type'    => 'string',
@@ -1867,6 +1900,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $joinTable->addForeignKeyConstraint($targetTable, ['entity2_id'], ['id']);
         $joinTable->setPrimaryKey(['entity1_id', 'entity2_id']);
 
+        $this->entityMetadataHelper->expects($this->once())
+            ->method('isEntityClassContainsColumn')
+            ->with('Acme\AcmeBundle\Entity\Entity1', 'rooms')
+            ->willReturn(true);
+
         $extension->addManyToManyInverseRelation(
             $schema,
             $selfTable,
@@ -1959,6 +1997,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
             ['name'],
             ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
         );
+
+        $this->entityMetadataHelper->expects($this->once())
+            ->method('isEntityClassContainsColumn')
+            ->with('Acme\AcmeBundle\Entity\Entity1', 'selfRel')
+            ->willReturn(true);
 
         $selfRelationKey = 'manyToMany|Acme\AcmeBundle\Entity\Entity1|Acme\AcmeBundle\Entity\Entity1|selfRel';
         $targetRelationKey = $selfRelationKey . '|inverse';
@@ -2299,6 +2342,9 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testAddManyToOneInverseRelation()
     {
         $schema = $this->getExtendSchema();
@@ -2333,6 +2379,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         );
+
+        $this->entityMetadataHelper->expects($this->once())
+            ->method('isEntityClassContainsColumn')
+            ->with('Acme\AcmeBundle\Entity\Entity1', 'room')
+            ->willReturn(true);
 
         $relationKey = 'manyToOne|Acme\AcmeBundle\Entity\Entity1|Acme\AcmeBundle\Entity\Entity2|room';
         $this->assertExtendOptions(
@@ -2405,6 +2456,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $table->addColumn('id', 'integer');
         $table->addColumn('name', 'string');
         $table->setPrimaryKey(['id']);
+
+        $this->entityMetadataHelper->expects($this->once())
+            ->method('isEntityClassContainsColumn')
+            ->with('Acme\AcmeBundle\Entity\Entity1', 'selfRel')
+            ->willReturn(true);
 
         $extension->addManyToOneInverseRelation(
             $schema,

@@ -6,7 +6,7 @@ use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -17,7 +17,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
 {
     const MIN_DATE = '1900-01-01';
 
-    /** @var DateTimeFormatter */
+    /** @var DateTimeFormatterInterface */
     protected $formatter;
 
     /** @var Compiler */
@@ -56,12 +56,12 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
     ];
 
     /**
-     * @param DateTimeFormatter   $formatter
-     * @param Compiler            $dateCompiler
+     * @param DateTimeFormatterInterface $formatter
+     * @param Compiler $dateCompiler
      * @param TranslatorInterface $translator
      */
     public function __construct(
-        DateTimeFormatter $formatter,
+        DateTimeFormatterInterface $formatter,
         Compiler $dateCompiler,
         TranslatorInterface $translator
     ) {

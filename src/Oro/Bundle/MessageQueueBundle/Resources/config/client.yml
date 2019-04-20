@@ -81,15 +81,6 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension', priority: -10 }
 
-    oro_message_queue.client.delay_redelivered_message_extension:
-        class: 'Oro\Component\MessageQueue\Client\ConsumptionExtension\DelayRedeliveredMessageExtension'
-        public: false
-        arguments:
-            - '@oro_message_queue.client.driver'
-            - ~
-        tags:
-            - { name: 'oro_message_queue.consumption.extension' }
-
     oro_message_queue.client.queue_consumer:
         class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
         arguments:

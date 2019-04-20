@@ -21,7 +21,8 @@ define(function(require) {
      */
     AddressRegionView = Backbone.View.extend({
         events: {
-            change: 'selectionChanged'
+            change: 'selectionChanged',
+            redraw: 'redraw'
         },
 
         switchState: config.switchState,
@@ -126,13 +127,23 @@ define(function(require) {
 
         /**
          * onChange event listener
-         *
-         * @param e {Object}
          */
-        selectionChanged: function(e) {
+        selectionChanged: function() {
             this.$el.trigger('value:changing');
-            if ($(e.currentTarget).val()) {
-                var countryId = $(e.currentTarget).val();
+            var validator = this.target.closest('form').data('validator');
+            if (validator) {
+                validator.hideElementErrors(this.target[0]);
+            }
+            this.redraw();
+            this.$el.trigger('value:changed');
+        },
+
+        redraw: function() {
+            if (this.$simpleEl) {
+                this.$simpleEl.hide();
+            }
+            var countryId = this.$el.val();
+            if (countryId) {
                 this.collection.setCountryId(countryId);
                 this.collection.fetch({reset: true});
             } else {
@@ -141,18 +152,13 @@ define(function(require) {
         },
 
         render: function() {
-            var validator = this.target.closest('form').data('validator');
-
-            if (validator) {
-                validator.hideElementErrors(this.target[0]);
-            }
-
             if (this.collection.models.length > 0) {
                 this.target.show();
                 this.displaySelect2(true);
                 this.target.find('option[value!=""]').remove();
                 this.target.append(this.template({regions: this.collection.models}));
-                this.target.val(this.target.data('selected-data') || '').trigger('change');
+                var value = this.target.data('selected-data') || '';
+                this.target.select2('val', value);
 
                 if (this.$simpleEl) {
                     this.$simpleEl.hide().val('');
@@ -166,7 +172,6 @@ define(function(require) {
                     this.$simpleEl.show();
                 }
             }
-            this.$el.trigger('value:changed');
         },
 
         switchInputWidget: function(display) {

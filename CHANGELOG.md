@@ -71,6 +71,9 @@ The current file describes significant changes in the code that may affect the u
 #### FilterBundle
 * The `datasource` attribute for `oro_filter.extension.orm_filter.filter` tag has been removed as it is redundant.
 
+#### MessageQueueBundle
+* The `DefaultTransportFactory` and related configuration option `oro_message_queue.transport.defaut` was removed. Check `config/config.yml` in your application.
+
 #### LayoutBundle
 * The `themes` section has been removed from LayoutBundle configuration. Use `Resources/views/layouts/{folder}/theme.yml` instead.
 

@@ -168,6 +168,7 @@ class UserType extends AbstractType
                 'tooltip' => $this->optionsProvider->getTooltip(),
                 'attr' => [
                     'data-validation' => $this->optionsProvider->getDataValidationOption(),
+                    'autocomplete' => 'new-password',
                 ]
             ],
             'second_options' => ['label' => 'oro.user.password_re.label'],

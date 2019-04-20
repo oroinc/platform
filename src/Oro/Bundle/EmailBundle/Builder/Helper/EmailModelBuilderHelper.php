@@ -6,6 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerAwareInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
@@ -22,6 +23,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Templating\EngineInterface;
 
 /**
+ * Provides helper methods for building full email address and user email related methods.
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class EmailModelBuilderHelper
@@ -105,7 +108,11 @@ class EmailModelBuilderHelper
                     if ($this->doExcludeCurrentUser($excludeCurrentUser, $emailAddress, $owner)) {
                         return;
                     }
-                    $ownerName = $this->entityNameResolver->getName($owner);
+                    if ($owner instanceof EmailOwnerAwareInterface) {
+                        $ownerName = $this->entityNameResolver->getName($owner->getEmailOwner());
+                    } else {
+                        $ownerName = $this->entityNameResolver->getName($owner);
+                    }
                     if (!empty($ownerName)) {
                         $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
 

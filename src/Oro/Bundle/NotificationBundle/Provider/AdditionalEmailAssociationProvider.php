@@ -23,9 +23,6 @@ class AdditionalEmailAssociationProvider implements AdditionalEmailAssociationPr
     /** @var TranslatorInterface */
     private $translator;
 
-    /** @var array */
-    private $collectedAssociations = [];
-
     /**
      * @param ManagerRegistry     $doctrine
      * @param ConfigProvider      $entityConfigProvider

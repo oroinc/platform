@@ -1,0 +1,13 @@
+oro_behat_extension:
+    suites:
+        OroEmbeddedFormBundle:
+            contexts:
+                - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+                - OroUserBundle::FeatureContext
+                - OroDataGridBundle::GridContext
+                - OroFormBundle::FormContext
+                - OroUIBundle::ContextSelectorContext
+                - OroNavigationBundle::FeatureContext
+                - OroLocaleBundle::LocalizationContext
+            paths:
+                - '@OroEmbeddedFormBundle/Tests/Behat/Features'

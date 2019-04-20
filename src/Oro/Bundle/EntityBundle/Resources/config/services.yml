@@ -58,6 +58,13 @@ services:
             - '%kernel.cache_dir%/oro/entity.php'
             - '%kernel.debug%'
 
+    oro_entity.converter.doctrine.orm.decorator:
+        class: 'Oro\Bundle\EntityBundle\Request\ParamConverter\DoctrineParamConverterDecorator'
+        decorates: 'sensio_framework_extra.converter.doctrine.orm'
+        decoration_priority: -256 # should be at the top of the decoration chain
+        arguments:
+            - '@oro_entity.converter.doctrine.orm.decorator.inner'
+
     oro_entity.listener.navigation_listener:
         class: '%oro_entity.listener.navigation_listener.class%'
         arguments:
@@ -169,26 +176,31 @@ services:
             - '@oro_entity.entity_hierarchy_provider.all'
             - '@oro_entity.entity_configuration.provider'
         tags:
-            - { name: oro_entity.virtual_field_provider, priority: 0 }
+            - { name: oro_entity.virtual_field_provider }
+
+    oro_entity.virtual_field_provider.cache.dictionary:
+        parent: oro.cache.abstract.without_memory_cache
+        public: false
+        calls:
+            - [ setNamespace, [ 'oro_dictionary_virtual_fields' ] ]
 
     oro_entity.virtual_field_provider.dictionary:
         class: Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider
         public: false
         arguments:
-            - '@oro_entity_config.provider.grouping'
-            - '@oro_entity_config.provider.dictionary'
-            - '@oro_entity_config.provider.entity'
+            - '@oro_entity_config.config_manager'
             - '@doctrine'
             - '@translator'
+            - '@oro_entity.virtual_field_provider.cache.dictionary'
         tags:
             - { name: oro_entity.virtual_field_provider, priority: 100 }
+            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: clearCache }
 
     oro_entity.virtual_field_provider.enum:
         class: Oro\Bundle\EntityBundle\Provider\EnumVirtualFieldProvider
         public: false
         arguments:
-            - '@oro_entity_config.provider.extend'
-            - '@doctrine'
+            - '@oro_entity_config.config_manager'
         tags:
             - { name: oro_entity.virtual_field_provider, priority: 100 }
 
@@ -206,7 +218,7 @@ services:
             - '@oro_entity.entity_hierarchy_provider.all'
             - '@oro_entity.entity_configuration.provider'
         tags:
-            - { name: oro_entity.virtual_relation_provider, priority: 0 }
+            - { name: oro_entity.virtual_relation_provider }
 
     oro_entity.entity_hierarchy_provider:
         class: Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider

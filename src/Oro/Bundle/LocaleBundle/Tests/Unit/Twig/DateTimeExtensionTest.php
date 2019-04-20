@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Twig\DateTimeExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
@@ -18,9 +18,7 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->formatter = $this->getMockBuilder(DateTimeFormatter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formatter = $this->createMock(DateTimeFormatterInterface::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_locale.formatter.date_time', $this->formatter)

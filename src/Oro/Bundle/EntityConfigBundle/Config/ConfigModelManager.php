@@ -18,13 +18,6 @@ use Oro\Component\DependencyInjection\ServiceLink;
  */
 class ConfigModelManager
 {
-    /** @deprecated since 1.9. Use ConfigModel::MODE_DEFAULT instead */
-    const MODE_DEFAULT = ConfigModel::MODE_DEFAULT;
-    /** @deprecated since 1.9. Use ConfigModel::MODE_HIDDEN instead */
-    const MODE_HIDDEN = ConfigModel::MODE_HIDDEN;
-    /** @deprecated since 1.9. Use ConfigModel::MODE_READONLY instead */
-    const MODE_READONLY = ConfigModel::MODE_READONLY;
-
     /** @var EntityConfigModel[] [{class name} => EntityConfigModel, ...] */
     private $entities;
 

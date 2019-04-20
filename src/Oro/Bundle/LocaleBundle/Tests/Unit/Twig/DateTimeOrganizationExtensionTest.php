@@ -3,7 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Twig\DateTimeOrganizationExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
@@ -15,7 +15,7 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DateTimeOrganizationExtension */
     protected $extension;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formatter;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
@@ -26,7 +26,7 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->formatter = $this->createMock(DateTimeFormatter::class);
+        $this->formatter = $this->createMock(DateTimeFormatterInterface::class);
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->localizationManager = $this->createMock(LocalizationManager::class);
 

@@ -11,7 +11,7 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
@@ -33,7 +33,7 @@ class OrmTotalsExtension extends AbstractExtension
     /** @var NumberFormatter */
     protected $numberFormatter;
 
-    /** @var DateTimeFormatter */
+    /** @var DateTimeFormatterInterface */
     protected $dateTimeFormatter;
 
     /** @var AclHelper */
@@ -44,14 +44,14 @@ class OrmTotalsExtension extends AbstractExtension
 
     /**
      * @param TranslatorInterface $translator
-     * @param NumberFormatter     $numberFormatter
-     * @param DateTimeFormatter   $dateTimeFormatter
-     * @param AclHelper           $aclHelper
+     * @param NumberFormatter $numberFormatter
+     * @param DateTimeFormatterInterface $dateTimeFormatter
+     * @param AclHelper $aclHelper
      */
     public function __construct(
         TranslatorInterface $translator,
         NumberFormatter $numberFormatter,
-        DateTimeFormatter $dateTimeFormatter,
+        DateTimeFormatterInterface $dateTimeFormatter,
         AclHelper $aclHelper
     ) {
         $this->translator        = $translator;

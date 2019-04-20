@@ -30,6 +30,10 @@ class ExtendOptionsParserTest extends \PHPUnit\Framework\TestCase
                     ['table2', ['Test\Entity2']],
                 ]
             );
+        $this->entityMetadataHelper->expects($this->any())
+            ->method('isEntityClassContainsColumn')
+            ->with('Test\Entity1', 'column1')
+            ->willReturn(true);
 
         $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->any())

@@ -110,6 +110,16 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
      */
     public function testSchema()
     {
+        $this->entityMetadataHelper->expects($this->exactly(3))
+            ->method('isEntityClassContainsColumn')
+            ->willReturnMap(
+                [
+                    ['Acme\AcmeBundle\Entity\Entity1', 'ref_column1', true],
+                    ['Acme\AcmeBundle\Entity\Entity1', 'ref_column2', true],
+                    ['Acme\AcmeBundle\Entity\Entity1', 'configurable_column1', true],
+                ]
+            );
+
         $schema = new ExtendSchema(
             $this->extendOptionsManager,
             $this->nameGenerator
@@ -221,6 +231,7 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
                         'configurable_column1' => [
                             'type'    => 'string',
                             'configs' => [
+                                'extend'   => ['length' => 100],
                                 'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_TRUE, 'other' => 'val'],
                                 'form'     => ['is_enabled' => false],
                             ]
@@ -228,7 +239,11 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
                         'extend_column1'       => [
                             'type'    => 'string',
                             'configs' => [
-                                'extend'   => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
+                                'extend'   => [
+                                    'is_extend' => true,
+                                    'owner' => ExtendScope::OWNER_CUSTOM,
+                                    'length' => 100
+                                ],
                                 'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]
                             ]
                         ],

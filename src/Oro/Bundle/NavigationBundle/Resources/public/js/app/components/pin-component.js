@@ -5,7 +5,7 @@ define(function(require) {
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var routing = require('routing');
-    var PageStateView = require('oronavigation/js/app/views/page-state-view');
+    var tools = require('oroui/js/tools');
     var ButtonView = require('oronavigation/js/app/views/bookmark-button-view');
     var PinBarView = require('oronavigation/js/app/views/pin-bar-view');
     var DropdownView = require('oronavigation/js/app/views/pin-dropdown-view');
@@ -14,10 +14,17 @@ define(function(require) {
     var PinbarCollection = require('oronavigation/js/app/models/pinbar-collection');
 
     PinComponent = BaseBookmarkComponent.extend({
+        relatedSiblingComponents: {
+            pageStateComponent: 'page-state-component'
+        },
+
         typeName: 'pinbar',
 
         listen: {
-            'page:request mediator': 'refreshPinbar'
+            'page:request mediator': 'refreshPinbar',
+
+            'add collection': 'togglePageStateTrace',
+            'remove collection': 'togglePageStateTrace'
         },
 
         collectionModel: PinbarCollection,
@@ -32,6 +39,12 @@ define(function(require) {
         initialize: function(options) {
             PinComponent.__super__.initialize.call(this, options);
 
+            if (!this.pageStateComponent) {
+                throw new Error('Instance of PageStateComponent is required for Pinned tabs');
+            }
+
+            this.pageStateComponent.view.setStateTraceRequiredChecker(this.isPageStateTraceRequired.bind(this));
+
             this.refreshPinbar();
         },
 
@@ -39,7 +52,6 @@ define(function(require) {
             this._createButtonView();
             this._createBarView();
             this._createDropdownView();
-            this._createPageStateView();
         },
 
         /**
@@ -111,16 +123,16 @@ define(function(require) {
             this.dropdown = new DropdownView(options);
         },
 
-        _createPageStateView: function() {
-            var options = this._options.pageStateOptions || {};
+        togglePageStateTrace: function() {
+            this.pageStateComponent.view.toggleStateTrace();
+        },
 
-            _.extend(options, {
-                collection: this.collection
-            });
+        isPageStateTraceRequired: function() {
+            var urlObj = document.createElement('a');
+            urlObj.href = mediator.execute('normalizeUrl', mediator.execute('currentUrl'));
+            var queryObj = tools.unpackFromQueryString(urlObj.search);
 
-            this.pageState = new PageStateView(options);
-
-            mediator.setHandler('isPageStateChanged', this.pageState.isStateChanged.bind(this.pageState));
+            return this.collection.getCurrentModel() !== undefined && queryObj['restore'];
         },
 
         actualizeAttributes: function(model) {

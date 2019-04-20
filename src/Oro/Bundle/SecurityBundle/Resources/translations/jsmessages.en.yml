@@ -1,0 +1,6 @@
+orosecurity:
+    switch_organization_modal:
+        title: 'Change Organization Confirmation'
+        unsaved_data_text: 'You are about to switch to a new organization. All unsaved data will be lost and you will be redirected to the dashboard of the new organization in all open tabs.'
+        saved_data_text: 'You are about to switch to a new organization. All data has been saved.'
+        question: 'Are you sure you want to proceed?'
