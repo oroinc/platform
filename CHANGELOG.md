@@ -51,6 +51,9 @@ The current file describes significant changes in the code that may affect the u
     - `Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass`
     - `Oro\Component\DependencyInjection\Exception\UnknownAliasException`
 
+#### ActionBundle
+* The deprecated `route_exists` action (class `Oro\Bundle\ActionBundle\Condition\RouteExists`) was removed.
+
 #### ChartBundle
 * The possibility to define charts via ChartBundle configuration has been removed. Use `Resources/config/oro/charts.yml` instead.
 * Methods `getConfigs()` and `getChartConfigs()` have been removed from `Oro\Bundle\ChartBundle\Model\ConfigProvider`. Use `getChartNames()` and `getChartConfig($chartName)` methods instead.

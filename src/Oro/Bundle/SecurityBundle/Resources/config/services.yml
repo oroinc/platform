@@ -333,6 +333,7 @@ services:
         class: Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader
         public: false
         arguments:
+            - '@oro_ui.controller_class_provider'
             - '@annotation_reader'
         tags:
             - { name: oro_security.acl.config_loader, priority: -10 }

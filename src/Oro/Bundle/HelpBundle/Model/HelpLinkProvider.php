@@ -5,6 +5,7 @@ namespace Oro\Bundle\HelpBundle\Model;
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\HelpBundle\Annotation\Help;
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
+use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -14,79 +15,55 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class HelpLinkProvider
 {
-    /**
-     * @var array
-     */
-    protected $rawConfiguration;
+    private const FORMAT          = '%server%/%vendor%/%bundle%/%controller%_%action%';
+    private const GROUP_SEPARATOR = '/';
 
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
+    /** @var array */
+    private $rawConfiguration;
 
-    /**
-     * @var ControllerNameParser
-     */
-    protected $parser;
+    /** @var RequestStack */
+    private $requestStack;
 
-    /**
-     * @var VersionHelper
-     */
-    protected $helper;
+    /** @var ControllerClassProvider */
+    private $controllerClassProvider;
 
-    /**
-     * @var array
-     */
-    protected $parserCache = array();
+    /** @var ControllerNameParser */
+    private $parser;
 
-    /**
-     * @var string
-     */
-    protected $groupSeparator = '/';
+    /** @var VersionHelper */
+    private $helper;
 
-    /**
-     * @var string
-     */
-    protected $requestController;
+    /** @var array */
+    private $parserCache = [];
 
-    /**
-     * @var string
-     */
-    protected $requestRoute;
+    /** @var string */
+    private $requestRoute;
 
-    /**
-     * @var Request
-     */
-    protected $request;
+    /** @var Request */
+    private $request;
 
-    /**
-     * @var Help|Help[]|null
-     */
-    protected $helpAnnotation;
+    /** @var Help[]|null */
+    private $helpAnnotation;
 
-    /**
-     * @var CacheProvider
-     */
-    protected $cache;
-
-    /**
-     * @var string
-     */
-    protected $format = '%server%/%vendor%/%bundle%/%controller%_%action%';
+    /** @var CacheProvider */
+    private $cache;
 
     /**
      * @param RequestStack $requestStack
+     * @param ControllerClassProvider $controllerClassProvider
      * @param ControllerNameParser $parser
      * @param VersionHelper $helper
      * @param CacheProvider $cache
      */
     public function __construct(
         RequestStack $requestStack,
+        ControllerClassProvider $controllerClassProvider,
         ControllerNameParser $parser,
         VersionHelper $helper,
         CacheProvider $cache
     ) {
         $this->requestStack = $requestStack;
+        $this->controllerClassProvider = $controllerClassProvider;
         $this->parser = $parser;
         $this->helper = $helper;
         $this->cache = $cache;
@@ -94,9 +71,8 @@ class HelpLinkProvider
 
     public function setRequest(Request $request)
     {
-        $this->requestController = $request->get('_controller');
         $this->requestRoute = $request->get('_route');
-        $this->helpAnnotation = $request->get('_' . Help::ALIAS);
+        $this->helpAnnotation = null;
         $this->request = $request;
     }
 
@@ -152,7 +128,7 @@ class HelpLinkProvider
      *
      * @return string
      */
-    protected function constructedHelpLinkUrl()
+    private function constructedHelpLinkUrl()
     {
         $config = $this->getConfiguration();
         if (isset($config['link'])) {
@@ -161,19 +137,19 @@ class HelpLinkProvider
 
         $config['server'] = rtrim($config['server'], '/');
         if (isset($config['prefix'], $config['vendor'])) {
-            $config['vendor'] = $config['prefix'] . $this->groupSeparator . $config['vendor'];
+            $config['vendor'] = $config['prefix'] . self::GROUP_SEPARATOR . $config['vendor'];
         }
 
-        $keys = array('server', 'vendor', 'bundle', 'controller', 'action', 'uri');
-        $replaceParams = array();
+        $keys = ['server', 'vendor', 'bundle', 'controller', 'action', 'uri'];
+        $replaceParams = [];
         foreach ($keys as $key) {
-            $replaceParams['%' . $key . '%'] = isset($config[$key]) ? $config[$key]: '';
+            $replaceParams['%' . $key . '%'] = $config[$key] ?? '';
         }
 
         if (isset($config['uri'])) {
             $link = strtr('%server%/%uri%', $replaceParams);
         } elseif (isset($config['vendor'], $config['bundle'], $config['controller'], $config['action'])) {
-            $link = strtr($this->format, $replaceParams);
+            $link = strtr(self::FORMAT, $replaceParams);
         } else {
             $link = $config['server'];
         }
@@ -200,15 +176,11 @@ class HelpLinkProvider
      * @param string $url
      * @return string
      */
-    protected function appendVersion($url)
+    private function appendVersion($url)
     {
-        if (strpos($url, "?")) {
-            $url .= "&";
-        } else {
-            $url .= "?";
-        }
+        $delimiter = false === strpos($url, '?') ? '?' : '&';
 
-        return $url . "v=" . $this->helper->getVersion();
+        return $url . $delimiter . 'v=' . $this->helper->getVersion();
     }
 
     /**
@@ -216,15 +188,21 @@ class HelpLinkProvider
      *
      * @return array
      */
-    protected function getConfiguration()
+    private function getConfiguration()
     {
-        $result = array();
+        $result = [];
+
+        $controllerData = $this->getRequestControllerData();
 
         $this->mergeDefaultsConfig($result);
-        $this->mergeRequestControllerConfig($result);
+        if ($controllerData) {
+            $this->mergeRequestControllerConfig($result, $controllerData);
+        }
         $this->mergeAnnotationConfig($result);
         $this->mergeRoutesConfig($result);
-        $this->mergeVendorsAndResourcesConfig($result);
+        if ($controllerData) {
+            $this->mergeVendorsAndResourcesConfig($result, $controllerData);
+        }
 
         return $result;
     }
@@ -234,7 +212,7 @@ class HelpLinkProvider
      *
      * @param array $resultConfig
      */
-    protected function mergeDefaultsConfig(array &$resultConfig)
+    private function mergeDefaultsConfig(array &$resultConfig)
     {
         $resultConfig = array_merge($resultConfig, $this->rawConfiguration['defaults']);
     }
@@ -244,20 +222,22 @@ class HelpLinkProvider
      *
      * @param array $resultConfig
      */
-    protected function mergeAnnotationConfig(array &$resultConfig)
+    private function mergeAnnotationConfig(array &$resultConfig)
     {
+        if (null === $this->helpAnnotation && null !== $this->request) {
+            $helpAnnotation = $this->request->get('_' . Help::ALIAS);
+            if (!$helpAnnotation) {
+                $helpAnnotation = [];
+            } elseif (!is_array($helpAnnotation)) {
+                $helpAnnotation = [$helpAnnotation];
+            }
+            $this->helpAnnotation = $helpAnnotation;
+        }
         if (!$this->helpAnnotation) {
             return;
         }
 
-        if (!is_array($this->helpAnnotation)) {
-            $helpList = array($this->helpAnnotation);
-        } else {
-            $helpList = $this->helpAnnotation;
-        }
-
-        /** @var $help Help */
-        foreach ($helpList as $help) {
+        foreach ($this->helpAnnotation as $help) {
             if ($help instanceof Help) {
                 $resultConfig = array_merge($resultConfig, $help->getConfigurationArray());
             }
@@ -269,7 +249,7 @@ class HelpLinkProvider
      *
      * @param array $resultConfig
      */
-    protected function mergeRoutesConfig(array &$resultConfig)
+    private function mergeRoutesConfig(array &$resultConfig)
     {
         if ($this->requestRoute && isset($this->rawConfiguration['routes'][$this->requestRoute])) {
             $resultConfig = array_merge($resultConfig, $this->rawConfiguration['routes'][$this->requestRoute]);
@@ -280,58 +260,46 @@ class HelpLinkProvider
      * Apply configuration from request controller name
      *
      * @param array $resultConfig
+     * @param array $controllerData
      */
-    protected function mergeRequestControllerConfig(array &$resultConfig)
+    private function mergeRequestControllerConfig(array &$resultConfig, array $controllerData)
     {
-        if (!$this->requestController) {
-            return;
-        }
-
-        $resultConfig = array_merge($resultConfig, $this->parseRequestController($this->requestController));
+        $resultConfig = array_merge($resultConfig, $controllerData);
     }
 
     /**
      * Apply configuration from "vendors" and "resources" section of configuration
      *
      * @param array $resultConfig
+     * @param array $controllerData
      */
-    protected function mergeVendorsAndResourcesConfig(array &$resultConfig)
+    private function mergeVendorsAndResourcesConfig(array &$resultConfig, array $controllerData)
     {
-        if (!$this->requestController) {
-            return;
-        }
-
-        $controllerData = $this->parseRequestController($this->requestController);
-
-        if (!$controllerData) {
-            return;
-        }
-
         $vendor = $controllerData['vendor'];
         $bundle = $controllerData['bundle'];
         $controller = $controllerData['controller'];
         $action = $controllerData['action'];
 
-        $configData[] = array(
+        $configData[] = [
             'id' => $vendor,
             'section' => 'vendors',
             'key' => 'vendor'
-        );
-        $configData[] = array(
+        ];
+        $configData[] = [
             'id' => $bundle,
             'section' => 'resources',
             'key' => 'bundle'
-        );
-        $configData[] = array(
+        ];
+        $configData[] = [
             'id' => $bundle . ':' . $controller,
             'section' => 'resources',
             'key' => 'controller'
-        );
-        $configData[] = array(
+        ];
+        $configData[] = [
             'id' => sprintf('%s:%s:%s', $bundle, $controller, $action),
             'section' => 'resources',
             'key' => 'action'
-        );
+        ];
 
         foreach ($configData as $searchData) {
             $id = $searchData['id'];
@@ -351,69 +319,48 @@ class HelpLinkProvider
     }
 
     /**
+     * @return array
+     */
+    private function getRequestControllerData()
+    {
+        $requestController = null;
+        if ($this->requestRoute) {
+            $controllers = $this->controllerClassProvider->getControllers();
+            if (isset($controllers[$this->requestRoute])) {
+                $controller = $controllers[$this->requestRoute];
+                $requestController = sprintf('%s::%s', $controller[0], $controller[1]);
+            }
+        }
+
+        return $this->parseRequestController($requestController);
+    }
+
+    /**
      * Parses request controller and returns vendor, bundle, controller, action
      *
      * @param string $controller
      * @return array
      */
-    protected function parseRequestController($controller)
+    private function parseRequestController($controller)
     {
         if (!is_string($controller)) {
-            return array();
+            return [];
         }
 
         if (array_key_exists($controller, $this->parserCache)) {
             return $this->parserCache[$controller];
         }
 
-        $result = array();
-
-        if ($this->isControllerActionFullName($controller)) {
-            // Format: "Foo\BarBundle\Controller\BazController::indexAction"
-            $controllerActionKey = $this->parser->build($controller);
-            $controllerFullName = $controller;
-        } elseif ($this->isControllerActionShortName($controller)) {
-            // Format: "FooBarBundle:BazController:index"
-            $controllerActionKey = $controller;
-            $controllerFullName = $this->parser->parse($controller);
-        } else {
-            // Format with service id: "foo_bar_bundle.baz_controller:indexAction"
-            // Cannot be used to parse vendor, bundle, controller, action
-            return $result;
-        }
-
-        $controllerNameParts = explode('::', $controllerFullName);
+        $controllerActionKey = $this->parser->build($controller);
+        $controllerNameParts = explode('::', $controller);
         $vendorName = current(explode('\\', $controllerNameParts[0]));
-
         list($bundleName, $controllerName, $actionName) = explode(':', $controllerActionKey);
 
-        return $this->parserCache[$controller] = array(
+        return $this->parserCache[$controller] = [
             'vendor' => $vendorName,
             'bundle' => $bundleName,
             'controller' => $controllerName,
             'action' => $actionName,
-        );
-    }
-
-    /**
-     * Check if controller has format "Bundle:Controller:action"
-     *
-     * @param string $controller
-     * @return bool
-     */
-    protected function isControllerActionShortName($controller)
-    {
-        return 3 === count(explode(':', $controller));
-    }
-
-    /**
-     * Check if controller has format Foo\BarBundle\Controller\BazController::indexAction
-     *
-     * @param string $controller
-     * @return int
-     */
-    protected function isControllerActionFullName($controller)
-    {
-        return preg_match('#^(.*?\\\\Controller\\\\(.+)Controller)::(.+)Action$#', $controller, $match);
+        ];
     }
 }

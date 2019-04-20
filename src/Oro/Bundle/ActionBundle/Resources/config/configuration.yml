@@ -15,7 +15,7 @@ services:
     oro_action.configuration.validator.operations:
         class: Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator
         arguments:
-            - '@router'
+            - '@oro_ui.controller_class_provider'
             - '@twig.loader'
             - '@oro_entity.doctrine_helper'
             - '@logger'

@@ -278,7 +278,10 @@ class TitleService implements TitleServiceInterface
      */
     public function loadByRoute($route, $menuName = null)
     {
-        $title = $this->titleReaderRegistry->getTitleByRoute($route);
+        $title = null;
+        if ($route) {
+            $title = $this->titleReaderRegistry->getTitleByRoute($route);
+        }
 
         $this->setTemplate($this->createTitle($route, $title, $menuName));
         $this->setShortTemplate($this->getShortTitle($route, $title, $menuName));
@@ -289,15 +292,19 @@ class TitleService implements TitleServiceInterface
     /**
      * Create title template for current route and menu name
      *
-     * @param string      $route
-     * @param string      $title
+     * @param string|null $route
+     * @param string|null $title
      * @param string|null $menuName
      *
      * @return string
      */
     public function createTitle($route, $title, $menuName = null)
     {
-        $titleData = $this->mergeTitleWithBreadcrumbLabels($route, $title, $menuName);
+        if ($route) {
+            $titleData = $this->mergeTitleWithBreadcrumbLabels($route, $title, $menuName);
+        } else {
+            $titleData = [];
+        }
 
         $globalTitleSuffix = $this->userConfigManager->get('oro_navigation.title_suffix');
         if ($globalTitleSuffix) {
@@ -366,22 +373,22 @@ class TitleService implements TitleServiceInterface
     /**
      * Get short title
      *
-     * @param string      $route
-     * @param string      $title
+     * @param string|null $route
+     * @param string|null $title
      * @param string|null $menuName
      *
      * @return string
      */
     private function getShortTitle($route, $title, $menuName = null)
     {
-        if (!$title) {
+        if (!$title && $route) {
             $breadcrumbs = $this->getBreadcrumbLabels($route, $menuName);
             if (count($breadcrumbs)) {
                 $title = $breadcrumbs[0];
             }
         }
 
-        return $title;
+        return $title ?? '';
     }
 
     /**

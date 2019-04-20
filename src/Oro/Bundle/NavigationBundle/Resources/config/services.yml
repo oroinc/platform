@@ -31,8 +31,6 @@ parameters:
     oro_navigation.title_service.class:                        Oro\Bundle\NavigationBundle\Provider\TitleService
     oro_navigation.title_translator.class:                     Oro\Bundle\NavigationBundle\Provider\TitleTranslator
 
-    oro_navigation.translation.extractor.class:                Oro\Bundle\NavigationBundle\Title\TranslationExtractor
-
     oro_navigation.form.type.pagestate.class:                  Oro\Bundle\NavigationBundle\Form\Type\PageStateType
     oro_navigation.form.handler.pagestate.class:               Oro\Bundle\NavigationBundle\Form\Handler\PageStateHandler
 
@@ -265,39 +263,23 @@ services:
           - '@translator.default'
           - '@oro_config.user'
 
-    oro_navigation.cache.title_annotations:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_navigation_annotations' ] ]
-
-    oro_navigation.cached_reader.title_annotations:
-        parent: annotations.cached_reader
-        arguments:
-            - '@annotation_reader'
-            - '@oro_navigation.cache.title_annotations'
-            - '%kernel.debug%'
-
     oro_navigation.title_reader.registry:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry
+        public: false
+        arguments:
+          - !tagged oro_navigation.title_reader
 
     oro_navigation.title_annotations_reader:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader
         public: false
+        parent: oro.static_config_provider.abstract
         arguments:
-            - '@oro_navigation.cached_reader.title_annotations'
-            - '@router'
-            - '@oro_navigation.cache.title_annotations'
+            - '%kernel.cache_dir%/oro/title_annotations.php'
+            - '%kernel.debug%'
+            - '@oro_ui.controller_class_provider'
+            - '@annotation_reader'
         tags:
             - { name: oro_navigation.title_reader, priority: 10}
-
-    oro_navigation.title_annotations_warmer:
-        class: Oro\Component\Config\Cache\ConfigCacheWarmer
-        public: false
-        arguments:
-            - '@oro_navigation.title_annotations_reader'
-        tags:
-            - { name: kernel.cache_warmer }
 
     oro_navigation.title_config_reader:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader
@@ -316,10 +298,10 @@ services:
             - { name: twig.extension }
 
     oro_navigation.translation.extractor:
-        class: '%oro_navigation.translation.extractor.class%'
+        class: Oro\Bundle\NavigationBundle\Title\TranslationExtractor
         arguments:
             - '@oro_navigation.title_reader.registry'
-            - '@router'
+            - '@oro_ui.controller_class_provider'
         tags:
             - { name: translation.extractor, alias: navigation_translation_extractor }
 

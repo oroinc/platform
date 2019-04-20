@@ -17,7 +17,6 @@ class OroActionExtensionTest extends ExtensionTestCase
         $this->loadExtension(new OroActionExtension());
         $expectedDefinitions = [
             // Services
-            'oro_action.condition.route_exists',
             'oro_action.condition.service_exists',
         ];
         $this->assertDefinitionsLoaded($expectedDefinitions);

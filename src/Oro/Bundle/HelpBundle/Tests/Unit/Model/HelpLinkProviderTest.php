@@ -5,20 +5,28 @@ namespace Oro\Bundle\HelpBundle\Tests\Unit\Model;
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\HelpBundle\Annotation\Help;
 use Oro\Bundle\HelpBundle\Model\HelpLinkProvider;
+use Oro\Bundle\HelpBundle\Tests\Unit\Fixtures\Bundles\TestBundle\Controller\TestController;
+use Oro\Bundle\HelpBundle\Tests\Unit\Fixtures\Bundles\TestBundle\OroTestBundle as TestBundle;
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
+use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
 {
     private const VERSION = '1.0';
 
+    private const WIKI      = 'http://wiki.test.com';
+    private const TEST      = 'http://test.com';
+    private const TEST_WIKI = self::TEST . '/wiki';
+
     /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     private $requestStack;
 
-    /** @var ControllerNameParser|\PHPUnit\Framework\MockObject\MockObject */
-    private $parser;
+    /** @var ControllerClassProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $controllerClassProvider;
 
     /** @var VersionHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $helper;
@@ -28,20 +36,36 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
 
     /** @var HelpLinkProvider */
     private $provider;
-    
+
     protected function setUp()
     {
+        $bundle = new TestBundle();
+        $kernel = $this->createMock(KernelInterface::class);
+        $kernel->expects($this->any())
+            ->method('getBundle')
+            ->with($bundle->getName(), $this->isFalse())
+            ->willReturn($bundle);
+        $kernel->expects($this->any())
+            ->method('getBundles')
+            ->willReturn([$bundle->getName() => $bundle]);
+
         $this->requestStack = $this->createMock(RequestStack::class);
-        $this->parser = $this->createMock(ControllerNameParser::class);
+        $this->controllerClassProvider = $this->createMock(ControllerClassProvider::class);
         $this->helper = $this->createMock(VersionHelper::class);
         $this->cache = $this->createMock(CacheProvider::class);
 
-        $this->provider = new HelpLinkProvider($this->requestStack, $this->parser, $this->helper, $this->cache);
+        $this->provider = new HelpLinkProvider(
+            $this->requestStack,
+            $this->controllerClassProvider,
+            new ControllerNameParser($kernel),
+            $this->helper,
+            $this->cache
+        );
     }
 
     public function testGetHelpLinkCached()
     {
-        $expectedLink = 'http://test.com/help/test?v=1.1';
+        $expectedLink = self::TEST . '/help/test?v=1.1';
         $routeName = 'test_route';
 
         $this->cache->expects($this->once())
@@ -71,7 +95,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->provider->setConfiguration([
             'defaults' => [
-                'link' => 'http://example.com/',
+                'link' => 'http://example.com/'
             ]
         ]);
         $this->assertEquals($expectedLink, $this->provider->getHelpLinkUrl());
@@ -88,7 +112,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->provider->setConfiguration([
             'defaults' => [
-                'link' => 'http://example.com/',
+                'link' => 'http://example.com/'
             ]
         ]);
         $this->assertEquals($expectedLink, $this->provider->getHelpLinkUrl());
@@ -99,26 +123,10 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetHelpLinkUrl(
         array $configuration,
+        array $controllers,
         array $requestAttributes,
-        array $parserResults,
         string $expectedLink
     ) {
-        if (isset($parserResults['buildResult'])) {
-            $this->assertArrayHasKey('_controller', $requestAttributes);
-            $this->parser->expects($this->once())
-                ->method('build')
-                ->with($requestAttributes['_controller'])
-                ->will($this->returnValue($parserResults['buildResult']));
-        } elseif (isset($parserResults['parseResult'])) {
-            $this->assertArrayHasKey('_controller', $requestAttributes);
-            $this->parser->expects($this->once())
-                ->method('parse')
-                ->with($requestAttributes['_controller'])
-                ->will($this->returnValue($parserResults['parseResult']));
-        } else {
-            $this->parser->expects($this->never())->method($this->anything());
-        }
-
         $this->helper
             ->expects($this->any())
             ->method('getVersion')
@@ -131,6 +139,9 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
         $this->requestStack->expects($this->any())
             ->method('getMasterRequest')
             ->willReturn($request);
+        $this->controllerClassProvider->expects($this->any())
+            ->method('getControllers')
+            ->willReturn($controllers);
 
         if (isset($requestAttributes['_route'])) {
             $this->cache->expects($this->once())
@@ -151,509 +162,577 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function configurationDataProvider()
     {
-        return array(
-            'simple default no cache' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/'
-                    )
-                ),
-                'requestAttributes' => array(
-                    '_controller' => 'Acme\DemoBundle\Controller\TestController::runAction',
+        return [
+            'simple default no cache'                   => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/'
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
                     '_route' => 'test_route'
-                ),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://test.com/wiki/Acme/AcmeDemoBundle/Test_run?v=' . self::VERSION
-            ),
-            'simple default with cache' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/'
-                    )
-                ),
-                'requestAttributes' => array(
-                    '_controller' => 'Acme\DemoBundle\Controller\TestController::runAction',
+                ],
+                'expectedLink'      => self::TEST_WIKI . '/Oro/OroTestBundle/Test_run?v=' . self::VERSION
+            ],
+            'simple default with cache'                 => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/'
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
                     '_route' => 'test_route'
-                ),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://test.com/wiki/Acme/AcmeDemoBundle/Test_run?v=' . self::VERSION
-            ),
-            'simple default with controller short name' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/'
-                    )
-                ),
-                'requestAttributes' => array(
-                    '_controller' => 'AcmeDemoBundle:Test:run'
-                ),
-                'parserResults' => array('parseResult' => 'Acme\DemoBundle\Controller\TestController::runAction'),
-                'expectedLink' => 'http://test.com/wiki/Acme/AcmeDemoBundle/Test_run?v=' . self::VERSION
-            ),
-            'default with prefix' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                ],
+                'expectedLink'      => self::TEST_WIKI . '/Oro/OroTestBundle/Test_run?v=' . self::VERSION
+            ],
+            'default with prefix'                       => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    )
-                ),
-                'requestAttributes' => array('_controller' => 'Acme\DemoBundle\Controller\TestController::runAction'),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://test.com/wiki/Third_Party/Acme/AcmeDemoBundle/Test_run?v='
-                    . self::VERSION
-            ),
-            'default with link' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::TEST_WIKI . '/Third_Party/Oro/OroTestBundle/Test_run?v=' . self::VERSION
+            ],
+            'default with link'                         => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party',
-                        'link' => 'http://wiki.test.com/'
-                    )
-                ),
-                'requestAttributes' => array('_controller' => 'Acme\DemoBundle\Controller\TestController::runAction'),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://wiki.test.com/'
-            ),
-            'vendor link' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                        'link'   => self::WIKI . '/'
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::WIKI . '/'
+            ],
+            'vendor link'                               => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    ),
-                    'vendors' => array(
-                        'Acme' => array(
-                            'link' => 'http://wiki.test.com/'
-                        )
-                    )
-                ),
-                'requestAttributes' => array('_controller' => 'Acme\DemoBundle\Controller\TestController::runAction'),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://wiki.test.com/'
-            ),
-            'vendor config' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                    ],
+                    'vendors'  => [
+                        'Oro' => [
+                            'link' => self::WIKI . '/'
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::WIKI . '/'
+            ],
+            'vendor config'                             => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    ),
-                    'vendors' => array(
-                        'Acme' => array(
-                            'alias' => 'CustomVendor',
+                    ],
+                    'vendors'  => [
+                        'Oro' => [
+                            'alias'  => 'CustomVendor',
                             'prefix' => 'Prefix',
-                            'server' => 'http://wiki.test.com/'
-                        )
-                    )
-                ),
-                'requestAttributes' => array('_controller' => 'Acme\DemoBundle\Controller\TestController::runAction'),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://wiki.test.com/Prefix/CustomVendor/AcmeDemoBundle/Test_run?v='
-                    . self::VERSION
-            ),
-            'vendor uri' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                            'server' => self::WIKI . '/'
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::WIKI . '/Prefix/CustomVendor/OroTestBundle/Test_run?v=' . self::VERSION
+            ],
+            'vendor uri'                                => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    ),
-                    'vendors' => array(
-                        'Acme' => array(
+                    ],
+                    'vendors'  => [
+                        'Oro' => [
                             'uri' => 'test'
-                        )
-                    )
-                ),
-                'requestAttributes' => array('_controller' => 'Acme\DemoBundle\Controller\TestController::runAction'),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://test.com/wiki/test?v=' . self::VERSION
-            ),
-            'bundle config' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::TEST_WIKI . '/test?v=' . self::VERSION
+            ],
+            'bundle config'                             => [
+                'configuration'     => [
+                    'defaults'  => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    ),
-                    'resources' => array(
-                        'AcmeDemoBundle' => array(
-                            'alias' => 'CustomBundle',
+                    ],
+                    'resources' => [
+                        'OroTestBundle' => [
+                            'alias'  => 'CustomBundle',
                             'prefix' => 'Prefix',
-                            'server' => 'http://wiki.test.com/'
-                        )
-                    )
-                ),
-                'requestAttributes' => array('_controller' => 'Acme\DemoBundle\Controller\TestController::runAction'),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://wiki.test.com/Prefix/Acme/CustomBundle/Test_run?v='
-                    . self::VERSION
-            ),
-            'bundle link' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                            'server' => self::WIKI . '/'
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::WIKI . '/Prefix/Oro/CustomBundle/Test_run?v=' . self::VERSION
+            ],
+            'bundle link'                               => [
+                'configuration'     => [
+                    'defaults'  => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    ),
-                    'resources' => array(
-                        'AcmeDemoBundle' => array(
-                            'link' => 'http://wiki.test.com/'
-                        )
-                    )
-                ),
-                'requestAttributes' => array('_controller' => 'Acme\DemoBundle\Controller\TestController::runAction'),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://wiki.test.com/'
-            ),
-            'bundle uri' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                    ],
+                    'resources' => [
+                        'OroTestBundle' => [
+                            'link' => self::WIKI . '/'
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::WIKI . '/'
+            ],
+            'bundle uri'                                => [
+                'configuration'     => [
+                    'defaults'  => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    ),
-                    'resources' => array(
-                        'AcmeDemoBundle' => array(
+                    ],
+                    'resources' => [
+                        'OroTestBundle' => [
                             'uri' => 'test'
-                        )
-                    )
-                ),
-                'requestAttributes' => array('_controller' => 'Acme\DemoBundle\Controller\TestController::runAction'),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://test.com/wiki/test?v=' . self::VERSION
-            ),
-            'controller config' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::TEST_WIKI . '/test?v=' . self::VERSION
+            ],
+            'controller config'                         => [
+                'configuration'     => [
+                    'defaults'  => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    ),
-                    'resources' => array(
-                        'AcmeDemoBundle:Test' => array(
-                            'alias' => 'MyTest',
+                    ],
+                    'resources' => [
+                        'OroTestBundle:Test' => [
+                            'alias'  => 'MyTest',
                             'prefix' => 'Prefix',
-                            'server' => 'http://wiki.test.com/'
-                        )
-                    )
-                ),
-                'requestAttributes' => array('_controller' => 'Acme\DemoBundle\Controller\TestController::runAction'),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://wiki.test.com/Prefix/Acme/AcmeDemoBundle/MyTest_run?v='
-                    . self::VERSION
-            ),
-            'controller link' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                            'server' => self::WIKI . '/'
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::WIKI . '/Prefix/Oro/OroTestBundle/MyTest_run?v=' . self::VERSION
+            ],
+            'controller link'                           => [
+                'configuration'     => [
+                    'defaults'  => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    ),
-                    'resources' => array(
-                        'AcmeDemoBundle:Test' => array(
-                            'link' => 'http://wiki.test.com/'
-                        )
-                    )
-                ),
-
-                'requestAttributes' => array('_controller' => 'Acme\DemoBundle\Controller\TestController::runAction'),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://wiki.test.com/'
-            ),
-            'controller uri' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                    ],
+                    'resources' => [
+                        'OroTestBundle:Test' => [
+                            'link' => self::WIKI . '/'
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::WIKI . '/'
+            ],
+            'controller uri'                            => [
+                'configuration'     => [
+                    'defaults'  => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    ),
-                    'resources' => array(
-                        'AcmeDemoBundle:Test' => array(
+                    ],
+                    'resources' => [
+                        'OroTestBundle:Test' => [
                             'uri' => 'test'
-                        )
-                    )
-                ),
-                'requestAttributes' => array('_controller' => 'Acme\DemoBundle\Controller\TestController::runAction'),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://test.com/wiki/test?v=' . self::VERSION
-            ),
-            'action config' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::TEST_WIKI . '/test?v=' . self::VERSION
+            ],
+            'action config'                             => [
+                'configuration'     => [
+                    'defaults'  => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    ),
-                    'resources' => array(
-                        'AcmeDemoBundle:Test:run' => array(
-                            'alias' => 'execute',
+                    ],
+                    'resources' => [
+                        'OroTestBundle:Test:run' => [
+                            'alias'  => 'execute',
                             'prefix' => 'Prefix',
-                            'server' => 'http://wiki.test.com/'
-                        )
-                    )
-                ),
-                'requestAttributes' => array('_controller' => 'Acme\DemoBundle\Controller\TestController::runAction'),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://wiki.test.com/Prefix/Acme/AcmeDemoBundle/Test_execute?v='
-                    . self::VERSION
-            ),
-            'action link' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                            'server' => self::WIKI . '/'
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::WIKI . '/Prefix/Oro/OroTestBundle/Test_execute?v=' . self::VERSION
+            ],
+            'action link'                               => [
+                'configuration'     => [
+                    'defaults'  => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    ),
-                    'resources' => array(
-                        'AcmeDemoBundle:Test:run' => array(
-                            'link' => 'http://wiki.test.com/'
-                        )
-                    )
-                ),
-                'requestAttributes' => array('_controller' => 'Acme\DemoBundle\Controller\TestController::runAction'),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://wiki.test.com/'
-            ),
-            'action uri' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                    ],
+                    'resources' => [
+                        'OroTestBundle:Test:run' => [
+                            'link' => self::WIKI . '/'
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::WIKI . '/'
+            ],
+            'action uri'                                => [
+                'configuration'     => [
+                    'defaults'  => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    ),
-                    'resources' => array(
-                        'AcmeDemoBundle:Test:run' => array(
+                    ],
+                    'resources' => [
+                        'OroTestBundle:Test:run' => [
                             'uri' => 'test'
-                        )
-                    )
-                ),
-                'requestAttributes' => array('_controller' => 'Acme\DemoBundle\Controller\TestController::runAction'),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://test.com/wiki/test?v=' . self::VERSION
-            ),
-            'service id controller' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/'
-                    )
-                ),
-                'requestAttributes' => array('_controller' => 'controller_service:runAction'),
-                'parserResults' => array(),
-                'expectedLink' => 'http://test.com/wiki?v=' . self::VERSION
-            ),
-            'annotation link' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::TEST_WIKI . '/test?v=' . self::VERSION
+            ],
+            'unknown route'                             => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/'
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'unknown_route'
+                ],
+                'expectedLink'      => self::TEST_WIKI . '?v=' . self::VERSION
+            ],
+            'annotation link'                           => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    )
-                ),
-                'requestAttributes' => array(
-                    '_controller' => 'Acme\DemoBundle\Controller\TestController::runAction',
-                    '_' . Help::ALIAS => new Help(array('link' => 'http://wiki.test.com/'))
-                ),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://wiki.test.com/'
-            ),
-            'annotation configuration' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route'          => 'test_route',
+                    '_' . Help::ALIAS => new Help(['link' => self::WIKI . '/'])
+                ],
+                'expectedLink'      => self::WIKI . '/'
+            ],
+            'annotation configuration'                  => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    )
-                ),
-                'requestAttributes' => array(
-                    '_controller' => 'Acme\DemoBundle\Controller\TestController::runAction',
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route'          => 'test_route',
                     '_' . Help::ALIAS => new Help(
-                        array(
-                            'actionAlias' => 'execute',
+                        [
+                            'actionAlias'     => 'execute',
                             'controllerAlias' => 'Executor',
-                            'bundleAlias' => 'Bundle',
-                            'vendorAlias' => 'Vendor',
-                            'prefix' => 'Prefix',
-                            'server' => 'http://wiki.test.com/'
-                        )
+                            'bundleAlias'     => 'Bundle',
+                            'vendorAlias'     => 'Vendor',
+                            'prefix'          => 'Prefix',
+                            'server'          => self::WIKI . '/'
+                        ]
                     )
-                ),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://wiki.test.com/Prefix/Vendor/Bundle/Executor_execute?v='
-                    . self::VERSION
-            ),
-            'annotation configuration override' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                ],
+                'expectedLink'      => self::WIKI . '/Prefix/Vendor/Bundle/Executor_execute?v=' . self::VERSION
+            ],
+            'annotation configuration override'         => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    )
-                ),
-                'requestAttributes' => array(
-                    '_controller' => 'Acme\DemoBundle\Controller\TestController::runAction',
-                    '_' . Help::ALIAS => array(
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route'          => 'test_route',
+                    '_' . Help::ALIAS => [
                         new Help(
-                            array(
-                                'actionAlias' => 'executeFoo',
+                            [
+                                'actionAlias'     => 'executeFoo',
                                 'controllerAlias' => 'ExecutorFoo',
-                                'bundleAlias' => 'BundleFoo',
-                                'vendorAlias' => 'VendorFoo',
-                                'prefix' => 'PrefixFoo',
-                                'server' => 'http://wiki.test.com/foo'
-                            )
+                                'bundleAlias'     => 'BundleFoo',
+                                'vendorAlias'     => 'VendorFoo',
+                                'prefix'          => 'PrefixFoo',
+                                'server'          => self::WIKI . '/foo'
+                            ]
                         ),
                         new Help(
-                            array(
-                                'actionAlias' => 'executeBar',
+                            [
+                                'actionAlias'     => 'executeBar',
                                 'controllerAlias' => 'ExecutorBar',
-                                'bundleAlias' => 'BundleBar',
-                                'vendorAlias' => 'VendorBar',
-                                'prefix' => 'PrefixBar',
-                                'server' => 'http://wiki.test.com/bar'
-                            )
+                                'bundleAlias'     => 'BundleBar',
+                                'vendorAlias'     => 'VendorBar',
+                                'prefix'          => 'PrefixBar',
+                                'server'          => self::WIKI . '/bar'
+                            ]
                         )
-                    )
-                ),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://wiki.test.com/bar/PrefixBar/VendorBar/BundleBar/ExecutorBar_executeBar?v='
+                    ]
+                ],
+                'expectedLink'      => self::WIKI . '/bar/PrefixBar/VendorBar/BundleBar/ExecutorBar_executeBar?v='
                     . self::VERSION
-            ),
-            'annotation uri' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+            ],
+            'annotation uri'                            => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    )
-                ),
-                'requestAttributes' => array(
-                    '_controller' => 'Acme\DemoBundle\Controller\TestController::runAction',
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route'          => 'test_route',
                     '_' . Help::ALIAS => new Help(
-                        array(
-                            'uri' => 'test',
-                            'server' => 'http://wiki.test.com/'
-                        )
-                    ),
-                ),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://wiki.test.com/test?v=' . self::VERSION
-            ),
-            'annotation uri unset with resource config' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/',
+                        [
+                            'uri'    => 'test',
+                            'server' => self::WIKI . '/'
+                        ]
+                    )
+                ],
+                'expectedLink'      => self::WIKI . '/test?v=' . self::VERSION
+            ],
+            'annotation uri unset with resource config' => [
+                'configuration'     => [
+                    'defaults'  => [
+                        'server' => self::TEST_WIKI . '/',
                         'prefix' => 'Third_Party'
-                    ),
-                    'resources' => array(
-                        'AcmeDemoBundle:Test:run' => array(
-                            'uri' => null,
-                        )
-                    )
-                ),
-                'requestAttributes' => array(
-                    '_controller' => 'Acme\DemoBundle\Controller\TestController::runAction',
+                    ],
+                    'resources' => [
+                        'OroTestBundle:Test:run' => [
+                            'uri' => null
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route'          => 'test_route',
                     '_' . Help::ALIAS => new Help(
-                        array(
-                            'uri' => 'test',
-                        )
-                    ),
-                ),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://test.com/wiki/Third_Party/Acme/AcmeDemoBundle/Test_run?v='
-                    . self::VERSION
-            ),
-            'route config' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/'
-                    ),
-                    'routes' => array(
-                        'test_route' => array(
-                            'action' => 'execute',
-                            'controller' => 'Executor',
-                            'bundle' => 'Bundle',
-                            'vendor' => 'Vendor',
-                            'prefix' => 'Prefix',
-                            'server' => 'http://wiki.test.com/'
-                        )
-                    )
-                ),
-                'requestAttributes' => array('_route' => 'test_route'),
-                'parserResults' => array(),
-                'expectedLink' => 'http://wiki.test.com/Prefix/Vendor/Bundle/Executor_execute?v='
-                    . self::VERSION
-            ),
-            'route uri' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/'
-                    ),
-                    'routes' => array(
-                        'test_route' => array(
+                        [
                             'uri' => 'test'
-                        )
+                        ]
                     )
-                ),
-                'requestAttributes' => array('_route' => 'test_route'),
-                'parserResults' => array(),
-                'expectedLink' => 'http://test.com/wiki/test?v=' . self::VERSION
-            ),
-            'route link' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/'
-                    ),
-                    'routes' => array(
-                        'test_route' => array(
-                            'link' => 'http://wiki.test.com/test'
-                        )
-                    )
-                ),
-                'requestAttributes' => array('_route' => 'test_route'),
-                'parserResults' => array(),
-                'expectedLink' => 'http://wiki.test.com/test'
-            ),
-            'route link override by resources' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/'
-                    ),
-                    'routes' => array(
-                        'test_route' => array(
-                            'link' => 'http://wiki.test.com/test'
-                        )
-                    ),
-                    'resources' => array(
-                        'AcmeDemoBundle:Test:run' => array(
-                            'link' => null
-                        )
-                    )
-                ),
-                'requestAttributes' => array(
-                    '_controller' => 'Acme\DemoBundle\Controller\TestController::runAction',
+                ],
+                'expectedLink'      => self::TEST_WIKI . '/Third_Party/Oro/OroTestBundle/Test_run?v=' . self::VERSION
+            ],
+            'route config'                              => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/'
+                    ],
+                    'routes'   => [
+                        'test_route' => [
+                            'action'     => 'execute',
+                            'controller' => 'Executor',
+                            'bundle'     => 'Bundle',
+                            'vendor'     => 'Vendor',
+                            'prefix'     => 'Prefix',
+                            'server'     => self::WIKI . '/'
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
                     '_route' => 'test_route'
-                ),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://test.com/wiki/Acme/AcmeDemoBundle/Test_run?v=' . self::VERSION
-            ),
-            'with parameters' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/'
-                    )
-                ),
-                'requestAttributes' => array(
-                    '_controller' => 'Acme\DemoBundle\Controller\TestController::runAction',
+                ],
+                'expectedLink'      => self::WIKI . '/Prefix/Vendor/Bundle/Executor_execute?v=' . self::VERSION
+            ],
+            'route uri'                                 => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/'
+                    ],
+                    'routes'   => [
+                        'test_route' => [
+                            'uri' => 'test'
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::TEST_WIKI . '/test?v=' . self::VERSION
+            ],
+            'route link'                                => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/'
+                    ],
+                    'routes'   => [
+                        'test_route' => [
+                            'link' => self::WIKI . '/test'
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::WIKI . '/test'
+            ],
+            'route link override by resources'          => [
+                'configuration'     => [
+                    'defaults'  => [
+                        'server' => self::TEST_WIKI . '/'
+                    ],
+                    'routes'    => [
+                        'test_route' => [
+                            'link' => self::WIKI . '/test'
+                        ]
+                    ],
+                    'resources' => [
+                        'OroTestBundle:Test:run' => [
+                            'link' => null
+                        ]
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route' => 'test_route'
+                ],
+                'expectedLink'      => self::TEST_WIKI . '/Oro/OroTestBundle/Test_run?v=' . self::VERSION
+            ],
+            'with parameters'                           => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/'
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route'          => 'test_route',
                     '_' . Help::ALIAS => new Help(
-                        array('actionAlias' => 'run/{optionOne}/{option_two}/{option_3}')
+                        ['actionAlias' => 'run/{optionOne}/{option_two}/{option_3}']
                     ),
-                    'optionOne' => 'test1',
-                    'option_two' => 'test2',
-                    'option_3' => 'test3'
-                ),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://test.com/wiki/Acme/AcmeDemoBundle/Test_run/test1/test2/test3?v='
+                    'optionOne'       => 'test1',
+                    'option_two'      => 'test2',
+                    'option_3'        => 'test3'
+                ],
+                'expectedLink'      => self::TEST_WIKI . '/Oro/OroTestBundle/Test_run/test1/test2/test3?v='
                     . self::VERSION
-            ),
-            'with parameters without parameter value' => array(
-                'configuration' => array(
-                    'defaults' => array(
-                        'server' => 'http://test.com/wiki/'
-                    )
-                ),
-                'requestAttributes' => array(
-                    '_controller' => 'Acme\DemoBundle\Controller\TestController::runAction',
+            ],
+            'with parameters without parameter value'   => [
+                'configuration'     => [
+                    'defaults' => [
+                        'server' => self::TEST_WIKI . '/'
+                    ]
+                ],
+                'controllers'       => [
+                    'test_route' => [TestController::class, 'runAction']
+                ],
+                'requestAttributes' => [
+                    '_route'          => 'test_route',
                     '_' . Help::ALIAS => new Help(
-                        array('actionAlias' => 'run/{option}')
+                        ['actionAlias' => 'run/{option}']
                     )
-                ),
-                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
-                'expectedLink' => 'http://test.com/wiki/Acme/AcmeDemoBundle/Test_run/?v=' . self::VERSION
-            ),
-        );
+                ],
+                'expectedLink'      => self::TEST_WIKI . '/Oro/OroTestBundle/Test_run/?v=' . self::VERSION
+            ]
+        ];
     }
 }

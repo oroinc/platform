@@ -33,7 +33,7 @@
 
             <ul class="nav pull-right user-menu">
                 <li>
-                    <a href="{{ get_help_link() }}" target="_blank">
+                    <a href="{{ help_url|default('') }}" target="_blank">
                         <i class="fa-question-circle" title="{{ 'oro.distribution.menu.get_help'|trans }}"></i>
                     </a>
                 </li>
