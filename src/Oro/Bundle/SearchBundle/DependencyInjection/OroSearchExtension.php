@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\DependencyInjection;
 
+use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -13,9 +13,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 class OroSearchExtension extends Extension
 {
     /**
-     * @param  array $configs
-     * @param  ContainerBuilder $container
-     * @throws InvalidConfigurationException
+     * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -35,16 +33,14 @@ class OroSearchExtension extends Extension
             'oro_search',
             new YamlCumulativeFileLoader('Resources/config/oro/search_engine/' . $config['engine'] . '.yml')
         );
-        $resources = $configLoader->load($container);
+        $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         foreach ($resources as $resource) {
             $loader->load($resource->path);
         }
     }
 
     /**
-     * Get alias
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getAlias()
     {

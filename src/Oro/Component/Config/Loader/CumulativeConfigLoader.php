@@ -6,7 +6,6 @@ use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\ResourcesContainerInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * This loader can be used to load configuration files that can be located in any bundle.
@@ -56,11 +55,11 @@ class CumulativeConfigLoader
     /**
      * Loads resources
      *
-     * @param ResourcesContainerInterface|ContainerBuilder|null $resourcesContainer
+     * @param ResourcesContainerInterface|null $resourcesContainer
      *
      * @return CumulativeResourceInfo[]
      */
-    public function load($resourcesContainer = null): array
+    public function load(ResourcesContainerInterface $resourcesContainer = null): array
     {
         $result = [];
 
@@ -97,13 +96,10 @@ class CumulativeConfigLoader
      * Adds a resource objects to the container.
      * These objects will be used to monitor whether resources are up-to-date or not.
      *
-     * @param ResourcesContainerInterface|ContainerBuilder $resourcesContainer
+     * @param ResourcesContainerInterface $resourcesContainer
      */
-    public function registerResources($resourcesContainer): void
+    public function registerResources(ResourcesContainerInterface $resourcesContainer): void
     {
-        if ($resourcesContainer instanceof ContainerBuilder) {
-            $resourcesContainer = new ContainerBuilderAdapter($resourcesContainer);
-        }
         $resourcesContainer->addResource($this->getResources());
     }
 

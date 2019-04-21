@@ -2,11 +2,16 @@
 
 namespace Oro\Bundle\SyncBundle\DependencyInjection\Compiler;
 
+use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * Registers all "Resources/config/oro/websocket_routing.yml" files
+ * in "gos_pubsub_router.loader.websocket" service.
+ */
 class WebsocketRouterConfigurationPass implements CompilerPassInterface
 {
     private const ROUTE_LOADER_SERVICE_NAME = 'gos_pubsub_router.loader.websocket';
@@ -21,15 +26,15 @@ class WebsocketRouterConfigurationPass implements CompilerPassInterface
             return;
         }
 
+        $routeLoaderDefinition = $container->getDefinition(self::ROUTE_LOADER_SERVICE_NAME);
+
         $configLoader = new CumulativeConfigLoader(
             'oro_sync_websocket_resources',
             new YamlCumulativeFileLoader(self::WEBSOCKET_ROUTING_CONFIG_PATH)
         );
-
-        $routeLoaderDefinition = $container->getDefinition(self::ROUTE_LOADER_SERVICE_NAME);
-
-        foreach ($configLoader->load() as $resourceInfo) {
-            $routeLoaderDefinition->addMethodCall('addResource', [$resourceInfo->path]);
+        $resources = $configLoader->load(new ContainerBuilderAdapter($container));
+        foreach ($resources as $resource) {
+            $routeLoaderDefinition->addMethodCall('addResource', [$resource->path]);
         }
     }
 }

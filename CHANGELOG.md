@@ -6,6 +6,12 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### Config component
+* The methods `load()` and `registerResources()` of class `Oro\Component\Config\Loader\CumulativeConfigLoader`
+  were changed to not accept `Symfony\Component\DependencyInjection\ContainerBuilder` as resources container.
+  Use `Oro\Component\Config\Loader\ContainerBuilderAdapter` to adapt
+  `Symfony\Component\DependencyInjection\ContainerBuilder` to `Oro\Component\Config\ResourcesContainerInterface`.
+
 #### CacheBundle
 * The approach based on `Oro\Bundle\CacheBundle\Loader\ConfigurationLoader` and `Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper` has been replaced with the approach based on `Oro\Component\Config\Cache\PhpConfigProvider`.
 

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\DependencyInjection;
 
+use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\FileLocator;
@@ -52,7 +53,7 @@ class OroEntityExtension extends Extension
             'oro_entity_hidden_fields',
             new YamlCumulativeFileLoader('Resources/config/oro/entity_hidden_fields.yml')
         );
-        $resources = $configLoader->load($container);
+        $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         foreach ($resources as $resource) {
             $hiddenFieldConfigs = array_merge(
                 $hiddenFieldConfigs,

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ConfigBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
+use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\Definition\Processor;
@@ -199,7 +200,7 @@ class SystemConfigurationPass implements CompilerPassInterface
             'oro_system_configuration',
             new YamlCumulativeFileLoader(self::CONFIG_FILE)
         );
-        $resources = $configLoader->load($container);
+        $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         foreach ($resources as $resource) {
             $config = $processor->merge($config, $resource->data);
         }

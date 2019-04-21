@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\HelpBundle\DependencyInjection;
 
+use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\FileLocator;
@@ -11,7 +12,8 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroHelpExtension extends Extension
 {
-    const HELP_FILE_CONFIG_ROOT = 'help';
+    private const HELP_FILE_CONFIG_ROOT = 'help';
+
     /**
      * {@inheritDoc}
      */
@@ -28,9 +30,8 @@ class OroHelpExtension extends Extension
      *
      * @param array $configs
      * @param ContainerBuilder $container
-     * @return array
      */
-    protected function setConfigurationToLinkProvider(array $configs, ContainerBuilder $container)
+    private function setConfigurationToLinkProvider(array $configs, ContainerBuilder $container)
     {
         $applicationConfig = $this->processConfiguration(new ApplicationConfiguration(), $configs);
         $bundleConfig = $this->processConfiguration(new BundleConfiguration(), $this->getBundleConfigs($container));
@@ -38,16 +39,17 @@ class OroHelpExtension extends Extension
         $configuration = array_merge_recursive($bundleConfig, $applicationConfig);
 
         $linkProvider = $container->getDefinition('oro_help.model.help_link_provider');
-        $linkProvider->addMethodCall('setConfiguration', array($configuration));
+        $linkProvider->addMethodCall('setConfiguration', [$configuration]);
     }
 
     /**
      * Get a list of configs from all bundles
      *
      * @param ContainerBuilder $container
+     *
      * @return array
      */
-    protected function getBundleConfigs(ContainerBuilder $container)
+    private function getBundleConfigs(ContainerBuilder $container)
     {
         $result = [];
 
@@ -55,7 +57,7 @@ class OroHelpExtension extends Extension
             'oro_help',
             new YamlCumulativeFileLoader('Resources/config/oro/help.yml')
         );
-        $resources = $configLoader->load($container);
+        $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         foreach ($resources as $resource) {
             if (array_key_exists(self::HELP_FILE_CONFIG_ROOT, $resource->data)) {
                 $result[] = $resource->data[self::HELP_FILE_CONFIG_ROOT];

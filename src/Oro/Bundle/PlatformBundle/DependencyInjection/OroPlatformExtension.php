@@ -3,6 +3,7 @@
 namespace Oro\Bundle\PlatformBundle\DependencyInjection;
 
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
@@ -36,8 +37,8 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
 
         $extensions = $container->getExtensions();
 
-        //bundles that are loaded later should be able to override configuration of bundles loaded before
-        $resources = array_reverse($configLoader->load());
+        // bundles that are loaded later should be able to override configuration of bundles loaded before
+        $resources = array_reverse($configLoader->load(new ContainerBuilderAdapter($container)));
         foreach ($resources as $resource) {
             foreach ($resource->data as $name => $config) {
                 if ($name === 'services') {
