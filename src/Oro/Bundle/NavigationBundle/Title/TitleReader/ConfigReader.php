@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Title\TitleReader;
 
-use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
+use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 
+/**
+ * Reads page titles from "Resources/config/oro/navigation.yml" files.
+ */
 class ConfigReader implements ReaderInterface
 {
     /** @var ConfigurationProvider */
@@ -22,11 +25,6 @@ class ConfigReader implements ReaderInterface
      */
     public function getTitle($route)
     {
-        $titles = $this->configurationProvider->getConfiguration(ConfigurationProvider::TITLES_KEY);
-        if (array_key_exists($route, $titles)) {
-            return $titles[$route];
-        }
-
-        return null;
+        return $this->configurationProvider->getTitle($route);
     }
 }

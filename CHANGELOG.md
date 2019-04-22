@@ -83,6 +83,10 @@ The current file describes significant changes in the code that may affect the u
 #### MessageQueueBundle
 * The `DefaultTransportFactory` and related configuration option `oro_message_queue.transport.defaut` was removed. Check `config/config.yml` in your application.
 
+#### NavigationBundle
+* The possibility to define `menu_config`, `navigation_elements` and `titles` sections via NavigationBundle configuration has been removed. Use `Resources/config/oro/navigation.yml` instead.
+* The class `Oro\Bundle\NavigationBundle\Config\MenuConfiguration` has been removed. Use `Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider` instead.
+
 #### LayoutBundle
 * The `themes` section has been removed from LayoutBundle configuration. Use `Resources/views/layouts/{folder}/theme.yml` instead.
 

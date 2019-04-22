@@ -6,7 +6,7 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuItem;
 use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Twig\Helper;
-use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
+use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
@@ -25,7 +25,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
     protected $breadcrumbManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $menuConfiguration;
+    protected $configurationProvider;
 
     /** @var MenuExtension */
     protected $extension;
@@ -33,19 +33,15 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->breadcrumbManager = $this->createMock(BreadcrumbManagerInterface::class);
-        $this->helper = $this->getMockBuilder(Helper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->helper = $this->createMock(Helper::class);
         $this->provider = $this->createMock(MenuProviderInterface::class);
-        $this->menuConfiguration = $this->getMockBuilder(MenuConfiguration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
 
         $container = self::getContainerBuilder()
             ->add('knp_menu.helper', $this->helper)
             ->add('oro_menu.builder_chain', $this->provider)
             ->add('oro_navigation.chain_breadcrumb_manager', $this->breadcrumbManager)
-            ->add('oro_menu.configuration', $this->menuConfiguration)
+            ->add('oro_navigation.configuration.provider', $this->configurationProvider)
             ->getContainer($this);
 
         $this->extension = new MenuExtension($container);
@@ -197,8 +193,8 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         $runtimeOptions = [
             'template' => 'test_runtime.tpl'
         ];
-        $this->menuConfiguration->expects(self::once())
-            ->method('getTemplates')
+        $this->configurationProvider->expects(self::once())
+            ->method('getMenuTemplates')
             ->willReturn($options);
 
         $this->assertRender($menuInstance, $menuInstance, $runtimeOptions, $renderer);

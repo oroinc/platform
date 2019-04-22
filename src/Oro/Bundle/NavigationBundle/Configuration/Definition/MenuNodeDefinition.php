@@ -1,23 +1,24 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Config\Definition\Builder;
+namespace Oro\Bundle\NavigationBundle\Configuration\Definition;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 /**
- * Configuration definition for menu nodes
+ * Configuration definition for menu nodes.
  */
 class MenuNodeDefinition extends ArrayNodeDefinition
 {
     /**
-     * Make menu hierarchy
+     * Makes menu hierarchy.
      *
-     * @param  int                $depth
+     * @param int $depth
+     *
      * @return MenuNodeDefinition
      */
-    public function menuNodeHierarchy($depth = 10)
+    public function menuNodeHierarchy(int $depth = 10)
     {
-        if ($depth == 0) {
+        if (0 === $depth) {
             return $this;
         }
 

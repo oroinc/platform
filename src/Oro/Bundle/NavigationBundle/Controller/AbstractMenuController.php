@@ -21,6 +21,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * The base class for menu related controllers.
+ */
 abstract class AbstractMenuController extends Controller
 {
     /**
@@ -293,7 +296,7 @@ abstract class AbstractMenuController extends Controller
             BuilderChainProvider::MENU_LOCAL_CACHE_PREFIX => 'edit_'
         ];
 
-        $configurationRootMenuKeys = array_keys($this->get('oro_menu.configuration')->getTree());
+        $configurationRootMenuKeys = array_keys($this->get('oro_navigation.configuration.provider')->getMenuTree());
         $isMenuFromConfiguration = in_array($menuName, $configurationRootMenuKeys, true);
 
         $menu = $this->get('oro_menu.builder_chain')->get($menuName, $options);

@@ -1,27 +1,24 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Tests\Unit\Config\Definition\Builder;
+namespace Oro\Bundle\NavigationBundle\Tests\Unit\Configuration\Definition;
 
-use Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuNodeDefinition;
+use Oro\Bundle\NavigationBundle\Configuration\Definition\MenuNodeDefinition;
+use Oro\Bundle\NavigationBundle\Configuration\Definition\MenuTreeBuilder;
 
 class MenuNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $builder;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $builder;
 
-    /**
-     * @var MenuNodeDefinition
-     */
-    protected $definition;
+    /** @var MenuNodeDefinition */
+    private $definition;
 
     protected function setUp()
     {
-        $this->builder = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuTreeBuilder')
-            ->setMethods(
-                array('node', 'children', 'scalarNode', 'end', 'menuNode', 'menuNodeHierarchy', 'defaultValue')
-            )
+        $this->builder = $this->getMockBuilder(MenuTreeBuilder::class)
+            ->setMethods([
+                'node', 'children', 'scalarNode', 'end', 'menuNode', 'menuNodeHierarchy', 'defaultValue'
+            ])
             ->getMock();
         $this->definition = new MenuNodeDefinition('test');
         $this->definition->setBuilder($this->builder);
@@ -33,7 +30,7 @@ class MenuNodeDefinitionTest extends \PHPUnit\Framework\TestCase
             ->method('node');
 
         $this->assertInstanceOf(
-            'Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuNodeDefinition',
+            MenuNodeDefinition::class,
             $this->definition->menuNodeHierarchy(0)
         );
     }

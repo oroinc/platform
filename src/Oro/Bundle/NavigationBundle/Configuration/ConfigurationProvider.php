@@ -1,8 +1,7 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Provider;
+namespace Oro\Bundle\NavigationBundle\Configuration;
 
-use Oro\Bundle\NavigationBundle\DependencyInjection\Configuration;
 use Oro\Component\Config\Cache\PhpArrayConfigProvider;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
@@ -16,30 +15,92 @@ use Oro\Component\PhpUtils\ArrayUtil;
  */
 class ConfigurationProvider extends PhpArrayConfigProvider
 {
-    public const NAVIGATION_ELEMENTS_KEY = 'navigation_elements';
-    public const MENU_CONFIG_KEY         = 'menu_config';
-    public const TITLES_KEY              = 'titles';
-
     private const CONFIG_FILE = 'Resources/config/oro/navigation.yml';
 
-    private const NAVIGATION_CONFIG_ROOT = 'navigation';
+    private const NAVIGATION_ELEMENTS = 'navigation_elements';
+    private const MENU_CONFIG         = 'menu_config';
+    private const TITLES              = 'titles';
+    private const TREE                = 'tree';
+    private const ITEMS               = 'items';
+    private const TEMPLATES           = 'templates';
+    private const CHILDREN            = 'children';
 
     /**
-     * Gets configuration for the given group.
-     *
-     * @param string $groupKey The key of a configuration group
-     *
      * @return array
      */
-    public function getConfiguration(string $groupKey): array
+    public function getMenuTree(): array
     {
         $config = $this->doGetConfig();
 
-        if (\array_key_exists($groupKey, $config)) {
-            return $config[$groupKey];
+        $menuConfig = $config[self::MENU_CONFIG];
+        if (!array_key_exists(self::TREE, $menuConfig)) {
+            return [];
         }
 
-        return [];
+        return $menuConfig[self::TREE];
+    }
+
+    /**
+     * @return array
+     */
+    public function getMenuItems(): array
+    {
+        $config = $this->doGetConfig();
+
+        $menuConfig = $config[self::MENU_CONFIG];
+        if (!array_key_exists(self::ITEMS, $menuConfig)) {
+            return [];
+        }
+
+        return $menuConfig[self::ITEMS];
+    }
+
+    /**
+     * @return array
+     */
+    public function getMenuTemplates(): array
+    {
+        $config = $this->doGetConfig();
+
+        $menuConfig = $config[self::MENU_CONFIG];
+        if (!array_key_exists(self::TEMPLATES, $menuConfig)) {
+            return [];
+        }
+
+        return $menuConfig[self::TEMPLATES];
+    }
+
+    /**
+     * @return array
+     */
+    public function getNavigationElements(): array
+    {
+        $config = $this->doGetConfig();
+        if (!isset($config[self::NAVIGATION_ELEMENTS])) {
+            return [];
+        }
+
+        return $config[self::NAVIGATION_ELEMENTS];
+    }
+
+    /**
+     * @param string $route
+     *
+     * @return string|null
+     */
+    public function getTitle(string $route): ?string
+    {
+        $config = $this->doGetConfig();
+        if (!isset($config[self::TITLES])) {
+            return null;
+        }
+
+        $titles = $config[self::TITLES];
+        if (array_key_exists($route, $titles)) {
+            return $titles[$route];
+        }
+
+        return null;
     }
 
     /**
@@ -54,16 +115,16 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         );
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
-            if (\array_key_exists(self::NAVIGATION_CONFIG_ROOT, $resource->data)) {
-                $resourceConfig = $resource->data[self::NAVIGATION_CONFIG_ROOT];
+            if (\array_key_exists(NavigationConfiguration::ROOT_NODE, $resource->data)) {
+                $resourceConfig = $resource->data[NavigationConfiguration::ROOT_NODE];
                 $config = ArrayUtil::arrayMergeRecursiveDistinct($config, $resourceConfig);
             }
         }
-        if (!\array_key_exists(self::MENU_CONFIG_KEY, $config)) {
-            $config[self::MENU_CONFIG_KEY] = [];
+        if (!\array_key_exists(self::MENU_CONFIG, $config)) {
+            $config[self::MENU_CONFIG] = [];
         }
-        if (\array_key_exists('tree', $config[self::MENU_CONFIG_KEY])) {
-            foreach ($config[self::MENU_CONFIG_KEY]['tree'] as &$configPart) {
+        if (\array_key_exists(self::TREE, $config[self::MENU_CONFIG])) {
+            foreach ($config[self::MENU_CONFIG][self::TREE] as &$configPart) {
                 $configPart = $this->getReorganizedTree($configPart);
             }
             unset($configPart);
@@ -71,13 +132,11 @@ class ConfigurationProvider extends PhpArrayConfigProvider
 
         $processedConfig = CumulativeConfigProcessorUtil::processConfiguration(
             self::CONFIG_FILE,
-            new Configuration(),
-            [Configuration::ROOT_NODE => $config]
+            new NavigationConfiguration(),
+            [NavigationConfiguration::ROOT_NODE => $config]
         );
 
-        unset($processedConfig['settings']);
-
-        $this->normalizeOptionNames($processedConfig[self::MENU_CONFIG_KEY]);
+        $this->normalizeOptionNames($processedConfig[self::MENU_CONFIG]);
 
         return $processedConfig;
     }
@@ -90,8 +149,8 @@ class ConfigurationProvider extends PhpArrayConfigProvider
     private function getReorganizedTree(array $tree): array
     {
         $newTree = $tree;
-        $newTree['children'] = [];
-        foreach ($tree['children'] as $childName => &$childData) {
+        $newTree[self::CHILDREN] = [];
+        foreach ($tree[self::CHILDREN] as $childName => &$childData) {
             $childData = \is_array($childData) ? $childData : [];
             $this->reorganizeTree($newTree, $newTree, $childName, $childData);
         }
@@ -110,17 +169,17 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         $data = $childData;
         if (\is_array($data)) {
             $existingChildData = $this->getChildAndRemove($tree, $childName);
-            if (!empty($existingChildData['children']) && $this->getMergeStrategy($childData) === 'move') {
-                $children = \array_key_exists('children', $data) ? $data['children'] : [];
-                $data['children'] = \array_merge($children, $existingChildData['children']);
+            if (!empty($existingChildData[self::CHILDREN]) && $this->getMergeStrategy($childData) === 'move') {
+                $children = \array_key_exists(self::CHILDREN, $data) ? $data[self::CHILDREN] : [];
+                $data[self::CHILDREN] = \array_merge($children, $existingChildData[self::CHILDREN]);
             }
         }
 
-        $treePart['children'][$childName] = $data;
-        if (\array_key_exists('children', $childData)) {
-            foreach ($childData['children'] as $key => $value) {
+        $treePart[self::CHILDREN][$childName] = $data;
+        if (\array_key_exists(self::CHILDREN, $childData)) {
+            foreach ($childData[self::CHILDREN] as $key => $value) {
                 $value = \is_array($value) ? $value : [];
-                $this->reorganizeTree($tree, $treePart['children'][$childName], $key, $value);
+                $this->reorganizeTree($tree, $treePart[self::CHILDREN][$childName], $key, $value);
             }
         }
     }
@@ -133,13 +192,13 @@ class ConfigurationProvider extends PhpArrayConfigProvider
      */
     private function getChildAndRemove(array &$tree, string $childName): ?array
     {
-        if (!\array_key_exists('children', $tree)) {
+        if (!\array_key_exists(self::CHILDREN, $tree)) {
             return null;
         }
 
-        foreach ($tree['children'] as $key => &$child) {
+        foreach ($tree[self::CHILDREN] as $key => &$child) {
             if ($key === $childName) {
-                unset($tree['children'][$key]);
+                unset($tree[self::CHILDREN][$key]);
 
                 return $child;
             }
@@ -180,7 +239,7 @@ class ConfigurationProvider extends PhpArrayConfigProvider
     private function normalizeOptionNames(array &$config): void
     {
         $normalizeMap = [
-            'templates' => [
+            self::TEMPLATES => [
                 'current_as_link' => 'currentAsLink',
                 'current_class'   => 'currentClass',
                 'ancestor_class'  => 'ancestorClass',
@@ -189,7 +248,7 @@ class ConfigurationProvider extends PhpArrayConfigProvider
                 'root_class'      => 'rootClass',
                 'is_dropdown'     => 'isDropdown'
             ],
-            'items'     => [
+            self::ITEMS     => [
                 'translate_domain'     => 'translateDomain',
                 'translate_parameters' => 'translateParameters',
                 'route_parameters'     => 'routeParameters',

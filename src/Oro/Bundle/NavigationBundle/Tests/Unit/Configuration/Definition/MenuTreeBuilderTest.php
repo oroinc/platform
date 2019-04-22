@@ -1,15 +1,14 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Tests\Unit\Config\Definition\Builder;
+namespace Oro\Bundle\NavigationBundle\Tests\Unit\Configuration\Definition;
 
-use Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuTreeBuilder;
+use Oro\Bundle\NavigationBundle\Configuration\Definition\MenuNodeDefinition;
+use Oro\Bundle\NavigationBundle\Configuration\Definition\MenuTreeBuilder;
 
 class MenuTreeBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MenuTreeBuilder
-     */
-    protected $builder;
+    /** @var MenuTreeBuilder */
+    private $builder;
 
     protected function setUp()
     {
@@ -21,7 +20,7 @@ class MenuTreeBuilderTest extends \PHPUnit\Framework\TestCase
         $nodeMapping = $this->readAttribute($this->builder, 'nodeMapping');
         $this->assertArrayHasKey('menu', $nodeMapping);
         $this->assertEquals(
-            'Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuNodeDefinition',
+            MenuNodeDefinition::class,
             $nodeMapping['menu']
         );
     }
@@ -30,7 +29,7 @@ class MenuTreeBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $nodeDefinition = $this->builder->menuNode('test');
         $this->assertInstanceOf(
-            'Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuNodeDefinition',
+            MenuNodeDefinition::class,
             $nodeDefinition
         );
         $this->assertEquals('test', $nodeDefinition->getNode()->getName());

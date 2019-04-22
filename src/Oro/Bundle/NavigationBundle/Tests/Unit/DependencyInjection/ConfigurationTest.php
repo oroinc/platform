@@ -44,8 +44,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'scope' => 'app'
                 ],
             ],
-            'navigation_elements' => [],
-            'titles' => [],
             'js_routing_filename_prefix' => ''
         ];
 

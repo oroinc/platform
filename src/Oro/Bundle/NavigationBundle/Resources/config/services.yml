@@ -80,11 +80,6 @@ services:
         tags:
             - { name: knp_menu.provider }
 
-    oro_menu.configuration:
-        class: Oro\Bundle\NavigationBundle\Config\MenuConfiguration
-        arguments:
-            - '@oro_navigation.configuration.provider'
-
     oro_menu.configuration_resolver:
         class: '%oro_menu.configuration_resolver.class%'
         arguments:
@@ -96,7 +91,7 @@ services:
             - '@oro_menu.configuration_resolver'
             - '@oro_menu.factory'
             - '@event_dispatcher'
-            - '@oro_menu.configuration'
+            - '@oro_navigation.configuration.provider'
         tags:
             - { name: oro_menu.builder }
 
@@ -397,7 +392,7 @@ services:
             - '@oro_menu.builder_chain'
             - '@oro_navigation.menu_manipulator'
             - '%oro_navigation.menu_update.scope_type%'
-            - '@oro_menu.configuration'
+            - '@oro_navigation.configuration.provider'
         tags:
             - { name: oro_datagrid.datasource, type: menu-update }
 
@@ -499,8 +494,7 @@ services:
             - {name: oro_scope.provider, scopeType: '%oro_navigation.menu_update.scope_type%', priority: 20}
 
     oro_navigation.configuration.provider:
-        class: Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider
-        public: false
+        class: Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider
         parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/navigation.php'

@@ -5,12 +5,12 @@ namespace Oro\Bundle\NavigationBundle\Twig;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Twig\Helper;
-use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
+use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Twig extension for menu & breadcrumbs rendering
+ * Twig extension for menu & breadcrumbs rendering.
  */
 class MenuExtension extends \Twig_Extension
 {
@@ -54,11 +54,11 @@ class MenuExtension extends \Twig_Extension
     }
 
     /**
-     * @return MenuConfiguration
+     * @return ConfigurationProvider
      */
-    protected function getMenuConfiguration()
+    protected function getConfigurationProvider()
     {
-        return $this->container->get('oro_menu.configuration');
+        return $this->container->get('oro_navigation.configuration.provider');
     }
 
     /**
@@ -110,7 +110,7 @@ class MenuExtension extends \Twig_Extension
         $menuType = $menu->getExtra('type');
         // rewrite config options with args
         if (!empty($menuType)) {
-            $templates = $this->getMenuConfiguration()->getTemplates();
+            $templates = $this->getConfigurationProvider()->getMenuTemplates();
             if (!empty($templates[$menuType])) {
                 $options = array_replace_recursive($templates[$menuType], $options);
             }
