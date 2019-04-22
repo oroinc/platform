@@ -3,8 +3,9 @@
 namespace Oro\Bundle\HelpBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-class ApplicationConfiguration extends AbstractConfiguration
+class Configuration implements ConfigurationInterface
 {
     /**
      * {@inheritDoc}
@@ -14,7 +15,7 @@ class ApplicationConfiguration extends AbstractConfiguration
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('oro_help');
 
-        $nodeBuilder = $rootNode
+        $rootNode
             ->children()
                 ->arrayNode('defaults')
                     ->isRequired()
@@ -23,11 +24,9 @@ class ApplicationConfiguration extends AbstractConfiguration
                             ->cannotBeEmpty()
                             ->isRequired()
                             ->validate()
-                                ->ifTrue(
-                                    function ($value) {
-                                        return !filter_var($value, FILTER_VALIDATE_URL);
-                                    }
-                                )
+                                ->ifTrue(function ($value) {
+                                    return !filter_var($value, FILTER_VALIDATE_URL);
+                                })
                                 ->thenInvalid('Invalid URL %s.')
                             ->end()
                         ->end()
@@ -35,20 +34,14 @@ class ApplicationConfiguration extends AbstractConfiguration
                         ->scalarNode('uri')->end()
                         ->scalarNode('link')
                             ->validate()
-                                ->ifTrue(
-                                    function ($value) {
-                                        return !filter_var($value, FILTER_VALIDATE_URL);
-                                    }
-                                )
+                                ->ifTrue(function ($value) {
+                                    return !filter_var($value, FILTER_VALIDATE_URL);
+                                })
                                 ->thenInvalid('Invalid URL %s.')
                             ->end()
                         ->end()
                     ->end()
                 ->end();
-
-        $this->configureResourcesNodeDefinition($nodeBuilder->arrayNode('resources'));
-        $this->configureVendorsNodeDefinition($nodeBuilder->arrayNode('vendors'));
-        $this->configureRoutesNodeDefinition($nodeBuilder->arrayNode('routes'));
 
         return $treeBuilder;
     }

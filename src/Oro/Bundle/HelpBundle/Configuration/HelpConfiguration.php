@@ -1,39 +1,57 @@
 <?php
 
-namespace Oro\Bundle\HelpBundle\DependencyInjection;
+namespace Oro\Bundle\HelpBundle\Configuration;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-abstract class AbstractConfiguration implements ConfigurationInterface
+/**
+ * Provides schema for configuration that is loaded from "Resources/config/oro/help.yml" files.
+ */
+class HelpConfiguration implements ConfigurationInterface
 {
+    public const ROOT_NODE = 'help';
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getConfigTreeBuilder()
+    {
+        $treeBuilder = new TreeBuilder();
+        $rootNode = $treeBuilder->root(self::ROOT_NODE);
+
+        $nodeBuilder = $rootNode->children();
+
+        $this->configureResourcesNodeDefinition($nodeBuilder->arrayNode('resources'));
+        $this->configureVendorsNodeDefinition($nodeBuilder->arrayNode('vendors'));
+        $this->configureRoutesNodeDefinition($nodeBuilder->arrayNode('routes'));
+
+        return $treeBuilder;
+    }
+
     /**
      * @param ArrayNodeDefinition $resourcesNode
      */
-    protected function configureResourcesNodeDefinition(ArrayNodeDefinition $resourcesNode)
+    private function configureResourcesNodeDefinition(ArrayNodeDefinition $resourcesNode)
     {
-        $self = $this;
-
         $resourcesNode
             ->useAttributeAsKey(true)
             ->beforeNormalization()
-                ->always(
-                    function (array $resources) use ($self) {
-                        $self->assertKeysAreValidResourceNames($resources);
-                        return $resources;
-                    }
-                )
+                ->always(function (array $resources) {
+                    $this->assertKeysAreValidResourceNames($resources);
+
+                    return $resources;
+                })
             ->end()
             ->prototype('array')
                 ->children()
                     ->scalarNode('server')
                         ->validate()
-                            ->ifTrue(
-                                function ($value) {
-                                    return !filter_var($value, FILTER_VALIDATE_URL);
-                                }
-                            )
+                            ->ifTrue(function ($value) {
+                                return !filter_var($value, FILTER_VALIDATE_URL);
+                            })
                             ->thenInvalid('Invalid URL %s.')
                         ->end()
                     ->end()
@@ -42,11 +60,9 @@ abstract class AbstractConfiguration implements ConfigurationInterface
                     ->scalarNode('uri')->end()
                     ->scalarNode('link')
                         ->validate()
-                            ->ifTrue(
-                                function ($value) {
-                                    return !filter_var($value, FILTER_VALIDATE_URL);
-                                }
-                            )
+                            ->ifTrue(function ($value) {
+                                return !filter_var($value, FILTER_VALIDATE_URL);
+                            })
                             ->thenInvalid('Invalid URL %s.')
                         ->end()
                     ->end()
@@ -57,19 +73,16 @@ abstract class AbstractConfiguration implements ConfigurationInterface
     /**
      * @param ArrayNodeDefinition $vendorsNode
      */
-    protected function configureVendorsNodeDefinition(ArrayNodeDefinition $vendorsNode)
+    private function configureVendorsNodeDefinition(ArrayNodeDefinition $vendorsNode)
     {
-        $self = $this;
-
         $vendorsNode
             ->useAttributeAsKey(true)
             ->beforeNormalization()
-                ->always(
-                    function (array $vendors) use ($self) {
-                        $self->assertKeysAreValidVendorNames($vendors);
-                        return $vendors;
-                    }
-                )
+                ->always(function (array $vendors) {
+                    $this->assertKeysAreValidVendorNames($vendors);
+
+                    return $vendors;
+                })
                 ->end()
             ->prototype('array')
                 ->children()
@@ -85,19 +98,16 @@ abstract class AbstractConfiguration implements ConfigurationInterface
     /**
      * @param ArrayNodeDefinition $routesNode
      */
-    protected function configureRoutesNodeDefinition(ArrayNodeDefinition $routesNode)
+    private function configureRoutesNodeDefinition(ArrayNodeDefinition $routesNode)
     {
-        $self = $this;
-
         $routesNode
             ->useAttributeAsKey(true)
             ->beforeNormalization()
-                ->always(
-                    function (array $vendors) use ($self) {
-                        $self->assertKeysAreValidVendorNames($vendors);
-                        return $vendors;
-                    }
-                )
+                ->always(function (array $vendors) {
+                    $this->assertKeysAreValidVendorNames($vendors);
+
+                    return $vendors;
+                })
                 ->end()
             ->prototype('array')
                 ->children()
@@ -110,9 +120,8 @@ abstract class AbstractConfiguration implements ConfigurationInterface
 
     /**
      * @param array $vendors
-     * @throws InvalidConfigurationException
      */
-    public function assertKeysAreValidVendorNames(array $vendors)
+    private function assertKeysAreValidVendorNames(array $vendors)
     {
         foreach (array_keys($vendors) as $vendorName) {
             if (!preg_match('/^[a-z_][a-z0-9_]*$/i', $vendorName)) {
@@ -125,9 +134,8 @@ abstract class AbstractConfiguration implements ConfigurationInterface
 
     /**
      * @param array $resources
-     * @throws InvalidConfigurationException
      */
-    public function assertKeysAreValidResourceNames(array $resources)
+    private function assertKeysAreValidResourceNames(array $resources)
     {
         foreach (array_keys($resources) as $resourceName) {
             if (!preg_match('/^[a-z_][a-z0-9_]*(:[a-z_][a-z0-9_]*){0,2}$/i', $resourceName)) {

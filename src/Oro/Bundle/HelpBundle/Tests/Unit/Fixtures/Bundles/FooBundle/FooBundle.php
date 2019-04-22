@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle;
+namespace Oro\Bundle\HelpBundle\Tests\Unit\Fixtures\Bundles\FooBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

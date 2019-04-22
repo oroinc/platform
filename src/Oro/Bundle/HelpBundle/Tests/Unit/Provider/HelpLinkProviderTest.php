@@ -1,10 +1,11 @@
 <?php
 
-namespace Oro\Bundle\HelpBundle\Tests\Unit\Model;
+namespace Oro\Bundle\HelpBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\HelpBundle\Annotation\Help;
-use Oro\Bundle\HelpBundle\Model\HelpLinkProvider;
+use Oro\Bundle\HelpBundle\Configuration\ConfigurationProvider;
+use Oro\Bundle\HelpBundle\Provider\HelpLinkProvider;
 use Oro\Bundle\HelpBundle\Tests\Unit\Fixtures\Bundles\TestBundle\Controller\TestController;
 use Oro\Bundle\HelpBundle\Tests\Unit\Fixtures\Bundles\TestBundle\OroTestBundle as TestBundle;
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
@@ -34,11 +35,27 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
     /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
-    /** @var HelpLinkProvider */
-    private $provider;
-
     protected function setUp()
     {
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->controllerClassProvider = $this->createMock(ControllerClassProvider::class);
+        $this->helper = $this->createMock(VersionHelper::class);
+        $this->cache = $this->createMock(CacheProvider::class);
+    }
+
+    /**
+     * @param array $defaultConfig
+     * @param array $config
+     *
+     * @return HelpLinkProvider
+     */
+    private function getHelpLinkProvider(array $defaultConfig = [], array $config = []): HelpLinkProvider
+    {
+        $configProvider = $this->createMock(ConfigurationProvider::class);
+        $configProvider->expects($this->any())
+            ->method('getConfiguration')
+            ->willReturn($config);
+
         $bundle = new TestBundle();
         $kernel = $this->createMock(KernelInterface::class);
         $kernel->expects($this->any())
@@ -49,12 +66,9 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getBundles')
             ->willReturn([$bundle->getName() => $bundle]);
 
-        $this->requestStack = $this->createMock(RequestStack::class);
-        $this->controllerClassProvider = $this->createMock(ControllerClassProvider::class);
-        $this->helper = $this->createMock(VersionHelper::class);
-        $this->cache = $this->createMock(CacheProvider::class);
-
-        $this->provider = new HelpLinkProvider(
+        return new HelpLinkProvider(
+            $defaultConfig,
+            $configProvider,
             $this->requestStack,
             $this->controllerClassProvider,
             new ControllerNameParser($kernel),
@@ -81,7 +95,8 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getMasterRequest')
             ->willReturn($request);
 
-        $this->assertEquals($expectedLink, $this->provider->getHelpLinkUrl());
+        $helpLinkProvider = $this->getHelpLinkProvider();
+        $this->assertEquals($expectedLink, $helpLinkProvider->getHelpLinkUrl());
     }
 
     public function testGetHelpLinkWithoutRouteAndWithoutCache()
@@ -93,12 +108,10 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
         $this->cache->expects($this->never())
             ->method('save');
 
-        $this->provider->setConfiguration([
-            'defaults' => [
-                'link' => 'http://example.com/'
-            ]
-        ]);
-        $this->assertEquals($expectedLink, $this->provider->getHelpLinkUrl());
+        $helpLinkProvider = $this->getHelpLinkProvider(
+            ['link' => 'http://example.com/']
+        );
+        $this->assertEquals($expectedLink, $helpLinkProvider->getHelpLinkUrl());
     }
 
     public function testGetHelpLinkWithoutRouteAndWithCache()
@@ -110,12 +123,10 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
         $this->cache->expects($this->never())
             ->method('save');
 
-        $this->provider->setConfiguration([
-            'defaults' => [
-                'link' => 'http://example.com/'
-            ]
-        ]);
-        $this->assertEquals($expectedLink, $this->provider->getHelpLinkUrl());
+        $helpLinkProvider = $this->getHelpLinkProvider(
+            ['link' => 'http://example.com/']
+        );
+        $this->assertEquals($expectedLink, $helpLinkProvider->getHelpLinkUrl());
     }
 
     /**
@@ -131,8 +142,6 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
             ->expects($this->any())
             ->method('getVersion')
             ->will($this->returnValue(self::VERSION));
-
-        $this->provider->setConfiguration($configuration);
 
         $request = new Request();
         $request->attributes->add($requestAttributes);
@@ -153,7 +162,13 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 ->with($requestAttributes['_route'], $expectedLink);
         }
 
-        $this->assertEquals($expectedLink, $this->provider->getHelpLinkUrl());
+        $defaultConfig = [];
+        if (array_key_exists('defaults', $configuration)) {
+            $defaultConfig = $configuration['defaults'];
+            unset($configuration['defaults']);
+        }
+        $helpLinkProvider = $this->getHelpLinkProvider($defaultConfig, $configuration);
+        $this->assertEquals($expectedLink, $helpLinkProvider->getHelpLinkUrl());
     }
 
     /**

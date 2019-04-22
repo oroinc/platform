@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\HelpBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\HelpBundle\Model\HelpLinkProvider;
+use Oro\Bundle\HelpBundle\Provider\HelpLinkProvider;
 use Oro\Bundle\HelpBundle\Twig\HelpExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
@@ -11,10 +11,10 @@ class HelpExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $linkProvider;
+    private $linkProvider;
 
     /** @var HelpExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp()
     {
@@ -23,7 +23,7 @@ class HelpExtensionTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $container = self::getContainerBuilder()
-            ->add('oro_help.model.help_link_provider', $this->linkProvider)
+            ->add('oro_help.help_link_provider', $this->linkProvider)
             ->getContainer($this);
 
         $this->extension = new HelpExtension($container);
@@ -42,10 +42,5 @@ class HelpExtensionTest extends \PHPUnit\Framework\TestCase
             $expects,
             self::callTwigFunction($this->extension, 'get_help_link', [])
         );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(HelpExtension::NAME, $this->extension->getName());
     }
 }

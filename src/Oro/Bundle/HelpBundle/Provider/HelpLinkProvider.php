@@ -1,9 +1,10 @@
 <?php
 
-namespace Oro\Bundle\HelpBundle\Model;
+namespace Oro\Bundle\HelpBundle\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\HelpBundle\Annotation\Help;
+use Oro\Bundle\HelpBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
@@ -19,7 +20,10 @@ class HelpLinkProvider
     private const GROUP_SEPARATOR = '/';
 
     /** @var array */
-    private $rawConfiguration;
+    private $defaultConfig;
+
+    /** @var ConfigurationProvider */
+    private $configProvider;
 
     /** @var RequestStack */
     private $requestStack;
@@ -49,6 +53,8 @@ class HelpLinkProvider
     private $cache;
 
     /**
+     * @param array $defaultConfig
+     * @param ConfigurationProvider $configProvider
      * @param RequestStack $requestStack
      * @param ControllerClassProvider $controllerClassProvider
      * @param ControllerNameParser $parser
@@ -56,34 +62,21 @@ class HelpLinkProvider
      * @param CacheProvider $cache
      */
     public function __construct(
+        array $defaultConfig,
+        ConfigurationProvider $configProvider,
         RequestStack $requestStack,
         ControllerClassProvider $controllerClassProvider,
         ControllerNameParser $parser,
         VersionHelper $helper,
         CacheProvider $cache
     ) {
+        $this->defaultConfig = $defaultConfig;
+        $this->configProvider = $configProvider;
         $this->requestStack = $requestStack;
         $this->controllerClassProvider = $controllerClassProvider;
         $this->parser = $parser;
         $this->helper = $helper;
         $this->cache = $cache;
-    }
-
-    public function setRequest(Request $request)
-    {
-        $this->requestRoute = $request->get('_route');
-        $this->helpAnnotation = null;
-        $this->request = $request;
-    }
-
-    /**
-     * Set configuration.
-     *
-     * @param array $configuration
-     */
-    public function setConfiguration(array $configuration)
-    {
-        $this->rawConfiguration = $configuration;
     }
 
     /**
@@ -118,7 +111,9 @@ class HelpLinkProvider
         if (null === $this->request) {
             $request = $this->requestStack->getMasterRequest();
             if (null !== $request) {
-                $this->setRequest($request);
+                $this->requestRoute = $request->get('_route');
+                $this->helpAnnotation = null;
+                $this->request = $request;
             }
         }
     }
@@ -160,9 +155,9 @@ class HelpLinkProvider
             function ($matches) use ($request) {
                 if (count($matches) > 1) {
                     return $request->get($matches[1]);
-                } else {
-                    return '';
                 }
+
+                return '';
             },
             $link
         );
@@ -190,11 +185,9 @@ class HelpLinkProvider
      */
     private function getConfiguration()
     {
-        $result = [];
+        $result = $this->defaultConfig;
 
         $controllerData = $this->getRequestControllerData();
-
-        $this->mergeDefaultsConfig($result);
         if ($controllerData) {
             $this->mergeRequestControllerConfig($result, $controllerData);
         }
@@ -205,16 +198,6 @@ class HelpLinkProvider
         }
 
         return $result;
-    }
-
-    /**
-     * Apply configuration from "defaults" section of configuration
-     *
-     * @param array $resultConfig
-     */
-    private function mergeDefaultsConfig(array &$resultConfig)
-    {
-        $resultConfig = array_merge($resultConfig, $this->rawConfiguration['defaults']);
     }
 
     /**
@@ -251,8 +234,13 @@ class HelpLinkProvider
      */
     private function mergeRoutesConfig(array &$resultConfig)
     {
-        if ($this->requestRoute && isset($this->rawConfiguration['routes'][$this->requestRoute])) {
-            $resultConfig = array_merge($resultConfig, $this->rawConfiguration['routes'][$this->requestRoute]);
+        if (!$this->requestRoute) {
+            return;
+        }
+
+        $config = $this->configProvider->getConfiguration();
+        if (isset($config['routes'][$this->requestRoute])) {
+            $resultConfig = array_merge($resultConfig, $config['routes'][$this->requestRoute]);
         }
     }
 
@@ -301,16 +289,14 @@ class HelpLinkProvider
             'key' => 'action'
         ];
 
+        $config = $this->configProvider->getConfiguration();
         foreach ($configData as $searchData) {
             $id = $searchData['id'];
             $section = $searchData['section'];
-
-            $key = $searchData['key'];
-
-            if (isset($this->rawConfiguration[$section][$id])) {
-                $rawConfiguration = $this->rawConfiguration[$section][$id];
+            if (isset($config[$section][$id])) {
+                $rawConfiguration = $config[$section][$id];
                 if (isset($rawConfiguration['alias'])) {
-                    $rawConfiguration[$key] = $rawConfiguration['alias'];
+                    $rawConfiguration[$searchData['key']] = $rawConfiguration['alias'];
                     unset($rawConfiguration['alias']);
                 }
                 $resultConfig = array_merge($resultConfig, $rawConfiguration);

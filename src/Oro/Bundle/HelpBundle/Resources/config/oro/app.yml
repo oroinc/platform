@@ -1,4 +1,5 @@
 oro_help:
     defaults:
-        # @TODO: drop static link BAP-7554
-        link: 'http://www.oroinc.com/doc'
+        server: 'http://help.orocrm.com/'
+        link:   'http://www.oroinc.com/doc'
+        prefix: Third_Party
