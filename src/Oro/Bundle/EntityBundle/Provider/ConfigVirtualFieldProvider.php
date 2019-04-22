@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 
 /**
  * The provider for virtual fields defined in "Resources/config/oro/entity.yml" files.

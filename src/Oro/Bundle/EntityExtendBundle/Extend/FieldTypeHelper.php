@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Extend;
 
-use Oro\Bundle\EntityExtendBundle\Provider\EntityExtendConfigurationProvider;
+use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 
 /**
  * The helper class that provides methods related to extended field types.

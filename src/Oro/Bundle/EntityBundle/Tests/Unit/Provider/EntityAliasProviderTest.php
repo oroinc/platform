@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProvider;
-use Oro\Bundle\EntityBundle\Provider\EntityConfigurationProvider;
 
 class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
 {

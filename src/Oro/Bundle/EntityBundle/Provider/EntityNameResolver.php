@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Configuration;
 
-use Oro\Bundle\EntityExtendBundle\Provider\EntityExtendConfigurationProvider;
+use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;

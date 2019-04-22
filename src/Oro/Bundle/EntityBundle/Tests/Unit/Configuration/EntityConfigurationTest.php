@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\Configuration;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 

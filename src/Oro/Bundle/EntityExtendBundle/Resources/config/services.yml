@@ -269,7 +269,7 @@ services:
             - '@oro_entity_extend.configuration_provider'
 
     oro_entity_extend.configuration_provider:
-        class: Oro\Bundle\EntityExtendBundle\Provider\EntityExtendConfigurationProvider
+        class: Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider
         public: false
         parent: oro.static_config_provider.abstract
         arguments:

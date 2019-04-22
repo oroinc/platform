@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Command;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\DependencyInjection;
+namespace Oro\Bundle\SearchBundle\Configuration;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Mode;
@@ -10,6 +10,9 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Provides schema for configuration that is loaded from "Resources/config/oro/search.yml" files.
+ */
 class MappingConfiguration implements ConfigurationInterface
 {
     public const ROOT_NODE = 'search';

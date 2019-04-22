@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Configuration;
 
-use Oro\Bundle\SearchBundle\DependencyInjection\MappingConfiguration;
+use Oro\Bundle\SearchBundle\Configuration\MappingConfiguration;
 use Oro\Component\Testing\Unit\LoadTestCaseDataTrait;
 use Symfony\Component\Config\Definition\Processor;
 

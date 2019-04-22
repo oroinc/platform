@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
+use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
 use Oro\Component\Config\Cache\WarmableConfigCacheInterface;

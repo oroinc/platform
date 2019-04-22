@@ -51,7 +51,7 @@ services:
             - '@doctrine'
 
     oro_entity.entity_configuration.provider:
-        class: Oro\Bundle\EntityBundle\Provider\EntityConfigurationProvider
+        class: Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider
         public: false
         parent: oro.static_config_provider.abstract
         arguments:

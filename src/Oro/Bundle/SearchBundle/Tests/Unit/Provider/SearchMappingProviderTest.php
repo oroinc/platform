@@ -3,8 +3,8 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Cache\Cache;
+use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
-use Oro\Bundle\SearchBundle\Provider\MappingConfigurationProvider;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 

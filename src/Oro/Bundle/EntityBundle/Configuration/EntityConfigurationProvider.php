@@ -1,8 +1,7 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Provider;
+namespace Oro\Bundle\EntityBundle\Configuration;
 
-use Oro\Bundle\EntityExtendBundle\DependencyInjection\EntityExtendConfiguration;
 use Oro\Component\Config\Cache\PhpArrayConfigProvider;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
@@ -10,22 +9,25 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\ResourcesContainerInterface;
 
 /**
- * The provider for configuration that is loaded from "Resources/config/oro/entity_extend.yml" files.
+ * The provider for configuration that is loaded from "Resources/config/oro/entity.yml" files.
  */
-class EntityExtendConfigurationProvider extends PhpArrayConfigProvider
+class EntityConfigurationProvider extends PhpArrayConfigProvider
 {
-    private const CONFIG_FILE = 'Resources/config/oro/entity_extend.yml';
+    private const CONFIG_FILE = 'Resources/config/oro/entity.yml';
 
     /**
-     * Gets configuration of underlying types.
+     * Gets configuration of the given section.
      *
-     * @return array [data type => underlying data type, ...]
+     * @param string $sectionName See constants in
+     *                            {@see \Oro\Bundle\EntityBundle\DependencyInjection\EntityConfiguration}
+     *
+     * @return array
      */
-    public function getUnderlyingTypes(): array
+    public function getConfiguration(string $sectionName): array
     {
         $config = $this->doGetConfig();
 
-        return $config['underlying_types'] ?? [];
+        return $config[$sectionName] ?? [];
     }
 
     /**
@@ -35,19 +37,19 @@ class EntityExtendConfigurationProvider extends PhpArrayConfigProvider
     {
         $configs = [];
         $configLoader = new CumulativeConfigLoader(
-            'oro_entity_extend',
+            'oro_entity',
             new YamlCumulativeFileLoader(self::CONFIG_FILE)
         );
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
-            if (!empty($resource->data[EntityExtendConfiguration::ROOT_NODE])) {
-                $configs[] = $resource->data[EntityExtendConfiguration::ROOT_NODE];
+            if (!empty($resource->data[EntityConfiguration::ROOT_NODE])) {
+                $configs[] = $resource->data[EntityConfiguration::ROOT_NODE];
             }
         }
 
         return CumulativeConfigProcessorUtil::processConfiguration(
             self::CONFIG_FILE,
-            new EntityExtendConfiguration(),
+            new EntityConfiguration(),
             $configs
         );
     }

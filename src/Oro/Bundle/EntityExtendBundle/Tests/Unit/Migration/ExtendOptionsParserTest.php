@@ -3,10 +3,10 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
-use Oro\Bundle\EntityExtendBundle\Provider\EntityExtendConfigurationProvider;
 
 /**
  * Tests for ExtendOptionsParser and ExtendOptionsBuilder

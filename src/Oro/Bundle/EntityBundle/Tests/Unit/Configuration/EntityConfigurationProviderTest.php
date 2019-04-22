@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\Configuration;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\EntityConfiguration;
-use Oro\Bundle\EntityBundle\Provider\EntityConfigurationProvider;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;

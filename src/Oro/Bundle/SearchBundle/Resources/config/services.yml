@@ -176,7 +176,7 @@ services:
             - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
 
     oro_search.mapping_configuration.provider:
-        class: Oro\Bundle\SearchBundle\Provider\MappingConfigurationProvider
+        class: Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider
         public: false
         parent: oro.static_config_provider.abstract
         arguments:
