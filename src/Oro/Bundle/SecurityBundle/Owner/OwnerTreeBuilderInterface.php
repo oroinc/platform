@@ -41,22 +41,12 @@ interface OwnerTreeBuilderInterface
     public function addBusinessUnit($businessUnitId, $owningOrganizationId = null);
 
     /**
-     * Adds a parent business unit to the given business unit
+     * Set array of subordinate business units to the given business unit
      *
-     * @param int|string      $businessUnitId
      * @param int|string|null $parentBusinessUnitId
+     * @param array           $businessUnitIds
      */
-    public function addBusinessUnitRelation($businessUnitId, $parentBusinessUnitId);
-
-    /**
-     * Calculate subordinated entity ids.
-     *
-     * The main aim is to remove such calculations inside each "addBusinessUnitRelation"
-     * as it has performance impact in case of huge amount of entities.
-     *
-     * Should be called only once after all "addBusinessUnitRelation".
-     */
-    public function buildTree();
+    public function setSubordinateBusinessUnitIds($parentBusinessUnitId, $businessUnitIds);
 
     /**
      * Gets the built owner tree

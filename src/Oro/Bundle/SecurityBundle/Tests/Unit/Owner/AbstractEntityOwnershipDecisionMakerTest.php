@@ -40,12 +40,12 @@ class AbstractEntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwner
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id', 'organization')
         );
 
-        /** @var OwnerTreeProvider|\PHPUnit\Framework\MockObject\MockObject $treeProvider */
-        $treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
+        /** @var OwnerTreeProvider|\PHPUnit\Framework\MockObject\MockObject $this->treeProvider */
+        $this->treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $treeProvider->expects($this->any())
+        $this->treeProvider->expects($this->any())
             ->method('getTree')
             ->will($this->returnValue($this->tree));
 
@@ -56,7 +56,7 @@ class AbstractEntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwner
         $this->decisionMaker = $this
             ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\AbstractEntityOwnershipDecisionMaker')
             ->setConstructorArgs([
-                $treeProvider,
+                $this->treeProvider,
                 new ObjectIdAccessor($doctrineHelper),
                 new EntityOwnerAccessor($this->metadataProvider),
                 $this->metadataProvider
