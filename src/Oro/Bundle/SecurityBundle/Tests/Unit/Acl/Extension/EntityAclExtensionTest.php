@@ -163,16 +163,6 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         $this->tree->addBusinessUnit('bu41', 'org4');
         $this->tree->addBusinessUnit('bu411', 'org4');
 
-        $this->tree->addBusinessUnitRelation('bu1', null);
-        $this->tree->addBusinessUnitRelation('bu2', null);
-        $this->tree->addBusinessUnitRelation('bu3', null);
-        $this->tree->addBusinessUnitRelation('bu31', 'bu3');
-        $this->tree->addBusinessUnitRelation('bu3a', null);
-        $this->tree->addBusinessUnitRelation('bu3a1', 'bu3a');
-        $this->tree->addBusinessUnitRelation('bu4', null);
-        $this->tree->addBusinessUnitRelation('bu41', 'bu4');
-        $this->tree->addBusinessUnitRelation('bu411', 'bu41');
-
         $this->tree->addUser('user1', null);
         $this->tree->addUser('user2', 'bu2');
         $this->tree->addUser('user3', 'bu3');
@@ -199,7 +189,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         $this->tree->addUserBusinessUnit('user4', 'org4', 'bu4');
         $this->tree->addUserBusinessUnit('user411', 'org4', 'bu411');
 
-        $this->tree->buildTree();
+        $this->buildTree();
     }
 
     /**
@@ -1303,5 +1293,20 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             ]);
 
         return $mock;
+    }
+
+    protected function buildTree()
+    {
+        $subordinateBusinessUnits = [
+            'bu3'  => ['bu31'],
+            'bu3a' => ['bu3a1'],
+            'bu41' => ['bu411'],
+            'bu4'  => ['bu41', 'bu411'],
+
+        ];
+
+        foreach ($subordinateBusinessUnits as $parentBuId => $buIds) {
+            $this->tree->setSubordinateBusinessUnitIds($parentBuId, $buIds);
+        }
     }
 }

@@ -2,10 +2,17 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
+use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 use Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ChainOwnerTreeProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -41,6 +48,22 @@ class ChainOwnerTreeProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->provider->addProvider($provider);
         $this->assertTrue($this->provider->supports());
+    }
+
+    public function testNotAddSameProvider()
+    {
+        $provider = $this->getOwnerTreeProviderMock();
+        $defaultProvider = $this->getOwnerTreeProviderMock();
+
+        $this->provider->addProvider($provider);
+        $this->provider->setDefaultProvider($defaultProvider);
+        $this->provider->addProvider($defaultProvider);
+
+        self::assertAttributeCount(
+            1,
+            'providers',
+            $this->provider
+        );
     }
 
     public function testSupportsDefault()
@@ -128,5 +151,26 @@ class ChainOwnerTreeProviderTest extends \PHPUnit\Framework\TestCase
     protected function getProviderMock()
     {
         return $this->createMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+    }
+
+    protected function getOwnerTreeProviderMock()
+    {
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $databaseChecker = $this->createMock(DatabaseChecker::class);
+        $cache = $this->createMock(CacheProvider::class);
+        $ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $logger = $this->createMock(LoggerInterface::class);
+
+        $treeProvider = new OwnerTreeProvider(
+            $doctrine,
+            $databaseChecker,
+            $cache,
+            $ownershipMetadataProvider,
+            $tokenStorage
+        );
+        $treeProvider->setLogger($logger);
+
+        return $treeProvider;
     }
 }
