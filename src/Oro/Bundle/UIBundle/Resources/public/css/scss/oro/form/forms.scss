@@ -215,6 +215,11 @@
         padding: 0 20px 0 0;
         display: inline-block;
     }
+
+    &-block-actions:first-child {
+        text-align: #{$end};
+        margin-bottom: $content-padding-medium;
+    }
 }
 
 input[type='radio'] + label,
