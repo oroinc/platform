@@ -4,9 +4,16 @@ namespace Oro\Bundle\SecurityBundle\Owner;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
-abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface
+/**
+ * This class provides access to the tree of owners.
+ */
+abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     const CACHE_KEY = 'data';
 
     /** @var DatabaseChecker */
@@ -37,7 +44,10 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface
      */
     protected function createTreeBuilder()
     {
-        return new OwnerTree();
+        $tree = new OwnerTree();
+        $tree->setLogger($this->logger);
+
+        return $tree;
     }
 
     /**
@@ -64,6 +74,7 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface
         $tree = $this->cache->fetch(self::CACHE_KEY);
         if (!$tree) {
             $tree = $this->loadTree();
+            $tree->setLogger($this->logger);
             $this->cache->save(self::CACHE_KEY, $tree);
         }
 

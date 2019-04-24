@@ -3,24 +3,34 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeBuilderInterface;
+use Oro\Bundle\SecurityBundle\Tests\Util\ReflectionUtil;
+use Psr\Log\LoggerInterface;
 
 class OwnerTreeTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var OwnerTreeBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $tree;
+
+    protected function setUp()
+    {
+        $this->tree = new OwnerTree();
+    }
+
     /**
      * @dataProvider addBusinessUnitRelationProvider
      */
     public function testAddBusinessUnitRelation($src, $expected)
     {
-        $tree = new OwnerTree();
         foreach ($src as $item) {
-            $tree->addBusinessUnitRelation($item[0], $item[1]);
+            $this->tree->addBusinessUnitRelation($item[0], $item[1]);
         }
-        $tree->buildTree();
+        $this->tree->buildTree();
 
         foreach ($expected as $buId => $sBuIds) {
             $this->assertEquals(
                 $sBuIds,
-                $tree->getSubordinateBusinessUnitIds($buId),
+                $this->tree->getSubordinateBusinessUnitIds($buId),
                 sprintf('Failed for %s', $buId)
             );
         }
@@ -28,226 +38,190 @@ class OwnerTreeTest extends \PHPUnit\Framework\TestCase
 
     public function testAddBusinessUnitShouldSetOwningOrganizationIdEvenIfItIsNull()
     {
-        $tree = new OwnerTree();
+        $this->tree->addBusinessUnit('bu1', null);
+        $this->assertNull($this->tree->getBusinessUnitOrganizationId('bu1'));
 
-        $tree->addBusinessUnit('bu1', null);
-        $this->assertNull($tree->getBusinessUnitOrganizationId('bu1'));
-
-        $tree->addBusinessUnit('bu2', 'org');
-        $this->assertEquals('org', $tree->getBusinessUnitOrganizationId('bu2'));
+        $this->tree->addBusinessUnit('bu2', 'org');
+        $this->assertEquals('org', $this->tree->getBusinessUnitOrganizationId('bu2'));
     }
 
     public function testAddBusinessUnitShouldSetOrganizationBusinessUnitIdsOnlyIfOrganizationIsNotNull()
     {
-        $tree = new OwnerTree();
+        $this->tree->addBusinessUnit('bu1', null);
+        $this->assertEquals(array(), $this->tree->getOrganizationBusinessUnitIds('bu1'));
 
-        $tree->addBusinessUnit('bu1', null);
-        $this->assertEquals(array(), $tree->getOrganizationBusinessUnitIds('bu1'));
+        $this->tree->addBusinessUnit('bu2', 'org');
+        $this->assertEquals(array('bu2'), $this->tree->getOrganizationBusinessUnitIds('org'));
 
-        $tree->addBusinessUnit('bu2', 'org');
-        $this->assertEquals(array('bu2'), $tree->getOrganizationBusinessUnitIds('org'));
-
-        $tree->addBusinessUnit('bu3', 'org');
-        $this->assertEquals(array('bu2', 'bu3'), $tree->getOrganizationBusinessUnitIds('org'));
+        $this->tree->addBusinessUnit('bu3', 'org');
+        $this->assertEquals(array('bu2', 'bu3'), $this->tree->getOrganizationBusinessUnitIds('org'));
     }
 
     public function testAddBusinessUnitShouldSetUserOwningOrganizationId()
     {
-        $tree = new OwnerTree();
+        $this->tree->addUser('user', 'bu');
 
-        $tree->addUser('user', 'bu');
-
-        $tree->addBusinessUnit('bu', 'org');
-        $this->assertEquals('org', $tree->getUserOrganizationId('user'));
+        $this->tree->addBusinessUnit('bu', 'org');
+        $this->assertEquals('org', $this->tree->getUserOrganizationId('user'));
     }
 
     public function testAddBusinessUnitShouldNotSetUserOrganizationIds()
     {
-        $tree = new OwnerTree();
+        $this->tree->addUser('user', 'bu');
 
-        $tree->addUser('user', 'bu');
-
-        $tree->addBusinessUnit('bu', 'org');
-        $this->assertEquals(array(), $tree->getUserOrganizationIds('user'));
+        $this->tree->addBusinessUnit('bu', 'org');
+        $this->assertEquals(array(), $this->tree->getUserOrganizationIds('user'));
     }
 
     public function testAddBusinessUnitShouldNotSetUserOrganizationIdsIfOrganizationIdIsNull()
     {
-        $tree = new OwnerTree();
+        $this->tree->addUser('user', 'bu');
 
-        $tree->addUser('user', 'bu');
-
-        $tree->addBusinessUnit('bu', null);
-        $this->assertEquals(array(), $tree->getUserOrganizationIds('user'));
+        $this->tree->addBusinessUnit('bu', null);
+        $this->assertEquals(array(), $this->tree->getUserOrganizationIds('user'));
     }
 
     public function testAddUserShouldSetUserOwningBusinessUnitId()
     {
-        $tree = new OwnerTree();
-
-        $tree->addUser('user', 'bu');
-        $this->assertEquals('bu', $tree->getUserBusinessUnitId('user'));
+        $this->tree->addUser('user', 'bu');
+        $this->assertEquals('bu', $this->tree->getUserBusinessUnitId('user'));
     }
 
     public function testAddUserShouldSetUserOwningBusinessUnitIdEvenIfItIsNull()
     {
-        $tree = new OwnerTree();
-
-        $tree->addUser('user', null);
-        $this->assertNull($tree->getUserBusinessUnitId('user'));
+        $this->tree->addUser('user', null);
+        $this->assertNull($this->tree->getUserBusinessUnitId('user'));
     }
 
     public function testAddUserShouldSetUserBusinessUnitIds()
     {
-        $tree = new OwnerTree();
-
-        $tree->addUser('user', null);
-        $this->assertEquals(array(), $tree->getUserBusinessUnitIds('user'));
+        $this->tree->addUser('user', null);
+        $this->assertEquals(array(), $this->tree->getUserBusinessUnitIds('user'));
     }
 
     public function testAddUserShouldNotSetUserOrganizationIds()
     {
-        $tree = new OwnerTree();
+        $this->tree->addBusinessUnit('bu', 'org');
 
-        $tree->addBusinessUnit('bu', 'org');
-
-        $tree->addUser('user', 'bu');
-        $this->assertEquals(array(), $tree->getUserOrganizationIds('user'));
+        $this->tree->addUser('user', 'bu');
+        $this->assertEquals(array(), $this->tree->getUserOrganizationIds('user'));
     }
 
     public function testAddUserShouldNotSetUserOrganizationIdsIfOrganizationIdIsNull()
     {
-        $tree = new OwnerTree();
+        $this->tree->addBusinessUnit('bu', null);
 
-        $tree->addBusinessUnit('bu', null);
-
-        $tree->addUser('user', 'bu');
-        $this->assertEquals(array(), $tree->getUserOrganizationIds('user'));
+        $this->tree->addUser('user', 'bu');
+        $this->assertEquals(array(), $this->tree->getUserOrganizationIds('user'));
     }
 
     public function testAddUserShouldSetUserOwningOrganizationId()
     {
-        $tree = new OwnerTree();
+        $this->tree->addBusinessUnit('bu', 'org');
 
-        $tree->addBusinessUnit('bu', 'org');
-
-        $tree->addUser('user', 'bu');
-        $this->assertEquals('org', $tree->getUserOrganizationId('user'));
+        $this->tree->addUser('user', 'bu');
+        $this->assertEquals('org', $this->tree->getUserOrganizationId('user'));
     }
 
     public function testAddUserShouldSetUserOwningOrganizationIdEvenIfOrganizationIdIsNull()
     {
-        $tree = new OwnerTree();
+        $this->tree->addBusinessUnit('bu', null);
 
-        $tree->addBusinessUnit('bu', null);
-
-        $tree->addUser('user', 'bu');
-        $this->assertNull($tree->getUserOrganizationId('user'));
+        $this->tree->addUser('user', 'bu');
+        $this->assertNull($this->tree->getUserOrganizationId('user'));
     }
 
     public function testAddUserBusinessUnitShouldNotSetUserBusinessUnitIdsIfBusinessUnitIdIsNull()
     {
-        $tree = new OwnerTree();
+        $this->tree->addUser('user', null);
 
-        $tree->addUser('user', null);
-
-        $tree->addUserBusinessUnit('user', 'org1', null);
-        $this->assertEquals(array(), $tree->getUserBusinessUnitIds('user'));
+        $this->tree->addUserBusinessUnit('user', 'org1', null);
+        $this->assertEquals(array(), $this->tree->getUserBusinessUnitIds('user'));
     }
 
     public function testAddUserBusinessUnitShouldSetUserBusinessUnitIds()
     {
-        $tree = new OwnerTree();
+        $this->tree->addUser('user', null);
 
-        $tree->addUser('user', null);
+        $this->tree->addUserBusinessUnit('user', 'org1', 'bu');
+        $this->assertEquals(array('bu'), $this->tree->getUserBusinessUnitIds('user'));
 
-        $tree->addUserBusinessUnit('user', 'org1', 'bu');
-        $this->assertEquals(array('bu'), $tree->getUserBusinessUnitIds('user'));
-
-        $tree->addUserBusinessUnit('user', 'org1', 'bu1');
-        $this->assertEquals(array('bu', 'bu1'), $tree->getUserBusinessUnitIds('user'));
-        $this->assertEquals(array('bu', 'bu1'), $tree->getUserBusinessUnitIds('user', 'org1'));
+        $this->tree->addUserBusinessUnit('user', 'org1', 'bu1');
+        $this->assertEquals(array('bu', 'bu1'), $this->tree->getUserBusinessUnitIds('user'));
+        $this->assertEquals(array('bu', 'bu1'), $this->tree->getUserBusinessUnitIds('user', 'org1'));
     }
 
     public function testAddUserBusinessUnitShouldNotSetUserOrganizationIdsIfOrganizationIdIsNull()
     {
-        $tree = new OwnerTree();
+        $this->tree->addBusinessUnit('bu', null);
+        $this->tree->addUser('user', null);
 
-        $tree->addBusinessUnit('bu', null);
-        $tree->addUser('user', null);
-
-        $tree->addUserBusinessUnit('user', 'org1', 'bu');
-        $this->assertEquals(array(), $tree->getUserOrganizationIds('user'));
+        $this->tree->addUserBusinessUnit('user', 'org1', 'bu');
+        $this->assertEquals(array(), $this->tree->getUserOrganizationIds('user'));
     }
 
     public function testAddUserBusinessUnitShouldSetUserOrganizationIds()
     {
-        $tree = new OwnerTree();
+        $this->tree->addBusinessUnit('bu', 'org');
+        $this->tree->addUser('user', null);
 
-        $tree->addBusinessUnit('bu', 'org');
-        $tree->addUser('user', null);
-
-        $tree->addUserOrganization('user', 'org');
-        $this->assertEquals(array('org'), $tree->getUserOrganizationIds('user'));
+        $this->tree->addUserOrganization('user', 'org');
+        $this->assertEquals(array('org'), $this->tree->getUserOrganizationIds('user'));
     }
 
     public function testAddUserBusinessUnitBelongToDifferentOrganizations()
     {
-        $tree = new OwnerTree();
+        $this->tree->addUser('user', null);
 
-        $tree->addUser('user', null);
+        $this->tree->addBusinessUnit('bu1', null);
+        $this->assertNull($this->tree->getBusinessUnitOrganizationId('bu1'));
+        $this->tree->addBusinessUnit('bu2', 'org2');
+        $this->assertEquals('org2', $this->tree->getBusinessUnitOrganizationId('bu2'));
+        $this->tree->addBusinessUnit('bu3', 'org3');
+        $this->assertEquals('org3', $this->tree->getBusinessUnitOrganizationId('bu3'));
 
-        $tree->addBusinessUnit('bu1', null);
-        $this->assertNull($tree->getBusinessUnitOrganizationId('bu1'));
-        $tree->addBusinessUnit('bu2', 'org2');
-        $this->assertEquals('org2', $tree->getBusinessUnitOrganizationId('bu2'));
-        $tree->addBusinessUnit('bu3', 'org3');
-        $this->assertEquals('org3', $tree->getBusinessUnitOrganizationId('bu3'));
+        $this->tree->addUserBusinessUnit('user', null, null);
+        $this->assertEquals(array(), $this->tree->getUserBusinessUnitIds('user'));
+        $this->assertNull($this->tree->getUserOrganizationId('user'));
+        $this->assertEquals(array(), $this->tree->getUserOrganizationIds('user'));
+        $this->assertEquals(array(), $this->tree->getUserSubordinateBusinessUnitIds('user', 'org1'));
+        $this->assertEquals(array(), $this->tree->getBusinessUnitsIdByUserOrganizations('user'));
 
-        $tree->addUserBusinessUnit('user', null, null);
-        $this->assertEquals(array(), $tree->getUserBusinessUnitIds('user'));
-        $this->assertNull($tree->getUserOrganizationId('user'));
-        $this->assertEquals(array(), $tree->getUserOrganizationIds('user'));
-        $this->assertEquals(array(), $tree->getUserSubordinateBusinessUnitIds('user', 'org1'));
-        $this->assertEquals(array(), $tree->getBusinessUnitsIdByUserOrganizations('user'));
+        $this->tree->addUserBusinessUnit('user', 'org1', 'bu1');
+        $this->assertEquals(array('bu1'), $this->tree->getUserBusinessUnitIds('user'));
+        $this->assertNull($this->tree->getUserOrganizationId('user'));
+        $this->assertEquals(array(), $this->tree->getUserOrganizationIds('user'));
+        $this->assertEquals(array('bu1'), $this->tree->getUserSubordinateBusinessUnitIds('user', 'org1'));
+        $this->assertEquals(array(), $this->tree->getBusinessUnitsIdByUserOrganizations('user'));
 
-        $tree->addUserBusinessUnit('user', 'org1', 'bu1');
-        $this->assertEquals(array('bu1'), $tree->getUserBusinessUnitIds('user'));
-        $this->assertNull($tree->getUserOrganizationId('user'));
-        $this->assertEquals(array(), $tree->getUserOrganizationIds('user'));
-        $this->assertEquals(array('bu1'), $tree->getUserSubordinateBusinessUnitIds('user', 'org1'));
-        $this->assertEquals(array(), $tree->getBusinessUnitsIdByUserOrganizations('user'));
+        $this->tree->addUserBusinessUnit('user', 'org2', 'bu2');
+        $this->tree->addUserOrganization('user', 'org2');
+        $this->assertEquals(array('bu1', 'bu2'), $this->tree->getUserBusinessUnitIds('user'));
+        $this->assertEquals(array('bu2'), $this->tree->getUserBusinessUnitIds('user', 'org2'));
+        $this->assertNull($this->tree->getUserOrganizationId('user'));
+        $this->assertEquals(array('org2'), $this->tree->getUserOrganizationIds('user'));
+        $this->assertEquals(array('bu2'), $this->tree->getUserSubordinateBusinessUnitIds('user', 'org2'));
+        $this->assertEquals(array('bu1', 'bu2'), $this->tree->getUserSubordinateBusinessUnitIds('user'));
+        $this->assertEquals(array('bu2'), $this->tree->getBusinessUnitsIdByUserOrganizations('user', 'org2'));
 
-        $tree->addUserBusinessUnit('user', 'org2', 'bu2');
-        $tree->addUserOrganization('user', 'org2');
-        $this->assertEquals(array('bu1', 'bu2'), $tree->getUserBusinessUnitIds('user'));
-        $this->assertEquals(array('bu2'), $tree->getUserBusinessUnitIds('user', 'org2'));
-        $this->assertNull($tree->getUserOrganizationId('user'));
-        $this->assertEquals(array('org2'), $tree->getUserOrganizationIds('user'));
-        $this->assertEquals(array('bu2'), $tree->getUserSubordinateBusinessUnitIds('user', 'org2'));
-        $this->assertEquals(array('bu1', 'bu2'), $tree->getUserSubordinateBusinessUnitIds('user'));
-        $this->assertEquals(array('bu2'), $tree->getBusinessUnitsIdByUserOrganizations('user', 'org2'));
-
-        $tree->addUserBusinessUnit('user', 'org3', 'bu3');
-        $tree->addUserOrganization('user', 'org3');
-        $this->assertEquals(array('bu1', 'bu2', 'bu3'), $tree->getUserBusinessUnitIds('user'));
-        $this->assertNull($tree->getUserOrganizationId('user'));
-        $this->assertEquals(array('org2', 'org3'), $tree->getUserOrganizationIds('user'));
-        $this->assertEquals(array('bu1', 'bu2', 'bu3'), $tree->getUserSubordinateBusinessUnitIds('user'));
-        $this->assertEquals(array('bu3'), $tree->getUserSubordinateBusinessUnitIds('user', 'org3'));
-        $this->assertEquals(array('bu2', 'bu3'), $tree->getBusinessUnitsIdByUserOrganizations('user'));
+        $this->tree->addUserBusinessUnit('user', 'org3', 'bu3');
+        $this->tree->addUserOrganization('user', 'org3');
+        $this->assertEquals(array('bu1', 'bu2', 'bu3'), $this->tree->getUserBusinessUnitIds('user'));
+        $this->assertNull($this->tree->getUserOrganizationId('user'));
+        $this->assertEquals(array('org2', 'org3'), $this->tree->getUserOrganizationIds('user'));
+        $this->assertEquals(array('bu1', 'bu2', 'bu3'), $this->tree->getUserSubordinateBusinessUnitIds('user'));
+        $this->assertEquals(array('bu3'), $this->tree->getUserSubordinateBusinessUnitIds('user', 'org3'));
+        $this->assertEquals(array('bu2', 'bu3'), $this->tree->getBusinessUnitsIdByUserOrganizations('user'));
     }
 
     public function testAddBusinessUsersAndGetAllBusinessUnitIds()
     {
-        $tree = new OwnerTree();
+        $this->tree->addBusinessUnit('bu1', 1);
+        $this->tree->addBusinessUnit('bu2', 2);
+        $this->tree->addBusinessUnit('bu3', 2);
+        $this->tree->addBusinessUnit('bu4', 3);
 
-        $tree->addBusinessUnit('bu1', 1);
-        $tree->addBusinessUnit('bu2', 2);
-        $tree->addBusinessUnit('bu3', 2);
-        $tree->addBusinessUnit('bu4', 3);
-
-        $this->assertEquals(['bu1', 'bu2', 'bu3', 'bu4'], $tree->getAllBusinessUnitIds());
+        $this->assertEquals(['bu1', 'bu2', 'bu3', 'bu4'], $this->tree->getAllBusinessUnitIds());
     }
 
     public static function addBusinessUnitRelationProvider()
@@ -355,15 +329,13 @@ class OwnerTreeTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetUsersAssignedToBusinessUnits(array $businessUnitIds, array $expectedOwnerIds)
     {
-        $tree = new OwnerTree();
+        $this->tree->addUserBusinessUnit(1, 1, 1);
+        $this->tree->addUserBusinessUnit(1, 1, 2);
+        $this->tree->addUserBusinessUnit(2, 1, 3);
+        $this->tree->addUserBusinessUnit(3, 1, 3);
+        $this->tree->addUserBusinessUnit(4, 1, 3);
 
-        $tree->addUserBusinessUnit(1, 1, 1);
-        $tree->addUserBusinessUnit(1, 1, 2);
-        $tree->addUserBusinessUnit(2, 1, 3);
-        $tree->addUserBusinessUnit(3, 1, 3);
-        $tree->addUserBusinessUnit(4, 1, 3);
-
-        $this->assertEquals($expectedOwnerIds, $tree->getUsersAssignedToBusinessUnits($businessUnitIds));
+        $this->assertEquals($expectedOwnerIds, $this->tree->getUsersAssignedToBusinessUnits($businessUnitIds));
     }
 
     public function getUsersAssignedToBusinessUnitsProvider()
@@ -393,6 +365,132 @@ class OwnerTreeTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 3],
                 [1, 2, 3, 4],
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider addBusinessUnitDirectCyclicRelationProvider
+     */
+    public function testDirectCyclicRelationshipBetweenBusinessUnits($src, $expected, $criticalMessageArguments)
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $this->tree->setLogger($logger);
+        $this->tree->setBusinessUnitClass('TestClass');
+
+        $logger->expects($this->once())
+            ->method('critical')
+            ->with(
+                sprintf(
+                    'Cyclic relationship in "%s" with problem id "%s"',
+                    'TestClass',
+                    $criticalMessageArguments['buId']
+                )
+            );
+
+        foreach ($src as $item) {
+            $this->tree->addBusinessUnitRelation($item[0], $item[1]);
+        }
+        $this->tree->buildTree();
+
+        foreach ($expected as $parentBusinessUnitId => $businessUnitIds) {
+            $this->assertEquals($businessUnitIds, $this->tree->getSubordinateBusinessUnitIds($parentBusinessUnitId));
+        }
+    }
+    /**
+     * @dataProvider addBusinessUnitNotDirectCyclicRelationProvider
+     */
+    public function testNotDirectCyclicRelationshipBetweenBusinessUnits($src, $expected, $criticalMessageArguments)
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $this->tree->setLogger($logger);
+        $this->tree->setBusinessUnitClass('TestClass');
+
+        $logger->expects($this->exactly(count($criticalMessageArguments)))
+            ->method('critical')
+            ->withConsecutive(
+                [sprintf(
+                    'Cyclic relationship in "%s" with problem id "%s"',
+                    'TestClass',
+                    $criticalMessageArguments[0]['buId']
+                )],
+                [sprintf(
+                    'Cyclic relationship in "%s" with problem id "%s"',
+                    'TestClass',
+                    $criticalMessageArguments[1]['buId']
+                )],
+                [sprintf(
+                    'Cyclic relationship in "%s" with problem id "%s"',
+                    'TestClass',
+                    $criticalMessageArguments[2]['buId']
+                )]
+            );
+
+        foreach ($src as $item) {
+            $this->tree->addBusinessUnitRelation($item[0], $item[1]);
+        }
+        $this->tree->buildTree();
+        foreach ($expected as $parentBusinessUnitId => $businessUnitIds) {
+            $this->assertEquals($businessUnitIds, $this->tree->getSubordinateBusinessUnitIds($parentBusinessUnitId));
+        }
+    }
+    /**
+     * @return array
+     */
+    public function addBusinessUnitDirectCyclicRelationProvider()
+    {
+        return [
+            'direct cyclic relationship' => [
+                [
+                    [2, 4],
+                    [1, null],
+                    [3, 1],
+                    [4, 2]
+                ],
+                [
+                    1 => [3]
+                ],
+                [
+                    'parentBuId' => 4,
+                    'buId' => 2
+                ]
+            ]
+        ];
+    }
+    /**
+     * @return array
+     */
+    public function addBusinessUnitNotDirectCyclicRelationProvider()
+    {
+        return [
+            'not direct cyclic relationship' => [
+                [
+                    [1, null],
+                    [3, 1],
+                    [4, 1],
+                    [5, 7],
+                    [6, 5],
+                    [7, 6],
+                    [8, 14],
+                    [11, 8],
+                    [12, 11],
+                    [13, 12],
+                    [14, 13]
+                ],
+                [
+                    1 => [3, 4]
+                ],
+                [
+                    [
+                        'buId' => 5
+                    ],
+                    [
+                        'buId' => 8
+                    ],
+                    [
+                        'buId' => 12
+                    ]
+                ]
+            ]
         ];
     }
 }
