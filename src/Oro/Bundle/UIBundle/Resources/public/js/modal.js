@@ -84,6 +84,10 @@ define(function(require) {
             return events;
         },
 
+        listen: {
+            'page:beforeChange mediator': 'close'
+        },
+
         /**
          * @inheritDoc
          */
