@@ -128,22 +128,12 @@ define(function(require) {
             e.preventDefault();
             var columnIndex = $(e.target).closest(this.options.columnsSelector).index();
             var targetColumn = (columnIndex === -1) ? 0 : columnIndex;
-
-            var widgetPickerModal = this.subview('widgetPickerModal');
-
-            if (!widgetPickerModal) {
-                var widgetPickerModal = new WidgetPickerModal({
-                    dashboard: this,
-                    dashboardId: this.options.dashboardId,
-                    targetColumn: targetColumn,
-                    allowOk: false,
-                    disposeOnHidden: false
-                });
-
-                this.subview('widgetPickerModal', widgetPickerModal);
-            } else {
-                widgetPickerModal.setTargetColumn(targetColumn);
-            }
+            var widgetPickerModal = new WidgetPickerModal({
+                dashboard: this,
+                dashboardId: this.options.dashboardId,
+                targetColumn: targetColumn,
+                allowOk: false
+            });
 
             widgetPickerModal.open();
         },
