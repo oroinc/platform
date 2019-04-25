@@ -1843,6 +1843,30 @@ TEXT;
     }
 
     /**
+     * @When /^(?:|I )should see following (filters|columns) in the grid settings in exact order:$/
+     * @param TableNode $table
+     */
+    public function iShouldSeeFollowingFiltersColumnsInExactOrder(TableNode $table)
+    {
+        $expectedItems = [];
+        foreach ($table->getRows() as $item) {
+            $expectedItems[] = $item[0];
+        }
+
+        $actualTable = $this->elementFactory->createElement('GridFilterManager');
+        $availableItems = $actualTable->findAll('css', 'td.title-cell label');
+
+        foreach ($availableItems as $exactIndex => $itemName) {
+            self::assertTrue(isset($expectedItems[$exactIndex]), 'Number of actual items exceeds expected');
+            self::assertEquals(
+                $expectedItems[$exactIndex],
+                $itemName->getText(),
+                'Expected items/order does not match'
+            );
+        }
+    }
+
+    /**
      * @When /^I select following records in "(?P<name>[\s\w]+)" grid:$/
      * @When /^I select following records in grid:$/
      * @param TableNode $table
