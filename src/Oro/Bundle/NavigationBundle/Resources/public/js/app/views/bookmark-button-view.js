@@ -63,7 +63,7 @@ define(function(require) {
             }
 
             if (data.navigationElements[this.navigationElementType]) {
-                this.$el.show();
+                this.$el.removeClass('hide');
                 if (data.titleShort) {
                     this.$el.data('title-rendered-short', data.titleShort);
                 }
@@ -77,7 +77,7 @@ define(function(require) {
                     }
                 }
             } else {
-                this.$el.hide();
+                this.$el.addClass('hide');
             }
 
             return this;
