@@ -3,15 +3,16 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\ImportExport;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryExecutorInterface;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -25,6 +26,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class DatagridExportIdFetcherTest extends OrmTestCase
 {
     protected $em;
+
+    /** @var QueryExecutorInterface */
+    protected $queryExecutor;
 
     public function setUp()
     {
@@ -45,7 +49,11 @@ class DatagridExportIdFetcherTest extends OrmTestCase
 
     public function testCreateWithRequiredArgs()
     {
-        new DatagridExportIdFetcher($this->createGridManagerLinkMock(), $this->createEventDispatcherMock());
+        new DatagridExportIdFetcher(
+            $this->createGridManagerLinkMock(),
+            $this->createEventDispatcherMock(),
+            $this->createQueryExecutorMock()
+        );
     }
 
     /**
@@ -61,7 +69,11 @@ class DatagridExportIdFetcherTest extends OrmTestCase
             ->with('gridName')
             ->willReturn(false);
 
-        $fetcher = new DatagridExportIdFetcher($this->createGridManagerLinkMock(), $this->createEventDispatcherMock());
+        $fetcher = new DatagridExportIdFetcher(
+            $this->createGridManagerLinkMock(),
+            $this->createEventDispatcherMock(),
+            $this->createQueryExecutorMock()
+        );
         $fetcher->setImportExportContext($context);
     }
 
@@ -76,11 +88,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
 
         $em = $this->createEntityManagerMock($classMetadata);
 
-        $query = $this->createQueryMock();
-        $query
-            ->expects($this->once())
-            ->method('getArrayResult')
-            ->willReturn([6 => 6, 3 => 3, 8 => 8]);
+        $query = new Query($this->em);
 
         $qb = $this->createQueryBuilderMock();
         $qb
@@ -174,7 +182,17 @@ class DatagridExportIdFetcherTest extends OrmTestCase
             ->method('dispatch')
             ->with(OrmResultBeforeQuery::NAME);
 
-        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher);
+        $executeFunc = function (Query $query) {
+            return $query->getArrayResult();
+        };
+
+        $queryExecutor = $this->createQueryExecutorMock();
+        $queryExecutor->expects($this->once())
+            ->method('execute')
+            ->with(self::identicalTo($grid), self::identicalTo($query), $executeFunc)
+            ->willReturn([6, 3, 8]);
+
+        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher, $queryExecutor);
         $fetcher->setImportExportContext($context);
 
         $result = $fetcher->getGridDataIds();
@@ -224,7 +242,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
             ->willReturn($manager);
 
         $eventDispatcher = $this->createEventDispatcherMock();
-        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher);
+        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher, $this->createQueryExecutorMock());
         $fetcher->setImportExportContext($context);
 
         $this->assertEquals('RootEntity', $fetcher->getGridRootEntity());
@@ -309,7 +327,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
             ->method('dispatch')
             ->with(OrmResultBeforeQuery::NAME);
 
-        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher);
+        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher, $this->createQueryExecutorMock());
         $fetcher->setImportExportContext($context);
 
         $result = $fetcher->getGridDataIds();
@@ -376,7 +394,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
             ->method('dispatch')
             ->with(OrmResultBeforeQuery::NAME);
 
-        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher);
+        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher, $this->createQueryExecutorMock());
         $fetcher->setImportExportContext($context);
 
         $result = $fetcher->getGridDataIds();
@@ -392,6 +410,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
         $qb = $this->em
             ->getRepository('Test:Test')
             ->createQueryBuilder('e')
+            ->select('e.id')
             ->groupBy('e.id');
 
         $gridConfig = $this->createDatagridConfigurationMock();
@@ -443,7 +462,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
             ->method('dispatch')
             ->with(OrmResultBeforeQuery::NAME);
 
-        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher);
+        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher, $this->createQueryExecutorMock());
         $fetcher->setImportExportContext($context);
 
         $result = $fetcher->getGridDataIds();
@@ -456,84 +475,8 @@ class DatagridExportIdFetcherTest extends OrmTestCase
         $qb = $this->em
             ->getRepository('Test:Test')
             ->createQueryBuilder('e')
-            ->orderBy('e.id', 'ASC');
-
-        $gridConfig = $this->createDatagridConfigurationMock();
-
-        $dataSource = $this->createDatasourceMock($qb);
-
-        $grid = $this->createDatagridMock($gridConfig, $dataSource);
-
-        $context = $this->createContextMock();
-        $context
-            ->expects($this->at(0))
-            ->method('hasOption')
-            ->with('gridName')
-            ->willReturn(true);
-
-        $context
-            ->expects($this->at(1))
-            ->method('getOption')
-            ->with('gridName')
-            ->willReturn('someGridName');
-
-        $context
-            ->expects($this->at(2))
-            ->method('getOption')
-            ->with('gridParameters')
-            ->willReturn('someGridParameters');
-
-        $context
-            ->expects($this->at(3))
-            ->method('setValue')
-            ->with('columns', 'SomeColumns');
-
-        $manager = $this->createManagerMock();
-        $manager
-            ->expects($this->once())
-            ->method('getDatagrid')
-            ->with('someGridName', 'someGridParameters')
-            ->willReturn($grid);
-
-        $gridManagerLink = $this->createGridManagerLinkMock();
-        $gridManagerLink
-            ->expects($this->once())
-            ->method('getService')
-            ->willReturn($manager);
-
-        $eventDispatcher = $this->createEventDispatcherMock();
-        $eventDispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with(OrmResultBeforeQuery::NAME);
-
-        $this->setQueryExpectation(
-            $this->getDriverConnectionMock($this->em),
-            'SELECT t0_.id AS id_0 FROM test_table t0_ ORDER BY t0_.id ASC',
-            [
-                ['id_0'  => 1]
-            ]
-        );
-
-        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher);
-        $fetcher->setImportExportContext($context);
-
-        $result = $fetcher->getGridDataIds();
-
-        $this->assertEquals([1], $result);
-    }
-
-    /**
-     * @dataProvider aliasOrderExpressionDataProvider
-     * @param string $orderExpression
-     */
-    public function testGetGridDataIdsForQueryOrderedByAliasOrExpression(string $orderExpression)
-    {
-        $qb = $this->em
-            ->getRepository('Test:Test')
-            ->createQueryBuilder('e')
-            ->select('e.id as someAlias')
-            ->addOrderBy($orderExpression, 'ASC');
+            ->select('e.id')
+            ->indexBy('e', 'e.id');
 
         $gridConfig = $this->createDatagridConfigurationMock();
 
@@ -580,46 +523,22 @@ class DatagridExportIdFetcherTest extends OrmTestCase
             ->method('dispatch')
             ->with(OrmResultBeforeQuery::NAME);
 
-        $this->setQueryExpectation(
-            $this->getDriverConnectionMock($this->em),
-            'SELECT t0_.id AS id_0 FROM test_table t0_',
-            [
-                ['id_0'  => 1]
-            ]
-        );
+        $executeFunc = function (Query $query) {
+            return $query->getArrayResult();
+        };
 
-        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher);
+        $queryExecutor = $this->createQueryExecutorMock();
+        $queryExecutor->expects($this->once())
+            ->method('execute')
+            ->with(self::identicalTo($grid), $qb->getQuery(), $executeFunc)
+            ->willReturn([1]);
+
+        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher, $queryExecutor);
         $fetcher->setImportExportContext($context);
 
         $result = $fetcher->getGridDataIds();
 
         $this->assertEquals([1], $result);
-    }
-
-    /**
-     * @return array
-     */
-    public function aliasOrderExpressionDataProvider()
-    {
-        return [
-            'some alias is used for ordering' => [
-                'orderExpression' => 'someAlias'
-            ],
-            'some expression is used for ordering' => [
-                'orderExpression' => 'e.id+someAlias'
-            ],
-            'another expression is used' => [
-                'orderExpression' => "LOCATE('some', e.name, someAlias)"
-            ]
-        ];
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject | AbstractQuery
-     */
-    private function createQueryMock()
-    {
-        return $this->createMock(AbstractQuery::class);
     }
 
     /**
@@ -729,7 +648,6 @@ class DatagridExportIdFetcherTest extends OrmTestCase
         return $this->createMock(ContextInterface::class);
     }
 
-
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject | ServiceLink
      */
@@ -744,5 +662,13 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     private function createEventDispatcherMock()
     {
         return $this->createMock(EventDispatcherInterface::class);
+    }
+
+    /**
+     * @return \PHPUnit\Framework\MockObject\MockObject| QueryExecutorInterface
+     */
+    private function createQueryExecutorMock()
+    {
+        return $this->createMock(QueryExecutorInterface::class);
     }
 }

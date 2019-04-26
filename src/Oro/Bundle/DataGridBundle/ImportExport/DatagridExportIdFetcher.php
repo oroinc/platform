@@ -6,6 +6,7 @@ use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryExecutorInterface;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -39,13 +40,23 @@ class DatagridExportIdFetcher implements ContextAwareInterface
     protected $grid;
 
     /**
+     * @var QueryExecutorInterface
+     */
+    protected $queryExecutor;
+
+    /**
      * @param ServiceLink $gridManagerLink
      * @param EventDispatcherInterface $eventDispatcher
+     * @param QueryExecutorInterface $queryExecutor
      */
-    public function __construct(ServiceLink $gridManagerLink, EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        ServiceLink $gridManagerLink,
+        EventDispatcherInterface $eventDispatcher,
+        QueryExecutorInterface $queryExecutor
+    ) {
         $this->gridManagerLink = $gridManagerLink;
         $this->eventDispatcher = $eventDispatcher;
+        $this->queryExecutor = $queryExecutor;
     }
 
     /**
@@ -113,7 +124,13 @@ class DatagridExportIdFetcher implements ContextAwareInterface
             $qb->resetDQLPart('orderBy');
         }
 
-        return array_keys($qb->getQuery()->getArrayResult());
+        return $this->queryExecutor->execute(
+            $this->grid,
+            $qb->getQuery(),
+            function ($qb) {
+                return array_keys($qb->getArrayResult());
+            }
+        );
     }
 
     /**

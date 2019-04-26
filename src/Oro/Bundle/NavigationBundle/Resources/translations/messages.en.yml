@@ -1,9 +1,5 @@
 oro:
     navigation:
-        help:
-            title: How To Use Pinbar
-            message: Use pin icon on the right top corner of page to create fast access link in the pinbar.
-            pinbar.location: Location of the Pinbar icon
         menu:
             pinbar.label: Pinbar
             how_to_use_pinbar: Learn how to use this space
@@ -27,6 +23,7 @@ oro:
             button: Minimize
             button.title: Pin/unpin the page
             more_tabs.label: More pintabs
+            help_message: Use the pin %pinIcon% icon on the right top corner of a page to create fast access link in the pinbar.
         menuitem:
             name.label: Name
         menuupdate:
