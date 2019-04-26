@@ -39,10 +39,6 @@ oro_navigation_api_pagestate:
     defaults:
         version:  latest
 
-oro_pinbar_help:
-    path:      /pinbar/help
-    defaults:     { _controller: FrameworkBundle:Template:template, template: "OroNavigationBundle:Pinbar:help.html.twig" }
-
 # deprecated API route
 oro_api_post_pagestate_deprecated:
     path:            /api/rest/{version}/pagestate.{_format}
