@@ -277,4 +277,16 @@ class FeatureContext extends OroFeatureContext implements
 
         $configManager->flush();
     }
+
+    /**
+     * @When /^(?:|I )set configuration property "(?P<key>[^"]+)" to "(?P<value>[^"]+)"$/
+     * @param string $key
+     * @param string $value
+     */
+    public function setConfigurationProperty($key, $value)
+    {
+        $configManager = $this->getContainer()->get('oro_config.global');
+        $configManager->set($key, $value);
+        $configManager->flush();
+    }
 }
