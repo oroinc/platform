@@ -131,12 +131,13 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider datagridPageSizesDataProvider
+     * @dataProvider datagridPagerParamsDataProvider
      *
      * @param array $parameters
      * @param integer|null $expectedPageSize
+     * @param integer|null $expectPage
      */
-    public function testProcessConfigs(array $parameters, $expectedPageSize)
+    public function testProcessConfigs(array $parameters, $expectedPageSize, $expectPage)
     {
         $config = [
             'options' => [
@@ -157,47 +158,56 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
 
         $pagerParameters = $parameterBag->get('_pager');
         $this->assertEquals($expectedPageSize, $pagerParameters['_per_page']);
+        $this->assertEquals($expectPage, $pagerParameters['_page']);
     }
 
     /**
      * @return array
      */
-    public function datagridPageSizesDataProvider(): array
+    public function datagridPagerParamsDataProvider(): array
     {
         return [
-            'empty page size param' => [
+            'empty params' => [
                 'parameters' => [
                     '_pager' => [
+                        '_page' => '',
                         '_per_page' => '',
                     ]
                 ],
                 'expectedPageSize' => 25,
+                'expectPage' => 1,
             ],
-            'wrong page size param' => [
+            'wrong params' => [
                 'parameters' => [
                     '_pager' => [
+                        '_page' => '2a',
                         '_per_page' => 1,
                     ]
                 ],
                 'expectedPageSize' => 25,
+                'expectPage' => 1,
             ],
-            'correct page size param' => [
+            'correct params' => [
                 'parameters' => [
                     '_pager' => [
+                        '_page' => 2,
                         '_per_page' => 10,
                     ]
                 ],
                 'expectedPageSize' => 10,
+                'expectPage' => 2,
             ],
-            'page size param does not exists' => [
+            'params does not exists' => [
                 'parameters' => [
                     '_pager' => []
                 ],
                 'expectedPageSize' => 25,
+                'expectPage' => 1,
             ],
-            'page size param without pager' => [
+            'without pager parameters' => [
                 'parameters' => [],
                 'expectedPageSize' => null,
+                'expectPage' => null,
             ],
         ];
     }

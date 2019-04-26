@@ -46,6 +46,12 @@ abstract class AbstractPagerExtension extends AbstractExtension
     public function processConfigs(DatagridConfiguration $config)
     {
         if ($this->getParameters()->has(PagerInterface::PAGER_ROOT_PARAM)) {
+            $page = $this->getOr(PagerInterface::PAGE_PARAM, 0);
+            if (!is_numeric($page) || $page <= 0) {
+                $this->getParameters()
+                    ->mergeKey(PagerInterface::PAGER_ROOT_PARAM, [PagerInterface::PAGE_PARAM => 1]);
+            }
+
             $currentPageSize = $this->getOr(PagerInterface::PER_PAGE_PARAM, 0);
             $defaultPageSize = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH);
             $pageSizeItems = $config->offsetGetByPath(ToolbarExtension::PAGER_ITEMS_OPTION_PATH, []);
