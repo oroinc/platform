@@ -12,7 +12,7 @@ services:
         arguments:
             - '@oro_asset_bundle.asset_config.cache'
         tags:
-            - { name: kernel.cache_warmer, priority: 0 }
+            - { name: kernel.cache_warmer }
 
     Oro\Bundle\AssetBundle\Command\OroAssetsBuildCommand:
         arguments:

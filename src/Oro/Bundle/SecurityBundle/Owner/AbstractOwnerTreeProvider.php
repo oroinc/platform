@@ -8,13 +8,13 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
 /**
- * This class provides access to the tree of owners.
+ * The base class for owner tree providers.
  */
 abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    const CACHE_KEY = 'data';
+    private const CACHE_KEY = 'data';
 
     /** @var DatabaseChecker */
     private $databaseChecker;
@@ -35,14 +35,14 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
     /**
      * @param OwnerTreeBuilderInterface $tree
      */
-    abstract protected function fillTree(OwnerTreeBuilderInterface $tree);
+    abstract protected function fillTree(OwnerTreeBuilderInterface $tree): void;
 
     /**
      * Returns empty instance of the owner tree builder
      *
      * @return OwnerTreeBuilderInterface
      */
-    protected function createTreeBuilder()
+    protected function createTreeBuilder(): OwnerTreeBuilderInterface
     {
         return new OwnerTree();
     }
@@ -137,7 +137,7 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clearCache(): void
     {
         $this->cache->deleteAll();
     }
@@ -145,7 +145,7 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
     /**
      * {@inheritdoc}
      */
-    public function warmUpCache()
+    public function warmUpCache(): void
     {
         $this->cache->save(self::CACHE_KEY, $this->loadTree());
     }
@@ -153,7 +153,7 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
     /**
      * {@inheritdoc}
      */
-    public function getTree()
+    public function getTree(): OwnerTreeInterface
     {
         $tree = $this->cache->fetch(self::CACHE_KEY);
         if (!$tree) {
@@ -165,11 +165,11 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
     }
 
     /**
-     * Loads tree data
+     * Loads tree data.
      *
      * @return OwnerTreeInterface
      */
-    protected function loadTree()
+    private function loadTree(): OwnerTreeInterface
     {
         $treeBuilder = $this->createTreeBuilder();
         if ($this->databaseChecker->checkDatabase()) {

@@ -6,7 +6,6 @@ Table of Contents
  - [Model](#model)
  - [Configuration](#configuration)
  - [Configuration Merging](#configuration-merging)
- - [Configuration Load](#configuration-load)
 
 User can manage visibility of role permissions on View and Edit Role pages.
 
@@ -60,12 +59,3 @@ Merging uses simple rules:
  * if node value is array - this array will be complemented by values from the second configuration
 
 After this step application knows about all permissions and have only one configuration for each permission.
-
-Configuration Load
-------------------
-
-To load or update configurable permissions configuration to cache execute a command:
-
-```
-security:configurable-permission:load
-```

@@ -10,7 +10,7 @@ interface ToArrayInterface
     /**
      * Gets an array representation of an object.
      *
-     * @return array
+     * @return array [key => value, ...]
      */
     public function toArray();
 }

@@ -6,16 +6,16 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Processor;
 
+/**
+ * Defines a schema of "Resources/config/oro/features.yml" files.
+ */
 class FeatureToggleConfiguration implements ConfigurationInterface
 {
-    const ROOT = 'features';
+    public const ROOT_NODE = 'features';
 
-    /**
-     * @var array|ConfigurationExtensionInterface[]
-     */
-    protected $extensions = [];
+    /** @var ConfigurationExtensionInterface[] */
+    private $extensions = [];
 
     /**
      * @param ConfigurationExtensionInterface $extension
@@ -31,18 +31,14 @@ class FeatureToggleConfiguration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $builder = new TreeBuilder();
-        $root = $builder->root(self::ROOT);
+        $root = $builder->root(self::ROOT_NODE);
 
         $children = $root->useAttributeAsKey('name')->prototype('array')->children();
-
-        $root->end();
 
         $this->addFeatureConfiguration($children);
         foreach ($this->extensions as $extension) {
             $extension->extendConfigurationTree($children);
         }
-
-        $children->end();
 
         return $builder;
     }
@@ -50,7 +46,7 @@ class FeatureToggleConfiguration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
-    protected function addFeatureConfiguration(NodeBuilder $node)
+    private function addFeatureConfiguration(NodeBuilder $node)
     {
         $node
             ->scalarNode('toggle')
@@ -106,16 +102,5 @@ class FeatureToggleConfiguration implements ConfigurationInterface
             ->end()
             ->booleanNode('allow_if_equal_granted_denied')
             ->end();
-    }
-
-    /**
-     * @param array $configs
-     * @return array
-     */
-    public function processConfiguration(array $configs)
-    {
-        $processor = new Processor();
-
-        return $processor->processConfiguration($this, [$configs]);
     }
 }

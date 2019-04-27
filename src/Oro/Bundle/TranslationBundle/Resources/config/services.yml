@@ -6,7 +6,6 @@ parameters:
     translator.class:                                           Oro\Bundle\TranslationBundle\Translation\Translator
     oro_translation.translation_walker.class:                   Gedmo\Translatable\Query\TreeWalker\TranslationWalker
     oro_translation.controller.class:                           Oro\Bundle\TranslationBundle\Controller\Controller
-    oro_translation.extractor.php_code_extractor.class:         Oro\Bundle\TranslationBundle\Extractor\PhpCodeExtractor
     oro_translation.empty_array.loader.class:                   Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader
 
     oro_translation.dynamic_translation.metadata.cache.class:   Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache
@@ -33,7 +32,7 @@ services:
         lazy: true
 
     oro_translation.extractor.php_code_extractor:
-        class: '%oro_translation.extractor.php_code_extractor.class%'
+        class: Oro\Bundle\TranslationBundle\Extractor\PhpCodeExtractor
         arguments:
             - '@service_container'
         tags:
@@ -328,9 +327,10 @@ services:
 
     oro_translation.filter.language:
         class: 'Oro\Bundle\TranslationBundle\Filter\LanguageFilter'
+        public: false
         parent: oro_filter.entity_filter
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: language, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: language }
 
     oro_translation.helper.translation_route:
         class: 'Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper'

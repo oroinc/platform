@@ -1,0 +1,3 @@
+services:
+    oro_layout.tests.theme_extension.resource_provider.theme:
+        alias: oro_layout.theme_extension.resource_provider.theme

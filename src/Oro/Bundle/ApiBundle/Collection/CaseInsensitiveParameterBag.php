@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Collection;
 
 use Oro\Component\ChainProcessor\ParameterBag;
 
+/**
+ * The container for key/value pairs where keys are case-insensitive.
+ */
 class CaseInsensitiveParameterBag extends ParameterBag
 {
     /**

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 use Oro\Component\ChainProcessor\AbstractParameterBag;
+use Oro\Component\ChainProcessor\ParameterValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -25,6 +26,12 @@ class RestRequestHeaders extends AbstractParameterBag
      *  ['v' => value] - a parameter exists and its value is stored in this array
      */
     private $parameters;
+
+    /** @var ParameterValueResolverInterface[] [key => ParameterValueResolverInterface, ...] */
+    private $resolvers = [];
+
+    /** @var array [key => value, ...] */
+    private $resolvedItems = [];
 
     /**
      * @param Request $request
@@ -54,21 +61,41 @@ class RestRequestHeaders extends AbstractParameterBag
     public function get($key)
     {
         if (null === $this->parameters) {
-            return $this->request->headers->get($key);
+            if (!$this->request->headers->has($key)) {
+                return null;
+            }
+            if (\array_key_exists($key, $this->resolvedItems)) {
+                return $this->resolvedItems[$key];
+            }
+
+            $value = $this->request->headers->get($key);
+        } else {
+            $key = $this->normalizeKey($key);
+            if (!isset($this->parameters[$key])) {
+                return null;
+            }
+            $val = $this->parameters[$key];
+            if (false === $val) {
+                return null;
+            }
+            if (\array_key_exists($key, $this->resolvedItems)) {
+                return $this->resolvedItems[$key];
+            }
+
+            $value = empty($val)
+                ? $this->request->headers->get($key)
+                : $val['v'];
         }
 
-        $key = $this->normalizeKey($key);
-        if (!isset($this->parameters[$key])) {
-            return null;
-        }
-        $val = $this->parameters[$key];
-        if (false === $val) {
-            return null;
+        if (isset($this->resolvers[$key])) {
+            $resolver = $this->resolvers[$key];
+            if ($resolver->supports($value)) {
+                $value = $resolver->resolve($value);
+            }
+            $this->resolvedItems[$key] = $value;
         }
 
-        return empty($val)
-            ? $this->request->headers->get($key)
-            : $val['v'];
+        return $value;
     }
 
     /**
@@ -78,7 +105,9 @@ class RestRequestHeaders extends AbstractParameterBag
     {
         $this->ensureInternalStorageInitialized();
 
-        $this->parameters[$this->normalizeKey($key)] = ['v' => $value];
+        $key = $this->normalizeKey($key);
+        $this->parameters[$key] = ['v' => $value];
+        unset($this->resolvedItems[$key]);
     }
 
     /**
@@ -88,7 +117,22 @@ class RestRequestHeaders extends AbstractParameterBag
     {
         $this->ensureInternalStorageInitialized();
 
-        $this->parameters[$this->normalizeKey($key)] = false;
+        $key = $this->normalizeKey($key);
+        $this->parameters[$key] = false;
+        unset($this->resolvedItems[$key]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setResolver($key, ?ParameterValueResolverInterface $resolver)
+    {
+        $key = $this->normalizeKey($key);
+        if (null === $resolver) {
+            unset($this->resolvers[$key]);
+        } else {
+            $this->resolvers[$key] = $resolver;
+        }
     }
 
     /**
@@ -100,7 +144,7 @@ class RestRequestHeaders extends AbstractParameterBag
         if (null === $this->parameters) {
             $keys = $this->request->headers->keys();
             foreach ($keys as $key) {
-                $result[$key] = $this->request->headers->get($key);
+                $result[$key] = $this->get($key);
             }
         } else {
             foreach ($this->parameters as $key => $parameter) {
@@ -124,6 +168,7 @@ class RestRequestHeaders extends AbstractParameterBag
         foreach ($keys as $key) {
             $this->parameters[$key] = false;
         }
+        $this->resolvedItems = [];
     }
 
     /**

@@ -11,6 +11,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\LocaleBundle\Autocomplete\ParentLocalizationSearchHandler;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Component\Testing\Unit\EntityTrait;
 
@@ -39,8 +40,14 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $searchMappingProvider = $this->createMock(SearchMappingProvider::class);
+        $searchMappingProvider->expects($this->once())
+            ->method('getEntityAlias')
+            ->with(self::TEST_ENTITY_CLASS)
+            ->willReturn('alias');
+
         $this->searchHandler = new ParentLocalizationSearchHandler(self::TEST_ENTITY_CLASS, ['name']);
-        $this->searchHandler->initSearchIndexer($this->indexer, [self::TEST_ENTITY_CLASS => ['alias' => 'alias']]);
+        $this->searchHandler->initSearchIndexer($this->indexer, $searchMappingProvider);
         $this->searchHandler->initDoctrinePropertiesByManagerRegistry($this->getManagerRegistryMock());
     }
 

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 
@@ -72,10 +74,15 @@ class ConfigVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         $entityHierarchyProvider->expects($this->any())
             ->method('getHierarchy')
             ->willReturn($hierarchy);
+        $configProvider = $this->createMock(EntityConfigurationProvider::class);
+        $configProvider->expects(self::any())
+            ->method('getConfiguration')
+            ->with(EntityConfiguration::VIRTUAL_FIELDS)
+            ->willReturn($this->virtualFieldsConfig);
 
         $this->virtualFieldProvider = new ConfigVirtualFieldProvider(
             $entityHierarchyProvider,
-            $this->virtualFieldsConfig
+            $configProvider
         );
     }
 

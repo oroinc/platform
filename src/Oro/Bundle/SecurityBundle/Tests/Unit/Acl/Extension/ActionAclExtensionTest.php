@@ -5,13 +5,13 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionMaskBuilder;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
-use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
+use Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadataProvider;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 class ActionAclExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ActionMetadataProvider
+     * @var \PHPUnit\Framework\MockObject\MockObject|ActionSecurityMetadataProvider
      */
     protected $metadataProvider;
 
@@ -22,9 +22,7 @@ class ActionAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->metadataProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->metadataProvider = $this->createMock(ActionSecurityMetadataProvider::class);
 
         $this->extension = new ActionAclExtension($this->metadataProvider);
     }

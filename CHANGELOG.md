@@ -4,7 +4,25 @@ The current file describes significant changes in the code that may affect the u
 
 ## 4.0.0-rc
 
+### Added
+
+#### ChainProcessor component
+* The method `setResolver($key, ?ParameterValueResolverInterface $resolver)` was added to
+  `Oro\Component\ChainProcessor\ParameterBagInterface`. It allows to resolve a parameter value
+  when the parameter is requested at the first time. This can be helpful for rare used parameters with time consuming
+  value resolving.
+
 ### Changed
+
+#### Config component
+* The methods `load()` and `registerResources()` of class `Oro\Component\Config\Loader\CumulativeConfigLoader`
+  were changed to not accept `Symfony\Component\DependencyInjection\ContainerBuilder` as resources container.
+  Use `Oro\Component\Config\Loader\ContainerBuilderAdapter` to adapt
+  `Symfony\Component\DependencyInjection\ContainerBuilder` to `Oro\Component\Config\ResourcesContainerInterface`.
+
+#### CacheBundle
+* The approach based on `Oro\Bundle\CacheBundle\Loader\ConfigurationLoader` and `Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper` has been replaced with the approach based on `Oro\Component\Config\Cache\PhpConfigProvider`.
+
 #### EmailBundle
 * The `Oro\Bundle\EmailBundle\Provider\EmailRenderer` was reimplemented to support computed variables.
   The following changes were made:
@@ -36,8 +54,6 @@ The current file describes significant changes in the code that may affect the u
   Use `data_type` attribute of `oro_formatter` tag to specify the default formatter for the data type.
 
 ### Removed
-#### MessageQueueBundle
-* The `DefaultTransportFactory` and related configuration option `oro_message_queue.transport.defaut` was removed. Check `config/config.yml` in your application.
 
 #### DependencyInjection component
 * The `ServiceLinkRegistry` and all relates classes was removed.
@@ -49,7 +65,67 @@ The current file describes significant changes in the code that may affect the u
     - `Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass`
     - `Oro\Component\DependencyInjection\Exception\UnknownAliasException`
 
-## 4.0.0-beta
+#### ActionBundle
+* The deprecated `route_exists` action (class `Oro\Bundle\ActionBundle\Condition\RouteExists`) was removed.
+
+#### ChartBundle
+* The possibility to define charts via ChartBundle configuration has been removed. Use `Resources/config/oro/charts.yml` instead.
+* Methods `getConfigs()` and `getChartConfigs()` have been removed from `Oro\Bundle\ChartBundle\Model\ConfigProvider`. Use `getChartNames()` and `getChartConfig($chartName)` methods instead.
+
+#### ConfigBundle
+* Not used tag `oro_config.configuration_provider` has been removed.
+
+#### DashboardBundle
+* The `dashboards`, `widgets` and `widgets_configuration` sections have been removed from DashboardBundle configuration. Use `Resources/config/oro/dashboards.yml` instead.
+* Methods `getConfigs()`, `getConfig($key)` and `hasConfig($key)` have been removed from `Oro\Bundle\DashboardBundle\Model\ConfigProvider`.
+
+#### EntityBundle
+* The `exclusions`, `entity_aliases`, `entity_alias_exclusions`, `virtual_fields`, `virtual_relations` and `entity_name_formats` sections have been removed from EntityBundle configuration. Use `Resources/config/oro/entity.yml` instead.
+
+#### FilterBundle
+* The `datasource` attribute for `oro_filter.extension.orm_filter.filter` tag has been removed as it is redundant.
+
+#### HelpBundle
+* The possibility to define `resources`, `vendors` and `routes` sections via HelpBundle configuration has been removed. Use `Resources/config/oro/help.yml` instead.
+
+#### MessageQueueBundle
+* The `DefaultTransportFactory` and related configuration option `oro_message_queue.transport.defaut` was removed. Check `config/config.yml` in your application.
+
+#### NavigationBundle
+* The possibility to define `menu_config`, `navigation_elements` and `titles` sections via NavigationBundle configuration has been removed. Use `Resources/config/oro/navigation.yml` instead.
+* The class `Oro\Bundle\NavigationBundle\Config\MenuConfiguration` has been removed. Use `Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider` instead.
+
+#### LayoutBundle
+* The `themes` section has been removed from LayoutBundle configuration. Use `Resources/views/layouts/{folder}/theme.yml` instead.
+
+#### LocaleBundle
+* The `name_format` section has been removed from LocaleBundle configuration. Use `Resources/config/oro/name_format.yml` instead.
+* The `address_format` section has been removed from LocaleBundle configuration. Use `Resources/config/oro/address_format.yml` instead.
+* The `locale_data` section has been removed from LocaleBundle configuration. Use `Resources/config/oro/locale_data.yml` instead.
+
+#### QueryDesignerBundle
+* The `oro_query_designer.query_designer.manager.link` service has been removed. Use `oro_query_designer.query_designer.manager` service instead.
+
+#### SearchBundle
+* The `datasource` attribute for `oro_search.extension.search_filter.filter` tag has been removed as it is redundant.
+* The `entities_config` section has been removed from SearchBundle configuration. Use `Resources/config/oro/search.yml` instead.
+* Not used event `Oro\Bundle\SearchBundle\Event\BeforeMapObjectEvent` has been removed.
+* Deprecated DIC parameter `oro_search.entities_config` has been removed. Use `oro_search.provider.search_mapping` service instead of it.
+
+#### SecurityBundle
+* The command `security:configurable-permission:load` has been removed.
+
+#### SidebarBundle
+* The `sidebar_widgets` section has been removed from SidebarBundle configuration. Use `Resources/public/sidebar_widgets/{folder}/widget.yml` instead.
+* The class `Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry` has been renamed to `Oro\Bundle\SidebarBundle\Configuration\WidgetDefinitionProvider`.
+* The service `oro_sidebar.widget_definition.registry` has been renamed to `oro_sidebar.widget_definition_provider`.
+
+#### UIBundle
+* The `placeholders` and `placeholder_items` sections have been removed from UIBundle configuration. Use `Resources/config/oro/placeholders.yml` instead.
+* Deprecated option `show_pin_button_on_start_page` has been removed from UIBundle configuration.
+
+## 4.0.0-beta (2019-03-28)
+[Show detailed list of changes](incompatibilities-4-0-beta.md)
 
 ### Changed
 #### EmailBundle

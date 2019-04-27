@@ -56,7 +56,7 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
     /**
      * {@inheritdoc}
      */
-    public function isApplicable($gridName)
+    public function isApplicable(string $gridName): bool
     {
         return $this->builder->isApplicable($gridName);
     }
@@ -64,7 +64,7 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
     /**
      * {@inheritdoc}
      */
-    public function getConfiguration($gridName)
+    public function getConfiguration(string $gridName): DatagridConfiguration
     {
         $cacheKey = $this->getCacheKey($gridName);
 

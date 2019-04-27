@@ -31,8 +31,6 @@ parameters:
     oro_navigation.title_service.class:                        Oro\Bundle\NavigationBundle\Provider\TitleService
     oro_navigation.title_translator.class:                     Oro\Bundle\NavigationBundle\Provider\TitleTranslator
 
-    oro_navigation.translation.extractor.class:                Oro\Bundle\NavigationBundle\Title\TranslationExtractor
-
     oro_navigation.form.type.pagestate.class:                  Oro\Bundle\NavigationBundle\Form\Type\PageStateType
     oro_navigation.form.handler.pagestate.class:               Oro\Bundle\NavigationBundle\Form\Handler\PageStateHandler
 
@@ -82,11 +80,6 @@ services:
         tags:
             - { name: knp_menu.provider }
 
-    oro_menu.configuration:
-        class: Oro\Bundle\NavigationBundle\Config\MenuConfiguration
-        arguments:
-            - '@oro_navigation.configuration.provider'
-
     oro_menu.configuration_resolver:
         class: '%oro_menu.configuration_resolver.class%'
         arguments:
@@ -98,7 +91,7 @@ services:
             - '@oro_menu.configuration_resolver'
             - '@oro_menu.factory'
             - '@event_dispatcher'
-            - '@oro_menu.configuration'
+            - '@oro_navigation.configuration.provider'
         tags:
             - { name: oro_menu.builder }
 
@@ -265,44 +258,31 @@ services:
           - '@translator.default'
           - '@oro_config.user'
 
-    oro_navigation.cache.title_annotations:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_navigation_annotations' ] ]
-
-    oro_navigation.cached_reader.title_annotations:
-        parent: annotations.cached_reader
-        arguments:
-            - '@annotation_reader'
-            - '@oro_navigation.cache.title_annotations'
-            - '%kernel.debug%'
-
     oro_navigation.title_reader.registry:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry
+        public: false
+        arguments:
+          - !tagged oro_navigation.title_reader
 
     oro_navigation.title_annotations_reader:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader
+        public: false
+        parent: oro.static_config_provider.abstract
         arguments:
-            - '@oro_navigation.cached_reader.title_annotations'
-            - '@router'
-            - '@oro_navigation.cache.title_annotations'
+            - '%kernel.cache_dir%/oro/title_annotations.php'
+            - '%kernel.debug%'
+            - '@oro_ui.controller_class_provider'
+            - '@annotation_reader'
         tags:
             - { name: oro_navigation.title_reader, priority: 10}
 
-    oro_navigation.cache_warmer.title_annotations:
-        class: Oro\Bundle\NavigationBundle\CacheWarmer\TitleAnnotationsCacheWarmer
-        arguments:
-            - '@oro_navigation.title_annotations_reader'
-        tags:
-            - { name: 'kernel.cache_warmer' }
-
     oro_navigation.title_config_reader:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader
+        public: false
         arguments:
             - '@oro_navigation.configuration.provider'
         tags:
-            - { name: oro_navigation.title_reader, priority: 0}
+            - { name: oro_navigation.title_reader}
 
     oro_navigation.title_service.twig.extension:
         class: Oro\Bundle\NavigationBundle\Twig\TitleExtension
@@ -313,10 +293,10 @@ services:
             - { name: twig.extension }
 
     oro_navigation.translation.extractor:
-        class: '%oro_navigation.translation.extractor.class%'
+        class: Oro\Bundle\NavigationBundle\Title\TranslationExtractor
         arguments:
             - '@oro_navigation.title_reader.registry'
-            - '@router'
+            - '@oro_ui.controller_class_provider'
         tags:
             - { name: translation.extractor, alias: navigation_translation_extractor }
 
@@ -412,7 +392,7 @@ services:
             - '@oro_menu.builder_chain'
             - '@oro_navigation.menu_manipulator'
             - '%oro_navigation.menu_update.scope_type%'
-            - '@oro_menu.configuration'
+            - '@oro_navigation.configuration.provider'
         tags:
             - { name: oro_datagrid.datasource, type: menu-update }
 
@@ -514,23 +494,19 @@ services:
             - {name: oro_scope.provider, scopeType: '%oro_navigation.menu_update.scope_type%', priority: 20}
 
     oro_navigation.configuration.provider:
-        class: Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider
+        class: Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider
+        parent: oro.static_config_provider.abstract
         arguments:
-            - '@oro_navigation.configuration_provider.cache'
-
-    oro_navigation.configuration_provider.cache:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_navigation_configuration' ] ]
+            - '%kernel.cache_dir%/oro/navigation.php'
+            - '%kernel.debug%'
 
     oro_navigation.event_listener.scope_grid_listener:
-        class: 'Oro\Bundle\NavigationBundle\EventListener\MenuGridListener'
+        class: Oro\Bundle\NavigationBundle\EventListener\MenuGridListener
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.menu-by-scope-grid, method: onPreBuild }
 
     oro_navigation.provider.menu_update_provider:
-        class: 'Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider'
+        class: Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider
         arguments:
             - '@oro_scope.scope_manager'
             - '@oro_navigation.manager.menu_update'

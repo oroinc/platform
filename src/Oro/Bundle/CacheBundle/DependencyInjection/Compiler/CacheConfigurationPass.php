@@ -5,6 +5,7 @@ namespace Oro\Bundle\CacheBundle\DependencyInjection\Compiler;
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
+use Oro\Component\Config\Cache\ConfigCacheWarmer;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -12,7 +13,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Configures cache
+ * Configures caches.
  */
 class CacheConfigurationPass implements CompilerPassInterface
 {
@@ -24,6 +25,8 @@ class CacheConfigurationPass implements CompilerPassInterface
     public const DATA_CACHE_NO_MEMORY_SERVICE = 'oro.cache.abstract.without_memory_cache';
     /** data cache manager service */
     public const MANAGER_SERVICE_KEY = 'oro_cache.oro_data_cache_manager';
+    /** the base service for static configuration providers */
+    public const STATIC_CONFIG_PROVIDER_SERVICE = 'oro.static_config_provider.abstract';
 
     /**
      * {@inheritdoc}
@@ -32,7 +35,7 @@ class CacheConfigurationPass implements CompilerPassInterface
     {
         $this->ensureAbstractFileCacheExists($container);
         $this->ensureAbstractDataCacheExists($container);
-        $this->configureDataCacheManager($container);
+        $this->configureDataCacheManagerAndStaticConfigCache($container);
     }
 
     /**
@@ -40,7 +43,7 @@ class CacheConfigurationPass implements CompilerPassInterface
      *
      * @param ContainerBuilder $container
      */
-    protected function ensureAbstractFileCacheExists(ContainerBuilder $container)
+    private function ensureAbstractFileCacheExists(ContainerBuilder $container)
     {
         $cacheProvider = $this->getCacheProvider($container, static::FILE_CACHE_SERVICE);
 
@@ -52,7 +55,7 @@ class CacheConfigurationPass implements CompilerPassInterface
      *
      * @param ContainerBuilder $container
      */
-    protected function ensureAbstractDataCacheExists(ContainerBuilder $container)
+    private function ensureAbstractDataCacheExists(ContainerBuilder $container)
     {
         $cacheProvider = $this->getCacheProvider($container, static::DATA_CACHE_SERVICE);
 
@@ -65,12 +68,8 @@ class CacheConfigurationPass implements CompilerPassInterface
      *
      * @param ContainerBuilder $container
      */
-    protected function configureDataCacheManager(ContainerBuilder $container)
+    private function configureDataCacheManagerAndStaticConfigCache(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::MANAGER_SERVICE_KEY)) {
-            return;
-        }
-
         $parentServices = [
             self::FILE_CACHE_SERVICE,
             self::DATA_CACHE_SERVICE,
@@ -79,15 +78,34 @@ class CacheConfigurationPass implements CompilerPassInterface
         $managerDef  = $container->getDefinition(self::MANAGER_SERVICE_KEY);
         $definitions = $container->getDefinitions();
         foreach ($definitions as $serviceId => $def) {
-            if ($def instanceof ChildDefinition
-                && !$def->isAbstract()
-                && in_array($def->getParent(), $parentServices, true)
-            ) {
+            if (!$def instanceof ChildDefinition || $def->isAbstract()) {
+                continue;
+            }
+            if (in_array($def->getParent(), $parentServices, true)) {
                 $managerDef->addMethodCall(
                     'registerCacheProvider',
                     [new Reference($serviceId)]
                 );
+            } elseif ($def->getParent() === self::STATIC_CONFIG_PROVIDER_SERVICE) {
+                $this->registerStaticConfigWarmer($container, $serviceId);
             }
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string           $providerServiceId
+     */
+    private function registerStaticConfigWarmer(ContainerBuilder $container, $providerServiceId)
+    {
+        $warmerServiceId = $providerServiceId . '.warmer';
+        if (!$container->hasDefinition($warmerServiceId)) {
+            // use priority = 200 to add this warmer at the begin of the warmers chain
+            // to prevent double warmup in case some Application cache depends on this cache
+            $container->register($warmerServiceId, ConfigCacheWarmer::class)
+                ->setPublic(false)
+                ->setArguments([new Reference($providerServiceId)])
+                ->addTag('kernel.cache_warmer', ['priority' => 200]);
         }
     }
 

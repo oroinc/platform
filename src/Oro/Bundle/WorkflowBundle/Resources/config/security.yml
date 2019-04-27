@@ -34,7 +34,6 @@ services:
         class: Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclMetadataProvider
         arguments:
             - '@doctrine'
-            - '@translator'
             - '@oro_featuretoggle.checker.feature_checker'
 
     oro_workflow.acl.extension.workflow:

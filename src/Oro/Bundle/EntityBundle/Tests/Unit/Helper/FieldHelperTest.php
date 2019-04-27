@@ -3,10 +3,13 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\ImportEntity;
-use Oro\Bundle\WorkflowBundle\Field\FieldProvider;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 class FieldHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -43,20 +46,19 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->fieldProvider = $this->prepareFieldProvider();
+        $this->fieldProvider = $this->createMock(EntityFieldProvider::class);
         $this->configProvider = $this->prepareConfigProvider();
 
-        $this->helper = new FieldHelper($this->fieldProvider, $this->configProvider, new FieldTypeHelper([]));
-    }
+        $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
+        $entityExtendConfigurationProvider->expects(self::any())
+            ->method('getUnderlyingTypes')
+            ->willReturn([]);
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|FieldProvider
-     */
-    protected function prepareFieldProvider()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->helper = new FieldHelper(
+            $this->fieldProvider,
+            $this->configProvider,
+            new FieldTypeHelper($entityExtendConfigurationProvider)
+        );
     }
 
     /**
@@ -64,9 +66,7 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
      */
     protected function prepareConfigProvider()
     {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $configProvider->expects($this->any())->method('hasConfig')
             ->with($this->isType('string'), $this->isType('string'))
             ->will(
@@ -81,7 +81,7 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnCallback(
                     function ($entityName, $fieldName) {
-                        $entityConfig = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+                        $entityConfig = $this->createMock(ConfigInterface::class);
                         $entityConfig->expects($this->any())->method('has')->with($this->isType('string'))
                             ->will(
                                 $this->returnCallback(
@@ -391,7 +391,7 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
                 'fieldName' => 'not_exists',
                 'value'     => 'test',
                 'exception' => [
-                    '\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException',
+                    NoSuchPropertyException::class,
                     'Neither the property "not_exists" nor one of the methods '
                 ]
             ],

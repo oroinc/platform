@@ -5,6 +5,8 @@ namespace Oro\Component\Config\Cache;
 use Oro\Component\Config\ResourcesContainer;
 use Oro\Component\Config\ResourcesContainerInterface;
 use Symfony\Component\Config\ConfigCacheInterface;
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -132,6 +134,17 @@ abstract class PhpConfigProvider implements
 
             $this->config = $this->getCacheAccessor()->load($cache);
         }
+    }
+
+    /**
+     * Gets a resource that represents the cache file
+     * and can be used by depended configuration caches to track if this cache is changed.
+     *
+     * @return ResourceInterface
+     */
+    public function getCacheResource(): ResourceInterface
+    {
+        return new FileResource($this->cacheFile);
     }
 
     /**

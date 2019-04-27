@@ -7,9 +7,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy;
 use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
-use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
-use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
@@ -659,29 +657,23 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param object                $object
-     * @param FieldSecurityMetadata $fieldMetadata
+     * @param object      $object
+     * @param string      $fieldName
+     * @param string|null $fieldAlias
      */
-    private function setFieldSecurityMetadata($object, FieldSecurityMetadata $fieldMetadata)
+    private function setFieldSecurityMetadata($object, $fieldName, $fieldAlias = null)
     {
         $securityMetadataProvider = $this->createMock(EntitySecurityMetadataProvider::class);
         $securityMetadataProvider->expects($this->any())
             ->method('isProtectedEntity')
             ->willReturn(true);
         $securityMetadataProvider->expects($this->any())
-            ->method('getMetadata')
+            ->method('getProtectedFieldName')
             ->with(get_class($object))
-            ->willReturnCallback(function () use ($object, $fieldMetadata) {
-                return new EntitySecurityMetadata(
-                    'ACL',
-                    get_class($object),
-                    '',
-                    '',
-                    [],
-                    '',
-                    '',
-                    [$fieldMetadata->getFieldName() => $fieldMetadata]
-                );
+            ->willReturnCallback(function ($cls, $fld) use ($fieldName, $fieldAlias) {
+                return $fld === $fieldName && $fieldAlias
+                    ? $fieldAlias
+                    : $fieldName;
             });
 
         $this->strategy->setSecurityMetadataProvider($this->createServiceLink($securityMetadataProvider));
@@ -692,7 +684,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $acl = $this->getAcl();
 
@@ -714,7 +706,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $acl = $this->getAcl();
         $acl->insertClassFieldAce($fieldName, $this->sid, self::MASK_VIEW_BASIC);
@@ -740,7 +732,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $acl = $this->getAcl();
         $acl->insertClassFieldAce($fieldName, $this->sid, self::MASK_VIEW_BASIC);
@@ -766,7 +758,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $parentAcl = $this->getAcl();
         $parentAcl->insertClassFieldAce($fieldName, $this->sid, self::MASK_VIEW_SYSTEM);
@@ -795,7 +787,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $parentAcl = $this->getAcl();
         $parentAcl->insertClassFieldAce($fieldName, $this->sid, self::MASK_VIEW_SYSTEM);
@@ -824,7 +816,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $parentAcl = $this->getAcl();
         $parentAcl->insertClassFieldAce($fieldName, $this->sid, self::MASK_VIEW_SYSTEM);
@@ -851,7 +843,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $anotherSid = new RoleSecurityIdentity('ROLE_USER');
 
@@ -879,7 +871,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $anotherSid = new RoleSecurityIdentity('ROLE_USER');
 
@@ -908,7 +900,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $this->setObjectToContext($obj);
         $fieldName = 'field';
         $fieldAlias = 'fieldAlias';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName, '', [], '', $fieldAlias));
+        $this->setFieldSecurityMetadata($obj, $fieldName, $fieldAlias);
 
         $acl = $this->getAcl();
         $acl->insertClassFieldAce($fieldAlias, $this->sid, self::MASK_VIEW_BASIC);
@@ -928,12 +920,12 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsFieldGrantedForNotConfigurableField()
+    public function testIsFieldGrantedForFieldWithoutAlias()
     {
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata('anotherField'));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $acl = $this->getAcl();
         $acl->insertClassFieldAce($fieldName, $this->sid, self::MASK_VIEW_BASIC);
@@ -997,7 +989,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $field = 'testField';
         $object = new TestEntity(123);
         $this->setObjectToContext($object);
-        $this->setFieldSecurityMetadata($object, new FieldSecurityMetadata($field));
+        $this->setFieldSecurityMetadata($object, $field);
 
         $acl = $this->getAcl();
 

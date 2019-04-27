@@ -4,6 +4,7 @@ OroCacheBundle introduces the configuration of the application data cache storag
 
 Read more in the Bundles Documentation on the OroPlatform website:
 
-- [Abstract cache services](https://oroinc.com/oroplatform/doc/current/bundles/CacheBundle/cache#abstract-cache-services) 
-- [Warm up config cache](https://oroinc.com/oroplatform/doc/current/bundles/CacheBundle/cache#warm-up-config-cache)
+- [Abstract Cache Services](https://oroinc.com/oroplatform/doc/current/bundles/CacheBundle/cache#abstract-cache-services)
+- [Caching Static Configuration](https://oroinc.com/oroplatform/doc/current/bundles/CacheBundle/cache#caching-static-configuration)
 - [Caching of Symfony Validation rules](https://oroinc.com/oroplatform/doc/current/bundles/CacheBundle/cache#caching-of-symfony-validation-rules)
+- [Caching Policy](https://oroinc.com/oroplatform/doc/current/bundles/CacheBundle/cache#caching-policy)

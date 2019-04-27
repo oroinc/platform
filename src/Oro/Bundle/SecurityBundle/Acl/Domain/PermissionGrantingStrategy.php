@@ -152,7 +152,6 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
     /**
      * {@inheritdoc}
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function isFieldGranted(AclInterface $acl, $field, array $masks, array $sids, $administrativeMode = false)
     {
@@ -162,14 +161,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         $type = $acl->getObjectIdentity()->getType();
         $securityMetadataProvider = $this->getSecurityMetadataProvider();
         if ($securityMetadataProvider->isProtectedEntity($type)) {
-            $entityMetadata = $securityMetadataProvider->getMetadata($type);
-            $entityFieldsMetadata = $entityMetadata->getFields();
-            if (isset($entityFieldsMetadata[$field])) {
-                $fieldAlias = $entityFieldsMetadata[$field]->getAlias();
-                if ($fieldAlias) {
-                    $field = $fieldAlias;
-                }
-            }
+            $field = $securityMetadataProvider->getProtectedFieldName($type, $field);
         }
 
         // check object ACEs

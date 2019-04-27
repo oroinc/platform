@@ -130,6 +130,14 @@ services:
         class: '%oro_organization.provider.business_units.class%'
         arguments:
             - '@doctrine.orm.entity_manager'
+
+    oro_organization.filter.business_unit:
+        class: Oro\Bundle\OrganizationBundle\Filter\BusinessUnitChoiceFilter
+        public: false
+        parent: 'oro_filter.choice_tree_filter'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: choice-business-unit }
+
     #
     # Entity config dumper extension
     #

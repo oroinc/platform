@@ -1,1 +1,22 @@
+label: Oro Black theme
 description: Oro Black theme description
+icon: oro-black.ico
+groups: [another]
+config:
+    page_templates:
+        templates:
+            -
+                label: Some label
+                key: some_key
+                route_name: some_route_name
+            -
+                label: Some label (disabled)
+                description: Disabled
+                key: some_key_disabled
+                route_name: some_route_name_disabled
+                enabled: false
+        titles:
+            route_1: Title for route 1
+            route_2: Title for route 2
+    extra_config:
+        label: Sample label

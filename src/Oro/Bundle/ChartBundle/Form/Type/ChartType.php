@@ -7,6 +7,9 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for chart.
+ */
 class ChartType extends ConfigProviderAwareType
 {
     /**
@@ -66,10 +69,14 @@ class ChartType extends ConfigProviderAwareType
      */
     protected function getChartConfigs(array $options)
     {
-        $result = $this->configProvider->getChartConfigs();
-
-        if (isset($options['chart_filter'])) {
-            $result = array_filter($result, $options['chart_filter']);
+        $result = [];
+        $filterFunction = $options['chart_filter'] ?? null;
+        $chartNames = $this->configProvider->getChartNames();
+        foreach ($chartNames as $chartName) {
+            $chartConfig = $this->configProvider->getChartConfig($chartName);
+            if (null === $filterFunction || $filterFunction($chartConfig)) {
+                $result[$chartName] = $chartConfig;
+            }
         }
 
         return $result;

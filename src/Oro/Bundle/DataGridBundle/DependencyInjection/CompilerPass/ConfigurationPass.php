@@ -6,6 +6,9 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Configures datagrid configuration providers and data sources.
+ */
 class ConfigurationPass implements CompilerPassInterface
 {
     const BUILDER_SERVICE_ID        = 'oro_datagrid.datagrid.builder';

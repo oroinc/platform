@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
 
 /**
@@ -18,11 +21,7 @@ class ExtendOptionsParserTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->entityMetadataHelper =
-            $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper')
-                ->disableOriginalConstructor()
-                ->getMock();
-
+        $this->entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);
         $this->entityMetadataHelper->expects($this->any())
             ->method('getEntityClassesByTableName')
             ->willReturnMap(
@@ -31,21 +30,24 @@ class ExtendOptionsParserTest extends \PHPUnit\Framework\TestCase
                     ['table2', ['Test\Entity2']],
                 ]
             );
-
         $this->entityMetadataHelper->expects($this->any())
             ->method('isEntityClassContainsColumn')
             ->with('Test\Entity1', 'column1')
             ->willReturn(true);
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->any())
             ->method('hasConfig')
             ->will($this->returnValue(true));
+
+        $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
+        $entityExtendConfigurationProvider->expects(self::any())
+            ->method('getUnderlyingTypes')
+            ->willReturn(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']);
+
         $this->extendOptionsParser = new ExtendOptionsParser(
             $this->entityMetadataHelper,
-            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']),
+            new FieldTypeHelper($entityExtendConfigurationProvider),
             $configManager
         );
     }

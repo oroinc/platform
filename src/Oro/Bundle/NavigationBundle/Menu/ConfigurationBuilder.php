@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
-use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
+use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Component\Config\Resolver\ResolverInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -25,25 +25,25 @@ class ConfigurationBuilder implements BuilderInterface
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-    /** @var MenuConfiguration */
-    protected $menuConfiguration;
+    /** @var ConfigurationProvider */
+    protected $configurationProvider;
 
     /**
      * @param ResolverInterface        $resolver
      * @param FactoryInterface         $factory
      * @param EventDispatcherInterface $eventDispatcher
-     * @param MenuConfiguration        $menuConfiguration
+     * @param ConfigurationProvider    $configurationProvider
      */
     public function __construct(
         ResolverInterface $resolver,
         FactoryInterface $factory,
         EventDispatcherInterface $eventDispatcher,
-        MenuConfiguration $menuConfiguration
+        ConfigurationProvider $configurationProvider
     ) {
         $this->resolver = $resolver;
         $this->factory = $factory;
         $this->eventDispatcher = $eventDispatcher;
-        $this->menuConfiguration = $menuConfiguration;
+        $this->configurationProvider = $configurationProvider;
     }
 
     /**
@@ -55,7 +55,7 @@ class ConfigurationBuilder implements BuilderInterface
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
-        $tree = $this->menuConfiguration->getTree();
+        $tree = $this->configurationProvider->getMenuTree();
 
         if (array_key_exists($alias, $tree)) {
             $treeData = $tree[$alias];
@@ -88,7 +88,7 @@ class ConfigurationBuilder implements BuilderInterface
         // If menu doesn't have children, it should be disabled
         $isAllowed = false;
 
-        $items = $this->menuConfiguration->getItems();
+        $items = $this->configurationProvider->getMenuItems();
 
         foreach ($sliceData as $itemName => $itemData) {
             // Throw exception if duplicated item name was found in menu tree

@@ -124,12 +124,14 @@ services:
 
     oro_tag.filter.tags_choice_tree:
         class: Oro\Bundle\TagBundle\Filter\TagsDictionaryFilter
+        public: false
         parent: 'oro_filter.dictionary_filter'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: tag }
 
     oro_tag.filter.tags_report:
         class: Oro\Bundle\TagBundle\Filter\TagsReportFilter
+        public: false
         parent: 'oro_filter.dictionary_filter'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: tags-report }

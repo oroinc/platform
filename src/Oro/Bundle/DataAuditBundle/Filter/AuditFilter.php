@@ -10,19 +10,19 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
 use Symfony\Component\Form\FormFactoryInterface;
 
 /**
- * The filter for AuditField entity
+ * The filter for AuditField entity.
  */
 class AuditFilter extends EntityFilter
 {
     const TYPE_CHANGED = 'changed';
     const TYPE_CHANGED_TO_VALUE = 'changed_to_value';
 
-    /** @var ServiceLink */
-    protected $queryDesignerManagerLink;
+    /** @var QueryDesignerManager */
+    protected $queryDesignerManager;
 
     /** @var string */
     protected $auditAlias;
@@ -38,16 +38,16 @@ class AuditFilter extends EntityFilter
 
     /**
      * @param FormFactoryInterface $factory
-     * @param FilterUtility $util
-     * @param ServiceLink $queryDesignerManagerLink
+     * @param FilterUtility        $util
+     * @param QueryDesignerManager $queryDesignerManager
      */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
-        ServiceLink $queryDesignerManagerLink
+        QueryDesignerManager $queryDesignerManager
     ) {
         parent::__construct($factory, $util);
-        $this->queryDesignerManagerLink = $queryDesignerManagerLink;
+        $this->queryDesignerManager = $queryDesignerManager;
     }
 
     /**
@@ -179,9 +179,10 @@ class AuditFilter extends EntityFilter
      */
     protected function applyFilter(FilterDatasourceAdapterInterface $ds, $name, $field, $data)
     {
-        $filter = $this->queryDesignerManagerLink->getService()->createFilter($name, [
-            FilterUtility::DATA_NAME_KEY => $field,
-        ]);
+        $filter = $this->queryDesignerManager->createFilter(
+            $name,
+            [FilterUtility::DATA_NAME_KEY => $field]
+        );
 
         $form = $filter->getForm();
         if (!$form->isSubmitted()) {

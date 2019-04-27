@@ -459,26 +459,29 @@ services:
 
     oro_workflow.filter.workflow:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowFilter'
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@oro_workflow.helper.translation'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: workflow, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: workflow }
 
     oro_workflow.filter.workflow_step:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowStepFilter'
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: workflow_step, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: workflow_step }
 
     oro_workflow.filter.workflow_translation:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowTranslationFilter'
+        public: false
         parent: oro_workflow.filter.workflow
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: workflow_translation, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: workflow_translation }
 
     oro_workflow.async.execute_process_job:
         class: 'Oro\Bundle\WorkflowBundle\Async\ExecuteProcessJobProcessor'

@@ -7,10 +7,14 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * The main implementation of SearchHandlerInterface.
+ */
 class SearchHandler implements SearchHandlerInterface
 {
     /**
@@ -78,17 +82,18 @@ class SearchHandler implements SearchHandlerInterface
     }
 
     /**
-     * @param Indexer $indexer
-     * @param array   $config
+     * @param Indexer               $indexer
+     * @param SearchMappingProvider $mappingProvider
      * @throws \RuntimeException
      */
-    public function initSearchIndexer(Indexer $indexer, array $config)
+    public function initSearchIndexer(Indexer $indexer, SearchMappingProvider $mappingProvider)
     {
         $this->indexer = $indexer;
-        if (empty($config[$this->entityName]['alias'])) {
+        $entityAlias = $mappingProvider->getEntityAlias($this->entityName);
+        if (!$entityAlias) {
             throw new \RuntimeException(sprintf('Cannot init search alias for entity "%s".', $this->entityName));
         }
-        $this->entitySearchAlias = $config[$this->entityName]['alias'];
+        $this->entitySearchAlias = $entityAlias;
     }
 
     /**
@@ -215,7 +220,7 @@ class SearchHandler implements SearchHandlerInterface
             /**
              * We need to sort entities in the same order given by method searchIds.
              *
-             * @todo Should be not necessary after implementation of BAP-5691.
+             * Should be not necessary after implementation of BAP-5691.
              */
             $entityByIdHash = [];
 

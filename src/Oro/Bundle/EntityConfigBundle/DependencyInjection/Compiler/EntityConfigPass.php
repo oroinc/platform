@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
+use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\DependencyInjection\ServiceLink;
@@ -89,7 +90,7 @@ class EntityConfigPass implements CompilerPassInterface
         );
 
         $result = [];
-        $resources = $configLoader->load($container);
+        $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         foreach ($resources as $resource) {
             if (!empty($resource->data[self::ENTITY_CONFIG_ROOT_NODE])) {
                 foreach ($resource->data[self::ENTITY_CONFIG_ROOT_NODE] as $scope => $config) {

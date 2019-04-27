@@ -16,9 +16,8 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
-use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -46,14 +45,11 @@ class ActivityListFilter extends EntityFilter
     /** @var string */
     protected $activityListAlias;
 
-    /** @var Manager */
-    protected $queryDesignerManager;
-
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
-    /** @var ServiceLink */
-    protected $queryDesignerManagerLink;
+    /** @var QueryDesignerManager */
+    protected $queryDesignerManager;
 
     /** @var ServiceLink */
     protected $datagridHelperLink;
@@ -65,7 +61,7 @@ class ActivityListFilter extends EntityFilter
      * @param ActivityListChainProvider $activityListChainProvider
      * @param ActivityListFilterHelper  $activityListFilterHelper
      * @param EntityRoutingHelper       $entityRoutingHelper
-     * @param ServiceLink               $queryDesignerManagerLink
+     * @param QueryDesignerManager      $queryDesignerManager
      * @param ServiceLink               $datagridHelperLink
      */
     public function __construct(
@@ -75,16 +71,16 @@ class ActivityListFilter extends EntityFilter
         ActivityListChainProvider $activityListChainProvider,
         ActivityListFilterHelper $activityListFilterHelper,
         EntityRoutingHelper $entityRoutingHelper,
-        ServiceLink $queryDesignerManagerLink,
+        QueryDesignerManager $queryDesignerManager,
         ServiceLink $datagridHelperLink
     ) {
         parent::__construct($factory, $util);
         $this->activityAssociationHelper = $activityAssociationHelper;
         $this->activityListChainProvider = $activityListChainProvider;
-        $this->activityListFilterHelper  = $activityListFilterHelper;
-        $this->entityRoutingHelper       = $entityRoutingHelper;
-        $this->queryDesignerManagerLink  = $queryDesignerManagerLink;
-        $this->datagridHelperLink        = $datagridHelperLink;
+        $this->activityListFilterHelper = $activityListFilterHelper;
+        $this->entityRoutingHelper = $entityRoutingHelper;
+        $this->queryDesignerManager = $queryDesignerManager;
+        $this->datagridHelperLink = $datagridHelperLink;
     }
 
     /**
@@ -338,10 +334,10 @@ class ActivityListFilter extends EntityFilter
      */
     protected function applyFilter(FilterDatasourceAdapterInterface $ds, $name, $field, $data)
     {
-        /** @var FilterInterface $filter */
-        $filter = $this->queryDesignerManagerLink->getService()->createFilter($name, [
-            FilterUtility::DATA_NAME_KEY => $field,
-        ]);
+        $filter = $this->queryDesignerManager->createFilter(
+            $name,
+            [FilterUtility::DATA_NAME_KEY => $field]
+        );
 
         $form = $filter->getForm();
         if (!$form->isSubmitted()) {

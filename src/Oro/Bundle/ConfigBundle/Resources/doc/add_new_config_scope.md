@@ -111,7 +111,7 @@ After this, developer should add new form provider for test scope:
 
 ```
 
-register it as a service with `oro_config.configuration_provider` tag:
+register it as a service:
 
 ```yml
 

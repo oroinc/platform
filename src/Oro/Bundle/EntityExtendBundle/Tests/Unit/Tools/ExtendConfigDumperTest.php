@@ -3,12 +3,16 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
+use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\EntityGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
@@ -44,9 +48,9 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->entityManagerBag = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag');
+        $this->entityManagerBag = $this->createMock(EntityManagerBag::class);
 
-        $this->configManager = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigManager');
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->configProvider = new ConfigProviderMock($this->configManager, 'extend');
         $this->configManager->expects($this->any())
@@ -54,17 +58,22 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
             ->with('extend')
             ->willReturn($this->configProvider);
 
-        $this->generator = $this->createMock('Oro\Bundle\EntityExtendBundle\Tools\EntityGenerator');
+        $this->generator = $this->createMock(EntityGenerator::class);
 
         $this->extendEntityConfigProvider = $this->createMock(ExtendEntityConfigProviderInterface::class);
 
         $this->cacheDir = $this->getTempDir('ExtendConfigDumperTest', false);
 
+        $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
+        $entityExtendConfigurationProvider->expects(self::any())
+            ->method('getUnderlyingTypes')
+            ->willReturn([]);
+
         $this->dumper = new ExtendConfigDumper(
             $this->entityManagerBag,
             $this->configManager,
             new ExtendDbIdentifierNameGenerator(),
-            new FieldTypeHelper([]),
+            new FieldTypeHelper($entityExtendConfigurationProvider),
             $this->generator,
             $this->extendEntityConfigProvider,
             $this->cacheDir

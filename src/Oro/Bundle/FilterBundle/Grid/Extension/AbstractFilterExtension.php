@@ -7,8 +7,9 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
+use Oro\Bundle\DataGridBundle\Provider\RawConfigurationProvider;
 use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
+use Oro\Bundle\FilterBundle\Filter\FilterBagInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -26,46 +27,34 @@ abstract class AbstractFilterExtension extends AbstractExtension
     public const FILTER_ROOT_PARAM = '_filter';
     public const MINIFIED_FILTER_PARAM = 'f';
 
-    /** @var FilterInterface[] */
-    protected $filters = [];
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var ConfigurationProvider */
+    /** @var RawConfigurationProvider */
     protected $configurationProvider;
+
+    /** @var FilterBagInterface */
+    protected $filterBag;
 
     /** @var DatagridStateProviderInterface */
     protected $filtersStateProvider;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
-     * @param ConfigurationProvider $configurationProvider
+     * @param RawConfigurationProvider       $configurationProvider
+     * @param FilterBagInterface             $filterBag
      * @param DatagridStateProviderInterface $filtersStateProvider
-     * @param TranslatorInterface $translator
+     * @param TranslatorInterface            $translator
      */
     public function __construct(
-        ConfigurationProvider $configurationProvider,
+        RawConfigurationProvider $configurationProvider,
+        FilterBagInterface $filterBag,
         DatagridStateProviderInterface $filtersStateProvider,
         TranslatorInterface $translator
     ) {
         $this->configurationProvider = $configurationProvider;
+        $this->filterBag = $filterBag;
         $this->filtersStateProvider = $filtersStateProvider;
         $this->translator = $translator;
-    }
-
-    /**
-     * Add filter to array of available filters
-     *
-     * @param string $name
-     * @param FilterInterface $filter
-     *
-     * @return $this
-     */
-    public function addFilter($name, FilterInterface $filter)
-    {
-        $this->filters[$name] = $filter;
-
-        return $this;
     }
 
     /**
@@ -77,7 +66,7 @@ abstract class AbstractFilterExtension extends AbstractExtension
 
         // Validates extension configuration and passes default values back to config.
         $filtersNormalized = $this->validateConfiguration(
-            new Configuration(array_keys($this->filters)),
+            new Configuration($this->filterBag->getFilterNames()),
             ['filters' => $filters]
         );
 
@@ -140,7 +129,7 @@ abstract class AbstractFilterExtension extends AbstractExtension
     {
         $filterType = $filterConfig[FilterUtility::TYPE_KEY];
 
-        $filter = $this->filters[$filterType];
+        $filter = $this->filterBag->getFilter($filterType);
         $filter->init($filterName, $filterConfig);
 
         // Ensures filter is "somewhat-stateless" across datagrids.
@@ -229,23 +218,23 @@ abstract class AbstractFilterExtension extends AbstractExtension
         DatagridConfiguration $config,
         MetadataObject $metadata
     ): void {
-        $rawConfig = $this->configurationProvider->isApplicable($config->getName())
-            ? $this->configurationProvider->getRawConfiguration($config->getName())
-            : [];
+        $rawConfig = $this->configurationProvider->getRawConfiguration($config->getName());
 
         $filtersMetadata = [];
         foreach ($filters as $filter) {
             $filterMetadata = $filter->getMetadata();
             $label = $filterMetadata['label'] ?? '';
+            if ($label && !empty($filterMetadata[FilterUtility::TRANSLATABLE_KEY])) {
+                $label = $this->translator->trans($label);
+            }
+            $cacheId = null;
+            if ($rawConfig && !empty($filterMetadata['lazy'])) {
+                $cacheId = $this->getFilterCacheId($rawConfig, $filterMetadata);
+            }
 
             $filtersMetadata[] = array_merge(
                 $filterMetadata,
-                [
-                    'label' => !empty($filterMetadata[FilterUtility::TRANSLATABLE_KEY])
-                        ? $this->translator->trans($label)
-                        : $label,
-                    'cacheId' => $this->getFilterCacheId($rawConfig, $filterMetadata),
-                ]
+                ['label' => $label, 'cacheId' => $cacheId]
             );
         }
 
@@ -260,10 +249,6 @@ abstract class AbstractFilterExtension extends AbstractExtension
      */
     protected function getFilterCacheId(array $rawGridConfig, array $filterMetadata): ?string
     {
-        if (empty($filterMetadata['lazy'])) {
-            return null;
-        }
-
         $rawOptions = ArrayUtil::getIn($rawGridConfig, ['filters', 'columns', $filterMetadata['name'], 'options']);
 
         return $rawOptions ? md5(serialize($rawOptions)) : null;

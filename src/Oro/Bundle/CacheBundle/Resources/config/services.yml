@@ -64,11 +64,9 @@ services:
         public: false
         class: 'Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToCronFormatTransformer'
 
+    oro.static_config_provider.abstract:
+        abstract: true
+
     oro.cache.memory_cache_chain:
         public: false
         class: Oro\Bundle\CacheBundle\Provider\MemoryCacheChain
-
-    oro.cache.configuration_loader:
-        class: Oro\Bundle\CacheBundle\Loader\ConfigurationLoader
-        calls:
-            - [ setParameterBag, ['@=service("kernel").getContainer().getParameterBag()']]

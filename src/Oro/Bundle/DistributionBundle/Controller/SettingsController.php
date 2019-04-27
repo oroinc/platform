@@ -4,14 +4,13 @@ namespace Oro\Bundle\DistributionBundle\Controller;
 
 use Oro\Bundle\DistributionBundle\Entity\Composer\Config;
 use Oro\Bundle\DistributionBundle\Form\Type\Composer\ConfigType;
-use Oro\Bundle\HelpBundle\Annotation\Help;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @Help(link="https://www.oroinc.com/doc/orocommerce/current/install-upgrade")
+ * The package manager settings controller.
  */
 class SettingsController extends Controller
 {

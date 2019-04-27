@@ -5,9 +5,11 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Extension;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
+use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
@@ -38,11 +40,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->entityMetadataHelper =
-            $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper')
-                ->disableOriginalConstructor()
-                ->getMock();
-
+        $this->entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);
         $this->entityMetadataHelper->expects($this->any())
             ->method('getEntityClassesByTableName')
             ->will(
@@ -57,16 +55,22 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $this->entityMetadataHelper->expects($this->any())
             ->method('getFieldNameByColumnName')
             ->will($this->returnArgument(1));
+
         $this->extendOptionsManager = new ExtendOptionsManager();
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+
+        $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->any())
             ->method('hasConfig')
             ->will($this->returnValue(true));
+
+        $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
+        $entityExtendConfigurationProvider->expects(self::any())
+            ->method('getUnderlyingTypes')
+            ->willReturn(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']);
+
         $this->extendOptionsParser = new ExtendOptionsParser(
             $this->entityMetadataHelper,
-            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']),
+            new FieldTypeHelper($entityExtendConfigurationProvider),
             $configManager
         );
     }

@@ -2,15 +2,19 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Query;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
@@ -22,6 +26,8 @@ use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
 {
@@ -30,30 +36,25 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
 
     protected function setUp()
     {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $translator->expects($this->any())->method('trans')->will($this->returnArgument(0));
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->willReturnArgument(0);
 
         $this->formFactory = Forms::createFormFactoryBuilder()
-            ->addExtensions(
-                [
+            ->addExtensions([
                 new PreloadedExtension(
                     [
-                    'oro_type_text_filter' => new TextFilterType($translator),
-                    'oro_type_filter'      => new FilterType($translator),
+                        'oro_type_text_filter' => new TextFilterType($translator),
+                        'oro_type_filter'      => new FilterType($translator)
                     ],
                     []
                 ),
                 new CsrfExtension(
-                    $this->createMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')
+                    $this->createMock(CsrfTokenManagerInterface::class)
                 )
-                ]
-            )
+            ])
             ->getFormFactory();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->formFactory);
     }
 
     public function testBuild()
@@ -65,30 +66,33 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
             [self::TEST_ENTITY => ['username' => 'string', 'email' => 'string']],
             [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
         );
-        $builder  = $this->getQueryBuilder($doctrine);
+        $builder = $this->getQueryBuilder($doctrine);
         /** @var \PHPUnit\Framework\MockObject\MockObject $em */
         $em = $doctrine->getManagerForClass(self::TEST_ENTITY);
         $qb = new QueryBuilder($em);
         $this->mockConnection($em);
-        $em->expects($this->any())->method('createQueryBuilder')
-            ->will($this->returnValue($qb));
-        $em->expects($this->any())->method('getExpressionBuilder')
-            ->will($this->returnValue(new Expr()));
-        $em->expects($this->any())->method('createQuery')
-            ->will($this->returnValue(new Query($em)));
+        $em->expects($this->any())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+        $em->expects($this->any())
+            ->method('getExpressionBuilder')
+            ->willReturn(new Expr());
+        $em->expects($this->any())
+            ->method('createQuery')
+            ->willReturn(new Query($em));
 
         $builder->build($segment);
 
-        $result  = $qb->getDQL();
+        $result = $qb->getDQL();
         $counter = 0;
-        $result  = preg_replace_callback(
+        $result = preg_replace_callback(
             '/(:[a-z]+)(\d+)/',
             function ($matches) use (&$counter) {
                 return $matches[1] . (++$counter);
             },
             $result
         );
-        $result  = preg_replace('/(ts)(\d+)/', 't1', $result);
+        $result = preg_replace('/(ts)(\d+)/', 't1', $result);
         $this->assertSame(
             'SELECT t1.userName, t1.id FROM AcmeBundle:UserEntity t1 WHERE t1.email LIKE :string1',
             $result
@@ -100,70 +104,73 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         $segment = $this->getSegment(
             false,
             [
-            'columns'          => [
-                [
-                    'name'    => 'id',
-                    'label'   => 'Id',
-                ],
-                [
-                    'name'    => 'userName',
-                    'label'   => 'User name',
-                    'func'    => null,
-                    'sorting' => 'ASC'
-                ]
-            ],
-            'grouping_columns' => [['name' => 'id']],
-            'filters'          => [
-                [
-                    'columnName' => 'address+AcmeBundle:Address::zip',
-                    'criterion'  => [
-                        'filter' => 'string',
-                        'data'   => [
-                            'type'  => 1,
-                            'value' => 'zip_code'
-                        ]
+                'columns'          => [
+                    [
+                        'name'  => 'id',
+                        'label' => 'Id'
+                    ],
+                    [
+                        'name'    => 'userName',
+                        'label'   => 'User name',
+                        'func'    => null,
+                        'sorting' => 'ASC'
                     ]
                 ],
-                'AND',
-                [
-                    'columnName' => 'status+AcmeBundle:Status::code',
-                    'criterion'  => [
-                        'filter' => 'string',
-                        'data'   => [
-                            'type'  => 1,
-                            'value' => 'code'
+                'grouping_columns' => [['name' => 'id']],
+                'filters'          => [
+                    [
+                        'columnName' => 'address+AcmeBundle:Address::zip',
+                        'criterion'  => [
+                            'filter' => 'string',
+                            'data'   => [
+                                'type'  => 1,
+                                'value' => 'zip_code'
+                            ]
+                        ]
+                    ],
+                    'AND',
+                    [
+                        'columnName' => 'status+AcmeBundle:Status::code',
+                        'criterion'  => [
+                            'filter' => 'string',
+                            'data'   => [
+                                'type'  => 1,
+                                'value' => 'code'
+                            ]
                         ]
                     ]
                 ]
-            ]
             ]
         );
         $segment->setType(new SegmentType(SegmentType::TYPE_DYNAMIC));
 
         $doctrine = $this->getDoctrine(
             [
-            self::TEST_ENTITY    => [
-                'username' => 'string',
-                'email'    => 'string',
-                'address'  => ['id'],
-                'status'   => ['id'],
-            ],
-            'AcmeBundle:Address' => ['zip' => 'string'],
-            'AcmeBundle:Status'  => ['code' => 'string'],
+                self::TEST_ENTITY    => [
+                    'username' => 'string',
+                    'email'    => 'string',
+                    'address'  => ['id'],
+                    'status'   => ['id']
+                ],
+                'AcmeBundle:Address' => ['zip' => 'string'],
+                'AcmeBundle:Status'  => ['code' => 'string']
             ],
             [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
         );
-        $builder  = $this->getQueryBuilder($doctrine);
+        $builder = $this->getQueryBuilder($doctrine);
         /** @var \PHPUnit\Framework\MockObject\MockObject $em */
         $em = $doctrine->getManagerForClass(self::TEST_ENTITY);
         $qb = new QueryBuilder($em);
         $this->mockConnection($em);
-        $em->expects($this->any())->method('createQueryBuilder')
-            ->will($this->returnValue($qb));
-        $em->expects($this->any())->method('getExpressionBuilder')
-            ->will($this->returnValue(new Expr()));
-        $em->expects($this->any())->method('createQuery')
-            ->will($this->returnValue(new Query($em)));
+        $em->expects($this->any())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+        $em->expects($this->any())
+            ->method('getExpressionBuilder')
+            ->willReturn(new Expr());
+        $em->expects($this->any())
+            ->method('createQuery')
+            ->willReturn(new Query($em));
 
         $builder->build($segment);
 
@@ -177,34 +184,33 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
      *
      * @return DynamicSegmentQueryBuilder
      */
-    protected function getQueryBuilder(\PHPUnit\Framework\MockObject\MockObject $doctrine = null)
+    private function getQueryBuilder($doctrine = null)
     {
-        $manager = $this->getMockBuilder('Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $manager = $this->createMock(Manager::class);
         $manager->expects($this->any())
             ->method('createFilter')
-            ->will(
-                $this->returnCallback(
-                    function ($name, $params) {
-                        return $this->createFilter($name, $params);
-                    }
-                )
-            );
+            ->willReturnCallback(function ($name, $params) {
+                return $this->createFilter($name, $params);
+            });
 
-        $entityHierarchyProvider = $this
-            ->createMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
+        $entityHierarchyProvider = $this->createMock(EntityHierarchyProviderInterface::class);
         $entityHierarchyProvider
             ->expects($this->any())
             ->method('getHierarchy')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
-        $virtualFieldProvider = new ConfigVirtualFieldProvider($entityHierarchyProvider, []);
+        $entityConfigurationProvider = $this->createMock(EntityConfigurationProvider::class);
+        $entityConfigurationProvider->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn([]);
+        $virtualFieldProvider = new ConfigVirtualFieldProvider(
+            $entityHierarchyProvider,
+            $entityConfigurationProvider
+        );
 
-        $doctrine = $doctrine ? : $this->getDoctrine();
+        $doctrine = $doctrine ?? $this->getDoctrine();
 
-        $segmentQueryConverterFactory = $this->getMockBuilder(SegmentQueryConverterFactory::class)
-            ->disableOriginalConstructor()->getMock();
+        $segmentQueryConverterFactory = $this->createMock(SegmentQueryConverterFactory::class);
 
         $segmentQueryConverterFactory->expects($this->once())
             ->method('createInstance')
@@ -215,7 +221,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
                 new RestrictionBuilder($manager)
             ));
 
-        $serviceLink = $this->getMockBuilder(ServiceLink::class)->disableOriginalConstructor()->getMock();
+        $serviceLink = $this->createMock(ServiceLink::class);
         $serviceLink->expects($this->once())
             ->method('getService')
             ->willReturn($segmentQueryConverterFactory);
@@ -256,16 +262,16 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
     }
 
     /**
-     * @param $em
+     * @param \PHPUnit\Framework\MockObject\MockObject $em
      */
-    protected function mockConnection($em)
+    private function mockConnection($em)
     {
-        $connection = $this->getMockBuilder('\Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $connection->expects($this->any())->method('getDatabasePlatform')
-            ->will($this->returnValue(null));
-        $em->expects($this->any())->method('getConnection')
-            ->will($this->returnValue($connection));
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->any())
+            ->method('getDatabasePlatform')
+            ->willReturn(null);
+        $em->expects($this->any())
+            ->method('getConnection')
+            ->willReturn($connection);
     }
 }

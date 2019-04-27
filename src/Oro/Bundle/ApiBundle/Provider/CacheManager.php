@@ -27,8 +27,8 @@ class CacheManager
     /** @var ConfigCacheWarmer */
     private $configCacheWarmer;
 
-    /** @var EntityAliasCacheWarmer */
-    private $entityAliasCacheWarmer;
+    /** @var EntityAliasResolverRegistry */
+    private $entityAliasResolverRegistry;
 
     /** @var ResourcesCacheWarmer */
     private $resourcesCacheWarmer;
@@ -37,14 +37,14 @@ class CacheManager
     private $apiDocExtractor;
 
     /**
-     * @param array                    $configKeys
-     * @param array                    $apiDocViews
-     * @param RequestExpressionMatcher $matcher
-     * @param ConfigCacheFactory       $configCacheFactory
-     * @param ConfigCacheWarmer        $configCacheWarmer
-     * @param EntityAliasCacheWarmer   $entityAliasCacheWarmer
-     * @param ResourcesCacheWarmer     $resourcesCacheWarmer
-     * @param ApiDocExtractor          $apiDocExtractor
+     * @param array                       $configKeys
+     * @param array                       $apiDocViews
+     * @param RequestExpressionMatcher    $matcher
+     * @param ConfigCacheFactory          $configCacheFactory
+     * @param ConfigCacheWarmer           $configCacheWarmer
+     * @param EntityAliasResolverRegistry $entityAliasResolverRegistry
+     * @param ResourcesCacheWarmer        $resourcesCacheWarmer
+     * @param ApiDocExtractor             $apiDocExtractor
      */
     public function __construct(
         array $configKeys,
@@ -52,7 +52,7 @@ class CacheManager
         RequestExpressionMatcher $matcher,
         ConfigCacheFactory $configCacheFactory,
         ConfigCacheWarmer $configCacheWarmer,
-        EntityAliasCacheWarmer $entityAliasCacheWarmer,
+        EntityAliasResolverRegistry $entityAliasResolverRegistry,
         ResourcesCacheWarmer $resourcesCacheWarmer,
         ApiDocExtractor $apiDocExtractor
     ) {
@@ -61,7 +61,7 @@ class CacheManager
         $this->matcher = $matcher;
         $this->configCacheFactory = $configCacheFactory;
         $this->configCacheWarmer = $configCacheWarmer;
-        $this->entityAliasCacheWarmer = $entityAliasCacheWarmer;
+        $this->entityAliasResolverRegistry = $entityAliasResolverRegistry;
         $this->resourcesCacheWarmer = $resourcesCacheWarmer;
         $this->apiDocExtractor = $apiDocExtractor;
     }
@@ -73,7 +73,7 @@ class CacheManager
     public function clearCaches()
     {
         $this->configCacheWarmer->warmUp();
-        $this->entityAliasCacheWarmer->clearCache();
+        $this->entityAliasResolverRegistry->clearCache();
         $this->resourcesCacheWarmer->clearCache();
     }
 
@@ -84,7 +84,7 @@ class CacheManager
     public function warmUpCaches()
     {
         $this->configCacheWarmer->warmUp();
-        $this->entityAliasCacheWarmer->warmUpCache();
+        $this->entityAliasResolverRegistry->warmUpCache();
         $this->resourcesCacheWarmer->warmUpCache();
     }
 
@@ -101,7 +101,7 @@ class CacheManager
             }
         }
         if (!empty($dirtyRequestTypeExpressions)) {
-            $this->entityAliasCacheWarmer->warmUpCache();
+            $this->entityAliasResolverRegistry->warmUpCache();
             $this->resourcesCacheWarmer->warmUpCache();
             if ($this->isApiDocCacheEnabled()) {
                 $toClearApiDocView = [];

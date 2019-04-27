@@ -7,187 +7,231 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader;
 use Oro\Bundle\SecurityBundle\Annotation\Loader\AclConfigLoader;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes\AbstractController;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes\ClassWOAnnotation;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes\ConfigController;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes\ExtendedController;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes\ExtendedFromAbstractController;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes\ExtendWithoutClassAnnotationOverride;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes\MainTestController;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes as Controller;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\TestBundle;
+use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\ResourcesContainer;
 
 class AclAnnotationLoadersTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp()
+    /**
+     * @return array
+     */
+    private function getControllers(): array
     {
-        if (!interface_exists('Doctrine\Common\Annotations\Reader')) {
-            $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');
+        $controllers = [
+            [Controller\ClassWOAnnotation::class, 'actionTest'],
+            [Controller\ConfigController::class, 'testAction'],
+            [Controller\ExtendedFromAbstractController::class, 'testAction'],
+            [Controller\ExtendedController::class, 'test2Action'],
+            [Controller\ExtendedController::class, 'test3Action'],
+            [Controller\ExtendedController::class, 'test4Action'],
+            [Controller\ExtendedController::class, 'test5Action'],
+            [Controller\ExtendWithoutClassAnnotationOverride::class, 'test2Action'],
+            [Controller\ExtendWithoutClassAnnotationOverride::class, 'test3Action'],
+            [Controller\ExtendWithoutClassAnnotationOverride::class, 'test4Action'],
+            [Controller\ExtendWithoutClassAnnotationOverride::class, 'test5Action'],
+            [Controller\MainTestController::class, 'test1Action'],
+            [Controller\MainTestController::class, 'test2Action'],
+            [Controller\MainTestController::class, 'test3Action'],
+            [Controller\MainTestController::class, 'test4Action'],
+            [Controller\MainTestController::class, 'testNoAclAction']
+        ];
+
+        $result = [];
+        foreach ($controllers as $controller) {
+            $result[$controller[0] . '_' . $controller[1]] = $controller;
         }
+
+        return $result;
     }
 
     public function testLoaders()
     {
+        $controllerClassProvider = $this->createMock(ControllerClassProvider::class);
+        $controllerClassProvider->expects(self::once())
+            ->method('getControllers')
+            ->willReturn($this->getControllers());
+
         $bundle = new TestBundle();
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles([$bundle->getName() => get_class($bundle)]);
 
         $storage = new AclAnnotationStorage();
+        $resourcesContainer = new ResourcesContainer();
         $configLoader = new AclConfigLoader();
-        $configLoader->load($storage);
-        $annotationLoader = new AclAnnotationLoader(new AnnotationReader());
-        $annotationLoader->load($storage);
+        $configLoader->load($storage, $resourcesContainer);
+        $annotationLoader = new AclAnnotationLoader($controllerClassProvider, new AnnotationReader());
+        $annotationLoader->load($storage, $resourcesContainer);
 
-        $this->assertFalse($storage->isKnownClass('ClassWONamespace'));
-        $this->assertFalse($storage->isKnownClass(ClassWOAnnotation::class));
-        $this->assertFalse($storage->isKnownClass('Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures'
-            . '\Controller\Classes\CommentedClassController'));
+        self::assertFalse($storage->isKnownClass(Controller\ClassWOAnnotation::class));
+        self::assertFalse($storage->isKnownClass(
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes\CommentedClassController'
+        ));
 
-        $this->assertAnnotations($storage->getAnnotations());
-        $this->assertEquals(
+        self::assertAnnotations($storage->getAnnotations());
+        self::assertBindings($storage);
+    }
+
+    /**
+     * @param AclAnnotationStorage $storage
+     */
+    private static function assertBindings(AclAnnotationStorage $storage)
+    {
+        self::assertEquals(
             [
-                '!' => 'user_test_main_controller',
+                '!'           => 'user_test_main_controller',
                 'test1Action' => 'user_test_main_controller_action1',
                 'test2Action' => 'user_test_main_controller_action2',
                 'test3Action' => 'user_test_main_controller_action2',
                 'test4Action' => 'user_test_main_controller_action4',
-
             ],
-            $storage->getBindings(MainTestController::class)
+            $storage->getBindings(Controller\MainTestController::class)
         );
-        $this->assertEquals(
+        self::assertEquals(
             [
-                '!' => 'user_test_extended_controller',
+                '!'           => 'user_test_extended_controller',
                 'test3Action' => 'user_test_main_controller_action1',
                 'test4Action' => 'user_test_main_controller_action4_rewrite',
                 'test5Action' => 'user_test_main_controller_action5',
                 'test1Action' => 'user_test_main_controller_action1',
-
             ],
-            $storage->getBindings(ExtendedController::class)
+            $storage->getBindings(Controller\ExtendedController::class)
         );
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'test3Action' => 'user_test_main_controller_action1',
                 'test4Action' => 'user_test_main_controller_action4_rewrite',
                 'test5Action' => 'user_test_main_controller_action5',
                 'test1Action' => 'test_controller',
-
             ],
-            $storage->getBindings(ExtendWithoutClassAnnotationOverride::class)
+            $storage->getBindings(Controller\ExtendWithoutClassAnnotationOverride::class)
         );
-        $this->assertEquals(
+        self::assertEquals(
             ['testAction' => 'test_controller'],
-            $storage->getBindings(ConfigController::class)
+            $storage->getBindings(Controller\ConfigController::class)
         );
-        $this->assertEquals(
+        self::assertEquals(
             ['testAction' => 'user_action_in_abstract_controller'],
-            $storage->getBindings(AbstractController::class)
+            $storage->getBindings(Controller\AbstractController::class)
         );
-        $this->assertEquals(
+        self::assertEquals(
             ['testAction' => 'user_action_in_abstract_controller'],
-            $storage->getBindings(ExtendedFromAbstractController::class)
+            $storage->getBindings(Controller\ExtendedFromAbstractController::class)
         );
     }
 
-    private function assertAnnotations($annotations)
+    /**
+     * @param Acl[] $annotations
+     */
+    private static function assertAnnotations(array $annotations)
     {
-        $this->assertTrue(in_array(
+        self::assertHasAnnotation(
             new Acl([
-                'id' => 'test_controller',
-                'type' => 'entity',
-                'class' => 'AcmeBundle\Entity\SomeEntity',
+                'id'         => 'test_controller',
+                'type'       => 'entity',
+                'class'      => 'AcmeBundle\Entity\SomeEntity',
                 'permission' => 'VIEW',
                 'group_name' => 'Test Group',
-                'label' => 'Test controller'
+                'label'      => 'Test controller'
             ]),
             $annotations
-        ));
-        $this->assertTrue(in_array(
+        );
+        self::assertHasAnnotation(
             new Acl([
-                'id' => 'test_wo_bindings',
-                'type' => 'action',
+                'id'         => 'test_wo_bindings',
+                'type'       => 'action',
                 'group_name' => 'Another Group',
-                'label' => 'Test without bindings'
+                'label'      => 'Test without bindings'
             ]),
             $annotations
-        ));
-        $this->assertTrue(in_array(
+        );
+        self::assertHasAnnotation(
             new Acl([
-                'id' => 'user_action_in_abstract_controller',
-                'type' => 'entity',
-                'class' => 'AcmeBundle\Entity\SomeClass',
+                'id'         => 'user_action_in_abstract_controller',
+                'type'       => 'entity',
+                'class'      => 'AcmeBundle\Entity\SomeClass',
                 'permission' => 'VIEW',
                 'group_name' => 'Test Group',
-                'label' => 'Action In Abstract Controller'
+                'label'      => 'Action In Abstract Controller'
             ]),
             $annotations
-        ));
-        $this->assertTrue(in_array(
+        );
+        self::assertHasAnnotation(
             new Acl([
-                'id' => 'user_test_main_controller',
-                'type' => 'action',
+                'id'         => 'user_test_main_controller',
+                'type'       => 'action',
                 'group_name' => 'Test Group',
-                'label' => 'Test controller for ACL'
+                'label'      => 'Test controller for ACL'
             ]),
             $annotations
-        ));
-        $this->assertTrue(in_array(
+        );
+        self::assertHasAnnotation(
             new Acl([
-                'id' => 'user_test_main_controller_action1',
-                'type' => 'entity',
-                'class' => 'AcmeBundle\Entity\SomeClass',
+                'id'         => 'user_test_main_controller_action1',
+                'type'       => 'entity',
+                'class'      => 'AcmeBundle\Entity\SomeClass',
                 'permission' => 'VIEW',
                 'group_name' => 'Test Group',
-                'label' => 'Action 1'
+                'label'      => 'Action 1'
             ]),
             $annotations
-        ));
-        $this->assertTrue(in_array(
+        );
+        self::assertHasAnnotation(
             new Acl([
-                'id' => 'user_test_main_controller_action2',
-                'type' => 'action',
+                'id'         => 'user_test_main_controller_action2',
+                'type'       => 'action',
                 'group_name' => 'Another Group',
-                'label' => 'Action 2'
+                'label'      => 'Action 2'
             ]),
             $annotations
-        ));
-        $this->assertTrue(in_array(
+        );
+        self::assertHasAnnotation(
             new Acl([
-                'id' => 'user_test_main_controller_action4',
-                'type' => 'action',
+                'id'         => 'user_test_main_controller_action4',
+                'type'       => 'action',
                 'group_name' => 'Another Group',
-                'label' => 'Action 4'
+                'label'      => 'Action 4'
             ]),
             $annotations
-        ));
-        $this->assertTrue(in_array(
+        );
+        self::assertHasAnnotation(
             new Acl([
-                'id' => 'user_test_extended_controller',
-                'type' => 'action',
+                'id'         => 'user_test_extended_controller',
+                'type'       => 'action',
                 'group_name' => 'Test Group',
-                'label' => 'Extended test controller for ACL'
+                'label'      => 'Extended test controller for ACL'
             ]),
             $annotations
-        ));
-        $this->assertTrue(in_array(
+        );
+        self::assertHasAnnotation(
             new Acl([
-                'id' => 'user_test_main_controller_action4_rewrite',
-                'type' => 'action',
+                'id'         => 'user_test_main_controller_action4_rewrite',
+                'type'       => 'action',
                 'group_name' => 'Another Group',
-                'label' => 'Action 4 Rewrite'
+                'label'      => 'Action 4 Rewrite'
             ]),
             $annotations
-        ));
-        $this->assertTrue(in_array(
+        );
+        self::assertHasAnnotation(
             new Acl([
-                'id' => 'user_test_main_controller_action5',
-                'type' => 'action',
+                'id'         => 'user_test_main_controller_action5',
+                'type'       => 'action',
                 'group_name' => 'Another Group',
-                'label' => 'Action 5'
+                'label'      => 'Action 5'
             ]),
             $annotations
-        ));
+        );
+    }
+
+    /**
+     * @param Acl   $annotation
+     * @param Acl[] $annotations
+     */
+    private static function assertHasAnnotation(Acl $annotation, array $annotations)
+    {
+        self::assertTrue(in_array($annotation, $annotations), $annotation->getId());
     }
 }

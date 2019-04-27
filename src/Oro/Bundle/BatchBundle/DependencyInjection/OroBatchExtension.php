@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\BatchBundle\DependencyInjection;
 
+use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\FileLocator;
@@ -11,7 +12,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * Batch bundle services configuration declaration
- *
  */
 class OroBatchExtension extends Extension
 {
@@ -24,7 +24,7 @@ class OroBatchExtension extends Extension
             'oro_batch_jobs',
             new YamlCumulativeFileLoader('Resources/config/batch_jobs.yml')
         );
-        $configLoader->registerResources($container);
+        $configLoader->registerResources(new ContainerBuilderAdapter($container));
 
         $config = $this->processConfiguration(new Configuration(), $configs);
         $container->setParameter('oro_batch.cleanup_interval', $config['cleanup_interval']);

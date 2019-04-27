@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Command;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Util\Debug;
-use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -13,6 +12,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * The CLI command to debug configuration of actions.
+ */
 class DebugOperationCommand extends ContainerAwareCommand
 {
     /**
@@ -32,8 +34,6 @@ class DebugOperationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $errors = new ArrayCollection();
-
         if ($input->getOption('action-group')) {
             $output->writeln('Load action_groups ...');
             $provider = $this->getActionGroupsProvider();
@@ -42,7 +42,7 @@ class DebugOperationCommand extends ContainerAwareCommand
             $provider = $this->getOperationsProvider();
         }
 
-        $configuration = $provider->getConfiguration(true, $errors);
+        $configuration = $provider->getConfiguration();
 
         if ($input->getOption('assemble')) {
             if ($input->getOption('action-group')) {
@@ -73,7 +73,7 @@ class DebugOperationCommand extends ContainerAwareCommand
     }
 
     /**
-     * @return ConfigurationProvider
+     * @return ConfigurationProviderInterface
      */
     protected function getOperationsProvider()
     {
@@ -81,7 +81,7 @@ class DebugOperationCommand extends ContainerAwareCommand
     }
 
     /**
-     * @return ConfigurationProvider
+     * @return ConfigurationProviderInterface
      */
     protected function getActionGroupsProvider()
     {

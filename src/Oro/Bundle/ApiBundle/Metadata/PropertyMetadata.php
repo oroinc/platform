@@ -4,11 +4,12 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ParameterBag;
+use Oro\Component\ChainProcessor\ToArrayInterface;
 
 /**
  * The base class for classes represents metadata for different kind of entity properties.
  */
-abstract class PropertyMetadata extends ParameterBag
+abstract class PropertyMetadata extends ParameterBag implements ToArrayInterface
 {
     private const MASK_DIRECTION_INPUT         = 1;
     private const MASK_DIRECTION_OUTPUT        = 2;
@@ -38,9 +39,7 @@ abstract class PropertyMetadata extends ParameterBag
     }
 
     /**
-     * Gets a native PHP array representation of the object.
-     *
-     * @return array [key => value, ...]
+     * {@inheritdoc}
      */
     public function toArray()
     {

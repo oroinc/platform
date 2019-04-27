@@ -5,8 +5,11 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\DumperExtensions;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityBundle\EntityConfig\IndexScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\IndexEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
@@ -21,13 +24,16 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+
+        $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
+        $entityExtendConfigurationProvider->expects(self::any())
+            ->method('getUnderlyingTypes')
+            ->willReturn(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']);
 
         $this->extension = new IndexEntityConfigDumperExtension(
             $this->configManager,
-            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany'])
+            new FieldTypeHelper($entityExtendConfigurationProvider)
         );
     }
 
@@ -50,9 +56,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
         $config->set('index', ['field1' => true]);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->once())
             ->method('getProvider')
@@ -77,12 +81,8 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', 'string'));
         $fieldConfig->set('is_extend', true);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datagridConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $datagridConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->exactly(3))
             ->method('getProvider')
@@ -126,12 +126,8 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 
         $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', 'string'));
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datagridConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $datagridConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
@@ -172,12 +168,8 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', 'string'));
         $fieldConfig->set('is_extend', true);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datagridConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $datagridConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->exactly(3))
             ->method('getProvider')
@@ -236,12 +228,8 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         );
         $datagridFieldConfig2->set('is_visible', DatagridScope::IS_VISIBLE_TRUE);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datagridConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $datagridConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->exactly(4))
             ->method('getProvider')
@@ -315,9 +303,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', $fieldType));
         $fieldConfig->set('is_extend', true);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
@@ -367,12 +353,8 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
             new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field1', 'string')
         );
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datagridConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $datagridConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->exactly(3))
             ->method('getProvider')
@@ -437,12 +419,8 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
             new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field2', 'string')
         );
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datagridConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $datagridConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->exactly(4))
             ->method('getProvider')

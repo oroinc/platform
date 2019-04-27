@@ -5,65 +5,29 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
-use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Mapping index data from entities' data - common code.
- *
- * @package Oro\Bundle\SearchBundle\Engine
  */
 abstract class AbstractMapper
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    /**
-     * @var array
-     * @deprecated since 1.8 Please use mappingProvider for mapping config
-     */
-    protected $mappingConfig;
-
-    /**
-     * @var SearchMappingProvider
-     */
+    /** @var SearchMappingProvider */
     protected $mappingProvider;
 
-    /**
-     * @var PropertyAccessorInterface
-     */
+    /** @var PropertyAccessorInterface */
     protected $propertyAccessor;
 
     /**
-     * @var HtmlTagHelper
-     */
-    protected $htmlTagHelper;
-
-    /**
      * @param SearchMappingProvider $mappingProvider
-     */
-    public function setMappingProvider(SearchMappingProvider $mappingProvider)
-    {
-        $this->mappingProvider = $mappingProvider;
-    }
-
-    /**
      * @param PropertyAccessorInterface $propertyAccessor
      */
-    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
-    {
+    public function __construct(
+        SearchMappingProvider $mappingProvider,
+        PropertyAccessorInterface $propertyAccessor
+    ) {
+        $this->mappingProvider = $mappingProvider;
         $this->propertyAccessor = $propertyAccessor;
-    }
-
-    /**
-     * @param HtmlTagHelper $htmlTagHelper
-     */
-    public function setHtmlTagHelper(HtmlTagHelper $htmlTagHelper)
-    {
-        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**

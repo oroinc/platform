@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -60,9 +61,15 @@ class AssignedToOrganizationUsersHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadataFactory')
             ->will($this->returnValue($metadataFactory));
 
+        $searchMappingProvider = $this->createMock(SearchMappingProvider::class);
+        $searchMappingProvider->expects($this->once())
+            ->method('getEntityAlias')
+            ->with(User::class)
+            ->willReturn('user');
+
         $this->handler = new AssignedToOrganizationUsersHandler($attachmentManager, User::class, []);
         $this->handler->setTokenAccessor($this->tokenAccessor);
-        $this->handler->initSearchIndexer($this->searchIndexer, [User::class => ['alias' => 'user']]);
+        $this->handler->initSearchIndexer($this->searchIndexer, $searchMappingProvider);
         $this->handler->initDoctrinePropertiesByEntityManager($this->manager);
     }
 

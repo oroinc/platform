@@ -20,8 +20,6 @@ parameters:
 
     oro_search.provider.search_mapping.class: Oro\Bundle\SearchBundle\Provider\SearchMappingProvider
 
-    oro_search.cache.search_mapping_cache.class: Oro\Bundle\SearchBundle\Cache\SearchMappingCache
-
     # services used only for ORM search engine
     oro_search.fulltext_index_manager.class:                      Oro\Bundle\SearchBundle\Engine\FulltextIndexManager
     oro_search.event_listener.orm.fulltext_index_listener.class:  Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener
@@ -71,11 +69,11 @@ services:
 
     oro_search.mapper:
         class: 'Oro\Bundle\SearchBundle\Engine\ObjectMapper'
-        arguments: ['@event_dispatcher', '%oro_search.entities_config%']
-        calls:
-            - [setMappingProvider, ['@oro_search.provider.search_mapping']]
-            - [setPropertyAccessor, ['@property_accessor']]
-            - [setHtmlTagHelper, ['@oro_ui.html_tag_helper']]
+        arguments:
+            - '@oro_search.provider.search_mapping'
+            - '@property_accessor'
+            - '@event_dispatcher'
+            - '@oro_ui.html_tag_helper'
 
     oro_search.text_filtered_mapper:
         parent: oro_search.mapper
@@ -177,6 +175,14 @@ services:
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
 
+    oro_search.mapping_configuration.provider:
+        class: Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider
+        public: false
+        parent: oro.static_config_provider.abstract
+        arguments:
+            - '%kernel.cache_dir%/oro/search_mapping.php'
+            - '%kernel.debug%'
+
     oro_search.cache.mapping_configuration:
         public: false
         parent: oro.cache.abstract
@@ -187,9 +193,16 @@ services:
         class: '%oro_search.provider.search_mapping.class%'
         arguments:
             - '@event_dispatcher'
+            - '@oro_search.mapping_configuration.provider'
             - '@oro_search.cache.mapping_configuration'
-        calls:
-            - [setMappingConfig, ['%oro_search.entities_config%']]
+
+    oro_search.cache.search_mapping.warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        public: false
+        arguments:
+            - '@oro_search.provider.search_mapping'
+        tags:
+            - { name: kernel.cache_warmer }
 
     oro_search.cache.doctrine_metadata:
         public: false
@@ -213,14 +226,6 @@ services:
             - [setRegistry,  ['@doctrine']]
             - [setDriversClasses, ['%oro_search.drivers%']]
         lazy: true
-
-    oro_search.cache.search_mapping_cache:
-        class: '%oro_search.cache.search_mapping_cache.class%'
-        arguments:
-            - '@oro_search.provider.search_mapping'
-        tags:
-            - { name: kernel.cache_warmer }
-            - { name: kernel.cache_clearer }
 
     oro_search.async.message_processor.index_entity:
         class: 'Oro\Bundle\SearchBundle\Async\IndexEntityMessageProcessor'
@@ -282,11 +287,17 @@ services:
     oro_search.extension.search_filter:
         class: '%oro_search.extension.search_filter.class%'
         arguments:
-            - '@oro_datagrid.configuration.provider'
+            - '@oro_datagrid.configuration.provider.raw'
+            - '@oro_search.extension.search_filter_bag'
             - '@oro_filter.provider.state.filters'
             - '@translator'
         tags:
             - { name: oro_datagrid.extension }
+
+    # this service is initialized by Oro\Bundle\FilterBundle\DependencyInjection\Compiler\FilterTypesPass
+    oro_search.extension.search_filter_bag:
+        class: Oro\Bundle\FilterBundle\Filter\FilterBag
+        public: true
 
     oro_search.extension.search_sorter:
         class: '%oro_search.extension.search_sorter.class%'

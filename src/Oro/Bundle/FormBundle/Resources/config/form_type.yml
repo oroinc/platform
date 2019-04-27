@@ -29,7 +29,6 @@ parameters:
     oro_form.extension.data_block.class:                         Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension
     oro_form.extension.client_validation.class:                  Oro\Bundle\FormBundle\Form\Extension\ClientValidationExtension
     oro_form.extension.constraint_as_option.class:               Oro\Bundle\FormBundle\Form\Extension\ConstraintAsOptionExtension
-    oro_form.extension.tooltip.class:                            Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension
     oro_form.extension.js_validation.class:                      Oro\Bundle\FormBundle\Form\Extension\JsValidationExtension
     oro_form.extension.js_validation.constraints_provider.class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider
     oro_form.extension.js_validation.repeated.class:             Oro\Bundle\FormBundle\Form\Extension\JsValidation\RepeatedTypeExtension
@@ -212,7 +211,7 @@ services:
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
-    oro_help.form.date_time_extension:
+    oro_form.extension.date_time_extension:
          class: Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension
          tags:
              - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\DateTimeType }
@@ -222,15 +221,15 @@ services:
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
-    oro_help.form.tooltip_extension:
-        class: '%oro_form.extension.tooltip.class%'
+    oro_form.extension.tooltip_extension:
+        class: Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension
         arguments:
             - '@oro_entity_config.provider.entity'
             - '@translator.default'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
-    oro_help.form.hint_extension:
+    oro_form.extension.hint_extension:
         class: Oro\Bundle\FormBundle\Form\Extension\HintFormExtension
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }

@@ -12,8 +12,6 @@ parameters:
 
     oro_datagrid.provider.resolver.class:                         Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver
 
-    oro_datagrid.configuration.provider.class:                    Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider
-    oro_datagrid.configuration.provider.chain.class:              Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider
     oro_datagrid.event.dispatcher.class:                          Oro\Bundle\DataGridBundle\Event\EventDispatcher
     oro_datagrid.event_listener.datasource_bind_parameters.class: Oro\Bundle\DataGridBundle\EventListener\DatasourceBindParametersListener
     oro_datagrid.event_listener.ormdatasource_acl.class:          Oro\Bundle\DataGridBundle\EventListener\OrmDatasourceAclListener
@@ -91,21 +89,24 @@ services:
             - '@service_container'
 
     oro_datagrid.configuration.provider:
-        class: '%oro_datagrid.configuration.provider.class%'
+        class: Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider
+        public: false
         arguments:
+            - '@oro_datagrid.configuration.provider.raw'
             - '@oro_datagrid.provider.resolver'
-            - '@oro_datagrid.configuration_provider.cache'
         tags:
             - { name: oro_datagrid.configuration.provider, priority: -10 }
 
-    oro_datagrid.configuration_provider.cache:
+    oro_datagrid.configuration.provider.raw:
+        class: Oro\Bundle\DataGridBundle\Provider\RawConfigurationProvider
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_datagrid_configuration' ] ]
+        parent: oro.static_config_provider.abstract
+        arguments:
+            - '%kernel.cache_dir%/oro/datagrids'
+            - '%kernel.debug%'
 
     oro_datagrid.configuration.provider.chain:
-        class: '%oro_datagrid.configuration.provider.chain.class%'
+        class: Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider
 
     oro_datagrid.twig.datagrid:
         class: 'Oro\Bundle\DataGridBundle\Twig\DataGridExtension'
@@ -291,13 +292,6 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_security.acl_helper'
-
-    oro_datagrid.cache.datagrid_configuration_cache_warmer:
-        class: Oro\Bundle\DataGridBundle\Cache\DatagridConfigurationCacheWarmer
-        arguments:
-            - '@oro_datagrid.configuration.provider'
-        tags:
-            - { name: kernel.cache_warmer }
 
     oro_datagrid.helper.route:
         class: 'Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper'

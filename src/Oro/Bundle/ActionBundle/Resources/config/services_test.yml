@@ -1,0 +1,3 @@
+services:
+    oro_action.tests.configuration.provider:
+        alias: oro_action.configuration.provider

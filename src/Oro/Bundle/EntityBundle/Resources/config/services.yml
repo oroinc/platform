@@ -6,13 +6,15 @@ parameters:
     # override Doctrine MappingDriverChain
     doctrine.orm.metadata.driver_chain.class: Oro\Bundle\EntityBundle\ORM\MappingDriverChain
 
+    # format that is used by default to get a human-readable text representation of an entity
+    oro_entity.entity_name_format.default: full
+
     oro_entity.listener.navigation_listener.class:                                     Oro\Bundle\EntityBundle\EventListener\NavigationListener
     oro_entity.datagrid_helper.class:                                                  Oro\Bundle\EntityBundle\Grid\GridHelper
     oro_entity.helper.field_helper.class:                                              Oro\Bundle\EntityBundle\Helper\FieldHelper
     oro_entity.event_listener.custom_entity_grid_listener.class:                       Oro\Bundle\EntityBundle\EventListener\CustomEntityGridListener
     oro_entity.event_listener.entity_relation_grid_listener.class:                     Oro\Bundle\EntityBundle\EventListener\EntityRelationGridListener
     oro_entity.event_listener.entity_modify_created_updated_properties_listener.class: Oro\Bundle\EntityBundle\EventListener\ModifyCreatedAndUpdatedPropertiesListener
-    oro_entity.exclusion_provider.config.class:                                        Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
     oro_entity.exclusion_provider.chain.class:                                         Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
     oro_entity.entity_provider.class:                                                  Oro\Bundle\EntityBundle\Provider\EntityProvider
     oro_entity.entity_field_provider.class:                                            Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
@@ -22,8 +24,6 @@ parameters:
     oro_entity.listener.orm.generated_value_strategy_listener.class: Oro\Bundle\EntityBundle\EventListener\ORM\GeneratedValueStrategyListener
     oro_entity.migration.extension.change_type.class: Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtension
     oro_entity.entity_alias_resolver.class:                  Oro\Bundle\EntityBundle\ORM\EntityAliasResolver
-    oro_entity.entity_alias_config_bag.class:                Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag
-    oro_entity.entity_alias_provider.class:                  Oro\Bundle\EntityBundle\Provider\EntityAliasProvider
     oro_entity.entity_class_name_helper.class:               Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper
     oro_entity.entity_class_name_provider.default.class:     Oro\Bundle\EntityBundle\Provider\EntityClassNameProvider
     oro_entity.dictionary_value_list_provider.default.class: Oro\Bundle\EntityBundle\Provider\DictionaryValueListProvider
@@ -45,10 +45,18 @@ parameters:
 
 services:
     oro_entity.entity_manager_bag:
-        public: false
         class: Oro\Bundle\EntityBundle\ORM\ManagerBag
+        public: false
         arguments:
             - '@doctrine'
+
+    oro_entity.entity_configuration.provider:
+        class: Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider
+        public: false
+        parent: oro.static_config_provider.abstract
+        arguments:
+            - '%kernel.cache_dir%/oro/entity.php'
+            - '%kernel.debug%'
 
     oro_entity.converter.doctrine.orm.decorator:
         class: 'Oro\Bundle\EntityBundle\Request\ParamConverter\DoctrineParamConverterDecorator'
@@ -145,10 +153,11 @@ services:
         class: '%oro_entity.exclusion_provider.chain.class%'
 
     oro_entity.exclusion_provider.config:
-        class: '%oro_entity.exclusion_provider.config.class%'
+        class: Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
+        public: false
         arguments:
             - '@oro_entity.entity_hierarchy_provider.all'
-            - '%oro_entity.exclusions%'
+            - '@oro_entity.entity_configuration.provider'
         tags:
             - { name: oro_entity.exclusion_provider.default }
             - { name: oro_entity.exclusion_provider.api, priority: 50 }
@@ -165,7 +174,7 @@ services:
         public: false
         arguments:
             - '@oro_entity.entity_hierarchy_provider.all'
-            - '%oro_entity.virtual_fields%'
+            - '@oro_entity.entity_configuration.provider'
         tags:
             - { name: oro_entity.virtual_field_provider }
 
@@ -207,7 +216,7 @@ services:
         public: false
         arguments:
             - '@oro_entity.entity_hierarchy_provider.all'
-            - '%oro_entity.virtual_relations%'
+            - '@oro_entity.entity_configuration.provider'
         tags:
             - { name: oro_entity.virtual_relation_provider }
 
@@ -277,7 +286,7 @@ services:
             - { name: oro_migration.extension, extension_name: change_type }
 
     oro_entity.entity_alias.cache.warmer:
-        class: Oro\Bundle\EntityBundle\Cache\EntityAliasCacheWarmer
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
         public: false
         arguments:
             - '@oro_entity.entity_alias_resolver'
@@ -298,6 +307,12 @@ services:
             - '@oro_entity.entity_alias_loader'
             - '@oro_entity.entity_alias_cache'
             - '@logger'
+        calls:
+            - [ setConfigCacheState, [ '@oro_entity.entity_alias_config_cache_state' ] ]
+
+    oro_entity.entity_alias_config_cache_state:
+        alias: oro_entity.entity_configuration.provider
+        public: false
 
     oro_entity.entity_alias_cache:
         parent: oro.cache.abstract.without_memory_cache
@@ -326,14 +341,13 @@ services:
             - { name: oro_entity.class_provider }
 
     oro_entity.entity_alias_config_bag:
-        class: '%oro_entity.entity_alias_config_bag.class%'
+        class: Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag
         public: false
         arguments:
-            - '%oro_entity.entity_aliases%'
-            - '%oro_entity.entity_alias_exclusions%'
+            - '@oro_entity.entity_configuration.provider'
 
     oro_entity.entity_alias_provider:
-        class: '%oro_entity.entity_alias_provider.class%'
+        class: Oro\Bundle\EntityBundle\Provider\EntityAliasProvider
         public: false
         arguments:
             - '@oro_entity.entity_alias_config_bag'
@@ -351,7 +365,7 @@ services:
         arguments:
             - !tagged oro_entity.name_provider
             - '%oro_entity.entity_name_format.default%'
-            - '%oro_entity.entity_name_formats%'
+            - '@oro_entity.entity_configuration.provider'
 
     oro_entity.entity_name_provider.default:
         class: Oro\Bundle\EntityBundle\Provider\EntityNameProvider

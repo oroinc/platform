@@ -52,10 +52,14 @@ class ChartTypeTest extends FormIntegrationTestCase
      */
     public function testBuildForm($chartConfigs)
     {
-        $this->configProvider
-            ->expects($this->once())
-            ->method('getChartConfigs')
-            ->will($this->returnValue($chartConfigs));
+        $this->configProvider->expects($this->once())
+            ->method('getChartNames')
+            ->willReturn(array_keys($chartConfigs));
+        $this->configProvider->expects($this->any())
+            ->method('getChartConfig')
+            ->willReturnCallback(function ($name) use ($chartConfigs) {
+                return $chartConfigs[$name];
+            });
 
         $form = $this->factory->create(ChartType::class, null, []);
 

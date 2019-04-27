@@ -17,7 +17,6 @@ class OroActionExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('assemblers.yml');
         $loader->load('block_types.yml');
-        $loader->load('cache.yml');
         $loader->load('conditions.yml');
         $loader->load('configuration.yml');
         $loader->load('form_types.yml');
@@ -26,8 +25,8 @@ class OroActionExtension extends Extension
         $loader->load('duplicator.yml');
         $loader->load('commands.yml');
 
-        if ($container->getParameter('kernel.debug')) {
-            $loader->load('debug.yml');
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
         }
     }
 }

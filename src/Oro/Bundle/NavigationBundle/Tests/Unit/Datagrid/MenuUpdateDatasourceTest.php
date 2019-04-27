@@ -5,7 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Datagrid;
 use Knp\Menu\MenuFactory;
 use Knp\Menu\Util\MenuManipulator;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
+use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 
@@ -23,8 +23,8 @@ class MenuUpdateDatasourceTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     protected $scopeType = 'default';
 
-    /** @var MenuConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    protected $menuConfiguration;
+    /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
+    protected $configurationProvider;
 
     /**
      * {@inheritdoc}
@@ -33,15 +33,13 @@ class MenuUpdateDatasourceTest extends \PHPUnit\Framework\TestCase
     {
         $this->chainProvider = $this->createMock(BuilderChainProvider::class);
         $this->menuManipulator = $this->createMock(MenuManipulator::class);
-        $this->menuConfiguration = $this->getMockBuilder(MenuConfiguration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
 
         $this->datasource = new MenuUpdateDatasource(
             $this->chainProvider,
             $this->menuManipulator,
             $this->scopeType,
-            $this->menuConfiguration
+            $this->configurationProvider
         );
     }
 
@@ -64,8 +62,8 @@ class MenuUpdateDatasourceTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetResults(array $menu, $resultCount)
     {
-        $this->menuConfiguration->expects(self::once())
-            ->method('getTree')
+        $this->configurationProvider->expects(self::once())
+            ->method('getMenuTree')
             ->willReturn([$menu['name'] => $menu]);
 
         $factory = new MenuFactory();

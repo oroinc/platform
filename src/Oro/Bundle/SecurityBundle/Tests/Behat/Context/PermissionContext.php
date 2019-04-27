@@ -4,9 +4,13 @@ namespace Oro\Bundle\SecurityBundle\Tests\Behat\Context;
 
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
-use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
+use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
+use Oro\Bundle\TestFrameworkBundle\Provider\PhpArrayConfigCacheModifier;
 
+/**
+ * Provides a set of steps to test security permissions.
+ */
 class PermissionContext extends OroFeatureContext implements KernelAwareContext
 {
     use KernelDictionary;
@@ -55,23 +59,17 @@ class PermissionContext extends OroFeatureContext implements KernelAwareContext
      */
     protected function addPermissionConfig(array $config, $group, $type, $refreshCache = false)
     {
-        $cache = $this->getContainer()->get('oro_security.cache.provider.configurable_permission');
-        $data = $cache->fetch(ConfigurablePermissionProvider::CACHE_ID);
+        /** @var ConfigurablePermissionConfigurationProvider $configurationProvider */
+        $configurationProvider = $this->getContainer()
+            ->get('oro_security.configuration.provider.configurable_permission_configuration');
+        $configurationModifier = new PhpArrayConfigCacheModifier($configurationProvider);
 
-        if ($refreshCache || $data === false) {
-            $this->loadPermissions();
-
-            $data = $cache->fetch(ConfigurablePermissionProvider::CACHE_ID);
+        if ($refreshCache) {
+            $configurationModifier->resetCache();
         }
 
+        $data = $configurationProvider->getConfiguration();
         $data = array_merge_recursive($data, [$group => ['default' => true, $type => $config]]);
-
-        $cache->save(ConfigurablePermissionProvider::CACHE_ID, $data);
-    }
-
-    protected function loadPermissions()
-    {
-        $provider = $this->getContainer()->get('oro_security.acl.configurable_permission_provider');
-        $provider->buildCache();
+        $configurationModifier->updateCache($data);
     }
 }

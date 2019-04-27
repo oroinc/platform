@@ -1,9 +1,0 @@
-parameters:
-    oro_organization_filter.filter_business_unit.class:  Oro\Bundle\OrganizationBundle\Filter\BusinessUnitChoiceFilter
-
-services:
-    oro_organization_filter.filter_business_unit:
-        class: '%oro_organization_filter.filter_business_unit.class%'
-        parent: 'oro_filter.choice_tree_filter'
-        tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: choice-business-unit }

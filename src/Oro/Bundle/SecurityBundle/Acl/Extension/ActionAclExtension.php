@@ -5,22 +5,25 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
-use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
+use Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadataProvider;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
+/**
+ * The ACL extension that works with actions (another name is capabilities).
+ */
 class ActionAclExtension extends AbstractAclExtension
 {
     const NAME = 'action';
 
     const PERMISSION_EXECUTE = 'EXECUTE';
 
-    /** @var ActionMetadataProvider */
+    /** @var ActionSecurityMetadataProvider */
     protected $actionMetadataProvider;
 
     /**
-     * @param ActionMetadataProvider $actionMetadataProvider
+     * @param ActionSecurityMetadataProvider $actionMetadataProvider
      */
-    public function __construct(ActionMetadataProvider $actionMetadataProvider)
+    public function __construct(ActionSecurityMetadataProvider $actionMetadataProvider)
     {
         $this->actionMetadataProvider = $actionMetadataProvider;
 

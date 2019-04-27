@@ -1,0 +1,19 @@
+# Circular Reference - Two Level
+features:
+    feature1:
+        label: Feature 1
+        toggle: toggle1
+        dependencies:
+            - feature2
+
+    feature2:
+        label: Feature 2
+        toggle: toggle2
+        dependencies:
+            - feature3
+
+    feature3:
+        label: Feature 3
+        toggle: toggle3
+        dependencies:
+            - feature1

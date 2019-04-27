@@ -6,43 +6,39 @@ namespace Oro\Bundle\EntityBundle\Provider;
  * This class applies entity hierarchy onto declaration of virtual fields or relations.
  * For instance virtual fields configured for some abstract class will be added to all inherited classes.
  */
-class AbstractConfigVirtualProvider
+abstract class AbstractConfigVirtualProvider
 {
-    /**
-     * @var array
-     */
-    protected $items;
+    /** @var EntityHierarchyProviderInterface */
+    private $entityHierarchyProvider;
 
-    /**
-     * @var array
-     */
-    protected $configuration = [];
-
-    /**
-     * @var EntityHierarchyProviderInterface
-     */
-    protected $entityHierarchyProvider;
+    /** @var array */
+    private $items;
 
     /**
      * @param EntityHierarchyProviderInterface $entityHierarchyProvider
-     * @param array                            $configuration
      */
-    public function __construct(EntityHierarchyProviderInterface $entityHierarchyProvider, array $configuration)
+    public function __construct(EntityHierarchyProviderInterface $entityHierarchyProvider)
     {
         $this->entityHierarchyProvider = $entityHierarchyProvider;
-        $this->configuration = $configuration;
     }
 
     /**
-     * Ensure virtual items are initialized.
+     * @return array
+     */
+    abstract protected function getConfiguration();
+
+    /**
+     * Gets initialized virtual items.
      *
      * When OroSomeBundle:SomeEntity extends OroAddressBundle:AbstractAddress and AbstractAddress has configured
      * virtual item all AbstractAddress virtual fields will be available in scope of OroSomeBundle:SomeEntity
+     *
+     * @return array
      */
-    protected function ensureVirtualFieldsInitialized()
+    protected function getItems()
     {
         if ($this->items === null) {
-            $items = $this->configuration;
+            $items = $this->getConfiguration();
 
             $hierarchy = $this->entityHierarchyProvider->getHierarchy();
             foreach ($hierarchy as $className => $parentClasses) {
@@ -63,5 +59,7 @@ class AbstractConfigVirtualProvider
 
             $this->items = $items;
         }
+
+        return $this->items;
     }
 }

@@ -173,13 +173,6 @@ services:
         tags:
             - { name: oro_action.condition, alias: action_available }
 
-    oro_action.condition.route_exists:
-        class: 'Oro\Bundle\ActionBundle\Condition\RouteExists'
-        arguments:
-            - '@router'
-        tags:
-            - { name: oro_action.condition, alias: 'route_exists' }
-
     oro_action.condition.service_exists:
         class: 'Oro\Bundle\ActionBundle\Condition\ServiceExists'
         arguments:

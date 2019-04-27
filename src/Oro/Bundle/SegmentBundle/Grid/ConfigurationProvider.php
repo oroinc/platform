@@ -9,6 +9,9 @@ use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+/**
+ * The provider for configuration of datagrids for segments.
+ */
 class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAwareInterface
 {
     /** @var SegmentDatagridConfigurationBuilder */
@@ -37,7 +40,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
     /**
      * {@inheritdoc}
      */
-    public function isApplicable($gridName)
+    public function isApplicable(string $gridName): bool
     {
         return $this->builder->isApplicable($gridName);
     }
@@ -45,7 +48,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
     /**
      * {@inheritdoc}
      */
-    public function getConfiguration($gridName)
+    public function getConfiguration(string $gridName): DatagridConfiguration
     {
         $id = intval(substr($gridName, strlen(Segment::GRID_PREFIX)));
         if (!$id) {

@@ -2,25 +2,20 @@
 
 namespace Oro\Bundle\NavigationBundle\Title\TitleReader;
 
+/**
+ * Contains all page title readers and use them to get a page title for a specific route.
+ */
 class TitleReaderRegistry
 {
-    /** @var ReaderInterface[] */
-    private $readers = [];
+    /** @var iterable|ReaderInterface[] */
+    private $readers;
 
     /**
-     * @param ReaderInterface $reader
+     * @param iterable|ReaderInterface[] $readers
      */
-    public function addTitleReader(ReaderInterface $reader)
+    public function __construct(iterable $readers)
     {
-        $this->readers[] = $reader;
-    }
-
-    /**
-     * @return ReaderInterface[]
-     */
-    public function getTitleReaders()
-    {
-        return $this->readers;
+        $this->readers = $readers;
     }
 
     /**
@@ -28,11 +23,11 @@ class TitleReaderRegistry
      *
      * @return string|null
      */
-    public function getTitleByRoute($route)
+    public function getTitleByRoute(string $route): ?string
     {
-        foreach ($this->getTitleReaders() as $titleReader) {
-            $title = $titleReader->getTitle($route);
-            if ($title !== null) {
+        foreach ($this->readers as $reader) {
+            $title = $reader->getTitle($route);
+            if (null !== $title) {
                 return $title;
             }
         }

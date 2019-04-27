@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Owner;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
@@ -15,7 +15,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
- * This class is used to build the tree of owners for business units.
+ * The provider for owner tree.
  */
 class OwnerTreeProvider extends AbstractOwnerTreeProvider
 {
@@ -51,7 +51,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     /**
      * {@inheritdoc}
      */
-    public function supports()
+    public function supports(): bool
     {
         $token = $this->tokenStorage->getToken();
         if (null === $token) {
@@ -64,11 +64,10 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     /**
      * {@inheritdoc}
      */
-    protected function fillTree(OwnerTreeBuilderInterface $tree)
+    protected function fillTree(OwnerTreeBuilderInterface $tree): void
     {
-        $ownershipMetadataProvider = $this->getOwnershipMetadataProvider();
-        $userClass = $ownershipMetadataProvider->getUserClass();
-        $businessUnitClass = $ownershipMetadataProvider->getBusinessUnitClass();
+        $userClass = $this->ownershipMetadataProvider->getUserClass();
+        $businessUnitClass = $this->ownershipMetadataProvider->getBusinessUnitClass();
         $connection = $this->getManagerForClass($userClass)->getConnection();
 
         list($businessUnits, $columnMap) = $this->executeQuery(
@@ -137,11 +136,14 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
      *
      * @return int|null
      */
-    protected function getId($item, $property)
+    private function getId(array $item, string $property): ?int
     {
         $id = $item[$property];
+        if (null !== $id) {
+            $id = (int)$id;
+        }
 
-        return null !== $id ? (int)$id : null;
+        return $id;
     }
 
     /**
@@ -150,7 +152,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
      *
      * @return array [rows, columnMap]
      */
-    protected function executeQuery(Connection $connection, Query $query)
+    private function executeQuery(Connection $connection, Query $query): array
     {
         $parsedQuery = QueryUtil::parseQuery($query);
 
@@ -174,9 +176,9 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     /**
      * @param string $className
      *
-     * @return EntityManager
+     * @return EntityManagerInterface
      */
-    protected function getManagerForClass($className)
+    private function getManagerForClass(string $className): EntityManagerInterface
     {
         return $this->doctrine->getManagerForClass($className);
     }
@@ -186,16 +188,8 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
      *
      * @return EntityRepository
      */
-    protected function getRepository($entityClass)
+    private function getRepository(string $entityClass): EntityRepository
     {
         return $this->getManagerForClass($entityClass)->getRepository($entityClass);
-    }
-
-    /**
-     * @return OwnershipMetadataProviderInterface
-     */
-    protected function getOwnershipMetadataProvider()
-    {
-        return $this->ownershipMetadataProvider;
     }
 }

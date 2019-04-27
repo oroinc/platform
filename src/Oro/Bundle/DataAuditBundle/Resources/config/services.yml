@@ -5,10 +5,11 @@ parameters:
 services:
     oro_dataaudit.filter.audit:
         class: 'Oro\Bundle\DataAuditBundle\Filter\AuditFilter'
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
-            - '@oro_query_designer.query_designer.manager.link'
+            - '@oro_query_designer.query_designer.manager'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: audit }
 

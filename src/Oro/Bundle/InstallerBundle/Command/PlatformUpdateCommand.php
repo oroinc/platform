@@ -5,7 +5,6 @@ namespace Oro\Bundle\InstallerBundle\Command;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\InstallerBundle\InstallerEvents;
-use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
 use Oro\Component\PhpUtils\PhpIniUtil;
@@ -121,7 +120,6 @@ class PlatformUpdateCommand extends AbstractCommand
                 ]
             )
             ->runCommand(LoadPermissionConfigurationCommand::NAME, ['--process-isolation' => true])
-            ->runCommand(LoadConfigurablePermissionCommand::NAME, ['--process-isolation' => true])
             ->runCommand(
                 'oro:cron:definitions:load',
                 [

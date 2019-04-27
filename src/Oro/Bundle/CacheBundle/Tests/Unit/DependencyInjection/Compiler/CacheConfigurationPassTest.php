@@ -5,8 +5,10 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass;
+use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
+use Oro\Component\Config\Cache\ConfigCacheWarmer;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -17,6 +19,7 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
     public function testCacheDefinitions()
     {
         $container = new ContainerBuilder();
+        $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
 
         $compiler = new CacheConfigurationPass();
         $compiler->process($container);
@@ -48,6 +51,7 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $dataCacheDef = new Definition(ArrayCache::class);
 
         $container = new ContainerBuilder();
+        $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
         $container->setDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE, $fileCacheDef);
         $container->setDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE, $dataCacheDef);
 
@@ -70,6 +74,7 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $dataCacheDef = new Definition(Cache::class);
 
         $container = new ContainerBuilder();
+        $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
         $container->setDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE, $fileCacheDef);
         $container->setDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE, $dataCacheDef);
 
@@ -81,14 +86,14 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
 
     public function testDataCacheManagerConfiguration()
     {
-        $dataCacheManagerDef  = new Definition('Oro\Bundle\CacheBundle\Manager\OroDataCacheManager');
-        $fileCacheDef         = new ChildDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE);
+        $dataCacheManagerDef = new Definition(OroDataCacheManager::class);
+        $fileCacheDef = new ChildDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE);
         $abstractFileCacheDef = new ChildDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE);
         $abstractFileCacheDef->setAbstract(true);
-        $dataCacheDef         = new ChildDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE);
+        $dataCacheDef = new ChildDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE);
         $abstractDataCacheDef = new ChildDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE);
         $abstractDataCacheDef->setAbstract(true);
-        $otherCacheDef        = new ChildDefinition('some_abstract_cache');
+        $otherCacheDef = new ChildDefinition('some_abstract_cache');
 
         $container = new ContainerBuilder();
         $container->setDefinition(CacheConfigurationPass::MANAGER_SERVICE_KEY, $dataCacheManagerDef);
@@ -101,7 +106,7 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $compiler = new CacheConfigurationPass();
         $compiler->process($container);
 
-        $expectedDataCacheManagerDef = new Definition('Oro\Bundle\CacheBundle\Manager\OroDataCacheManager');
+        $expectedDataCacheManagerDef = new Definition(OroDataCacheManager::class);
         $expectedDataCacheManagerDef->addMethodCall('registerCacheProvider', [new Reference('file_cache')]);
         $expectedDataCacheManagerDef->addMethodCall('registerCacheProvider', [new Reference('data_cache')]);
         $this->assertEquals(
@@ -110,8 +115,47 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testStaticConfigCacheWarmers()
+    {
+        $providerDef = new ChildDefinition(CacheConfigurationPass::STATIC_CONFIG_PROVIDER_SERVICE);
+        $abstractProviderDef = new ChildDefinition(CacheConfigurationPass::STATIC_CONFIG_PROVIDER_SERVICE);
+        $abstractProviderDef->setAbstract(true);
+        $providerWithWarmerDef = new ChildDefinition(CacheConfigurationPass::STATIC_CONFIG_PROVIDER_SERVICE);
+        $existingWarmerDef = new Definition('TestWarmer');
+        $notConfigProviderDef = new ChildDefinition('some_abstract_service');
+
+        $container = new ContainerBuilder();
+        $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
+        $container->setDefinition('provider', $providerDef);
+        $container->setDefinition('abstract_provider', $abstractProviderDef);
+        $container->setDefinition('provider_with_warmer', $providerWithWarmerDef);
+        $container->setDefinition('not_config_provider', $notConfigProviderDef);
+        $container->setDefinition('provider_with_warmer.warmer', $existingWarmerDef);
+
+        $compiler = new CacheConfigurationPass();
+        $compiler->process($container);
+
+        $expectedWarmerDef = new Definition(ConfigCacheWarmer::class);
+        $expectedWarmerDef
+            ->setPublic(false)
+            ->setArguments([new Reference('provider')])
+            ->addTag('kernel.cache_warmer', ['priority' => 200]);
+
+        $this->assertEquals(
+            $expectedWarmerDef,
+            $container->getDefinition('provider.warmer')
+        );
+        $this->assertFalse($container->hasDefinition('abstract_provider.warmer'));
+        $this->assertSame(
+            $existingWarmerDef,
+            $container->getDefinition('provider_with_warmer.warmer')
+        );
+        $this->assertFalse($container->hasDefinition('not_config_provider.warmer'));
+    }
+
     /**
      * @param string $path
+     *
      * @return Definition
      */
     private function getFilesystemCache($path)

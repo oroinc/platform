@@ -31,10 +31,39 @@ services:
             - '@oro_config.manager'
             - '@oro_locale.calendar_factory'
             - '@oro_locale.manager.localization'
-        calls:
-            - [addNameFormats, ['%oro_locale.format.name%']]
-            - [addAddressFormats, ['%oro_locale.format.address%']]
-            - [addLocaleData, ['%oro_locale.locale_data%']]
+            - '@oro_locale.configuration_provider'
+
+    oro_locale.configuration_provider:
+        class: Oro\Bundle\LocaleBundle\Configuration\LocaleConfigurationProvider
+        public: false
+        arguments:
+            - '@oro_locale.name_format_configuration.provider'
+            - '@oro_locale.address_format_configuration.provider'
+            - '@oro_locale.locale_data_configuration.provider'
+
+    oro_locale.name_format_configuration.provider:
+        class: Oro\Bundle\LocaleBundle\Configuration\NameFormatConfigurationProvider
+        public: false
+        parent: oro.static_config_provider.abstract
+        arguments:
+            - '%kernel.cache_dir%/oro/locale_name_format.php'
+            - '%kernel.debug%'
+
+    oro_locale.address_format_configuration.provider:
+        class: Oro\Bundle\LocaleBundle\Configuration\AddressFormatConfigurationProvider
+        public: false
+        parent: oro.static_config_provider.abstract
+        arguments:
+            - '%kernel.cache_dir%/oro/locale_address_format.php'
+            - '%kernel.debug%'
+
+    oro_locale.locale_data_configuration.provider:
+        class: Oro\Bundle\LocaleBundle\Configuration\LocaleDataConfigurationProvider
+        public: false
+        parent: oro.static_config_provider.abstract
+        arguments:
+            - '%kernel.cache_dir%/oro/locale_data.php'
+            - '%kernel.debug%'
 
     oro_locale.helper.localization:
         class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationHelper'

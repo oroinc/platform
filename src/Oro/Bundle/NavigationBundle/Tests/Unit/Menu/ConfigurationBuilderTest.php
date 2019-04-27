@@ -5,7 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;
-use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
+use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Component\Config\Resolver\SystemAwareResolver;
@@ -25,8 +25,8 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
-    /** @var MenuConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    protected $menuConfiguration;
+    /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
+    protected $configurationProvider;
 
     protected function setUp()
     {
@@ -34,15 +34,13 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->menuFactory = $this->createMock(FactoryInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->menuConfiguration = $this->getMockBuilder(MenuConfiguration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
 
         $this->configurationBuilder = new ConfigurationBuilder(
             $resolver,
             $this->menuFactory,
             $this->eventDispatcher,
-            $this->menuConfiguration
+            $this->configurationProvider
         );
 
         $this->factory = $this->getMockBuilder(MenuFactory::class)
@@ -64,11 +62,11 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
      */
     public function testBuild($options)
     {
-        $this->menuConfiguration->expects(self::once())
-            ->method('getTree')
+        $this->configurationProvider->expects(self::once())
+            ->method('getMenuTree')
             ->willReturn($options['tree']);
-        $this->menuConfiguration->expects(self::any())
-            ->method('getItems')
+        $this->configurationProvider->expects(self::any())
+            ->method('getMenuItems')
             ->willReturn(isset($options['items']) ? $options['items'] : []);
 
         $menu = new MenuItem('navbar', $this->factory);
@@ -96,11 +94,11 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetAreaToExtra($options, $expectedArea)
     {
-        $this->menuConfiguration->expects(self::once())
-            ->method('getTree')
+        $this->configurationProvider->expects(self::once())
+            ->method('getMenuTree')
             ->willReturn($options['tree']);
-        $this->menuConfiguration->expects(self::once())
-            ->method('getItems')
+        $this->configurationProvider->expects(self::once())
+            ->method('getMenuItems')
             ->willReturn($options['items']);
 
         $menu = new MenuItem('navbar', $this->factory);
@@ -281,11 +279,11 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ];
-        $this->menuConfiguration->expects(self::once())
-            ->method('getTree')
+        $this->configurationProvider->expects(self::once())
+            ->method('getMenuTree')
             ->willReturn($options['tree']);
-        $this->menuConfiguration->expects(self::any())
-            ->method('getItems')
+        $this->configurationProvider->expects(self::any())
+            ->method('getMenuItems')
             ->willReturn($options['items']);
         $menu = new MenuItem('navbar', $this->factory);
         $this->configurationBuilder->build($menu, [], 'navbar');
@@ -318,11 +316,11 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ];
-        $this->menuConfiguration->expects(self::once())
-            ->method('getTree')
+        $this->configurationProvider->expects(self::once())
+            ->method('getMenuTree')
             ->willReturn($options['tree']);
-        $this->menuConfiguration->expects(self::any())
-            ->method('getItems')
+        $this->configurationProvider->expects(self::any())
+            ->method('getMenuItems')
             ->willReturn($options['items']);
 
         $menu = new MenuItem('navbar', $this->factory);

@@ -11,17 +11,9 @@ services:
             - [ setNamespace, [ 'oro_locale_tree_fallback_strategy' ] ]
 
     oro_locale.localization.localization_provider.cache.warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
         public: false
-        class: 'Oro\Bundle\LocaleBundle\Cache\LocalizationCacheWarmer'
         arguments:
             - '@oro_locale.manager.localization'
         tags:
             - { name: kernel.cache_warmer }
-
-    oro_locale.localization.localization_provider.cache.clearer:
-        public: false
-        class: 'Oro\Bundle\LocaleBundle\Cache\LocalizationCacheCleaner'
-        arguments:
-            - '@oro_locale.manager.localization'
-        tags:
-            - { name: kernel.cache_clearer }

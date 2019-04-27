@@ -27,7 +27,7 @@ class ThemeFactory implements ThemeFactoryInterface
     {
         $theme = new Theme(
             $themeName,
-            isset($themeDefinition['parent']) ? $themeDefinition['parent'] : null
+            $themeDefinition['parent'] ?? null
         );
 
         $this->applyThemeProperties($theme, $themeDefinition);

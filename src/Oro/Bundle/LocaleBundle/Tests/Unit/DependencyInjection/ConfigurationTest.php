@@ -44,6 +44,10 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                             'value' => null,
                             'scope' => 'app'
                         ],
+                        'currency' => [
+                            'value' => null,
+                            'scope' => 'app'
+                        ],
                         'timezone' => [
                             'value' => 'UTC',
                             'scope' => 'app'
@@ -82,9 +86,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                     'formatting_code' => Translator::DEFAULT_LOCALE,
                     'language' => Translator::DEFAULT_LOCALE,
-                    'name_format' => [],
-                    'address_format' => [],
-                    'locale_data' => [],
                 ]
             ]
         ];

@@ -1,4 +1,0 @@
-oro_configurable_permissions:
-    test_configurable_permissions:
-        capability:
-            test_action: true

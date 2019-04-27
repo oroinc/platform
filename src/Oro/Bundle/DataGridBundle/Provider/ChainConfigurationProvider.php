@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\DataGridBundle\Provider;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 
+/**
+ * Delegates the loading of datagrid configuration to child providers.
+ */
 class ChainConfigurationProvider implements ConfigurationProviderInterface
 {
-    /**
-     * @var ConfigurationProviderInterface[]
-     */
-    protected $providers = [];
+    /** @var ConfigurationProviderInterface[] */
+    private $providers = [];
 
     /**
      * Registers the given provider in the chain
@@ -24,7 +26,7 @@ class ChainConfigurationProvider implements ConfigurationProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function isApplicable($gridName)
+    public function isApplicable(string $gridName): bool
     {
         return true;
     }
@@ -32,7 +34,7 @@ class ChainConfigurationProvider implements ConfigurationProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function getConfiguration($gridName)
+    public function getConfiguration(string $gridName): DatagridConfiguration
     {
         $foundProvider = null;
         foreach ($this->providers as $provider) {

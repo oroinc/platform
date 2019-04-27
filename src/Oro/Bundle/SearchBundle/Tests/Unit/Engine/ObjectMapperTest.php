@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
+use Doctrine\Common\Cache\Cache;
+use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
@@ -193,8 +195,15 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->mapperProvider  = new SearchMappingProvider($this->dispatcher);
-        $this->mapperProvider->setMappingConfig($this->mappingConfig);
+        $configProvider = $this->createMock(MappingConfigurationProvider::class);
+        $configProvider->expects($this->any())
+            ->method('getConfiguration')
+            ->willReturn($this->mappingConfig);
+        $cache = $this->createMock(Cache::class);
+        $cache->expects($this->any())
+            ->method('fetch')
+            ->willReturn(false);
+        $this->mapperProvider  = new SearchMappingProvider($this->dispatcher, $configProvider, $cache);
 
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
         $this->htmlTagHelper->expects($this->any())
@@ -221,10 +230,12 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->mapper = new ObjectMapper($this->dispatcher, $this->mappingConfig);
-        $this->mapper->setMappingProvider($this->mapperProvider);
-        $this->mapper->setPropertyAccessor(PropertyAccess::createPropertyAccessor());
-        $this->mapper->setHtmlTagHelper($this->htmlTagHelper);
+        $this->mapper = new ObjectMapper(
+            $this->mapperProvider,
+            PropertyAccess::createPropertyAccessor(),
+            $this->dispatcher,
+            $this->htmlTagHelper
+        );
     }
 
     /**

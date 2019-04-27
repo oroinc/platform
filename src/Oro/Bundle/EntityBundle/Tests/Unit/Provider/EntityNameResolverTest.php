@@ -2,26 +2,28 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
 class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $provider1;
+    private $provider1;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $provider2;
+    private $provider2;
 
     /** @var EntityNameResolver */
-    protected $entityNameResolver;
+    private $entityNameResolver;
 
     protected function setUp()
     {
         $this->provider1 = $this->createMock(EntityNameProviderInterface::class);
         $this->provider2 = $this->createMock(EntityNameProviderInterface::class);
 
-        $this->entityNameResolver = new EntityNameResolver(
+        $this->entityNameResolver = $this->getEntityNameResolver(
             [$this->provider2, $this->provider1],
             'full',
             [
@@ -29,6 +31,24 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
                 'short' => ['fallback' => null]
             ]
         );
+    }
+
+    /**
+     * @param array  $providers
+     * @param string $defaultFormat
+     * @param array  $config
+     *
+     * @return EntityNameResolver
+     */
+    private function getEntityNameResolver($providers, $defaultFormat, $config)
+    {
+        $configProvider = $this->createMock(EntityConfigurationProvider::class);
+        $configProvider->expects(self::any())
+            ->method('getConfiguration')
+            ->with(EntityConfiguration::ENTITY_NAME_FORMATS)
+            ->willReturn($config);
+
+        return new EntityNameResolver($providers, $defaultFormat, $configProvider);
     }
 
     /**
@@ -116,7 +136,7 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testGetNameWithoutChildProviders()
     {
-        $entityNameResolver = new EntityNameResolver([], 'full', ['full' => ['fallback' => null]]);
+        $entityNameResolver = $this->getEntityNameResolver([], 'full', ['full' => ['fallback' => null]]);
         $this->assertNull($entityNameResolver->getName(new \stdClass(), 'full', 'en_US'));
     }
 
@@ -179,7 +199,7 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testGetNameDQLWithoutChildProviders()
     {
-        $entityNameResolver = new EntityNameResolver([], 'full', ['full' => ['fallback' => null]]);
+        $entityNameResolver = $this->getEntityNameResolver([], 'full', ['full' => ['fallback' => null]]);
         $this->assertNull($entityNameResolver->getNameDQL('Test\Entity', 'entity_alias', 'full', 'en_US'));
     }
 

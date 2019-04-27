@@ -18,7 +18,6 @@ parameters:
     oro_email.email_body_loader_selector.class:   Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector
     oro_email.email_flag_manager_loader_selector.class: Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderSelector
     oro_email.listener.entity_listener.class:     Oro\Bundle\EmailBundle\EventListener\EntityListener
-    oro_email.listener.role_subscriber.class:     Oro\Bundle\EmailBundle\EventListener\RoleSubscriber
     oro_email.listener.auto_response_listener.class: Oro\Bundle\EmailBundle\EventListener\AutoResponseListener
     oro_email.manager.autoresponserule.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_email.autoresponserule_manager.class:     Oro\Bundle\EmailBundle\Manager\AutoResponseManager
@@ -615,6 +614,35 @@ services:
         arguments:
             - '@oro_entity.entity_provider'
             - '@translator'
+
+    oro_email_filter.filter_origin_folder:
+        class: Oro\Bundle\EmailBundle\Filter\ChoiceOriginFolderFilter
+        public: false
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: multiselect-originfolder }
+
+    oro_email_filter.filter_massage_type:
+        class: Oro\Bundle\EmailBundle\Filter\ChoiceMessageTypeFilter
+        public: false
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@oro_email.email.owner.provider.storage'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: multiselect-messagetype }
+
+    oro_email_filter.filter_email_string:
+        class: Oro\Bundle\EmailBundle\Filter\EmailStringFilter
+        public: false
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@oro_email.email.owner.provider.storage'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: email-string }
 
     oro_email.mailer.processor:
         class: '%oro_email.mailer.processor.class%'

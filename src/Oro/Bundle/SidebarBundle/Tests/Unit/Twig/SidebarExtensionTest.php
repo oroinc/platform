@@ -3,10 +3,9 @@
 namespace Oro\Bundle\SidebarBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
+use Oro\Bundle\SidebarBundle\Configuration\WidgetDefinitionProvider;
 use Oro\Bundle\SidebarBundle\Twig\SidebarExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -14,8 +13,8 @@ class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetDefinitionRegistry */
-    protected $widgetDefinitionsRegistry;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetDefinitionProvider */
+    protected $widgetDefinitionProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     protected $translator;
@@ -31,19 +30,13 @@ class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->widgetDefinitionsRegistry = $this->getMockBuilder(WidgetDefinitionRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->widgetDefinitionProvider = $this->createMock(WidgetDefinitionProvider::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->assetHelper = $this->getMockBuilder(Packages::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->assetHelper = $this->createMock(AssetHelper::class);
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_sidebar.widget_definition.registry', $this->widgetDefinitionsRegistry)
+            ->add('oro_sidebar.widget_definition_provider', $this->widgetDefinitionProvider)
             ->add('translator', $this->translator)
             ->add('assets.packages', $this->assetHelper)
             ->getContainer($this);
@@ -73,7 +66,7 @@ class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->widgetDefinitionsRegistry->expects(self::once())
+        $this->widgetDefinitionProvider->expects(self::once())
             ->method('getWidgetDefinitionsByPlacement')
             ->with($placement)
             ->willReturn($definitions);
@@ -123,7 +116,7 @@ class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->widgetDefinitionsRegistry->expects(self::once())
+        $this->widgetDefinitionProvider->expects(self::once())
             ->method('getWidgetDefinitionsByPlacement')
             ->with($placement)
             ->willReturn($definitions);

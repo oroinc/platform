@@ -12,14 +12,16 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
     {
         parent::setUp();
 
-        $this->mapper = new TextFilteredObjectMapper($this->dispatcher, $this->mappingConfig);
-        $this->mapper->setMappingProvider($this->mapperProvider);
-        $this->mapper->setPropertyAccessor(PropertyAccess::createPropertyAccessor());
-        $this->mapper->setHtmlTagHelper($this->htmlTagHelper);
+        $this->mapper = new TextFilteredObjectMapper(
+            $this->mapperProvider,
+            PropertyAccess::createPropertyAccessor(),
+            $this->dispatcher,
+            $this->htmlTagHelper
+        );
     }
 
     /**
-     * @todo Overwritten due to ORM limitations, resolved here: https://magecore.atlassian.net/browse/BB-12955
+     * Overwritten due to ORM limitations, should be fixed in  https://magecore.atlassian.net/browse/BB-12955
      */
     public function testAllTextLimitation()
     {

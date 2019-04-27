@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection;
 
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -33,19 +31,11 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         $loader->load('services.yml');
         $loader->load('commands.yml');
 
-        if ($container->getParameter('kernel.debug')) {
-            $loader->load('debug.yml');
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
         }
 
         $this->addClassesToCompile(['Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener']);
-
-        if ('test' === $container->getParameter('kernel.environment')) {
-            $loader = new Loader\YamlFileLoader(
-                $container,
-                new FileLocator(__DIR__ . '/../Tests/Functional/Environment')
-            );
-            $loader->load('services.yml');
-        }
     }
 
     /**
@@ -56,17 +46,6 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         if ($container instanceof ExtendedContainerBuilder) {
             $this->setupWsseNonceCache($container);
         }
-    }
-
-    /**
-     * @return CumulativeConfigLoader
-     */
-    public static function getAclConfigLoader()
-    {
-        return new CumulativeConfigLoader(
-            'oro_acl_config',
-            new YamlCumulativeFileLoader('Resources/config/oro/acls.yml')
-        );
     }
 
     /**

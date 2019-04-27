@@ -5,14 +5,13 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Configuration;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RouterInterface;
 
 class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
+    /** @var ControllerClassProvider|\PHPUnit\Framework\MockObject\MockObject */
+    protected $controllerClassProvider;
 
     /** @var \Twig_Loader_Filesystem|\PHPUnit\Framework\MockObject\MockObject */
     protected $twigLoader;
@@ -28,15 +27,10 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->router = $this->createMock('Symfony\Component\Routing\RouterInterface');
-
+        $this->controllerClassProvider = $this->createMock(ControllerClassProvider::class);
         $this->twigLoader = $this->createMock('Twig_Loader_Filesystem');
-
         $this->logger = $this->createMock(LoggerInterface::class);
-
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->createValidator();
     }
@@ -47,7 +41,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
     protected function createValidator($debug = false)
     {
         $this->validator = new OperationConfigurationValidator(
-            $this->router,
+            $this->controllerClassProvider,
             $this->twigLoader,
             $this->doctrineHelper,
             $this->logger,
@@ -65,9 +59,6 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->createValidator($inputData['debug']);
 
-        /* @var $collection RouteCollection|\PHPUnit\Framework\MockObject\MockObject */
-        $collection = $this->createMock('Symfony\Component\Routing\RouteCollection');
-
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityClass')
             ->willReturnCallback(function ($class) {
@@ -78,13 +69,9 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
             ->method('isManageableEntity')
             ->willReturn(true);
 
-        $this->router->expects($this->any())
-            ->method('getRouteCollection')
-            ->willReturn($collection);
-
-        $collection->expects($this->any())
-            ->method('get')
-            ->will($this->returnValueMap($inputData['routes']));
+        $this->controllerClassProvider->expects($this->any())
+            ->method('getControllers')
+            ->willReturn($inputData['routes']);
 
         $this->twigLoader->expects($this->any())
             ->method('exists')
@@ -205,7 +192,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
     public function validateProvider()
     {
         $routes = [
-            ['route1', new \stdClass()],
+            'route1' => [\stdClass::class, null]
         ];
 
         $templates = [

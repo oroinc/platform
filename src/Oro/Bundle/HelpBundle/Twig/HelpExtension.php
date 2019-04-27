@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\HelpBundle\Twig;
 
-use Oro\Bundle\HelpBundle\Model\HelpLinkProvider;
+use Oro\Bundle\HelpBundle\Provider\HelpLinkProvider;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Provides "get_help_link" TWIG function.
+ */
 class HelpExtension extends \Twig_Extension
 {
-    const NAME = 'oro_help';
-
     /** @var ContainerInterface */
-    protected $container;
+    private $container;
 
     /**
      * @param ContainerInterface $container
@@ -23,9 +24,9 @@ class HelpExtension extends \Twig_Extension
     /**
      * @return HelpLinkProvider
      */
-    protected function getHelpLinkProvider()
+    private function getHelpLinkProvider()
     {
-        return $this->container->get('oro_help.model.help_link_provider');
+        return $this->container->get('oro_help.help_link_provider');
     }
 
     /**
@@ -34,7 +35,7 @@ class HelpExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('get_help_link', [$this, 'getHelpLinkUrl']),
+            new \Twig_SimpleFunction('get_help_link', [$this, 'getHelpLinkUrl'])
         ];
     }
 
@@ -46,13 +47,5 @@ class HelpExtension extends \Twig_Extension
     public function getHelpLinkUrl()
     {
         return $this->getHelpLinkProvider()->getHelpLinkUrl();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 }

@@ -26,7 +26,6 @@ class AclAnnotationProviderPass implements CompilerPassInterface
         }
 
         $taggedServices = $this->findAndSortTaggedServices(self::TAG_NAME, $container);
-
         if ($taggedServices) {
             $providerDef = $container->getDefinition(self::PROVIDER_SERVICE_NAME);
             foreach ($taggedServices as $loader) {

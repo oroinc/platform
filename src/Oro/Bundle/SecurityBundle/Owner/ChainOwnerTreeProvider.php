@@ -5,21 +5,20 @@ namespace Oro\Bundle\SecurityBundle\Owner;
 use Oro\Bundle\SecurityBundle\Exception\UnsupportedOwnerTreeProviderException;
 
 /**
- * This provider allows to clear the owner tree cache.
- * Also this provider works with multiple trees in the chain mode.
+ * Delegates returning of owner tree to suitable child provider.
  */
 class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
 {
     /** @var OwnerTreeProviderInterface[] */
-    protected $providers = [];
+    private $providers = [];
 
     /** @var OwnerTreeProviderInterface */
-    protected $defaultProvider;
+    private $defaultProvider;
 
     /**
      * @param OwnerTreeProviderInterface $provider
      */
-    public function addProvider(OwnerTreeProviderInterface $provider)
+    public function addProvider(OwnerTreeProviderInterface $provider): void
     {
         if ($provider !== $this->defaultProvider) {
             $this->providers[] = $provider;
@@ -29,7 +28,7 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
     /**
      * @param OwnerTreeProviderInterface $defaultProvider
      */
-    public function setDefaultProvider($defaultProvider)
+    public function setDefaultProvider(OwnerTreeProviderInterface $defaultProvider): void
     {
         $this->defaultProvider = $defaultProvider;
     }
@@ -37,7 +36,7 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function supports()
+    public function supports(): bool
     {
         if ($this->defaultProvider) {
             return true;
@@ -55,7 +54,7 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
     /**
      * @return OwnerTreeInterface
      */
-    public function getTree()
+    public function getTree(): OwnerTreeInterface
     {
         foreach ($this->providers as $provider) {
             if ($provider->supports()) {
@@ -73,21 +72,21 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clearCache(): void
     {
         foreach ($this->providers as $provider) {
-            $provider->clear();
+            $provider->clearCache();
         }
 
         if ($this->defaultProvider) {
-            $this->defaultProvider->clear();
+            $this->defaultProvider->clearCache();
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function warmUpCache()
+    public function warmUpCache(): void
     {
         foreach ($this->providers as $provider) {
             $provider->warmUpCache();

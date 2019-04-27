@@ -6,6 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CurrencyBundle\Model\LocaleSettings;
 use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
+use Oro\Bundle\LocaleBundle\Configuration\LocaleConfigurationProvider;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface;
 
@@ -19,6 +20,9 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
 
     /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
     private $localizationManager;
+
+    /** @var LocaleConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $localeConfigProvider;
 
     /** @var ViewTypeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $viewTypeProvider;
@@ -34,6 +38,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->calendarFactory = $this->createMock(CalendarFactoryInterface::class);
         $this->localizationManager = $this->createMock(LocalizationManager::class);
+        $this->localeConfigProvider = $this->createMock(LocaleConfigurationProvider::class);
         $this->viewTypeProvider = $this->createMock(ViewTypeProviderInterface::class);
         $this->currencyProvider = $this->createMock(CurrencyProviderInterface::class);
 
@@ -41,6 +46,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
             $this->configManager,
             $this->calendarFactory,
             $this->localizationManager,
+            $this->localeConfigProvider,
             $this->viewTypeProvider,
             $this->currencyProvider
         );

@@ -2,8 +2,14 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer;
 
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer;
+use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
+use Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer\Stub\DenormalizationStub;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
@@ -20,15 +26,15 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $fieldProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $fieldTypeHelper = new FieldTypeHelper([]);
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $fieldProvider = $this->createMock(EntityFieldProvider::class);
+        $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
+        $entityExtendConfigurationProvider->expects(self::any())
+            ->method('getUnderlyingTypes')
+            ->willReturn([]);
+        $fieldTypeHelper = new FieldTypeHelper($entityExtendConfigurationProvider);
 
-        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
+        $this->fieldHelper = $this->getMockBuilder(FieldHelper::class)
             ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
             ->setMethods(['hasConfig', 'getConfigValue', 'getFields', 'getObjectValue'])
             ->getMock();
@@ -114,17 +120,13 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
     // @codingStandardsIgnoreEnd
     public function testSetSerializerException()
     {
-        $serializer = $this->getMockBuilder('Symfony\Component\Serializer\Serializer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $serializer = $this->createMock(\Symfony\Component\Serializer\Serializer::class);
         $this->normalizer->setSerializer($serializer);
     }
 
     public function testSetSerializer()
     {
-        $serializer = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Serializer\Serializer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $serializer = $this->createMock(Serializer::class);
         $this->normalizer->setSerializer($serializer);
         $this->assertAttributeSame($serializer, 'serializer', $this->normalizer);
     }
@@ -203,9 +205,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                 ->will($this->returnValue($hasConfigMap));
         }
 
-        $serializer = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Serializer\Serializer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $serializer = $this->createMock(Serializer::class);
         if ($normalizedMap) {
             $serializer->expects($this->atLeastOnce())
                 ->method('normalize')
@@ -424,9 +424,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
             }
         }
 
-        $serializer = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Serializer\Serializer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $serializer = $this->createMock(Serializer::class);
         if ($denormalizedMap) {
             $serializer->expects($this->atLeastOnce())
                 ->method('denormalize')
@@ -468,7 +466,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                     'collection' => [1, 2],
                     'unknown' => 'not_included'
                 ],
-                'Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer\Stub\DenormalizationStub',
+                DenormalizationStub::class,
                 [
                     [
                         'name' => 'id'

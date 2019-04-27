@@ -7,8 +7,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const ROOT_NODE = 'oro_search';
-    const DEFAULT_ENGINE = 'orm';
+    public const DEFAULT_ENGINE = 'orm';
 
     /**
      * {@inheritdoc}
@@ -16,9 +15,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::ROOT_NODE);
-
-        $entitiesConfigConfiguration = new EntitiesConfigConfiguration();
+        $rootNode = $treeBuilder->root('oro_search');
 
         $rootNode
             ->children()
@@ -35,7 +32,6 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('item_container_template')
                     ->defaultValue('OroSearchBundle:Datagrid:itemContainer.html.twig')
                 ->end()
-                ->append($entitiesConfigConfiguration->getEntitiesConfigurationNode(new TreeBuilder()))
             ->end();
 
         return $treeBuilder;

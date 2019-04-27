@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Metadata;
 
-use Oro\Component\ChainProcessor\ToArrayInterface;
-
 /**
  * The metadata for an entity field.
  */
-class FieldMetadata extends PropertyMetadata implements ToArrayInterface
+class FieldMetadata extends PropertyMetadata
 {
     /** @var bool */
     private $nullable = false;
@@ -16,9 +14,7 @@ class FieldMetadata extends PropertyMetadata implements ToArrayInterface
     private $maxLength;
 
     /**
-     * Gets a native PHP array representation of the object.
-     *
-     * @return array [key => value, ...]
+     * {@inheritdoc}
      */
     public function toArray()
     {

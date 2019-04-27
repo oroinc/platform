@@ -37,7 +37,7 @@ Configuration of Operation declares all aspects related to a specific operation:
 * frontend configuration
 * operation dialog parameters
 
-Structure of configuration is declared in the Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration class.
+Structure of configuration is declared in the [Configuration](../../Configuration/Configuration.php) class.
 
 ## Configuration File
 

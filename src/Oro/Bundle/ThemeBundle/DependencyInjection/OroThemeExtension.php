@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ThemeBundle\DependencyInjection;
 
+use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
@@ -58,7 +59,7 @@ class OroThemeExtension extends Extension
                 new YamlCumulativeFileLoader('Resources/public/themes/{folder}/settings.yml')
             )
         );
-        $resources    = $configLoader->load($container);
+        $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         foreach ($resources as $resource) {
             unset($resource->data['styles']);
             $result[basename(dirname($resource->path))] = $resource->data;

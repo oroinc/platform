@@ -5,6 +5,9 @@ namespace Oro\Bundle\ReportBundle\Form\Type;
 use Oro\Bundle\ChartBundle\Form\Type\ConfigProviderAwareType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * The form type for schemas of all charts available in reports.
+ */
 class ReportChartSchemaCollectionType extends ConfigProviderAwareType
 {
     /**
@@ -12,9 +15,9 @@ class ReportChartSchemaCollectionType extends ConfigProviderAwareType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $chartConfigs = $this->configProvider->getChartConfigs();
-
-        foreach ($chartConfigs as $chartName => $chartConfig) {
+        $chartNames = $this->configProvider->getChartNames();
+        foreach ($chartNames as $chartName) {
+            $chartConfig = $this->configProvider->getChartConfig($chartName);
             $isAvailable = !empty($chartConfig['default_settings']['available_in_reports']);
             if ($isAvailable && isset($chartConfig['data_schema'])) {
                 $builder->add(

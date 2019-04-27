@@ -1,0 +1,5 @@
+title: Foo2
+icon: foo2.ico
+placement: left
+settings:
+    key: value

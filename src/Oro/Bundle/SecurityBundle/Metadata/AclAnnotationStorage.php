@@ -6,25 +6,15 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor as AclAnnotationAncestor;
 
 /**
- * Storage of ACL annotations and bindings.
+ * The storage for ACL annotations and bindings.
  */
 class AclAnnotationStorage implements \Serializable
 {
-    /**
-     * @var AclAnnotation[]
-     *   key = annotation id
-     *   value = annotation object
-     */
-    private $annotations = array();
+    /** @var AclAnnotation[] [annotation id => annotation object, ...] */
+    private $annotations = [];
 
-    /**
-     * @var string[]
-     *   key = class name
-     *   value = array of methods
-     *              key = method name ('!' for class if it have an annotation)
-     *              value = annotation id bound to the method
-     */
-    private $classes = array();
+    /** @var array [class name => [method name ('!' for class if it have an annotation) => annotation id, ...], ...] */
+    private $classes = [];
 
     /**
      * Gets an annotation by its id
@@ -39,9 +29,7 @@ class AclAnnotationStorage implements \Serializable
             throw new \InvalidArgumentException('$id must not be empty.');
         }
 
-        return isset($this->annotations[$id])
-            ? $this->annotations[$id]
-            : null;
+        return $this->annotations[$id] ?? null;
     }
 
     /**
@@ -70,9 +58,7 @@ class AclAnnotationStorage implements \Serializable
             $id = $this->classes[$class][$method];
         }
 
-        return isset($this->annotations[$id])
-            ? $this->annotations[$id]
-            : null;
+        return $this->annotations[$id] ?? null;
     }
 
     /**
@@ -108,10 +94,10 @@ class AclAnnotationStorage implements \Serializable
     public function getAnnotations($type = null)
     {
         if ($type === null) {
-            return array_values($this->annotations);
+            return \array_values($this->annotations);
         }
 
-        $result = array();
+        $result = [];
         foreach ($this->annotations as $annotation) {
             if ($annotation->getType() === $type) {
                 $result[] = $annotation;
@@ -141,7 +127,7 @@ class AclAnnotationStorage implements \Serializable
      */
     public function isKnownMethod($class, $method)
     {
-        return isset($this->classes[$class]) && isset($this->classes[$class][$method]);
+        return isset($this->classes[$class][$method]);
     }
 
     /**
@@ -187,7 +173,7 @@ class AclAnnotationStorage implements \Serializable
      */
     public function getBindings(string $class): array
     {
-        return isset($this->classes[$class]) ? $this->classes[$class] : [];
+        return $this->classes[$class] ?? [];
     }
 
     /**
@@ -241,35 +227,29 @@ class AclAnnotationStorage implements \Serializable
         if (isset($this->classes[$class])) {
             if (empty($method)) {
                 if (isset($this->classes[$class]['!']) && $this->classes[$class]['!'] !== $id) {
-                    throw new \RuntimeException(
-                        sprintf(
-                            'Duplicate binding for "%s". New Id: %s. Existing Id: %s',
-                            $class,
-                            $id,
-                            $this->classes[$class]['!']
-                        )
-                    );
+                    throw new \RuntimeException(\sprintf(
+                        'Duplicate binding for "%s". New Id: %s. Existing Id: %s',
+                        $class,
+                        $id,
+                        $this->classes[$class]['!']
+                    ));
                 }
                 $this->classes[$class]['!'] = $id;
             } else {
                 if (isset($this->classes[$class][$method]) && $this->classes[$class][$method] !== $id) {
-                    throw new \RuntimeException(
-                        sprintf(
-                            'Duplicate binding for "%s". New Id: %s. Existing Id: %s',
-                            $class . '::' . $method,
-                            $id,
-                            $this->classes[$class][$method]
-                        )
-                    );
+                    throw new \RuntimeException(\sprintf(
+                        'Duplicate binding for "%s". New Id: %s. Existing Id: %s',
+                        $class . '::' . $method,
+                        $id,
+                        $this->classes[$class][$method]
+                    ));
                 }
                 $this->classes[$class][$method] = $id;
             }
+        } elseif (empty($method)) {
+            $this->classes[$class] = ['!' => $id];
         } else {
-            if (empty($method)) {
-                $this->classes[$class] = array('!' => $id);
-            } else {
-                $this->classes[$class] = array($method => $id);
-            }
+            $this->classes[$class] = [$method => $id];
         }
     }
 
@@ -278,17 +258,12 @@ class AclAnnotationStorage implements \Serializable
      */
     public function serialize()
     {
-        $data = array();
+        $data = [];
         foreach ($this->annotations as $annotation) {
             $data[] = $annotation->serialize();
         }
 
-        return serialize(
-            array(
-                $data,
-                $this->classes
-            )
-        );
+        return \serialize([$data, $this->classes]);
     }
 
     /**
@@ -296,12 +271,9 @@ class AclAnnotationStorage implements \Serializable
      */
     public function unserialize($serialized)
     {
-        list(
-            $data,
-            $this->classes
-            ) = unserialize($serialized);
+        list($data, $this->classes) = \unserialize($serialized);
 
-        $this->annotations = array();
+        $this->annotations = [];
         foreach ($data as $d) {
             $annotation = new AclAnnotation();
             $annotation->unserialize($d);
@@ -318,9 +290,9 @@ class AclAnnotationStorage implements \Serializable
     // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
-        $result              = new AclAnnotationStorage();
+        $result = new AclAnnotationStorage();
         $result->annotations = $data['annotations'];
-        $result->classes     = $data['classes'];
+        $result->classes = $data['classes'];
 
         return $result;
     }

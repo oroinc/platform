@@ -3,7 +3,6 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\Extension;
 
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\FilterBundle\Filter\DateFilterUtility;
 use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
@@ -18,8 +17,6 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
-use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
-use Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Stubs\OrmDatasourceExtension;
@@ -29,6 +26,8 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class OrmDatasourceExtensionTest extends OrmTestCase
 {
@@ -37,23 +36,21 @@ class OrmDatasourceExtensionTest extends OrmTestCase
 
     protected function setUp()
     {
-        $configManager = $this->createMock(ConfigManager::class);
-        $calendarFactory = $this->createMock(CalendarFactoryInterface::class);
-        $localizationManager = $this->createMock(LocalizationManager::class);
-
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())->method('trans')->will($this->returnArgument(0));
-        $localeSettings = new LocaleSettings($configManager, $calendarFactory, $localizationManager);
 
-        $mock = $this->createMock(DateFilterSubscriber::class);
+        $localeSettings = $this->createMock(LocaleSettings::class);
+        $localeSettings->expects($this->any())
+            ->method('getTimeZone')
+            ->willReturn('America/Los_Angeles');
 
-        $subscriber = new MutableFormEventSubscriber($mock);
+        $subscriber = new MutableFormEventSubscriber($this->createMock(DateFilterSubscriber::class));
 
         $this->formFactory = Forms::createFormFactoryBuilder()
             ->addExtensions(
-                array(
+                [
                     new PreloadedExtension(
-                        array(
+                        [
                             'oro_type_text_filter'           => new TextFilterType($translator),
                             'oro_type_datetime_range_filter' =>
                                 new DateTimeRangeFilterType($translator, new DateModifierProvider(), $subscriber),
@@ -62,13 +59,13 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                             'oro_type_datetime_range'        => new DateTimeRangeType($localeSettings),
                             'oro_type_date_range'            => new DateRangeType($localeSettings),
                             'oro_type_filter'                => new FilterType($translator),
-                        ),
-                        array()
+                        ],
+                        []
                     ),
                     new CsrfExtension(
-                        $this->createMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')
+                        $this->createMock(CsrfTokenManagerInterface::class)
                     )
-                )
+                ]
             )
             ->getFormFactory();
     }

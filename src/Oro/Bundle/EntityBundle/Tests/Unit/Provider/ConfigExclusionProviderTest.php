@@ -3,6 +3,8 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 
@@ -23,14 +25,20 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
                 ['Test\Entity\Entity4', []]
             ]);
 
-        $this->provider = new ConfigExclusionProvider(
-            $hierarchyProvider,
-            [
+        $configProvider = $this->createMock(EntityConfigurationProvider::class);
+        $configProvider->expects(self::any())
+            ->method('getConfiguration')
+            ->with(EntityConfiguration::EXCLUSIONS)
+            ->willReturn([
                 ['entity' => 'Test\Entity\Entity1', 'field' => 'field1'],
                 ['entity' => 'Test\Entity\BaseEntity1', 'field' => 'field2'],
                 ['type' => 'date'],
                 ['entity' => 'Test\Entity\Entity3']
-            ]
+            ]);
+
+        $this->provider = new ConfigExclusionProvider(
+            $hierarchyProvider,
+            $configProvider
         );
     }
 

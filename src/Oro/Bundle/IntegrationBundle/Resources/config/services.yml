@@ -30,9 +30,6 @@ parameters:
     oro_integration.delete_manager.class:                                 Oro\Bundle\IntegrationBundle\Manager\DeleteManager
     oro_integration.sync_scheduler.class:                                 Oro\Bundle\IntegrationBundle\Manager\SyncScheduler
 
-    oro_integration.provider.settings_provider.class:                     Oro\Bundle\IntegrationBundle\Provider\SettingsProvider
-
-    oro_integration.config_resolver.class:                                Oro\Component\Config\Resolver\SystemAwareResolver
     oro_integration.utils.form_utils.class:                               Oro\Bundle\IntegrationBundle\Utils\FormUtils
 
     oro_integration.datagrid.status_grid_helper.class:                    Oro\Bundle\IntegrationBundle\Datagrid\StatusGridHelper
@@ -217,13 +214,16 @@ services:
             - { name: oro_service_link,  service: oro_integration.sync_scheduler }
 
     oro_integration.provider.settings_provider:
-        class: '%oro_integration.provider.settings_provider.class%'
+        class: Oro\Bundle\IntegrationBundle\Provider\SettingsProvider
+        public: false
         arguments:
-            - []
+            - '%kernel.cache_dir%/oro/integrations.php'
+            - '%kernel.debug%'
             - '@oro_integration.config_resolver'
 
     oro_integration.config_resolver:
-        class: '%oro_integration.config_resolver.class%'
+        class: Oro\Component\Config\Resolver\SystemAwareResolver
+        public: false
         arguments:
             - '@service_container'
 

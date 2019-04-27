@@ -79,10 +79,10 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [SystemConfigurationPass::CONFIG_DEFINITION_BAG_SERVICE, $bagServiceDef],
-                        [SystemConfigurationPass::CONFIG_BAG_SERVICE, $configBagServiceDef],
-                        [SystemConfigurationPass::API_MANAGER_SERVICE_ID, $apiManagerServiceDef],
-                        [SystemConfigurationPass::MAIN_MANAGER_SERVICE_ID, $configManagerServiceDef],
+                        ['oro_config.config_definition_bag', $bagServiceDef],
+                        ['oro_config.config_bag', $configBagServiceDef],
+                        ['oro_config.manager.api', $apiManagerServiceDef],
+                        ['oro_config.manager', $configManagerServiceDef],
                         ['oro_config.default_provider', $defaultProviderMock],
                     ]
                 )
@@ -180,10 +180,10 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [SystemConfigurationPass::CONFIG_DEFINITION_BAG_SERVICE, $bagServiceDef],
-                        [SystemConfigurationPass::CONFIG_BAG_SERVICE, $configBagServiceDef],
-                        [SystemConfigurationPass::API_MANAGER_SERVICE_ID, $apiManagerServiceDef],
-                        [SystemConfigurationPass::MAIN_MANAGER_SERVICE_ID, $configManagerServiceDef],
+                        ['oro_config.config_definition_bag', $bagServiceDef],
+                        ['oro_config.config_bag', $configBagServiceDef],
+                        ['oro_config.manager.api', $apiManagerServiceDef],
+                        ['oro_config.manager', $configManagerServiceDef],
                         ['oro_config.default_provider', $defaultProviderMock],
                     ]
                 )

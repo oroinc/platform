@@ -8,14 +8,16 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
+use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
 use Oro\Component\Config\Cache\ConfigCacheStateInterface;
+use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
 use Psr\Log\LoggerInterface;
 
 /**
  * Provides functionality to get singular and plural aliases for an entity class
  * and resolve entity class by any of these aliases.
  */
-class EntityAliasResolver
+class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConfigCacheInterface
 {
     private const CACHE_KEY = 'entity_aliases';
 
@@ -175,18 +177,18 @@ class EntityAliasResolver
     }
 
     /**
-     * Warms up the cache.
+     * {@inheritdoc}
      */
-    public function warmUpCache()
+    public function warmUpCache(): void
     {
         $this->clearCache();
         $this->ensureAllAliasesLoaded();
     }
 
     /**
-     * Clears the cache.
+     * {@inheritdoc}
      */
-    public function clearCache()
+    public function clearCache(): void
     {
         $this->cache->delete(self::CACHE_KEY);
         $this->storage = null;

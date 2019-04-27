@@ -205,7 +205,7 @@ services:
             - customize_form_data
 
     oro_api.entity_alias.cache_warmer:
-        class: Oro\Bundle\ApiBundle\Provider\EntityAliasCacheWarmer
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
         public: false
         arguments:
             - '@oro_api.entity_alias_resolver_registry'
@@ -338,7 +338,7 @@ services:
             - '@oro_api.request_expression_matcher'
             - '@oro_api.config_cache_factory'
             - '@oro_api.config_cache_warmer'
-            - '@oro_api.entity_alias.cache_warmer'
+            - '@oro_api.entity_alias_resolver_registry'
             - '@oro_api.resources.cache_warmer'
             - '@nelmio_api_doc.extractor.api_doc_extractor'
 

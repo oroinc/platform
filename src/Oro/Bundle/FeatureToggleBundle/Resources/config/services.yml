@@ -1,9 +1,4 @@
 services:
-    oro_featuretoggle.cache.provider.features:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_featuretoggle_features' ] ]
-
     oro_featuretoggle.expression.feature_enabled:
         class: 'Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureEnabled'
         arguments:
@@ -20,30 +15,17 @@ services:
 
     oro_featuretoggle.configuration.provider:
         class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider'
+        parent: oro.static_config_provider.abstract
         arguments:
-            - []
+            - '%kernel.cache_dir%/oro/features.php'
+            - '%kernel.debug%'
             - '%kernel.bundles%'
             - '@oro_featuretoggle.configuration'
-            - '@oro_featuretoggle.cache.provider.features'
 
     oro_featuretoggle.configuration.manager:
         class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager'
         arguments:
             - '@oro_featuretoggle.configuration.provider'
-
-    oro_featuretoggle.cache.clearer:
-        class: 'Oro\Bundle\FeatureToggleBundle\Cache\CacheClearer'
-        arguments:
-            - '@oro_featuretoggle.configuration.provider'
-        tags:
-            - { name: kernel.cache_clearer }
-
-    oro_featuretoggle.cache.warmer:
-        class: 'Oro\Bundle\FeatureToggleBundle\Cache\CacheWarmer'
-        arguments:
-            - '@oro_featuretoggle.configuration.provider'
-        tags:
-            - { name: kernel.cache_warmer }
 
     oro_featuretoggle.configuration:
         class: 'Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration'

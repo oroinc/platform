@@ -2,24 +2,30 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Functional;
 
+use Oro\Bundle\LayoutBundle\Tests\Fixtures\TestBundle\TestBundle;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 abstract class AbstractLayoutBuilderTest extends WebTestCase
 {
-    /**
-     * @var ThemeManager
-     */
-    private $oldThemeManager;
+    /** @var array */
+    private $initialBundles;
+
+    /** @var ThemeManager */
+    private $initialThemeManager;
+
+    /** @var ThemeResourceProvider */
+    private $resourcesProvider;
 
     /**
      * {@inheritdoc}
@@ -27,7 +33,12 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-        $this->oldThemeManager = $this->getContainer()->get('oro_layout.theme_manager');
+
+        // prepare test environment
+        $container = $this->getContainer();
+        $this->initialBundles = CumulativeResourceManager::getInstance()->getBundles();
+        $this->initialThemeManager = $container->get('oro_layout.theme_manager');
+        $this->resourcesProvider = $container->get('oro_layout.tests.theme_extension.resource_provider.theme');
     }
 
     /**
@@ -36,12 +47,12 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
     protected function tearDown()
     {
         $container = $this->getContainer();
-        // Revert overridden service
-        $container->set('oro_layout.theme_manager', $this->oldThemeManager);
-
-        // Clear caches that are changed in getLayout()
+        CumulativeResourceManager::getInstance()->setBundles($this->initialBundles);
+        // revert overridden service
+        $container->set('oro_layout.theme_manager', $this->initialThemeManager);
+        // clear caches that are changed in getLayout()
         $container->get('oro_layout.cache.block_view_cache')->reset();
-        $container->get('oro_layout.theme_extension.resource_provider.cache')->deleteAll();
+        $this->resourcesProvider->warmUpCache();
     }
 
     /**
@@ -66,29 +77,37 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
      */
     protected function getLayout($theme)
     {
-        CumulativeResourceManager::getInstance()->clear();
+        $bundle = new TestBundle();
+        CumulativeResourceManager::getInstance()
+            ->setBundles([$bundle->getName() => get_class($bundle)]);
+
+        $definitions = [
+            'base' => [
+                'label' => 'base'
+            ],
+            $theme => [
+                'parent' => 'base',
+                'label' => $theme
+            ]
+        ];
+
+        $themeDefinitionBag = $this->createMock(ThemeDefinitionBagInterface::class);
+        $themeDefinitionBag->expects($this->any())
+            ->method('getThemeNames')
+            ->willReturn(array_keys($definitions));
+        $themeDefinitionBag->expects($this->any())
+            ->method('getThemeDefinition')
+            ->willReturnCallback(function ($themeName) use ($definitions) {
+                return $definitions[$themeName] ?? null;
+            });
 
         $themeManager = new ThemeManager(
-            new ThemeFactory(new PropertyAccessor()),
-            [
-                'base' => [
-                    'label' => 'base'
-                ],
-                $theme => [
-                    'parent' => 'base',
-                    'label' => $theme
-                ]
-            ]
+            new ThemeFactory(PropertyAccess::createPropertyAccessor()),
+            $themeDefinitionBag
         );
-        $this->getContainer()
-            ->set('oro_layout.theme_manager', $themeManager);
+        $this->getContainer()->set('oro_layout.theme_manager', $themeManager);
 
-        $resourceProvider = $this->getContainer()
-            ->get('oro_layout.theme_extension.resource_provider.theme');
-
-        $resourceProvider->loadResources(new ContainerBuilder(), [
-            $this->getResource(__DIR__ . '/../Fixtures/layouts')
-        ]);
+        $this->resourcesProvider->warmUpCache();
 
         $layoutManager = $this->getContainer()->get('oro_layout.layout_manager');
         $layoutBuilder = $layoutManager->getLayoutBuilder();

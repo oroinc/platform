@@ -12,11 +12,17 @@ services:
     oro_filter.extension.orm_filter:
         class: '%oro_filter.extension.orm_filter.class%'
         arguments:
-            - '@oro_datagrid.configuration.provider'
+            - '@oro_datagrid.configuration.provider.raw'
+            - '@oro_filter.extension.orm_filter_bag'
             - '@oro_filter.provider.state.filters'
             - '@translator'
         tags:
             - { name: oro_datagrid.extension }
+
+    # this service is initialized by Oro\Bundle\FilterBundle\DependencyInjection\Compiler\FilterTypesPass
+    oro_filter.extension.orm_filter_bag:
+        class: Oro\Bundle\FilterBundle\Filter\FilterBag
+        public: true
 
     oro_filter.datagrid.column_options_guesser:
         class: '%oro_filter.datagrid.column_options_guesser.class%'

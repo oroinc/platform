@@ -8,11 +8,11 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
- * Loader that returns folder content as a list of found files, works recursively as deep
+ * The loader that returns folder content as a list of found files, works recursively as deep
  * as it's configured by $maxNestingLevel param. There are two possible scenarios
  * how it organizes data loaded: plain and nested, this configured by $plainResultStructure param.
  * It should be used when need to trace directory structure/content updates
- * (including adding new file or removing previously found), but skip file modification.
+ * (including adding a new file, removing or modifying a previously found file).
  *
  * Examples:
  *   Plain mode
@@ -47,6 +47,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  *                   ]
  *              ]
  *          ]
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class FolderContentCumulativeLoader implements CumulativeResourceLoader
 {
@@ -59,33 +61,33 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
     /** @var bool */
     protected $plainResultStructure;
 
-    /** @var string[] */
-    protected $fileNamePatterns;
+    /** @var FileMatcherInterface */
+    protected $fileMatcher;
 
-    /** @var PropertyAccess */
+    /** @var PropertyAccess|null */
     protected $propertyAccessor;
 
-    /** @var string */
-    protected $resource;
-
     /**
-     * @param string   $relativeFolderPath
-     * @param int      $maxNestingLevel      Pass -1 to unlimit, if you want to find files in exact path given pass 1
-     * @param bool     $plainResultStructure Indicates whether result should be returned as flat array
-     *                                       or should be nested tree depends on file position in directory hierarchy
-     * @param string[] $fileNamePatterns     The regular expressions that are used to filter files to be scanned
+     * @param string                    $relativeFolderPath   The relative path to a directory to be scanned
+     * @param int                       $maxNestingLevel      Pass -1 to unlimit,
+     *                                                        if you want to find files in exact path given pass 1
+     * @param bool                      $plainResultStructure Indicates whether result should be returned
+     *                                                        as flat array or should be nested tree depends on
+     *                                                        file position in directory hierarchy
+     * @param FileMatcherInterface|null $fileMatcher          The matcher that are used to filter files to be scanned
      */
     public function __construct(
         $relativeFolderPath,
         $maxNestingLevel = -1,
         $plainResultStructure = true,
-        array $fileNamePatterns = []
+        FileMatcherInterface $fileMatcher = null
     ) {
-        $this->relativeFolderPath   = $relativeFolderPath;
-        $this->maxNestingLevel      = $maxNestingLevel === -1 ? $maxNestingLevel : --$maxNestingLevel;
+        $this->relativeFolderPath = $relativeFolderPath;
+        $this->maxNestingLevel = -1 === $maxNestingLevel
+            ? $maxNestingLevel
+            : --$maxNestingLevel;
         $this->plainResultStructure = $plainResultStructure;
-        $this->fileNamePatterns     = $fileNamePatterns;
-        $this->resource             = 'Folder contents: ' . $relativeFolderPath;
+        $this->fileMatcher = $fileMatcher;
     }
 
     /**
@@ -98,7 +100,7 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
                 $this->relativeFolderPath,
                 $this->maxNestingLevel,
                 $this->plainResultStructure,
-                $this->fileNamePatterns
+                $this->fileMatcher
             ]
         );
     }
@@ -112,7 +114,7 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
             $this->relativeFolderPath,
             $this->maxNestingLevel,
             $this->plainResultStructure,
-            $this->fileNamePatterns
+            $this->fileMatcher
             ) = unserialize($serialized);
     }
 
@@ -121,7 +123,7 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
      */
     public function getResource()
     {
-        return $this->resource;
+        return 'Folder content: ' . $this->relativeFolderPath;
     }
 
     /**
@@ -129,14 +131,12 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
      */
     public function load($bundleClass, $bundleDir, $bundleAppDir = '')
     {
-        $dir           = $this->getDirectoryAbsolutePath($bundleDir);
         $bundleAppData = [];
-
         if (is_dir($bundleAppDir)) {
-            $appDir        = $this->getResourcesDirectoryAbsolutePath($bundleAppDir);
-            $bundleAppData = $this->getData($appDir);
+            $bundleAppData = $this->getData($this->getResourcesDirectoryAbsolutePath($bundleAppDir));
         }
 
+        $dir = $this->getDirectoryAbsolutePath($bundleDir);
         $data = $this->mergeArray($bundleAppData, $this->getData($dir), $bundleAppDir, $bundleDir);
         if (empty($data)) {
             return null;
@@ -158,24 +158,42 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
      */
     protected function mergeArray(array $a, array $b, $bundleAppDir, $bundleDir)
     {
+        $result = [];
         foreach ($b as $k => $v) {
             if (is_int($k)) {
-                foreach ($a as $val) {
-                    if ($this->isFilePathEquals($val, $v, $bundleAppDir, $bundleDir)) {
-                        continue 2;
-                    }
+                if ($this->isOverriddenByAppFile($v, $a, $bundleAppDir, $bundleDir)) {
+                    continue;
                 }
-                $a[] = $v;
+                $result[] = $v;
+            } elseif (is_array($v) && isset($a[$k]) && is_array($a[$k])) {
+                $result[$k] = $this->mergeArray($a[$k], $v, $bundleAppDir, $bundleDir);
             } else {
-                if (is_array($v) && isset($a[$k]) && is_array($a[$k])) {
-                    $a[$k] = $this->mergeArray($a[$k], $v, $bundleAppDir, $bundleDir);
-                } else {
-                    $a[$k] = $v;
-                }
+                $result[$k] = $v;
             }
         }
 
-        return $a;
+        return array_merge($a, $result);
+    }
+
+    /**
+     * Checks if the given file from a bundle is overridden be a file from an application
+     *
+     * @param string   $bundlePath
+     * @param string[] $bundleAppPaths
+     * @param string   $bundleAppDir
+     * @param string   $bundleDir
+     *
+     * @return bool
+     */
+    protected function isOverriddenByAppFile($bundlePath, $bundleAppPaths, $bundleAppDir, $bundleDir)
+    {
+        foreach ($bundleAppPaths as $bundleAppPath) {
+            if ($this->isFilePathEquals($bundleAppPath, $bundlePath, $bundleAppDir, $bundleDir)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -191,9 +209,10 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
     protected function isFilePathEquals($bundleAppPath, $bundlePath, $bundleAppDir, $bundleDir)
     {
         $a = str_replace($bundleDir . DIRECTORY_SEPARATOR . 'Resources', '', $bundlePath);
-        $b = DIRECTORY_SEPARATOR !== '/'
-            ? str_replace(str_replace('/', DIRECTORY_SEPARATOR, $bundleAppDir), '', $bundleAppPath)
-            : str_replace($bundleAppDir, '', $bundleAppPath);
+        if (DIRECTORY_SEPARATOR !== '/') {
+            $bundleAppDir = str_replace('/', DIRECTORY_SEPARATOR, $bundleAppDir);
+        }
+        $b = str_replace($bundleAppDir, '', $bundleAppPath);
 
         return $a === $b;
     }
@@ -216,17 +235,17 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
         if ($this->plainResultStructure) {
             $data = $this->getDirectoryContentsArray($realPath);
         } else {
-            $iterator           = $this->getDirectoryContents($realPath);
+            $iterator = $this->getDirectoryContents($realPath);
             $absolutePathLength = strlen($realPath);
 
             foreach ($iterator as $file) {
-                $pathName     = $file->getPathname();
+                $pathName = $file->getPathname();
                 $relativePath = substr($pathName, $absolutePathLength + 1);
-                $split        = explode(DIRECTORY_SEPARATOR, $relativePath);
+                $split = explode(DIRECTORY_SEPARATOR, $relativePath);
                 array_pop($split);
 
                 if (!empty($split)) {
-                    $path      = sprintf('[%s]', implode('][', $split));
+                    $path = sprintf('[%s]', implode('][', $split));
                     $currValue = $this->getPropertyAccessor()->getValue($data, $path) ?: [];
                     $this->getPropertyAccessor()->setValue($data, $path, array_merge($currValue, [$pathName]));
                 } else {
@@ -243,21 +262,20 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
      */
     public function registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource)
     {
-        $dir           = $this->getResourcesDirectoryAbsolutePath($bundleAppDir);
-        $realPath      = realpath($dir);
         $bundleAppData = [];
+        $realPath = realpath($this->getResourcesDirectoryAbsolutePath($bundleAppDir));
         if (is_dir($realPath)) {
             $bundleAppData = $this->getDirectoryContentsArray($realPath);
         }
 
-        $dir        = $this->getDirectoryAbsolutePath($bundleDir);
-        $realPath   = realpath($dir);
         $bundleData = [];
+        $realPath = realpath($this->getDirectoryAbsolutePath($bundleDir));
         if (is_dir($realPath)) {
             $bundleData = $this->getDirectoryContentsArray($realPath);
         }
 
-        foreach ($this->mergeArray($bundleAppData, $bundleData, $bundleAppDir, $bundleDir) as $filename) {
+        $fileNames = $this->mergeArray($bundleAppData, $bundleData, $bundleAppDir, $bundleDir);
+        foreach ($fileNames as $filename) {
             $resource->addFound($bundleClass, $filename);
         }
     }
@@ -267,47 +285,61 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
      */
     public function isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource, $timestamp)
     {
-        $registeredFiles = $resource->getFound($bundleClass);
-        $registeredFiles = array_flip($registeredFiles);
+        $registeredFiles = array_fill_keys($resource->getFound($bundleClass), false);
 
-        // Check and remove data from $bundleAppDir resources directory
+        $registeredAppFiles = [];
         if (is_dir($bundleAppDir)) {
-            $dir      = $this->getResourcesDirectoryAbsolutePath($bundleAppDir);
-            $realPath = realpath($dir);
+            $realPath = realpath($this->getResourcesDirectoryAbsolutePath($bundleAppDir));
             if (is_dir($realPath)) {
-                $currentContents = $this->getDirectoryContentsArray($realPath);
-
-                foreach ($currentContents as $filename) {
-                    if (!$resource->isFound($bundleClass, $filename)) {
+                $files = $this->getDirectoryContentsArray($realPath);
+                foreach ($files as $filename) {
+                    if (!$this->isResourceFileFresh($resource, $bundleClass, $filename, $timestamp)) {
                         return false;
                     }
 
-                    unset($registeredFiles[$filename]);
+                    $registeredFiles[$filename] = true;
+                    $registeredAppFiles[] = $filename;
                 }
             }
         }
 
-        // Check and remove data from $bundleDir resources directory
-        $dir      = $this->getDirectoryAbsolutePath($bundleDir);
-        $realPath = realpath($dir);
+        $realPath = realpath($this->getDirectoryAbsolutePath($bundleDir));
         if (is_dir($realPath)) {
-            $currentContents = $this->getDirectoryContentsArray($realPath);
-
-            foreach ($currentContents as $filename) {
-                if (!$resource->isFound($bundleClass, $filename)) {
+            $files = $this->getDirectoryContentsArray($realPath);
+            foreach ($files as $filename) {
+                if (!$this->isResourceFileFresh($resource, $bundleClass, $filename, $timestamp)
+                    && !$this->isOverriddenByAppFile($filename, $registeredAppFiles, $bundleAppDir, $bundleDir)
+                ) {
                     return false;
                 }
 
-                unset($registeredFiles[$filename]);
+                $registeredFiles[$filename] = true;
             }
         }
 
-        // case when entire dir was removed or some file was removed
-        if (!empty($registeredFiles)) {
-            return false;
+        foreach ($registeredFiles as $isFileFresh) {
+            if (!$isFileFresh) {
+                return false;
+            }
         }
 
         return true;
+    }
+
+    /**
+     * @param CumulativeResource $resource
+     * @param string             $bundleClass
+     * @param string             $filename
+     * @param int                $timestamp
+     *
+     * @return boolean
+     */
+    protected function isResourceFileFresh(CumulativeResource $resource, $bundleClass, $filename, $timestamp)
+    {
+        return
+            $resource->isFound($bundleClass, $filename)
+            && is_file($filename)
+            && filemtime($filename) < $timestamp;
     }
 
     /**
@@ -322,32 +354,13 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
             \RecursiveIteratorIterator::LEAVES_ONLY
         );
         $recursiveIterator->setMaxDepth($this->maxNestingLevel);
-        $iterator = new \CallbackFilterIterator(
+
+        return new \CallbackFilterIterator(
             $recursiveIterator,
             function (\SplFileInfo $file) {
-                return empty($this->fileNamePatterns)
-                    ? true
-                    : $this->isFileIncluded($file->getBasename());
+                return null === $this->fileMatcher || $this->fileMatcher->isMatched($file);
             }
         );
-
-        return $iterator;
-    }
-
-    /**
-     * @param string $fileName
-     *
-     * @return bool
-     */
-    protected function isFileIncluded($fileName)
-    {
-        foreach ($this->fileNamePatterns as $fileNamePattern) {
-            if (preg_match($fileNamePattern, $fileName)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

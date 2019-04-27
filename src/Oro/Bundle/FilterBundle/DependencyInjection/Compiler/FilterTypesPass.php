@@ -3,35 +3,54 @@
 namespace Oro\Bundle\FilterBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Finds all available filters tagged with the given tag and registers them in the given filter bag.
+ */
 class FilterTypesPass implements CompilerPassInterface
 {
-    const FILTER_EXTENSION_ID = 'oro_filter.extension.orm_filter';
-    const TAG_NAME            = 'oro_filter.extension.orm_filter.filter';
+    /** @var string */
+    private $filterBagServiceId;
+
+    /** @var string */
+    private $filterTag;
 
     /**
-     * {@inheritDoc}
+     * @param string $filterBagServiceId
+     * @param string $filterTag
+     */
+    public function __construct(string $filterBagServiceId, string $filterTag)
+    {
+        $this->filterBagServiceId = $filterBagServiceId;
+        $this->filterTag = $filterTag;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        /**
-         * Find and add available filters to extension
-         */
-        $extension = $container->getDefinition(self::FILTER_EXTENSION_ID);
-        if ($extension) {
-            $filters = $container->findTaggedServiceIds(self::TAG_NAME);
-            foreach ($filters as $serviceId => $tags) {
-                $tagAttrs = reset($tags);
-                if (isset($tagAttrs['datasource']) && 'orm' !== $tagAttrs['datasource']) {
-                    continue;
+        $filters = [];
+        $taggedServices = $container->findTaggedServiceIds($this->filterTag);
+        foreach ($taggedServices as $serviceId => $tags) {
+            foreach ($tags as $attributes) {
+                if (empty($attributes['type'])) {
+                    throw new \InvalidArgumentException(sprintf(
+                        'The tag attribute "type" is required for service "%s".',
+                        $serviceId
+                    ));
                 }
-                if ($container->hasDefinition($serviceId)) {
-                    $container->getDefinition($serviceId)->setPublic(false);
-                }
-                $extension->addMethodCall('addFilter', array($tagAttrs['type'], new Reference($serviceId)));
+
+                $container->getDefinition($serviceId)->setPublic(false);
+                $filters[$attributes['type']] = new Reference($serviceId);
             }
         }
+
+        $container->findDefinition($this->filterBagServiceId)
+            ->setArgument(0, array_keys($filters))
+            ->setArgument(1, ServiceLocatorTagPass::register($container, $filters));
     }
 }

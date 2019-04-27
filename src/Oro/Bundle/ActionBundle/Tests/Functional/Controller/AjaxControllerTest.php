@@ -2,25 +2,27 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller;
 
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
-use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
+use Oro\Bundle\TestFrameworkBundle\Provider\PhpArrayConfigCacheModifier;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 class AjaxControllerTest extends WebTestCase
 {
-    const ROOT_NODE_NAME = 'operations';
-
-    const MESSAGE_DEFAULT = 'test message';
-    const MESSAGE_NEW = 'new test message';
+    private const MESSAGE_DEFAULT = 'test message';
+    private const MESSAGE_NEW = 'new test message';
 
     /** @var TestActivity */
     private $entity;
 
-    /** @var FilesystemCache */
-    protected $cacheProvider;
+    /** @var ConfigurationProvider */
+    private $configProvider;
+
+    /** @var PhpArrayConfigCacheModifier */
+    private $configModifier;
 
     /**
      * {@inheritdoc}
@@ -29,11 +31,10 @@ class AjaxControllerTest extends WebTestCase
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
-        $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider.operations');
-        $this->loadFixtures([
-            'Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData',
-        ]);
+        $this->configProvider = $this->getContainer()->get('oro_action.tests.configuration.provider');
+        $this->configModifier = new PhpArrayConfigCacheModifier($this->configProvider);
 
+        $this->loadFixtures([LoadTestEntityData::class]);
         $this->entity = $this->getReference(LoadTestEntityData::TEST_ENTITY_1)
             ->setMessage(self::MESSAGE_DEFAULT);
     }
@@ -43,9 +44,7 @@ class AjaxControllerTest extends WebTestCase
      */
     protected function tearDown()
     {
-        $this->cacheProvider->delete(self::ROOT_NODE_NAME);
-
-        parent::tearDown();
+        $this->configModifier->resetCache();
     }
 
     /**
@@ -76,7 +75,7 @@ class AjaxControllerTest extends WebTestCase
         array $flashMessages = [],
         array $headers = ['HTTP_X-Requested-With' => 'XMLHttpRequest']
     ) {
-        $this->cacheProvider->save(self::ROOT_NODE_NAME, $config);
+        $this->setOperationsConfig($config);
 
         $this->assertEquals(self::MESSAGE_DEFAULT, $this->entity->getMessage());
 
@@ -310,7 +309,7 @@ class AjaxControllerTest extends WebTestCase
      *
      * @return array
      */
-    protected function getOperationExecuteParams($operationName, $entityId, $entityClass, $datagrid)
+    private function getOperationExecuteParams($operationName, $entityId, $entityClass, $datagrid)
     {
         $actionContext = [
             'entityId'    => $entityId,
@@ -326,5 +325,15 @@ class AjaxControllerTest extends WebTestCase
         $container->get('session')->save();
 
         return $tokenData;
+    }
+
+    /**
+     * @param array $operations
+     */
+    private function setOperationsConfig(array $operations)
+    {
+        $config = $this->configProvider->getConfiguration();
+        $config['operations'] = $operations;
+        $this->configModifier->updateCache($config);
     }
 }

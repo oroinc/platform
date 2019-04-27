@@ -8,7 +8,7 @@ use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 class EntitySecurityMetadataTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntitySecurityMetadata */
-    protected $entity;
+    private $entity;
 
     protected function setUp()
     {
@@ -17,19 +17,14 @@ class EntitySecurityMetadataTest extends \PHPUnit\Framework\TestCase
             \stdClass::class,
             'SomeGroup',
             'SomeLabel',
-            array(), //permissions
+            [], //permissions
             'SomeDescription',
             'SomeCategory',
             [
-                'first' => new FieldSecurityMetadata('first', 'First Label'),
+                'first'  => new FieldSecurityMetadata('first', 'First Label'),
                 'second' => new FieldSecurityMetadata('second', 'Second Label', ['VIEW'], 'Second Description')
             ]
         );
-    }
-
-    protected function tearDown()
-    {
-        unset($this->entity);
     }
 
     public function testGetters()
@@ -40,11 +35,10 @@ class EntitySecurityMetadataTest extends \PHPUnit\Framework\TestCase
         static::assertEquals('SomeLabel', $this->entity->getLabel());
         static::assertEquals('SomeDescription', $this->entity->getDescription());
         static::assertEquals('SomeCategory', $this->entity->getCategory());
-        static::assertFalse($this->entity->isTranslated());
         $fields = $this->entity->getFields();
         static::assertCount(2, $fields);
         static::assertEquals(new FieldSecurityMetadata('first', 'First Label'), $fields['first']);
-        $secondFieldConfig =  $fields['second'];
+        $secondFieldConfig = $fields['second'];
         static::assertEquals('second', $secondFieldConfig->getFieldName());
         static::assertEquals('Second Label', $secondFieldConfig->getLabel());
         static::assertEquals(['VIEW'], $secondFieldConfig->getPermissions());
@@ -52,7 +46,7 @@ class EntitySecurityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testSerialize()
     {
-        $data        = serialize($this->entity);
+        $data = serialize($this->entity);
         $emptyEntity = unserialize($data);
 
         static::assertEquals('SomeType', $emptyEntity->getSecurityType());
@@ -68,23 +62,5 @@ class EntitySecurityMetadataTest extends \PHPUnit\Framework\TestCase
             new FieldSecurityMetadata('second', 'Second Label', ['VIEW'], 'Second Description'),
             $fields['second']
         );
-    }
-
-    public function testSetters()
-    {
-        $label = 'SomeAnotherLabel';
-        $this->entity->setLabel($label);
-        static::assertEquals($label, $this->entity->getLabel());
-
-        $description = 'SomeAnotherDescription';
-        $this->entity->setDescription($description);
-        static::assertEquals($description, $this->entity->getDescription());
-
-        $this->entity->setTranslated(true);
-        static::assertTrue($this->entity->isTranslated());
-
-        $fields = [new FieldSecurityMetadata('anotherField', 'AnotherFieldLabel')];
-        $this->entity->setFields($fields);
-        static::assertEquals($fields, $this->entity->getFields());
     }
 }

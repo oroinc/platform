@@ -22,6 +22,7 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
 
         $this->extension = new OrmFilterExtension(
             $this->configurationProvider,
+            $this->filterBag,
             $this->filtersStateProvider,
             $this->translator
         );
@@ -130,7 +131,7 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
             ->expects(self::never())
             ->method('apply');
 
-        $this->extension->addFilter(static::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(static::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }
@@ -154,7 +155,7 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
             ->expects(self::never())
             ->method('apply');
 
-        $this->extension->addFilter(static::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(static::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }
@@ -194,7 +195,7 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
             ->method('apply')
             ->with(self::isInstanceOf(OrmFilterDatasourceAdapter::class), $expectedFormData);
 
-        $this->extension->addFilter(static::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(static::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }
@@ -290,7 +291,7 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
                 [self::isInstanceOf(OrmFilterDatasourceAdapter::class), $expectedFormData]
             );
 
-        $this->extension->addFilter(static::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(static::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }
