@@ -1,0 +1,6 @@
+oro:
+    logger:
+        system_configuration:
+            fields:
+                email_notification_recipients:
+                    error: '{1} The "{{ value }}" is not valid email address.|]1,Inf[ The "{{ value }}" are not valid email addresses.'

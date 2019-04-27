@@ -8,7 +8,7 @@ define(function(require) {
     var routing = require('routing');
     var mediator = require('oroui/js/mediator');
     var Modal = require('oroui/js/modal');
-    var widgetPickerModalTemplate = require('text!oroui/templates/widget-picker/widget-picker-modal-template.html');
+    var widgetPickerModalTemplate = require('tpl!oroui/templates/widget-picker/widget-picker-modal-template.html');
 
     var BaseCollection = require('oroui/js/app/models/base/collection');
     var WidgetPickerModel = require('oroui/js/app/models/widget-picker/widget-picker-model');
@@ -17,11 +17,14 @@ define(function(require) {
     WidgetPickerModal = Modal.extend({
         className: 'modal oro-modal-normal widget-picker__modal  modal--fullscreen-small-device',
 
-        options: {
+        defaultOptions: {
             /**
              * @property {DashboardContainer}
              */
-            dashboard: null
+            dashboard: null,
+            content: widgetPickerModalTemplate(),
+            title: __('oro.dashboard.add_dashboard_widgets.title'),
+            cancelText: __('Close')
         },
 
         /**
@@ -40,34 +43,43 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            this.options = _.defaults(options || {}, this.options);
-            options.content = _.template(widgetPickerModalTemplate)({});
-            options.title = __('oro.dashboard.add_dashboard_widgets.title');
-            options.cancelText = __('Close');
-            Modal.prototype.initialize.apply(this, arguments);
+            this.options = _.defaults(options || {}, this.defaultOptions);
+
+            WidgetPickerModal.__super__.initialize.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         open: function(cb) {
-            Modal.prototype.open.apply(this, arguments);
-            var widgetPickerCollection = new BaseCollection(
-                this.options.dashboard.getAvailableWidgets(),
-                {model: WidgetPickerModel}
-            );
-            this.component = new WidgetPickerComponent({
-                _sourceElement: this.$content,
-                collection: widgetPickerCollection,
-                loadWidget: _.bind(this.loadWidget, this)
-            });
+            WidgetPickerModal.__super__.open.apply(this, arguments);
+
+            if (!this.component) {
+                var widgetPickerCollection = new BaseCollection(
+                    this.options.dashboard.getAvailableWidgets(),
+                    {model: WidgetPickerModel}
+                );
+                this.component = new WidgetPickerComponent({
+                    _sourceElement: this.$content,
+                    collection: widgetPickerCollection,
+                    loadWidget: _.bind(this.loadWidget, this)
+                });
+            }
+
+            return this;
         },
 
-        close: function() {
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
             if (this.component) {
                 this.component.dispose();
                 this.component = null;
             }
+
+            WidgetPickerModal.__super__.dispose.call(this);
         },
 
         /**
@@ -90,10 +102,6 @@ define(function(require) {
                 },
                 'json'
             );
-        },
-
-        setTargetColumn: function(targetColumn) {
-            this.options.targetColumn = targetColumn;
         }
     });
 

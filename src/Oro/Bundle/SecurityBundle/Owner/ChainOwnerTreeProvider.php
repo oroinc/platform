@@ -20,7 +20,9 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
      */
     public function addProvider(OwnerTreeProviderInterface $provider): void
     {
-        $this->providers[] = $provider;
+        if ($provider !== $this->defaultProvider) {
+            $this->providers[] = $provider;
+        }
     }
 
     /**

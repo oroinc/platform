@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
@@ -13,40 +14,57 @@ abstract class AbstractCommonEntityOwnershipDecisionMakerTest extends \PHPUnit\F
     /** @var OwnerTree */
     protected $tree;
 
+    /** @var OwnerTreeProvider */
+    protected $treeProvider;
+
     /** @var Organization */
     protected $org1;
+
     /** @var Organization */
     protected $org2;
+
     /** @var Organization */
     protected $org3;
+
     /** @var Organization */
     protected $org4;
 
     /** @var BusinessUnit */
     protected $bu1;
+
     /** @var BusinessUnit */
     protected $bu2;
+
     /** @var BusinessUnit */
     protected $bu3;
+
     /** @var BusinessUnit */
     protected $bu31;
+
     /** @var BusinessUnit */
     protected $bu4;
+
     /** @var BusinessUnit */
     protected $bu41;
+
     /** @var BusinessUnit */
     protected $bu411;
 
     /** @var User */
     protected $user1;
+
     /** @var User */
     protected $user2;
+
     /** @var User */
     protected $user3;
+
     /** @var User */
     protected $user31;
+
     /** @var User */
     protected $user4;
+
     /** @var User */
     protected $user411;
 
@@ -115,17 +133,7 @@ abstract class AbstractCommonEntityOwnershipDecisionMakerTest extends \PHPUnit\F
         $this->tree->addBusinessUnit('bu41', 'org4');
         $this->tree->addBusinessUnit('bu411', 'org4');
 
-        $this->tree->addBusinessUnitRelation('bu1', null);
-        $this->tree->addBusinessUnitRelation('bu2', null);
-        $this->tree->addBusinessUnitRelation('bu3', null);
-        $this->tree->addBusinessUnitRelation('bu31', 'bu3');
-        $this->tree->addBusinessUnitRelation('bu3a', null);
-        $this->tree->addBusinessUnitRelation('bu3a1', 'bu3a');
-        $this->tree->addBusinessUnitRelation('bu4', null);
-        $this->tree->addBusinessUnitRelation('bu41', 'bu4');
-        $this->tree->addBusinessUnitRelation('bu411', 'bu41');
-
-        $this->tree->buildTree();
+        $this->buildTree();
 
         $this->tree->addUser('user1', null);
         $this->tree->addUser('user2', 'bu2');
@@ -152,5 +160,20 @@ abstract class AbstractCommonEntityOwnershipDecisionMakerTest extends \PHPUnit\F
         $this->tree->addUserBusinessUnit('user31', 'org3', 'bu31');
         $this->tree->addUserBusinessUnit('user4', 'org4', 'bu4');
         $this->tree->addUserBusinessUnit('user411', 'org4', 'bu411');
+    }
+
+    protected function buildTree()
+    {
+        $subordinateBusinessUnits = [
+            'bu3'  => ['bu31'],
+            'bu3a' => ['bu3a1'],
+            'bu41' => ['bu411'],
+            'bu4'  => ['bu41', 'bu411'],
+
+        ];
+
+        foreach ($subordinateBusinessUnits as $parentBuId => $buIds) {
+            $this->tree->setSubordinateBusinessUnitIds($parentBuId, $buIds);
+        }
     }
 }

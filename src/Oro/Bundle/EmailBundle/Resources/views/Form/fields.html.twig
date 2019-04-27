@@ -228,14 +228,12 @@
         'parameters': app.request.attributes.get('_route_params'),
     } %}
     {% if is_granted('oro_organization_update') %}
-        <div class="row">
-            <div class="pull-right">
-                <div class="btn-group">
-                    {{ UI.addButton({
-                        'path': path('oro_email_mailbox_create', {redirectData: redirectData}),
-                        'label': 'oro.email.system_configuration.mailbox_configuration.add_mailbox.label'|trans
-                    }) }}
-                </div>
+        <div class="row user-fieldset-block-actions">
+            <div class="btn-group">
+                {{ UI.addButton({
+                    'path': path('oro_email_mailbox_create', {redirectData: redirectData}),
+                    'label': 'oro.email.system_configuration.mailbox_configuration.add_mailbox.label'|trans
+                }) }}
             </div>
         </div>
     {% endif %}
@@ -247,7 +245,7 @@
         'route': app.request.attributes.get('_route'),
         'parameters': app.request.attributes.get('_route_params')
     } %}
-    <div class="row" style="margin-right: -20px;">
+    <div class="row user-fieldset-block-body">
         {{ dataGrid.renderGrid('base-mailboxes-grid', {
             'redirectData': redirectData, 'organization_ids': [get_current_organization().getId()]
         }) }}

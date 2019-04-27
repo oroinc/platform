@@ -4,6 +4,14 @@ The current file describes significant changes in the code that may affect the u
 
 ## 4.0.0-rc
 
+### Added
+
+#### ChainProcessor component
+* The method `setResolver($key, ?ParameterValueResolverInterface $resolver)` was added to
+  `Oro\Component\ChainProcessor\ParameterBagInterface`. It allows to resolve a parameter value
+  when the parameter is requested at the first time. This can be helpful for rare used parameters with time consuming
+  value resolving.
+
 ### Changed
 
 #### Config component
@@ -116,7 +124,8 @@ The current file describes significant changes in the code that may affect the u
 * The `placeholders` and `placeholder_items` sections have been removed from UIBundle configuration. Use `Resources/config/oro/placeholders.yml` instead.
 * Deprecated option `show_pin_button_on_start_page` has been removed from UIBundle configuration.
 
-## 4.0.0-beta
+## 4.0.0-beta (2019-03-28)
+[Show detailed list of changes](incompatibilities-4-0-beta.md)
 
 ### Changed
 #### EmailBundle

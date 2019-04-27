@@ -42,7 +42,10 @@ define(function(require) {
                             label: __('oro.datagrid.settings.tab.filters'),
                             view: DatagridManageFilterView,
                             options: {
-                                collection: this.main.metadata.filters,
+                                collection: _.filter(this.main.metadata.filters, function(filter) {
+                                    // Do not render filters with visible=false setting
+                                    return filter.visible;
+                                }),
                                 addSorting: false
                             }
                         }

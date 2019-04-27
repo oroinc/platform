@@ -51,3 +51,16 @@ services:
             - '@oro_message_queue.log.message_processor_class_provider'
         tags:
             - { name: oro_message_queue.consumption.extension, persistent: true }
+
+    oro_logger.validator.email_recipients_list:
+        class: Oro\Bundle\LoggerBundle\Validator\EmailRecipientsListValidator
+        tags:
+            - { name: validator.constraint_validator, alias: oro_logger.validator.email_recipients_list }
+
+    oro_logger.deduplication_handler.cache.warmer:
+        public: false
+        class: Oro\Bundle\LoggerBundle\Cache\DeduplicationHandlerCacheWarmer
+        arguments:
+            - '@?monolog.handler.deduplicated'
+        tags:
+            - { name: kernel.cache_warmer, priority: -1000 }

@@ -9,6 +9,9 @@ use Symfony\Component\Validator\Mapping\Loader\AbstractLoader;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Guessing the column options for the Inline Editing extension
+ */
 class InlineEditColumnOptionsGuesser
 {
     /** @var ValidatorInterface */
@@ -46,23 +49,17 @@ class InlineEditColumnOptionsGuesser
     {
         /** @var ClassMetadataInterface $validatorMetadata */
         $validatorMetadata = $this->validator->getMetadataFor($entityName);
-        $isEnabledInline =
-            isset($column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY]) &&
-            $column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY] === true;
 
-        if ($behaviour === Configuration::BEHAVIOUR_ENABLE_ALL_VALUE ||
-            ($behaviour === Configuration::BEHAVIOUR_ENABLE_SELECTED && $isEnabledInline)) {
-            $isEnabledInlineWithBehaviour = true;
-        } else {
-            $isEnabledInlineWithBehaviour = false;
-        }
+        // The column option should always be prioritized than behaviour
+        $isEnabledInline = $column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY]
+            ?? ($behaviour === Configuration::BEHAVIOUR_ENABLE_ALL_VALUE);
 
         foreach ($this->guessers as $guesser) {
             $options = $guesser->guessColumnOptions(
                 $columnName,
                 $entityName,
                 $column,
-                $isEnabledInlineWithBehaviour
+                $isEnabledInline
             );
 
             if (!empty($options)) {
@@ -113,10 +110,7 @@ class InlineEditColumnOptionsGuesser
      */
     private function isDefaultConstraint($constraint)
     {
-        if (is_array($constraint)) {
-            return in_array(Constraint::DEFAULT_GROUP, $constraint['groups'], true);
-        }
-
-        return in_array(Constraint::DEFAULT_GROUP, $constraint->groups, true);
+        $groups = is_array($constraint) ? $constraint['groups'] : $constraint->groups;
+        return in_array(Constraint::DEFAULT_GROUP, $groups, true);
     }
 }

@@ -9,6 +9,9 @@ use Oro\Component\ChainProcessor\Context;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * The execution context for processors for "transit" action.
+ */
 class TransitionContext extends Context
 {
     const WORKFLOW_NAME = 'workflowName';
@@ -62,12 +65,11 @@ class TransitionContext extends Context
      */
     public function clear()
     {
-        $this->items = [
-            self::IS_START => false,
-            self::SAVED => false,
-            self::PROCESSED => false,
-            self::STATE => self::STATE_OK
-        ];
+        parent::clear();
+        $this->set(self::IS_START, false);
+        $this->set(self::SAVED, false);
+        $this->set(self::PROCESSED, false);
+        $this->set(self::STATE, self::STATE_OK);
     }
 
     /**
