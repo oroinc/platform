@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Metadata;
 
-use Oro\Component\ChainProcessor\ToArrayInterface;
-
 /**
  * The metadata for an entity property that provides some meta information about this entity.
  */
-class MetaPropertyMetadata extends PropertyMetadata implements ToArrayInterface
+class MetaPropertyMetadata extends PropertyMetadata
 {
     /** @var string */
     private $resultName;

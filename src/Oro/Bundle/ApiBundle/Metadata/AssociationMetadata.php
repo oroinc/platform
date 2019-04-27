@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-use Oro\Component\ChainProcessor\ToArrayInterface;
 
 /**
  * The metadata for an entity association.
@@ -11,7 +10,7 @@ use Oro\Component\ChainProcessor\ToArrayInterface;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
-class AssociationMetadata extends PropertyMetadata implements ToArrayInterface
+class AssociationMetadata extends PropertyMetadata
 {
     /** @var string */
     private $targetClass;
@@ -64,9 +63,7 @@ class AssociationMetadata extends PropertyMetadata implements ToArrayInterface
     }
 
     /**
-     * Gets a native PHP array representation of the object.
-     *
-     * @return array [key => value, ...]
+     * {@inheritdoc}
      */
     public function toArray()
     {

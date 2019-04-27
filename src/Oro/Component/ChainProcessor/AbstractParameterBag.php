@@ -18,14 +18,6 @@ abstract class AbstractParameterBag implements ParameterBagInterface
     /**
      * {@inheritdoc}
      */
-    public function count()
-    {
-        return \count($this->toArray());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function offsetExists($offset)
     {
         return $this->has($offset);

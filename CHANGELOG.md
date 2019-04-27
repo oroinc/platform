@@ -4,6 +4,13 @@ The current file describes significant changes in the code that may affect the u
 
 ## 4.0.0-rc
 
+### Added
+#### ChainProcessor component
+* The method `setResolver($key, ?ParameterValueResolverInterface $resolver)` was added to
+  `Oro\Component\ChainProcessor\ParameterBagInterface`. It allows to resolve a parameter value
+  when the parameter is requested at the first time. This can be helpful for rare used parameters with time consuming
+  value resolving.
+
 ### Changed
 #### EmailBundle
 * The `Oro\Bundle\EmailBundle\Provider\EmailRenderer` was reimplemented to support computed variables.
