@@ -39,8 +39,8 @@ class CompleteEntityDefinitionHelper
     /** @var CompleteAssociationHelper */
     private $associationHelper;
 
-    /** @var CompleteCustomAssociationHelper */
-    private $customAssociationHelper;
+    /** @var CompleteCustomDataTypeHelper */
+    private $customDataTypeHelper;
 
     /** @var ExclusionProviderRegistry */
     private $exclusionProviderRegistry;
@@ -49,20 +49,20 @@ class CompleteEntityDefinitionHelper
     private $expandedAssociationExtractor;
 
     /**
-     * @param DoctrineHelper                  $doctrineHelper
-     * @param EntityOverrideProviderRegistry  $entityOverrideProviderRegistry
-     * @param EntityIdHelper                  $entityIdHelper
-     * @param CompleteAssociationHelper       $associationHelper
-     * @param CompleteCustomAssociationHelper $customAssociationHelper
-     * @param ExclusionProviderRegistry       $exclusionProviderRegistry
-     * @param ExpandedAssociationExtractor    $expandedAssociationExtractor
+     * @param DoctrineHelper                 $doctrineHelper
+     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
+     * @param EntityIdHelper                 $entityIdHelper
+     * @param CompleteAssociationHelper      $associationHelper
+     * @param CompleteCustomDataTypeHelper   $customDataTypeHelper
+     * @param ExclusionProviderRegistry      $exclusionProviderRegistry
+     * @param ExpandedAssociationExtractor   $expandedAssociationExtractor
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityOverrideProviderRegistry $entityOverrideProviderRegistry,
         EntityIdHelper $entityIdHelper,
         CompleteAssociationHelper $associationHelper,
-        CompleteCustomAssociationHelper $customAssociationHelper,
+        CompleteCustomDataTypeHelper $customDataTypeHelper,
         ExclusionProviderRegistry $exclusionProviderRegistry,
         ExpandedAssociationExtractor $expandedAssociationExtractor
     ) {
@@ -70,7 +70,7 @@ class CompleteEntityDefinitionHelper
         $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
         $this->entityIdHelper = $entityIdHelper;
         $this->associationHelper = $associationHelper;
-        $this->customAssociationHelper = $customAssociationHelper;
+        $this->customDataTypeHelper = $customDataTypeHelper;
         $this->exclusionProviderRegistry = $exclusionProviderRegistry;
         $this->expandedAssociationExtractor = $expandedAssociationExtractor;
     }
@@ -97,7 +97,7 @@ class CompleteEntityDefinitionHelper
                 $context->get(ExpandRelatedEntitiesConfigExtra::NAME)
             );
             $entityOverrideProvider = $this->entityOverrideProviderRegistry->getEntityOverrideProvider($requestType);
-            $this->completeCustomAssociations($definition, $metadata, $version, $requestType);
+            $this->customDataTypeHelper->completeCustomDataTypes($definition, $metadata, $version, $requestType);
             $this->completeUnidirectionalAssociations(
                 $definition,
                 $metadata,
@@ -405,26 +405,6 @@ class CompleteEntityDefinitionHelper
                 )
             );
         }
-    }
-
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param ClassMetadata          $metadata
-     * @param string                 $version
-     * @param RequestType            $requestType
-     */
-    private function completeCustomAssociations(
-        EntityDefinitionConfig $definition,
-        ClassMetadata $metadata,
-        $version,
-        RequestType $requestType
-    ) {
-        $this->customAssociationHelper->completeCustomAssociations(
-            $metadata->name,
-            $definition,
-            $version,
-            $requestType
-        );
     }
 
     /**

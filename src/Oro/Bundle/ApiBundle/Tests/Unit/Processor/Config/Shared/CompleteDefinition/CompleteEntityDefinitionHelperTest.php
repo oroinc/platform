@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteAssociationHelper;
-use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomAssociationHelper;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomDataTypeHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteEntityDefinitionHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
@@ -34,8 +34,8 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     private $configProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CompleteCustomAssociationHelper */
-    private $customAssociationHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CompleteCustomDataTypeHelper */
+    private $customDataTypeHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ExclusionProviderRegistry */
     private $exclusionProviderRegistry;
@@ -50,7 +50,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->entityOverrideProvider = $this->createMock(EntityOverrideProviderInterface::class);
         $this->configProvider = $this->createMock(ConfigProvider::class);
-        $this->customAssociationHelper = $this->createMock(CompleteCustomAssociationHelper::class);
+        $this->customDataTypeHelper = $this->createMock(CompleteCustomDataTypeHelper::class);
         $this->exclusionProviderRegistry = $this->createMock(ExclusionProviderRegistry::class);
 
         $entityOverrideProviderRegistry = $this->createMock(EntityOverrideProviderRegistry::class);
@@ -63,7 +63,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             $entityOverrideProviderRegistry,
             new EntityIdHelper(),
             new CompleteAssociationHelper($this->configProvider),
-            $this->customAssociationHelper,
+            $this->customDataTypeHelper,
             $this->exclusionProviderRegistry,
             new ExpandedAssociationExtractor()
         );

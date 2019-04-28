@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
@@ -12,12 +13,12 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
- * The helper class to complete the configuration of different kind of custom associations.
+ * Completes the configuration of different kind of custom associations.
  * @see \Oro\Bundle\ApiBundle\Request\DataType::isNestedObject
  * @see \Oro\Bundle\ApiBundle\Request\DataType::isNestedAssociation
  * @see \Oro\Bundle\ApiBundle\Request\DataType::isExtendedAssociation
  */
-class CompleteCustomAssociationHelper
+class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
 {
     /** @var DoctrineHelper */
     private $doctrineHelper;
@@ -44,49 +45,30 @@ class CompleteCustomAssociationHelper
     }
 
     /**
-     * @param string                 $entityClass
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $version
-     * @param RequestType            $requestType
+     * {@inheritdoc}
      */
-    public function completeCustomAssociations(
-        $entityClass,
+    public function completeCustomDataType(
+        ClassMetadata $metadata,
         EntityDefinitionConfig $definition,
-        $version,
-        RequestType $requestType
-    ) {
-        $fields = $definition->getFields();
-        foreach ($fields as $fieldName => $field) {
-            $this->completeCustomAssociation($entityClass, $definition, $fieldName, $field, $version, $requestType);
-        }
-    }
-
-    /**
-     * @param string                      $entityClass
-     * @param EntityDefinitionConfig      $definition
-     * @param string                      $fieldName
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $version
-     * @param RequestType                 $requestType
-     */
-    private function completeCustomAssociation(
-        $entityClass,
-        EntityDefinitionConfig $definition,
-        $fieldName,
+        string $fieldName,
         EntityDefinitionFieldConfig $field,
-        $version,
+        string $dataType,
+        string $version,
         RequestType $requestType
-    ) {
-        $dataType = $field->getDataType();
-        if ($dataType) {
-            if (DataType::isNestedObject($dataType)) {
-                $this->associationHelper->completeNestedObject($fieldName, $field);
-            } elseif (DataType::isNestedAssociation($dataType)) {
-                $this->associationHelper->completeNestedAssociation($definition, $field, $version, $requestType);
-            } elseif (DataType::isExtendedAssociation($dataType)) {
-                $this->completeExtendedAssociation($entityClass, $fieldName, $field, $version, $requestType);
-            }
+    ): bool {
+        $result = false;
+        if (DataType::isNestedObject($dataType)) {
+            $this->associationHelper->completeNestedObject($fieldName, $field);
+            $result = true;
+        } elseif (DataType::isNestedAssociation($dataType)) {
+            $this->associationHelper->completeNestedAssociation($definition, $field, $version, $requestType);
+            $result = true;
+        } elseif (DataType::isExtendedAssociation($dataType)) {
+            $this->completeExtendedAssociation($metadata->name, $fieldName, $field, $version, $requestType);
+            $result = true;
         }
+
+        return $result;
     }
 
     /**
@@ -104,22 +86,18 @@ class CompleteCustomAssociationHelper
         RequestType $requestType
     ) {
         if ($field->getTargetType()) {
-            throw new \RuntimeException(
-                sprintf(
-                    'The "target_type" option cannot be configured for "%s::%s".',
-                    $entityClass,
-                    $fieldName
-                )
-            );
+            throw new \RuntimeException(sprintf(
+                'The "target_type" option cannot be configured for "%s::%s".',
+                $entityClass,
+                $fieldName
+            ));
         }
         if ($field->getDependsOn()) {
-            throw new \RuntimeException(
-                sprintf(
-                    'The "depends_on" option cannot be configured for "%s::%s".',
-                    $entityClass,
-                    $fieldName
-                )
-            );
+            throw new \RuntimeException(sprintf(
+                'The "depends_on" option cannot be configured for "%s::%s".',
+                $entityClass,
+                $fieldName
+            ));
         }
 
         list($associationType, $associationKind) = DataType::parseExtendedAssociation($field->getDataType());

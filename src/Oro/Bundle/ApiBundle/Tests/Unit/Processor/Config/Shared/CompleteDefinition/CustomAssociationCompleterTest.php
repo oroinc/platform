@@ -4,13 +4,13 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared\CompleteDefini
 
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteAssociationHelper;
-use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomAssociationHelper;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CustomAssociationCompleter;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
-class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCase
+class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
@@ -21,8 +21,8 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
     /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
     private $associationManager;
 
-    /** @var CompleteCustomAssociationHelper */
-    private $completeCustomAssociationHelper;
+    /** @var CustomAssociationCompleter */
+    private $customAssociationCompleter;
 
     protected function setUp()
     {
@@ -32,7 +32,7 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->associationManager = $this->createMock(AssociationManager::class);
 
-        $this->completeCustomAssociationHelper = new CompleteCustomAssociationHelper(
+        $this->customAssociationCompleter = new CustomAssociationCompleter(
             $this->doctrineHelper,
             new CompleteAssociationHelper($this->configProvider),
             $this->associationManager
@@ -41,10 +41,12 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
 
     public function testCompleteToOneExtendedAssociationWithoutAssociationKind()
     {
+        $dataType = 'association:manyToOne';
+        $associationName = 'association1';
         $config = $this->createConfigObject([
             'fields' => [
-                'association1' => [
-                    'data_type' => 'association:manyToOne'
+                $associationName => [
+                    'data_type' => $dataType
                 ]
             ]
         ]);
@@ -72,18 +74,22 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                 )
             );
 
-        $this->completeCustomAssociationHelper->completeCustomAssociations(
-            self::TEST_CLASS_NAME,
+        $result = $this->customAssociationCompleter->completeCustomDataType(
+            $this->getClassMetadataMock(self::TEST_CLASS_NAME),
             $config,
+            $associationName,
+            $config->getField($associationName),
+            $dataType,
             $version,
             $requestType
         );
+        self::assertTrue($result);
 
         $this->assertConfig(
             [
                 'fields' => [
-                    'association1' => [
-                        'data_type'              => 'association:manyToOne',
+                    $associationName => [
+                        'data_type'              => $dataType,
                         'target_class'           => EntityIdentifier::class,
                         'target_type'            => 'to-one',
                         'depends_on'             => ['field1'],
@@ -104,10 +110,12 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
 
     public function testCompleteToManyExtendedAssociationWithAssociationKind()
     {
+        $dataType = 'association:manyToMany:kind';
+        $associationName = 'association1';
         $config = $this->createConfigObject([
             'fields' => [
-                'association1' => [
-                    'data_type' => 'association:manyToMany:kind'
+                $associationName => [
+                    'data_type' => $dataType
                 ]
             ]
         ]);
@@ -135,18 +143,22 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                 )
             );
 
-        $this->completeCustomAssociationHelper->completeCustomAssociations(
-            self::TEST_CLASS_NAME,
+        $result = $this->customAssociationCompleter->completeCustomDataType(
+            $this->getClassMetadataMock(self::TEST_CLASS_NAME),
             $config,
+            $associationName,
+            $config->getField($associationName),
+            $dataType,
             $version,
             $requestType
         );
+        self::assertTrue($result);
 
         $this->assertConfig(
             [
                 'fields' => [
-                    'association1' => [
-                        'data_type'              => 'association:manyToMany:kind',
+                    $associationName => [
+                        'data_type'              => $dataType,
                         'target_class'           => EntityIdentifier::class,
                         'target_type'            => 'to-many',
                         'depends_on'             => ['field1'],
@@ -167,10 +179,12 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
 
     public function testCompleteMultipleManyToOneExtendedAssociation()
     {
+        $dataType = 'association:multipleManyToOne';
+        $associationName = 'association1';
         $config = $this->createConfigObject([
             'fields' => [
-                'association1' => [
-                    'data_type' => 'association:multipleManyToOne'
+                $associationName => [
+                    'data_type' => $dataType
                 ]
             ]
         ]);
@@ -198,18 +212,22 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                 )
             );
 
-        $this->completeCustomAssociationHelper->completeCustomAssociations(
-            self::TEST_CLASS_NAME,
+        $result = $this->customAssociationCompleter->completeCustomDataType(
+            $this->getClassMetadataMock(self::TEST_CLASS_NAME),
             $config,
+            $associationName,
+            $config->getField($associationName),
+            $dataType,
             $version,
             $requestType
         );
+        self::assertTrue($result);
 
         $this->assertConfig(
             [
                 'fields' => [
-                    'association1' => [
-                        'data_type'              => 'association:multipleManyToOne',
+                    $associationName => [
+                        'data_type'              => $dataType,
                         'target_class'           => EntityIdentifier::class,
                         'target_type'            => 'to-many',
                         'depends_on'             => ['field1'],
@@ -230,10 +248,12 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
 
     public function testCompleteExtendedAssociationWithCustomTargetClass()
     {
+        $dataType = 'association:manyToOne';
+        $associationName = 'association1';
         $config = $this->createConfigObject([
             'fields' => [
-                'association1' => [
-                    'data_type'    => 'association:manyToOne',
+                $associationName => [
+                    'data_type'    => $dataType,
                     'target_class' => 'Test\TargetClass'
                 ]
             ]
@@ -262,19 +282,23 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                 )
             );
 
-        $this->completeCustomAssociationHelper->completeCustomAssociations(
-            self::TEST_CLASS_NAME,
+        $result = $this->customAssociationCompleter->completeCustomDataType(
+            $this->getClassMetadataMock(self::TEST_CLASS_NAME),
             $config,
+            $associationName,
+            $config->getField($associationName),
+            $dataType,
             $version,
             $requestType
         );
+        self::assertTrue($result);
 
         $this->assertConfig(
             [
                 'fields' => [
-                    'association1' => [
+                    $associationName => [
                         'exclusion_policy'       => 'all',
-                        'data_type'              => 'association:manyToOne',
+                        'data_type'              => $dataType,
                         'target_class'           => 'Test\TargetClass',
                         'target_type'            => 'to-one',
                         'identifier_field_names' => ['id'],
@@ -298,10 +322,12 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
      */
     public function testCompleteExtendedAssociationWithCustomTargetType()
     {
+        $dataType = 'association:manyToOne';
+        $associationName = 'association1';
         $config = $this->createConfigObject([
             'fields' => [
-                'association1' => [
-                    'data_type'   => 'association:manyToOne',
+                $associationName => [
+                    'data_type'   => $dataType,
                     'target_type' => 'to-many'
                 ]
             ]
@@ -309,9 +335,12 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
         $version = self::TEST_VERSION;
         $requestType = new RequestType([self::TEST_REQUEST_TYPE]);
 
-        $this->completeCustomAssociationHelper->completeCustomAssociations(
-            self::TEST_CLASS_NAME,
+        $this->customAssociationCompleter->completeCustomDataType(
+            $this->getClassMetadataMock(self::TEST_CLASS_NAME),
             $config,
+            $associationName,
+            $config->getField($associationName),
+            $dataType,
             $version,
             $requestType
         );
@@ -323,10 +352,12 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
      */
     public function testCompleteExtendedAssociationWithCustomDependsOn()
     {
+        $dataType = 'association:manyToOne';
+        $associationName = 'association1';
         $config = $this->createConfigObject([
             'fields' => [
-                'association1' => [
-                    'data_type'  => 'association:manyToOne',
+                $associationName => [
+                    'data_type'  => $dataType,
                     'depends_on' => ['field1']
                 ]
             ]
@@ -334,9 +365,12 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
         $version = self::TEST_VERSION;
         $requestType = new RequestType([self::TEST_REQUEST_TYPE]);
 
-        $this->completeCustomAssociationHelper->completeCustomAssociations(
-            self::TEST_CLASS_NAME,
+        $this->customAssociationCompleter->completeCustomDataType(
+            $this->getClassMetadataMock(self::TEST_CLASS_NAME),
             $config,
+            $associationName,
+            $config->getField($associationName),
+            $dataType,
             $version,
             $requestType
         );
@@ -344,10 +378,12 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
 
     public function testCompleteExtendedAssociationWhenTargetsHaveNotStringIdentifier()
     {
+        $dataType = 'association:manyToOne';
+        $associationName = 'association1';
         $config = $this->createConfigObject([
             'fields' => [
-                'association1' => [
-                    'data_type' => 'association:manyToOne'
+                $associationName => [
+                    'data_type' => $dataType
                 ]
             ]
         ]);
@@ -402,18 +438,22 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                 )
             );
 
-        $this->completeCustomAssociationHelper->completeCustomAssociations(
-            self::TEST_CLASS_NAME,
+        $result = $this->customAssociationCompleter->completeCustomDataType(
+            $this->getClassMetadataMock(self::TEST_CLASS_NAME),
             $config,
+            $associationName,
+            $config->getField($associationName),
+            $dataType,
             $version,
             $requestType
         );
+        self::assertTrue($result);
 
         $this->assertConfig(
             [
                 'fields' => [
-                    'association1' => [
-                        'data_type'              => 'association:manyToOne',
+                    $associationName => [
+                        'data_type'              => $dataType,
                         'target_class'           => EntityIdentifier::class,
                         'target_type'            => 'to-one',
                         'depends_on'             => ['field1', 'field2'],
@@ -434,10 +474,12 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
 
     public function testCompleteExtendedAssociationWhenTargetsHaveDifferentTypesOfIdentifier()
     {
+        $dataType = 'association:manyToOne';
+        $associationName = 'association1';
         $config = $this->createConfigObject([
             'fields' => [
-                'association1' => [
-                    'data_type' => 'association:manyToOne'
+                $associationName => [
+                    'data_type' => $dataType
                 ]
             ]
         ]);
@@ -492,18 +534,22 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                 )
             );
 
-        $this->completeCustomAssociationHelper->completeCustomAssociations(
-            self::TEST_CLASS_NAME,
+        $result = $this->customAssociationCompleter->completeCustomDataType(
+            $this->getClassMetadataMock(self::TEST_CLASS_NAME),
             $config,
+            $associationName,
+            $config->getField($associationName),
+            $dataType,
             $version,
             $requestType
         );
+        self::assertTrue($result);
 
         $this->assertConfig(
             [
                 'fields' => [
-                    'association1' => [
-                        'data_type'              => 'association:manyToOne',
+                    $associationName => [
+                        'data_type'              => $dataType,
                         'target_class'           => EntityIdentifier::class,
                         'target_type'            => 'to-one',
                         'depends_on'             => ['field1', 'field2'],
@@ -524,10 +570,12 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
 
     public function testCompleteExtendedAssociationWhenOneOfTargetHasCompositeIdentifier()
     {
+        $dataType = 'association:manyToOne';
+        $associationName = 'association1';
         $config = $this->createConfigObject([
             'fields' => [
-                'association1' => [
-                    'data_type' => 'association:manyToOne'
+                $associationName => [
+                    'data_type' => $dataType
                 ]
             ]
         ]);
@@ -580,18 +628,22 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                 )
             );
 
-        $this->completeCustomAssociationHelper->completeCustomAssociations(
-            self::TEST_CLASS_NAME,
+        $result = $this->customAssociationCompleter->completeCustomDataType(
+            $this->getClassMetadataMock(self::TEST_CLASS_NAME),
             $config,
+            $associationName,
+            $config->getField($associationName),
+            $dataType,
             $version,
             $requestType
         );
+        self::assertTrue($result);
 
         $this->assertConfig(
             [
                 'fields' => [
-                    'association1' => [
-                        'data_type'              => 'association:manyToOne',
+                    $associationName => [
+                        'data_type'              => $dataType,
                         'target_class'           => EntityIdentifier::class,
                         'target_type'            => 'to-one',
                         'depends_on'             => ['field1', 'field2'],
@@ -612,10 +664,12 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
 
     public function testCompleteExtendedAssociationWithEmptyTargets()
     {
+        $dataType = 'association:manyToOne';
+        $associationName = 'association1';
         $config = $this->createConfigObject([
             'fields' => [
-                'association1' => [
-                    'data_type' => 'association:manyToOne'
+                $associationName => [
+                    'data_type' => $dataType
                 ]
             ]
         ]);
@@ -643,18 +697,22 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                 )
             );
 
-        $this->completeCustomAssociationHelper->completeCustomAssociations(
-            self::TEST_CLASS_NAME,
+        $result = $this->customAssociationCompleter->completeCustomDataType(
+            $this->getClassMetadataMock(self::TEST_CLASS_NAME),
             $config,
+            $associationName,
+            $config->getField($associationName),
+            $dataType,
             $version,
             $requestType
         );
+        self::assertTrue($result);
 
         $this->assertConfig(
             [
                 'fields' => [
-                    'association1' => [
-                        'data_type'              => 'association:manyToOne',
+                    $associationName => [
+                        'data_type'              => $dataType,
                         'target_class'           => EntityIdentifier::class,
                         'target_type'            => 'to-one',
                         'form_options'           => [
