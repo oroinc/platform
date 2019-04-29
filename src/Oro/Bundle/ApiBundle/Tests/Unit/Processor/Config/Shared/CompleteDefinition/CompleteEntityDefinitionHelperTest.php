@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteAssociationHelper;
-use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomAssociationHelper;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomDataTypeHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteEntityDefinitionHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
@@ -19,6 +19,12 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -34,11 +40,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     private $configProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CompleteCustomAssociationHelper */
-    private $customAssociationHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CompleteCustomDataTypeHelper */
+    private $customDataTypeHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ExclusionProviderRegistry */
     private $exclusionProviderRegistry;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
+    private $configManager;
 
     /** @var CompleteEntityDefinitionHelper */
     private $completeEntityDefinitionHelper;
@@ -50,8 +59,9 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->entityOverrideProvider = $this->createMock(EntityOverrideProviderInterface::class);
         $this->configProvider = $this->createMock(ConfigProvider::class);
-        $this->customAssociationHelper = $this->createMock(CompleteCustomAssociationHelper::class);
+        $this->customDataTypeHelper = $this->createMock(CompleteCustomDataTypeHelper::class);
         $this->exclusionProviderRegistry = $this->createMock(ExclusionProviderRegistry::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $entityOverrideProviderRegistry = $this->createMock(EntityOverrideProviderRegistry::class);
         $entityOverrideProviderRegistry->expects(self::any())
@@ -63,9 +73,36 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             $entityOverrideProviderRegistry,
             new EntityIdHelper(),
             new CompleteAssociationHelper($this->configProvider),
-            $this->customAssociationHelper,
+            $this->customDataTypeHelper,
             $this->exclusionProviderRegistry,
-            new ExpandedAssociationExtractor()
+            new ExpandedAssociationExtractor(),
+            $this->configManager
+        );
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return ConfigInterface
+     */
+    private function getEntityConfig(array $config)
+    {
+        return new Config(
+            new EntityConfigId('extend', self::TEST_CLASS_NAME),
+            $config
+        );
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return ConfigInterface
+     */
+    private function getFieldConfig($fieldName, array $config)
+    {
+        return new Config(
+            new FieldConfigId('extend', self::TEST_CLASS_NAME, $fieldName, 'int'),
+            $config
         );
     }
 
@@ -1038,8 +1075,9 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getAssociationMappings')
             ->willReturn([]);
         $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationNames')
-            ->willReturn([]);
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(false);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -1113,9 +1151,8 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn([]);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationNames')
-            ->willReturn([]);
+        $rootEntityMetadata->expects(self::never())
+            ->method('hasAssociation');
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -2026,5 +2063,780 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+    }
+
+    public function testCustomFieldsExclusionPolicyForFieldsOfNonConfigurableEntity()
+    {
+        $config = $this->createConfigObject([
+            'exclusion_policy' => 'custom_fields',
+            'fields'           => [
+                'field1' => null
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+        $this->configManager->expects(self::never())
+            ->method('getEntityConfig');
+        $this->configManager->expects(self::never())
+            ->method('getFieldConfig');
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::exactly(3))
+            ->method('isIgnoredField')
+            ->willReturnMap([
+                [$rootEntityMetadata, 'id', false],
+                [$rootEntityMetadata, 'field1', false],
+                [$rootEntityMetadata, 'field2', false]
+            ]);
+
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn([
+                'id',
+                'field1',
+                'field2'
+            ]);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'custom_fields',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'     => null,
+                    'field1' => null,
+                    'field2' => null
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCustomFieldsExclusionPolicyForFieldsOfCustomEntity()
+    {
+        $config = $this->createConfigObject([
+            'exclusion_policy' => 'custom_fields',
+            'fields'           => [
+                'field1' => null
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('extend', self::TEST_CLASS_NAME)
+            ->willReturn(
+                $this->getEntityConfig(['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM])
+            );
+        $this->configManager->expects(self::never())
+            ->method('getFieldConfig');
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::exactly(3))
+            ->method('isIgnoredField')
+            ->willReturnMap([
+                [$rootEntityMetadata, 'id', false],
+                [$rootEntityMetadata, 'field1', false],
+                [$rootEntityMetadata, 'field2', false]
+            ]);
+
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn([
+                'id',
+                'field1',
+                'field2'
+            ]);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'custom_fields',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'     => null,
+                    'field1' => null,
+                    'field2' => null
+                ]
+            ],
+            $config
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testCustomFieldsExclusionPolicyForFieldsOfExtendSystemEntity()
+    {
+        $config = $this->createConfigObject([
+            'exclusion_policy' => 'custom_fields',
+            'fields'           => [
+                'field1' => null,
+                'field3' => null
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $this->configManager->expects(self::exactly(4))
+            ->method('hasConfig')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, null, true],
+                [self::TEST_CLASS_NAME, 'id', true],
+                [self::TEST_CLASS_NAME, 'field2', true],
+                [self::TEST_CLASS_NAME, 'field4', true]
+            ]);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('extend', self::TEST_CLASS_NAME)
+            ->willReturn(
+                $this->getEntityConfig(['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM])
+            );
+        $this->configManager->expects(self::exactly(3))
+            ->method('getFieldConfig')
+            ->willReturnMap([
+                [
+                    'extend',
+                    self::TEST_CLASS_NAME,
+                    'id',
+                    $this->getFieldConfig('id', ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM])
+                ],
+                [
+                    'extend',
+                    self::TEST_CLASS_NAME,
+                    'field2',
+                    $this->getFieldConfig('field2', ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM])
+                ],
+                [
+                    'extend',
+                    self::TEST_CLASS_NAME,
+                    'field4',
+                    $this->getFieldConfig('field4', ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM])
+                ]
+            ]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::exactly(4))
+            ->method('isIgnoredField')
+            ->willReturnMap([
+                [$rootEntityMetadata, 'id', false],
+                [$rootEntityMetadata, 'field1', false],
+                [$rootEntityMetadata, 'field2', false],
+                [$rootEntityMetadata, 'field3', false]
+            ]);
+
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn([
+                'id',
+                'field1',
+                'field2',
+                'field3',
+                'field4'
+            ]);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'custom_fields',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'     => null,
+                    'field1' => null,
+                    'field2' => null,
+                    'field3' => null
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCustomFieldsExclusionPolicyForAssociationOfNonConfigurableEntity()
+    {
+        $config = $this->createConfigObject([
+            'exclusion_policy' => 'custom_fields',
+            'fields'           => [
+                'association1' => null
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+        $this->configManager->expects(self::never())
+            ->method('getEntityConfig');
+        $this->configManager->expects(self::never())
+            ->method('getFieldConfig');
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
+            ->method('isIgnoredRelation')
+            ->with($rootEntityMetadata, 'association1')
+            ->willReturn(false);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'custom_fields',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
+                    'association1' => [
+                        'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-one',
+                        'collapse'               => true,
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testCustomFieldsExclusionPolicyForAssociationOfCustomEntity()
+    {
+        $config = $this->createConfigObject([
+            'exclusion_policy' => 'custom_fields',
+            'fields'           => [
+                'association1' => null
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('extend', self::TEST_CLASS_NAME)
+            ->willReturn(
+                $this->getEntityConfig(['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM])
+            );
+        $this->configManager->expects(self::never())
+            ->method('getFieldConfig');
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
+            ->method('isIgnoredRelation')
+            ->with($rootEntityMetadata, 'association1')
+            ->willReturn(false);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'custom_fields',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
+                    'association1' => [
+                        'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-one',
+                        'collapse'               => true,
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testCustomFieldsExclusionPolicyForConfiguredExplicitlyAssociationOfExtendSystemEntity()
+    {
+        $config = $this->createConfigObject([
+            'exclusion_policy' => 'custom_fields',
+            'fields'           => [
+                'association1' => null
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, null, true],
+                [self::TEST_CLASS_NAME, 'id', true]
+            ]);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('extend', self::TEST_CLASS_NAME)
+            ->willReturn(
+                $this->getEntityConfig(['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM])
+            );
+        $this->configManager->expects(self::once())
+            ->method('getFieldConfig')
+            ->with('extend', self::TEST_CLASS_NAME, 'id')
+            ->willReturn(
+                $this->getFieldConfig('id', ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM])
+            );
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
+            ->method('isIgnoredRelation')
+            ->with($rootEntityMetadata, 'association1')
+            ->willReturn(false);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'custom_fields',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
+                    'association1' => [
+                        'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-one',
+                        'collapse'               => true,
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testCustomFieldsExclusionPolicyForNotConfiguredExplicitlySystemAssociationOfExtendSystemEntity()
+    {
+        $config = $this->createConfigObject([
+            'exclusion_policy' => 'custom_fields',
+            'fields'           => []
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $this->configManager->expects(self::exactly(3))
+            ->method('hasConfig')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, null, true],
+                [self::TEST_CLASS_NAME, 'id', true],
+                [self::TEST_CLASS_NAME, 'association1', true]
+            ]);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('extend', self::TEST_CLASS_NAME)
+            ->willReturn(
+                $this->getEntityConfig(['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM])
+            );
+        $this->configManager->expects(self::exactly(2))
+            ->method('getFieldConfig')
+            ->willReturnMap([
+                [
+                    'extend',
+                    self::TEST_CLASS_NAME,
+                    'id',
+                    $this->getFieldConfig('id', ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM])
+                ],
+                [
+                    'extend',
+                    self::TEST_CLASS_NAME,
+                    'association1',
+                    $this->getFieldConfig('association1', ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM])
+                ]
+            ]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
+            ->method('isIgnoredRelation')
+            ->with($rootEntityMetadata, 'association1')
+            ->willReturn(false);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'custom_fields',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
+                    'association1' => [
+                        'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-one',
+                        'collapse'               => true,
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCustomFieldsExclusionPolicyForNotConfiguredExplicitlyCustomAssociationOfExtendSystemEntity()
+    {
+        $config = $this->createConfigObject([
+            'exclusion_policy' => 'custom_fields',
+            'fields'           => []
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $this->configManager->expects(self::exactly(3))
+            ->method('hasConfig')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, null, true],
+                [self::TEST_CLASS_NAME, 'id', true],
+                [self::TEST_CLASS_NAME, 'association1', true]
+            ]);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('extend', self::TEST_CLASS_NAME)
+            ->willReturn(
+                $this->getEntityConfig(['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM])
+            );
+        $this->configManager->expects(self::exactly(2))
+            ->method('getFieldConfig')
+            ->willReturnMap([
+                [
+                    'extend',
+                    self::TEST_CLASS_NAME,
+                    'id',
+                    $this->getFieldConfig('id', ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM])
+                ],
+                [
+                    'extend',
+                    self::TEST_CLASS_NAME,
+                    'association1',
+                    $this->getFieldConfig('association1', ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM])
+                ]
+            ]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::never())
+            ->method('isIgnoredRelation');
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'custom_fields',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id' => null
+                ]
+            ],
+            $config
+        );
     }
 }
