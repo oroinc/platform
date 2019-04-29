@@ -37,6 +37,9 @@ class ConfigContext extends ApiContext
     /** a list of requests for configuration data that should be retrieved */
     const EXTRA = 'extra';
 
+    /** the exclusion policy that was before CompleteDefinition processor is set it to "all" */
+    private const REQUESTED_EXCLUSION_POLICY = 'requested_exclusion_policy';
+
     /** @var ConfigExtraInterface[] */
     protected $extras = [];
 
@@ -174,6 +177,30 @@ class ConfigContext extends ApiContext
             $this->remove(self::MAX_RELATED_ENTITIES);
         } else {
             $this->set(self::MAX_RELATED_ENTITIES, $limit);
+        }
+    }
+
+    /**
+     * Gets the exclusion policy that was before CompleteDefinition processor is set it to "all".
+     *
+     * @return string|null
+     */
+    public function getRequestedExclusionPolicy()
+    {
+        return $this->get(self::REQUESTED_EXCLUSION_POLICY);
+    }
+
+    /**
+     * Sets the exclusion policy that was before CompleteDefinition processor is set it to "all".
+     *
+     * @param string|null $exclusionPolicy
+     */
+    public function setRequestedExclusionPolicy($exclusionPolicy)
+    {
+        if ($exclusionPolicy) {
+            $this->set(self::REQUESTED_EXCLUSION_POLICY, $exclusionPolicy);
+        } else {
+            $this->remove(self::REQUESTED_EXCLUSION_POLICY);
         }
     }
 
