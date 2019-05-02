@@ -19,6 +19,9 @@ use Oro\Bundle\FilterBundle\Grid\Extension\Configuration as FilterConfiguration;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
+/**
+ * Base datagrid extension which adds to datagrids columns, filters and sorters for the extended entities fields.
+ */
 abstract class AbstractFieldsExtension extends AbstractExtension
 {
     /** @var ConfigManager */
@@ -233,24 +236,27 @@ abstract class AbstractFieldsExtension extends AbstractExtension
         $isRequired   = $gridVisibilityValue === DatagridScope::IS_VISIBLE_MANDATORY;
         $isRenderable = $isRequired ? : $gridVisibilityValue === DatagridScope::IS_VISIBLE_TRUE;
 
-        $columnOptions = ArrayUtil::arrayMergeRecursiveDistinct(
-            [
-                DatagridGuesser::FORMATTER => [
-                    'label' => $this->getFieldConfig('entity', $field)->get('label', false, $fieldName),
-                    'renderable' => $isRenderable,
-                    'required' => $isRequired,
-                    'order' => $this->getFieldConfig('datagrid', $field)->get('order', false, 0),
-                ],
-                DatagridGuesser::SORTER => [
-                    'data_name' => $fieldName,
-                ],
-                DatagridGuesser::FILTER => [
-                    'data_name' => $fieldName,
-                    'enabled' => false,
-                ],
+        $defaultColumnOptions = [
+            DatagridGuesser::FORMATTER => [
+                'label' => $this->getFieldConfig('entity', $field)->get('label', false, $fieldName),
+                'renderable' => $isRenderable,
+                'required' => $isRequired,
             ],
-            $columnOptions
-        );
+            DatagridGuesser::SORTER => [
+                'data_name' => $fieldName,
+            ],
+            DatagridGuesser::FILTER => [
+                'data_name' => $fieldName,
+                'enabled' => false,
+            ],
+        ];
+
+        $columnOrder = $this->getFieldConfig('datagrid', $field)->get('order');
+        if ($columnOrder !== null) {
+            $defaultColumnOptions[DatagridGuesser::FORMATTER]['order'] = $columnOrder;
+        }
+
+        $columnOptions = ArrayUtil::arrayMergeRecursiveDistinct($defaultColumnOptions, $columnOptions);
 
         switch ($field->getFieldType()) {
             case RelationType::MANY_TO_ONE:
