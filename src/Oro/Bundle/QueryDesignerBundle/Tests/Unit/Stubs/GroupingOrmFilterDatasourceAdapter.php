@@ -11,13 +11,13 @@ class GroupingOrmFilterDatasourceAdapter extends BaseAdapter
      *
      * @var int
      */
-    protected $paramCount = 0;
+    public static $paramCount = 0;
 
     /**
      * {@inheritdoc}
      */
     public function generateParameterName($filterName)
     {
-        return preg_replace('#[^a-z0-9]#i', '', $filterName) . $this->paramCount++;
+        return preg_replace('#[^a-z0-9]#i', '', $filterName) . self::$paramCount++;
     }
 }
