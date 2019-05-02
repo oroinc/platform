@@ -10,10 +10,10 @@ use Symfony\Component\Form\FormFactoryInterface;
 /**
  * The base class for different kind of "datetime", "date" and "time" filters.
  * IMPORTANT: take into account that "between" and "not between" expressions are different
- * from such expressions in filters for numberic fields. The difference is that
+ * from such expressions in filters for numeric fields. The difference is that
  * for date and datetime fields these expressions are not include the end value.
  * This is done to prevent loss of data related to ending minutes, seconds, milliseconds, etc.
- * For example to corrent filtering of all records created on May 1, 2018, the following expression
+ * For example to current filtering of all records created on May 1, 2018, the following expression
  * should be used: "createdAt >= 2018-05-01 00:00:00 AND createdAt < 2018-05-02 00:00:00".
  * The expression like "createdAt >= 2018-05-01 00:00:00 AND createdAt <= 2018-05-01 23:59:59"
  * is incorrect and leads to loss of data created at the last second of the day.
