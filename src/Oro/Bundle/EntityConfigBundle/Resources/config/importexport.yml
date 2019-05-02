@@ -32,6 +32,12 @@ services:
             - [setFieldTypeProvider, ['@oro_entity_extend.field_type_provider']]
             - [setFieldValidationHelper, ['@oro_entity_extend.extend.field_name_validation_helper']]
 
+    oro_entity_config.importexport.strategy.attribute.add_or_replace:
+        class: Oro\Bundle\EntityConfigBundle\ImportExport\Strategy\AttributeImportStrategy
+        parent: oro_entity_config.importexport.strategy.entity_field.add_or_replace
+        calls:
+            - [setConfigHelper, ['@oro_entity_config.config.config_helper']]
+
     # Template Fixture
     oro_entity_config.importexport.template_fixture.entity_field:
         class: 'Oro\Bundle\EntityConfigBundle\ImportExport\TemplateFixture\EntityFieldFixture'
@@ -49,6 +55,14 @@ services:
         tags:
             - { name: oro_importexport.processor, type: import, entity: '%oro_entity_config.entity.entity_field.class%', alias: oro_entity_config_entity_field.add_or_replace }
             - { name: oro_importexport.processor, type: import_validation, entity: '%oro_entity_config.entity.entity_field.class%', alias: oro_entity_config_entity_field.add_or_replace }
+
+    oro_entity_config.importexport.processor.import.attribute:
+        parent: oro_importexport.processor.import_abstract
+        class: Oro\Bundle\EntityConfigBundle\ImportExport\Processor\AttributeImportProcessor
+        calls:
+             - [setDataConverter, ['@oro_entity_config.importexport.data_converter.entity_field']]
+             - [setStrategy, ['@oro_entity_config.importexport.strategy.attribute.add_or_replace']]
+             - [setContextRegistry, ['@oro_importexport.context_registry']]
 
     # Export template
     oro_entity_config.importexport.processor.export_template.entity_field:
@@ -93,6 +107,8 @@ services:
         arguments:
             - '@translator'
             - '@oro_importexport.strategy.import.helper'
+        calls:
+            - [setConfigManager, ['@oro_entity_config.config_manager']]
         tags:
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }
 

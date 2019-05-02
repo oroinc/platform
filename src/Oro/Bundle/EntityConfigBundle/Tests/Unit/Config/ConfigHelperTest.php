@@ -594,4 +594,20 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->configHelper->updateFieldConfigs($this->fieldConfigModel, $options);
     }
+    public function testAddToFieldConfigModel()
+    {
+        $model = new FieldConfigModel();
+        $model->fromArray('someScope', ['someKey' => 'someValue']);
+        $options = [
+            'someScope' => ['someNewKey' => 'someNewValue'],
+            'anotherScope' => ['anotherKey' => 'anotherValue'],
+        ];
+
+        $this->configHelper->addToFieldConfigModel($model, $options);
+        self::assertEquals([
+            'someKey' => 'someValue',
+            'someNewKey' => 'someNewValue',
+        ], $model->toArray('someScope'));
+        self::assertEquals(['anotherKey' => 'anotherValue'], $model->toArray('anotherScope'));
+    }
 }
