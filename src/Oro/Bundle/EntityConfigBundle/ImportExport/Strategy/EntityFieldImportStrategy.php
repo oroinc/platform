@@ -105,16 +105,11 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
      */
     protected function validateAndUpdateContext(FieldConfigModel $entity)
     {
-        $groups = ['FieldConfigModel', 'Sql', 'ChangeTypeField'];
-        if ($this->context->getOption('check_attributes')) {
-            $groups[] = 'AttributeField';
-        }
-
         $errors = array_merge(
             (array)$this->strategyHelper->validateEntity(
                 $entity,
                 null,
-                new GroupSequence($groups)
+                new GroupSequence($this->getValidationGroups())
             ),
             $this->validateEntityFields($entity)
         );
@@ -206,5 +201,13 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
         }
 
         return $errors;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getValidationGroups(): array
+    {
+        return ['FieldConfigModel', 'Sql', 'ChangeTypeField'];
     }
 }

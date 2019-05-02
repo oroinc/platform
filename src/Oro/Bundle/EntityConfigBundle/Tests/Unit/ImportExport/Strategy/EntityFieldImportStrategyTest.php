@@ -14,7 +14,6 @@ use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraints\GroupSequence;
 
 class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
 {
@@ -179,34 +178,6 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
             ->with($entity)
             ->willReturn(['first error message', 'second error message']);
 
-        $this->context->expects($this->once())
-            ->method('incrementErrorEntriesCount');
-
-        $this->strategyHelper->expects($this->once())
-            ->method('addValidationErrors')
-            ->with(['first error message', 'second error message'], $this->context);
-
-        self::assertNull($this->strategy->process($entity));
-    }
-
-    public function testProcessValidationErrorsWithAttributesGroup()
-    {
-        $entity = new FieldConfigModel('testFieldName', 'integer');
-
-        $this->fieldTypeProvider->expects($this->once())
-            ->method('getSupportedFieldTypes')
-            ->willReturn(['string', 'integer', 'date']);
-
-        $groups = ['FieldConfigModel', 'Sql', 'ChangeTypeField', 'AttributeField'];
-        $this->strategyHelper->expects($this->once())
-            ->method('validateEntity')
-            ->with($entity, null, new GroupSequence($groups))
-            ->willReturn(['first error message', 'second error message']);
-
-        $this->context->expects($this->once())
-            ->method('getOption')
-            ->with('check_attributes')
-            ->willReturn(true);
         $this->context->expects($this->once())
             ->method('incrementErrorEntriesCount');
 
