@@ -1,0 +1,24 @@
+system_configuration:
+    fields:
+        oro_query_designer.conditions_group_merge_same_entity_conditions:
+            data_type: boolean
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
+            options:
+                label: oro.query_designer.system_configuration.fields.conditions_group_merge_same_entity_conditions.label
+                tooltip: oro.query_designer.system_configuration.fields.conditions_group_merge_same_entity_conditions.tooltip
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            look_and_feel:
+                                children:
+                                    reports_settings:
+                                        children:
+                                            - oro_query_designer.conditions_group_merge_same_entity_conditions
+
+    api_tree:
+        application:
+            oro_query_designer.conditions_group_merge_same_entity_conditions: ~

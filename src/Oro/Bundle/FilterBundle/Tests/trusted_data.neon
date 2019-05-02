@@ -70,7 +70,14 @@ trusted_data:
                 parts: true
             addWhereClause:
                 filterType: true
+        Oro\Bundle\FilterBundle\Filter\AbstractFilter:
+            getSubQueryExpressionWithParameters:
+                fieldExpr: true
+            createSubQueryBuilder:
+                filter: true
     safe_methods:
+        Oro\Bundle\FilterBundle\Filter\AbstractFilter:
+            getSelectFieldFromGroupBy: true
         Oro\Bundle\FilterBundle\Filter\DateGroupingFilter:
             getSelectAlias: true
             getSelectClause: true
