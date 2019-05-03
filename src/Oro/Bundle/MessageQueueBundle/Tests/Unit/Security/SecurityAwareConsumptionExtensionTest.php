@@ -7,7 +7,6 @@ use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
@@ -71,6 +70,7 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessage($message);
+        $context->setLogger($this->logger);
 
         $this->tokenSerializer->expects(self::once())
             ->method('deserialize')
@@ -86,6 +86,9 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->onPreReceived($context);
     }
 
+    /**
+     * @expectedException \Oro\Bundle\MessageQueueBundle\Consumption\Exception\InvalidSecurityTokenException
+     */
     public function testOnPreReceivedShouldRejectMessageIfSecurityTokenCannotBeDeserialized()
     {
         $serializedToken = 'serialized';
@@ -95,6 +98,7 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessage($message);
+        $context->setLogger($this->logger);
 
         $this->tokenSerializer->expects(self::once())
             ->method('deserialize')
@@ -104,11 +108,9 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('setToken');
         $this->logger->expects(self::once())
             ->method('error')
-            ->with('Cannot deserialize security token');
+            ->with('Security token is invalid');
 
         $this->extension->onPreReceived($context);
-
-        self::assertEquals(MessageProcessorInterface::REJECT, $context->getStatus());
     }
 
     public function testOnPreReceivedShouldDoNothingIdMessageDoesNotContainSecurityToken()
