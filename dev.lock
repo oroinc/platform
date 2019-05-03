@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "20a46a27a006e8bf530e541e1fe4ceb7",
+    "content-hash": "c7b22d3550b8435cd77e33225b82f7a9",
     "packages": [
         {
             "name": "akeneo/batch-bundle",
@@ -599,22 +599,6 @@
             "license": [
                 "MIT"
             ]
-        },
-        {
-            "name": "bower-asset/json2",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/douglascrockford/JSON-js.git",
-                "reference": "03157639c7a7cddd2e9f032537f346f1a87c0f6d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/douglascrockford/JSON-js/zipball/03157639c7a7cddd2e9f032537f346f1a87c0f6d",
-                "reference": "03157639c7a7cddd2e9f032537f346f1a87c0f6d"
-            },
-            "type": "bower-asset",
-            "time": "2018-07-23T18:12:50+00:00"
         },
         {
             "name": "bower-asset/jsplumb",
@@ -11065,7 +11049,6 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "bower-asset/json2": 20,
         "bower-asset/flotr2": 20,
         "oro/redis-config": 20
     },
