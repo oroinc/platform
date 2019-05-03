@@ -242,6 +242,15 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.non_extended_entity_bidirectional }
 
+    oro_entity_extend.validator.attribute_configuration:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\AttributeConfigurationValidator
+        arguments:
+            - '@oro_entity_config.registry.attribute_type'
+            - '@oro_entity_config.provider.attribute'
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.attribute_configuration }
+
     oro_entity_extend.migration.config_processor:
         class: '%oro_entity_extend.migration.config_processor.class%'
         arguments:

@@ -6,11 +6,24 @@ See below the list of key highlights how to handle errors, work with logs and lo
 ## Table of Contents
 
 * [Logs, Output and Verbosity](#logs-output-and-verbosity)
+
+  * [Processors](#processors)
+  * [Handlers](#handlers)
+  * [Formatters](#formatters)
+  * [Console Messages Output](#console-messages-output)
+
 * [Consumer Heartbeat](#consumer-heartbeat)
 * [Consumer Interruption](#consumer-interruption)
 * [Errors and Crashes](#errors-and-crashes)
 * [Profiling](#profiling)
 * [Separate Message Queue Consumer Logs](#separate-message-queue-consumer-logs)
+* [Third Party Logging Systems](#third-party-logging-systems)
+
+  * [Writing Logs to Stackdriver](./stackdriver.md)
+  * [Writing Logs to ELK Stack](./elk_stack.md)
+
+* [References](#references)
+ 
 
 ## Logs, Output and Verbosity
 
@@ -33,27 +46,31 @@ You can change minimal log level that should be printed to the `prod.log` file u
  
 _NOTICE: `prod.log` it is an example, your log file name may differ depending on your Monolog handlers configuration._
 
-#### Console Messages Output
+### Processors
+
+Sometimes it is necessary to add own data to log extra data. Create own processor and add `monolog.processor` DIC tag to it.
+See more in the [doc](https://symfony.com/doc/current/logging/processors.html).
+
+### Handlers
+
+Consumer output is based on [Monolog](https://github.com/Seldaek/monolog), so it support stack of handlers, each can be used to write the log entries to different locations (e.g. files, database, Slack, etc).
+See more in the [doc](https://symfony.com/doc/current/logging.html#handlers-writing-logs-to-different-locations).
+ 
+It is useful when your production is configured with real-time log service such as [Google Stackdriver](https://cloud.google.com/stackdriver). Read more [how to write logs to Stackdriver](./stackdriver.md).
+
+### Formatters
+
+To format the record before logging it to each logging handler uses a Formatter that implements `Monolog\Formatter\FormatterInterface`.
+
+If your production is configured with a real-time log service [ELK Stack](https://www.elastic.co/elk-stack), you can read how to write logs to it in the [corresponding documentation](./elk_stack.md).
+
+### Console Messages Output
 
 Message Queue Consumer provides [ConsoleHandler](../../Log/Handler/ConsoleHandler.php) that listens to console events and writes log messages to the console output depending on the console verbosity. It uses a [ConsoleFormatter](../../Log/Formatter/ConsoleFormatter.php) to format the record before logging it. Record format pattern is described below:
+
 ```php
 "%datetime% %start_tag%%channel%.%level_name%%end_tag%: %message%%context%%extra%\n"
 ```
-
-### How to Add extra Data to Log Messages via a Processor
-
-Sometimes it is necessary to add own data to log extra data. Create own processor and add `monolog.processor` DIC tag to it.
- See more in the [doc](https://symfony.com/doc/current/logging/processors.html).
-
-### Handlers: Writing Logs to different Locations
-
-Consumer output is based on [Monolog](https://github.com/Seldaek/monolog), so it support stack of handlers, each can be used to write the log entries to different locations (e.g. files, database, Slack, etc).
- See more in the [doc](https://symfony.com/doc/current/logging.html#handlers-writing-logs-to-different-locations).
- 
-It is useful when your production is configured with real-time log service such as [Stackdriver](https://cloud.google.com/stackdriver/), 
- [Kibana](https://www.elastic.co/products/kibana) and etc.
- 
-* [Writing Logs to Stackdriver](./stackdriver.md)
 
 ## Consumer Heartbeat
 
@@ -248,3 +265,19 @@ monolog:
             level:          debug
             channels:       ["consumer"]
 ```
+
+## Third Party Logging Systems
+
+  * [Writing Logs to Stackdriver](./stackdriver.md)
+  * [Writing Logs to ELK Stack](./elk_stack.md)
+
+## References
+
+* [GitHub Monolog](https://github.com/Seldaek/monolog)
+* [GitHub MonologBundle](https://github.com/symfony/monolog-bundle)
+* [Symfony "Logging with Monolog"](http://symfony.com/doc/current/logging.html#logging-a-message)
+* [Symfony Verbosity Levels](https://symfony.com/doc/current/console/verbosity.html)
+* [Symfony Logging Processors](https://symfony.com/doc/current/logging/processors.html)
+* [Symfony Logging Handlers](https://symfony.com/doc/current/logging.html#handlers-writing-logs-to-different-locations)
+* [Google Stackdriver](https://cloud.google.com/stackdriver)
+* [ELK Stack: Elasticsearch, Logstash, Kibana](https://www.elastic.co/elk-stack)
