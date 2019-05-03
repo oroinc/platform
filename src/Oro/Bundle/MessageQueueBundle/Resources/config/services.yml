@@ -70,7 +70,6 @@ services:
             - [] # security agnostic processors
             - '@security.token_storage'
             - '@oro_security.token_serializer'
-            - '@logger'
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
