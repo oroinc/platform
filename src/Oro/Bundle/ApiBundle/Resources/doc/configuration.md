@@ -186,6 +186,8 @@ api:
             override_class: Acme\Bundle\AcmeBundle\Entity\AcmeEntity
 ```
 
+**Note:** The model class must be a subclass of the overridden entity class.
+
 **Note:** When `override_class` option is used, some entity specific configuration,
 like [Extended Associations](./how_to.md#configure-an-extended-many-to-one-association), need to be done
 for an overridden ORM entity, not for a model.

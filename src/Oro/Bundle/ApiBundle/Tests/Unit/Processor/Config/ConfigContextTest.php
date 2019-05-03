@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ConfigContextTest extends \PHPUnit\Framework\TestCase
 {
@@ -49,6 +50,20 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setMaxRelatedEntities();
         self::assertNull($this->context->getMaxRelatedEntities());
         self::assertFalse($this->context->has(ConfigContext::MAX_RELATED_ENTITIES));
+    }
+
+    public function testRequestedExclusionPolicy()
+    {
+        self::assertNull($this->context->getRequestedExclusionPolicy());
+
+        $this->context->setRequestedExclusionPolicy(ConfigUtil::EXCLUSION_POLICY_NONE);
+        self::assertEquals(ConfigUtil::EXCLUSION_POLICY_NONE, $this->context->getRequestedExclusionPolicy());
+
+        $this->context->setRequestedExclusionPolicy(ConfigUtil::EXCLUSION_POLICY_ALL);
+        self::assertEquals(ConfigUtil::EXCLUSION_POLICY_ALL, $this->context->getRequestedExclusionPolicy());
+
+        $this->context->setRequestedExclusionPolicy(null);
+        self::assertNull($this->context->getRequestedExclusionPolicy());
     }
 
     public function testExtras()

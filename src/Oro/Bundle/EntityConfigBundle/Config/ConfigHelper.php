@@ -7,6 +7,9 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Provide helpful methods to work with entity and field configs.
+ */
 class ConfigHelper
 {
     /**
@@ -96,6 +99,18 @@ class ConfigHelper
                 $indexedValues = $configProvider->getPropertyConfig()->getIndexedValues($config->getId());
                 $fieldModel->fromArray($config->getId()->getScope(), $config->all(), $indexedValues);
             }
+        }
+    }
+
+    /**
+     * @param FieldConfigModel $fieldModel
+     * @param array $options
+     */
+    public function addToFieldConfigModel(FieldConfigModel $fieldModel, $options)
+    {
+        foreach ($options as $scope => $scopeValues) {
+            $scopeValues = array_merge($scopeValues, $fieldModel->toArray($scope));
+            $fieldModel->fromArray($scope, $scopeValues);
         }
     }
 

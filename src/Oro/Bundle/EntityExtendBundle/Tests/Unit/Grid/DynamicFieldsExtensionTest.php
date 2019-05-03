@@ -19,6 +19,9 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension;
 use Oro\Component\Testing\Unit\EntityTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
 {
     use EntityTrait;
@@ -187,7 +190,6 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                             'renderable' => true,
                             'required' => false,
                             'data_name' => 'testField',
-                            'order' => 0
                         ],
                     ],
                     'sorters' => [
@@ -353,7 +355,6 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                     'renderable' => true,
                     'required' => false,
                     'data_name' => 'testField',
-                    'order' => 0
                 ],
             ],
             'sorters' => [

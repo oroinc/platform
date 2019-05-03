@@ -29,7 +29,13 @@ class ConfigUtil extends BaseConfigUtil
     /** the name of subresources configuration section */
     public const SUBRESOURCES = 'subresources';
 
-    /** exclude all custom fields that are not configured explicitly */
+    /**
+     * exclude all custom fields belong to system extend entities that are not configured explicitly;
+     * the custom fields are fields with "is_extend" = true and "owner" = "Custom"
+     * in "extend" scope in entity configuration;
+     * the system extend entities are entities with "is_extend" = true and "owner" != "Custom"
+     * in "extend" scope in entity configuration
+     */
     public const EXCLUSION_POLICY_CUSTOM_FIELDS = 'custom_fields';
 
     /** a flag indicates whether an entity configuration should be merged with a configuration of a parent entity */

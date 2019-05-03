@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
@@ -211,6 +212,8 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         $doctrine = $doctrine ?? $this->getDoctrine();
 
         $segmentQueryConverterFactory = $this->createMock(SegmentQueryConverterFactory::class);
+        /** @var ConfigManager $configManager */
+        $configManager = $this->createMock(ConfigManager::class);
 
         $segmentQueryConverterFactory->expects($this->once())
             ->method('createInstance')
@@ -218,7 +221,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
                 $manager,
                 $virtualFieldProvider,
                 $doctrine,
-                new RestrictionBuilder($manager)
+                new RestrictionBuilder($manager, $configManager)
             ));
 
         $serviceLink = $this->createMock(ServiceLink::class);

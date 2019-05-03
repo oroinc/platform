@@ -15,6 +15,7 @@ class AttributeImportExportConfigurationProviderTest extends TestCase
             new ImportExportConfiguration([
                 ImportExportConfiguration::FIELD_ENTITY_CLASS => FieldConfigModel::class,
                 ImportExportConfiguration::FIELD_IMPORT_JOB_NAME => 'attribute_import_from_csv',
+                ImportExportConfiguration::FIELD_IMPORT_VALIDATION_JOB_NAME => 'attribute_import_validation_from_csv',
                 ImportExportConfiguration::FIELD_IMPORT_PROCESSOR_ALIAS =>
                     'oro_entity_config_entity_field.add_or_replace',
                 ImportExportConfiguration::FIELD_EXPORT_TEMPLATE_JOB_NAME => 'entity_export_template_to_csv',

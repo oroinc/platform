@@ -77,6 +77,19 @@ class Manager implements FunctionProviderInterface
     }
 
     /**
+     * @param string $type
+     * @return FilterInterface
+     */
+    public function getFilter($type): FilterInterface
+    {
+        if (!$this->filterBag->hasFilter($type)) {
+            throw new \RuntimeException(sprintf('Unknown filter type "%s".', $type));
+        }
+
+        return $this->filterBag->getFilter($type);
+    }
+
+    /**
      * Creates a new instance of a filter based on a configuration
      * of a filter registered in this manager with the given name
      *

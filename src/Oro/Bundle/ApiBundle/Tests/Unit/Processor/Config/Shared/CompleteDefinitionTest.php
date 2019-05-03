@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class CompleteDefinitionTest extends ConfigProcessorTestCase
@@ -51,6 +52,8 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
+
+        self::assertEquals(ConfigUtil::EXCLUSION_POLICY_ALL, $this->context->getRequestedExclusionPolicy());
     }
 
     public function testProcessForManageableEntity()
@@ -71,6 +74,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertTrue($definition->isExcludeAll());
+        self::assertEquals(ConfigUtil::EXCLUSION_POLICY_NONE, $this->context->getRequestedExclusionPolicy());
     }
 
     public function testProcessForNotManageableEntity()
@@ -92,5 +96,6 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertTrue($definition->isExcludeAll());
+        self::assertEquals(ConfigUtil::EXCLUSION_POLICY_NONE, $this->context->getRequestedExclusionPolicy());
     }
 }

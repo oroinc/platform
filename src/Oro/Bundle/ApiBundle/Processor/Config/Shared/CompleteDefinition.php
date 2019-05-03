@@ -24,6 +24,10 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  * Updates configuration of fields if other fields a linked to them using "property_path".
  * Completes configuration of extended associations (associations with data_type=association:...[:...]).
  * Completes configuration of fields that represent nested objects and nested associations.
+ * If exclusion policy equals to "custom_fields" and entity is system extend entity
+ * ("is_extend" = true and "owner" != "Custom" in "extend" scope in entity configuration)
+ * the custom fields (fields with "is_extend" = true and "owner" = "Custom" in "extend" scope in entity configuration)
+ * that do not configured explicitly are skipped.
  * Sets "exclusion_policy = all" for the entity. It means that the configuration
  * of all fields and associations was completed.
  * By performance reasons all these actions are done in one processor.
@@ -62,6 +66,7 @@ class CompleteDefinition implements ProcessorInterface
         /** @var ConfigContext $context */
 
         $definition = $context->getResult();
+        $context->setRequestedExclusionPolicy($definition->getExclusionPolicy());
         if ($definition->isExcludeAll()) {
             // already processed
             return;
