@@ -7,6 +7,10 @@ use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Manager for Query Designer.
+ * Provide functionality to work with metadata, functions, filters, excluded properties, etc.
+ */
 class Manager implements FunctionProviderInterface
 {
     /** @var ConfigurationObject */
@@ -73,6 +77,19 @@ class Manager implements FunctionProviderInterface
     public function addFilter($type, FilterInterface $filter)
     {
         $this->filters[$type] = $filter;
+    }
+
+    /**
+     * @param string $type
+     * @return FilterInterface
+     */
+    public function getFilter($type): FilterInterface
+    {
+        if (!isset($this->filters[$type])) {
+            throw new \RuntimeException(sprintf('Unknown filter type "%s".', $type));
+        }
+
+        return $this->filters[$type];
     }
 
     /**

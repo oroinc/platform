@@ -117,6 +117,7 @@ oro:
             message:
                 invalid_field_type: Invalid field type.
                 require_update_schema: "Please, click 'Update Schema' to apply changes"
+                cant_replace_extend_field: Can not create attribute with such name.
 
         sections:
             attribute_family:
