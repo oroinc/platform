@@ -287,7 +287,7 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
         return $items;
     }
 
-    public static function dataTransformer1($class, $property, $value, $config)
+    public static function dataTransformer1($value, $config, $context)
     {
     }
 }

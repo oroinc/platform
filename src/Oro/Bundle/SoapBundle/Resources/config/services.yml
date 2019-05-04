@@ -99,14 +99,15 @@ services:
             - '@oro_entity_config.config_manager'
 
     oro_soap.entity_serializer.value_transformer:
-        class: Oro\Component\EntitySerializer\ValueTransformer
-        public: false
-
-    oro_soap.entity_serializer.data_transformer:
-        class: Oro\Component\EntitySerializer\EntityDataTransformer
+        class: Oro\Component\EntitySerializer\DataTransformer
         public: false
         arguments:
             - '@service_container'
+
+    oro_soap.entity_serializer.data_transformer:
+        class: Oro\Bundle\SoapBundle\Serializer\DataTransformer
+        public: false
+        arguments:
             - '@oro_soap.entity_serializer.value_transformer'
 
     oro_soap.entity_serializer.query_resolver:

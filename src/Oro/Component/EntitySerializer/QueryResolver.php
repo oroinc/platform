@@ -29,5 +29,11 @@ class QueryResolver
     public function resolveQuery(Query $query, EntityConfig $config)
     {
         $this->queryHintResolver->resolveHints($query, $config->getHints());
+
+        // use HINT_REFRESH to prevent collisions between queries for the same entity
+        // but with different partial fields
+        if (!$query->hasHint(Query::HINT_REFRESH)) {
+            $query->setHint(Query::HINT_REFRESH, true);
+        }
     }
 }

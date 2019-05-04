@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityDataAccessor;
 use Oro\Component\EntitySerializer\DataNormalizer;
-use Oro\Component\EntitySerializer\EntityDataTransformer;
+use Oro\Component\EntitySerializer\DataTransformer;
 use Oro\Component\EntitySerializer\SerializationHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -31,9 +31,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->objectNormalizer = new ObjectNormalizer(
             $normalizers,
             new DoctrineHelper($doctrine),
-            new SerializationHelper(
-                new EntityDataTransformer($this->createMock(ContainerInterface::class))
-            ),
+            new SerializationHelper(new DataTransformer($this->createMock(ContainerInterface::class))),
             new EntityDataAccessor(),
             new ConfigNormalizer(),
             new DataNormalizer()

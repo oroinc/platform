@@ -2065,6 +2065,60 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
     }
 
+    public function testShouldThrowCorrectExceptionWhenPropertyPathPointsToFieldItself()
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'association' => [
+                    'property_path' => 'association.name'
+                ]
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(self::TEST_CLASS_NAME, $context->getVersion(), $context->getRequestType())
+            ->willThrowException(new RuntimeException('circular dependency detected'));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Cannot resolve property path "association.name" specified for "Test\Class::association".'
+            . ' Check "property_path" option for this field.'
+            . ' If it is correct you can rename the target property as a possible solution.'
+            . ' For example:' . "\n"
+            . '_association:' . "\n"
+            . '    property_path: association'
+        );
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+    }
+
     public function testCustomFieldsExclusionPolicyForFieldsOfNonConfigurableEntity()
     {
         $config = $this->createConfigObject([

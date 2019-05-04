@@ -474,11 +474,15 @@ class CompleteEntityDefinitionHelper
                 } catch (\Exception $e) {
                     throw new \RuntimeException(
                         sprintf(
-                            'Cannot resolve property path "%s" specified for "%s::%s".'
-                            . ' Check "property_path" option for this field.',
+                            'Cannot resolve property path "%1$s" specified for "%2$s::%3$s".'
+                            . ' Check "property_path" option for this field.'
+                            . ' If it is correct you can rename the target property as a possible solution.'
+                            . ' For example:%4$s'
+                            . '_%3$s:%4$s    property_path: %3$s',
                             $propertyPath,
                             $entityClass,
-                            $fieldName
+                            $fieldName,
+                            "\n"
                         ),
                         0,
                         $e

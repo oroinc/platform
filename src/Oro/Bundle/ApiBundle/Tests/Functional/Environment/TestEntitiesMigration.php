@@ -310,7 +310,8 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $table->addColumn('field_smallint', 'smallint', ['notnull' => false]);
         $table->addColumn('field_bigint', 'bigint', ['notnull' => false]);
         $table->addColumn('field_boolean', 'boolean', ['notnull' => false]);
-        $table->addColumn('field_decimal', 'decimal', ['notnull' => false, 'precision' => 10, 'scale' => 6]);
+        $table->addColumn('field_decimal', 'decimal', ['notnull' => false, 'precision' => 20, 'scale' => 8]);
+        $table->addColumn('field_decimal_default', 'decimal', ['notnull' => false]);
         $table->addColumn('field_float', 'float', ['notnull' => false]);
         $table->addColumn('field_array', 'array', ['notnull' => false]);
         $table->addColumn('field_simple_array', 'simple_array', ['notnull' => false]);

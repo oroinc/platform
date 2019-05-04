@@ -208,6 +208,7 @@ api:
                     fieldBigInt: ~
                     fieldBoolean: ~
                     fieldDecimal: ~
+                    fieldDecimalDefault: ~
                     fieldFloat: ~
                     fieldDateTime: ~
                     fieldDate: ~
@@ -226,6 +227,7 @@ api:
                     fieldBigInt: ~
                     fieldBoolean: ~
                     fieldDecimal: ~
+                    fieldDecimalDefault: ~
                     fieldFloat: ~
                     fieldDateTime: ~
                     fieldDate: ~

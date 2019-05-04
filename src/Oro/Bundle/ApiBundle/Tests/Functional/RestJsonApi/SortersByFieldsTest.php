@@ -101,67 +101,71 @@ class SortersByFieldsTest extends RestJsonApiTestCase
         ];
 
         return [
-            'by string field'      => [
+            'by string field'          => [
                 '-fieldString',
                 $expectedRowsDefault
             ],
-            'by integer field'     => [
+            'by integer field'         => [
                 '-fieldInt',
                 $expectedRowsSortedByNumber
             ],
-            'by smallint field'    => [
+            'by smallint field'        => [
                 '-fieldSmallInt',
                 $expectedRowsSortedByNumber
             ],
-            'by bigint field'      => [
+            'by bigint field'          => [
                 '-fieldBigInt',
                 $expectedRowsDefault
             ],
-            'by boolean field'     => [
+            'by boolean field'         => [
                 '-fieldBoolean',
                 $expectedRowsSortedByBoolean
             ],
-            'by decimal field'     => [
+            'by decimal field'         => [
                 '-fieldDecimal',
                 $expectedRowsSortedByNumber
             ],
-            'by float field'       => [
+            'by default decimal field' => [
+                '-fieldDecimalDefault',
+                $expectedRowsSortedByNumber
+            ],
+            'by float field'           => [
                 '-fieldFloat',
                 $expectedRowsSortedByNumber
             ],
-            'by datetime field'    => [
+            'by datetime field'        => [
                 '-fieldDateTime',
                 $expectedRowsSortedByDateTime
             ],
-            'by date field'        => [
+            'by date field'            => [
                 '-fieldDate',
                 $expectedRowsSortedByDate
             ],
-            'by time field'        => [
+            'by time field'            => [
                 '-fieldTime',
                 $expectedRowsDefault
             ],
-            'by guid field'        => [
+            'by guid field'            => [
                 '-fieldGuid',
                 $expectedRowsSortedByGuid
             ],
-            'by percent field'     => [
+            'by percent field'         => [
                 '-fieldPercent',
                 $expectedRowsDefault
             ],
-            'by money field'       => [
+            'by money field'           => [
                 '-fieldMoney',
                 $expectedRowsSortedByMoney
             ],
-            'by duration field'    => [
+            'by duration field'        => [
                 '-fieldDuration',
                 $expectedRowsDefault
             ],
-            'by money_value field' => [
+            'by money_value field'     => [
                 '-fieldMoneyValue',
                 $expectedRowsSortedByMoney
             ],
-            'by currency field'    => [
+            'by currency field'        => [
                 '-fieldCurrency',
                 $expectedRowsSortedByCurrency
             ]

@@ -805,7 +805,7 @@ $metadata = $metadataProvider->getMetadata($entityClassName, $version, $requestT
 
 ## normalize_value Action
 
-This action converts a value to a requested data type.
+This action converts an input value to a requested data type.
 
 The context class: [NormalizeValueContext](../../Processor/NormalizeValue/NormalizeValueContext.php).
 
@@ -813,7 +813,8 @@ The main processor class: [NormalizeValueProcessor](../../Processor/NormalizeVal
 
 Existing worker processors: [processors.normalize_value.yml](../../Resources/config/processors.normalize_value.yml). Run `php bin/console oro:api:debug normalize_value` to see the list of processors.
 
-Additionally, [ValueNormalizer](../../Request/ValueNormalizer.php) was created to make usage of this action as easy as possible.
+Additionally, [ValueNormalizer](../../Request/ValueNormalizer.php) and
+[ValueNormalizerUtil](../../Util/ValueNormalizerUtil.php) were created to make usage of this action as easy as possible.
 
 **Example:**
 
@@ -822,6 +823,9 @@ Additionally, [ValueNormalizer](../../Request/ValueNormalizer.php) was created t
 $valueNormalizer = $container->get('oro_api.metadata_provider');
 $normalizedValue = $valueNormalizer->normalizeValue($value, $dataType, $requestType);
 ```
+
+**Note:** The [ValueNormalizer](../../Request/ValueNormalizer.php) is intended to process input values only.
+In case you need to convert a value for the data API response, use [ValueTransformer](../../Request/ValueTransformer.php).
 
 ## collect_resources Action
 
