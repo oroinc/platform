@@ -17,7 +17,7 @@ define(function(require) {
 
     var config = _.extend({
         type: 'dialog',
-        dialogOptions: null,
+        limitTo: tools.isMobile() ? 'body' : '#container',
         stateEnabled: true,
         incrementalPosition: true,
         preventModelRemoval: false,
@@ -91,13 +91,12 @@ define(function(require) {
             dialogOptions = options.dialogOptions = options.dialogOptions || {};
             _.defaults(dialogOptions, {
                 title: options.title,
-                limitTo: '#container',
+                limitTo: this.options.limitTo,
                 minWidth: 320,
                 minHeight: 150
             });
             if (tools.isMobile()) {
                 options.incrementalPosition = false;
-                options.dialogOptions.limitTo = 'body';
             }
 
             if (dialogOptions.modal) {
@@ -348,6 +347,18 @@ define(function(require) {
             return this.actionsEl;
         },
 
+        getLimitToContainer: function() {
+            var limitTo = this.options.dialogOptions.limitTo;
+
+            if (limitTo === 'viewport') {
+                return document.documentElement;
+            } else if (limitTo) {
+                return $(this.options.dialogOptions.limitTo)[0];
+            } else {
+                return document.body;
+            }
+        },
+
         _clearActionsContainer: function() {
             this.widget.dialog('actionsContainer').empty();
             this.actionsEl = null;
@@ -427,7 +438,7 @@ define(function(require) {
             this.widget.off('.set-max-size-events');
             this.widget.on('dialogresizestart.set-max-size-events', _.bind(function() {
                 var dialog = this.widget.closest('.ui-dialog');
-                var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
+                var containerEl = this.getLimitToContainer();
                 dialog.css({
                     maxWidth: containerEl.clientWidth,
                     maxHeight: containerEl.clientHeight
@@ -470,7 +481,7 @@ define(function(require) {
             }
             if (this.options.position) {
                 this.setPosition(_.extend(this.options.position, {
-                    of: '#container',
+                    of: this.getLimitToContainer(),
                     collision: 'fit'
                 }));
             }
@@ -478,7 +489,7 @@ define(function(require) {
                 this.setPosition({
                     my: 'center center',
                     at: this.defaultPos,
-                    of: '#container',
+                    of: this.getLimitToContainer(),
                     collision: 'fit'
                 });
             } else {
@@ -511,7 +522,6 @@ define(function(require) {
             if (!this.widget) {
                 throw new Error('this function must be called only after dialog is created');
             }
-            var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
             var dialog = this.widget.closest('.ui-dialog');
 
             var initialDialogPosition = dialog.css('position');
@@ -526,8 +536,8 @@ define(function(require) {
             }
 
             this.internalSetDialogPosition(position, leftShift, topShift);
-            this.leftAndWidthAdjustments(dialog, containerEl);
-            this.topAndHeightAdjustments(dialog, containerEl);
+            this.leftAndWidthAdjustments(dialog);
+            this.topAndHeightAdjustments(dialog);
             if (!_.isMobile()) {
                 mediator.execute('layout:adjustLabelsWidth', this.widget);
             }
@@ -543,8 +553,9 @@ define(function(require) {
             }
         },
 
-        leftAndWidthAdjustments: function(dialog, containerEl) {
+        leftAndWidthAdjustments: function(dialog) {
             // containerEl.offsetLeft will only work if offsetParent is document.body
+            var containerEl = this.getLimitToContainer();
             var left = parseFloat(dialog.css('left')) - containerEl.offsetLeft;
             var width = parseFloat(dialog.css('width'));
             var minWidth = parseFloat(dialog.css('min-width'));
@@ -572,8 +583,9 @@ define(function(require) {
             }
         },
 
-        topAndHeightAdjustments: function(dialog, containerEl) {
+        topAndHeightAdjustments: function(dialog) {
             // containerEl.offsetTop will only work if offsetParent is document.body
+            var containerEl = this.getLimitToContainer();
 
             // Set auto height for dialog before calc
             if (this.getState() !== 'maximized' && !this.widgetIsResizable()) {
@@ -584,7 +596,7 @@ define(function(require) {
             var height = parseFloat(dialog.css('height'));
             var minHeight = parseFloat(dialog.css('min-height'));
             var windowHeight = parseFloat($(window).height());
-            if (containerEl.clientHeight > windowHeight) {
+            if (containerEl.clientHeight >= windowHeight) {
                 top = (windowHeight - height) / 2;
                 dialog.css('top', top);
             }
