@@ -29,7 +29,9 @@
 
             color: $role-capability-icon-expand-color;
 
-            @include fa-icon($fa-var-minus-square-o);
+            @include fa-icon($fa-var-minus-square-o, before, true) {
+                vertical-align: bottom;
+            }
 
             &.collapsed {
                 @include fa-icon($fa-var-plus-square-o);
@@ -48,13 +50,14 @@
     }
 
     .fields-list {
-        > :first-child {
-            margin-top: $inner-permissions-grid-fields-list-offset;
-        }
+        padding-#{$start}: $inner-permissions-grid-fields-list-indent;
+        padding-bottom: $inner-permissions-grid-fields-list-offset;
+    }
 
-        > :last-child {
-            margin-bottom: $inner-permissions-grid-fields-list-offset;
-        }
+    .field-name {
+        width: $role-collapse-action-container-width - $inner-permissions-grid-fields-list-indent;
+
+        padding-#{$end}: $inner-permissions-grid-entity-name-offset;
     }
 
     .collapse {
@@ -73,7 +76,8 @@
     display: none;
 }
 
-.entity-permission-container {
+.entity-permission-container,
+.field-permission-container {
     display: flex;
     justify-content: flex-start;
 
@@ -90,6 +94,14 @@
     }
 }
 
+.field-permission-container {
+    padding: $field-permission-container-padding;
+
+    &:not(:last-child) {
+        border-bottom: $field-permission-container-border-bottom;
+    }
+}
+
 .action-permissions {
     display: flex;
     align-items: center;
@@ -102,6 +114,8 @@
     &__item {
         width: $action-permissions-item-width;
         padding-#{$end}: $action-permissions-item-offset;
+
+        line-height: $action-permissions-item-line-height;
 
         .dropdown-toggle {
             position: relative;
