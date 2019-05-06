@@ -146,13 +146,12 @@
         background-color: $widget-picker-icon-bg-color;
         border-radius: 50%;
         color: $widget-picker-icon-color;
-        height: 18px;
+        height: $widget-picker-icon-height;
         font-size: 18px;
         margin: 0;
-        padding: 7px 6px;
-        width: 20px;
-        box-sizing: content-box;
+        width: $widget-picker-icon-width;
         text-align: center;
+        line-height: $widget-picker-icon-height;
         display: inline-block;
     }
 }
