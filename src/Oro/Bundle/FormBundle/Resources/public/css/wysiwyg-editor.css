@@ -6,8 +6,10 @@ body {
     line-height: 20px;
     font-family: Helvetica, Arial, sans-serif;
     color: #444;
-    min-height: calc(100% - 16px);
-    margin: 8px;
+    min-height: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 8px;
 }
 body[contenteditable="false"] {
     cursor: not-allowed;
