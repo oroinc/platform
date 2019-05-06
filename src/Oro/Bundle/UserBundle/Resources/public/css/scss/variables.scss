@@ -31,24 +31,29 @@ $role-capability-item-disabled: $primary-700 !default;
 
 $entity-permission-entity-row-action-offset: 5px 0 !default;
 
-$inner-permissions-grid-collapse-action-offset: 16px !default;
+$inner-permissions-grid-collapse-action-offset: $content-padding-medium !default;
 
 $inner-permissions-grid-entity-name-offset: 10px !default;
 $inner-permissions-grid-entity-name-weight: bold !default;
 
-$inner-permissions-grid-fields-list-offset: 8px !default;
+$inner-permissions-grid-fields-list-offset: $content-padding-small !default;
+$inner-permissions-grid-fields-list-indent: 29px !default;
 
 $inner-permissions-grid-launcher-min-height: 24px !default;
 
 $entity-permission-container-offset: 1px !default;
-$entity-permission-collapse-offset: 10px !default;
+$entity-permission-collapse-offset: $content-padding-small !default;
 
 $action-permissions-item-width: 165px !default;
 $action-permissions-item-offset: 10px !default;
 $action-permissions-item-wrapper-offset: 14px !default;
+$action-permissions-item-line-height: 1.5 !default;
 
 $action-permissions-label-trim-width: 84px !default;
 $action-permissions-toggle-trim-width: 54px !default;
+
+$field-permission-container-padding: 10px 0 !default;
+$field-permission-container-border-bottom: 1px solid $primary-830 !default;
 
 
 // Mobile
