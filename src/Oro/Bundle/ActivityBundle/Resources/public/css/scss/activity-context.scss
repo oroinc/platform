@@ -18,7 +18,9 @@
 }
 
 .activity-context-activity-items {
-    margin-#{$start}: $activity-context-activity-items-offset;
+    .activity-context-activity-label + & {
+        margin-#{$start}: $activity-context-activity-items-offset;
+    }
 }
 
 .activity-context-activity-block {
