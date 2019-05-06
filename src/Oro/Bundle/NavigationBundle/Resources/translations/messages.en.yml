@@ -23,7 +23,7 @@ oro:
             button: Minimize
             button.title: Pin/unpin the page
             more_tabs.label: More pintabs
-            help_message: Use the pin %pinIcon% icon on the right top corner of a page to create fast access link in the pinbar.
+            help_message: Use the %pinIcon% icon in the top right corner of the page to create a pin, so that you can come back to it at any time in one click.
         menuitem:
             name.label: Name
         menuupdate:

@@ -102,7 +102,7 @@ define(function(require) {
             var confirmModal = new Modal({
                 title: __('oro.datagrid.inline_editing.refresh_confirm_modal.title'),
                 content: __('oro.ui.leave_page_with_unsaved_data_confirm'),
-                okText: __('OK, got it.'),
+                okText: __('Ok, got it'),
                 className: 'modal modal-primary',
                 cancelText: __('Cancel')
             });

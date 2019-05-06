@@ -46,7 +46,7 @@ define(function(require) {
             confirmModal = new Modal({
                 title: __('Refresh Confirmation'),
                 content: __('Your local changes will be lost. Are you sure you want to refresh the page?'),
-                okText: __('OK, got it.'),
+                okText: __('Ok, got it'),
                 className: 'modal modal-primary',
                 cancelText: __('Cancel'),
                 disposeOnHidden: false
