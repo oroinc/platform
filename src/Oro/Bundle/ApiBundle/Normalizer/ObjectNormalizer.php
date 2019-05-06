@@ -184,13 +184,7 @@ class ObjectNormalizer
                     if (null !== $targetConfig) {
                         $value = $this->normalizeValue($value, $level + 1, $context, $targetConfig);
                     } else {
-                        $value = $this->serializationHelper->transformValue(
-                            $entityClass,
-                            $fieldName,
-                            $value,
-                            $context,
-                            $field
-                        );
+                        $value = $this->serializationHelper->transformValue($value, $context, $field);
                     }
                 }
                 $result[$fieldName] = $value;

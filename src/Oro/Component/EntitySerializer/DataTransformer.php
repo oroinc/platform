@@ -5,35 +5,32 @@ namespace Oro\Component\EntitySerializer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterface;
 
-class EntityDataTransformer implements DataTransformerInterface
+/**
+ * The implementation of the data transformer that executes transformer(s)
+ * from "data_transformer" configuration attribute.
+ */
+class DataTransformer implements DataTransformerInterface
 {
     /** @var ContainerInterface */
-    protected $container;
-
-    /** @var DataTransformerInterface */
-    protected $baseDataTransformer;
+    private $container;
 
     /**
-     * @param ContainerInterface            $container
-     * @param DataTransformerInterface|null $baseDataTransformer
+     * @param ContainerInterface $container
      */
-    public function __construct(ContainerInterface $container, DataTransformerInterface $baseDataTransformer = null)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->baseDataTransformer = $baseDataTransformer;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function transform($class, $property, $value, array $config, array $context)
+    public function transform($value, array $config, array $context)
     {
         if (isset($config[ConfigUtil::DATA_TRANSFORMER])) {
             foreach ($config[ConfigUtil::DATA_TRANSFORMER] as $transformer) {
                 $value = $this->transformByCustomTransformer(
                     $transformer,
-                    $class,
-                    $property,
                     $value,
                     $config,
                     $context
@@ -41,15 +38,11 @@ class EntityDataTransformer implements DataTransformerInterface
             }
         }
 
-        return null !== $this->baseDataTransformer
-            ? $this->baseDataTransformer->transform($class, $property, $value, $config, $context)
-            : $value;
+        return $value;
     }
 
     /**
      * @param mixed  $transformer
-     * @param string $class
-     * @param string $property
      * @param mixed  $value
      * @param array  $config
      * @param array  $context
@@ -60,8 +53,6 @@ class EntityDataTransformer implements DataTransformerInterface
      */
     protected function transformByCustomTransformer(
         $transformer,
-        $class,
-        $property,
         $value,
         array $config,
         array $context
@@ -70,33 +61,29 @@ class EntityDataTransformer implements DataTransformerInterface
             $transformerService = $this->container->get($transformer, ContainerInterface::NULL_ON_INVALID_REFERENCE);
             if (null === $transformerService) {
                 throw new \InvalidArgumentException(\sprintf(
-                    'Undefined data transformer service "%s". Class: %s. Property: %s.',
-                    $transformer,
-                    $class,
-                    $property
+                    'Undefined data transformer service "%s".',
+                    $transformer
                 ));
             }
             $transformer = $transformerService;
         }
 
         if ($transformer instanceof DataTransformerInterface) {
-            return $transformer->transform($class, $property, $value, $config, $context);
+            return $transformer->transform($value, $config, $context);
         }
         if ($transformer instanceof FormDataTransformerInterface) {
             return $transformer->transform($value);
         }
         if (\is_callable($transformer)) {
-            return \call_user_func($transformer, $class, $property, $value, $config, $context);
+            return $transformer($value, $config, $context);
         }
 
         throw new \InvalidArgumentException(\sprintf(
-            'Unexpected type of data transformer "%s". Expected "%s", "%s" or "%s". Class: %s. Property: %s.',
+            'Unexpected type of data transformer "%s". Expected "%s", "%s" or "%s".',
             \is_object($transformer) ? \get_class($transformer) : \gettype($transformer),
-            'Oro\Component\EntitySerializer\DataTransformerInterface',
-            'Symfony\Component\Form\DataTransformerInterface',
-            'callable',
-            $class,
-            $property
+            DataTransformerInterface::class,
+            FormDataTransformerInterface::class,
+            'callable'
         ));
     }
 }

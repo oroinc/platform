@@ -15,6 +15,8 @@ parameters:
         dataType: 'datetime'
     fieldDecimal:
         dataType: 'decimal'
+    fieldDecimalDefault:
+        dataType: 'decimal'
     fieldDuration:
         dataType: 'integer'
     fieldFloat:
@@ -57,6 +59,8 @@ response:
     fieldDateTime:
         dataType: 'datetime'
     fieldDecimal:
+        dataType: 'decimal'
+    fieldDecimalDefault:
         dataType: 'decimal'
     fieldDuration:
         dataType: 'integer'

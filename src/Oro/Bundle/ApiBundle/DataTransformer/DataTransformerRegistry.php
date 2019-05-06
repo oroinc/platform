@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 /**
  * Contains all data transformers
  * and allows to get a transformer suitable for a specific request type.
- * @see \Oro\Component\EntitySerializer\EntityDataTransformer
+ * @see \Oro\Component\EntitySerializer\DataTransformerInterface
  */
 class DataTransformerRegistry
 {

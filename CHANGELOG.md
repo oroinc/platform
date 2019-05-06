@@ -12,6 +12,10 @@ The current file describes significant changes in the code that may affect the u
   when the parameter is requested at the first time. This can be helpful for rare used parameters with time consuming
   value resolving.
 
+#### ApiBundle
+* The class `Oro\Bundle\ApiBundle\Request\ValueTransformer` (service ID is `oro_api.value_transformer`) was added
+  to help transformation of complex computed values to concrete data-type for API responses.
+
 ### Changed
 
 #### Config component
@@ -19,6 +23,13 @@ The current file describes significant changes in the code that may affect the u
   were changed to not accept `Symfony\Component\DependencyInjection\ContainerBuilder` as resources container.
   Use `Oro\Component\Config\Loader\ContainerBuilderAdapter` to adapt
   `Symfony\Component\DependencyInjection\ContainerBuilder` to `Oro\Component\Config\ResourcesContainerInterface`.
+
+#### EntitySerializer component
+* The method `transform` of `Oro\Component\EntitySerializer\DataTransformerInterface` was changed
+  from `transform($class, $property, $value, array $config, array $context)`
+  to `transform($value, array $config, array $context)`.
+* The class `Oro\Component\EntitySerializer\EntityDataTransformer` was renamed to `Oro\Component\EntitySerializer\DataTransformer`
+  and `$baseDataTransformer` property was removed from it.
 
 #### CacheBundle
 * The approach based on `Oro\Bundle\CacheBundle\Loader\ConfigurationLoader` and `Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper` has been replaced with the approach based on `Oro\Component\Config\Cache\PhpConfigProvider`.

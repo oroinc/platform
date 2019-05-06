@@ -21,24 +21,15 @@ class SerializationHelper
     /**
      * Prepares the given value for serialization.
      *
-     * @param string           $entityClass
-     * @param string           $fieldName
      * @param mixed            $fieldValue
      * @param array            $context
      * @param FieldConfig|null $fieldConfig
      *
      * @return mixed
      */
-    public function transformValue(
-        $entityClass,
-        $fieldName,
-        $fieldValue,
-        array $context,
-        FieldConfig $fieldConfig = null
-    ) {
+    public function transformValue($fieldValue, array $context, FieldConfig $fieldConfig = null)
+    {
         return $this->dataTransformer->transform(
-            $entityClass,
-            $fieldName,
             $fieldValue,
             null !== $fieldConfig ? $fieldConfig->toArray(true) : [],
             $context
@@ -145,8 +136,6 @@ class SerializationHelper
                             $currentConfig = $this->getTargetEntityConfig($currentConfig, $currentField);
                             if (null === $currentConfig) {
                                 $value = $this->transformValue(
-                                    $entityClass,
-                                    $fieldName,
                                     $value,
                                     $context,
                                     $entityConfig->getField($fieldName)

@@ -67,9 +67,16 @@ class TestAllDataTypes implements TestFrameworkEntityInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="field_decimal", type="decimal", precision=10, scale=6, nullable=true)
+     * @ORM\Column(name="field_decimal", type="decimal", precision=20, scale=8, nullable=true)
      */
     public $fieldDecimal;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="field_decimal_default", type="decimal", nullable=true)
+     */
+    public $fieldDecimalDefault;
 
     /**
      * @var float

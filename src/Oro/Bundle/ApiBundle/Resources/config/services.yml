@@ -149,6 +149,13 @@ services:
         arguments:
             - '@oro_api.normalize_value.processor'
 
+    oro_api.value_transformer:
+        class: Oro\Bundle\ApiBundle\Request\ValueTransformer
+        public: false
+        arguments:
+            - '@oro_api.data_transformer_registry'
+            - '@oro_api.entity_serializer.data_transformer'
+
     oro_api.query_resolver:
         class: Oro\Bundle\ApiBundle\Util\AclProtectedQueryResolver
         public: false
@@ -491,7 +498,7 @@ services:
         public: false
 
     oro_api.entity_serializer.data_transformer:
-        class: Oro\Component\EntitySerializer\EntityDataTransformer
+        class: Oro\Component\EntitySerializer\DataTransformer
         public: false
         arguments:
             - '@service_container'

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -54,11 +53,7 @@ class LoadEntitiesByEntitySerializer implements ProcessorInterface
             $this->entitySerializer->serialize(
                 $query,
                 $config,
-                [
-                    Context::ACTION       => $context->getAction(),
-                    Context::VERSION      => $context->getVersion(),
-                    Context::REQUEST_TYPE => $context->getRequestType()
-                ]
+                $context->getNormalizationContext()
             )
         );
 

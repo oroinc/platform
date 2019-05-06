@@ -3,18 +3,15 @@
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Oro\Component\EntitySerializer\DataTransformerInterface;
-use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterface;
 
 class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
 {
-    // @codingStandardsIgnoreStart
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Undefined data transformer service "data_transformer_service_id". Class: Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group. Property: name.
+     * @expectedExceptionMessage Undefined data transformer service "data_transformer_service_id".
      */
-    // @codingStandardsIgnoreEnd
     public function testUndefinedDataTransformerService()
     {
         $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
@@ -58,7 +55,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unexpected type of data transformer "stdClass". Expected "Oro\Component\EntitySerializer\DataTransformerInterface", "Symfony\Component\Form\DataTransformerInterface" or "callable". Class: Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group. Property: name.
+     * @expectedExceptionMessage Unexpected type of data transformer "stdClass". Expected "Oro\Component\EntitySerializer\DataTransformerInterface", "Symfony\Component\Form\DataTransformerInterface" or "callable".
      */
     // @codingStandardsIgnoreEnd
     public function testInvalidDataTransformerType()
@@ -127,8 +124,6 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         $transformer->expects($this->once())
             ->method('transform')
             ->with(
-                Entity\Group::class,
-                'name',
                 'group_name',
                 ['data_transformer' => ['data_transformer_service_id']],
                 $context
@@ -250,7 +245,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
                 'fields'           => [
                     'id'   => null,
                     'name' => [
-                        'data_transformer' => function ($class, $property, $value, array $config, array $context) {
+                        'data_transformer' => function ($value, array $config, array $context) {
                             return sprintf('transformed_group_name[%s]', $context['key']);
                         }
                     ],
@@ -295,8 +290,6 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         $transformer->expects($this->once())
             ->method('transform')
             ->with(
-                Entity\Group::class,
-                'newName',
                 'group_name',
                 ['data_transformer' => ['data_transformer_service_id'], 'property_path' => 'name'],
                 []
@@ -367,8 +360,6 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         $transformer->expects($this->once())
             ->method('transform')
             ->with(
-                Entity\Product::class,
-                'ownerName',
                 'user_name',
                 ['data_transformer' => ['data_transformer_service_id'], 'property_path' => 'owner.name'],
                 []

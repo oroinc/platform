@@ -123,7 +123,7 @@ data:
         type: inventorylevels
         id: '@warehouse_inventory_level.warehouse.1.product_unit_precision.product-1.liter->id'
         attributes:
-            quantity: '10.0000000000'
+            quantity: '10'
         relationships:
             product:
                 data:

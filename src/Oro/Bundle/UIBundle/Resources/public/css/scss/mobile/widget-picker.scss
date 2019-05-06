@@ -1,5 +1,16 @@
 /* @theme: admin.oro; */
 
+.widget-picker {
+    &__description-toggler {
+        height: $widget-picker-icon-height;
+        width: $widget-picker-icon-width;
+
+        .collapse-action-icon {
+            height: $btn-mobile-font-size;
+        }
+    }
+}
+
 @media only screen and (max-width: $medium-devices-media-breakpoint) {
     .widget-picker {
         &__modal .modal-body {
@@ -46,6 +57,10 @@
         &__description-toggler {
             width: $widget-picker-description-collapse-font-size;
             height: auto;
+
+            .collapse-action-icon {
+                height: auto;
+            }
         }
 
         &__info-column {

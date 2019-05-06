@@ -397,13 +397,7 @@ class EntitySerializer
                             );
                         }
                     } else {
-                        $value = $this->serializationHelper->transformValue(
-                            $entityClass,
-                            $field,
-                            $value,
-                            $context,
-                            $fieldConfig
-                        );
+                        $value = $this->serializationHelper->transformValue($value, $context, $fieldConfig);
                     }
                 }
                 $result[$field] = $value;

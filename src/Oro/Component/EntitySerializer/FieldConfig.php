@@ -177,7 +177,7 @@ class FieldConfig
      * @return array Each item of the array can be the id of a service in DIC, an instance of
      *               "Oro\Component\EntitySerializer\DataTransformerInterface" or
      *               "Symfony\Component\Form\DataTransformerInterface",
-     *               or function ($class, $property, $value, $config, $context) : mixed.
+     *               or function ($value, $config, $context) : mixed.
      */
     public function getDataTransformers()
     {
@@ -194,7 +194,7 @@ class FieldConfig
      * The data transformer can be the id of a service in DIC or an instance of
      * "Oro\Component\EntitySerializer\DataTransformerInterface" or
      * "Symfony\Component\Form\DataTransformerInterface",
-     * or function ($class, $property, $value, $config, $context) : mixed.
+     * or function ($value, $config, $context) : mixed.
      *
      * Please note that these data transformers work only during loading of data
      * and they are applicable only to fields. For associations they do not work.

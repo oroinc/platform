@@ -19,7 +19,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityDataAccessor;
 use Oro\Component\EntitySerializer\DataNormalizer;
-use Oro\Component\EntitySerializer\EntityDataTransformer;
+use Oro\Component\EntitySerializer\DataTransformer;
 use Oro\Component\EntitySerializer\SerializationHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -42,9 +42,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->objectNormalizer = new ObjectNormalizer(
             $normalizers,
             new DoctrineHelper($doctrine),
-            new SerializationHelper(
-                new EntityDataTransformer($this->createMock(ContainerInterface::class))
-            ),
+            new SerializationHelper(new DataTransformer($this->createMock(ContainerInterface::class))),
             new EntityDataAccessor(),
             new ConfigNormalizer(),
             new DataNormalizer()
@@ -125,8 +123,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
                 'id'   => null,
                 'name' => [
                     'data_transformer' => [
-                        function ($class, $property, $value, $config, $context) {
-                            return $value . sprintf(' (%s::%s)[%s]', $class, $property, $context['key']);
+                        function ($value, $config, $context) {
+                            return $value . sprintf(' [%s]', $context['key']);
                         }
                     ]
                 ]
@@ -142,7 +140,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [
                 'id'   => 123,
-                'name' => 'test_name (Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group::name)[context value]'
+                'name' => 'test_name [context value]'
             ],
             $result
         );
@@ -427,8 +425,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
                     'fields'           => [
                         'name'    => [
                             'data_transformer' => [
-                                function ($class, $property, $value, $config, $context) {
-                                    return $value . sprintf(' (%s::%s)[%s]', $class, $property, $context['key']);
+                                function ($value, $config, $context) {
+                                    return $value . sprintf(' [%s]', $context['key']);
                                 }
                             ]
                         ],
@@ -458,8 +456,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
                 'id'        => 123,
                 'category1' => 'category_label',
                 'owner'     => [
-                    'name'    => 'user_name (Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User::name)'
-                        . '[context value]_additional[context value]',
+                    'name'    => 'user_name [context value]_additional[context value]',
                     'groups1' => [11, 22]
                 ]
             ],

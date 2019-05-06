@@ -9,16 +9,15 @@ use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\EntitySerializer\ConfigConverter;
 use Oro\Component\EntitySerializer\ConfigNormalizer;
 use Oro\Component\EntitySerializer\DataNormalizer;
+use Oro\Component\EntitySerializer\DataTransformer;
 use Oro\Component\EntitySerializer\DoctrineHelper;
 use Oro\Component\EntitySerializer\EntityDataAccessor;
-use Oro\Component\EntitySerializer\EntityDataTransformer;
 use Oro\Component\EntitySerializer\EntityFieldFilterInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Component\EntitySerializer\FieldAccessor;
 use Oro\Component\EntitySerializer\QueryFactory;
 use Oro\Component\EntitySerializer\QueryResolver;
 use Oro\Component\EntitySerializer\SerializationHelper;
-use Oro\Component\EntitySerializer\ValueTransformer;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -56,16 +55,12 @@ abstract class EntitySerializerTestCase extends OrmTestCase
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
         $doctrine->expects($this->any())
             ->method('getAliasNamespace')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Test', 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity']
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['Test', 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity']
+            ]);
 
         $this->entityFieldFilter = $this->createMock(EntityFieldFilterInterface::class);
         $this->entityFieldFilter->expects($this->any())
@@ -73,17 +68,13 @@ abstract class EntitySerializerTestCase extends OrmTestCase
             ->willReturn(true);
 
         $this->container = $this->createMock(ContainerInterface::class);
-
         $queryHintResolver = $this->createMock(QueryHintResolverInterface::class);
-
-        $doctrineHelper   = new DoctrineHelper($doctrine);
-        $dataAccessor     = new EntityDataAccessor();
-        $fieldAccessor    = new FieldAccessor($doctrineHelper, $dataAccessor, $this->entityFieldFilter);
+        $doctrineHelper = new DoctrineHelper($doctrine);
+        $dataAccessor = new EntityDataAccessor();
+        $fieldAccessor = new FieldAccessor($doctrineHelper, $dataAccessor, $this->entityFieldFilter);
         $this->serializer = new EntitySerializer(
             $doctrineHelper,
-            new SerializationHelper(
-                new EntityDataTransformer($this->container, new ValueTransformer())
-            ),
+            new SerializationHelper(new DataTransformer($this->container)),
             $dataAccessor,
             new QueryFactory($doctrineHelper, new QueryResolver($queryHintResolver)),
             $fieldAccessor,

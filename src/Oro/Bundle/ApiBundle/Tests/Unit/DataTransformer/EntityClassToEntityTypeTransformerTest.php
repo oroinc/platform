@@ -35,7 +35,7 @@ class EntityClassToEntityTypeTransformerTest extends \PHPUnit\Framework\TestCase
 
         self::assertSame(
             $value,
-            $this->transformer->transform('Test\Class', 'testField', $value, [], [])
+            $this->transformer->transform($value, [], [])
         );
     }
 
@@ -60,13 +60,7 @@ class EntityClassToEntityTypeTransformerTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             $expectedValue,
-            $this->transformer->transform(
-                'Test\Class',
-                'testField',
-                $value,
-                [],
-                [Context::REQUEST_TYPE => $requestType]
-            )
+            $this->transformer->transform($value, [], [Context::REQUEST_TYPE => $requestType])
         );
     }
 }

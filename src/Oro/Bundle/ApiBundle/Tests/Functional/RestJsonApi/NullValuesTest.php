@@ -54,7 +54,9 @@ class NullValuesTest extends DefaultAndNullTestCase
         self::assertNull($entity->withoutDefaultValueString);
         // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
         // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
-        if (!$this->isPostgreSql()) {
+        if ($this->isPostgreSql()) {
+            self::assertFalse($entity->withoutDefaultValueBoolean);
+        } else {
             self::assertNull($entity->withoutDefaultValueBoolean);
         }
         self::assertNull($entity->withoutDefaultValueInteger);
@@ -82,14 +84,22 @@ class NullValuesTest extends DefaultAndNullTestCase
 
         $result = self::jsonToArray($response->getContent());
         self::assertNull($result['data']['attributes']['withoutDefaultValueString']);
-        self::assertNull($result['data']['attributes']['withoutDefaultValueBoolean']);
+        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
+        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
+        if ($this->isPostgreSql()) {
+            self::assertFalse($result['data']['attributes']['withoutDefaultValueBoolean']);
+        } else {
+            self::assertNull($result['data']['attributes']['withoutDefaultValueBoolean']);
+        }
         self::assertNull($result['data']['attributes']['withoutDefaultValueInteger']);
 
         $entity = $this->loadTestEntity((int)$result['data']['id']);
         self::assertNull($entity->withoutDefaultValueString);
         // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
         // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
-        if (!$this->isPostgreSql()) {
+        if ($this->isPostgreSql()) {
+            self::assertFalse($entity->withoutDefaultValueBoolean);
+        } else {
             self::assertNull($entity->withoutDefaultValueBoolean);
         }
         self::assertNull($entity->withoutDefaultValueInteger);

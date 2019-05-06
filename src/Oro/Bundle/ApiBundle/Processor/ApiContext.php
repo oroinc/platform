@@ -103,4 +103,18 @@ abstract class ApiContext extends BaseContext
             && array_key_exists($operationName, $this->processed)
             && $this->processed[$operationName];
     }
+
+    /**
+     * Gets a context for response data normalization.
+     *
+     * @return array
+     */
+    public function getNormalizationContext(): array
+    {
+        return [
+            self::ACTION       => $this->getAction(),
+            self::VERSION      => $this->getVersion(),
+            self::REQUEST_TYPE => $this->getRequestType()
+        ];
+    }
 }
