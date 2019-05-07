@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c7b22d3550b8435cd77e33225b82f7a9",
+    "content-hash": "2005655e1787c5f027b96bb09a71f7c3",
     "packages": [
         {
             "name": "akeneo/batch-bundle",
@@ -327,21 +327,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/fat/bean/zipball/0bbb3911ec2bb15333fdcf3a0a7904a1d4f62dea",
                 "reference": "0bbb3911ec2bb15333fdcf3a0a7904a1d4f62dea"
-            },
-            "type": "bower-asset"
-        },
-        {
-            "name": "bower-asset/bootstrap",
-            "version": "v4.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/twbs/bootstrap.git",
-                "reference": "779ad9f174ea5ab7e755f6df0ec9e5912d67dd16"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/779ad9f174ea5ab7e755f6df0ec9e5912d67dd16",
-                "reference": "779ad9f174ea5ab7e755f6df0ec9e5912d67dd16"
             },
             "type": "bower-asset"
         },
@@ -5063,37 +5048,16 @@
             "time": "2018-05-29T15:23:46+00:00"
         },
         {
-            "name": "npm-asset/bootbox",
-            "version": "v4.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/makeusabrew/bootbox.git",
-                "reference": "f4ced08acee9ba17a542d72d44db8c868f5379c2"
-            },
+            "name": "npm-asset/bootstrap",
+            "version": "4.3.1",
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/makeusabrew/bootbox/zipball/f4ced08acee9ba17a542d72d44db8c868f5379c2",
-                "reference": "f4ced08acee9ba17a542d72d44db8c868f5379c2"
+                "type": "tar",
+                "url": "https://registry.npmjs.org/bootstrap/-/bootstrap-4.3.1.tgz"
             },
             "type": "npm-asset",
             "license": [
                 "MIT"
             ]
-        },
-        {
-            "name": "npm-asset/bootstrap",
-            "version": "v3.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/twbs/bootstrap.git",
-                "reference": "6d03173a1aad98e75f7d33e65b411c519176c59a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/6d03173a1aad98e75f7d33e65b411c519176c59a",
-                "reference": "6d03173a1aad98e75f7d33e65b411c519176c59a"
-            },
-            "type": "npm-asset"
         },
         {
             "name": "npm-asset/jquery",
@@ -5128,6 +5092,18 @@
             "dist": {
                 "type": "tar",
                 "url": "https://registry.npmjs.org/overlayscrollbars/-/overlayscrollbars-1.6.3.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/popper.js",
+            "version": "1.14.7",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/popper.js/-/popper.js-1.14.7.tgz"
             },
             "type": "npm-asset",
             "license": [
