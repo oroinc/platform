@@ -77,6 +77,13 @@ services:
         tags:
             - { name: form.type, alias: oro_integration_select }
 
+    oro_integration.form.type.config_integration_select:
+        class: 'Oro\Bundle\IntegrationBundle\Form\Type\ConfigIntegrationSelectType'
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: form.type }
+
     oro_integration.form.subscriber.channel_subscriber:
         class: '%oro_integration.form.subscriber.channel_subscriber.class%'
         arguments:
