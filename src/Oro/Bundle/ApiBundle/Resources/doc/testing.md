@@ -218,6 +218,5 @@ public function testGetList()
 }
 ```
 
-**Important:**
-Do not forget to check references after you dump a response for the first time: there can be collisions
+**Important:** Do not forget to check references after you dump a response for the first time: there can be collisions
 if references have the same IDs.

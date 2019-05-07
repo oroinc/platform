@@ -84,7 +84,15 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
                 if ($isCollectionProcessor) {
                     $item[1][self::GROUP_ATTRIBUTE] = 'collection';
                     // "identifier_only" attribute is not supported for collections
-                    unset($item[1][self::IDENTIFIER_ONLY_ATTRIBUTE]);
+                    if (array_key_exists(self::IDENTIFIER_ONLY_ATTRIBUTE, $item[1])) {
+                        throw new LogicException(sprintf(
+                            'The "%s" processor uses the "%s" tag attribute that is not supported'
+                            . ' in case the "%s" tag attribute equals to true.',
+                            $item[0],
+                            self::IDENTIFIER_ONLY_ATTRIBUTE,
+                            self::COLLECTION_ATTRIBUTE
+                        ));
+                    }
                     $collectionProcessors[] = $item;
                 } else {
                     $item[1][self::GROUP_ATTRIBUTE] = 'item';

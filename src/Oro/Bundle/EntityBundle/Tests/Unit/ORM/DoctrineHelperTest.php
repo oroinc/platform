@@ -1014,22 +1014,14 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $entityClass    = 'MockEntity';
         $entityId       = 100;
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repo->expects($this->once())
-            ->method('find')
-            ->with($entityId)
-            ->will($this->returnValue($expectedResult));
-
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->with($entityClass)
-            ->will($this->returnValue($repo));
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->with($entityClass)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
+        $this->em->expects($this->once())
+            ->method('find')
+            ->with($entityClass, $entityId)
+            ->willReturn($expectedResult);
 
         $this->assertSame(
             $expectedResult,

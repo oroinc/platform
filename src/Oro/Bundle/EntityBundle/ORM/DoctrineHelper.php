@@ -382,7 +382,7 @@ class DoctrineHelper
     public function getEntityReference($entityClass, $entityId)
     {
         return $this
-            ->getEntityManager($entityClass)
+            ->getEntityManagerForClass($entityClass)
             ->getReference($entityClass, $entityId);
     }
 
@@ -397,8 +397,8 @@ class DoctrineHelper
     public function getEntity($entityClass, $entityId)
     {
         return $this
-            ->getEntityRepository($entityClass)
-            ->find($entityId);
+            ->getEntityManagerForClass($entityClass)
+            ->find($entityClass, $entityId);
     }
 
     /**
@@ -411,7 +411,7 @@ class DoctrineHelper
     public function createEntityInstance($entityClass)
     {
         return $this
-            ->getEntityMetadata($entityClass)
+            ->getEntityMetadataForClass($entityClass)
             ->newInstance();
     }
 
