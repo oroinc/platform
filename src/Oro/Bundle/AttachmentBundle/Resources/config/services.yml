@@ -61,6 +61,13 @@ services:
         tags:
             - { name: validator.constraint_validator }
 
+    oro_attachment.validators.image_validator:
+        class: 'Oro\Bundle\AttachmentBundle\Validator\Constraints\ImageValidator'
+        arguments:
+            - '@oro_config.global'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_attachment_image_validator }
+
     oro_attachment.liip_imagine.binary.factory.guess_mime_type:
         class: 'Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\GuessMimeType\GuessMimeTypeByFileContextFactory'
         arguments:
