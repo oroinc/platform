@@ -114,6 +114,29 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(self::FILE_ID, $this->transformer->reverseTransform($file->reveal()));
     }
 
+    public function testReverseTransformInvalidFileWithoutPersistedEntity()
+    {
+        $httpFile = $this->prepareHttpFile();
+
+        $file = $this->prepareFile($httpFile);
+        $file->preUpdate()->shouldNotBeCalled();
+        $file->getId()->willReturn(null);
+        $file->getFilename()->willReturn(self::FILENAME);
+
+        $this->validator->validate($httpFile, $this->constraints)->willReturn(['violation']);
+
+        $em = $this->prepareEntityManager();
+        $em->persist($file)->shouldNotBeCalled();
+        $em->flush($file)->shouldNotBeCalled();
+
+        $repo = $this->prophesize(EntityRepository::class);
+        $repo->findOneBy(['filename' => self::FILENAME])->willReturn(null);
+
+        $this->doctrineHelper->getEntityRepositoryForClass(File::class)->willReturn($repo->reveal());
+
+        $this->assertEquals(null, $this->transformer->reverseTransform($file->reveal()));
+    }
+
     /**
      * @return EntityManager
      */

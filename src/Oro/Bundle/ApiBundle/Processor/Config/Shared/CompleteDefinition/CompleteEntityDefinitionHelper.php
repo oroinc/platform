@@ -21,6 +21,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 /**
  * The helper class to complete the configuration of Data API resource based on ORM entity.
@@ -99,7 +100,6 @@ class CompleteEntityDefinitionHelper
         } else {
             $version = $context->getVersion();
             $requestType = $context->getRequestType();
-            $existingFields = $this->getExistingFields($definition);
             $expandedEntities = $this->getExpandedEntities(
                 $definition,
                 $context->get(ExpandRelatedEntitiesConfigExtra::NAME)
@@ -109,6 +109,7 @@ class CompleteEntityDefinitionHelper
                 $definition->getExclusionPolicy() === ConfigUtil::EXCLUSION_POLICY_CUSTOM_FIELDS
                 && $this->isExtendSystemEntity($entityClass);
             $this->customDataTypeHelper->completeCustomDataTypes($definition, $metadata, $version, $requestType);
+            $existingFields = $this->getExistingFields($definition);
             $this->completeUnidirectionalAssociations(
                 $definition,
                 $metadata,
@@ -333,7 +334,7 @@ class CompleteEntityDefinitionHelper
         foreach ($associations as $propertyPath => $mapping) {
             if ($skipNotConfiguredCustomFields
                 && !isset($existingFields[$propertyPath])
-                && $this->isCustomField($metadata->name, $propertyPath)
+                && $this->isCustomAssocation($metadata->name, $propertyPath)
             ) {
                 continue;
             }
@@ -733,5 +734,24 @@ class CompleteEntityDefinitionHelper
         return
             $fieldConfig->is('is_extend')
             && $fieldConfig->is('owner', ExtendScope::OWNER_CUSTOM);
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $associationName
+     *
+     * @return bool
+     */
+    private function isCustomAssocation($entityClass, $associationName)
+    {
+        return
+            $this->isCustomField($entityClass, $associationName)
+            || (
+                0 === \strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX)
+                && $this->isCustomField(
+                    $entityClass,
+                    \substr($associationName, \strlen(ExtendConfigDumper::DEFAULT_PREFIX))
+                )
+            );
     }
 }
