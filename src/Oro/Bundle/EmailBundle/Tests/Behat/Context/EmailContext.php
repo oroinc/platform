@@ -367,12 +367,16 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             return;
         }
 
-        $pattern = sprintf('/<a\s+href\s*=\s*"([^"]+)".*>%s<\/a>/', $linkCaption);
+        $pattern = sprintf('/<a\s+.*href\s*=\s*"([^"]+)".*>\s*%s\s*<\/a>/s', $linkCaption);
         $matches = [];
 
         /** @var \Swift_Mime_Message $message */
         foreach ($mailer->getSentMessages() as $message) {
-            $found = preg_match($pattern, $message->getBody(), $matches);
+            $text = utf8_decode(html_entity_decode($message->getBody()));
+            // replace non-breaking spaces with plain spaces to be able to search
+            $text = str_replace(chr(160), chr(32), $text);
+
+            $found = preg_match($pattern, $text, $matches);
             if ($found === 1) {
                 break;
             }
