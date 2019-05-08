@@ -209,6 +209,24 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * @When price lists scheduled cron processes are executed
+     */
+    public function processPriceListsScheduledCronTriggers()
+    {
+        $commandRunner = $this->getContainer()->get('oro_cron.async.command_runner');
+        $repository = $this->getContainer()->get('oro_entity.doctrine_helper')
+            ->getEntityRepositoryForClass(Schedule::class);
+
+        $schedules = $repository->findBy(['command' => 'oro:cron:price-lists:schedule']);
+
+        /** @var Schedule $schedule */
+        foreach ($schedules as $schedule) {
+            $commandRunner->run($schedule->getCommand(), $this->resolveCommandOptions($schedule->getArguments()));
+        }
+    }
+
+
+    /**
      * @param array $commandOptions
      * @return array
      */
