@@ -6,6 +6,9 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * Transforms between id and entity.
+ */
 class IdToEntityTransformer implements DataTransformerInterface
 {
     /**

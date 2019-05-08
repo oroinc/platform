@@ -8,6 +8,9 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * Provides functionality to select an existing integration channel.
+ */
 class ConfigIntegrationSelectType extends AbstractType
 {
     /**
