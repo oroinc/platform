@@ -112,7 +112,6 @@ Filters
 ### oro_format_address
 
 This filter use *format* method from address formatter, and has same logic.
-By default new line separator set to *&lt;br/&gt;*
 
 ```
 {{ address|oro_format_address('US') }}
