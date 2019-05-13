@@ -116,6 +116,10 @@
     > li > a {
         @extend .dropdown-item;
     }
+    
+    .btn-group {
+        padding: $dropdown-item-padding-y $dropdown-item-padding-x;
+    }
 }
 
 .dropdown-toggle {

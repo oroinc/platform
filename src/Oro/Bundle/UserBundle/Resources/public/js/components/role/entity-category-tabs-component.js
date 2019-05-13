@@ -8,6 +8,11 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
     var BaseCollection = require('oroui/js/app/models/base/collection');
     var TabCollectionView = require('oroui/js/app/views/tab-collection-view');
+    var config = require('module').config();
+
+    config = _.extend({
+        useDropdown: true
+    }, config);
 
     EntityCategoryTabsComponent = BaseComponent.extend({
         /**
@@ -56,7 +61,7 @@ define(function(require) {
                 el: options._sourceElement,
                 animationDuration: 0,
                 collection: this.categories,
-                useDropdown: options.useDropdown
+                useDropdown: (options.useDropdown === void 0 ? config : options)['useDropdown']
             });
 
             this.listenTo(this.categories, 'change', this.onCategoryChange);
