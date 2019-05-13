@@ -59,9 +59,6 @@ class FindFieldUtil
             if (!$fieldPropertyPath || $fieldPropertyPath === $propertyPath) {
                 return $propertyPath;
             }
-            if (ConfigUtil::IGNORE_PROPERTY_PATH === $fieldPropertyPath) {
-                return self::findFieldNameByPropertyPath($fields, $propertyPath) ?? $propertyPath;
-            }
         }
 
         return self::findFieldNameByPropertyPath($fields, $propertyPath);

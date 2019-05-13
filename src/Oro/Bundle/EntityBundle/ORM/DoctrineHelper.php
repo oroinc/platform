@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\Exception;
 
 /**
@@ -368,6 +369,24 @@ class DoctrineHelper
         return $this
             ->getEntityManagerForClass($entityClass)
             ->getRepository($entityClass);
+    }
+
+    /**
+     * Creates a new QueryBuilder instance for the given entity class.
+     *
+     * @param string $entityClass The real class name of an entity
+     * @param string $alias       The alias of the entity class
+     * @param string $indexBy     The index for the from
+     *
+     * @return QueryBuilder
+     */
+    public function createQueryBuilder($entityClass, $alias, $indexBy = null)
+    {
+        return $this
+            ->getEntityManagerForClass($entityClass)
+            ->createQueryBuilder()
+            ->from($entityClass, $alias, $indexBy)
+            ->select($alias);
     }
 
     /**

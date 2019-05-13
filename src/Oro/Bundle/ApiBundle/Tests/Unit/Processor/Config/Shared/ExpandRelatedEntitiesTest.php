@@ -95,14 +95,12 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->context->setExtras(
-            [
-                new ExpandRelatedEntitiesConfigExtra(
-                    ['field1', 'association1', 'association2', 'association3', 'association4']
-                ),
-                new TestConfigSection('test_section')
-            ]
-        );
+        $this->context->setExtras([
+            new ExpandRelatedEntitiesConfigExtra(
+                ['field1', 'association1', 'association2', 'association3', 'association4']
+            ),
+            new TestConfigSection('test_section')
+        ]);
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
@@ -181,14 +179,12 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->context->setExtras(
-            [
-                new ExpandRelatedEntitiesConfigExtra(
-                    ['field1', 'association1', 'association2', 'association3', 'association4']
-                ),
-                new TestConfigSection('test_section')
-            ]
-        );
+        $this->context->setExtras([
+            new ExpandRelatedEntitiesConfigExtra(
+                ['field1', 'association1', 'association2', 'association3', 'association4']
+            ),
+            new TestConfigSection('test_section')
+        ]);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects(self::exactly(5))
@@ -302,12 +298,10 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             ]
         ]);
         $this->context->setResult($entityDefinition);
-        $this->context->setExtras(
-            [
-                new ExpandRelatedEntitiesConfigExtra(['account']),
-                new TestConfigSection('test_section')
-            ]
-        );
+        $this->context->setExtras([
+            new ExpandRelatedEntitiesConfigExtra(['account']),
+            new TestConfigSection('test_section')
+        ]);
 
         $this->configProvider->expects(self::any())
             ->method('getConfig')
@@ -320,7 +314,6 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             ->willReturn($this->createRelationConfigObject([]));
 
         $metadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        new ClassMetadata(self::TEST_CLASS_NAME);
         $metadata->associationMappings = [
             'customerAssociation' => [
                 'fieldName'    => 'customerAssociation',
@@ -374,11 +367,9 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
     {
         $config = [];
 
-        $this->context->setExtras(
-            [
-                new ExpandRelatedEntitiesConfigExtra(['association1.association11'])
-            ]
-        );
+        $this->context->setExtras([
+            new ExpandRelatedEntitiesConfigExtra(['association1.association11'])
+        ]);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects(self::once())
@@ -440,7 +431,9 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->context->setExtras([new ExpandRelatedEntitiesConfigExtra(['association1'])]);
+        $this->context->setExtras([
+            new ExpandRelatedEntitiesConfigExtra(['association1'])
+        ]);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects(self::once())
@@ -495,7 +488,9 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->context->setExtras([new ExpandRelatedEntitiesConfigExtra(['association1'])]);
+        $this->context->setExtras([
+            new ExpandRelatedEntitiesConfigExtra(['association1'])
+        ]);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects(self::once())
@@ -533,7 +528,9 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
 
     public function testProcessForManageableEntityWithAssociationToOverriddenEntity()
     {
-        $this->context->setExtras([new ExpandRelatedEntitiesConfigExtra(['association1'])]);
+        $this->context->setExtras([
+            new ExpandRelatedEntitiesConfigExtra(['association1'])
+        ]);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects(self::once())
@@ -586,13 +583,132 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
+    public function testProcessWhenPropertyNameIsUsedInsteadOfFieldName()
+    {
+        $entityDefinition = $this->createConfigObject([
+            'fields' => [
+                '_account' => [
+                    'property_path' => 'account'
+                ]
+            ]
+        ]);
+        $this->context->setResult($entityDefinition);
+        $this->context->setExtras([
+            new ExpandRelatedEntitiesConfigExtra(['account']),
+            new TestConfigSection('test_section')
+        ]);
+
+        $this->entityOverrideProvider->expects(self::never())
+            ->method('getSubstituteEntityClass');
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        $metadata = new ClassMetadata(self::TEST_CLASS_NAME);
+        $metadata->associationMappings = [
+            'account' => [
+                'fieldName'    => 'account',
+                'type'         => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'Test\AssociationTarget'
+            ]
+        ];
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($metadata);
+
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    '_account' => [
+                        'property_path' => 'account'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForRenamedField()
+    {
+        $entityDefinition = $this->createConfigObject([
+            'fields' => [
+                'account'  => [
+                    'property_path' => 'anotherAssociation'
+                ],
+                '_account' => [
+                    'property_path' => 'account'
+                ]
+            ]
+        ]);
+        $this->context->setResult($entityDefinition);
+        $this->context->setExtras([
+            new ExpandRelatedEntitiesConfigExtra(['account']),
+            new TestConfigSection('test_section')
+        ]);
+
+        $this->entityOverrideProvider->expects(self::once())
+            ->method('getSubstituteEntityClass')
+            ->with('Test\AssociationTarget')
+            ->willReturn(null);
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                'Test\AssociationTarget',
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $this->context->getPropagableExtras()
+            )
+            ->willReturn($this->createRelationConfigObject([]));
+
+        $metadata = new ClassMetadata(self::TEST_CLASS_NAME);
+        $metadata->associationMappings = [
+            'anotherAssociation' => [
+                'fieldName'    => 'anotherAssociation',
+                'type'         => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'Test\AssociationTarget'
+            ]
+        ];
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($metadata);
+
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'account'  => [
+                        'property_path' => 'anotherAssociation',
+                        'target_class'  => 'Test\AssociationTarget',
+                        'target_type'   => 'to-one'
+                    ],
+                    '_account' => [
+                        'property_path' => 'account'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
     /**
      * @param array|null $definition
      * @param array|null $testSection
      *
      * @return Config
      */
-    protected function createRelationConfigObject(array $definition = null, array $testSection = null)
+    private function createRelationConfigObject(array $definition = null, array $testSection = null)
     {
         $config = new Config();
         if (null !== $definition) {

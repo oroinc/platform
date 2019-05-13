@@ -104,6 +104,12 @@ class ExpandRelatedEntities implements ProcessorInterface
         $entityOverrideProvider = $this->entityOverrideProviderRegistry->getEntityOverrideProvider($requestType);
         $associations = $this->splitExpandedEntities($expandedEntities);
         foreach ($associations as $fieldName => $targetExpandedEntities) {
+            if (!$definition->hasField($fieldName)
+                && null !== $definition->findFieldNameByPropertyPath($fieldName)
+            ) {
+                continue;
+            }
+
             $propertyPath = $this->getPropertyPath($fieldName, $definition);
 
             $lastDelimiter = strrpos($propertyPath, '.');
