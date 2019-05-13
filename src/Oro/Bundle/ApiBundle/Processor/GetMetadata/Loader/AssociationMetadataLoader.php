@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\DataType;
 
 /**
  * Adds metadata to all associations.
@@ -13,7 +14,7 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 class AssociationMetadataLoader
 {
     /** @var MetadataProvider */
-    protected $metadataProvider;
+    private $metadataProvider;
 
     /**
      * @param MetadataProvider $metadataProvider
@@ -65,7 +66,32 @@ class AssociationMetadataLoader
             );
             if (null !== $targetMetadata) {
                 $association->setTargetMetadata($targetMetadata);
+                if (!$association->getDataType()) {
+                    $association->setDataType($this->getAssociationDataType($targetMetadata));
+                }
             }
         }
+    }
+
+    /**
+     * @param EntityMetadata $targetMetadata
+     *
+     * @return string
+     */
+    private function getAssociationDataType(EntityMetadata $targetMetadata)
+    {
+        $dataType = null;
+        $idFieldNames = $targetMetadata->getIdentifierFieldNames();
+        if (\count($idFieldNames) === 1) {
+            $idField = $targetMetadata->getProperty(reset($idFieldNames));
+            if (null !== $idField) {
+                $dataType = $idField->getDataType();
+            }
+        }
+        if (null === $dataType) {
+            $dataType = DataType::STRING;
+        }
+
+        return $dataType;
     }
 }

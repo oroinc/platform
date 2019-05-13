@@ -153,8 +153,7 @@ class EntityMetadataLoader
             if (!empty($idFieldNames)) {
                 $normalizedIdFieldNames = [];
                 foreach ($idFieldNames as $propertyPath) {
-                    $fieldName = $config->findFieldNameByPropertyPath($propertyPath);
-                    $normalizedIdFieldNames[] = $fieldName ?: $propertyPath;
+                    $normalizedIdFieldNames[] = $config->findFieldNameByPropertyPath($propertyPath) ?? $propertyPath;
                 }
                 $entityMetadata->setIdentifierFieldNames($normalizedIdFieldNames);
             }
@@ -289,13 +288,15 @@ class EntityMetadataLoader
                             $targetAction
                         );
                     } elseif ($field->getTargetClass()) {
+                        $targetClass = $field->getTargetClass();
                         $metadata = $this->objectMetadataFactory->createAndAddAssociationMetadata(
                             $entityMetadata,
                             $entityClass,
                             $config,
                             $fieldName,
                             $field,
-                            $targetAction
+                            $targetAction,
+                            $targetClass
                         );
                     } elseif ($dataType) {
                         $metadata = $this->objectMetadataFactory->createAndAddFieldMetadata(

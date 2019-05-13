@@ -300,6 +300,10 @@ The **data_type** attribute can serve to specify a data type of a field. However
 | nestedAssociation | Helps configure nested associations. For details, see [Configure nested association](./how_to.md#configure-nested-association). |
 | association:relationType\[:associationKind\] | Helps configure extended associations. For details, see [Configure Extended Many-To-One Association](./how_to.md#configure-extended-many-to-one-association), [Configure Extended Many-To-Many Association](./how_to.md#configure-extended-many-to-many-association), and [Configure Extended Multiple Many-To-One Association](./how_to.md#configure-extended-multiple-many-to-one-association). |
 
+**Note:** To add a new special type of a field that requires an additional configuration of a field or an entity,
+create a class that implements [CustomDataTypeCompleterInterface](../../Processor/Config/Shared/CompleteDefinition/CustomDataTypeCompleterInterface.php)
+and register this class in the dependency injection container with `oro.api.custom_data_type_completer` tag.
+The `requestType` tag attribute can be used to register a converter only for specific request types.
 
 **Examples:**
 

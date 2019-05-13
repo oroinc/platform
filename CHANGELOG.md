@@ -30,6 +30,12 @@ The current file describes significant changes in the code that may affect the u
   to `transform($value, array $config, array $context)`.
 * The class `Oro\Component\EntitySerializer\EntityDataTransformer` was renamed to `Oro\Component\EntitySerializer\DataTransformer`
   and `$baseDataTransformer` property was removed from it.
+* The execution of post serialize collection handlers was added to `to-one` associations; now both
+  single item and collection post serialize handlers are executed for all types of associations.
+* The execution of post serialize handlers was removed for associations in case only ID field is requested for them.
+
+#### ApiBundle
+* The parameter `$usePropertyPathByDefault` was removed from `getResultFieldName` method of `Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext`.
 
 #### CacheBundle
 * The approach based on `Oro\Bundle\CacheBundle\Loader\ConfigurationLoader` and `Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper` has been replaced with the approach based on `Oro\Component\Config\Cache\PhpConfigProvider`.

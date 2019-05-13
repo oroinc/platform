@@ -32,6 +32,8 @@ trusted_data:
         Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpressionInterface:
             __all__: true
             walkComparisonExpression: [1, 2, 3]
+        Oro\Bundle\ApiBundle\Util\DoctrineHelper:
+            createQueryBuilder: true
 
     check_methods_safety:
         Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor:

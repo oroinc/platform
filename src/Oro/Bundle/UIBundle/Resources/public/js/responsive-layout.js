@@ -17,6 +17,7 @@ define(function(require) {
     var _ = require('underscore');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
     var tools = require('oroui/js/tools');
+    var mediator = require('oroui/js/mediator');
 
     var SCROLLBAR_WIDTH = scrollHelper.scrollbarWidth() || 17;
     var DESKTOP_SERVICE_AREA = 80 + 32 + 24 * 2 + SCROLLBAR_WIDTH; // menu, sidebar, content paddings, scollbar widths;
@@ -160,15 +161,21 @@ define(function(require) {
 
     return {
         /**
-         * Finds responsive sections in received context (or in docuument if context wasn't determined)
+         * Finds responsive sections in received context (or in document if context wasn't determined)
          * and update them and its blocks with appropriate classes
          *
          * @param {HTMLElement} [context]
          */
         update: function(context) {
+            var isChanged = false;
+
             $(context || window.document).find(SELECTORS.SECTION).addBack(SELECTORS.SECTION).each(function() {
-                updateSection($(this));
+                isChanged = updateSection($(this)) || isChanged;
             });
+
+            if (isChanged) {
+                mediator.trigger('layout:reposition');
+            }
         }
     };
 });

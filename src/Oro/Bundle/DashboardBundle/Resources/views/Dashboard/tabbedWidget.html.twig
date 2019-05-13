@@ -1,12 +1,16 @@
 {% extends 'OroDashboardBundle:Dashboard:widget.html.twig' %}
 
 {% block content %}
-    <div class="tab-container">
+    <div class="tab-container"
+        {{ UI.renderPageComponentAttributes({
+            module: 'oroui/js/app/components/tabs-component'
+        }) }}
+    >
         <ul class="nav nav-tabs" role="tablist">
             {% set tabTabId = 'tab-'|uniqid %}
             {% set tabContentId = 'tab-content-'|uniqid %}
             {% for tab in tabs %}
-                <li class="nav-item">
+                <li class="nav-item tab">
                     <a id="{{ (loop.index == 0) ? tabTabId : tabTabId ~ loop.index }}"
                        href="#{{ tabContentId }}"
                        role="tab"
