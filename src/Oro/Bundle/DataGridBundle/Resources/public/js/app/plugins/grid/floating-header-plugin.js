@@ -389,7 +389,16 @@ define(function(require) {
                     headerHeight: self.headerHeight
                 });
 
-                self.scrollVisible = scrollContainer[0].clientHeight < scrollContainer[0].scrollHeight;
+                var height = scrollContainer[0].getBoundingClientRect().height;
+                var scrollHeight = scrollContainer[0].scrollHeight;
+
+                if (scrollHeight - height < 1) {
+                    // ie/edge bounding rect height may include fraction
+                    scrollHeight = Math.floor(height);
+                }
+
+                self.scrollVisible = scrollContainer[0].clientHeight < scrollHeight;
+
                 scrollStateModel.set({
                     visible: self.scrollVisible,
                     scrollHeight: scrollContainer[0].scrollHeight,
