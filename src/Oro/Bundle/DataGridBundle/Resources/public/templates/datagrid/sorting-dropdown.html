@@ -4,7 +4,7 @@
 <span class="datagrid-tool__label"><%=_.__('oro.datagrid.toolbar_sorting.label') %>:</span>
 <% } %>
 
-<select class="oro-select2 oro-select2--size-s input-widget">
+<select class="oro-select2 oro-select2--size-s input-widget" data-skip-input-widgets>
     <% if (disableNotSelectedOption === false || currentDirection === null) { %>
         <option value="not-selected" <% if (currentDirection === null) { %>selected="selected"<% } %>>
             <%= _.__('oro.datagrid.sorters.not_selected') %>
