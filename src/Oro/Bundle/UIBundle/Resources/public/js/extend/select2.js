@@ -325,6 +325,8 @@ define(function(require) {
                     // Remove previously auto generated name
                     this.search.removeAttr('name');
                 }.bind(this));
+
+            this.opts.element.trigger($.Event('select2-init'));
         };
 
         prototype.destroy = function() {
