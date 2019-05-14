@@ -10,6 +10,7 @@ define(function(require) {
     var FuzzySearch = require('oroui/js/fuzzy-search');
     var persistentStorage = require('oroui/js/persistent-storage');
     var highlightSwitcherTemplate = require('tpl!oroui/templates/highlight-switcher.html');
+    var inputWidgetManager = require('oroui/js/input-widget-manager');
 
     HighlightTextView = BaseView.extend({
         /**
@@ -24,7 +25,9 @@ define(function(require) {
         ]),
 
         events: {
-            'click [data-role="highlight-switcher"]': 'changeHighlightSwitcherState'
+            'click [data-role="highlight-switcher"]': 'changeHighlightSwitcherState',
+            'change .select2-offscreen': 'onSelect2Change',
+            'select2-init .select2-offscreen[data-name]': 'onSelect2Change'
         },
 
         /**
@@ -132,7 +135,7 @@ define(function(require) {
             this.findElementHighlightClass = '.' + this.elementHighlightClass;
             this.findNotFoundClass = '.' + this.notFoundClass;
             this.findFoundClass = '.' + this.foundClass;
-            this.replaceBy = '<span class="' + this.highlightClass + '">$&</span>';
+            this.replaceBy = '<mark class="' + this.highlightClass + '">$&</mark>';
 
             HighlightTextView.__super__.initialize.apply(this, arguments);
 
@@ -339,6 +342,11 @@ define(function(require) {
 
             if (popover !== void 0) {
                 content = $('<div/>').html(popover.getContent());
+            } else if (this._isSelect2Multi($el)) {
+                content = $el.siblings('.select2-container').find('.select2-choices');
+            } else if (this._isSelect2($el)) {
+                content = $el.siblings('.select2-container').find('.select2-choice:not(.select2-default)')
+                    .find('.select2-chosen');
             } else if (this._isField($el) && !this._isFieldChoice($el)) {
                 content = $('<div/>').html($el.val());
             } else {
@@ -355,19 +363,42 @@ define(function(require) {
          * @param {jQuery} $content
          */
         setElementContent: function($el, $content) {
+            var $highlightTarget = $el;
+            var isContentHighlighted = this.isElementContentHighlighted($content, false);
             var popover = $el.data(Popover.DATA_KEY);
 
             if (popover !== void 0) {
                 popover.updateContent($content.html());
-                $el.toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($content, false));
-            } else if (this._isFieldChoice($el)) {
-                $el.parent().toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($content, false));
-            } else if (this._isField($el)) {
-                $el.toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($content, false));
-            } else {
+            } else if (this._isSelect2($el)) {
+                $highlightTarget = $el.parent();
+
+                if (this.findText && !isContentHighlighted) {
+                    if ($el.is('select')) {
+                        $el.children('option').each(function(i, option) {
+                            isContentHighlighted = this.findText.test($(option).text());
+
+                            return !isContentHighlighted;
+                        }.bind(this));
+                    } else {
+                        var initializeOptions = _.result($el.data('inputWidget'), 'initializeOptions');
+
+                        if (_.isArray(initializeOptions.data)) {
+                            isContentHighlighted = this.isSelect2DataContainsSearchText(initializeOptions.data);
+                        }
+                    }
+                }
+            } else if (this._isFieldChoice($el) && !this._isMultiselect($el)) {
+                $highlightTarget = $el.parent();
+
+                if (inputWidgetManager.hasWidget($el)) {
+                    $el.inputWidget('refresh');
+                }
+            } else if (!this._isField($el)) {
                 $el.get(0).normalize();
-                $el.toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($el));
+                isContentHighlighted = this.isElementContentHighlighted($el);
             }
+
+            $highlightTarget.toggleClass(this.elementHighlightClass, isContentHighlighted);
         },
 
         /**
@@ -459,7 +490,7 @@ define(function(require) {
         },
 
         /**
-         * Check if given element is field
+         * Check if given element is selectable field
          *
          * @param {jQuery} $element
          */
@@ -477,6 +508,15 @@ define(function(require) {
         },
 
         /**
+         * Check if given element is multiselect field
+         *
+         * @param {jQuery} $element
+         */
+        _isMultiselect: function($element) {
+            return this._isField($element) && $element.is('select') && $element[0].hasAttribute('multiple');
+        },
+
+        /**
          * Check if given element is field
          *
          * @param {jQuery} $element
@@ -486,6 +526,42 @@ define(function(require) {
             var fieldName = 'field__value';
 
             return elementName === fieldName;
+        },
+
+        /**
+         * Check if given element is Select2
+         *
+         * @param {jQuery} $element
+         */
+        _isSelect2: function($element) {
+            return $element.is('.select2-offscreen[data-name]');
+        },
+
+        /**
+         * Check if given element is Select2 multiselect
+         *
+         * @param {jQuery} $element
+         */
+        _isSelect2Multi: function($element) {
+            return this._isSelect2($element) && $element[0].hasAttribute('multiple');
+        },
+
+        onSelect2Change: function(e) {
+            this.highlightElement({$el: $(e.currentTarget)});
+        },
+
+        /**
+         * Checks if Select2 data contains search text
+         *
+         * @param {Array.<string|Object>} data
+         * @return {boolean}
+         */
+        isSelect2DataContainsSearchText: function(data) {
+            return _.some(data, function(item) {
+                var text = _.isString(item) ? item : item.text;
+
+                return this.findText.test(text);
+            }, this);
         },
 
         /**
