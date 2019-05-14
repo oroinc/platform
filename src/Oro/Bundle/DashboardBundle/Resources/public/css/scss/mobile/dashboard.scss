@@ -23,6 +23,14 @@
         .action-wrapper.sortable {
             display: none;
         }
+
+        .widget-header {
+            padding: 0;
+        }
+
+        .row-fluid {
+            padding: $dashboard-mobile-widget-content-offset;
+        }
     }
 }
 
