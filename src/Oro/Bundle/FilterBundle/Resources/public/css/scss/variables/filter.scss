@@ -64,6 +64,7 @@ $input-append-btn-group-min-width: 125px !default;
 $input-append-btn-group-a-inner-offset: 1px 13px !default;
 
 $filter-update-offset-left: 8px !default;
+$filter-update-offset-align: flex-start !default;
 
 $choice-filter-display: flex !default;
 $choice-filter-align-items: center !default;
@@ -133,8 +134,8 @@ $filter-select-oro-wrapper-offset-bottom: 8px !default;
 $filter-select-oro-wrapper-width: 100% !default;
 $filter-select-oro-wrapper-span-width: 100% !default;
 
-$choice-filter-btn-width: auto !default;
-$choice-filter-btn-float: left !default;
+$choice-filter-btn-inner-offset: 0 !default;
+$choice-filter-btn-align: flex-start !default;
 
 $choice-filter-value-field-frame-position: relative !default;
 $choice-filter-value-field-frame-vertical-align: top !default;
