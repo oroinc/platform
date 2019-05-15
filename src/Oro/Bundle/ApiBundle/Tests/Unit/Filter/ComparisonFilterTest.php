@@ -459,12 +459,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
                 true,
                 false,
                 new FilterValue('path', 'value', ComparisonFilter::NOT_CONTAINS),
-                new CompositeExpression(
-                    'NOT',
-                    [
-                        new Comparison('fieldName', 'ALL_MEMBER_OF', new Value('value'))
-                    ]
-                )
+                new Comparison('fieldName', 'ALL_NOT_MEMBER_OF', new Value('value'))
             ]
         ];
     }

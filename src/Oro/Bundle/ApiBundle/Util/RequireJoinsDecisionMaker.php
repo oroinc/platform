@@ -19,6 +19,7 @@ class RequireJoinsDecisionMaker implements RequireJoinsDecisionMakerInterface
             case 'EMPTY':
             case 'NEQ_OR_EMPTY':
             case 'ALL_MEMBER_OF':
+            case 'ALL_NOT_MEMBER_OF':
                 return false;
         }
 

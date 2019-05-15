@@ -204,31 +204,32 @@ but allows to add new types of expressions easily and helps to build subquery ba
 
 The following query expressions are implemented out of the box:
 
-| Operator        | Class | Description |
-|-----------------|-------|-------------|
-| AND             | [AndCompositeExpression](../../Collection/QueryVisitorExpression/AndCompositeExpression.php) | Logical AND |
-| OR              | [OrCompositeExpression](../../Collection/QueryVisitorExpression/OrCompositeExpression.php) | Logical OR |
-| NOT             | [NotCompositeExpression](../../Collection/QueryVisitorExpression/NotCompositeExpression.php) | Logical NOT |
-| =               | [EqComparisonExpression](../../Collection/QueryVisitorExpression/EqComparisonExpression.php) | EQUAL TO comparison |
-| <>              | [NeqComparisonExpression](../../Collection/QueryVisitorExpression/NeqComparisonExpression.php) | NOT EQUAL TO comparison |
-| <               | [LtComparisonExpression](../../Collection/QueryVisitorExpression/LtComparisonExpression.php) | LESS THAN comparison |
-| <=              | [LteComparisonExpression](../../Collection/QueryVisitorExpression/LteComparisonExpression.php) | LESS THAN OR EQUAL TO comparison |
-| >               | [GtComparisonExpression](../../Collection/QueryVisitorExpression/GtComparisonExpression.php) | GREATER THAN comparison |
-| >=              | [GteComparisonExpression](../../Collection/QueryVisitorExpression/GteComparisonExpression.php) | GREATER THAN OR EQUAL TO comparison |
-| IN              | [InComparisonExpression](../../Collection/QueryVisitorExpression/InComparisonExpression.php) | IN comparison |
-| NIN             | [NinComparisonExpression](../../Collection/QueryVisitorExpression/NinComparisonExpression.php) | NOT IN comparison |
-| EXISTS          | [ExistsComparisonExpression](../../Collection/QueryVisitorExpression/ExistsComparisonExpression.php) | EXISTS (IS NOT NULL) and NOT EXISTS (IS NULL) comparisons |
-| EMPTY           | [EmptyComparisonExpression](../../Collection/QueryVisitorExpression/EmptyComparisonExpression.php) | EMPTY and NOT EMPTY comparisons for collections |
-| NEQ_OR_NULL     | [NeqOrNullComparisonExpression](../../Collection/QueryVisitorExpression/NeqOrNullComparisonExpression.php) | NOT EQUAL TO OR IS NULL comparison |
-| NEQ_OR_EMPTY    | [NeqOrEmptyComparisonExpression](../../Collection/QueryVisitorExpression/NeqOrEmptyComparisonExpression.php) | NOT EQUAL TO OR EMPTY comparison for collections |
-| MEMBER_OF       | [MemberOfComparisonExpression](../../Collection/QueryVisitorExpression/MemberOfComparisonExpression.php) | MEMBER OF comparison that checks whether a collection contains any of specific values |
-| ALL_MEMBER_OF   | [AllMemberOfComparisonExpression](../../Collection/QueryVisitorExpression/AllMemberOfComparisonExpression.php) | ALL MEMBER OF comparison that checks whether a collection contains all of specific values |
-| CONTAINS        | [ContainsComparisonExpression](../../Collection/QueryVisitorExpression/ContainsComparisonExpression.php) | LIKE '%value%' comparison |
-| NOT_CONTAINS    | [NotContainsComparisonExpression](../../Collection/QueryVisitorExpression/NotContainsComparisonExpression.php) | NOT LIKE '%value%' comparison |
-| STARTS_WITH     | [StartsWithComparisonExpression](../../Collection/QueryVisitorExpression/StartsWithComparisonExpression.php) | LIKE 'value%' comparison |
-| NOT_STARTS_WITH | [NotStartsWithComparisonExpression](../../Collection/QueryVisitorExpression/NotStartsWithComparisonExpression.php) | NOT LIKE 'value%' comparison |
-| ENDS_WITH       | [EndsWithComparisonExpression](../../Collection/QueryVisitorExpression/EndsWithComparisonExpression.php) | LIKE '%value' comparison |
-| NOT_ENDS_WITH   | [NotEndsWithComparisonExpression](../../Collection/QueryVisitorExpression/NotEndsWithComparisonExpression.php) | NOT LIKE '%value' comparison |
+| Operator          | Class | Description |
+|-------------------|-------|-------------|
+| AND               | [AndCompositeExpression](../../Collection/QueryVisitorExpression/AndCompositeExpression.php) | Logical AND |
+| OR                | [OrCompositeExpression](../../Collection/QueryVisitorExpression/OrCompositeExpression.php) | Logical OR |
+| NOT               | [NotCompositeExpression](../../Collection/QueryVisitorExpression/NotCompositeExpression.php) | Logical NOT |
+| =                 | [EqComparisonExpression](../../Collection/QueryVisitorExpression/EqComparisonExpression.php) | EQUAL TO comparison |
+| <>                | [NeqComparisonExpression](../../Collection/QueryVisitorExpression/NeqComparisonExpression.php) | NOT EQUAL TO comparison |
+| <                 | [LtComparisonExpression](../../Collection/QueryVisitorExpression/LtComparisonExpression.php) | LESS THAN comparison |
+| <=                | [LteComparisonExpression](../../Collection/QueryVisitorExpression/LteComparisonExpression.php) | LESS THAN OR EQUAL TO comparison |
+| >                 | [GtComparisonExpression](../../Collection/QueryVisitorExpression/GtComparisonExpression.php) | GREATER THAN comparison |
+| >=                | [GteComparisonExpression](../../Collection/QueryVisitorExpression/GteComparisonExpression.php) | GREATER THAN OR EQUAL TO comparison |
+| IN                | [InComparisonExpression](../../Collection/QueryVisitorExpression/InComparisonExpression.php) | IN comparison |
+| NIN               | [NinComparisonExpression](../../Collection/QueryVisitorExpression/NinComparisonExpression.php) | NOT IN comparison |
+| EXISTS            | [ExistsComparisonExpression](../../Collection/QueryVisitorExpression/ExistsComparisonExpression.php) | EXISTS (IS NOT NULL) and NOT EXISTS (IS NULL) comparisons |
+| EMPTY             | [EmptyComparisonExpression](../../Collection/QueryVisitorExpression/EmptyComparisonExpression.php) | EMPTY and NOT EMPTY comparisons for collections |
+| NEQ_OR_NULL       | [NeqOrNullComparisonExpression](../../Collection/QueryVisitorExpression/NeqOrNullComparisonExpression.php) | NOT EQUAL TO OR IS NULL comparison |
+| NEQ_OR_EMPTY      | [NeqOrEmptyComparisonExpression](../../Collection/QueryVisitorExpression/NeqOrEmptyComparisonExpression.php) | NOT EQUAL TO OR EMPTY comparison for collections |
+| MEMBER_OF         | [MemberOfComparisonExpression](../../Collection/QueryVisitorExpression/MemberOfComparisonExpression.php) | MEMBER OF comparison that checks whether a collection contains any of specific values |
+| ALL_MEMBER_OF     | [AllMemberOfComparisonExpression](../../Collection/QueryVisitorExpression/AllMemberOfComparisonExpression.php) | ALL MEMBER OF comparison that checks whether a collection contains all of specific values |
+| ALL_NOT_MEMBER_OF | [AllNotMemberOfComparisonExpression](../../Collection/QueryVisitorExpression/AllNotMemberOfComparisonExpression.php) | ALL NOT MEMBER OF comparison that checks whether a collection does not contain all of specific values |
+| CONTAINS          | [ContainsComparisonExpression](../../Collection/QueryVisitorExpression/ContainsComparisonExpression.php) | LIKE '%value%' comparison |
+| NOT_CONTAINS      | [NotContainsComparisonExpression](../../Collection/QueryVisitorExpression/NotContainsComparisonExpression.php) | NOT LIKE '%value%' comparison |
+| STARTS_WITH       | [StartsWithComparisonExpression](../../Collection/QueryVisitorExpression/StartsWithComparisonExpression.php) | LIKE 'value%' comparison |
+| NOT_STARTS_WITH   | [NotStartsWithComparisonExpression](../../Collection/QueryVisitorExpression/NotStartsWithComparisonExpression.php) | NOT LIKE 'value%' comparison |
+| ENDS_WITH         | [EndsWithComparisonExpression](../../Collection/QueryVisitorExpression/EndsWithComparisonExpression.php) | LIKE '%value' comparison |
+| NOT_ENDS_WITH     | [NotEndsWithComparisonExpression](../../Collection/QueryVisitorExpression/NotEndsWithComparisonExpression.php) | NOT LIKE '%value' comparison |
 
 If necessary, you can add new comparison expressions and use them in your filters.
 For this, create a class that implements the expression logic, register it as a service tagged with the

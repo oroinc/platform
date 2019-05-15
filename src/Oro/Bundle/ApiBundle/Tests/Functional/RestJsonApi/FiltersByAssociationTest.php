@@ -438,7 +438,6 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
 
         $expectedRows = [
             ['id' => '<toString(@entity1_1->id)>'],
-            ['id' => '<toString(@entity1_2->id)>'],
             ['id' => '<toString(@entity1_4->id)>']
         ];
         $this->prepareExpectedRows($expectedRows);
@@ -456,7 +455,6 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
 
         $expectedRows = [
             ['id' => '<toString(@entity1_1->id)>'],
-            ['id' => '<toString(@entity1_2->id)>'],
             ['id' => '<toString(@entity1_3->id)>'],
             ['id' => '<toString(@entity1_4->id)>']
         ];
@@ -1415,7 +1413,6 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
         $filter = ['filter' => ['biM2M' => ['not_contains' => implode(',', $ids)]]];
 
         $expectedRows = [
-            ['id' => '<toString(@entity1_1->id)>'],
             ['id' => '<toString(@entity1_3->id)>'],
             ['id' => '<toString(@entity1_4->id)>'],
             ['id' => '<toString(@entity1_null->id)>']
@@ -1439,7 +1436,6 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
         ];
 
         $expectedRows = [
-            ['id' => '<toString(@entity1_1->id)>'],
             ['id' => '<toString(@entity1_3->id)>'],
             ['id' => '<toString(@entity1_4->id)>'],
             ['id' => '<toString(@entity1_null->id)>']

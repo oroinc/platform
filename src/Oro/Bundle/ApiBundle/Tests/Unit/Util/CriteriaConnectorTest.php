@@ -45,14 +45,15 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
                 'OR'  => new Expression\OrCompositeExpression()
             ],
             [
-                '='             => new Expression\EqComparisonExpression(),
-                '<>'            => new Expression\NeqComparisonExpression(),
-                'IN'            => new Expression\InComparisonExpression(),
-                'NEQ_OR_NULL'   => new Expression\NeqOrNullComparisonExpression(),
-                'NEQ_OR_EMPTY'  => new Expression\NeqOrEmptyComparisonExpression(),
-                'EXISTS'        => new Expression\ExistsComparisonExpression(),
-                'EMPTY'         => new Expression\EmptyComparisonExpression(),
-                'ALL_MEMBER_OF' => new Expression\AllMemberOfComparisonExpression()
+                '='                 => new Expression\EqComparisonExpression(),
+                '<>'                => new Expression\NeqComparisonExpression(),
+                'IN'                => new Expression\InComparisonExpression(),
+                'NEQ_OR_NULL'       => new Expression\NeqOrNullComparisonExpression(),
+                'NEQ_OR_EMPTY'      => new Expression\NeqOrEmptyComparisonExpression(),
+                'EXISTS'            => new Expression\ExistsComparisonExpression(),
+                'EMPTY'             => new Expression\EmptyComparisonExpression(),
+                'ALL_MEMBER_OF'     => new Expression\AllMemberOfComparisonExpression(),
+                'ALL_NOT_MEMBER_OF' => new Expression\AllNotMemberOfComparisonExpression()
             ],
             $entityClassResolver
         );
@@ -295,6 +296,29 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
+    public function testShouldNotOptimizeJoinForAllNotMemberOf()
+    {
+        $this->criteria->andWhere(
+            $this->criteria::expr()->andX(
+                $this->criteria::expr()->eq('category', 'test_category'),
+                $this->criteria::expr()->in('groups', [123]),
+                self::comparison('groups', 'ALL_NOT_MEMBER_OF', 234)
+            )
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' INNER JOIN e.category category'
+            . ' LEFT JOIN e.groups groups'
+            . ' WHERE e.category = :category'
+            . ' AND e.groups IN(:groups)'
+            . ' AND (:groups_2_expected = ('
+            . 'SELECT COUNT(groups_subquery1)'
+            . ' FROM Test:Group groups_subquery1'
+            . ' WHERE groups_subquery1 MEMBER OF e.groups AND groups_subquery1 IN(:groups_2)))'
+        );
+    }
+
     public function testShouldNotRequireJoinForEmpty()
     {
         $this->criteria->andWhere(
@@ -369,6 +393,21 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     {
         $this->criteria->andWhere(
             self::comparison('groups', 'ALL_MEMBER_OF', 234)
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' WHERE :groups_expected = ('
+            . 'SELECT COUNT(groups_subquery1)'
+            . ' FROM Test:Group groups_subquery1'
+            . ' WHERE groups_subquery1 MEMBER OF e.groups AND groups_subquery1 IN(:groups))'
+        );
+    }
+
+    public function testShouldRequireAnyJoinsWhenOnlyAllNotMemberOf()
+    {
+        $this->criteria->andWhere(
+            self::comparison('groups', 'ALL_NOT_MEMBER_OF', 234)
         );
 
         $this->assertQuery(

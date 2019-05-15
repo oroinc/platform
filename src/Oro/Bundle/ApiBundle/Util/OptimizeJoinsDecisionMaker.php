@@ -21,6 +21,7 @@ class OptimizeJoinsDecisionMaker implements OptimizeJoinsDecisionMakerInterface
             case 'NEQ_OR_NULL':
             case 'NEQ_OR_EMPTY':
             case 'ALL_MEMBER_OF':
+            case 'ALL_NOT_MEMBER_OF':
                 return false;
             case 'EMPTY':
                 return !(bool)$resolvedValue;

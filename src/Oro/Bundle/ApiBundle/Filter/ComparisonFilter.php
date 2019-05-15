@@ -322,9 +322,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
             case self::CONTAINS:
                 return $this->buildComparisonExpression($field, 'ALL_MEMBER_OF', $value);
             case self::NOT_CONTAINS:
-                return $this->buildNotExpression(
-                    $this->buildComparisonExpression($field, 'ALL_MEMBER_OF', $value)
-                );
+                return $this->buildComparisonExpression($field, 'ALL_NOT_MEMBER_OF', $value);
         }
 
         return null;
