@@ -76,8 +76,9 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function Row() {
-            Row.__super__.constructor.apply(this, arguments);
+        constructor: function Row(options) {
+            _.extend(this, _.pick(options, ['rowClassName', 'themeOptions', 'template', 'columns']));
+            Row.__super__.constructor.call(this, options);
         },
 
         /**
@@ -87,7 +88,6 @@ define([
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
             var _this = this;
-            _.extend(this, _.pick(options, ['themeOptions', 'template', 'columns']));
             // let descendants override itemView
             if (!this.itemView) {
                 this.itemView = function(options) {
@@ -206,7 +206,14 @@ define([
         },
 
         className: function() {
-            return this.model.get('row_class_name');
+            var classes = [];
+            if (this.rowClassName) {
+                classes.push(this.rowClassName);
+            }
+            if (this.model.get('row_class_name')) {
+                classes.push(this.model.get('row_class_name'));
+            }
+            return classes.join(' ');
         },
 
         /**

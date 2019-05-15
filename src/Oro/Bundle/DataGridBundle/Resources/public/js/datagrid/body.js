@@ -83,7 +83,7 @@ define([
                     model: model,
                     collection: this.filteredColumns,
                     columns: this.columns,
-                    className: this.rowClassName
+                    rowClassName: this.rowClassName
                 };
                 this.columns.trigger('configureInitializeOptions', Row, rowOptions);
                 return new Row(rowOptions);
