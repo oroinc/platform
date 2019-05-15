@@ -89,8 +89,8 @@
 
         .choice-filter {
             .btn-group.btn-block {
-                width: $choice-filter-btn-width;
-                float: $choice-filter-btn-float;
+                align-self: $choice-filter-btn-align;
+                padding: $choice-filter-btn-inner-offset;
             }
 
             .value-field-frame {
@@ -162,6 +162,7 @@
 
     .filter-update {
         margin-left: $filter-update-offset-left;
+        align-self: $filter-update-offset-align;
     }
 
     .filter-select-oro {
