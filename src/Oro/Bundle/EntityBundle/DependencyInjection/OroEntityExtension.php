@@ -32,6 +32,10 @@ class OroEntityExtension extends Extension
         $loader->load('services_api.yml');
         $loader->load('commands.yml');
 
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
+
         $container->setParameter(
             self::DEFAULT_QUERY_CACHE_LIFETIME_PARAM_NAME,
             $config['default_query_cache_lifetime']

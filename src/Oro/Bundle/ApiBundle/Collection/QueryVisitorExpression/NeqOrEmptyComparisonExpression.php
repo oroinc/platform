@@ -25,11 +25,10 @@ class NeqOrEmptyComparisonExpression implements ComparisonExpressionInterface
         $value
     ) {
         if (null === $value) {
-            // the filter like IS NOT NULL OR EMPTY does not have a sense
+            // the filter like IS NULL OR EMPTY does not have a sense
             throw new QueryException(\sprintf('The value for "%s" must not be NULL.', $field));
         }
 
-        $builder = $visitor->getExpressionBuilder();
         $subquery = $visitor->createSubquery($field);
 
         if ($value instanceof Range) {
@@ -39,7 +38,7 @@ class NeqOrEmptyComparisonExpression implements ComparisonExpressionInterface
             $visitor->addParameter($toParameterName, $value->getToValue());
 
             $subqueryWhereExpr = $subquery->expr()->between(
-                QueryBuilderUtil::getSingleRootAlias($subquery),
+                QueryBuilderUtil::getSelectExpr($subquery),
                 $visitor->buildPlaceholder($fromParameterName),
                 $visitor->buildPlaceholder($toParameterName)
             );
@@ -47,11 +46,14 @@ class NeqOrEmptyComparisonExpression implements ComparisonExpressionInterface
             $visitor->addParameter($parameterName, $value);
 
             $subqueryWhereExpr = $subquery->expr()->in(
-                QueryBuilderUtil::getSingleRootAlias($subquery),
+                QueryBuilderUtil::getSelectExpr($subquery),
                 $visitor->buildPlaceholder($parameterName)
             );
         }
         $subquery->andWhere($subqueryWhereExpr);
+        $subquery->select(QueryBuilderUtil::getSingleRootAlias($subquery));
+
+        $builder = $visitor->getExpressionBuilder();
 
         return $builder->not($builder->exists($subquery->getDQL()));
     }

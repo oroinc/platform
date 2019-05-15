@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression;
 
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Represents EMPTY (to-many association does not contain any records)
@@ -20,9 +21,10 @@ class EmptyComparisonExpression implements ComparisonExpressionInterface
         string $parameterName,
         $value
     ) {
-        $builder = $visitor->getExpressionBuilder();
-
         $subquery = $visitor->createSubquery($field);
+        $subquery->select(QueryBuilderUtil::getSingleRootAlias($subquery));
+
+        $builder = $visitor->getExpressionBuilder();
         $expr = $builder->exists($subquery->getDQL());
         if ($value) {
             $expr = $builder->not($expr);

@@ -1011,4 +1011,52 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
             . ' WHERE u7_.id = u3_.id))';
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
+
+    public function testCreateSubqueryForNotJoinedSeveralAssociationsAndLastElementInPathIsField()
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            new EntityClassResolver($this->doctrine)
+        );
+
+        $qb = new QueryBuilder($this->em);
+        $qb
+            ->select('e')
+            ->from(Entity\Account::class, 'e')
+            ->leftJoin('e.roles', 'roles');
+
+        $expressionVisitor->setQuery($qb);
+        $expressionVisitor->setQueryJoinMap(['roles' => 'roles']);
+        $expressionVisitor->setQueryAliases(['e', 'roles']);
+        $subquery = $expressionVisitor->createSubquery('roles.users.groups.name');
+
+        $expectedSubquery = 'SELECT groups_subquery1.name'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group groups_subquery1'
+            . ' WHERE groups_subquery1 IN('
+            . 'SELECT groups_1_subquery2'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Role roles_subquery2'
+            . ' INNER JOIN roles_subquery2.users users_0_subquery2'
+            . ' INNER JOIN users_0_subquery2.groups groups_1_subquery2'
+            . ' WHERE roles_subquery2 = roles)';
+        self::assertEquals($expectedSubquery, $subquery->getDQL());
+
+        // test that the subquery has valid SQL
+        $expectedSql = 'SELECT a0_.id AS id_0, a0_.name AS name_1'
+            . ' FROM account_table a0_'
+            . ' LEFT JOIN account_to_role_table a2_ ON a0_.id = a2_.group_id'
+            . ' LEFT JOIN role_table r1_ ON r1_.id = a2_.role_id'
+            . ' WHERE EXISTS ('
+            . 'SELECT g3_.name'
+            . ' FROM group_table g3_'
+            . ' WHERE g3_.id IN ('
+            . 'SELECT g4_.id'
+            . ' FROM role_table r5_'
+            . ' INNER JOIN role_to_user_table r7_ ON r5_.id = r7_.role_id'
+            . ' INNER JOIN user_table u6_ ON u6_.id = r7_.user_role_id'
+            . ' INNER JOIN user_to_group_table u8_ ON u6_.id = u8_.user_id'
+            . ' INNER JOIN group_table g4_ ON g4_.id = u8_.user_group_id'
+            . ' WHERE r5_.id = r1_.id))';
+        self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
+    }
 }

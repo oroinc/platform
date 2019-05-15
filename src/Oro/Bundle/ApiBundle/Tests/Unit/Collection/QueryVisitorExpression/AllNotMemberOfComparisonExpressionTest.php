@@ -7,16 +7,16 @@ use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
-use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AllMemberOfComparisonExpression;
+use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AllNotMemberOfComparisonExpression;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
-class AllMemberOfComparisonExpressionTest extends OrmRelatedTestCase
+class AllNotMemberOfComparisonExpressionTest extends OrmRelatedTestCase
 {
     public function testWalkComparisonExpressionWhenAssociationIsNotJoined()
     {
-        $expression = new AllMemberOfComparisonExpression();
+        $expression = new AllNotMemberOfComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -60,7 +60,7 @@ class AllMemberOfComparisonExpressionTest extends OrmRelatedTestCase
         self::assertEquals(
             [
                 new Parameter($parameterName, $value, Connection::PARAM_INT_ARRAY),
-                new Parameter($expectedNumberOfRecordsParameterName, count($value), 'integer')
+                new Parameter($expectedNumberOfRecordsParameterName, 0, 'integer')
             ],
             $expressionVisitor->getParameters()
         );
@@ -68,7 +68,7 @@ class AllMemberOfComparisonExpressionTest extends OrmRelatedTestCase
 
     public function testWalkComparisonExpressionForArrayValue()
     {
-        $expression = new AllMemberOfComparisonExpression();
+        $expression = new AllNotMemberOfComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -113,7 +113,7 @@ class AllMemberOfComparisonExpressionTest extends OrmRelatedTestCase
         self::assertEquals(
             [
                 new Parameter($parameterName, $value, Connection::PARAM_INT_ARRAY),
-                new Parameter($expectedNumberOfRecordsParameterName, count($value), 'integer')
+                new Parameter($expectedNumberOfRecordsParameterName, 0, 'integer')
             ],
             $expressionVisitor->getParameters()
         );
@@ -121,7 +121,7 @@ class AllMemberOfComparisonExpressionTest extends OrmRelatedTestCase
 
     public function testWalkComparisonExpressionForScalarValue()
     {
-        $expression = new AllMemberOfComparisonExpression();
+        $expression = new AllNotMemberOfComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -166,7 +166,7 @@ class AllMemberOfComparisonExpressionTest extends OrmRelatedTestCase
         self::assertEquals(
             [
                 new Parameter($parameterName, $value, 'integer'),
-                new Parameter($expectedNumberOfRecordsParameterName, 1, 'integer')
+                new Parameter($expectedNumberOfRecordsParameterName, 0, 'integer')
             ],
             $expressionVisitor->getParameters()
         );
@@ -174,7 +174,7 @@ class AllMemberOfComparisonExpressionTest extends OrmRelatedTestCase
 
     public function testWalkComparisonExpressionWhenLastElementInPathIsField()
     {
-        $expression = new AllMemberOfComparisonExpression();
+        $expression = new AllNotMemberOfComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -219,7 +219,7 @@ class AllMemberOfComparisonExpressionTest extends OrmRelatedTestCase
         self::assertEquals(
             [
                 new Parameter($parameterName, $value, 'integer'),
-                new Parameter($expectedNumberOfRecordsParameterName, 1, 'integer')
+                new Parameter($expectedNumberOfRecordsParameterName, 0, 'integer')
             ],
             $expressionVisitor->getParameters()
         );

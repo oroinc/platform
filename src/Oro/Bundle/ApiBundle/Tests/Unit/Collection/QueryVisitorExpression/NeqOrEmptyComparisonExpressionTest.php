@@ -135,4 +135,100 @@ class NeqOrEmptyComparisonExpressionTest extends OrmRelatedTestCase
             $expressionVisitor->getParameters()
         );
     }
+
+    public function testWalkComparisonExpressionWhenLastElementInPathIsField()
+    {
+        $expression = new NeqOrEmptyComparisonExpression();
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            new EntityClassResolver($this->doctrine)
+        );
+        $field = 'e.groups.name';
+        $expr = 'LOWER(e.groups.name)';
+        $parameterName = 'groups_1';
+        $value = 'text';
+
+        $qb = new QueryBuilder($this->em);
+        $qb
+            ->select('e')
+            ->from(Entity\User::class, 'e')
+            ->innerJoin('e.groups', 'groups');
+
+        $expressionVisitor->setQuery($qb);
+        $expressionVisitor->setQueryAliases(['e', 'groups']);
+        $expressionVisitor->setQueryJoinMap(['groups' => 'groups']);
+
+        $result = $expression->walkComparisonExpression(
+            $expressionVisitor,
+            $field,
+            $expr,
+            $parameterName,
+            $value
+        );
+
+        $expectedSubquery = 'SELECT groups_subquery1'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group groups_subquery1'
+            . ' WHERE groups_subquery1 = groups AND groups_subquery1.name IN(:groups_1)';
+
+        self::assertEquals(
+            new Expr\Func('NOT', [new Expr\Func('EXISTS', [$expectedSubquery])]),
+            $result
+        );
+        self::assertEquals(
+            [new Parameter($parameterName, $value, \PDO::PARAM_STR)],
+            $expressionVisitor->getParameters()
+        );
+    }
+
+    public function testWalkComparisonExpressionForRangeValueWhenLastElementInPathIsField()
+    {
+        $expression = new NeqOrEmptyComparisonExpression();
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            new EntityClassResolver($this->doctrine)
+        );
+        $field = 'e.groups.name';
+        $expr = 'LOWER(e.groups.name)';
+        $parameterName = 'groups_1';
+        $fromValue = 123;
+        $toValue = 234;
+        $value = new Range($fromValue, $toValue);
+
+        $qb = new QueryBuilder($this->em);
+        $qb
+            ->select('e')
+            ->from(Entity\User::class, 'e')
+            ->innerJoin('e.groups', 'groups');
+
+        $expressionVisitor->setQuery($qb);
+        $expressionVisitor->setQueryAliases(['e', 'groups']);
+        $expressionVisitor->setQueryJoinMap(['groups' => 'groups']);
+
+        $result = $expression->walkComparisonExpression(
+            $expressionVisitor,
+            $field,
+            $expr,
+            $parameterName,
+            $value
+        );
+
+        $expectedSubquery = 'SELECT groups_subquery1'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group groups_subquery1'
+            . ' WHERE groups_subquery1 = groups'
+            . ' AND (groups_subquery1.name BETWEEN :groups_1_from AND :groups_1_to)';
+
+        self::assertEquals(
+            new Expr\Func('NOT', [new Expr\Func('EXISTS', [$expectedSubquery])]),
+            $result
+        );
+        self::assertEquals(
+            [
+                new Parameter('groups_1_from', $fromValue, 'integer'),
+                new Parameter('groups_1_to', $toValue, 'integer')
+            ],
+            $expressionVisitor->getParameters()
+        );
+    }
 }
