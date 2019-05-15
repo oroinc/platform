@@ -1,0 +1,3 @@
+services:
+    oro_entity.tests.event_listener.doctrine_flush_progress_listener:
+        alias: oro_entity.event_listener.doctrine_flush_progress_listener
