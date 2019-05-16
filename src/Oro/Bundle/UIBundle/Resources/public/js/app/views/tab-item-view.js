@@ -18,15 +18,7 @@ define(function(require) {
 
         className: config.className,
 
-        template: _.template('<a  href="#"\n' +
-            'id="<%- uniqueId %>" ' +
-            'class="'+ config.templateClassName +'<% if(obj.active) { %> active<% } %>"' +
-            'role="tab" ' +
-            'data-tab-link ' +
-            'data-toggle="tab" ' +
-            'aria-controls="<% if(obj.controlTabPanel) { %><%- controlTabPanel %><% } else { %><%- id %><% } %>" ' +
-            'aria-selected="<% if(obj.active) { %>true<% } else { %>false<% } %>"' +
-            '><%- label %></a>'),
+        template: require('tpl!oroui/templates/tab-collection-item.html'),
 
         listen: {
             'change:active model': 'updateStates',
@@ -51,6 +43,7 @@ define(function(require) {
         },
 
         updateStates: function() {
+            this.$('a').toggleClass('active', !!this.model.get('active'));
             this.$el.toggleClass('changed', !!this.model.get('changed'));
 
             if (this.model.get('active')) {

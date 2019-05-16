@@ -3,7 +3,6 @@
 .list-bar-wrapper {
     display: flex;
     flex-grow: 1;
-    overflow: hidden;
     flex-basis: 0;
     min-width: $pin-item-show-more-menu-width;
 
@@ -19,34 +18,86 @@
                 color: $pin-item-outdated-hover-color;
             }
         }
+
+        .btn-close {
+            position: absolute;
+            top: 50%;
+            #{$end}: 6px;
+            width: 14px;
+            height: 14px;
+            display: block;
+            background-color: transparent;
+            color: transparent;
+            font-size: 0;
+            padding: 0;
+            margin: side-values(-7px 0 0 0);
+            border-width: 0;
+
+            &:active,
+            &:focus {
+                outline: none;
+            }
+
+            &:before {
+                font-size: 12px;
+                color: $pin-item-close-color;
+            }
+
+            &:hover:before {
+                color: $pin-item-close-hover-color;
+            }
+        }
     }
 
-    .btn-close {
-        position: absolute;
-        top: 50%;
-        #{$end}: 6px;
-        width: 14px;
-        height: 14px;
-        display: block;
-        background-color: transparent;
-        color: transparent;
-        font-size: 0;
-        padding: 0;
-        margin: -7px 0 0 0;
-        border-width: 0;
-
-        &:active,
-        &:focus {
-            outline: none;
-        }
-
-        &:before {
+    .pin-bar-empty {
+        a {
+            display: inline-block;
+            margin: 2px 10px;
+            color: inherit;
             font-size: 12px;
-            color: $pin-item-close-color;
+            line-height: 20px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            overflow: hidden;
+            vertical-align: middle;
         }
 
-        &:hover:before {
-            color: $pin-item-close-hover-color;
+        .dropdown-menu {
+            line-height: 1.6;
+            padding: 12px $content-padding-medium;
+            width: 202px;
+        }
+
+        .dropdown-content {
+            margin-right: $content-padding-medium;
+
+            .fa-thumb-tack {
+                font-size: $icon-font-size;
+                margin: 0 6px;
+                vertical-align: middle;
+                color: $primary-550;
+            }
+        }
+
+        .btn-close {
+            position: absolute;
+            top: 4px;
+            #{$end}: 4px;
+
+            &:before {
+                color: $pin-item-close-color;
+            }
+
+            &:hover:before {
+                color: $pin-item-close-hover-color;
+            }
+        }
+
+        .btn-success {
+            margin: $content-padding-small auto;
+
+            display: flex;
         }
     }
 }
@@ -158,18 +209,5 @@
                 outline: none;
             }
         }
-    }
-
-    .pin-bar-empty a {
-        display: inline-block;
-        margin: 2px 10px;
-        color: inherit;
-        font-size: 12px;
-        line-height: 20px;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        max-width: 100%;
-        overflow: hidden;
-        vertical-align: middle;
     }
 }

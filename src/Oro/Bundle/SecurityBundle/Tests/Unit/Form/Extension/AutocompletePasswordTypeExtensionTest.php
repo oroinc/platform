@@ -56,6 +56,10 @@ class AutocompletePasswordTypeExtensionTest extends \PHPUnit\Framework\TestCase
                 'options' => ['attr' => ['sample_attr' => 'sample_value']],
                 'expected' => ['attr' => ['sample_attr' => 'sample_value', 'autocomplete' => 'off']],
             ],
+            [
+                'options' => ['attr' => ['autocomplete' => 'new-password']],
+                'expected' => ['attr' => ['autocomplete' => 'new-password']],
+            ],
         ];
     }
 }

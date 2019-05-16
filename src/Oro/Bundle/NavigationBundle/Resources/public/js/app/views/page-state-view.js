@@ -8,9 +8,9 @@ define(function(require) {
     var routing = require('routing');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
-    var tools = require('oroui/js/tools');
     var Modal = require('oroui/js/modal');
     var PageStateModel = require('oronavigation/js/app/models/page-state-model');
+    var pageStateChecker = require('oronavigation/js/app/services/page-state-checker');
     var BaseView = require('oroui/js/app/views/base/view');
 
     PageStateView = BaseView.extend({
@@ -23,10 +23,7 @@ define(function(require) {
             'page:afterChange mediator': 'afterPageChange',
             'page:afterPagePartChange mediator': 'afterPageChange',
             'page:beforeRefresh mediator': 'beforePageRefresh',
-            'openLink:before mediator': 'beforePageChange',
-
-            'add collection': 'toggleStateTrace',
-            'remove collection': 'toggleStateTrace'
+            'openLink:before mediator': 'beforePageChange'
         },
 
         /**
@@ -49,7 +46,7 @@ define(function(require) {
             confirmModal = new Modal({
                 title: __('Refresh Confirmation'),
                 content: __('Your local changes will be lost. Are you sure you want to refresh the page?'),
-                okText: __('OK, got it.'),
+                okText: __('Ok, got it'),
                 className: 'modal modal-primary',
                 cancelText: __('Cancel'),
                 disposeOnHidden: false
@@ -57,6 +54,9 @@ define(function(require) {
             this.subview('confirmModal', confirmModal);
 
             $(window).on('beforeunload' + this.eventNamespace(), _.bind(this.onWindowUnload, this));
+
+            this.isStateChanged = this.isStateChanged.bind(this);
+            pageStateChecker.registerChecker(this.isStateChanged);
 
             PageStateView.__super__.initialize.call(this, options);
         },
@@ -68,6 +68,7 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
+            pageStateChecker.removeChecker(this.isStateChanged);
             $(window).off(this.eventNamespace());
             PageStateView.__super__.dispose.apply(this, arguments);
         },
@@ -125,7 +126,7 @@ define(function(require) {
          */
         beforePageChange: function(e) {
             var action = $(e.target).data('action');
-            if (action !== 'cancel' && !this._isStateTraceRequired() && this._isStateChanged()) {
+            if (!e.prevented && action !== 'cancel' && !this._isStateTraceRequired() && this._isStateChanged()) {
                 e.prevented = !window.confirm(__('oro.ui.leave_page_with_unsaved_data_confirm'));
             }
         },
@@ -155,7 +156,7 @@ define(function(require) {
          * if page changes is not preserved and the state is changed from initial
          */
         onWindowUnload: function() {
-            if (!this._isStateTraceRequired() && this._isStateChanged()) {
+            if (!this._isStateTraceRequired() && this._isStateChanged() && !pageStateChecker.hasChangesIgnored()) {
                 return __('oro.ui.leave_page_with_unsaved_data_confirm');
             }
         },
@@ -433,15 +434,21 @@ define(function(require) {
         },
 
         /**
+         * Allows to overload _isStateTraceRequired stub-method
+         *
+         * @param {Function} callback
+         */
+        setStateTraceRequiredChecker: function(callback) {
+            this._isStateTraceRequired = callback;
+        },
+
+        /**
          * Defines if page is in cache and state trace is required
+         * (it is stub-method and can be overloaded)
          * @protected
          */
         _isStateTraceRequired: function() {
-            var urlObj = document.createElement('a');
-            urlObj.href = this._getCurrentURL();
-            var queryObj = tools.unpackFromQueryString(urlObj.search);
-
-            return !!this.collection.getCurrentModel() && queryObj['restore'];
+            return false;
         },
 
         /**

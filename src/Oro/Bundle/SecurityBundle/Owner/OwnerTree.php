@@ -2,12 +2,17 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * This class represents a tree of owners
  */
-class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
+class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface, LoggerAwareInterface, \Serializable
 {
+    use LoggerAwareTrait;
+
     /**
      * A map for owning organization of an user
      * @var array [userId => organizationId, ...]
@@ -62,6 +67,12 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
      */
     protected $organizationBusinessUnitIds;
 
+    /**
+     * /**
+     * @var string
+     */
+    protected $businessUnitClass;
+
     public function __construct()
     {
         $this->clear();
@@ -85,6 +96,49 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         return $result;
     }
     // @codingStandardsIgnoreEnd
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize([
+            $this->userOwningOrganizationId,
+            $this->userOwningBusinessUnitId,
+            $this->userOrganizationIds,
+            $this->userBusinessUnitIds,
+            $this->userOrganizationBusinessUnitIds,
+            $this->businessUnitOwningOrganizationId,
+            $this->assignedBusinessUnitUserIds,
+            $this->subordinateBusinessUnitIds,
+            $this->organizationBusinessUnitIds
+        ]);
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        list(
+            $this->userOwningOrganizationId,
+            $this->userOwningBusinessUnitId,
+            $this->userOrganizationIds,
+            $this->userBusinessUnitIds,
+            $this->userOrganizationBusinessUnitIds,
+            $this->businessUnitOwningOrganizationId,
+            $this->assignedBusinessUnitUserIds,
+            $this->subordinateBusinessUnitIds,
+            $this->organizationBusinessUnitIds
+        ) = unserialize($serialized);
+    }
+
+    /**
+     * @param $businessUnitClass
+     */
+    public function setBusinessUnitClass($businessUnitClass)
+    {
+        $this->businessUnitClass = $businessUnitClass;
+    }
 
     /**
      * {@inheritdoc}
@@ -348,8 +402,20 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
                     $levelsData[$buId] = 0;
                 } elseif (array_key_exists($parentBuId, $levelsData)) {
                     $levelsData[$buId] = $levelsData[$parentBuId] + 1;
-                } elseif (array_key_exists($parentBuId, $this->subordinateBusinessUnitIds)) {
+                } elseif (array_key_exists($parentBuId, $businessUnits)) {
                     $unprocessed[$buId] = $parentBuId;
+                    if ($businessUnits[$parentBuId] === $buId
+                        || in_array($buId, $businessUnits, true)
+                    ) {
+                        $this->logger->critical(
+                            sprintf(
+                                'Cyclic relationship in "%s" with problem id "%s"',
+                                $this->businessUnitClass,
+                                $buId
+                            )
+                        );
+                        unset($businessUnits[$buId]);
+                    }
                 }
             }
             $businessUnits = $unprocessed;

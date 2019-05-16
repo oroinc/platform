@@ -3,7 +3,7 @@
 "Yes, I Agree": "Yes, I Agree"
 "Yes, do it": "Yes, do it"
 "No": "No"
-"OK, got it.": "OK, got it."
+"Ok, got it": "Ok, got it"
 "Cancel": "Cancel"
 "Back": "Back"
 "Delete Confirmation": "Delete Confirmation"
@@ -142,7 +142,7 @@ oro:
         search: "Search"
         reset: "Reset"
         close_menu: "Close menu"
-
+        tab_view_more: '...'
 articles: "a|an|the|some|every|any|no"
 abbreviate_ignore_list: "a|an|the|of|at|per|in|on"
 postpositions: "ago|apart|aside|away|hence|through"

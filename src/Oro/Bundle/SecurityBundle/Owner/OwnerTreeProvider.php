@@ -9,11 +9,15 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * This class is used to build the tree of owners for business units.
+ */
 class OwnerTreeProvider extends AbstractOwnerTreeProvider
 {
     /** @var ManagerRegistry */
@@ -63,6 +67,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
      */
     protected function fillTree(OwnerTreeBuilderInterface $tree)
     {
+        $tree->setBusinessUnitClass(BusinessUnit::class);
         $ownershipMetadataProvider = $this->getOwnershipMetadataProvider();
         $userClass = $ownershipMetadataProvider->getUserClass();
         $businessUnitClass = $ownershipMetadataProvider->getBusinessUnitClass();

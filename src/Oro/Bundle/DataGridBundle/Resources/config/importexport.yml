@@ -35,6 +35,8 @@ services:
         arguments:
             - '@oro_datagrid.datagrid.manager.link'
             - '@event_dispatcher'
+        calls:
+            - [setQueryExecutor, ['@oro_datagrid.orm.query_executor']]
 
     oro_datagrid.importexport.datagrid_columns_from_context_provider:
         class: 'Oro\Bundle\DataGridBundle\ImportExport\DatagridColumnsFromContextProvider'

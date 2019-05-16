@@ -11,6 +11,7 @@ define(function(require) {
     var ApiAccessor = require('oroui/js/tools/api-accessor');
     var Modal = require('oroui/js/modal');
     var SplitEventList = require('./inline-editing-plugin/split-event-list');
+    var pageStateChecker = require('oronavigation/js/app/services/page-state-checker');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('oroform/js/app/views/editor/text-editor-view');
 
@@ -28,6 +29,7 @@ define(function(require) {
         initialize: function(main, options) {
             this.activeEditorComponents = [];
             this.patchCellConstructor = _.bind(this.patchCellConstructor, this);
+            this.hasChanges = this.hasChanges.bind(this);
             InlineEditingPlugin.__super__.initialize.apply(this, arguments);
         },
 
@@ -57,6 +59,7 @@ define(function(require) {
             if (this.main.rendered) {
                 this.main.body.refresh();
             }
+            pageStateChecker.registerChecker(this.hasChanges);
             InlineEditingPlugin.__super__.enable.call(this);
             $(window).on('beforeunload.' + this.cid, _.bind(this.onWindowUnload, this));
         },
@@ -81,6 +84,7 @@ define(function(require) {
                 this.main.$el.removeClass('grid-editable');
                 this.main.body.refresh();
             }
+            pageStateChecker.removeChecker(this.hasChanges);
             InlineEditingPlugin.__super__.disable.call(this);
         },
 
@@ -98,7 +102,7 @@ define(function(require) {
             var confirmModal = new Modal({
                 title: __('oro.datagrid.inline_editing.refresh_confirm_modal.title'),
                 content: __('oro.ui.leave_page_with_unsaved_data_confirm'),
-                okText: __('OK, got it.'),
+                okText: __('Ok, got it'),
                 className: 'modal modal-primary',
                 cancelText: __('Cancel')
             });
@@ -138,13 +142,13 @@ define(function(require) {
         },
 
         beforePageChange: function(e) {
-            if (this.hasChanges()) {
+            if (!e.prevented && this.hasChanges()) {
                 e.prevented = !window.confirm(__('oro.ui.leave_page_with_unsaved_data_confirm'));
             }
         },
 
         onWindowUnload: function() {
-            if (this.hasChanges()) {
+            if (this.hasChanges() && !pageStateChecker.hasChangesIgnored()) {
                 return __('oro.ui.leave_page_with_unsaved_data_confirm');
             }
         },

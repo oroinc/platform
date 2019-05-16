@@ -154,60 +154,6 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($entities, $result);
     }
 
-    public function testGetLocalizationData()
-    {
-        $this->assertGetEntityRepositoryForClassIsCalled();
-        $this->repository->expects($this->once())
-            ->method('getLocalizationsData')
-            ->willReturn(
-                [
-                    1001 => ['languageCode' => 'en', 'formattingCode' => 'en'],
-                    2002 => ['languageCode' => 'fr', 'formattingCode' => 'fr'],
-                ]
-            );
-        $this->assertCacheReads(false);
-
-        $this->assertEquals(
-            ['languageCode' => 'fr', 'formattingCode' => 'fr'],
-            $this->manager->getLocalizationData(2002)
-        );
-    }
-
-    public function testGetLocalizationDataCached()
-    {
-        $this->assertGetEntityRepositoryForClassIsNotCalled();
-        $this->assertCacheReads([1001 => ['languageCode' => 'en', 'formattingCode' => 'en']]);
-
-        $this->assertEquals(
-            ['languageCode' => 'en', 'formattingCode' => 'en'],
-            $this->manager->getLocalizationData(1001)
-        );
-    }
-
-    public function testGetLocalizationDataForcedCacheDisabled()
-    {
-        $this->assertGetEntityRepositoryForClassIsCalled();
-        $this->repository->expects($this->once())
-            ->method('getLocalizationsData')
-            ->willReturn(
-                [
-                    1001 => ['languageCode' => 'en', 'formattingCode' => 'en'],
-                    2002 => ['languageCode' => 'fr', 'formattingCode' => 'fr'],
-                ]
-            );
-
-        //Cache should not be accessed at all
-        $this->cacheProvider->expects($this->never())
-            ->method('fetch');
-        $this->cacheProvider->expects($this->never())
-            ->method('save');
-
-        $this->assertEquals(
-            ['languageCode' => 'fr', 'formattingCode' => 'fr'],
-            $this->manager->getLocalizationData(2002, false)
-        );
-    }
-
     public function testGetDefaultLocalization()
     {
         $this->assertGetEntityRepositoryForClassIsCalled();
@@ -282,26 +228,21 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testWarmUpCache()
     {
-        $this->doctrineHelper->expects($this->exactly(2))
+        $this->doctrineHelper->expects($this->exactly(1))
             ->method('getEntityRepositoryForClass')
             ->with(Localization::class)
             ->willReturn($this->repository);
 
         $this->cacheProvider->expects($this->exactly(2))
             ->method('fetch')
-            ->withConsecutive(
-                ['ORO_LOCALE_LOCALIZATION_DATA'],
-                ['ORO_LOCALE_LOCALIZATION_DATA_SIMPLE']
-            )
-            ->willReturn(false);
+            ->will($this->returnValueMap([
+                ['ORO_LOCALE_LOCALIZATION_DATA', false],
+                ['ORO_LOCALE_LOCALIZATION_DATA_SIMPLE', []]
+            ]));
 
         $this->repository->expects($this->once())
             ->method('findBy')
             ->willReturn($this->entities);
-
-        $this->repository->expects($this->once())
-            ->method('getLocalizationsData')
-            ->willReturn([]);
 
         $this->manager->warmUpCache();
     }

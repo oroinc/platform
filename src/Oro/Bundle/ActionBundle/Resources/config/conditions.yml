@@ -186,3 +186,23 @@ services:
             - '@service_container'
         tags:
             - { name: oro_action.condition, alias: 'service_exists' }
+
+    oro_action.condition.contains:
+        class: Oro\Component\ConfigExpression\Condition\Contains
+        tags:
+            - { name: oro_action.condition, alias: contains }
+
+    oro_action.condition.not_contains:
+        class: Oro\Component\ConfigExpression\Condition\NotContains
+        tags:
+            - { name: oro_action.condition, alias: not_contains }
+
+    oro_action.condition.start_with:
+        class: Oro\Component\ConfigExpression\Condition\StartWith
+        tags:
+            - { name: oro_action.condition, alias: start_with }
+
+    oro_action.condition.end_with:
+        class: Oro\Component\ConfigExpression\Condition\EndWith
+        tags:
+            - { name: oro_action.condition, alias: end_with }

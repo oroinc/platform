@@ -7,7 +7,7 @@
     <div class="navigation clearfix">
         <div class="top-action-box">
             {% spaceless %}
-            <button class="btn btn-icon btn-light-custom favorite-button" {% if contentProviderContent['favoriteButton'] == false %}style="display: none"{% endif %}
+            <button class="btn btn-icon btn-light-custom favorite-button{% if contentProviderContent['favoriteButton'] == false %} hide{% endif %}"
                     data-title="{{ oro_title_render_serialized() }}"
                     data-title-rendered="{{ oro_title_render() }}"
                     data-title-rendered-short="{{ oro_title_render_short() }}"
@@ -29,7 +29,7 @@
                         <span class="fa-star-o"></span>
                         {{- 'oro.navigation.favorites.button'|trans -}}
             </button>
-            <button class="btn btn-icon btn-light-custom minimize-button" {% if contentProviderContent['pinButton'] == false %}style="display: none"{% endif %}
+            <button class="btn btn-icon btn-light-custom minimize-button{% if contentProviderContent['pinButton'] == false %} hide{% endif %}"
                     data-title="{{ oro_title_render_serialized() }}"
                     data-title-rendered="{{ oro_title_render() }}"
                     data-title-rendered-short="{{ oro_title_render_short() }}"
@@ -46,13 +46,9 @@
                                 listSelector: '.dropdown-menu'
                             },
                             barOptions: {
-                                el: '#pinbar .list-bar',
-                                listSelector: 'ul',
+                                el: '#pinbar',
+                                listSelector: '.list-bar ul',
                                 fallbackSelector: '.pin-bar-empty'
-                            },
-                            pageStateOptions: {
-                                el: '#container',
-                                keepElement: true
                             }
                         }
                     }) }}>
@@ -65,3 +61,11 @@
 </div>
 
 {% endif %}
+<script {{ UI.renderPageComponentAttributes({
+    view: 'oronavigation/js/app/views/page-state-view',
+    name: 'page-state-component',
+    options: {
+        el: '#container',
+        keepElement: true
+    }
+}) }}></script>

@@ -19,31 +19,35 @@
 <div class="widget-content import-widget-content" {{ UI.renderPageComponentAttributes(ImportValidateViewOptions) }}>
     {% set tabId = 'import-tablist-'|uniqid %}
     {% if configsWithForm|length > 1 %}
-        <ul class="nav nav-tabs" role="tablist">
-            {% for configWithForm in configsWithForm %}
-                {% set config = configWithForm.configuration %}
-                {% set shortEntityName = config.entityClass|basename %}
+        <div  {{ UI.renderPageComponentAttributes({
+            module: 'oroui/js/app/components/tabs-component'
+        }) }}>
+            <ul class="nav nav-tabs" role="tablist">
+                {% for configWithForm in configsWithForm %}
+                    {% set config = configWithForm.configuration %}
+                    {% set shortEntityName = config.entityClass|basename %}
 
-                {% if config.importEntityLabel is defined and config.importEntityLabel is not empty %}
-                    {% set entityLabel = config.importEntityLabel %}
-                {% else %}
-                    {% set entityLabel = shortEntityName %}
-                {% endif %}
+                    {% if config.importEntityLabel is defined and config.importEntityLabel is not empty %}
+                        {% set entityLabel = config.importEntityLabel %}
+                    {% else %}
+                        {% set entityLabel = shortEntityName %}
+                    {% endif %}
 
-                {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
+                    {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
 
-                <li class="nav-item">
-                    <a id="importExport{{ shortEntityName ~ tabId }}-tab"
-                       href="#importExport{{ shortEntityName ~ tabId }}"
-                       class="nav-link{% if isActiveEntity %} active{% endif %}"
-                       data-toggle="tab"
-                       aria-selected="{% if isActiveEntity %}true{% else %}false{% endif %}"
-                       aria-controls="importExport{{ shortEntityName ~ tabId }}"
-                       role="tab"
-                    >{{ entityLabel }}</a>
-                </li>
-            {% endfor %}
-        </ul>
+                    <li class="nav-item">
+                        <a id="importExport{{ shortEntityName ~ tabId }}-tab"
+                           href="#importExport{{ shortEntityName ~ tabId }}"
+                           class="nav-link{% if isActiveEntity %} active{% endif %}"
+                           data-toggle="tab"
+                           aria-selected="{% if isActiveEntity %}true{% else %}false{% endif %}"
+                           aria-controls="importExport{{ shortEntityName ~ tabId }}"
+                           role="tab"
+                        >{{ entityLabel }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
     {% endif %}
 
     {% if configsWithForm|length > 1 %}

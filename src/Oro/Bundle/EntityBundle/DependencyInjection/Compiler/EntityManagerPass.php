@@ -4,10 +4,9 @@ namespace Oro\Bundle\EntityBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Injects the default logger to entity manager.
+ * Deprecated, will be removed in 4.0.
  */
 class EntityManagerPass implements CompilerPassInterface
 {
@@ -16,7 +15,5 @@ class EntityManagerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $em = $container->findDefinition('doctrine.orm.entity_manager');
-        $em->addMethodCall('setLogger', [new Reference('logger')]);
     }
 }

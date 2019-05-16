@@ -35,7 +35,7 @@ define([
 
             this._appendFilter($filter);
 
-            var events = ['click', 'show.bs.dropdown'].map(function(eventName) {
+            var events = ['click', 'multiselectbeforeopen', 'show.bs.dropdown'].map(function(eventName) {
                 return eventName + this._eventNamespace();
             }.bind(this)).join(' ');
 

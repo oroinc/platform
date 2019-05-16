@@ -45,7 +45,7 @@ oro:
             associations.label:  Communication & Collaboration
 
         config_log:
-            entity_plyral_label: Histories
+            entity_plural_label: Histories
             user.label:      Author
             diffs.label:     Diffs
             logged_at.label: Logged at
@@ -117,6 +117,7 @@ oro:
             message:
                 invalid_field_type: Invalid field type.
                 require_update_schema: "Please, click 'Update Schema' to apply changes"
+                cant_replace_extend_field: Can not create attribute with such name.
 
         sections:
             attribute_family:

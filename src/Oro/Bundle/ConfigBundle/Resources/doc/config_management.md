@@ -55,7 +55,7 @@ Example
 ```php
 SettingsBuilder::append($root, array(
     'locale' => array(
-        'value' => '%locale%',
+        'value' => '%oro_locale.language%',
     ),
     'entity_segment_id' => array(
         'value' => '@oro_config.provider.default_segment_id',

@@ -27,6 +27,11 @@ class EntityMetadataHelper
     protected $classToTableMap;
 
     /**
+     * @var string[][] {class name} => [{field name}, ...]
+     */
+    protected $classToColumnsMap;
+
+    /**
      * @param ManagerRegistry $doctrine
      */
     public function __construct(ManagerRegistry $doctrine)
@@ -43,9 +48,7 @@ class EntityMetadataHelper
     {
         $this->ensureNameMapsLoaded();
 
-        return isset($this->tableToClassesMap[$tableName])
-            ? $this->tableToClassesMap[$tableName]
-            : [];
+        return $this->tableToClassesMap[$tableName] ?? [];
     }
 
     /**
@@ -58,9 +61,32 @@ class EntityMetadataHelper
     {
         $this->ensureNameMapsLoaded();
 
-        return isset($this->classToTableMap[$className])
-            ? $this->classToTableMap[$className]
-            : null;
+        return $this->classToTableMap[$className] ?? null;
+    }
+
+    /**
+     * @param string $className
+     * @return string[]
+     */
+    public function getEntityColumnsByEntityClass($className)
+    {
+        $this->ensureNameMapsLoaded();
+
+        return $this->classToColumnsMap[$className] ?? [];
+    }
+
+    /**
+     * @param string $className
+     * @param string $columnName
+     * @return bool
+     */
+    public function isEntityClassContainsColumn($className, $columnName)
+    {
+        $this->ensureNameMapsLoaded();
+
+        $columns = $this->getEntityColumnsByEntityClass($className);
+
+        return !$columns || in_array($columnName, $columns, true);
     }
 
     /**
@@ -114,8 +140,9 @@ class EntityMetadataHelper
      */
     protected function loadNameMaps()
     {
-        $this->tableToClassesMap  = [];
-        $this->classToTableMap  = [];
+        $this->tableToClassesMap = [];
+        $this->classToTableMap = [];
+        $this->classToColumnsMap = [];
         $names = $this->doctrine->getManagerNames();
         foreach ($names as $name => $id) {
             $manager = $this->doctrine->getManager($name);
@@ -127,6 +154,21 @@ class EntityMetadataHelper
                         $className = $metadata->getName();
                         $this->tableToClassesMap[$tableName][] = $className;
                         $this->classToTableMap[$className] = $tableName;
+
+                        // Column mapping
+                        $this->classToColumnsMap[$className] = $metadata->getColumnNames();
+
+                        if (!empty($metadata->discriminatorColumn)) {
+                            $this->classToColumnsMap[$className][] = $metadata->discriminatorColumn['name'];
+                        }
+
+                        foreach ($metadata->getAssociationMappings() as $relation) {
+                            if (array_key_exists('joinColumns', $relation) && is_array($relation['joinColumns'])) {
+                                foreach ($relation['joinColumns'] as $joinColumn) {
+                                    $this->classToColumnsMap[$className][] = $joinColumn['name'];
+                                }
+                            }
+                        }
                     }
                 }
             }

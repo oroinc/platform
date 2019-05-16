@@ -17,7 +17,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
     $.widget( 'ui.dialog', $.ui.dialog, {
         version: '2.0.0',
 
-        _limitToEl: false,
+        _limitToEl: null,
 
         _resizeTries: 0,
 
@@ -56,8 +56,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
 
         _create: function () {
             this._super();
-
             this._verifySettings();
+
             this._initBottomLine();
 
             // inner-wrapper fixes max-height for flex container in IE11 https://jsfiddle.net/d158647x/
@@ -74,11 +74,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         },
 
         _limitTo: function() {
-            if (false === this._limitToEl) {
-                this._limitToEl = this.options.limitTo ? $(this.options.limitTo) : this._appendTo();
+            if (this.options.limitTo === 'viewport') {
+                return this._limitToEl = $(document.documentElement)
+            } else if (this.options.limitTo) {
+                return this._limitToEl = $(this.options.limitTo);
             }
 
-            return this._limitToEl;
+            return this._limitToEl = this._appendTo();
         },
 
         _init: function() {
@@ -103,7 +105,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
 
         _makeDraggable: function() {
             this._super();
-            this.uiDialog.draggable('option', 'containment', this.options.limitTo || 'parent');
+            this.uiDialog.draggable('option', 'containment',
+                this.options.limitTo === 'viewport' ? 'window': this._limitTo());
         },
 
         open: function() {

@@ -299,5 +299,40 @@ define(function(require) {
         return original.remove.call(this);
     };
 
+    // Backbone.Events
+    /**
+     * Wraps original `listenTo` method and makes the event handler first in order
+     *
+     * @param {Object} obj
+     * @param {string} name
+     * @param {Function} callback
+     * @return {Backbone.Events}
+     */
+    Backbone.Events.firstListenTo = function(obj, name, callback) {
+        this.listenTo.apply(this, arguments);
+
+        if (!obj) {
+            return this;
+        }
+        var events = obj._events[name];
+        var last = events.splice(events.length - 1, 1);
+        events.unshift(last[0]);
+    };
+
+    /**
+     * Wraps original `on` method and makes the event handler first in order
+     *
+     * @param {string} name
+     * @param {Function} callback
+     * @param {Object} [context]
+     */
+    Backbone.Events.firstOn = function(name, callback, context) {
+        this.on.apply(this, arguments);
+
+        var events = this._events[name];
+        var last = events.splice(events.length - 1, 1);
+        events.unshift(last[0]);
+    };
+
     return Backbone;
 });

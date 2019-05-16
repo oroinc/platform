@@ -8,6 +8,9 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\HttpFoundation\File\File as HttpFile;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Transforms a value between File entity id and File entity
+ */
 class ConfigFileDataTransformer implements DataTransformerInterface
 {
     /**
@@ -81,7 +84,8 @@ class ConfigFileDataTransformer implements DataTransformerInterface
             $em->flush($file);
         }
 
-        return $this->restoreFile($file)->getId();
+        $persistedFile = $this->restoreFile($file);
+        return $persistedFile ? $persistedFile->getId() : null;
     }
 
     /**
@@ -95,7 +99,7 @@ class ConfigFileDataTransformer implements DataTransformerInterface
 
     /**
      * @param File $file
-     * @return File
+     * @return File|null
      */
     protected function restoreFile(File $file)
     {

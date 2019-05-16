@@ -975,6 +975,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: When I filter Date Range as between "2015-12-24" and "2015-12-26"
      * Example: But when I filter Created At as not between "25 Jun 2015" and "30 Jun 2015"
      *
+     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|equals|not equals)) "(?P<start>.+)" as single value$/
+     * @When /^(?:|I )filter "(?P<filterName>[\w\s]+)" as (?P<type>(?:|equals|not equals)) "(?P<start>.+)" as single value$/
      * @When /^(?:|when )(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|between|not between)) "(?P<start>.+)" and "(?P<end>.+)"$/
      * @When /^(?:|when )(?:|I )filter "(?P<filterName>[\w\s\/]+)" as (?P<type>(?:|between|not between)) "(?P<start>.+)" and "(?P<end>.+)"$/
      * @When /^(?:|when )(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|between|not between)) "(?P<start>.+)" and "(?P<end>.+)" in "(?P<filterGridName>[\w\s]+)"$/
@@ -986,7 +988,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $filterGridName
      */
     //@codingStandardsIgnoreEnd
-    public function applyDateTimeFilter($filterName, $type, $start, $end, $filterGridName = 'Grid')
+    public function applyDateTimeFilter($filterName, $type, $start, $end = null, $filterGridName = 'Grid')
     {
         /** @var GridFilterDateTimeItem $filterItem */
         $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('GridFilterDateTimeItem', $filterName);
@@ -994,7 +996,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem->open();
         $filterItem->selectType($type);
         $filterItem->setStartTime(new \DateTime($start));
-        $filterItem->setEndTime(new \DateTime($end));
+
+        if (null !== $end) {
+            $filterItem->setEndTime(new \DateTime($end));
+        }
+
         $filterItem->submit();
     }
 
@@ -1786,7 +1792,7 @@ TEXT;
         $gridSettingsButton->click();
 
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
-        $filterButton->click();
+        $filterButton->clickForce();
 
         // Actually element "GridFilterManager" points to all filter dropdowns, so we have to find out
         // which one is the actual filter manager dropdown.
@@ -1834,6 +1840,30 @@ TEXT;
 
         $gridSettingsClose = $grid->getElement($grid->getMappedChildElementName('GridSettingsManagerClose'));
         $gridSettingsClose->click();
+    }
+
+    /**
+     * @When /^(?:|I )should see following (filters|columns) in the grid settings in exact order:$/
+     * @param TableNode $table
+     */
+    public function iShouldSeeFollowingFiltersColumnsInExactOrder(TableNode $table)
+    {
+        $expectedItems = [];
+        foreach ($table->getRows() as $item) {
+            $expectedItems[] = $item[0];
+        }
+
+        $actualTable = $this->elementFactory->createElement('GridFilterManager');
+        $availableItems = $actualTable->findAll('css', 'td.title-cell label');
+
+        foreach ($availableItems as $exactIndex => $itemName) {
+            self::assertTrue(isset($expectedItems[$exactIndex]), 'Number of actual items exceeds expected');
+            self::assertEquals(
+                $expectedItems[$exactIndex],
+                $itemName->getText(),
+                'Expected items/order does not match'
+            );
+        }
     }
 
     /**

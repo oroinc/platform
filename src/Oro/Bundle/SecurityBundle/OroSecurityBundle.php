@@ -13,6 +13,7 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnerMetadataProvider
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipDecisionMakerPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipTreeProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\RemoveAclSchemaListenerPass;
+use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\SessionPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\SetPublicForDecoratedAuthorizationCheckerPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationFormLoginFactory;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationHttpBasicFactory;
@@ -45,6 +46,7 @@ class OroSecurityBundle extends Bundle
         $container->addCompilerPass(new AclGroupProvidersPass());
         $container->addCompilerPass(new AclPrivilegeFilterPass());
         $container->addCompilerPass(new AccessRulesPass());
+        $container->addCompilerPass(new SessionPass());
         if ($container instanceof ExtendedContainerBuilder) {
             $container->addCompilerPass(new RemoveAclSchemaListenerPass());
             $container->moveCompilerPassBefore(

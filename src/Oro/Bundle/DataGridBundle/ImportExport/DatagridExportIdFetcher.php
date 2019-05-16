@@ -6,6 +6,7 @@ use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryExecutorInterface;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -13,6 +14,9 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Getting ids of exported records from data grid
+ */
 class DatagridExportIdFetcher implements ContextAwareInterface
 {
     /**
@@ -36,13 +40,28 @@ class DatagridExportIdFetcher implements ContextAwareInterface
     protected $grid;
 
     /**
+     * @var QueryExecutorInterface
+     */
+    protected $queryExecutor;
+
+    /**
      * @param ServiceLink $gridManagerLink
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(ServiceLink $gridManagerLink, EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        ServiceLink $gridManagerLink,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->gridManagerLink = $gridManagerLink;
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * @param QueryExecutorInterface $queryExecutor
+     */
+    public function setQueryExecutor(QueryExecutorInterface $queryExecutor)
+    {
+        $this->queryExecutor = $queryExecutor;
     }
 
     /**
@@ -99,7 +118,13 @@ class DatagridExportIdFetcher implements ContextAwareInterface
             $qb->resetDQLPart('orderBy');
         }
 
-        return array_keys($qb->getQuery()->getArrayResult());
+        return $this->queryExecutor->execute(
+            $this->grid,
+            $qb->getQuery(),
+            function ($qb) {
+                return array_keys($qb->getArrayResult());
+            }
+        );
     }
 
     /**

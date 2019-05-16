@@ -4,6 +4,10 @@ namespace Oro\Bundle\SecurityBundle\Owner;
 
 use Oro\Bundle\SecurityBundle\Exception\UnsupportedOwnerTreeProviderException;
 
+/**
+ * This provider allows to clear the owner tree cache.
+ * Also this provider works with multiple trees in the chain mode.
+ */
 class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
 {
     /** @var OwnerTreeProviderInterface[] */
@@ -17,7 +21,9 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
      */
     public function addProvider(OwnerTreeProviderInterface $provider)
     {
-        $this->providers[] = $provider;
+        if ($provider !== $this->defaultProvider) {
+            $this->providers[] = $provider;
+        }
     }
 
     /**

@@ -3,8 +3,11 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension;
 use Oro\Bundle\EntityExtendBundle\Grid\FieldsHelper;
@@ -152,6 +155,74 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
      */
     abstract protected function getDatagridConfiguration(array $options = []);
 
+    public function testProcessConfigsWithDatagridOrder()
+    {
+        $fieldType = 'string';
+
+        $datagridFieldConfig = new Config(
+            new FieldConfigId('datagrid', self::ENTITY_CLASS, self::FIELD_NAME, $fieldType),
+            [
+                'show_filter' => true,
+                'is_visible' => DatagridScope::IS_VISIBLE_TRUE,
+                'renderable' => true,
+                'order' => 3,
+            ]
+        );
+
+        $this->datagridConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS, self::FIELD_NAME)
+            ->willReturn($datagridFieldConfig);
+
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, self::FIELD_NAME, $fieldType);
+
+        $config = $this->getDatagridConfiguration();
+        $initialConfig = $config->toArray();
+
+        $this->getExtension()->processConfigs($config);
+        $this->assertEquals(
+            array_merge(
+                $initialConfig,
+                [
+                    'columns' => [
+                        self::FIELD_NAME => [
+                            'label' => 'label',
+                            'frontend_type' => 'string',
+                            'renderable' => true,
+                            'required' => false,
+                            'data_name' => 'testField',
+                            'order' => 3
+                        ],
+                    ],
+                    'sorters' => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'data_name' => 'o.' . self::FIELD_NAME,
+                            ],
+                        ],
+                    ],
+                    'filters' => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'type' => 'string',
+                                'data_name' => 'o.' . self::FIELD_NAME,
+                                'enabled' => true,
+                            ],
+                        ],
+                    ],
+                    'source' => [
+                        'query' => [
+                            'from' => [['table' => self::ENTITY_CLASS, 'alias' => 'o']],
+                            'select' => ['o.testField'],
+                        ],
+                    ],
+                    'fields_acl' => ['columns' => ['testField' => ['data_name' => 'o.testField']]],
+                ]
+            ),
+            $config->toArray()
+        );
+    }
+
     public function testProcessConfigs()
     {
         $fieldType = 'string';
@@ -172,7 +243,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             'renderable' => true,
                             'required' => false,
                             'data_name' => 'testField',
-                            'order' => 0
                         ],
                     ],
                     'sorters' => [
@@ -228,7 +298,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             'renderable' => true,
                             'required' => false,
                             'data_name' => 'testField',
-                            'order' => 0
                         ],
                     ],
                     'sorters' => [
@@ -326,7 +395,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             'label' => 'label',
                             'renderable' => true,
                             'required' => false,
-                            'order' => 0
                         ],
                     ],
                     'sorters' => [
@@ -399,7 +467,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             'label' => 'label',
                             'renderable' => true,
                             'required' => false,
-                            'order' => 0
                         ],
                     ],
                     'sorters' => [
@@ -458,7 +525,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             'renderable' => true,
                             'required' => false,
                             'data_name' => 'testField_target_field',
-                            'order' => 0
                         ],
                     ],
                     'sorters' => [

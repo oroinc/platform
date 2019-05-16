@@ -428,6 +428,19 @@ class Form extends Element
             );
         }
 
+        if (!$errorSpan && $field->getAttribute('type') === 'file') {
+            // Get the validation error for file input widget
+            $errorSpan = $this->find(
+                'xpath',
+                sprintf(
+                    '%s%s%s',
+                    $field->getXpath(),
+                    '/ancestor::div[contains(@class, "input-widget-file")]',
+                    '/following-sibling::div/span[@class="validation-failed"]'
+                )
+            );
+        }
+
         self::assertNotNull($errorSpan, "Field $fieldName has no validation errors");
 
         return $errorSpan->getText();

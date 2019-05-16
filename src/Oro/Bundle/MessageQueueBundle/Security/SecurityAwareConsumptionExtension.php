@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Security;
 
+use Oro\Bundle\MessageQueueBundle\Consumption\Exception\InvalidSecurityTokenException;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -66,10 +66,12 @@ class SecurityAwareConsumptionExtension extends AbstractExtension
         if ($serializedToken) {
             $token = $this->tokenSerializer->deserialize($serializedToken);
             if (null === $token) {
-                $this->logger->error('Cannot deserialize security token');
-                $context->setStatus(MessageProcessorInterface::REJECT);
+                $exception = new InvalidSecurityTokenException();
+                $context->getLogger()->error($exception->getMessage());
+
+                throw $exception;
             } else {
-                $this->logger->debug('Set security token');
+                $context->getLogger()->debug('Set security token');
                 $this->tokenStorage->setToken($token);
             }
         }

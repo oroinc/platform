@@ -15,6 +15,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * ACL Permission controller
+ */
 class AclPermissionController extends Controller
 {
     /**
@@ -103,6 +106,9 @@ class AclPermissionController extends Controller
         $token->setOrganizationContext($organization);
         $event = new OrganizationSwitchAfter($user, $organization);
         $this->get('event_dispatcher')->dispatch(OrganizationSwitchAfter::NAME, $event);
+
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+        $request->attributes->set('_fullRedirect', true);
 
         return $this->redirect($this->generateUrl('oro_default'));
     }
