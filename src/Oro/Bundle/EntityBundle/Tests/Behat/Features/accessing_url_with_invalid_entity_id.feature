@@ -4,7 +4,6 @@ Feature: Accessing url with invalid entity id
   As an user
   I want to see 404 page when database exception happened
 
-  @skipWait
   Scenario: Check out of range id
     Given I login as administrator
     When I open User view page with id 123456789123456789

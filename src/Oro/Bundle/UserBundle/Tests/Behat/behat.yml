@@ -89,6 +89,10 @@ oro_behat_extension:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserForgotPassword
       route: 'oro_user_reset_request'
 
+    User Password Reset:
+      class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserPasswordReset
+      route: 'oro_user_reset_reset'
+
     User Profile View:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserProfileView
       route: 'oro_user_profile_view'
