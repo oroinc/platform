@@ -89,7 +89,7 @@
 
         .choice-filter {
             .btn-group.btn-block {
-                align-self: $choice-filter-btn-align;
+                width: $choice-filter-btn-width;
                 padding: $choice-filter-btn-inner-offset;
             }
 
@@ -162,7 +162,6 @@
 
     .filter-update {
         margin-left: $filter-update-offset-left;
-        align-self: $filter-update-offset-align;
     }
 
     .filter-select-oro {
