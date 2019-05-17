@@ -121,20 +121,6 @@ class FeatureContext extends OroFeatureContext implements
         } else {
             $this->oroMainContext->pressButton('Request');
         }
-
-        // need to be skiped ajax wait, because we have redirect to login page and no ajax requests
-        $this->oroMainContext->applySkipWait();
-    }
-
-    /**
-     * @When /^(?:|I )confirm login$/
-     */
-    public function iConfirmLogin()
-    {
-        $this->oroMainContext->pressButton('Log in');
-
-        // need to be skiped ajax wait, because we have redirect to login page and no ajax requests
-        $this->oroMainContext->applySkipWait();
     }
 
     /**

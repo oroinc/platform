@@ -357,34 +357,36 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
      * Example: Then I follow "Confirm" link from the email
      *
      * @Given /^(?:|I )follow "(?P<linkCaption>[^"]+)" link from the email$/
+     * @Given /^(?:|I )follow link from the email$/
      *
      * @param string $linkCaption
      */
-    public function followLinkFromEmail(string $linkCaption)
+    public function followLinkFromEmail(string $linkCaption = '[^\<]+')
     {
         $mailer = $this->getMailer();
         if (!$mailer instanceof DirectMailerDecorator) {
             return;
         }
 
-        $pattern = sprintf('/<a\s+.*href\s*=\s*"([^"]+)".*>\s*%s\s*<\/a>/s', $linkCaption);
-        $matches = [];
+        $pattern = sprintf('/<a.*href\s*=\s*"(?P<url>[^"]+)".*>\s*%s\s*<\/a>/s', $linkCaption);
+        $url = $this->spin(function () use ($mailer, $pattern) {
+            $matches = [];
+            /** @var \Swift_Mime_Message $message */
+            foreach ($mailer->getSentMessages() as $message) {
+                $text = utf8_decode(html_entity_decode($message->getBody()));
+                // replace non-breaking spaces with plain spaces to be able to search
+                $text = str_replace(chr(160), chr(32), $text);
 
-        /** @var \Swift_Mime_Message $message */
-        foreach ($mailer->getSentMessages() as $message) {
-            $text = utf8_decode(html_entity_decode($message->getBody()));
-            // replace non-breaking spaces with plain spaces to be able to search
-            $text = str_replace(chr(160), chr(32), $text);
-
-            $found = preg_match($pattern, $text, $matches);
-            if ($found === 1) {
-                break;
+                if (preg_match($pattern, $text, $matches) && isset($matches['url'])) {
+                    return htmlspecialchars_decode($matches['url']);
+                }
             }
-        }
 
-        self::assertArrayHasKey(1, $matches, sprintf('"%s" link not found in the email', $linkCaption));
+            return false;
+        });
 
-        $url = htmlspecialchars_decode($matches[1]);
+        self::assertNotNull($url, sprintf('"%s" link not found in the email', $linkCaption));
+
         $this->visitPath($url);
     }
 }

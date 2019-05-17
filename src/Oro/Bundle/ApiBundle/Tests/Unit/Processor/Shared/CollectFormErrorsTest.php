@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Form\Type\ArrayType;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors;
@@ -213,7 +214,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     public function testProcessWithInvalidCollectionPropertyValue()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
-            ->add('field1', TextType::class, ['constraints' => [new Constraints\All(new Constraints\NotNull())]])
+            ->add('field1', ArrayType::class, ['constraints' => [new Constraints\All(new Constraints\NotNull())]])
             ->getForm();
         $form->submit(
             [
@@ -239,7 +240,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add(
                 'renamedField1',
-                TextType::class,
+                ArrayType::class,
                 ['property_path' => '[field1]', 'constraints' => [new Constraints\All(new Constraints\NotNull())]]
             )
             ->getForm();

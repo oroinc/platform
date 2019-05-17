@@ -24,6 +24,7 @@ Feature: Localized email notification during forgot password
       | Default Localization | German Localization |
     And I submit form
     Then I should see "Configuration saved" flash message
+
     When I click My Configuration in user menu
     And I follow "System Configuration/General Setup/Localization" on configuration sidebar
     And uncheck "Use Organization" for "Default Localization" field
@@ -32,9 +33,8 @@ Feature: Localized email notification during forgot password
     And I submit form
     Then I should see "Configuration saved" flash message
 
-  Scenario: A user should get an email in a language of his config underuse of "Forgot password" functionality
-    Given I go to System / Emails / Templates
-    When I filter Template Name as is equal to "user_reset_password"
+    When I go to System / Emails / Templates
+    And I filter Template Name as is equal to "user_reset_password"
     And I click "edit" on first row in grid
     And fill "Email Template Form" with:
       | Subject | English Forgot Password Subject |
@@ -49,7 +49,9 @@ Feature: Localized email notification during forgot password
       | Content | German Forgot Password Body    |
     And I submit form
     Then I should see "Template saved" flash message
-    Given I click Logout in user menu
+    And I click Logout in user menu
+
+  Scenario: A user should get an email in a language of his config underuse of "Forgot password" functionality
     And I click "Forgot your password?"
     And I fill form with:
       | Username or Email | admin@example.com |

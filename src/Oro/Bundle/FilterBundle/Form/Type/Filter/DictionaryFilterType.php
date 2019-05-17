@@ -3,9 +3,9 @@
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FormBundle\Form\Type\OroUnstructuredTextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -105,7 +105,7 @@ class DictionaryFilterType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'field_type' => TextType::class,
+                'field_type' => OroUnstructuredTextType::class,
                 'field_options' => [],
                 'operator_type' => ChoiceType::class,
                 'operator_options' => [],

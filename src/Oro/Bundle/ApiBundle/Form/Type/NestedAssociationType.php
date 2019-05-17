@@ -60,7 +60,8 @@ class NestedAssociationType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
-            ->setDefaults(['compound' => false])
+            ->setDefault('compound', false)
+            ->setDefault('multiple', true)
             ->setRequired(['metadata', 'config'])
             ->setAllowedTypes('metadata', [AssociationMetadata::class])
             ->setAllowedTypes('config', [EntityDefinitionFieldConfig::class]);
