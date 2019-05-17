@@ -13,6 +13,7 @@ use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailOriginFromType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailType;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestMailbox;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
@@ -323,17 +324,17 @@ class EmailTypeTest extends TypeTestCase
                 [
                     'gridName' => 'test_grid',
                     'origin'=>'1|john@example.com',
-                    'to' => [
+                    'to' => implode(EmailRecipientsHelper::EMAIL_IDS_SEPARATOR, [
                         'John Smith 1 <john1@example.com>',
-                        '"John Smith 2" <john2@example.com>',
+                        '\"John Smith 2\" <john2@example.com>',
                         'john3@example.com',
-                    ],
+                    ]),
                     'subject' => 'Test subject',
                     'type' => 'text',
                     'attachments' => [],
                     'template' => new EmailTemplate(),
                 ],
-                ['John Smith 1 <john1@example.com>', '"John Smith 2" <john2@example.com>', 'john3@example.com'],
+                ['John Smith 1 <john1@example.com>', '\"John Smith 2\" <john2@example.com>', 'john3@example.com'],
                 [],
                 [],
             ],
@@ -341,29 +342,29 @@ class EmailTypeTest extends TypeTestCase
                 [
                     'gridName' => 'test_grid',
                     'origin'=>'1|john@example.com',
-                    'to' => [
+                    'to' => implode(EmailRecipientsHelper::EMAIL_IDS_SEPARATOR, [
                         'John Smith 1 <john1@example.com>',
-                        '"John Smith 2" <john2@example.com>',
+                        '\"John Smith 2\" <john2@example.com>',
                         'john3@example.com',
-                    ],
-                    'cc' => [
+                    ]),
+                    'cc' => implode(EmailRecipientsHelper::EMAIL_IDS_SEPARATOR, [
                         'John Smith 4 <john4@example.com>',
-                        '"John Smith 5" <john5@example.com>',
+                        '\"John Smith 5\" <john5@example.com>',
                         'john6@example.com',
-                    ],
-                    'bcc' => [
+                    ]),
+                    'bcc' => implode(EmailRecipientsHelper::EMAIL_IDS_SEPARATOR, [
                         'John Smith 7 <john7@example.com>',
-                        '"John Smith 8" <john8@example.com>',
+                        '\"John Smith 8\" <john8@example.com>',
                         'john9@example.com',
-                    ],
+                    ]),
                     'subject' => 'Test subject',
                     'body' => 'Test body',
                     'type' => 'text',
                     'template' => new EmailTemplate(),
                 ],
-                ['John Smith 1 <john1@example.com>', '"John Smith 2" <john2@example.com>', 'john3@example.com'],
-                ['John Smith 4 <john4@example.com>', '"John Smith 5" <john5@example.com>', 'john6@example.com'],
-                ['John Smith 7 <john7@example.com>', '"John Smith 8" <john8@example.com>', 'john9@example.com'],
+                ['John Smith 1 <john1@example.com>', '\"John Smith 2\" <john2@example.com>', 'john3@example.com'],
+                ['John Smith 4 <john4@example.com>', '\"John Smith 5\" <john5@example.com>', 'john6@example.com'],
+                ['John Smith 7 <john7@example.com>', '\"John Smith 8\" <john8@example.com>', 'john9@example.com'],
             ],
         ];
     }

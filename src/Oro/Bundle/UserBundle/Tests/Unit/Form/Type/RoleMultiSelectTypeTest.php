@@ -108,10 +108,6 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
                 'submittedData' => '',
                 'expected' => [],
             ],
-            'empty array' => [
-                'submittedData' => [],
-                'expected' => [],
-            ]
         ];
     }
 
