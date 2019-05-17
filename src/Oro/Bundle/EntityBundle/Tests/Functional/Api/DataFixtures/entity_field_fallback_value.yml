@@ -1,0 +1,7 @@
+Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue:
+    fallback_value:
+        fallback: 'test_fallback'
+    scalar_value:
+        scalarValue: 'test value'
+    array_value:
+        arrayValue: [1, 2, 3]
