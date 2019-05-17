@@ -701,17 +701,13 @@ services:
             - { name: oro.api.processor, action: customize_loaded_data, class: Acme\Bundle\AppBundle\Entity\MyEntity, collection: true }
 ```
 
-**Important:**
+**Important:** The collection elements are an associative array and processors responsible to customize the collection
+must keep keys in this array without changes.
 
-The collection elements are an associative array and processors responsible to customize the collection must keep
-keys in this array without changes.
-
-**Please note:**
-
-All processors for this action has `identifier_only` tag attribute set to `false`. It means that such
-processors are not executed during loading of relationships. If your processor should be executed
-during loading of relationships set `identifier_only` tag attribute to `true`. If your processor should be executed
-during loading of relationships, primary and included entities, set `identifier_only` tag attribute to `null`. E.g.:
+**Note:** All processors for this action has `identifier_only` tag attribute set to `false`. It means that such
+processors are not executed when loading of relationships. If your processor should be executed
+when loading of relationships set `identifier_only` tag attribute to `true`. If your processor should be executed
+when loading of relationships, primary and included entities, set `identifier_only` tag attribute to `null`. E.g.:
 
 ```yaml
 services:
@@ -720,6 +716,10 @@ services:
         tags:
             - { name: oro.api.processor, action: customize_loaded_data, class: Acme\Bundle\AppBundle\Entity\MyEntity, identifier_only: true }
 ```
+
+**Note:** The `identifier_only` tag attribute is not supported if the `collection` tag attribute equals `true`.
+All processors intended for the modification of collections are executed when loading primary entities
+and entities in `to-many` associations, even if only identifier field is requested.
 
 ## customize_form_data Action
 

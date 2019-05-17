@@ -29,6 +29,10 @@ oro_behat_extension:
           OroCRM Organization:
             locator: '(//div[contains(@class,"organization-structure")]//input[@type="checkbox"][@data-name="organization"])[1]'
             type: xpath
+          Organization Business Units:
+            locator: '//input[@name="oro_user_user_form[organizations][businessUnits]"]'
+            type: xpath
+            element: Select2Share
 
     UserMenu:
       selector: {type: 'xpath', locator: '//*[@id="user-menu"]'}
@@ -47,6 +51,14 @@ oro_behat_extension:
       options:
         mapping:
           Use parent scope for Position: 'look_and_feel[oro_ui___navbar_position][use_parent_scope_value]'
+
+    User Reset Password Form:
+      selector: 'form[name="oro_user_reset_form"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          New password: 'oro_user_reset_form[plainPassword][first]'
+          Repeat password: 'oro_user_reset_form[plainPassword][second]'
 
     Sided Main Menu:
       selector: 'div.main-menu-sided'

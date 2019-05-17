@@ -439,6 +439,14 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
 
+    oro_entity_config.exclusion_provider.attribute:
+        class: Oro\Bundle\EntityConfigBundle\Attribute\AttributeExclusionProvider
+        public: false
+        arguments:
+            - "@oro_entity_config.config_manager"
+        tags:
+            - { name: oro_entity.exclusion_provider.api }
+
     oro_entity_config.listener.structure_options:
         class: 'Oro\Bundle\EntityConfigBundle\EventListener\EntityConfigStructureOptionsListener'
         arguments:

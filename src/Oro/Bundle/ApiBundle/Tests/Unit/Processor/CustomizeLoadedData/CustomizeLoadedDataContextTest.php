@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
 {
@@ -80,8 +81,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
     public function testGetResultFieldNameWithoutConfig()
     {
         $propertyPath = 'test';
-        self::assertNull($this->context->getResultFieldName($propertyPath));
-        self::assertEquals($propertyPath, $this->context->getResultFieldName($propertyPath, true));
+        self::assertEquals($propertyPath, $this->context->getResultFieldName($propertyPath));
     }
 
     public function testGetResultFieldNameWhenFieldDoesNotExist()
@@ -90,7 +90,6 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         $config = new EntityDefinitionConfig();
         $this->context->setConfig($config);
         self::assertNull($this->context->getResultFieldName($propertyPath));
-        self::assertEquals($propertyPath, $this->context->getResultFieldName($propertyPath, true));
     }
 
     public function testGetResultFieldNameForNotRenamedField()
@@ -100,7 +99,6 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         $config->addField($propertyPath);
         $this->context->setConfig($config);
         self::assertEquals($propertyPath, $this->context->getResultFieldName($propertyPath));
-        self::assertEquals($propertyPath, $this->context->getResultFieldName($propertyPath, true));
     }
 
     public function testGetResultFieldNameForRenamedField()
@@ -111,14 +109,22 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         $config->addField($fieldName)->setPropertyPath($propertyPath);
         $this->context->setConfig($config);
         self::assertEquals($fieldName, $this->context->getResultFieldName($propertyPath));
-        self::assertEquals($fieldName, $this->context->getResultFieldName($propertyPath, true));
+    }
+
+    public function testGetResultFieldNameForComputedField()
+    {
+        $fieldName = 'renamedTest';
+        $config = new EntityDefinitionConfig();
+        $config->addField($fieldName)->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $this->context->setConfig($config);
+        self::assertEquals($fieldName, $this->context->getResultFieldName($fieldName));
     }
 
     public function testGetResultFieldValueWithoutConfig()
     {
         $propertyName = 'test';
         $data = [$propertyName => 'test value'];
-        self::assertNull($this->context->getResultFieldValue($propertyName, $data));
+        self::assertEquals($data[$propertyName], $this->context->getResultFieldValue($propertyName, $data));
     }
 
     public function testGetResultFieldValueWhenFieldDoesNotExist()

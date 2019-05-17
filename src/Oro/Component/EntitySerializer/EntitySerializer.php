@@ -388,13 +388,15 @@ class EntitySerializer
                             );
 
                             $value = $this->serializeItem($value, $targetEntityClass, $targetConfig, $context);
-                            $this->loadRelatedDataForOneEntity(
-                                $value,
-                                $targetEntityClass,
-                                $targetEntityId,
-                                $targetConfig,
-                                $context
-                            );
+                            if (null === $this->getIdFieldNameIfIdOnlyRequested($targetConfig, $targetEntityClass)) {
+                                $this->loadRelatedDataForOneEntity(
+                                    $value,
+                                    $targetEntityClass,
+                                    $targetEntityId,
+                                    $targetConfig,
+                                    $context
+                                );
+                            }
                         }
                     } else {
                         $value = $this->serializationHelper->transformValue($value, $context, $fieldConfig);
@@ -577,11 +579,16 @@ class EntitySerializer
     ) {
         $items = [$entity];
         $this->loadRelatedData($items, $entityClass, [$entityId], $config, $context);
-        $entity = $items[0];
+        $entity = reset($items);
 
         $handler = $config->getPostSerializeHandler();
         if (null !== $handler) {
             $entity = $this->serializationHelper->postSerialize($entity, $handler, $context);
+        }
+        $collectionHandler = $config->getPostSerializeCollectionHandler();
+        if (null !== $collectionHandler) {
+            $items = $this->serializationHelper->postSerializeCollection([$entity], $collectionHandler, $context);
+            $entity = reset($items);
         }
     }
 

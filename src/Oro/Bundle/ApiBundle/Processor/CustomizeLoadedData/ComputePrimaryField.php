@@ -75,17 +75,14 @@ class ComputePrimaryField implements ProcessorInterface
     {
         $result = null;
         $associationName = $config->findFieldNameByPropertyPath($this->associationName);
-        if ($associationName) {
-            $associationName = $config->findFieldNameByPropertyPath($this->associationName);
-            if (!empty($data[$associationName]) && is_array($data[$associationName])) {
-                $associationTargetConfig = $config->getField($associationName)->getTargetEntity();
-                if (null !== $associationTargetConfig) {
-                    $result = $this->extractPrimaryValue(
-                        $data[$associationName],
-                        $associationTargetConfig->findFieldNameByPropertyPath($this->associationDataFieldName),
-                        $associationTargetConfig->findFieldNameByPropertyPath($this->associationPrimaryFlagFieldName)
-                    );
-                }
+        if ($associationName && !empty($data[$associationName]) && is_array($data[$associationName])) {
+            $associationTargetConfig = $config->getField($associationName)->getTargetEntity();
+            if (null !== $associationTargetConfig) {
+                $result = $this->extractPrimaryValue(
+                    $data[$associationName],
+                    $associationTargetConfig->findFieldNameByPropertyPath($this->associationDataFieldName),
+                    $associationTargetConfig->findFieldNameByPropertyPath($this->associationPrimaryFlagFieldName)
+                );
             }
         }
 

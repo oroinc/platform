@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy;
@@ -988,13 +989,71 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper->getEntityRepositoryForClass($class);
     }
 
+    public function testCreateQueryBuilderWithoutIndexBy()
+    {
+        $class = 'ItemStub';
+        $alias = 'itemAlias';
+        $qb = $this->createMock(QueryBuilder::class);
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->willReturn($this->em);
+        $this->em->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+        $qb->expects($this->once())
+            ->method('from')
+            ->with($class, $alias, null)
+            ->willReturnSelf();
+        $qb->expects($this->once())
+            ->method('select')
+            ->with($alias)
+            ->willReturnSelf();
+
+        $this->assertSame(
+            $qb,
+            $this->doctrineHelper->createQueryBuilder($class, $alias)
+        );
+    }
+
+    public function testCreateQueryBuilderWithIndexBy()
+    {
+        $class = 'ItemStub';
+        $alias = 'itemAlias';
+        $indexBy = 'itemIndexBy';
+        $qb = $this->createMock(QueryBuilder::class);
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->willReturn($this->em);
+        $this->em->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+        $qb->expects($this->once())
+            ->method('from')
+            ->with($class, $alias, $indexBy)
+            ->willReturnSelf();
+        $qb->expects($this->once())
+            ->method('select')
+            ->with($alias)
+            ->willReturnSelf();
+
+        $this->assertSame(
+            $qb,
+            $this->doctrineHelper->createQueryBuilder($class, $alias, $indexBy)
+        );
+    }
+
     public function testGetEntityReference()
     {
         $expectedResult = $this->createMock(\stdClass::class);
         $entityClass    = 'MockEntity';
         $entityId       = 100;
 
-        $this->em->expects($this->once())->method('getReference')
+        $this->em->expects($this->once())
+            ->method('getReference')
             ->with($entityClass, $entityId)
             ->will($this->returnValue($expectedResult));
         $this->registry->expects($this->any())
@@ -1014,22 +1073,14 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $entityClass    = 'MockEntity';
         $entityId       = 100;
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repo->expects($this->once())
-            ->method('find')
-            ->with($entityId)
-            ->will($this->returnValue($expectedResult));
-
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->with($entityClass)
-            ->will($this->returnValue($repo));
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->with($entityClass)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
+        $this->em->expects($this->once())
+            ->method('find')
+            ->with($entityClass, $entityId)
+            ->willReturn($expectedResult);
 
         $this->assertSame(
             $expectedResult,

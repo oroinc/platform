@@ -64,11 +64,12 @@ class NeqOrNullComparisonExpression implements ComparisonExpressionInterface
         $subquery = $visitor->createSubquery($field);
         $subquery->andWhere(
             $subquery->expr()->between(
-                QueryBuilderUtil::getSingleRootAlias($subquery),
+                QueryBuilderUtil::getSelectExpr($subquery),
                 $visitor->buildPlaceholder($fromParameterName),
                 $visitor->buildPlaceholder($toParameterName)
             )
         );
+        $subquery->select(QueryBuilderUtil::getSingleRootAlias($subquery));
 
         $builder = $visitor->getExpressionBuilder();
 

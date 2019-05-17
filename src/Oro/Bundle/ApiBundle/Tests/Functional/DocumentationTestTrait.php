@@ -8,6 +8,7 @@ use Nelmio\ApiDocBundle\Formatter\FormatterInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\Extractor\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 use Symfony\Component\Routing\Route;
@@ -71,7 +72,10 @@ trait DocumentationTestTrait
             || 0 === strpos($entityType, 'testapi')
             || (// custom entities (entities from "Extend\Entity" namespace), except enums
                 0 === strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE)
-                && 0 !== strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_')
+                && (
+                    0 !== strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_')
+                    || 0 === strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_')
+                )
             );
     }
 
@@ -94,6 +98,13 @@ trait DocumentationTestTrait
      */
     private function isTestField($entityClass, $fieldName)
     {
+        if (0 === strpos($fieldName, ExtendConfigDumper::DEFAULT_PREFIX)) {
+            return $this->isTestField(
+                $entityClass,
+                substr($fieldName, strlen(ExtendConfigDumper::DEFAULT_PREFIX))
+            );
+        }
+
         $configManager = $this->getEntityConfigManager();
         if (!$configManager->hasConfig($entityClass, $fieldName)) {
             return false;
@@ -187,8 +198,13 @@ trait DocumentationTestTrait
             $missingDocs[] = 'Empty documentation';
         } elseif (isset(self::$defaultDocumentation[$action])
             && in_array($definition['documentation'], (array)self::$defaultDocumentation[$action], true)
-            && !$this->isSkippedField($entityClass, $association)
-            && !$this->isTestField($entityClass, $association)
+            && (
+                !$association
+                || (
+                    !$this->isSkippedField($entityClass, $association)
+                    && !$this->isTestField($entityClass, $association)
+                )
+            )
         ) {
             $missingDocs[] = sprintf(
                 'Missing documentation. Default value is used: "%s"',

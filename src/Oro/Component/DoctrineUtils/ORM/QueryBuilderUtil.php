@@ -57,6 +57,30 @@ class QueryBuilderUtil
     }
 
     /**
+     * Returns a string contains the expression of SELECT clause.
+     *
+     * @param QueryBuilder $qb
+     *
+     * @return string|null
+     */
+    public static function getSelectExpr(QueryBuilder $qb)
+    {
+        $parts = [];
+        /** @var \Doctrine\ORM\Query\Expr\Select $selectPart */
+        foreach ($qb->getDQLPart('select') as $selectPart) {
+            foreach ($selectPart->getParts() as $part) {
+                $parts[] = $part;
+            }
+        }
+
+        if (empty($parts)) {
+            return null;
+        }
+
+        return implode(', ', $parts);
+    }
+
+    /**
      * Returns an expression in SELECT clause by its alias
      *
      * @param QueryBuilder $qb

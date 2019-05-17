@@ -46,10 +46,10 @@ class QueryExpressionVisitor extends ExpressionVisitor
     private $expressionBuilder;
 
     /** @var CompositeExpressionInterface[] */
-    private $compositeExpressions = [];
+    private $compositeExpressions;
 
     /** @var ComparisonExpressionInterface[] */
-    private $comparisonExpressions = [];
+    private $comparisonExpressions;
 
     /** @var EntityClassResolver */
     private $entityClassResolver;
@@ -111,7 +111,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
      * @param mixed            $value     The value of a parameter
      * @param mixed            $type      The data type of a parameter
      */
-    public function addParameter($parameter, $value = null, $type = null)
+    public function addParameter($parameter, $value = null, $type = null): void
     {
         if (!$parameter instanceof Parameter) {
             $parameter = $this->createParameter($parameter, $value, $type);
@@ -161,9 +161,9 @@ class QueryExpressionVisitor extends ExpressionVisitor
 
     /**
      * Builds a subquery for the given to-many association.
-     * The returned subquery is joined to an association corresponding the specified field.
+     * The returned subquery is joined to an association corresponds the specified field.
      * The type of root entity of the returned subquery is always equal to a target entity
-     * of an association corresponding the specified field.
+     * of an association corresponds the specified field.
      * For example, if there is the following main query:
      * <code>
      * SELECT a FROM Account a JOIN a.users users
@@ -184,6 +184,13 @@ class QueryExpressionVisitor extends ExpressionVisitor
      *   INNER JOIN users_subquery2.groups groups_0_subquery2
      *   WHERE users_subquery2 = users
      * )
+     * </code>
+     * If the last element in the path is a field, the select part of the subquery will contain it,
+     * e.g., the subquery for the path "a.users.name" will be:
+     * <code>
+     * SELECT users_subquery1.name
+     * FROM User users_subquery1
+     * WHERE users_subquery1 = users
      * </code>
      *
      * @param string $field             The unique name of a field corresponds an association
@@ -376,11 +383,15 @@ class QueryExpressionVisitor extends ExpressionVisitor
     /**
      * @param string $path
      * @param bool   $disallowJoinUsage
+     * @param bool   $allowEndsWithField
      *
      * @return QueryBuilder
      */
-    private function createSubqueryByPath(string $path, bool $disallowJoinUsage): QueryBuilder
-    {
+    private function createSubqueryByPath(
+        string $path,
+        bool $disallowJoinUsage,
+        bool $allowEndsWithField = true
+    ): QueryBuilder {
         if (!$disallowJoinUsage && isset($this->queryJoinMap[$path])) {
             return $this->createSubqueryByJoin($this->queryJoinMap[$path]);
         }
@@ -390,7 +401,8 @@ class QueryExpressionVisitor extends ExpressionVisitor
             return $this->createSubqueryByRootAssociation($path);
         }
 
-        $joinedPath = $this->getJoinedPath(\substr($path, 0, $lastDelimiter));
+        $sourceJoinedPath = \substr($path, 0, $lastDelimiter);
+        $joinedPath = $this->getJoinedPath($sourceJoinedPath);
         if (null === $joinedPath) {
             $parentAlias = $this->getRootAlias();
             $parentEntityClass = $this->getRootEntityClass();
@@ -402,22 +414,50 @@ class QueryExpressionVisitor extends ExpressionVisitor
         }
 
         $entityClass = $parentEntityClass;
-        foreach ($associationNames as $associationName) {
-            $entityClass = $this->getClassMetadata($entityClass)
-                ->getAssociationTargetClass($associationName);
+        $fieldName = null;
+        $associationName = null;
+        $i = 0;
+        foreach ($associationNames as $currentName) {
+            $i++;
+            $entityMetadata = $this->getClassMetadata($entityClass);
+            if ($entityMetadata->hasAssociation($currentName)) {
+                $entityClass = $entityMetadata->getAssociationTargetClass($currentName);
+                $associationName = $currentName;
+            } elseif (!$allowEndsWithField || \count($associationNames) !== $i) {
+                throw new QueryException(\sprintf(
+                    'The "%s" must be an association in "%s" entity.',
+                    $currentName,
+                    $entityClass
+                ));
+            } else {
+                if (!$entityMetadata->hasField($currentName)) {
+                    throw new QueryException(\sprintf(
+                        'The "%s" must be an association or a field in "%s" entity.',
+                        $currentName,
+                        $entityClass
+                    ));
+                }
+                $fieldName = $currentName;
+                break;
+            }
         }
-        $subqueryEntityClass = $entityClass;
-        $subqueryAlias = $this->generateSubqueryAlias($associationName);
 
-        $innerSubquery = $this->createInnerSubquery(
-            $parentEntityClass,
-            $this->generateSubqueryAlias($parentAlias),
-            $associationNames,
-            $parentAlias
-        );
-
-        $subquery = $this->createQueryBuilder($subqueryEntityClass, $subqueryAlias);
-        $subquery->where($subquery->expr()->in($subqueryAlias, $innerSubquery->getDQL()));
+        if ($fieldName) {
+            $subquery = $this->createSubqueryByPath($sourceJoinedPath, $disallowJoinUsage, false);
+            $subquery->select(
+                QueryBuilderUtil::getField(QueryBuilderUtil::getSingleRootAlias($subquery), $fieldName)
+            );
+        } else {
+            $subqueryAlias = $this->generateSubqueryAlias($associationName);
+            $innerSubquery = $this->createInnerSubquery(
+                $parentEntityClass,
+                $this->generateSubqueryAlias($parentAlias),
+                $associationNames,
+                $parentAlias
+            );
+            $subquery = $this->createQueryBuilder($entityClass, $subqueryAlias);
+            $subquery->where($subquery->expr()->in($subqueryAlias, $innerSubquery->getDQL()));
+        }
 
         return $subquery;
     }

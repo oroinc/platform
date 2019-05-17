@@ -1,0 +1,16 @@
+<noscript>
+    <style>
+        .noscript-container {
+            position: fixed;
+            top:0;
+            left: 0;
+            right:0;
+            z-index: 900; /* value of z-index like in container for flash messages  */
+        }
+    </style>
+    <div class="noscript-container">
+        <div class="alert alert-danger" role="alert">
+            <div class="text-center">{{ 'oro.ui.disabled_js'|trans }}</div>
+        </div>
+    </div>
+</noscript>

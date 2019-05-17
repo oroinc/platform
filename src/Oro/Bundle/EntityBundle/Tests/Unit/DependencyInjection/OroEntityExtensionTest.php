@@ -10,6 +10,7 @@ class OroEntityExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoadDefaultConfigs()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'test');
 
         $extension = new OroEntityExtension();
         $extension->load([], $container);
@@ -22,6 +23,7 @@ class OroEntityExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoad()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'test');
 
         $config = [
             'default_query_cache_lifetime' => 123

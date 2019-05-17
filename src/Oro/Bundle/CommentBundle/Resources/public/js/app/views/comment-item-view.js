@@ -21,11 +21,11 @@ define(function(require) {
             'click .item-edit-button': 'onEditCommentClick',
 
             // open/close dropdown on hover
-            'mouseenter .more-bar-holder': function(e) {
-                $(e.target).trigger('click');
+            'mouseenter .more-bar-holder [data-toggle="dropdown"]': function(e) {
+                $(e.currentTarget).trigger('click');
             },
             'mouseleave .more-bar-holder': function(e) {
-                this.$('.show > [data-toggle="dropdown"]').trigger('tohide.bs.dropdown');
+                $(e.currentTarget).find('[data-toggle="dropdown"]').trigger('tohide.bs.dropdown');
             }
         },
 

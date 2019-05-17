@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Processor\CustomizeDataContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * The execution context for processors for "customize_loaded_data" action.
@@ -37,22 +38,23 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
     /**
      * Gets the name under which the given field should be represented in response data.
      *
-     * @param string $propertyPath             The name of an entity field
-     * @param bool   $usePropertyPathByDefault Whether the given property path should be returned
-     *                                         if a field does not exist
+     * @param string $propertyPath The name of an entity field
      *
      * @return string|null
      */
-    public function getResultFieldName(string $propertyPath, bool $usePropertyPathByDefault = false): ?string
+    public function getResultFieldName(string $propertyPath): ?string
     {
         $config = $this->getConfig();
         if (null === $config) {
-            return $usePropertyPathByDefault ? $propertyPath : null;
+            return $propertyPath;
         }
 
         $fieldName = $config->findFieldNameByPropertyPath($propertyPath);
-        if (!$fieldName && $usePropertyPathByDefault) {
-            $fieldName = $propertyPath;
+        if (!$fieldName) {
+            $field = $config->getField($propertyPath);
+            if (null !== $field && ConfigUtil::IGNORE_PROPERTY_PATH === $field->getPropertyPath()) {
+                $fieldName = $propertyPath;
+            }
         }
 
         return $fieldName;

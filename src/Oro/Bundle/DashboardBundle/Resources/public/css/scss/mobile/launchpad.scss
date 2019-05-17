@@ -22,11 +22,10 @@
 
 @media only screen and (max-width: $small-devices-media-breakpoint) {
     .quick-launchpad-toolbar {
-        padding: 0 16px;
+        padding: 0;
 
         &__item {
             min-width: 100%;
-            margin: 16px 0;
             padding: 10px 16px;
 
             text-align: center;
@@ -36,6 +35,10 @@
             border-radius: 20px;
             display: block;
             vertical-align: middle;
+
+            &:not(:first-child) {
+                margin: 16px 0 0 0;
+            }
         }
 
         &__link {

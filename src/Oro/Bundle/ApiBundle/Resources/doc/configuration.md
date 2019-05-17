@@ -28,8 +28,8 @@ api:
 
 If an auto-generated alias for your entity does not look good enough for you, change it in `Resources/config/oro/entity.yml`. For more details, see the [entity aliases documentation](../../../EntityBundle/Resources/doc/entity_aliases.md).
 
-**Important:**
-Run the `oro:api:cache:clear` CLI command to immediately make an entity accessible via the data API. If you use the API sandbox, run the `oro:api:doc:cache:clear` CLI command to apply the changes for it. 
+**Important:** Run the `oro:api:cache:clear` CLI command to immediately make an entity accessible via the data API.
+If you use the API sandbox, run the `oro:api:doc:cache:clear` CLI command to apply the changes for it.
 
 For additional information, see [CLI commands](./commands.md).
 
@@ -300,6 +300,10 @@ The **data_type** attribute can serve to specify a data type of a field. However
 | nestedAssociation | Helps configure nested associations. For details, see [Configure nested association](./how_to.md#configure-nested-association). |
 | association:relationType\[:associationKind\] | Helps configure extended associations. For details, see [Configure Extended Many-To-One Association](./how_to.md#configure-extended-many-to-one-association), [Configure Extended Many-To-Many Association](./how_to.md#configure-extended-many-to-many-association), and [Configure Extended Multiple Many-To-One Association](./how_to.md#configure-extended-multiple-many-to-one-association). |
 
+**Note:** To add a new special type of a field that requires an additional configuration of a field or an entity,
+create a class that implements [CustomDataTypeCompleterInterface](../../Processor/Config/Shared/CompleteDefinition/CustomDataTypeCompleterInterface.php)
+and register this class in the dependency injection container with `oro.api.custom_data_type_completer` tag.
+The `requestType` tag attribute can be used to register a converter only for specific request types.
 
 **Examples:**
 

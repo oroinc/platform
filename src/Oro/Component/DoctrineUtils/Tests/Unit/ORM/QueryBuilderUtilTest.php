@@ -128,6 +128,58 @@ class QueryBuilderUtilTest extends OrmTestCase
     }
 
     /**
+     * @dataProvider getSelectExprProvider
+     *
+     * @param QueryBuilder $qb
+     * @param string       $expectedExpr
+     */
+    public function testGetSelectExpr($qb, $expectedExpr)
+    {
+        $this->assertEquals($expectedExpr, QueryBuilderUtil::getSelectExpr($qb));
+    }
+
+    /**
+     * @return array
+     */
+    public function getSelectExprProvider()
+    {
+        return [
+            [
+                $this->getQueryBuilder()->select('e'),
+                'e'
+            ],
+            [
+                $this->getQueryBuilder()->select('e, a'),
+                'e, a'
+            ],
+            [
+                $this->getQueryBuilder()->addSelect('e')->addSelect('a'),
+                'e, a'
+            ],
+            [
+                $this->getQueryBuilder()->select('e.id'),
+                'e.id'
+            ],
+            [
+                $this->getQueryBuilder()->select('e.id as id'),
+                'e.id as id'
+            ],
+            [
+                $this->getQueryBuilder()->select('e.id as id, e.name AS name1'),
+                'e.id as id, e.name AS name1'
+            ],
+            [
+                $this->getQueryBuilder()->select('e.id as id, e.name AS name1')->addSelect('e.lbl AS name2'),
+                'e.id as id, e.name AS name1, e.lbl AS name2'
+            ],
+            [
+                $this->getQueryBuilder()->select('e.id, CONCAT(e.name1, e.name2) AS name'),
+                'e.id, CONCAT(e.name1, e.name2) AS name'
+            ]
+        ];
+    }
+
+    /**
      * @dataProvider getSelectExprByAliasProvider
      *
      * @param QueryBuilder $qb

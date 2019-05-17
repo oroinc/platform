@@ -171,4 +171,57 @@ class AllMemberOfComparisonExpressionTest extends OrmRelatedTestCase
             $expressionVisitor->getParameters()
         );
     }
+
+    public function testWalkComparisonExpressionWhenLastElementInPathIsField()
+    {
+        $expression = new AllMemberOfComparisonExpression();
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            new EntityClassResolver($this->doctrine)
+        );
+        $field = 'e.groups.name';
+        $expr = 'LOWER(e.groups.name)';
+        $parameterName = 'groups_1';
+        $value = 123;
+        $expectedNumberOfRecordsParameterName = $parameterName . '_expected';
+
+        $qb = new QueryBuilder($this->em);
+        $qb
+            ->select('e')
+            ->from(Entity\User::class, 'e')
+            ->innerJoin('e.groups', 'groups');
+
+        $expressionVisitor->setQuery($qb);
+        $expressionVisitor->setQueryAliases(['e', 'groups']);
+        $expressionVisitor->setQueryJoinMap(['groups' => 'groups']);
+
+        $result = $expression->walkComparisonExpression(
+            $expressionVisitor,
+            $field,
+            $expr,
+            $parameterName,
+            $value
+        );
+
+        $expectedSubquery = 'SELECT COUNT(groups_subquery1)'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group groups_subquery1'
+            . ' WHERE groups_subquery1 MEMBER OF e.groups AND groups_subquery1.name IN(:groups_1)';
+
+        self::assertEquals(
+            new Comparison(
+                ':' . $expectedNumberOfRecordsParameterName,
+                Comparison::EQ,
+                '(' . $expectedSubquery . ')'
+            ),
+            $result
+        );
+        self::assertEquals(
+            [
+                new Parameter($parameterName, $value, 'integer'),
+                new Parameter($expectedNumberOfRecordsParameterName, 1, 'integer')
+            ],
+            $expressionVisitor->getParameters()
+        );
+    }
 }

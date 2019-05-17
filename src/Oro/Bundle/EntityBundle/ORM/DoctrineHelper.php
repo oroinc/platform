@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\Exception;
 
 /**
@@ -371,6 +372,24 @@ class DoctrineHelper
     }
 
     /**
+     * Creates a new QueryBuilder instance for the given entity class.
+     *
+     * @param string $entityClass The real class name of an entity
+     * @param string $alias       The alias of the entity class
+     * @param string $indexBy     The index for the from
+     *
+     * @return QueryBuilder
+     */
+    public function createQueryBuilder($entityClass, $alias, $indexBy = null)
+    {
+        return $this
+            ->getEntityManagerForClass($entityClass)
+            ->createQueryBuilder()
+            ->from($entityClass, $alias, $indexBy)
+            ->select($alias);
+    }
+
+    /**
      * Gets a reference to the entity identified by the given class and identifier
      * without actually loading it, if the entity is not yet loaded.
      *
@@ -382,7 +401,7 @@ class DoctrineHelper
     public function getEntityReference($entityClass, $entityId)
     {
         return $this
-            ->getEntityManager($entityClass)
+            ->getEntityManagerForClass($entityClass)
             ->getReference($entityClass, $entityId);
     }
 
@@ -397,8 +416,8 @@ class DoctrineHelper
     public function getEntity($entityClass, $entityId)
     {
         return $this
-            ->getEntityRepository($entityClass)
-            ->find($entityId);
+            ->getEntityManagerForClass($entityClass)
+            ->find($entityClass, $entityId);
     }
 
     /**
@@ -411,7 +430,7 @@ class DoctrineHelper
     public function createEntityInstance($entityClass)
     {
         return $this
-            ->getEntityMetadata($entityClass)
+            ->getEntityMetadataForClass($entityClass)
             ->newInstance();
     }
 

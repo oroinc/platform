@@ -264,7 +264,7 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNull($config->findField('ignoredField', true));
         self::assertNull($config->findField(ConfigUtil::IGNORE_PROPERTY_PATH));
         self::assertNull($config->findField(ConfigUtil::IGNORE_PROPERTY_PATH, true));
-        self::assertSame('ignoredField', $config->findFieldNameByPropertyPath('ignoredField'));
+        self::assertNull($config->findFieldNameByPropertyPath('ignoredField'));
         self::assertNull($config->findFieldNameByPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH));
         self::assertSame($ignoredField, $config->findFieldByPath('ignoredField'));
         self::assertNull($config->findFieldByPath('ignoredField', true));

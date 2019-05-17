@@ -29,26 +29,34 @@ class AllMemberOfComparisonExpression implements ComparisonExpressionInterface
         }
 
         $expectedNumberOfRecordsParameterName = $parameterName . '_expected';
-        $expectedNumberOfRecords = \is_array($value)
-            ? \count($value)
-            : 1;
 
         $visitor->addParameter($parameterName, $value);
-        $visitor->addParameter($expectedNumberOfRecordsParameterName, $expectedNumberOfRecords);
+        $visitor->addParameter($expectedNumberOfRecordsParameterName, $this->getExpectedNumberOfRecords($value));
 
         $subquery = $visitor->createSubquery($field, true);
-        $subqueryRootAlias = QueryBuilderUtil::getSingleRootAlias($subquery);
-        $subquery->select($subquery->expr()->count($subqueryRootAlias));
         $subquery->andWhere(
             $subquery->expr()->in(
-                $subqueryRootAlias,
+                QueryBuilderUtil::getSelectExpr($subquery),
                 $visitor->buildPlaceholder($parameterName)
             )
         );
+        $subquery->select($subquery->expr()->count(QueryBuilderUtil::getSingleRootAlias($subquery)));
 
         return $visitor->getExpressionBuilder()->eq(
             $visitor->buildPlaceholder($expectedNumberOfRecordsParameterName),
             \sprintf('(%s)', $subquery->getDQL())
         );
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return int
+     */
+    protected function getExpectedNumberOfRecords($value): int
+    {
+        return \is_array($value)
+            ? \count($value)
+            : 1;
     }
 }

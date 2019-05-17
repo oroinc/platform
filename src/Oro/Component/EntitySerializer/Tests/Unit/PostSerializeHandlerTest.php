@@ -27,7 +27,9 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
     {
         $ids = [];
         foreach ($items as $item) {
-            $ids[] = $item['id'];
+            $ids[] = array_key_exists('id', $item)
+                ? $item['id']
+                : $item['name'];
         }
         $ids = implode(',', $ids);
         foreach ($items as $key => $item) {
@@ -53,8 +55,8 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
             $conn,
             0,
             'SELECT u0_.id AS id_0, u0_.name AS name_1,'
-            . ' c1_.name AS name_2,'
-            . ' u0_.category_name AS category_name_3'
+            . ' c1_.name AS name_2, c1_.label AS label_3,'
+            . ' u0_.category_name AS category_name_4'
             . ' FROM user_table u0_'
             . ' LEFT JOIN category_table c1_ ON u0_.category_name = c1_.name'
             . ' WHERE u0_.id = ?',
@@ -63,7 +65,8 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
                     'id_0'            => 1,
                     'name_1'          => 'user_name',
                     'name_2'          => 'category_name',
-                    'category_name_3' => 'category_name'
+                    'label_3'         => 'category_label',
+                    'category_name_4' => 'category_name'
                 ]
             ],
             [1 => 1],
@@ -98,7 +101,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
                     'category' => [
                         'exclusion_policy'          => 'all',
                         'fields'                    => [
-                            'name' => null
+                            'label' => null
                         ],
                         'post_serialize'            => function (array $result, array $context) {
                             return $this->postSerializeCallback($result, $context);
@@ -136,8 +139,9 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
                     'id'         => 1,
                     'name'       => 'user_name',
                     'category'   => [
-                        'name'       => 'category_name',
-                        'additional' => 'category_name_additional[context value]'
+                        'label'      => 'category_label',
+                        'additional' => 'category_name_additional[context value]',
+                        'collection' => 'category_name [context value]'
                     ],
                     'products'   => [
                         [
@@ -169,8 +173,8 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
             $conn,
             0,
             'SELECT u0_.id AS id_0, u0_.name AS name_1,'
-            . ' c1_.name AS name_2,'
-            . ' u0_.category_name AS category_name_3'
+            . ' c1_.name AS name_2, c1_.label AS label_3,'
+            . ' u0_.category_name AS category_name_4'
             . ' FROM user_table u0_'
             . ' LEFT JOIN category_table c1_ ON u0_.category_name = c1_.name'
             . ' WHERE u0_.id = ?',
@@ -179,7 +183,8 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
                     'id_0'            => 1,
                     'name_1'          => 'user_name',
                     'name_2'          => 'category_name',
-                    'category_name_3' => 'category_name'
+                    'label_3'         => 'category_label',
+                    'category_name_4' => 'category_name'
                 ]
             ],
             [1 => 1],
@@ -214,7 +219,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
                     'category' => [
                         'exclusion_policy'          => 'all',
                         'fields'                    => [
-                            'name' => null
+                            'label' => null
                         ],
                         'post_serialize'            => [$this, 'postSerializeCallback'],
                         'post_serialize_collection' => [$this, 'postSerializeCollectionCallback']
@@ -240,8 +245,9 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
                     'id'         => 1,
                     'name'       => 'user_name',
                     'category'   => [
-                        'name'       => 'category_name',
-                        'additional' => 'category_name_additional[context value]'
+                        'label'      => 'category_label',
+                        'additional' => 'category_name_additional[context value]',
+                        'collection' => 'category_name [context value]'
                     ],
                     'products'   => [
                         [

@@ -744,7 +744,7 @@ class OroMainContext extends MinkContext implements
      * Click on element on page
      * Example: When I click on "Help Icon"
      *
-     * @When /^(?:|I )click on "(?P<element>[\w\s]+)"$/
+     * @When /^(?:|I )click on "(?P<element>(?:[^"]|\\")*)"$/
      */
     public function iClickOn($element)
     {
