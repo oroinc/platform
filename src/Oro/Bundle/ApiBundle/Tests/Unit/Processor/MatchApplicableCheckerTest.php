@@ -6,8 +6,8 @@ use Oro\Bundle\ApiBundle\Processor\MatchApplicableChecker;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Oro\Component\ChainProcessor\Tests\Unit\ProcessorMock;
 
 class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
@@ -41,7 +41,7 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
             $processors,
             $context,
             $this->getApplicableChecker(),
-            $this->getProcessorFactory()
+            $this->getProcessorRegistry()
         );
 
         $this->assertProcessors(
@@ -66,12 +66,12 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return ProcessorFactoryInterface
+     * @return ProcessorRegistryInterface
      */
-    protected function getProcessorFactory()
+    protected function getProcessorRegistry()
     {
-        $factory = $this->createMock(ProcessorFactoryInterface::class);
-        $factory->expects(self::any())
+        $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
+        $processorRegistry->expects(self::any())
             ->method('getProcessor')
             ->willReturnCallback(
                 function ($processorId) {
@@ -79,7 +79,7 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        return $factory;
+        return $processorRegistry;
     }
 
     /**

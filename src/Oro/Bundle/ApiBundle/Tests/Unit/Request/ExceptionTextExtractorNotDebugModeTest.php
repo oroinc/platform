@@ -9,6 +9,8 @@ use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractor;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
+use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\DisabledException;
@@ -38,7 +40,8 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
         $this->exceptionTextExtractor = new ExceptionTextExtractor(
             false,
             $translator,
-            [\UnexpectedValueException::class]
+            [\UnexpectedValueException::class],
+            [NotFoundExceptionInterface::class]
         );
     }
 
@@ -84,6 +87,7 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
             [new DisabledException('Reason.'), 403],
             [new UsernameNotFoundException('Reason.'), 403],
             [new ResourceNotAccessibleException(), 404],
+            [new ServiceNotFoundException('test'), 500],
             [new NotSupportedConfigOperationException('Test\Class', 'test_operation'), 400]
         ];
     }
@@ -120,6 +124,7 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
             [new DisabledException('Reason.'), 'authentication exception'],
             [new UsernameNotFoundException('Reason.'), 'authentication exception'],
             [new ResourceNotAccessibleException(), 'resource not accessible exception'],
+            [new ServiceNotFoundException('test'), 'service not found exception'],
             [
                 new NotSupportedConfigOperationException('Test\Class', 'test_operation'),
                 'not supported config operation exception'
@@ -221,6 +226,10 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
             [
                 new ResourceNotAccessibleException(),
                 'The resource is not accessible.'
+            ],
+            [
+                new ServiceNotFoundException('test'),
+                null
             ],
             [
                 new NotSupportedConfigOperationException('Test\Class', 'test_operation'),

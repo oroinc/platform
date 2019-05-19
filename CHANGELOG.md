@@ -18,6 +18,12 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### ChainProcessor component
+* The interface `Oro\Component\ChainProcessor\ProcessorFactoryInterface` was replaced with
+  `Oro\Component\ChainProcessor\ProcessorRegistryInterface`.
+* The class `Oro\Component\ChainProcessor\ChainProcessorFactory` was removed.
+  Use the decoration to create a chain of processor registries instead.
+
 #### Config component
 * The methods `load()` and `registerResources()` of class `Oro\Component\Config\Loader\CumulativeConfigLoader`
   were changed to not accept `Symfony\Component\DependencyInjection\ContainerBuilder` as resources container.

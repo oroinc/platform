@@ -6,6 +6,7 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Oro\Bundle\WorkflowBundle\Async\Topics;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler;
 use Oro\Bundle\WorkflowBundle\OroWorkflowBundle;
+use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
@@ -37,6 +38,11 @@ class OroWorkflowBundleTest extends \PHPUnit\Framework\TestCase
             new LoadAndBuildProcessorsCompilerPass(
                 'oro_workflow.processor_bag_config_provider',
                 'oro_workflow.processor'
+            ),
+            new CleanUpProcessorsCompilerPass(
+                'oro_workflow.simple_processor_registry',
+                'oro_workflow.processor',
+                'oro_workflow.simple_processor_registry.inner'
             ),
             $this->isInstanceOf(Compiler\EventsCompilerPass::class),
             $addTopicMetaPass,

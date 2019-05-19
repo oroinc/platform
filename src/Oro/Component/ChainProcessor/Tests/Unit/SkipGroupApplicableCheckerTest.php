@@ -5,8 +5,8 @@ namespace Oro\Component\ChainProcessor\Tests\Unit;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Oro\Component\ChainProcessor\SkipGroupApplicableChecker;
 
 class SkipGroupApplicableCheckerTest extends \PHPUnit\Framework\TestCase
@@ -25,7 +25,7 @@ class SkipGroupApplicableCheckerTest extends \PHPUnit\Framework\TestCase
             $processors,
             $context,
             $this->getApplicableChecker(),
-            $this->getProcessorFactory(
+            $this->getProcessorRegistry(
                 [
                     'processor1' => function (ContextInterface $context) {
                         $context->skipGroup('group2');
@@ -58,12 +58,12 @@ class SkipGroupApplicableCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @param callable[] $callbacks
      *
-     * @return ProcessorFactoryInterface
+     * @return ProcessorRegistryInterface
      */
-    protected function getProcessorFactory(array $callbacks = [])
+    protected function getProcessorRegistry(array $callbacks = [])
     {
-        $factory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
-        $factory->expects($this->any())
+        $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
+        $processorRegistry->expects($this->any())
             ->method('getProcessor')
             ->willReturnCallback(
                 function ($processorId) use ($callbacks) {
@@ -74,7 +74,7 @@ class SkipGroupApplicableCheckerTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        return $factory;
+        return $processorRegistry;
     }
 
     /**

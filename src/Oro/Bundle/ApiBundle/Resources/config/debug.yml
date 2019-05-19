@@ -14,13 +14,13 @@ services:
         tags:
             - { name: data_collector, template: OroApiBundle:Collector:api.html.twig, id: data_api }
 
-    oro_api.profiler.processor_factory:
-        class: Oro\Component\ChainProcessor\Debug\TraceableProcessorFactory
+    oro_api.profiler.processor_registry:
+        class: Oro\Component\ChainProcessor\Debug\TraceableProcessorRegistry
         public: false
-        decorates: oro_api.processor_factory
+        decorates: oro_api.processor_registry
         decoration_priority: -255 # should be at the top of the decoration chain
         arguments:
-            - '@oro_api.profiler.processor_factory.inner'
+            - '@oro_api.profiler.processor_registry.inner'
             - '@oro_api.profiler.logger'
 
     oro_api.profiler.processor_applicable_checker_factory:

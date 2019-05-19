@@ -3,16 +3,28 @@ imports:
     - { resource: processors.transit.template.yml }
     - { resource: processors.transit.layout.yml }
 services:
-    oro_workflow.processor_factory:
-        class: Oro\Component\ChainProcessor\DependencyInjection\ProcessorFactory
+    oro_workflow.processor_registry:
+        class: Oro\Component\ChainProcessor\DependencyInjection\ProcessorRegistry
+        public: false
         arguments:
+            # the service container is replaced by a service locator
+            # by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
             - '@service_container'
+
+    oro_workflow.simple_processor_registry:
+        class: Oro\Component\ChainProcessor\SimpleProcessorRegistry
+        public: false
+        decorates: oro_workflow.processor_registry
+        arguments:
+            - [] # processors; injected by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
+            - '@oro_workflow.simple_processor_registry.inner'
 
     oro_workflow.processor_bag:
         class: Oro\Component\ChainProcessor\ProcessorBag
+        public: false
         arguments:
             - '@oro_workflow.processor_bag_config_provider'
-            - '@oro_workflow.processor_factory'
+            - '@oro_workflow.processor_registry'
             - '%kernel.debug%'
 
     oro_workflow.processor_bag_config_provider:

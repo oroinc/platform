@@ -18,7 +18,7 @@ services:
         public: false
         arguments:
             - '@oro_api.processor_bag_config_provider'
-            - '@oro_api.processor_factory'
+            - '@oro_api.processor_registry'
             - '%kernel.debug%'
             - '@oro_api.processor_applicable_checker_factory'
             - '@oro_api.processor_iterator_factory'
@@ -48,22 +48,21 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerWithoutGroupsFactory
         public: false
 
-    oro_api.processor_factory:
-        class: Oro\Component\ChainProcessor\ChainProcessorFactory
-        public: false
-        calls:
-            - [addFactory,  ['@oro_api.simple_processor_factory', 10]]
-            - [addFactory,  ['@oro_api.di_processor_factory']]
-
-    oro_api.simple_processor_factory:
-        class: Oro\Component\ChainProcessor\SimpleProcessorFactory
-        public: false
-
-    oro_api.di_processor_factory:
-        class: Oro\Component\ChainProcessor\DependencyInjection\ProcessorFactory
+    oro_api.processor_registry:
+        class: Oro\Component\ChainProcessor\DependencyInjection\ProcessorRegistry
         public: false
         arguments:
+            # the service container is replaced by a service locator
+            # by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
             - '@service_container'
+
+    oro_api.simple_processor_registry:
+        class: Oro\Component\ChainProcessor\SimpleProcessorRegistry
+        public: false
+        decorates: oro_api.processor_registry
+        arguments:
+            - [] # processors; they are set by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
+            - '@oro_api.simple_processor_registry.inner'
 
     oro_api.criteria_connector:
         class: Oro\Bundle\ApiBundle\Util\CriteriaConnector
@@ -556,6 +555,8 @@ services:
                 - '\UnexpectedValueException'
                 - '\OutOfBoundsException'
                 - 'Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException'
+            -
+                - 'Psr\Container\NotFoundExceptionInterface'
         tags:
             - { name: oro.api.exception_text_extractor, priority: -10 }
 

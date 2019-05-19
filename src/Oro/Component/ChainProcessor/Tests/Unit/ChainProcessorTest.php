@@ -7,8 +7,8 @@ use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
 class ChainProcessorTest extends \PHPUnit\Framework\TestCase
 {
@@ -17,13 +17,13 @@ class ChainProcessorTest extends \PHPUnit\Framework\TestCase
         $processor1 = $this->createMock(ProcessorInterface::class);
         $processor2 = $this->createMock(ProcessorInterface::class);
 
-        $factory = $this->createMock(ProcessorFactoryInterface::class);
-        $factory->expects(self::exactly(2))
+        $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
+        $processorRegistry->expects(self::exactly(2))
             ->method('getProcessor')
             ->willReturnOnConsecutiveCalls($processor1, $processor2);
 
         $builder = new ProcessorBagConfigBuilder();
-        $processorBag = new ProcessorBag($builder, $factory);
+        $processorBag = new ProcessorBag($builder, $processorRegistry);
         $builder->addProcessor('processor1', [], 'action1', null, 20);
         $builder->addProcessor('processor2', [], 'action1', null, 10);
 
@@ -46,13 +46,13 @@ class ChainProcessorTest extends \PHPUnit\Framework\TestCase
         $processor1 = $this->createMock(ProcessorInterface::class);
         $processor2 = $this->createMock(ProcessorInterface::class);
 
-        $factory = $this->createMock(ProcessorFactoryInterface::class);
-        $factory->expects(self::exactly(2))
+        $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
+        $processorRegistry->expects(self::exactly(2))
             ->method('getProcessor')
             ->willReturnOnConsecutiveCalls($processor1, $processor2);
 
         $builder = new ProcessorBagConfigBuilder();
-        $processorBag = new ProcessorBag($builder, $factory);
+        $processorBag = new ProcessorBag($builder, $processorRegistry);
         $builder->addGroup('group1', 'action1', 20);
         $builder->addGroup('group2', 'action1', 10);
         $builder->addProcessor('processor1', [], 'action1', 'group1', 20);
