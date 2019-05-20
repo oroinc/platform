@@ -4,8 +4,8 @@ namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Component\ChainProcessor\ApplicableCheckerInterface;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
 /**
  * This iterator implements a group related checks in more performant way than
@@ -23,16 +23,16 @@ class OptimizedProcessorIterator extends ProcessorIterator
      * @param string[]                   $groups
      * @param ComponentContextInterface  $context
      * @param ApplicableCheckerInterface $applicableChecker
-     * @param ProcessorFactoryInterface  $processorFactory
+     * @param ProcessorRegistryInterface $processorRegistry
      */
     public function __construct(
         array $processors,
         array $groups,
         ComponentContextInterface $context,
         ApplicableCheckerInterface $applicableChecker,
-        ProcessorFactoryInterface $processorFactory
+        ProcessorRegistryInterface $processorRegistry
     ) {
-        parent::__construct($processors, $context, $applicableChecker, $processorFactory);
+        parent::__construct($processors, $context, $applicableChecker, $processorRegistry);
         $this->groups = $this->loadGroups($groups);
     }
 

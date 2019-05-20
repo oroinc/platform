@@ -16,8 +16,8 @@ class ProcessorIterator implements \Iterator
     /** @var ApplicableCheckerInterface */
     protected $applicableChecker;
 
-    /** @var ProcessorFactoryInterface */
-    protected $processorFactory;
+    /** @var ProcessorRegistryInterface */
+    protected $processorRegistry;
 
     /** @var int */
     protected $index;
@@ -29,18 +29,18 @@ class ProcessorIterator implements \Iterator
      * @param array                      $processors
      * @param ContextInterface           $context
      * @param ApplicableCheckerInterface $applicableChecker
-     * @param ProcessorFactoryInterface  $processorFactory
+     * @param ProcessorRegistryInterface $processorRegistry
      */
     public function __construct(
         array $processors,
         ContextInterface $context,
         ApplicableCheckerInterface $applicableChecker,
-        ProcessorFactoryInterface $processorFactory
+        ProcessorRegistryInterface $processorRegistry
     ) {
         $this->processors = $processors;
         $this->context = $context;
         $this->applicableChecker = $applicableChecker;
-        $this->processorFactory = $processorFactory;
+        $this->processorRegistry = $processorRegistry;
     }
 
     /**
@@ -120,13 +120,7 @@ class ProcessorIterator implements \Iterator
      */
     public function current()
     {
-        $processorId = $this->processors[$this->index][0];
-        $processor = $this->processorFactory->getProcessor($processorId);
-        if (null === $processor) {
-            throw new \RuntimeException(\sprintf('The processor "%s" does not exist.', $processorId));
-        }
-
-        return $processor;
+        return $this->processorRegistry->getProcessor($this->processors[$this->index][0]);
     }
 
     /**

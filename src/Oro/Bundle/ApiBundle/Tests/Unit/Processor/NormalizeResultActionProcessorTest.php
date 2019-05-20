@@ -16,7 +16,7 @@ use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\ChainProcessor\SimpleProcessorFactory;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Symfony\Component\Debug\BufferingLogger;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -31,8 +31,8 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 {
     private const TEST_ACTION = 'test';
 
-    /** @var SimpleProcessorFactory */
-    private $processorFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorRegistryInterface */
+    private $processorRegistry;
 
     /** @var ProcessorBagConfigBuilder */
     private $processorBagConfigBuilder;
@@ -51,9 +51,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->processorFactory = new SimpleProcessorFactory();
+        $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();
-        $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->processorFactory);
+        $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->processorRegistry);
         $this->processorBagConfigBuilder->addGroup('group1', self::TEST_ACTION, -1);
         $this->processorBagConfigBuilder->addGroup('group2', self::TEST_ACTION, -2);
         $this->processorBagConfigBuilder->addGroup(
@@ -97,23 +97,30 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $processorId
-     * @param string $groupName
+     * @param array $processors [processorId => groupName, ...]
      *
-     * @return \PHPUnit\Framework\MockObject\MockObject|ProcessorInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject[]
      */
-    private function addProcessor($processorId, $groupName)
+    private function addProcessors(array $processors)
     {
-        $processor = $this->createMock(ProcessorInterface::class);
-        $this->processorFactory->addProcessor($processorId, $processor);
-        $this->processorBagConfigBuilder->addProcessor(
-            $processorId,
-            [],
-            self::TEST_ACTION,
-            $groupName
-        );
+        $createdProcessors = [];
+        $processorRegistryMap = [];
+        foreach ($processors as $processorId => $groupName) {
+            $this->processorBagConfigBuilder->addProcessor(
+                $processorId,
+                [],
+                self::TEST_ACTION,
+                $groupName
+            );
+            $processor = $this->createMock(ProcessorInterface::class);
+            $createdProcessors[] = $processor;
+            $processorRegistryMap[] = [$processorId, $processor];
+        }
+        $this->processorRegistry->expects(self::any())
+            ->method('getProcessor')
+            ->willReturnMap($processorRegistryMap);
 
-        return $processor;
+        return $createdProcessors;
     }
 
     /**
@@ -137,8 +144,10 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $context = $this->getContext();
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -168,10 +177,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -226,10 +237,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -281,10 +294,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -340,9 +355,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor2, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -398,10 +415,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -458,9 +477,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor2, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -517,10 +538,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $exception = new \Exception('test exception');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -578,10 +601,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -634,10 +659,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -710,10 +737,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -768,9 +797,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $exception = new \Exception('test exception');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor10, $processor11) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
+            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -825,9 +856,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor10, $processor11) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
+            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -877,9 +910,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $authenticationException = new AuthenticationException('Access Denied');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor10, $processor11) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
+            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -918,9 +953,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $exception = new \Exception('test exception');
         $authenticationException = new AuthenticationException('Access Denied');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor10, $processor11) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
+            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -973,9 +1010,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $authenticationException = new AuthenticationException('Access Denied');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor10, $processor11) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
+            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -1020,9 +1059,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $exception = new \Exception('test exception');
         $authenticationException = new AuthenticationException('Access Denied');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor10, $processor11) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
+            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -1079,9 +1120,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor10, $processor11) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
+            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -1123,9 +1166,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor10, $processor11) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
+            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -1166,10 +1211,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $internalPhpError = new \Error('test error', 1);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -1223,10 +1270,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -1287,10 +1336,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -1346,7 +1397,10 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $logger = $this->setLogger();
         $context = $this->getContext();
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
+        list($processor1) = $this->addProcessors([
+            'processor1'  => 'group1'
+        ]);
+
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))

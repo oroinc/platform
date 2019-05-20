@@ -28,16 +28,25 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
     /** @var string[] */
     private $safeExceptions;
 
+    /** @var string[] */
+    private $safeExceptionExclusions;
+
     /**
      * @param bool                $debug
      * @param TranslatorInterface $translator
      * @param string[]            $safeExceptions
+     * @param string[]            $safeExceptionExclusions
      */
-    public function __construct($debug, TranslatorInterface $translator, array $safeExceptions)
-    {
+    public function __construct(
+        $debug,
+        TranslatorInterface $translator,
+        array $safeExceptions,
+        array $safeExceptionExclusions = []
+    ) {
         $this->debug = $debug;
         $this->translator = $translator;
         $this->safeExceptions = $safeExceptions;
+        $this->safeExceptionExclusions = $safeExceptionExclusions;
         $this->safeExceptions[] = ApiException::class;
         $this->safeExceptions[] = HttpExceptionInterface::class;
         $this->safeExceptions[] = AccessDeniedException::class;
@@ -140,13 +149,23 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
      */
     private function isSafeException(\Exception $exception)
     {
+        $isSafe = false;
         foreach ($this->safeExceptions as $class) {
             if (\is_a($exception, $class)) {
-                return true;
+                $isSafe = true;
+                break;
+            }
+        }
+        if ($isSafe) {
+            foreach ($this->safeExceptionExclusions as $exclusionClass) {
+                if (\is_a($exception, $exclusionClass)) {
+                    $isSafe = false;
+                    break;
+                }
             }
         }
 
-        return false;
+        return $isSafe;
     }
 
     /**

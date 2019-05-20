@@ -6,15 +6,18 @@ use Oro\Component\ChainProcessor\ApplicableCheckerInterface;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ProcessorBagAwareIteratorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIteratorFactoryInterface;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
+/**
+ * The factory to create an instance of OptimizedProcessorIterator class.
+ */
 class OptimizedProcessorIteratorFactory implements
     ProcessorIteratorFactoryInterface,
     ProcessorBagAwareIteratorFactoryInterface
 {
     /** @var ProcessorBagInterface|null */
-    protected $processorBag;
+    private $processorBag;
 
     /**
      * {@inheritdoc}
@@ -23,14 +26,14 @@ class OptimizedProcessorIteratorFactory implements
         array $processors,
         ComponentContextInterface $context,
         ApplicableCheckerInterface $applicableChecker,
-        ProcessorFactoryInterface $processorFactory
+        ProcessorRegistryInterface $processorRegistry
     ) {
         return new OptimizedProcessorIterator(
             $processors,
             $this->processorBag->getActionGroups($context->getAction()),
             $context,
             $applicableChecker,
-            $processorFactory
+            $processorRegistry
         );
     }
 

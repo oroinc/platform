@@ -8,8 +8,8 @@ use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ProcessorApplicableCheckerFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigProviderInterface;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIteratorFactoryInterface;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
 /**
  * By performance reasons this processor bag uses different iterators and applicable checkers
@@ -28,7 +28,7 @@ class OptimizedProcessorBag extends ProcessorBag
 
     /**
      * @param ProcessorBagConfigProviderInterface        $configProvider
-     * @param ProcessorFactoryInterface                  $processorFactory
+     * @param ProcessorRegistryInterface                 $processorRegistry
      * @param bool                                       $debug
      * @param ProcessorApplicableCheckerFactoryInterface $applicableCheckerFactory
      * @param ProcessorIteratorFactoryInterface          $processorIteratorFactory
@@ -37,7 +37,7 @@ class OptimizedProcessorBag extends ProcessorBag
      */
     public function __construct(
         ProcessorBagConfigProviderInterface $configProvider,
-        ProcessorFactoryInterface $processorFactory,
+        ProcessorRegistryInterface $processorRegistry,
         $debug,
         ProcessorApplicableCheckerFactoryInterface $applicableCheckerFactory,
         ProcessorIteratorFactoryInterface $processorIteratorFactory,
@@ -46,7 +46,7 @@ class OptimizedProcessorBag extends ProcessorBag
     ) {
         parent::__construct(
             $configProvider,
-            $processorFactory,
+            $processorRegistry,
             $debug,
             $applicableCheckerFactory,
             $processorIteratorFactory
@@ -99,7 +99,7 @@ class OptimizedProcessorBag extends ProcessorBag
             $actionProcessors,
             $context,
             $processorApplicableChecker,
-            $this->processorFactory
+            $this->processorRegistry
         );
     }
 }

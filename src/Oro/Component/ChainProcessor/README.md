@@ -61,8 +61,9 @@ class AcmeTextRepresentationBundle extends Bundle
         );
         $container->addCompilerPass(
             new CleanUpProcessorsCompilerPass(
-                'text_representation.simple_processor_factory',
-                'text_representation.processor'
+                'text_representation.simple_processor_registry',
+                'text_representation.processor',
+                'text_representation.simple_processor_registry.inner'
             ),
             PassConfig::TYPE_BEFORE_REMOVING
         );
@@ -163,7 +164,7 @@ services:
         public: false
         arguments:
             - '@text_representation.processor_bag_config_provider'
-            - '@text_representation.processor_factory'
+            - '@text_representation.processor_registry'
             - '%kernel.debug%'
 
     text_representation.processor_bag_config_provider:
@@ -173,22 +174,19 @@ services:
             - # groups
                 'get_text_representation': ['prepare_data', 'format']
 
-    text_representation.processor_factory:
-        class: Oro\Component\ChainProcessor\ChainProcessorFactory
-        public: false
-        calls:
-            - [addFactory, ['@text_representation.simple_processor_factory', 10]]
-            - [addFactory, ['@text_representation.di_processor_factory']]
-
-    text_representation.simple_processor_factory:
-        class: Oro\Component\ChainProcessor\SimpleProcessorFactory
-        public: false
-
-    text_representation.di_processor_factory:
-        class: Oro\Component\ChainProcessor\DependencyInjection\ProcessorFactory
+    text_representation.processor_registry:
+        class: Oro\Component\ChainProcessor\DependencyInjection\ProcessorRegistry
         public: false
         arguments:
-            - '@service_container'
+            - ~ # service locator; it is set by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
+
+    text_representation.simple_processor_registry:
+        class: Oro\Component\ChainProcessor\SimpleProcessorRegistry
+        public: false
+        decorates: text_representation.processor_registry
+        arguments:
+            - [] # processors; they are set by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
+            - '@text_representation.simple_processor_registry.inner'
 ```
 
 - Implement a simple processor that will get an object identifier and register it in `prepare_data` group

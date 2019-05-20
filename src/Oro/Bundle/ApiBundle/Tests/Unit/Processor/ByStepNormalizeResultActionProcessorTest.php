@@ -8,7 +8,9 @@ use Oro\Bundle\ApiBundle\Processor\ByStepNormalizeResultContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
-use Oro\Component\ChainProcessor\SimpleProcessorFactory;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -18,8 +20,8 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 {
     private const TEST_ACTION = 'test';
 
-    /** @var SimpleProcessorFactory */
-    private $processorFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorRegistryInterface */
+    private $processorRegistry;
 
     /** @var ProcessorBagConfigBuilder */
     private $processorBagConfigBuilder;
@@ -32,9 +34,9 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
     protected function setUp()
     {
-        $this->processorFactory = new SimpleProcessorFactory();
+        $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();
-        $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->processorFactory);
+        $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->processorRegistry);
         $this->processorBagConfigBuilder->addGroup('group1', self::TEST_ACTION, -1);
         $this->processorBagConfigBuilder->addGroup('group2', self::TEST_ACTION, -2);
         $this->processorBagConfigBuilder->addGroup(
@@ -66,23 +68,30 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     }
 
     /**
-     * @param string $processorId
-     * @param string $groupName
+     * @param array $processors [processorId => groupName, ...]
      *
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject[]
      */
-    private function addProcessor($processorId, $groupName)
+    private function addProcessors(array $processors)
     {
-        $processor = $this->createMock('Oro\Component\ChainProcessor\ProcessorInterface');
-        $this->processorFactory->addProcessor($processorId, $processor);
-        $this->processorBagConfigBuilder->addProcessor(
-            $processorId,
-            [],
-            self::TEST_ACTION,
-            $groupName
-        );
+        $createdProcessors = [];
+        $processorRegistryMap = [];
+        foreach ($processors as $processorId => $groupName) {
+            $this->processorBagConfigBuilder->addProcessor(
+                $processorId,
+                [],
+                self::TEST_ACTION,
+                $groupName
+            );
+            $processor = $this->createMock(ProcessorInterface::class);
+            $createdProcessors[] = $processor;
+            $processorRegistryMap[] = [$processorId, $processor];
+        }
+        $this->processorRegistry->expects(self::any())
+            ->method('getProcessor')
+            ->willReturnMap($processorRegistryMap);
 
-        return $processor;
+        return $createdProcessors;
     }
 
     public function loggerProvider()
@@ -160,7 +169,9 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         $context = $this->getContext();
         $context->setFailedGroup('group2');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
+        list($processor1) = $this->addProcessors([
+            'processor1' => 'group1'
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -179,11 +190,10 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $context = $this->getContext();
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -201,7 +211,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -211,13 +221,12 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -264,7 +273,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -275,13 +284,12 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -328,7 +336,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -336,13 +344,12 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -393,7 +400,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -401,12 +408,11 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor2, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -456,7 +462,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -465,13 +471,12 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -522,7 +527,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -531,12 +536,11 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor2, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -585,11 +589,10 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         $initialError = Error::create('initial error');
         $context->addError($initialError);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -612,7 +615,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -624,13 +627,12 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -677,7 +679,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -690,13 +692,12 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -743,7 +744,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -753,13 +754,12 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -813,7 +813,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -823,12 +823,11 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor2, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -881,7 +880,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -892,13 +891,12 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -952,7 +950,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -963,12 +961,11 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor2, $processor10) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -1021,7 +1018,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -1031,15 +1028,11 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $exception = new \Exception('test exception');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
-        $processor11 = $this->addProcessor(
-            'processor11',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor10, $processor11) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
+            'processor11' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::never())
             ->method('process');
@@ -1079,7 +1072,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -1092,15 +1085,11 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
-        $processor11 = $this->addProcessor(
-            'processor11',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor10, $processor11) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
+            'processor11' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::never())
             ->method('process');
@@ -1139,7 +1128,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -1149,15 +1138,11 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
-        $processor11 = $this->addProcessor(
-            'processor11',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor10, $processor11) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
+            'processor11' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::never())
             ->method('process');
@@ -1192,7 +1177,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock(LoggerInterface::class);
             $this->processor->setLogger($logger);
         }
 
@@ -1203,15 +1188,11 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor(
-            'processor10',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
-        $processor11 = $this->addProcessor(
-            'processor11',
-            ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
-        );
+        list($processor1, $processor10, $processor11) = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
+            'processor11' => ByStepNormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+        ]);
 
         $processor1->expects(self::never())
             ->method('process');

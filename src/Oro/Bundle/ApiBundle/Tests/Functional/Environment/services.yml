@@ -157,11 +157,29 @@ services:
             - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestOverrideClassTargetModel }
             - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget }
 
-    oro_api.tests.update_loaded_data:
+    oro_api.tests.update_loaded_data_simple_processor:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\UpdateLoadedData
         tags:
             - { name: oro.api.processor, action: customize_loaded_data, class: Extend\Entity\TestApiE1 }
+
+    oro_api.tests.update_loaded_data_container_processor:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\UpdateLoadedData
+        arguments:
+            - ' - entity2'
+        tags:
             - { name: oro.api.processor, action: customize_loaded_data, class: Extend\Entity\TestApiE2 }
+
+    oro_api.tests.update_loaded_data_simple_processor.decorator:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\UpdateLoadedDataDecorator
+        decorates: oro_api.tests.update_loaded_data_simple_processor
+        arguments:
+            - '@oro_api.tests.update_loaded_data_simple_processor.decorator.inner'
+
+    oro_api.tests.update_loaded_data_container_processor.decorator:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\UpdateLoadedDataDecorator
+        decorates: oro_api.tests.update_loaded_data_container_processor
+        arguments:
+            - '@oro_api.tests.update_loaded_data_container_processor.decorator.inner'
 
     oro_api.tests.update_loaded_collection:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\UpdateLoadedCollection

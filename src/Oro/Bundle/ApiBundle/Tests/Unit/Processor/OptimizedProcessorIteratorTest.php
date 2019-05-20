@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\OptimizedProcessorIterator;
 use Oro\Component\ChainProcessor\ApplicableCheckerInterface;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Oro\Component\ChainProcessor\Tests\Unit\NotDisabledApplicableChecker;
 use Oro\Component\ChainProcessor\Tests\Unit\ProcessorMock;
 
@@ -36,17 +36,17 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             $groups,
             $context,
             $chainApplicableChecker,
-            $this->getProcessorFactory()
+            $this->getProcessorRegistry()
         );
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ProcessorFactoryInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ProcessorRegistryInterface
      */
-    private function getProcessorFactory()
+    private function getProcessorRegistry()
     {
-        $factory = $this->createMock(ProcessorFactoryInterface::class);
-        $factory->expects(self::any())
+        $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
+        $processorRegistry->expects(self::any())
             ->method('getProcessor')
             ->willReturnCallback(
                 function ($processorId) {
@@ -54,7 +54,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        return $factory;
+        return $processorRegistry;
     }
 
     /**

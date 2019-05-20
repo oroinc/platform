@@ -14,7 +14,7 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
 /**
  * Tests ValueNormalizer and normalization processors for all supported simple types
@@ -31,9 +31,9 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        $processorFactory = $this->createMock(ProcessorFactoryInterface::class);
+        $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $builder = new ProcessorBagConfigBuilder();
-        $processorBag = new ProcessorBag($builder, $processorFactory);
+        $processorBag = new ProcessorBag($builder, $processorRegistry);
 
         $entityAliasResolver = $this->createMock(EntityAliasResolver::class);
         $entityAliasResolver->expects(self::any())
@@ -134,7 +134,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 $val[1]->setRangeAllowed(true);
             }
         }
-        $processorFactory->expects(self::any())
+        $processorRegistry->expects(self::any())
             ->method('getProcessor')
             ->willReturnMap($processorMap);
     }

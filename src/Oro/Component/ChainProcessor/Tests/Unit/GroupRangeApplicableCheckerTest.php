@@ -5,7 +5,7 @@ namespace Oro\Component\ChainProcessor\Tests\Unit;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
 class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
 {
@@ -15,7 +15,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         $context->setAction('action1');
 
         $builder = new ProcessorBagConfigBuilder();
-        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+        $processorBag = new ProcessorBag($builder, $this->getProcessorRegistry());
 
         $builder->addGroup('group1', 'action1', -10);
 
@@ -44,7 +44,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         $context->setFirstGroup('unknown_group');
 
         $builder = new ProcessorBagConfigBuilder();
-        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+        $processorBag = new ProcessorBag($builder, $this->getProcessorRegistry());
 
         $builder->addGroup('group1', 'action1', -10);
 
@@ -73,7 +73,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         $context->setLastGroup('unknown_group');
 
         $builder = new ProcessorBagConfigBuilder();
-        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+        $processorBag = new ProcessorBag($builder, $this->getProcessorRegistry());
 
         $builder->addGroup('group1', 'action1', -10);
 
@@ -103,7 +103,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         $context->setLastGroup('group5');
 
         $builder = new ProcessorBagConfigBuilder();
-        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+        $processorBag = new ProcessorBag($builder, $this->getProcessorRegistry());
 
         $builder->addGroup('group1', 'action1', -10);
         $builder->addGroup('group2', 'action1', -20);
@@ -145,7 +145,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         $context->setFirstGroup('group2');
 
         $builder = new ProcessorBagConfigBuilder();
-        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+        $processorBag = new ProcessorBag($builder, $this->getProcessorRegistry());
 
         $builder->addGroup('group1', 'action1', -10);
         $builder->addGroup('group2', 'action1', -20);
@@ -188,7 +188,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         $context->setLastGroup('group5');
 
         $builder = new ProcessorBagConfigBuilder();
-        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+        $processorBag = new ProcessorBag($builder, $this->getProcessorRegistry());
 
         $builder->addGroup('group1', 'action1', -10);
         $builder->addGroup('group2', 'action1', -20);
@@ -232,7 +232,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         $context->setLastGroup('group2');
 
         $builder = new ProcessorBagConfigBuilder();
-        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+        $processorBag = new ProcessorBag($builder, $this->getProcessorRegistry());
 
         $builder->addGroup('group1', 'action1', -10);
         $builder->addGroup('group2', 'action1', -20);
@@ -262,7 +262,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         $context->setLastGroup('group2');
 
         $builder = new ProcessorBagConfigBuilder();
-        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+        $processorBag = new ProcessorBag($builder, $this->getProcessorRegistry());
 
         $builder->addGroup('group1', 'action1', -10);
         $builder->addGroup('group2', 'action1', -20);
@@ -286,7 +286,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         $context->setLastGroup('group2');
 
         $builder = new ProcessorBagConfigBuilder();
-        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+        $processorBag = new ProcessorBag($builder, $this->getProcessorRegistry());
 
         $builder->addGroup('group1', 'action1', -10);
         $builder->addGroup('group2', 'action1', -20);
@@ -309,7 +309,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         $context->setLastGroup('group3');
 
         $builder = new ProcessorBagConfigBuilder();
-        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+        $processorBag = new ProcessorBag($builder, $this->getProcessorRegistry());
 
         $builder->addGroup('group1', 'action1', -10);
         $builder->addGroup('group2', 'action1', -20);
@@ -332,7 +332,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         $context->setLastGroup('group2');
 
         $builder = new ProcessorBagConfigBuilder();
-        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+        $processorBag = new ProcessorBag($builder, $this->getProcessorRegistry());
 
         $builder->addGroup('group1', 'action1', -10);
         $builder->addGroup('group2', 'action1', -20);
@@ -348,12 +348,12 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return ProcessorFactoryInterface
+     * @return ProcessorRegistryInterface
      */
-    protected function getProcessorFactory()
+    protected function getProcessorRegistry()
     {
-        $factory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
-        $factory->expects($this->any())
+        $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
+        $processorRegistry->expects($this->any())
             ->method('getProcessor')
             ->willReturnCallback(
                 function ($processorId) {
@@ -361,7 +361,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        return $factory;
+        return $processorRegistry;
     }
 
     /**
