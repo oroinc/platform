@@ -323,7 +323,7 @@
     {% set selected = (app.request.locale == locale) ? 'true' : 'false' %}
 
     <li class="nav-item">
-        <a href="javascript:void(0);"
+        <a href="#"
            class="nav-link {% if (app.request.locale == locale) %}active{% endif %}"
            data-role="change-language"
            data-target=".emailtemplate-translatation-fields-{{ locale }}"

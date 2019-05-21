@@ -54,7 +54,7 @@
                         {% set cssType = "dashboard-link" %}
                     {% endif %}
                     <a class="dashboard-btn  {{ cssType }}{% if not action.url is defined or not action.url %} no-hash{% endif %}"
-                        href="{{ action.url|default('javascript:void(0);') }}"
+                        href="{{ action.url|default('#') }}"
                         {% if action.data is defined %}
                             {% for dataItemName,dataItemValue in action.data %}
                             data-{{ dataItemName }}="{{ dataItemValue|e('html_attr')|raw }}"
