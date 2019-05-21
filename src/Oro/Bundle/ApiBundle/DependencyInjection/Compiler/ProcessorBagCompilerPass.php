@@ -31,27 +31,21 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $processorBagConfigProviderServiceDef = DependencyInjectionUtil::findDefinition(
-            $container,
-            self::PROCESSOR_BAG_CONFIG_PROVIDER_SERVICE_ID
-        );
-        if (null !== $processorBagConfigProviderServiceDef) {
-            $groups = [];
-            $config = DependencyInjectionUtil::getConfig($container);
-            foreach ($config['actions'] as $action => $actionConfig) {
-                if (isset($actionConfig['processing_groups'])) {
-                    foreach ($actionConfig['processing_groups'] as $group => $groupConfig) {
-                        $groups[$action][$group] = DependencyInjectionUtil::getPriority($groupConfig);
-                    }
+        $groups = [];
+        $config = DependencyInjectionUtil::getConfig($container);
+        foreach ($config['actions'] as $action => $actionConfig) {
+            if (isset($actionConfig['processing_groups'])) {
+                foreach ($actionConfig['processing_groups'] as $group => $groupConfig) {
+                    $groups[$action][$group] = DependencyInjectionUtil::getPriority($groupConfig);
                 }
             }
-            $groups[self::CUSTOMIZE_LOADED_DATA_ACTION] = ['item' => 0, 'collection' => -1];
-            $processors = ProcessorsLoader::loadProcessors($container, DependencyInjectionUtil::PROCESSOR_TAG);
-            $builder = new ProcessorBagConfigBuilder($groups, $processors);
-            $processorBagConfigProviderServiceDef->replaceArgument(0, $builder->getGroups());
-            $processorBagConfigProviderServiceDef
-                ->replaceArgument(1, $this->normalizeProcessors($builder->getProcessors()));
         }
+        $groups[self::CUSTOMIZE_LOADED_DATA_ACTION] = ['item' => 0, 'collection' => -1];
+        $processors = ProcessorsLoader::loadProcessors($container, DependencyInjectionUtil::PROCESSOR_TAG);
+        $builder = new ProcessorBagConfigBuilder($groups, $processors);
+        $container->getDefinition(self::PROCESSOR_BAG_CONFIG_PROVIDER_SERVICE_ID)
+            ->replaceArgument(0, $builder->getGroups())
+            ->replaceArgument(1, $this->normalizeProcessors($builder->getProcessors()));
     }
 
     /**

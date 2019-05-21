@@ -8,9 +8,11 @@ use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilder;
 use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Form\Type\Stub\CompoundFormTypeStub;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
+use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormType;
 
@@ -292,12 +294,14 @@ class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
      */
     protected function getForm($compound = true, $innerType = TextType::class, $name = 'some_form')
     {
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
-        $form       = new Form($formConfig);
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $resolvedType = new ResolvedFormType(new $innerType());
         $formConfig->expects($this->any())
             ->method('getCompound')
             ->will($this->returnValue($compound));
+        $formConfig->expects($this->any())
+            ->method('getDataMapper')
+            ->willReturn($this->createMock(DataMapperInterface::class));
         $formConfig->expects($this->any())
             ->method('getType')
             ->will($this->returnValue($resolvedType));
@@ -305,7 +309,7 @@ class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->will($this->returnValue($name));
 
-        return $form;
+        return new Form($formConfig);
     }
 
     /**

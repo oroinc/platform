@@ -7,8 +7,8 @@ use Oro\Bundle\WorkflowBundle\Processor\TransitActionProcessor;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -23,8 +23,8 @@ class TransitActionProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessorBag */
     protected $processorBag;
 
-    /** @var ProcessorFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $factory;
+    /** @var ProcessorRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $processorRegistry;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
@@ -34,11 +34,11 @@ class TransitActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->factory = $this->createMock(ProcessorFactoryInterface::class);
+        $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();
-        $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->factory);
+        $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->processorRegistry);
 
         $this->processor = new TransitActionProcessor($this->processorBag, $this->logger);
     }
@@ -67,7 +67,7 @@ class TransitActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor1 = $this->createMock(ProcessorInterface::class);
         $processor2 = $this->createMock(ProcessorInterface::class);
 
-        $this->factory->expects(self::exactly(2))
+        $this->processorRegistry->expects(self::exactly(2))
             ->method('getProcessor')
             ->willReturnOnConsecutiveCalls($processor1, $processor2);
 
@@ -97,7 +97,7 @@ class TransitActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor1 = $this->createMock(ProcessorInterface::class);
         $processor2 = $this->createMock(ProcessorInterface::class);
 
-        $this->factory->expects(self::exactly(2))
+        $this->processorRegistry->expects(self::exactly(2))
             ->method('getProcessor')
             ->willReturnOnConsecutiveCalls($processor1, $processor2);
 

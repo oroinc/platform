@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Api\Processor;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Form\FormUtil;
+use Oro\Bundle\ApiBundle\Form\Type\ArrayType;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
@@ -57,7 +58,7 @@ class ValidateEntityFallbackTest extends TypeTestCase
         $formBuilder
             ->add('fallback', TextType::class)
             ->add('scalarValue', TextType::class)
-            ->add('arrayValue', TextType::class);
+            ->add('arrayValue', ArrayType::class);
 
         $formBuilder->setData($fallbackValue);
 

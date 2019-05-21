@@ -2,6 +2,9 @@
 
 namespace Oro\Component\ChainProcessor;
 
+/**
+ * The factory to create an instance of ProcessorIterator class.
+ */
 class ProcessorIteratorFactory implements ProcessorIteratorFactoryInterface
 {
     /**
@@ -11,8 +14,8 @@ class ProcessorIteratorFactory implements ProcessorIteratorFactoryInterface
         array $processors,
         ContextInterface $context,
         ApplicableCheckerInterface $applicableChecker,
-        ProcessorFactoryInterface $processorFactory
+        ProcessorRegistryInterface $processorRegistry
     ) {
-        return new ProcessorIterator($processors, $context, $applicableChecker, $processorFactory);
+        return new ProcessorIterator($processors, $context, $applicableChecker, $processorRegistry);
     }
 }

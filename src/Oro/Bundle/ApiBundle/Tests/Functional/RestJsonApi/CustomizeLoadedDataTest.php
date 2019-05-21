@@ -80,7 +80,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                     'id'            => '<toString(@entity1_1->id)>',
                     'attributes'    => [
                         'name'         => 'Entity 1_1',
-                        'computedName' => 'Entity 1_1 (computed)',
+                        'computedName' => 'Entity 1_1 (computed) (decorated)',
                         'computedIds'  => $computedId
                     ],
                     'relationships' => [
@@ -133,7 +133,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                     'id'            => '<toString(@entity2_1->id)>',
                     'attributes'    => [
                         'name'         => 'Entity 2_1',
-                        'computedName' => 'Entity 2_1 (computed)',
+                        'computedName' => 'Entity 2_1 (computed - entity2) (decorated)',
                         'computedIds'  => $computedId
                     ],
                     'relationships' => [
@@ -182,7 +182,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                     'id'         => '<toString(@entity1_1->id)>',
                     'attributes' => [
                         'name'         => 'Entity 1_1',
-                        'computedName' => 'Entity 1_1 (computed)',
+                        'computedName' => 'Entity 1_1 (computed) (decorated)',
                         'computedIds'  => $computedId
                     ]
                 ],
@@ -230,7 +230,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                     'id'         => '<toString(@entity2_1->id)>',
                     'attributes' => [
                         'name'         => 'Entity 2_1',
-                        'computedName' => 'Entity 2_1 (computed)',
+                        'computedName' => 'Entity 2_1 (computed - entity2) (decorated)',
                         'computedIds'  => $computedId
                     ]
                 ],
@@ -277,7 +277,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                         'id'         => '<toString(@entity1_1->id)>',
                         'attributes' => [
                             'name'         => 'Entity 1_1',
-                            'computedName' => 'Entity 1_1 (computed)',
+                            'computedName' => 'Entity 1_1 (computed) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ],
@@ -286,7 +286,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                         'id'         => '<toString(@entity1_2->id)>',
                         'attributes' => [
                             'name'         => 'Entity 1_2',
-                            'computedName' => 'Entity 1_2 (computed)',
+                            'computedName' => 'Entity 1_2 (computed) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ],
@@ -295,7 +295,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                         'id'         => '<toString(@entity1_3->id)>',
                         'attributes' => [
                             'name'         => 'Entity 1_3',
-                            'computedName' => 'Entity 1_3 (computed)',
+                            'computedName' => 'Entity 1_3 (computed) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ],
@@ -304,7 +304,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                         'id'         => '<toString(@entity1_4->id)>',
                         'attributes' => [
                             'name'         => 'Entity 1_4',
-                            'computedName' => 'Entity 1_4 (computed)',
+                            'computedName' => 'Entity 1_4 (computed) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ]
@@ -336,7 +336,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                         'id'         => '<toString(@entity2_1->id)>',
                         'attributes' => [
                             'name'         => 'Entity 2_1',
-                            'computedName' => 'Entity 2_1 (computed)',
+                            'computedName' => 'Entity 2_1 (computed - entity2) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ],
@@ -345,7 +345,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                         'id'         => '<toString(@entity2_2->id)>',
                         'attributes' => [
                             'name'         => 'Entity 2_2',
-                            'computedName' => 'Entity 2_2 (computed)',
+                            'computedName' => 'Entity 2_2 (computed - entity2) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ],
@@ -354,7 +354,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                         'id'         => '<toString(@entity2_3->id)>',
                         'attributes' => [
                             'name'         => 'Entity 2_3',
-                            'computedName' => 'Entity 2_3 (computed)',
+                            'computedName' => 'Entity 2_3 (computed - entity2) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ],
@@ -363,7 +363,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                         'id'         => '<toString(@entity2_4->id)>',
                         'attributes' => [
                             'name'         => 'Entity 2_4',
-                            'computedName' => 'Entity 2_4 (computed)',
+                            'computedName' => 'Entity 2_4 (computed - entity2) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ]
@@ -393,7 +393,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                         'id'         => '<toString(@entity2_1->id)>',
                         'attributes' => [
                             'name'         => 'Entity 2_1',
-                            'computedName' => 'Entity 2_1 (computed)',
+                            'computedName' => 'Entity 2_1 (computed - entity2) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ],
@@ -402,7 +402,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                         'id'         => '<toString(@entity2_2->id)>',
                         'attributes' => [
                             'name'         => 'Entity 2_2',
-                            'computedName' => 'Entity 2_2 (computed)',
+                            'computedName' => 'Entity 2_2 (computed - entity2) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ]
@@ -432,7 +432,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                         'id'         => '<toString(@entity1_1->id)>',
                         'attributes' => [
                             'name'         => 'Entity 1_1',
-                            'computedName' => 'Entity 1_1 (computed)',
+                            'computedName' => 'Entity 1_1 (computed) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ],
@@ -441,7 +441,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                         'id'         => '<toString(@entity1_2->id)>',
                         'attributes' => [
                             'name'         => 'Entity 1_2',
-                            'computedName' => 'Entity 1_2 (computed)',
+                            'computedName' => 'Entity 1_2 (computed) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ]
@@ -476,7 +476,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                         'id'         => '<toString(@entity2_1->id)>',
                         'attributes' => [
                             'name'         => 'Entity 2_1',
-                            'computedName' => 'Entity 2_1 (computed)',
+                            'computedName' => 'Entity 2_1 (computed - entity2) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ],
@@ -485,7 +485,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                         'id'         => '<toString(@entity2_2->id)>',
                         'attributes' => [
                             'name'         => 'Entity 2_2',
-                            'computedName' => 'Entity 2_2 (computed)',
+                            'computedName' => 'Entity 2_2 (computed - entity2) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ]

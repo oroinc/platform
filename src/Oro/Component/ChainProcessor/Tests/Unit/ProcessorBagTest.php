@@ -5,7 +5,7 @@ namespace Oro\Component\ChainProcessor\Tests\Unit;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
 class ProcessorBagTest extends \PHPUnit\Framework\TestCase
 {
@@ -17,8 +17,8 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $factory = $this->createMock(ProcessorFactoryInterface::class);
-        $factory->expects(self::any())
+        $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
+        $processorRegistry->expects(self::any())
             ->method('getProcessor')
             ->willReturnCallback(
                 function ($processorId) {
@@ -27,7 +27,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->builder = new ProcessorBagConfigBuilder();
-        $this->processorBag = new ProcessorBag($this->builder, $factory);
+        $this->processorBag = new ProcessorBag($this->builder, $processorRegistry);
     }
 
     public function testEmptyBag()

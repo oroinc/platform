@@ -10,8 +10,8 @@ class ProcessorBag implements ProcessorBagInterface
     /** @var ProcessorBagConfigProviderInterface */
     protected $configProvider;
 
-    /** @var ProcessorFactoryInterface */
-    protected $processorFactory;
+    /** @var ProcessorRegistryInterface */
+    protected $processorRegistry;
 
     /** @var ProcessorIteratorFactoryInterface */
     protected $processorIteratorFactory;
@@ -30,20 +30,20 @@ class ProcessorBag implements ProcessorBagInterface
 
     /**
      * @param ProcessorBagConfigProviderInterface             $configProvider
-     * @param ProcessorFactoryInterface                       $processorFactory
+     * @param ProcessorRegistryInterface                      $processorRegistry
      * @param bool                                            $debug
      * @param ProcessorApplicableCheckerFactoryInterface|null $applicableCheckerFactory
      * @param ProcessorIteratorFactoryInterface|null          $processorIteratorFactory
      */
     public function __construct(
         ProcessorBagConfigProviderInterface $configProvider,
-        ProcessorFactoryInterface $processorFactory,
+        ProcessorRegistryInterface $processorRegistry,
         $debug = false,
         ProcessorApplicableCheckerFactoryInterface $applicableCheckerFactory = null,
         ProcessorIteratorFactoryInterface $processorIteratorFactory = null
     ) {
         $this->configProvider = $configProvider;
-        $this->processorFactory = $processorFactory;
+        $this->processorRegistry = $processorRegistry;
         $this->debug = $debug;
         $this->applicableCheckerFactory = $applicableCheckerFactory ?: new ProcessorApplicableCheckerFactory();
         $this->processorIteratorFactory = $processorIteratorFactory ?: new ProcessorIteratorFactory();
@@ -107,7 +107,7 @@ class ProcessorBag implements ProcessorBagInterface
             $actionProcessors,
             $context,
             $this->processorApplicableChecker,
-            $this->processorFactory
+            $this->processorRegistry
         );
     }
 

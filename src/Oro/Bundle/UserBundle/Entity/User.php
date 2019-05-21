@@ -766,6 +766,11 @@ class User extends ExtendUser implements
         if (array_diff_key($event->getEntityChangeSet(), array_flip($excludedFields))) {
             $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
         }
+
+        if (array_intersect_key($event->getEntityChangeSet(), array_flip(['username', 'email', 'password']))) {
+            $this->confirmationToken = null;
+            $this->passwordRequestedAt = null;
+        }
     }
 
     /**

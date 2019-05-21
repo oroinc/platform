@@ -66,8 +66,9 @@ class OroApiBundle extends Bundle
         );
         $container->addCompilerPass(
             new CleanUpProcessorsCompilerPass(
-                'oro_api.simple_processor_factory',
-                DependencyInjectionUtil::PROCESSOR_TAG
+                'oro_api.simple_processor_registry',
+                DependencyInjectionUtil::PROCESSOR_TAG,
+                'oro_api.simple_processor_registry.inner'
             ),
             PassConfig::TYPE_BEFORE_REMOVING
         );

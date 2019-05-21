@@ -8,6 +8,17 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 class UpdateLoadedData implements ProcessorInterface
 {
+    /** @var string */
+    private $suffix;
+
+    /**
+     * @param string $suffix
+     */
+    public function __construct(string $suffix = '')
+    {
+        $this->suffix = $suffix;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -25,7 +36,7 @@ class UpdateLoadedData implements ProcessorInterface
             return;
         }
 
-        $data['computedName'] = $data['name'] . ' (computed)';
+        $data['computedName'] = $data['name'] . ' (computed' . $this->suffix . ')';
         $context->setResult($data);
     }
 }

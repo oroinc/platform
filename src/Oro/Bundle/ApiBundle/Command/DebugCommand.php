@@ -146,14 +146,6 @@ class DebugCommand extends AbstractDebugCommand
             }
         }
 
-        $container = $this->getContainer();
-        $allProcessorsIdsRegisteredInContainer = [];
-        foreach ($allProcessorsIds as $processorId) {
-            if ($container->has($processorId)) {
-                $allProcessorsIdsRegisteredInContainer[] = $processorId;
-            }
-        }
-
         $output->writeln('<info>All Actions:</info>');
         $this->dumpAllActions($output, $processors);
 
@@ -165,11 +157,6 @@ class DebugCommand extends AbstractDebugCommand
             '<info>Total number of processor instances'
             . ' (the same processor can be re-used in several actions or groups):</info> %s',
             count($allProcessorsIds)
-        ));
-        $output->writeln(sprintf(
-            '<info>Total number of processors in DIC'
-            . ' (only processors that depend on other services are added to DIC):</info> %s',
-            count($allProcessorsIdsRegisteredInContainer)
         ));
 
         $output->writeln('<info>Public Actions:</info>');

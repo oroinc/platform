@@ -3,38 +3,17 @@
 namespace Oro\Component\ChainProcessor\Tests\Unit\DependencyInjection;
 
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
-use Oro\Component\ChainProcessor\SimpleProcessorFactory;
+use Oro\Component\ChainProcessor\SimpleProcessorRegistry;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 class CleanUpProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testProcessWithoutSimpleFactory()
-    {
-        $container = new ContainerBuilder();
-
-        $simpleProcessor = new Definition('Test\SimpleProcessor');
-        $simpleProcessor->addTag('processor');
-
-        $container->addDefinitions([
-            'simple_processor' => $simpleProcessor,
-        ]);
-
-        $compilerPass = new CleanUpProcessorsCompilerPass(
-            'simple_factory',
-            'processor'
-        );
-
-        $compilerPass->process($container);
-
-        self::assertTrue($container->hasDefinition('simple_processor'));
-    }
-
     public function testProcess()
     {
         $container = new ContainerBuilder();
 
-        $simpleFactory = new Definition(SimpleProcessorFactory::class, [[]]);
+        $simpleRegistry = new Definition(SimpleProcessorRegistry::class, [[]]);
 
         $simpleProcessor = new Definition('Test\SimpleProcessor');
         $simpleProcessor->addTag('processor');
@@ -51,7 +30,7 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         $withArgumentsProcessor->addTag('processor');
 
         $container->addDefinitions([
-            'simple_factory'           => $simpleFactory,
+            'simple_factory'           => $simpleRegistry,
             'simple_processor'         => $simpleProcessor,
             'abstract_processor'       => $abstractProcessor,
             'lazy_processor'           => $lazyProcessor,
@@ -72,7 +51,7 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             ['simple_processor' => 'Test\SimpleProcessor'],
-            $simpleFactory->getArgument(0)
+            $simpleRegistry->getArgument(0)
         );
     }
 
@@ -80,13 +59,13 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
     {
         $container = new ContainerBuilder();
 
-        $simpleFactory = new Definition(SimpleProcessorFactory::class, []);
+        $simpleRegistry = new Definition(SimpleProcessorRegistry::class, []);
 
         $simpleProcessor = new Definition('Test\SimpleProcessor');
         $simpleProcessor->addTag('processor');
 
         $container->addDefinitions([
-            'simple_factory'   => $simpleFactory,
+            'simple_factory'   => $simpleRegistry,
             'simple_processor' => $simpleProcessor
         ]);
 
@@ -101,7 +80,7 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             ['simple_processor' => 'Test\SimpleProcessor'],
-            $simpleFactory->getArgument(0)
+            $simpleRegistry->getArgument(0)
         );
     }
 }

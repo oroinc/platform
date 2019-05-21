@@ -128,7 +128,8 @@ class AssetsInstallCommandListener
     private function getPublicDir(InputInterface $input)
     {
         $defaultPublicDir = 'public';
-        $dir = rtrim($input->getArgument('target'), '/');
+        $target = $input->getArgument('target') ?? 'public';
+        $dir = rtrim($target, '/');
 
         if (!$dir) {
             $composerFilePath = $this->kernelProjectDir . '/composer.json';
