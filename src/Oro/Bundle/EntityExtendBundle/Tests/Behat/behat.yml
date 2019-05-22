@@ -19,15 +19,12 @@ oro_behat_extension:
   elements:
     Create Entity:
       selector: '.btn-primary[title="Create entity"]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Create Field:
       selector: '.btn[title="Create field"]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Update Schema:
       selector: '.btn-danger[title="Update schema"]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Target Entity:
       selector: 'select[data-name="field__target-entity"]'
