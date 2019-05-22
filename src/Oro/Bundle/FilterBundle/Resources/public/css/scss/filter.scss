@@ -90,7 +90,7 @@
         .choice-filter {
             .btn-group.btn-block {
                 width: $choice-filter-btn-width;
-                float: $choice-filter-btn-float;
+                padding: $choice-filter-btn-inner-offset;
             }
 
             .value-field-frame {
