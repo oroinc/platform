@@ -11,10 +11,16 @@ use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtension;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * @dbIsolationPerTest
+ */
 class SecurityAwareConsumptionExtensionTest extends WebTestCase
 {
     /**
@@ -23,7 +29,7 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
     private $producer;
 
     /**
-     * @var * MessageProducerInterface
+     * @var MessageProcessorInterface
      */
     private $messageProcessor;
 
@@ -40,6 +46,7 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
+        $this->clearMessages();
         $container = self::getContainer();
         $this->logger = self::createMock(LoggerInterface::class);
         $this->consumer = $container->get('oro_test.consumption.queue_consumer');
@@ -50,6 +57,7 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
     protected function tearDown(): void
     {
         $this->getTokenStorage()->setToken(null);
+        $this->clearMessages();
     }
 
     public function testWithValidToken(): void
@@ -114,5 +122,16 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
         $message->setProperties([SecurityAwareDriver::PARAMETER_SECURITY_TOKEN => $serializedToken]);
 
         return $message;
+    }
+
+    private function clearMessages()
+    {
+        $connection = self::getContainer()->get(
+            'oro_message_queue.transport.dbal.connection',
+            ContainerInterface::NULL_ON_INVALID_REFERENCE
+        );
+        if ($connection instanceof DbalConnection) {
+            $connection->getDBALConnection()->executeQuery('DELETE FROM ' . $connection->getTableName());
+        }
     }
 }

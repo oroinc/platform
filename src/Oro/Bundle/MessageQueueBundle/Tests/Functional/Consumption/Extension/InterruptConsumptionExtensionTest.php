@@ -10,7 +10,10 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InterruptConsumptionExtensionTest extends WebTestCase
 {
@@ -20,7 +23,7 @@ class InterruptConsumptionExtensionTest extends WebTestCase
     protected $producer;
 
     /**
-     * @var * MessageProducerInterface
+     * @var MessageProcessorInterface
      */
     protected $messageProcessor;
 
@@ -42,6 +45,12 @@ class InterruptConsumptionExtensionTest extends WebTestCase
         $this->messageProcessor = $container->get('oro_message_queue.client.delegate_message_processor');
         $this->logger = new TestLogger();
         $this->consumer = $container->get('oro_test.consumption.queue_consumer');
+        $this->clearMessages();
+    }
+
+    protected function tearDown()
+    {
+        $this->clearMessages();
     }
 
     public function testMessageConsumptionIsNotInterruptedByMessageLimit()
@@ -80,5 +89,16 @@ class InterruptConsumptionExtensionTest extends WebTestCase
         $logs = $this->logger->getLogs('warning');
 
         self::assertEquals($expectedMessage, reset($logs));
+    }
+
+    private function clearMessages()
+    {
+        $connection = self::getContainer()->get(
+            'oro_message_queue.transport.dbal.connection',
+            ContainerInterface::NULL_ON_INVALID_REFERENCE
+        );
+        if ($connection instanceof DbalConnection) {
+            $connection->getDBALConnection()->executeQuery('DELETE FROM ' . $connection->getTableName());
+        }
     }
 }

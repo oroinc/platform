@@ -205,6 +205,17 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity_config.translation.helper'
 
+    oro_entity_config.listener.attribute_manager_cache:
+        class: Oro\Bundle\EntityConfigBundle\EventListener\AttributeManagerCacheListener
+        arguments:
+            - '@oro_entity_config.manager.attribute_manager'
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.entity.create, method: onCreateEntity }
+            - { name: kernel.event_listener, event: oro.entity_config.field.create, method: onCreateField }
+            - { name: kernel.event_listener, event: oro.entity_config.entity.update, method: onUpdateEntity }
+            - { name: kernel.event_listener, event: oro.entity_config.field.update, method: onUpdateField }
+            - { name: kernel.event_listener, event: oro.entity_config.field.rename, method: onRenameField }
+
     oro_entity_config.validator.attribute_family_groups:
         class: 'Oro\Bundle\EntityConfigBundle\Validator\Constraints\AttributeFamilyGroupsValidator'
         tags:
