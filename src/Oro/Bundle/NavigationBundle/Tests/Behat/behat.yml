@@ -22,7 +22,6 @@ oro_behat_extension:
 
     PinBarLink:
       selector: '#pinbar div.list-bar .pin-holder a'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     PinPageButton:
       selector: 'button[title="Pin/unpin the page"]'
@@ -30,39 +29,31 @@ oro_behat_extension:
 
     AddToFavoritesButton:
       selector: 'button.favorite-button'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     History Content:
       selector: '#history-content'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Most Viewed Content:
       selector: '#mostviewed-content'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Favorites Content:
       selector: '#favorite-content'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     QuickMenuContentItem:
       selector: 'ul li'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Next Paginator Button:
       selector:
         type: xpath
         locator: '//li/a[contains (@href,"/admin/entity-pagination/next")]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Previous Paginator Button:
       selector:
         type: xpath
         locator: '//li/a[contains (@href,"/admin/entity-pagination/previous")]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     MenuTree:
       selector: 'div.jstree-wrapper'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Menu Form:
       selector: 'form[name="menu_update"]'
@@ -76,36 +67,28 @@ oro_behat_extension:
 
     Application menu item:
       selector: '#application_menu_anchor'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Dashboards menu item:
       selector: '#dashboard_tab_anchor'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Dashboards sub item:
       selector: '#1_dashboard_menu_item_anchor'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Manage Dashboards sub item:
       selector: '#oro_dashboard_index_anchor'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Create Menu Item DropDown:
       selector: '.navigation .pull-right.pinned-dropdown .btn-primary.dropdown-toggle'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     JS Tree item:
       selector: '.jstree-wrapper .jstree-container-ul .jstree-anchor'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Scrollspy Link:
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
       selector:
         locator: '//div[contains(@class,"scrollspy-nav")]/nav/a'
         type: xpath
 
     Tab Link:
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
       selector:
         locator: '//ul[contains(@class,"nav-tabs")]/li/a'
         type: xpath
