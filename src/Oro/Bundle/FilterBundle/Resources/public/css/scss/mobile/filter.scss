@@ -117,7 +117,7 @@
 
         .btn-group {
             display: block;
-            float: none;
+            float: $start;
 
             > .btn {
                 width: $mobile-filter-box-width;
