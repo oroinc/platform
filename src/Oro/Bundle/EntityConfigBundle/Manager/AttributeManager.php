@@ -390,4 +390,15 @@ class AttributeManager
 
         return $this->extendConfigProvider;
     }
+
+    public function clearAttributesCache()
+    {
+        $this->attributesByGroup = [];
+        $this->attributesByFamily = [];
+        $this->attributesByClass = [];
+        $this->activeAttributesByClass = [];
+        $this->systemAttributesByClass = [];
+        $this->nonSystemAttributesByClass = [];
+        $this->familiesByAttributeId = [];
+    }
 }

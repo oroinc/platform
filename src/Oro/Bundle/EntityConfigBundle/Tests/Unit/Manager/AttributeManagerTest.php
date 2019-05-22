@@ -65,10 +65,10 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAttributesByGroup()
     {
-        $this->expectsDatabaseCheck(true);
+        $this->expectsDatabaseCheck(true, 2);
 
-        $repository = $this->expectsGetFieldConfigModelRepository();
-        $repository->expects($this->once())
+        $repository = $this->expectsGetFieldConfigModelRepository(2);
+        $repository->expects($this->exactly(2))
             ->method('getAttributesByIds')
             ->with([1,2])
             ->willReturn([]);
@@ -79,6 +79,10 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getAttributesByGroup($group);
 
         // ensure that result is lazy loaded
+        $this->manager->getAttributesByGroup($group);
+
+        // call method after clearing the cache
+        $this->manager->clearAttributesCache();
         $this->manager->getAttributesByGroup($group);
     }
 
@@ -95,10 +99,10 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAttributesByFamily()
     {
-        $this->expectsDatabaseCheck(true);
+        $this->expectsDatabaseCheck(true, 2);
 
-        $repository = $this->expectsGetFieldConfigModelRepository();
-        $repository->expects($this->once())
+        $repository = $this->expectsGetFieldConfigModelRepository(2);
+        $repository->expects($this->exactly(2))
             ->method('getAttributesByIds')
             ->with([1,2,3])
             ->willReturn([]);
@@ -116,6 +120,10 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
         // ensure that result is lazy loaded
         $this->manager->getAttributesByFamily($family);
+
+        // call method after clearing the cache
+        $this->manager->clearAttributesCache();
+        $this->manager->getAttributesByFamily($family);
     }
 
     /**
@@ -131,10 +139,10 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAttributesByClass()
     {
-        $this->expectsDatabaseCheck(true);
+        $this->expectsDatabaseCheck(true, 2);
 
-        $repository = $this->expectsGetFieldConfigModelRepository();
-        $repository->expects($this->once())
+        $repository = $this->expectsGetFieldConfigModelRepository(2);
+        $repository->expects($this->exactly(2))
             ->method('getAttributesByClass')
             ->with('className')
             ->willReturn([]);
@@ -142,6 +150,10 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getAttributesByClass('className');
 
         // ensure that result is lazy loaded
+        $this->manager->getAttributesByClass('className');
+
+        // call method after clearing the cache
+        $this->manager->clearAttributesCache();
         $this->manager->getAttributesByClass('className');
     }
 
@@ -158,10 +170,10 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetActiveAttributesByClass()
     {
-        $this->expectsDatabaseCheck(true);
+        $this->expectsDatabaseCheck(true, 2);
 
-        $repository = $this->expectsGetFieldConfigModelRepository();
-        $repository->expects($this->once())
+        $repository = $this->expectsGetFieldConfigModelRepository(2);
+        $repository->expects($this->exactly(2))
             ->method('getActiveAttributesByClass')
             ->with('className')
             ->willReturn([]);
@@ -169,6 +181,10 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getActiveAttributesByClass('className');
 
         // ensure that result is lazy loaded
+        $this->manager->getActiveAttributesByClass('className');
+
+        // call method after clearing the cache
+        $this->manager->clearAttributesCache();
         $this->manager->getActiveAttributesByClass('className');
     }
 
@@ -185,10 +201,10 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSystemAttributesByClass()
     {
-        $this->expectsDatabaseCheck(true);
+        $this->expectsDatabaseCheck(true, 2);
 
-        $repository = $this->expectsGetFieldConfigModelRepository();
-        $repository->expects($this->once())
+        $repository = $this->expectsGetFieldConfigModelRepository(2);
+        $repository->expects($this->exactly(2))
             ->method('getAttributesByClassAndIsSystem')
             ->with('className', 1)
             ->willReturn([]);
@@ -196,6 +212,10 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getSystemAttributesByClass('className');
 
         // ensure that result is lazy loaded
+        $this->manager->getSystemAttributesByClass('className');
+
+        // call method after clearing the cache
+        $this->manager->clearAttributesCache();
         $this->manager->getSystemAttributesByClass('className');
     }
 
@@ -212,10 +232,10 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetNonSystemAttributesByClass()
     {
-        $this->expectsDatabaseCheck(true);
+        $this->expectsDatabaseCheck(true, 2);
 
-        $repository = $this->expectsGetFieldConfigModelRepository();
-        $repository->expects($this->once())
+        $repository = $this->expectsGetFieldConfigModelRepository(2);
+        $repository->expects($this->exactly(2))
             ->method('getAttributesByClassAndIsSystem')
             ->with('className', 0)
             ->willReturn([]);
@@ -223,6 +243,10 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getNonSystemAttributesByClass('className');
 
         // ensure that result is lazy loaded
+        $this->manager->getNonSystemAttributesByClass('className');
+
+        // call method after clearing the cache
+        $this->manager->clearAttributesCache();
         $this->manager->getNonSystemAttributesByClass('className');
     }
 
@@ -239,8 +263,8 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFamiliesByAttributeId()
     {
-        $repository = $this->expectsGetAttributeFamilyRepository();
-        $repository->expects($this->once())
+        $repository = $this->expectsGetAttributeFamilyRepository(2);
+        $repository->expects($this->exactly(2))
             ->method('getFamiliesByAttributeId')
             ->with(1)
             ->willReturn([]);
@@ -248,6 +272,10 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getFamiliesByAttributeId(1);
 
         // ensure that result is lazy loaded
+        $this->manager->getFamiliesByAttributeId(1);
+
+        // call method after clearing the cache
+        $this->manager->clearAttributesCache();
         $this->manager->getFamiliesByAttributeId(1);
     }
 
@@ -574,9 +602,9 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @param bool $isCheckSuccessful
      */
-    private function expectsDatabaseCheck($isCheckSuccessful)
+    private function expectsDatabaseCheck($isCheckSuccessful, $calls = 1)
     {
-        $this->configManager->expects($this->once())
+        $this->configManager->expects($this->exactly($calls))
             ->method('isDatabaseReadyToWork')
             ->willReturn($isCheckSuccessful);
     }
@@ -584,13 +612,13 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @return FieldConfigModelRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function expectsGetFieldConfigModelRepository()
+    private function expectsGetFieldConfigModelRepository($calls = 1)
     {
         $repository = $this->getMockBuilder(FieldConfigModelRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects($this->exactly($calls))
             ->method('getEntityRepositoryForClass')
             ->with(FieldConfigModel::class)
             ->willReturn($repository);
@@ -601,13 +629,13 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @return AttributeFamilyRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function expectsGetAttributeFamilyRepository()
+    private function expectsGetAttributeFamilyRepository($calls = 1)
     {
         $repository = $this->getMockBuilder(AttributeFamilyRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects($this->exactly($calls))
             ->method('getEntityRepositoryForClass')
             ->with(AttributeFamily::class)
             ->willReturn($repository);
