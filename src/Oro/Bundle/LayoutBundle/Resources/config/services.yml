@@ -142,7 +142,7 @@ services:
             - [ setNamespace, [ 'oro_layout_expression_language' ] ]
 
     oro_layout.expression_language.parsed_cache:
-        class: Symfony\Bridge\Doctrine\ExpressionLanguage\DoctrineParserCache
+        class: Symfony\Component\Cache\Adapter\DoctrineAdapter
         arguments:
             - '@oro_layout.expression_language.cache'
 
