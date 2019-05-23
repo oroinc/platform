@@ -42,8 +42,6 @@ class OroEntityExtension extends Extension
         );
 
         $loader->load('collectors.yml');
-
-        $this->addClassesToCompile(['Oro\Bundle\EntityBundle\ORM\OroEntityManager']);
     }
 
     /**

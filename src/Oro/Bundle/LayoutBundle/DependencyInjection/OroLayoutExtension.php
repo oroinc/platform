@@ -31,7 +31,6 @@ class OroLayoutExtension extends Extension
 
         if ($config['view']['annotations']) {
             $loader->load('view_annotations.yml');
-            $this->addClassesToCompile(['Oro\Bundle\LayoutBundle\EventListener\LayoutListener']);
         }
 
         $container->setParameter(
@@ -67,11 +66,6 @@ class OroLayoutExtension extends Extension
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
         }
-
-        $this->addClassesToCompile([
-            'Oro\Bundle\LayoutBundle\EventListener\ThemeListener',
-            'Oro\Bundle\LayoutBundle\Request\LayoutHelper'
-        ]);
     }
 
     /**

@@ -3,9 +3,6 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\LayoutBundle\DependencyInjection\OroLayoutExtension;
-use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
-use Oro\Bundle\LayoutBundle\EventListener\ThemeListener;
-use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
@@ -35,16 +32,6 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
             $container->getExtensionConfig($extension->getAlias())
         );
 
-        // view annotations
-        $this->assertEquals(
-            [
-                LayoutListener::class,
-                ThemeListener::class,
-                LayoutHelper::class
-            ],
-            $extension->getClassesToCompile(),
-            'Failed asserting that @Layout annotation is enabled'
-        );
         // default renderer name
         $this->assertTrue(
             $container->hasParameter('oro_layout.templating.default'),

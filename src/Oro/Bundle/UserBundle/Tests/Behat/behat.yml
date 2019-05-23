@@ -62,7 +62,6 @@ oro_behat_extension:
 
     Sided Main Menu:
       selector: 'div.main-menu-sided'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UserRoleView:
       selector:

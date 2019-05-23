@@ -436,14 +436,14 @@ services:
         arguments:
             - '@translator'
             - '@oro_user.provider.role_privilege_category_provider'
-            - '@oro_user.form.handler.abstract.acl_role='
+            - '@oro_user.form.handler.abstract.acl_role'
 
     oro_user.datagrid.datasource.role_permission_datasource:
         class: '%oro_user.datagrid.datasource.role_permission_datasource.class%'
         arguments:
             - '@translator'
             - '@oro_security.acl.permission_manager'
-            - '@oro_user.form.handler.abstract.acl_role='
+            - '@oro_user.form.handler.abstract.acl_role'
             - '@oro_user.provider.role_privilege_category_provider'
             - '@oro_entity_config.config_manager'
         tags:

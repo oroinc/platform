@@ -6,11 +6,9 @@ oro_behat_extension:
 
     Label:
       selector: 'label'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Action Button Chooser:
       selector: 'div.title-buttons-container a.dropdown-toggle'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     FileField:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\FileField
@@ -29,11 +27,9 @@ oro_behat_extension:
 
     EntitySelector:
       selector: '.select2-chosen'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     SelectToResultLabel:
       selector: 'div.select2-result-label'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Select2Entity:
       selector: '.select2-offscreen'
