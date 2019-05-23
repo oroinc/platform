@@ -154,7 +154,7 @@ services:
             - '@oro_email.form.email.api'
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
-            - "@oro_email.email.entity.builder="
+            - "@oro_email.email.entity.builder"
             - '@oro_security.token_accessor'
             - '@event_dispatcher'
             - '@oro_email.email_importance_transformer'
