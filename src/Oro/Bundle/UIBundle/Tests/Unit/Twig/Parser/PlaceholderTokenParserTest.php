@@ -8,47 +8,40 @@ class PlaceholderTokenParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject
      */
-    protected $parser;
+    private $parser;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject
      */
-    protected $expressionParser;
+    private $expressionParser;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject
      */
-    protected $stream;
+    private $stream;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject
      */
-    protected $compiler;
+    private $compiler;
 
     /**
      * @var PlaceholderTokenParser
      */
-    protected $tokenParser;
+    private $tokenParser;
 
     protected function setUp()
     {
-        $this->stream = $this->getMockBuilder('Twig_TokenStream')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->stream = $this->createMock('Twig_TokenStream');
+        $this->expressionParser = $this->createMock('Twig_ExpressionParser');
+        $this->parser = $this->createMock('Twig_Parser');
 
-        $this->expressionParser = $this->getMockBuilder('Twig_ExpressionParser')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->parser = $this->getMockBuilder('Twig_Parser')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->parser->expects($this->any())
             ->method('getStream')
-            ->will($this->returnValue($this->stream));
+            ->willReturn($this->stream);
         $this->parser->expects($this->any())
             ->method('getExpressionParser')
-            ->will($this->returnValue($this->expressionParser));
+            ->willReturn($this->expressionParser);
 
         $this->compiler = $this->getMockBuilder('Twig_Compiler')
             ->disableOriginalConstructor()
@@ -67,21 +60,21 @@ class PlaceholderTokenParserTest extends \PHPUnit\Framework\TestCase
         $token = $this->createToken();
         $token->expects($this->any())
             ->method('getLine')
-            ->will($this->returnValue($expectedLine));
+            ->willReturn($expectedLine);
 
         $this->stream->expects($this->at(0))
             ->method('test')
             ->with(\Twig_Token::NAME_TYPE)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->expressionParser->expects($this->once())
             ->method('parseExpression')
-            ->will($this->returnValue($nameExpr));
+            ->willReturn($nameExpr);
 
         $this->stream->expects($this->at(1))
             ->method('nextIf')
             ->with(\Twig_Token::NAME_TYPE, 'with')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->stream->expects($this->at(2))
             ->method('expect')
@@ -89,7 +82,7 @@ class PlaceholderTokenParserTest extends \PHPUnit\Framework\TestCase
 
         $actualNode = $this->tokenParser->parse($token);
         $this->assertInstanceOf('\Twig_Node_Print', $actualNode);
-        $this->assertEquals($expectedLine, $actualNode->getLine());
+        $this->assertEquals($expectedLine, $actualNode->getTemplateLine());
         $this->assertEquals('placeholder', $actualNode->getNodeTag());
 
         $expectedExpr           = new \Twig_Node_Expression_Function(
@@ -132,26 +125,26 @@ class PlaceholderTokenParserTest extends \PHPUnit\Framework\TestCase
         $token = $this->createToken();
         $token->expects($this->any())
             ->method('getLine')
-            ->will($this->returnValue($expectedLine));
+            ->willReturn($expectedLine);
 
         $nameToken      = $this->createToken();
         $nameTokenValue = 'nameTokenValue';
         $nameTokenLine  = 102;
         $nameToken->expects($this->once())
             ->method('getValue')
-            ->will($this->returnValue($nameTokenValue));
+            ->willReturn($nameTokenValue);
         $nameToken->expects($this->once())
             ->method('getLine')
-            ->will($this->returnValue($nameTokenLine));
+            ->willReturn($nameTokenLine);
 
         $this->stream->expects($this->at(0))
             ->method('test')
             ->with(\Twig_Token::NAME_TYPE)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->stream->expects($this->at(1))
             ->method('getCurrent')
-            ->will($this->returnValue($nameToken));
+            ->willReturn($nameToken);
 
         $this->stream->expects($this->at(2))
             ->method('next');
@@ -159,11 +152,11 @@ class PlaceholderTokenParserTest extends \PHPUnit\Framework\TestCase
         $this->stream->expects($this->at(3))
             ->method('nextIf')
             ->with(\Twig_Token::NAME_TYPE, 'with')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->expressionParser->expects($this->once())
             ->method('parseExpression')
-            ->will($this->returnValue($variablesExpr));
+            ->willReturn($variablesExpr);
 
         $this->stream->expects($this->at(4))
             ->method('expect')
@@ -171,7 +164,7 @@ class PlaceholderTokenParserTest extends \PHPUnit\Framework\TestCase
 
         $actualNode = $this->tokenParser->parse($token);
         $this->assertInstanceOf('\Twig_Node_Print', $actualNode);
-        $this->assertEquals($expectedLine, $actualNode->getLine());
+        $this->assertEquals($expectedLine, $actualNode->getTemplateLine());
         $this->assertEquals('placeholder', $actualNode->getNodeTag());
 
         $expectedNameExpr       = new \Twig_Node_Expression_Filter_Default(
@@ -218,17 +211,13 @@ class PlaceholderTokenParserTest extends \PHPUnit\Framework\TestCase
         $actualNode->compile($this->compiler);
     }
 
-    protected function createExpressionNode()
+    private function createExpressionNode()
     {
-        return $this->getMockBuilder('Twig_Node_Expression')
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->createMock('Twig_Node_Expression');
     }
 
-    protected function createToken()
+    private function createToken()
     {
-        return $this->getMockBuilder('Twig_Token')
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->createMock('Twig_Token');
     }
 }
