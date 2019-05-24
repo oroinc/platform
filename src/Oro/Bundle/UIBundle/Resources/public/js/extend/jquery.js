@@ -19,7 +19,9 @@ define(['jquery'], function($) {
         } else {
             csrfCookie = getCookieValue('_csrf');
         }
-        if (options.url.indexOf('://') === -1 && csrfCookie.length > 0) {
+        if ((options.url.indexOf('://') === -1 || options.url.indexOf(location.origin) === 0) &&
+            csrfCookie.length > 0
+        ) {
             xhr.setRequestHeader('X-CSRF-Header', csrfCookie);
         }
     });
