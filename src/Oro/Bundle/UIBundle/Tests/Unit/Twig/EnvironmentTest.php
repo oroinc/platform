@@ -48,6 +48,10 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @param string $filename
+     * @return mixed
+     */
     public function escapingStrategyCallback($filename)
     {
         return $filename;
@@ -148,21 +152,5 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
             'Oro\Bundle\UIBundle\Tests\Unit\Twig\Fixture\EnvironmentNodeVisitor',
             get_class($visitors[2])
         );
-    }
-
-    public function testRemoveExtension()
-    {
-        $twig = new Environment(new \Twig_Loader_String());
-        $twig->addExtension(new EnvironmentExtension());
-        $twig->removeExtension('environment_test');
-
-        $this->assertFalse(array_key_exists('test', $twig->getTags()));
-        $this->assertFalse(array_key_exists('foo_filter', $twig->getFilters()));
-        $this->assertFalse(array_key_exists('foo_function', $twig->getFunctions()));
-        $this->assertFalse(array_key_exists('foo_test', $twig->getTests()));
-        $this->assertFalse(array_key_exists('foo_unary', $twig->getUnaryOperators()));
-        $this->assertFalse(array_key_exists('foo_binary', $twig->getBinaryOperators()));
-        $this->assertFalse(array_key_exists('foo_global', $twig->getGlobals()));
-        $this->assertCount(2, $twig->getNodeVisitors());
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Twig\Node;
 
+use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
+
 /**
  * Implementation of block_* TWIG functions
  */
@@ -16,7 +18,9 @@ class SearchAndRenderBlockNode extends \Twig_Node_Expression_Function
     public function compile(\Twig_Compiler $compiler)
     {
         $compiler->addDebugInfo($this);
-        $compiler->raw('$this->env->getExtension(\'layout\')->renderer->searchAndRenderBlock(');
+        $compiler->raw(
+            sprintf('$this->env->getExtension("%s")->renderer->searchAndRenderBlock(', LayoutExtension::class)
+        );
 
         $name            = $this->getAttribute('name');
         $blockNameSuffix = substr($name, strrpos($name, '_') + 1);

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Twig\Node;
 
+use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
+
 /**
  * Node for the 'block_theme' tag
  */
@@ -25,7 +27,7 @@ class BlockThemeNode extends \Twig_Node
     {
         $compiler
             ->addDebugInfo($this)
-            ->write('$this->env->getExtension(\'layout\')->renderer->setTheme(')
+            ->write(sprintf('$this->env->getExtension("%s")->renderer->setTheme(', LayoutExtension::class))
             ->subcompile($this->getNode('block'))
             ->raw(', ')
             ->subcompile($this->getNode('resources'))

@@ -6,7 +6,8 @@ use Oro\Bundle\LayoutBundle\Twig\Node\BlockThemeNode;
 
 class BlockThemeNodeTest extends \PHPUnit\Framework\TestCase
 {
-    const SET_THEME_CALL = '$this->env->getExtension(\'layout\')->renderer->setTheme';
+    const SET_THEME_CALL = '$this->env->getExtension("Oro\Bundle\LayoutBundle\Twig\LayoutExtension")->renderer' .
+        '->setTheme';
 
     public function testCompile()
     {

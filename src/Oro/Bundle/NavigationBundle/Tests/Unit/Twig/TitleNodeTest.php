@@ -3,16 +3,18 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\NavigationBundle\Twig\TitleNode;
+use Twig\Compiler;
+use Twig\Node\Node;
 
 class TitleNodeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var Node|\PHPUnit\Framework\MockObject\MockObject
      */
     private $node;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var Compiler|\PHPUnit\Framework\MockObject\MockObject
      */
     private $compiler;
 
@@ -26,10 +28,8 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        $this->node = $this->createMock('Twig_Node');
-        $this->compiler = $this->getMockBuilder('Twig_Compiler')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->node = $this->createMock(Node::class);
+        $this->compiler = $this->createMock(Compiler::class);
 
         $this->titleNode = new TitleNode($this->node);
     }
@@ -41,7 +41,7 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
      */
     public function testFailedCompile()
     {
-        $this->node->expects($this->once())->method('getIterator')->will($this->returnValue(array()));
+        $this->node->expects($this->once())->method('getIterator')->willReturn([]);
 
         $this->titleNode->compile($this->compiler);
     }
@@ -55,7 +55,7 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
 
         $this->node->expects($this->once())
             ->method('getIterator')
-            ->will($this->returnValue(array($exprMock)));
+            ->willReturn([$exprMock]);
 
         $this->compiler->expects($this->at(0))
             ->method('raw')
@@ -64,7 +64,7 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
 
         $this->compiler->expects($this->at(1))
             ->method('write')
-            ->with('$this->env->getExtension("oro_title")->set(')
+            ->with('$this->env->getExtension("Oro\Bundle\NavigationBundle\Twig\TitleExtension")->set(')
             ->will($this->returnSelf());
 
         $this->compiler->expects($this->at(2))

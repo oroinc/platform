@@ -6,7 +6,8 @@ use Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode;
 
 class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 {
-    const RENDER_CALL = '$this->env->getExtension(\'layout\')->renderer->searchAndRenderBlock';
+    const RENDER_CALL = '$this->env->getExtension("Oro\Bundle\LayoutBundle\Twig\LayoutExtension")->renderer' .
+        '->searchAndRenderBlock';
 
     /**
      * block_widget(block)
