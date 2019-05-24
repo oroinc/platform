@@ -380,7 +380,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->arrayNode('supported_operators')
                             ->prototype('scalar')->end()
-                            ->cannotBeEmpty()
+                            ->requiresAtLeastOneElement()
                             ->defaultValue(['=', '!=', '*', '!*'])
                         ->end()
                     ->end()

@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\Twig\Sandbox;
 
 use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface as ConfigProvider;
+use Twig\Extension\SandboxExtension;
 
 /**
  * The base class to render TWIG templates in a sandboxed environment.
@@ -127,7 +128,7 @@ abstract class TemplateRenderer
     {
         $config = $this->configProvider->getConfiguration();
         /** @var \Twig_Extension_Sandbox $sandbox */
-        $sandbox = $this->environment->getExtension('sandbox');
+        $sandbox = $this->environment->getExtension(SandboxExtension::class);
         /** @var \Twig_Sandbox_SecurityPolicy $security */
         $security = $sandbox->getSecurityPolicy();
         $security->setAllowedProperties($config[ConfigProvider::PROPERTIES]);

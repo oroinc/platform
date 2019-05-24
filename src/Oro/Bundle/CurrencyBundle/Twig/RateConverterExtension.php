@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\CurrencyBundle\Twig;
 
+/**
+ * Provides TWIG function for converting currencies.
+ */
 class RateConverterExtension extends \Twig_Extension
 {
     /**
@@ -25,13 +28,5 @@ class RateConverterExtension extends \Twig_Extension
     public function convert()
     {
         return '';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_multicurrency';
     }
 }

@@ -4,10 +4,12 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
+use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\Form\FormView;
+use Twig\Environment;
 
 class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -25,9 +27,7 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->renderer = $this->createMock(TwigRendererInterface::class);
-        $this->textHelper = $this->getMockBuilder(TextHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->textHelper = $this->createMock(TextHelper::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_layout.twig.renderer', $this->renderer)
@@ -44,9 +44,8 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testInitRuntime()
     {
-        /** @var \Twig_Environment $environment */
-        $environment = $this->getMockBuilder('\Twig_Environment')
-            ->getMock();
+        /** @var Environment $environment */
+        $environment = $this->createMock(Environment::class);
 
         $this->renderer->expects($this->once())
             ->method('setEnvironment')
@@ -62,10 +61,7 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->assertCount(1, $tokenParsers);
 
-        $this->assertInstanceOf(
-            'Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser',
-            $tokenParsers[0]
-        );
+        $this->assertInstanceOf(BlockThemeTokenParser::class, $tokenParsers[0]);
     }
 
     public function testMergeContext()
