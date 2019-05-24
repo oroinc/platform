@@ -14,28 +14,31 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
 {
-    protected $messages = array(
-        'fr' => array(
-            'jsmessages' => array(
+    /**
+     * @var array
+     */
+    protected $messages = [
+        'fr' => [
+            'jsmessages' => [
                 'foo' => 'foo (FR)',
-            ),
-            'messages' => array(
+            ],
+            'messages' => [
                 'foo' => 'foo messages (FR)',
-            ),
-        ),
-        'en' => array(
-            'jsmessages' => array(
+            ],
+        ],
+        'en' => [
+            'jsmessages' => [
                 'foo' => 'foo (EN)',
                 'bar' => 'bar (EN)',
-            ),
-            'messages' => array(
+            ],
+            'messages' => [
                 'foo' => 'foo messages (EN)',
-            ),
-            'validators' => array(
+            ],
+            'validators' => [
                 'choice' => '{0} choice 0 (EN)|{1} choice 1 (EN)|]1,Inf] choice inf (EN)',
-            ),
-        ),
-    );
+            ],
+        ],
+    ];
 
     /**
      * @param string $locale
@@ -53,9 +56,9 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
             }
         }
         $translator = $this->getTranslator($this->getLoader(), $this->getStrategyProvider($locales));
-        $_locale = !is_null($locale) ? $locale : reset($locales);
-        $translator->setLocale($_locale);
-        $translator->setFallbackLocales(array_slice($locales, array_search($_locale, $locales) + 1));
+        $locale = $locale ?: reset($locales);
+        $translator->setLocale($locale);
+        $translator->setFallbackLocales(array_slice($locales, array_search($locale, $locales, true) + 1));
 
         $this->assertEquals($expected, $translator->trans($source, [], $domain));
     }
@@ -98,9 +101,9 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
             }
         }
         $translator = $this->getTranslator($this->getLoader(), $this->getStrategyProvider($locales));
-        $_locale = !is_null($locale) ? $locale : reset($locales);
-        $translator->setLocale($_locale);
-        $translator->setFallbackLocales(array_slice($locales, array_search($_locale, $locales) + 1));
+        $locale = $locale ?: reset($locales);
+        $translator->setLocale($locale);
+        $translator->setFallbackLocales(array_slice($locales, array_search($locale, $locales, true) + 1));
 
         $this->assertEquals($expected, $translator->transChoice($source, $number, [], $domain));
     }
@@ -216,20 +219,22 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
      * Creates instance of Translator
      *
      * @param $loader
+     * @param TranslationStrategyProvider $strategyProvider
      * @param array $options
      * @return DebugTranslator
      */
-    public function getTranslator($loader, $strategyProvider, $options = array())
+    public function getTranslator($loader, TranslationStrategyProvider $strategyProvider, $options = [])
     {
         $translator = new DebugTranslator(
             $this->getContainer($loader, $strategyProvider),
             new MessageFormatter(),
-            array('loader' => array('loader')),
+            'en',
+            ['loader' => ['loader']],
             array_merge(['resource_files' => []], $options)
         );
 
         $strategy = $this->createMock(TranslationStrategyInterface::class);
-        $strategyProvider = $this->createMock(TranslationStrategyProvider::class);
+
         $strategyProviderLink = new ServiceLink($strategyProvider);
         $strategyProvider->expects($this->any())
             ->method('getStrategy')
