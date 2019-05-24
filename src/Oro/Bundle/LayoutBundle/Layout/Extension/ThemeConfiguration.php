@@ -99,7 +99,7 @@ class ThemeConfiguration implements ConfigurationInterface
                         ->info('Layout groups for which the theme is applicable')
                         ->example('[main, embedded_forms, frontend]')
                         ->prototype('scalar')->end()
-                        ->cannotBeEmpty()
+                        ->requiresAtLeastOneElement()
                     ->end()
                     ->append($configNode)
                 ->end()
