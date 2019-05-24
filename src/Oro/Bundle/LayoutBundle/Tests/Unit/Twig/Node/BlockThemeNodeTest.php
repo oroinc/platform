@@ -3,6 +3,12 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig\Node;
 
 use Oro\Bundle\LayoutBundle\Twig\Node\BlockThemeNode;
+use Twig\Compiler;
+use Twig\Environment;
+use Twig\Loader\LoaderInterface;
+use Twig\Node\Expression\ConstantExpression;
+use Twig\Node\Expression\NameExpression;
+use Twig\Node\Node;
 
 class BlockThemeNodeTest extends \PHPUnit\Framework\TestCase
 {
@@ -11,20 +17,21 @@ class BlockThemeNodeTest extends \PHPUnit\Framework\TestCase
 
     public function testCompile()
     {
-        $block = new \Twig_Node(
+        $loader = $this->createMock(LoaderInterface::class);
+        $block = new Node(
             [
-                new \Twig_Node_Expression_Name('layout', 0)
+                new NameExpression('layout', 0)
             ]
         );
-        $resources = new \Twig_Node(
+        $resources = new Node(
             [
-                new \Twig_Node_Expression_Constant('SomeBundle:Layout:blocks.html.twig', 0)
+                new ConstantExpression('SomeBundle:Layout:blocks.html.twig', 0)
             ]
         );
 
         $node = new BlockThemeNode($block, $resources, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new Compiler(new Environment($loader));
 
         $this->assertEquals(
             sprintf(
@@ -35,6 +42,10 @@ class BlockThemeNodeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @param string $name
+     * @return string
+     */
     protected function getVariableGetter($name)
     {
         if (PHP_VERSION_ID >= 70000) {

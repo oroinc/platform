@@ -3,26 +3,45 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig\Node;
 
 use Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode;
+use Twig\Compiler;
+use Twig\Environment;
+use Twig\Loader\LoaderInterface;
+use Twig\Node\Expression\ArrayExpression;
+use Twig\Node\Expression\ConditionalExpression;
+use Twig\Node\Expression\ConstantExpression;
+use Twig\Node\Expression\NameExpression;
+use Twig\Node\Node;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 {
     const RENDER_CALL = '$this->env->getExtension("Oro\Bundle\LayoutBundle\Twig\LayoutExtension")->renderer' .
         '->searchAndRenderBlock';
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LoaderInterface */
+    private $loader;
+
+    public function setUp()
+    {
+        $this->loader = $this->createMock(LoaderInterface::class);
+    }
 
     /**
      * block_widget(block)
      */
     public function testCompileWidget()
     {
-        $arguments = new \Twig_Node(
+        $arguments = new Node(
             [
-                new \Twig_Node_Expression_Name('block', 0),
+                new NameExpression('block', 0),
             ]
         );
 
         $node = new SearchAndRenderBlockNode('block_widget', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new Compiler(new Environment($this->loader));
 
         $this->assertEquals(
             sprintf(
@@ -38,13 +57,13 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
      */
     public function testCompileWidgetWithVariables()
     {
-        $arguments = new \Twig_Node(
+        $arguments = new Node(
             [
-                new \Twig_Node_Expression_Name('block', 0),
-                new \Twig_Node_Expression_Array(
+                new NameExpression('block', 0),
+                new ArrayExpression(
                     [
-                        new \Twig_Node_Expression_Constant('foo', 0),
-                        new \Twig_Node_Expression_Constant('bar', 0),
+                        new ConstantExpression('foo', 0),
+                        new ConstantExpression('bar', 0),
                     ],
                     0
                 ),
@@ -53,7 +72,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('block_widget', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new Compiler(new Environment($this->loader));
 
         $this->assertEquals(
             sprintf(
@@ -69,16 +88,16 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
      */
     public function testCompileLabelWithLabel()
     {
-        $arguments = new \Twig_Node(
+        $arguments = new Node(
             [
-                new \Twig_Node_Expression_Name('block', 0),
-                new \Twig_Node_Expression_Constant('my label', 0),
+                new NameExpression('block', 0),
+                new ConstantExpression('my label', 0),
             ]
         );
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new Compiler(new Environment($this->loader));
 
         $this->assertEquals(
             sprintf(
@@ -94,16 +113,16 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
      */
     public function testCompileLabelWithNullLabel()
     {
-        $arguments = new \Twig_Node(
+        $arguments = new Node(
             [
-                new \Twig_Node_Expression_Name('block', 0),
-                new \Twig_Node_Expression_Constant(null, 0),
+                new NameExpression('block', 0),
+                new ConstantExpression(null, 0),
             ]
         );
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new Compiler(new Environment($this->loader));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -121,16 +140,16 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
      */
     public function testCompileLabelWithEmptyStringLabel()
     {
-        $arguments = new \Twig_Node(
+        $arguments = new Node(
             [
-                new \Twig_Node_Expression_Name('block', 0),
-                new \Twig_Node_Expression_Constant('', 0),
+                new NameExpression('block', 0),
+                new ConstantExpression('', 0),
             ]
         );
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new Compiler(new Environment($this->loader));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -148,15 +167,15 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
      */
     public function testCompileLabelWithDefaultLabel()
     {
-        $arguments = new \Twig_Node(
+        $arguments = new Node(
             [
-                new \Twig_Node_Expression_Name('block', 0),
+                new NameExpression('block', 0),
             ]
         );
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new Compiler(new Environment($this->loader));
 
         $this->assertEquals(
             sprintf(
@@ -172,14 +191,14 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
      */
     public function testCompileLabelWithAttributes()
     {
-        $arguments = new \Twig_Node(
+        $arguments = new Node(
             [
-                new \Twig_Node_Expression_Name('block', 0),
-                new \Twig_Node_Expression_Constant(null, 0),
-                new \Twig_Node_Expression_Array(
+                new NameExpression('block', 0),
+                new ConstantExpression(null, 0),
+                new ArrayExpression(
                     [
-                        new \Twig_Node_Expression_Constant('foo', 0),
-                        new \Twig_Node_Expression_Constant('bar', 0),
+                        new ConstantExpression('foo', 0),
+                        new ConstantExpression('bar', 0),
                     ],
                     0
                 ),
@@ -188,7 +207,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new Compiler(new Environment($this->loader));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -207,16 +226,16 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
      */
     public function testCompileLabelWithLabelAndAttributes()
     {
-        $arguments = new \Twig_Node(
+        $arguments = new Node(
             [
-                new \Twig_Node_Expression_Name('block', 0),
-                new \Twig_Node_Expression_Constant('value in argument', 0),
-                new \Twig_Node_Expression_Array(
+                new NameExpression('block', 0),
+                new ConstantExpression('value in argument', 0),
+                new ArrayExpression(
                     [
-                        new \Twig_Node_Expression_Constant('foo', 0),
-                        new \Twig_Node_Expression_Constant('bar', 0),
-                        new \Twig_Node_Expression_Constant('label', 0),
-                        new \Twig_Node_Expression_Constant('value in attributes', 0),
+                        new ConstantExpression('foo', 0),
+                        new ConstantExpression('bar', 0),
+                        new ConstantExpression('label', 0),
+                        new ConstantExpression('value in attributes', 0),
                     ],
                     0
                 ),
@@ -225,7 +244,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new Compiler(new Environment($this->loader));
 
         $this->assertEquals(
             sprintf(
@@ -241,13 +260,13 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
      */
     public function testCompileLabelWithLabelThatEvaluatesToNull()
     {
-        $arguments = new \Twig_Node(
+        $arguments = new Node(
             [
-                new \Twig_Node_Expression_Name('block', 0),
-                new \Twig_Node_Expression_Conditional(
-                    new \Twig_Node_Expression_Constant(true, 0), // if
-                    new \Twig_Node_Expression_Constant(null, 0), // then
-                    new \Twig_Node_Expression_Constant(null, 0), // else
+                new NameExpression('block', 0),
+                new ConditionalExpression(
+                    new ConstantExpression(true, 0), // if
+                    new ConstantExpression(null, 0), // then
+                    new ConstantExpression(null, 0), // else
                     0
                 ),
             ]
@@ -255,7 +274,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new Compiler(new Environment($this->loader));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -275,21 +294,21 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
      */
     public function testCompileLabelWithLabelThatEvaluatesToNullAndAttributes()
     {
-        $arguments = new \Twig_Node(
+        $arguments = new Node(
             [
-                new \Twig_Node_Expression_Name('block', 0),
-                new \Twig_Node_Expression_Conditional(
-                    new \Twig_Node_Expression_Constant(true, 0), // if
-                    new \Twig_Node_Expression_Constant(null, 0), // then
-                    new \Twig_Node_Expression_Constant(null, 0), // else
+                new NameExpression('block', 0),
+                new ConditionalExpression(
+                    new ConstantExpression(true, 0), // if
+                    new ConstantExpression(null, 0), // then
+                    new ConstantExpression(null, 0), // else
                     0
                 ),
-                new \Twig_Node_Expression_Array(
+                new ArrayExpression(
                     [
-                        new \Twig_Node_Expression_Constant('foo', 0),
-                        new \Twig_Node_Expression_Constant('bar', 0),
-                        new \Twig_Node_Expression_Constant('label', 0),
-                        new \Twig_Node_Expression_Constant('value in attributes', 0),
+                        new ConstantExpression('foo', 0),
+                        new ConstantExpression('bar', 0),
+                        new ConstantExpression('label', 0),
+                        new ConstantExpression('value in attributes', 0),
                     ],
                     0
                 ),
@@ -298,7 +317,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new Compiler(new Environment($this->loader));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -316,15 +335,15 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
     public function testCompileParentBlockWidget()
     {
-        $arguments = new \Twig_Node(
+        $arguments = new Node(
             [
-                new \Twig_Node_Expression_Name('block', 0),
+                new NameExpression('block', 0),
             ]
         );
 
         $node = new SearchAndRenderBlockNode('parent_block_widget', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new Compiler(new Environment($this->loader));
 
         $this->assertEquals(
             self::RENDER_CALL . '($context[\'block\'], \'widget\', $context, true)',
@@ -332,7 +351,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function getVariableGetter($name)
+    private function getVariableGetter($name)
     {
         if (PHP_VERSION_ID >= 70000) {
             return sprintf('($context["%s"] ?? null)', $name);
