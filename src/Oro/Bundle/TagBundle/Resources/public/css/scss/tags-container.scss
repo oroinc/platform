@@ -30,7 +30,8 @@
         line-height: $tag-item-line-height;
         transition: $hover-transition;
         height: $tag-item-height;
-
+        white-space: nowrap;
+        
         &:hover,
         &:focus {
             color: $tag-item-color;
