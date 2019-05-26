@@ -1183,6 +1183,10 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setCriteria($criteria);
         self::assertSame($criteria, $this->context->getCriteria());
         self::assertSame($criteria, $this->context->get(Context::CRITERIA));
+
+        $this->context->setCriteria();
+        self::assertNull($this->context->getCriteria());
+        self::assertFalse($this->context->has(Context::CRITERIA));
     }
 
     /**

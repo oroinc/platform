@@ -94,8 +94,8 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
             ]
         ];
 
-        $expectedQueryBuilder = $this->doctrineHelper->getEntityRepositoryForClass($parentClassName)
-            ->createQueryBuilder('e')
+        $expectedQueryBuilder = $this->doctrineHelper
+            ->createQueryBuilder($parentClassName, 'e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $parentId);
         $this->entitySerializer->expects(self::once())
@@ -142,8 +142,8 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
             ]
         ];
 
-        $expectedQueryBuilder = $this->doctrineHelper->getEntityRepositoryForClass($parentClassName)
-            ->createQueryBuilder('e')
+        $expectedQueryBuilder = $this->doctrineHelper
+            ->createQueryBuilder($parentClassName, 'e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $parentId);
         $this->entitySerializer->expects(self::once())
@@ -195,8 +195,8 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
             ]
         ];
 
-        $expectedQueryBuilder = $this->doctrineHelper->getEntityRepositoryForClass($parentClassName)
-            ->createQueryBuilder('e')
+        $expectedQueryBuilder = $this->doctrineHelper
+            ->createQueryBuilder($parentClassName, 'e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $parentId);
         $this->entitySerializer->expects(self::once())
@@ -246,8 +246,8 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
             ]
         ];
 
-        $expectedQueryBuilder = $this->doctrineHelper->getEntityRepositoryForClass($parentClassName)
-            ->createQueryBuilder('e')
+        $expectedQueryBuilder = $this->doctrineHelper
+            ->createQueryBuilder($parentClassName, 'e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $parentId);
         $this->entitySerializer->expects(self::once())
@@ -289,8 +289,8 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
             ['id' => $parentId, $associationName => null]
         ];
 
-        $expectedQueryBuilder = $this->doctrineHelper->getEntityRepositoryForClass($parentClassName)
-            ->createQueryBuilder('e')
+        $expectedQueryBuilder = $this->doctrineHelper
+            ->createQueryBuilder($parentClassName, 'e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $parentId);
         $this->entitySerializer->expects(self::once())
@@ -322,8 +322,8 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
 
         $loadedData = [];
 
-        $expectedQueryBuilder = $this->doctrineHelper->getEntityRepositoryForClass($parentClassName)
-            ->createQueryBuilder('e')
+        $expectedQueryBuilder = $this->doctrineHelper
+            ->createQueryBuilder($parentClassName, 'e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $parentId);
         $this->entitySerializer->expects(self::once())

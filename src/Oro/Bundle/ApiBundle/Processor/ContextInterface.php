@@ -242,9 +242,9 @@ interface ContextInterface extends ComponentContextInterface
     /**
      * Sets the Criteria object is used to add additional restrictions to a query is used to get result data.
      *
-     * @param Criteria $criteria
+     * @param Criteria|null $criteria
      */
-    public function setCriteria($criteria);
+    public function setCriteria(Criteria $criteria = null);
 
     /**
      * Whether any error happened during the processing of an action.

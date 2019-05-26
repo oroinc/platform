@@ -103,7 +103,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         $config = new EntityDefinitionConfig();
         $totalCount = 123;
 
-        $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder($entityClass, 'e');
         $query->setFirstResult(20);
         $query->setMaxResults(10);
 
@@ -142,7 +142,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         $config = new EntityDefinitionConfig();
         $totalCount = 123;
 
-        $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder($entityClass, 'e');
         $query->setFirstResult(20);
         $query->setMaxResults(10);
 

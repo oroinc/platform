@@ -51,26 +51,6 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     /**
      * {@inheritdoc}
      */
-    public function has($key)
-    {
-        return \array_key_exists($key, $this->items);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function get($key, $defaultValue = null)
-    {
-        if (!\array_key_exists($key, $this->items)) {
-            return $defaultValue;
-        }
-
-        return $this->items[$key];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function set($key, $value)
     {
         if (null !== $value) {
@@ -78,14 +58,6 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
         } else {
             unset($this->items[$key]);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function remove($key)
-    {
-        unset($this->items[$key]);
     }
 
     /**

@@ -13,6 +13,9 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
 
+/**
+ * The base class for processors that load data for different kind of custom associations.
+ */
 abstract class LoadCustomAssociation implements ProcessorInterface
 {
     /** @var EntitySerializer */
@@ -149,7 +152,7 @@ abstract class LoadCustomAssociation implements ProcessorInterface
      */
     protected function getQueryBuilder($parentEntityClass, $parentEntityId, EntityMetadata $parentEntityMetadata)
     {
-        $query = $this->doctrineHelper->getEntityRepositoryForClass($parentEntityClass)->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder($parentEntityClass, 'e');
         $this->entityIdHelper->applyEntityIdentifierRestriction(
             $query,
             $parentEntityId,

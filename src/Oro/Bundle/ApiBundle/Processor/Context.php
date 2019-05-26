@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
+use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
@@ -356,9 +357,13 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function setCriteria($criteria)
+    public function setCriteria(Criteria $criteria = null)
     {
-        $this->set(self::CRITERIA, $criteria);
+        if ($criteria) {
+            $this->set(self::CRITERIA, $criteria);
+        } else {
+            $this->remove(self::CRITERIA);
+        }
     }
 
     /**

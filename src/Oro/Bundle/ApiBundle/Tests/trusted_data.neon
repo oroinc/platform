@@ -33,7 +33,7 @@ trusted_data:
             __all__: true
             walkComparisonExpression: [1, 2, 3]
         Oro\Bundle\ApiBundle\Util\DoctrineHelper:
-            createQueryBuilder: true
+            createQueryBuilder: [1, 2]
 
     check_methods_safety:
         Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor:

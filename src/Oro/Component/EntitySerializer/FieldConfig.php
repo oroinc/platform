@@ -63,6 +63,56 @@ class FieldConfig
     }
 
     /**
+     * Checks whether the configuration attribute exists.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function has($key)
+    {
+        return \array_key_exists($key, $this->items);
+    }
+
+    /**
+     * Gets the configuration value.
+     *
+     * @param string $key
+     * @param mixed  $defaultValue
+     *
+     * @return mixed
+     */
+    public function get($key, $defaultValue = null)
+    {
+        if (!\array_key_exists($key, $this->items)) {
+            return $defaultValue;
+        }
+
+        return $this->items[$key];
+    }
+
+    /**
+     * Sets the configuration value.
+     *
+     * @param string $key
+     * @param mixed  $value
+     */
+    public function set($key, $value)
+    {
+        $this->items[$key] = $value;
+    }
+
+    /**
+     * Removes the configuration value.
+     *
+     * @param string $key
+     */
+    public function remove($key)
+    {
+        unset($this->items[$key]);
+    }
+
+    /**
      * Gets the configuration of the target entity if the field represents an association with another entity.
      *
      * @return EntityConfig|null

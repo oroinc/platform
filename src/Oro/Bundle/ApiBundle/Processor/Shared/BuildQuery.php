@@ -3,31 +3,24 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Builds ORM QueryBuilder object that will be used to get a list of entities
- * based on the Criteria object.
+ * Builds ORM QueryBuilder object that will be used to get a list of entities.
  */
 class BuildQuery implements ProcessorInterface
 {
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var CriteriaConnector */
-    protected $criteriaConnector;
+    private $doctrineHelper;
 
     /**
-     * @param DoctrineHelper    $doctrineHelper
-     * @param CriteriaConnector $criteriaConnector
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper, CriteriaConnector $criteriaConnector)
+    public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
-        $this->criteriaConnector = $criteriaConnector;
     }
 
     /**
@@ -42,12 +35,6 @@ class BuildQuery implements ProcessorInterface
             return;
         }
 
-        $criteria = $context->getCriteria();
-        if (null === $criteria) {
-            // the criteria object does not exist
-            return;
-        }
-
         $entityClass = $this->doctrineHelper->getManageableEntityClass(
             $context->getClassName(),
             $context->getConfig()
@@ -57,9 +44,8 @@ class BuildQuery implements ProcessorInterface
             return;
         }
 
-        $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
-        $this->criteriaConnector->applyCriteria($query, $criteria);
-
-        $context->setQuery($query);
+        $context->setQuery(
+            $this->doctrineHelper->createQueryBuilder($entityClass, 'e')
+        );
     }
 }

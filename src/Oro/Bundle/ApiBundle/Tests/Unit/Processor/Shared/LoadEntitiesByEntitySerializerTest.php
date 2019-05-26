@@ -51,7 +51,7 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
     {
         $entityClass = Group::class;
 
-        $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder($entityClass, 'e');
 
         $this->configProvider->expects(self::once())
             ->method('getConfig')
@@ -68,7 +68,7 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
     {
         $entityClass = Group::class;
 
-        $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder($entityClass, 'e');
 
         $data = [new Group()];
 
