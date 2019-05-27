@@ -81,6 +81,10 @@ $input-focus-border-color: $secondary;
 $input-btn-mobile-padding-y: 0;
 $input-btn-mobile-padding-x: 16px;
 
+$custom-select-padding-x: .375rem; // set original bootstrap value because chain value in 'px'
+$custom-control-indicator-size: 16px; // default 1rem it is equal to default font size 16px;
+$custom-control-gutter: 8px; // default .5rem it is equal to half of default font size 16px;
+
 $btn-line-height: 32px;
 $btn-square-line-height: 28px;
 
@@ -322,7 +326,7 @@ $large-screen:                          1920px;
 // );
 
 // Bootstrap and its default variables
-@import "bowerassets/bootstrap/scss/_variables";
+@import "npmassets/bootstrap/scss/variables";
 
 // Remove unnecessary default theme colors
 // $theme-colors: map-remove($theme-colors, "info", "light", "dark");

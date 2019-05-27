@@ -34,7 +34,7 @@
                 {% set locale = translationsFields.vars.name %}
 
                 <li class="nav-item{% if (app.request.locale == locale) %} active{% endif %}">
-                    <a href="javascript:void(0);" data-target=".oro_translationsFields-{{ locale }}" data-toggle="tab">
+                    <a href="#" data-target=".oro_translationsFields-{{ locale }}" data-toggle="tab">
                         {{ locale|capitalize }} {% if isDefaultLocale %}[Default]{% endif %}
                     </a>
                 </li>

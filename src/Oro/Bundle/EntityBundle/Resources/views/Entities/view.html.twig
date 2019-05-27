@@ -52,6 +52,7 @@
             'data':  [entityConfig.renderDynamicFields(entity, entity_class)]
         }]
     }] } %}
+    {% set id = 'entityView' %}
 
     {{ parent() }}
 {% endblock content_data %}

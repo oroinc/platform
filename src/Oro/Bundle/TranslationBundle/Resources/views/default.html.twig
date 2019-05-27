@@ -5,7 +5,7 @@
             {% set locale = translationsFields.vars.name %}
 
             <li class="nav-item{% if app.request.locale == locale %} active{% endif %}">
-                <a href="javascript:void(0)" data-toggle="tab" data-target=".oro_translationsFields-{{ locale }}" class="nav-link">
+                <a href="#" data-toggle="tab" data-target=".oro_translationsFields-{{ locale }}" class="nav-link">
                    {{ locale|capitalize }}
                 </a>
             </li>
@@ -37,7 +37,7 @@
                     {% set locale = translationsFields.vars.name %}
 
                     <li class="nav-item{% if app.request.locale == locale %} active{% endif %}">
-                        <a href="javascript:void(0)" data-toggle="tab" data-target=".oro_translationsFields-{{ locale }}" class="nav-link">
+                        <a href="#" data-toggle="tab" data-target=".oro_translationsFields-{{ locale }}" class="nav-link">
                             {{ locale|capitalize }} {% if isDefaultLocale %}[Default]{% endif %}
                         </a>
                     </li>
