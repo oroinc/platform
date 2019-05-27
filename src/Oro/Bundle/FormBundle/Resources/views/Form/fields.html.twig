@@ -393,7 +393,7 @@
                 {% endif %}
             </div>
             {% if allow_add %}
-            <a class="btn add-list-item" href="javascript: void(0);">{{ form.vars.add_label|default('oro.form.collection.add')|trans }}</a>
+            <a class="btn add-list-item" href="#">{{ form.vars.add_label|default('oro.form.collection.add')|trans }}</a>
             {% endif %}
         </div>
         {% if handle_primary and (prototype is not defined or prototype.primary is defined) %}
@@ -469,7 +469,7 @@
 
     <div class="create-select-entity-container clearfix">
         <div id="{{ btnGroupId }}" class="buttons-container">
-            <a href="javascript:void(0)" class="entity-select-btn" title="{{ 'Choose'|trans }}"{% if disabled or (attr.readonly is defined and attr.readonly) %} disabled="disabled"{% endif %}>
+            <a href="#" class="entity-select-btn" title="{{ 'Choose'|trans }}"{% if disabled or (attr.readonly is defined and attr.readonly) %} disabled="disabled"{% endif %}>
                 <span
                     data-label="{{ 'Choose Existing'|trans }}"
                     data-alt-label-view="{{ 'Choose Another'|trans }}"
@@ -482,11 +482,11 @@
                 </span>
             </a>
 
-            <a href="javascript:void(0)" class="entity-create-btn" title="{{ 'Create New'|trans }}"{% if disabled or (attr.readonly is defined and attr.readonly) %} disabled="disabled"{% endif %}>
+            <a href="#" class="entity-create-btn" title="{{ 'Create New'|trans }}"{% if disabled or (attr.readonly is defined and attr.readonly) %} disabled="disabled"{% endif %}>
                 <span>{{ 'Create New'|trans }}</span>
             </a>
 
-            <a href="javascript:void(0)" class="entity-cancel-btn" title="{{ 'Cancel'|trans }}"{% if disabled or (attr.readonly is defined and attr.readonly) %} disabled="disabled"{% endif %}>
+            <a href="#" class="entity-cancel-btn" title="{{ 'Cancel'|trans }}"{% if disabled or (attr.readonly is defined and attr.readonly) %} disabled="disabled"{% endif %}>
                 <span>{{ 'Cancel'|trans }}</span>
             </a>
         </div>
