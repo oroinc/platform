@@ -79,7 +79,7 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
             $fieldName,
             $parameterName,
             $this->getName(),
-            in_array($comparisonType, [DictionaryFilterType::NOT_EQUAL, DictionaryFilterType::TYPE_NOT_IN], true)
+            in_array($comparisonType, [DictionaryFilterType::NOT_EQUAL, DictionaryFilterType::TYPE_NOT_IN], false)
         );
     }
 
