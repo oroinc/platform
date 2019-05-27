@@ -7,6 +7,30 @@ use Oro\Component\EntitySerializer\FieldConfig;
 
 class EntityConfigTest extends \PHPUnit\Framework\TestCase
 {
+    public function testCustomAttribute()
+    {
+        $attrName = 'test';
+
+        $entityConfig = new EntityConfig();
+        self::assertFalse($entityConfig->has($attrName));
+        self::assertNull($entityConfig->get($attrName));
+
+        $entityConfig->set($attrName, null);
+        self::assertTrue($entityConfig->has($attrName));
+        self::assertNull($entityConfig->get($attrName));
+        self::assertEquals([$attrName => null], $entityConfig->toArray());
+
+        $entityConfig->set($attrName, false);
+        self::assertTrue($entityConfig->has($attrName));
+        self::assertFalse($entityConfig->get($attrName));
+        self::assertEquals([$attrName => false], $entityConfig->toArray());
+
+        $entityConfig->remove($attrName);
+        self::assertFalse($entityConfig->has($attrName));
+        self::assertNull($entityConfig->get($attrName));
+        self::assertSame([], $entityConfig->toArray());
+    }
+
     public function testToArray()
     {
         $entityConfig = new EntityConfig();

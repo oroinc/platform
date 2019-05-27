@@ -50,7 +50,7 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
     {
         $entityClass = Group::class;
 
-        $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder($entityClass, 'e');
 
         $this->configProvider->expects(self::once())
             ->method('getConfig')
@@ -70,7 +70,7 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
     {
         $entityClass = Group::class;
 
-        $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder($entityClass, 'e');
 
         $entityDefinitionConfig = new EntityDefinitionConfig();
         $config = new Config();

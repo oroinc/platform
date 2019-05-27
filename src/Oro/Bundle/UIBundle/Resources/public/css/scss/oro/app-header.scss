@@ -213,6 +213,11 @@
                             display: none;
                         }
 
+                        // Don't hide suggestion list immediately after search input loses focus as it prevents clicking on links in Firefox
+                        input.search:not(:focus) + .search-suggestion-list:hover {
+                            display: block;
+                        }
+
                         input.search:not(:focus) + .search-suggestion-list + .no-data {
                             display: none !important;
                         }

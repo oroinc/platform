@@ -5,6 +5,9 @@ namespace Oro\Bundle\UserBundle\Autocomplete;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\FormBundle\Autocomplete\FullNameSearchHandler;
 
+/**
+ * Autocomplete search handler for users.
+ */
 class UserSearchHandler extends FullNameSearchHandler
 {
     const IMAGINE_AVATAR_FILTER = 'avatar_xsmall';

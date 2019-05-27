@@ -41,7 +41,7 @@
         {% for repo in form.repositories %}
             {% include 'OroDistributionBundle:Settings:repo_prototype.html.twig' with { 'repo': repo } %}
         {% endfor %}
-        <a href="javascript:void(0);" id="add_repo_link">{{ 'oro.distribution.settings.add_repository'|trans }}</a>
+        <a href="#" id="add_repo_link">{{ 'oro.distribution.settings.add_repository'|trans }}</a>
     </fieldset>
 
 

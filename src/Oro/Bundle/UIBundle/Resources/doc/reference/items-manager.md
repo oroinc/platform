@@ -64,9 +64,9 @@ Define template for item in list:
         <td><%= func %></td>
         <td><%= sorting %></td>
         <td class="action-cell">
-            <a href="javascript: void(0);" data-collection-action="edit">
+            <a href="#" data-collection-action="edit">
                 <i class="fa-pencil-square-o hide-text"></i></a>
-            <a href="javascript: void(0);" data-collection-action="delete" data-message="Delete?">
+            <a href="#" data-collection-action="delete" data-message="Delete?">
                 <i class="fa-trash-o hide-text"></i></a>
         </td>
     </tr>

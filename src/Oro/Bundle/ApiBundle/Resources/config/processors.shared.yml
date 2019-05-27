@@ -599,7 +599,6 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.criteria_connector'
         tags:
             - { name: oro.api.processor, action: get_list, group: build_query, priority: -100 }
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -100 }
@@ -610,10 +609,20 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemQuery
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.criteria_connector'
             - '@oro_api.entity_id_helper'
         tags:
             - { name: oro.api.processor, action: get, group: build_query, priority: -100 }
+
+    oro_api.apply_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ApplyCriteria
+        arguments:
+            - '@oro_api.criteria_connector'
+        tags:
+            - { name: oro.api.processor, action: get, group: build_query, priority: -110 }
+            - { name: oro.api.processor, action: get_list, group: build_query, priority: -110 }
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -110 }
+            - { name: oro.api.processor, action: get_subresource, group: build_query, priority: -110 }
+            - { name: oro.api.processor, action: get_relationship, group: build_query, priority: -110 }
 
     oro_api.subresource.add_parent_entity_id_to_query:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\AddParentEntityIdToQuery

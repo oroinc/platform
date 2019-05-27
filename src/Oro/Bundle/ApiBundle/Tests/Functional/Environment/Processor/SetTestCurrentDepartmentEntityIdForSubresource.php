@@ -29,8 +29,7 @@ class SetTestCurrentDepartmentEntityIdForSubresource implements ProcessorInterfa
         /** @var SubresourceContext $context */
 
         $rows = $this->doctrineHelper
-            ->getEntityRepositoryForClass(TestDepartment::class)
-            ->createQueryBuilder('e')
+            ->createQueryBuilder(TestDepartment::class, 'e')
             ->select('e.id')
             ->where('e.name = :name')
             ->setParameter('name', 'Current Department')

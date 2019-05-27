@@ -58,7 +58,7 @@
         <ul class="nav">
             <% _.each(variables, function(variable, varName) { %>
             <li>
-                <a href="javascript:void(0);"
+                <a href="#"
                    class="variable"
                    title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= root %>.<%= varName %><% if(variable.filter){%>|<%= variable.filter %><% } %> }}{% endverbatim %}</a>
                 <span>&ndash; <%= variable.label %></span>
@@ -68,7 +68,7 @@
     </script>
     <script type="text/template" id="oro-email-template-variables-entity-variable-template">
         <li>
-            <a href="javascript:void(0);"
+            <a href="#"
                class="variable"
                title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>"
             >{% verbatim %}{{ <%= varValue %> }}{% endverbatim %}</a>
@@ -93,7 +93,7 @@
             <% breadcrumbItemLabel = (i === 0 ? entityLabel : pathLabels[breadcrumbs[i]]); %>
             <li<% if (i === breadcrumbs.length - 1) { %> class="active"<% } %>>
                 <% if (i !== breadcrumbs.length - 1) { %>
-                <a href="javascript:void(0);"
+                <a href="#"
                    class="reference"
                    data-path="<%= breadcrumbPath.substring(root.length + 1) %>"><%= breadcrumbItemLabel %></a>
                 <span class="divider">/&nbsp;</span>
@@ -158,7 +158,7 @@
                 <ul class="nav">
                     <% _.each(relations, function(variable, varName) { %>
                     <li>
-                        <a href="javascript:void(0);"
+                        <a href="#"
                            class="reference"
                            data-path="<%= path + '/' + varName %>"
                            title="<%= _.__('oro.email.emailtemplate.reference_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a>

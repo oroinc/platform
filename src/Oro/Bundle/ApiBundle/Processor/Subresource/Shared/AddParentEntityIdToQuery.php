@@ -3,7 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -17,8 +20,10 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class AddParentEntityIdToQuery implements ProcessorInterface
 {
+    public const PARENT_ENTITY_ID_QUERY_PARAM_NAME = 'parent_entity_id';
+
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /**
      * @param DoctrineHelper $doctrineHelper
@@ -41,61 +46,136 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             return;
         }
 
-        if (null === QueryBuilderUtil::getSingleRootAlias($query, false)) {
+        $rootAlias = QueryBuilderUtil::getSingleRootAlias($query, false);
+        if (null === $rootAlias) {
             // only queries with one root entity is supported
             return;
         }
 
-        $parentConfig = $context->getParentConfig();
-        $path = ConfigUtil::explodePropertyPath($this->getAssociationName($context));
+        $associationName = $this->getAssociationName($context);
+        if (ConfigUtil::IGNORE_PROPERTY_PATH !== $associationName) {
+            $parentConfig = $context->getParentConfig();
+            $parentJoinAlias = $this->joinParentEntity(
+                $query,
+                $rootAlias,
+                $parentConfig,
+                $context->getParentClassName(),
+                $associationName,
+                $context->isCollection()
+            );
+            $this->addParentEntityIdToWhereClause(
+                $query,
+                $parentJoinAlias,
+                $context->getParentId(),
+                $parentConfig
+            );
+        } elseif (!$this->isParentEntityIdExistInQuery($query)) {
+            throw new RuntimeException('The query is not valid. Reason: the parent entity ID is not set.');
+        }
+    }
+
+    /**
+     * @param QueryBuilder $query
+     *
+     * @return bool
+     */
+    private function isParentEntityIdExistInQuery(QueryBuilder $query): bool
+    {
+        /** @var Parameter[] $parameters */
+        $parameters = $query->getParameters();
+        foreach ($parameters as $parameter) {
+            if (0 === strpos($parameter->getName(), self::PARENT_ENTITY_ID_QUERY_PARAM_NAME)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param QueryBuilder           $query
+     * @param string                 $queryRootAlias
+     * @param EntityDefinitionConfig $parentConfig
+     * @param string                 $parentClassName
+     * @param string                 $associationName
+     * @param bool                   $isCollection
+     *
+     * @return string the alias of joined parent entity
+     */
+    private function joinParentEntity(
+        QueryBuilder $query,
+        string $queryRootAlias,
+        EntityDefinitionConfig $parentConfig,
+        string $parentClassName,
+        string $associationName,
+        bool $isCollection
+    ): string {
+        $parentJoinAlias = $queryRootAlias;
+        $path = ConfigUtil::explodePropertyPath($associationName);
         $pathLength = count($path);
-        $parentJoinAlias = 'e';
         for ($i = 1; $i <= $pathLength; $i++) {
-            $fieldName = $path[$pathLength - $i];
+            $joinFieldName = $path[$pathLength - $i];
             $joinAlias = sprintf('parent_entity%d', $i);
             $parentPath = array_slice($path, 0, -$i);
             if (empty($parentPath)) {
-                $parentClassName = $context->getParentClassName();
-                if (!$this->doctrineHelper->isManageableEntityClass($parentClassName)) {
+                $joinParentClassName = $parentClassName;
+                if (!$this->doctrineHelper->isManageableEntityClass($joinParentClassName)) {
                     $parentResourceClass = $parentConfig->getParentResourceClass();
-                    if ($parentResourceClass && $this->doctrineHelper->isManageableEntityClass($parentResourceClass)) {
-                        $parentClassName = $parentResourceClass;
+                    if ($parentResourceClass
+                        && $this->doctrineHelper->isManageableEntityClass($parentResourceClass)
+                    ) {
+                        $joinParentClassName = $parentResourceClass;
                     }
                 }
-                $isCollection = $context->isCollection();
+                $joinIsCollection = $isCollection;
             } else {
                 $parentFieldConfig = $parentConfig->findFieldByPath($parentPath, true);
-                $parentClassName = $parentFieldConfig->getTargetClass();
-                $isCollection = $parentFieldConfig->getTargetEntity()
-                    ->findField($fieldName, true)
+                $joinParentClassName = $parentFieldConfig->getTargetClass();
+                $joinIsCollection = $parentFieldConfig->getTargetEntity()
+                    ->findField($joinFieldName, true)
                     ->isCollectionValuedAssociation();
             }
             $this->addJoinToParentEntity(
                 $query,
-                $parentClassName,
-                $fieldName,
-                $isCollection,
+                $joinParentClassName,
+                $joinFieldName,
+                $joinIsCollection,
                 $joinAlias,
                 $parentJoinAlias
             );
             $parentJoinAlias = $joinAlias;
         }
 
-        $parentId = $context->getParentId();
+        return $parentJoinAlias;
+    }
+
+    /**
+     * @param QueryBuilder           $query
+     * @param string                 $parentJoinAlias
+     * @param mixed                  $parentId
+     * @param EntityDefinitionConfig $parentConfig
+     */
+    private function addParentEntityIdToWhereClause(
+        QueryBuilder $query,
+        string $parentJoinAlias,
+        $parentId,
+        EntityDefinitionConfig $parentConfig
+    ): void {
         $parentIdFieldNames = $parentConfig->getIdentifierFieldNames();
         if (!is_array($parentId) && count($parentIdFieldNames) === 1) {
             $query
                 ->andWhere(QueryBuilderUtil::sprintf(
-                    '%s.%s = :parent_entity_id',
+                    '%s.%s = :%s',
                     $parentJoinAlias,
-                    $parentConfig->getField($parentIdFieldNames[0])->getPropertyPath($parentIdFieldNames[0])
+                    $parentConfig->getField($parentIdFieldNames[0])->getPropertyPath($parentIdFieldNames[0]),
+                    self::PARENT_ENTITY_ID_QUERY_PARAM_NAME
                 ))
-                ->setParameter('parent_entity_id', $parentId);
+                ->setParameter(self::PARENT_ENTITY_ID_QUERY_PARAM_NAME, $parentId);
         } else {
             $i = 0;
             foreach ($parentIdFieldNames as $fieldName) {
                 $i++;
-                $parameterName = sprintf('parent_entity_id%d', $i);
+                $parameterName = sprintf('%s%d', self::PARENT_ENTITY_ID_QUERY_PARAM_NAME, $i);
                 $query
                     ->andWhere(QueryBuilderUtil::sprintf(
                         '%s.%s = :%s',
@@ -116,7 +196,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
      * @param string       $joinAlias
      * @param string|null  $parentJoinAlias
      */
-    protected function addJoinToParentEntity(
+    private function addJoinToParentEntity(
         QueryBuilder $query,
         $parentClassName,
         $associationName,
@@ -157,7 +237,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
      *
      * @return string|null
      */
-    protected function getAssociationName(SubresourceContext $context)
+    private function getAssociationName(SubresourceContext $context)
     {
         $associationName = $context->getAssociationName();
         $propertyPath = $context->getParentConfig()
@@ -173,7 +253,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
      *
      * @return string|null
      */
-    protected function getJoinFieldName($parentClassName, $associationName)
+    private function getJoinFieldName($parentClassName, $associationName)
     {
         $parentMetadata = $this->doctrineHelper->getEntityMetadataForClass($parentClassName);
         if (!$parentMetadata->hasAssociation($associationName)) {

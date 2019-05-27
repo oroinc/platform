@@ -31,7 +31,12 @@ class GetAndDeleteTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType($entityClass);
 
         // test "get list" request
-        $response = $this->cget(['entity' => $entityType, 'page[size]' => 1]);
+        $response = $this->cget(['entity' => $entityType], ['page[size]' => 1], [], false);
+        if ($response->getStatusCode() === 400) {
+            $response = $this->cget(['entity' => $entityType], [], [], false);
+        }
+        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, ApiActions::GET_LIST);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
 
         $id = $this->getFirstEntityId(self::jsonToArray($response->getContent()));
         if (null !== $id) {
@@ -65,7 +70,12 @@ class GetAndDeleteTest extends RestJsonApiTestCase
         }
 
         $entityType = $this->getEntityType($entityClass);
-        $response = $this->cget(['entity' => $entityType], ['page[size]' => 1]);
+        $response = $this->cget(['entity' => $entityType], ['page[size]' => 1], [], false);
+        if ($response->getStatusCode() === 400) {
+            $response = $this->cget(['entity' => $entityType], [], [], false);
+        }
+        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, ApiActions::GET_LIST);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
 
         $content = self::jsonToArray($response->getContent());
         if (!empty($content['data'])) {
