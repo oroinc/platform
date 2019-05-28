@@ -21,14 +21,14 @@ $table-td-nowrap-ellipsis-div-overflow: hidden !default;
 $table-td-nowrap-ellipsis-div-text-overflow: ellipsis !default;
 $table-td-nowrap-ellipsis-div-width: 100% !default;
 
-$table-thead-th-background: $primary-600 !default;
+$table-thead-th-background: $primary-200 !default;
 $table-thead-th-font-size: $base-font-size--xs !default;
 $table-thead-th-color: $primary-inverse !default;
 $table-thead-th-padding: 11px 8px !default;
 $table-thead-th-white-space: nowrap !default;
 $table-thead-th-vertical-align: top !default;
 $table-thead-th-text-transform: uppercase !default;
-$table-bordered-thead-th-border-color: $primary-600 !default;
+$table-bordered-thead-th-border-color: $primary-200 !default;
 
 $table-thead-th-a-color: inherit !default;
 $table-thead-th-a-display: block !default;
@@ -69,7 +69,7 @@ $table-tbody-td-border-top: 1px solid $primary-860 !default;
 $table-tbody-td-border-bottom: 1px solid $primary-860 !default;
 $table-tbody-td-offset: $content-padding-small !default;
 
-$table-tfoot-th-background: $primary-600 !default;
+$table-tfoot-th-background: $primary-200 !default;
 $table-tfoot-th-inner-offset: ($content-padding-small / 2) $content-padding-small !default;
 
 $table-dl-offset: 0 0 15px !default;
