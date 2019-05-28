@@ -42,9 +42,9 @@ $btn-square-icon-dropdown-toggle-fa-left: $content-padding-small !default;
 $btn-theme: (
     'background': $primary-830,
     'border': $primary-830,
-    'color': $primary-400,
-    'hover-color': $primary-400,
-    'active-color': $primary-400,
+    'color': $primary-100,
+    'hover-color': $primary-100,
+    'active-color': $primary-100,
     'active-box-shadow': inset 0 2px 3px 2px rgba(0, 0, 0, .21),
     'focus-box-shadow': (inset 0 0 0 2px $secondary-100, 0 0 6px 0 rgba($secondary-100, .8))
 ) !default;
@@ -118,7 +118,11 @@ $btn-theme-warning: (
 
 $btn-theme-danger: (
     'background': $danger,
-    'border': $danger
+    'border': $danger,
+    'hover-background': $danger-dark,
+    'hover-border': $danger-dark,
+    'active-background': $danger-dark,
+    'active-border': $danger-dark,
 ) !default;
 
 $btn-theme-dark: (
