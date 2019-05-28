@@ -12,11 +12,12 @@
         border-radius: $scrollspy-nav-border-radius;
 
         position: $scrollspy-nav-position;
+        z-index: $scrollspy-nav-z-index;
 
         @include clearfix();
 
         &:after {
-            content: "";
+            content: '';
             position: absolute;
             pointer-events: none;
             bottom: -$scrollspy-nav-gradient-height;
@@ -24,7 +25,6 @@
             right: 0;
             height: $scrollspy-nav-gradient-height;
             background: $scrollspy-nav-gradient;
-            z-index: $scrollspy-nav-gradient-z-index;
         }
 
         &-target {
