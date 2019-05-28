@@ -220,6 +220,27 @@ define(function(require) {
                 }
             });
             $container.data('attachedWidgetsCount', 0);
+        },
+
+        /**
+         * Finds all input widgets in container, all or determined type
+         *
+         * @param {jQuery} $container
+         * @param {Object} [Constructor] - type of widgets what are searched
+         * @returns {Array.<Object>}
+         */
+        findWidgetsInContainer: function($container, Constructor) {
+            var widgets = [];
+
+            $container.find('[data-bound-input-widget]').each(function(i, el) {
+                var widget = this.getWidget($(el));
+
+                if (widget && (!_.isObject(Constructor) || widget instanceof Constructor)) {
+                    widgets.push(widget);
+                }
+            }.bind(this));
+
+            return widgets;
         }
     };
 
