@@ -4,12 +4,16 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var Select2 = require('jquery.select2');
+    var tools = require('oroui/js/tools');
+
     require('oroui/js/select2-l10n');
 
     // disable scroll on IOS when select2 drop is visible
-    $(document).on('wheel mousewheel touchmove keydown', '#select2-drop-mask', function(e) {
-        e.preventDefault();
-    });
+    if (tools.isIOS()) {
+        $(document).on('wheel mousewheel touchmove keydown', '#select2-drop-mask', function(e) {
+            e.preventDefault();
+        });
+    }
 
     $('body').on('click', function(e) {
         // Fixes issue with extra click event in Safari browser. It triggers click event on body, even though
@@ -264,6 +268,8 @@ define(function(require) {
         var init = prototype.init;
         var destroy = prototype.destroy;
 
+        prototype.dropdownFixedMode = false;
+
         prototype.prepareOpts = function(options) {
             if (options.collapsibleResults) {
                 options.populateResults = populateCollapsibleResults;
@@ -284,6 +290,21 @@ define(function(require) {
         prototype.positionDropdown = function() {
             var $container = this.container;
             positionDropdown.apply(this, arguments);
+
+            if (this.dropdownFixedMode) {
+                var top = this.container[0].getBoundingClientRect().top;
+
+                if (this.dropdown.hasClass('select2-drop-above')) {
+                    top -= this.dropdown.height();
+                } else {
+                    top += this.container.outerHeight(false);
+                }
+
+                this.dropdown.css({position: 'fixed', top: top});
+            } else if (this.dropdown.css('position') === 'fixed') {
+                this.dropdown.css('position', '');
+            }
+
             var dialogIsBelow = $container.hasClass('select2-dropdown-open') &&
                 !$container.hasClass('select2-drop-above');
             if ($container.parent().hasClass(select2DropBelowClassName) !== dialogIsBelow) {
