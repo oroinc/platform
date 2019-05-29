@@ -230,7 +230,7 @@ class ConfigController extends Controller
 
     /**
      * @Route("/widget/info/{id}", name="oro_entityconfig_widget_info")
-     * @Template
+     * @Template("@OroEntityConfig/Config/widget/info.html.twig")
      *
      * @param EntityConfigModel $entity
      *

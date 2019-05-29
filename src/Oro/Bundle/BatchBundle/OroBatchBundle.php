@@ -7,19 +7,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * Batch Bundle
- *
+ * The BatchBundle bundle class.
  */
 class OroBatchBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'AkeneoBatchBundle';
-    }
-
     /**
      * {@inheritdoc}
      */
