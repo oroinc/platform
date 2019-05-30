@@ -89,7 +89,14 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
     {
         $body = JSON::decode($message->getBody());
 
-        if (! isset($body['jobId'], $body['jobName'], $body['exportType'], $body['outputFormat'], $body['email'])) {
+        if (! isset(
+            $body['jobId'],
+            $body['jobName'],
+            $body['exportType'],
+            $body['outputFormat'],
+            $body['email'],
+            $body['entity']
+        )) {
             $this->logger->critical('Invalid message');
         }
 
@@ -131,6 +138,15 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
 
             $this->recipientUserId = $body['recipientUserId'] ?? null;
             $this->sendEmailNotification($body['email'], $summary, $body['notificationTemplate'] ?? null);
+
+            $this->producer->send(
+                Topics::SAVE_IMPORT_EXPORT_RESULT,
+                [
+                    'jobId' => $job->getId(),
+                    'type' => $body['exportType'],
+                    'entity' => $body['entity'],
+                ]
+            );
         }
 
         return self::ACK;

@@ -438,19 +438,16 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
         $dependentJobContext = $this->createDependentJobContextMock();
         $dependentJobContext
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('addDependentJob')
-            ->withConsecutive(
-                [
-                    Topics::POST_EXPORT,
-                    $this->callback(function ($message) {
-                        return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
-                    }),
-                ],
-                [
-                    Topics::SAVE_IMPORT_EXPORT_RESULT,
-                    ['jobId' => $job->getId(), 'type' => 'export_type', 'entity' => 'Acme']
-                ]
+            ->with(
+                Topics::POST_EXPORT,
+                $this->callback(function ($message) {
+                    $this->assertArrayHasKey('entity', $message);
+                    $this->assertEquals('Acme', $message['entity']);
+
+                    return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
+                })
             )
         ;
 
@@ -581,19 +578,16 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
         $dependentJobContext = $this->createDependentJobContextMock();
         $dependentJobContext
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('addDependentJob')
-            ->withConsecutive(
-                [
-                    Topics::POST_EXPORT,
-                    $this->callback(function ($message) {
-                        return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
-                    })
-                ],
-                [
-                    Topics::SAVE_IMPORT_EXPORT_RESULT,
-                    ['jobId' => $job->getId(), 'type' => 'export_type', 'entity' => 'Acme']
-                ]
+            ->with(
+                Topics::POST_EXPORT,
+                $this->callback(function ($message) {
+                    $this->assertArrayHasKey('entity', $message);
+                    $this->assertEquals('Acme', $message['entity']);
+
+                    return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
+                })
             )
         ;
 

@@ -4,10 +4,11 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 
 use Oro\Bundle\ImportExportBundle\Async\Export\PostExportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
+use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\NotificationBundle\Async\Topics;
+use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -87,7 +88,8 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'exportType' => 'type',
             'outputFormat' => 'csv',
             'email' => 'test@example.com',
-            'notificationTemplate' => 'resultTemplate'
+            'notificationTemplate' => 'resultTemplate',
+            'entity' => 'Acme',
         ];
         $message
             ->expects(self::once())
@@ -148,7 +150,8 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'exportType' => 'type',
             'outputFormat' => 'csv',
             'email' => 'test@example.com',
-            'notificationTemplate' => 'resultTemplate'
+            'notificationTemplate' => 'resultTemplate',
+            'entity' => 'Acme',
         ];
         $message
             ->expects(self::once())
@@ -175,7 +178,24 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('exportResultFileMerge')
             ->willReturn('acme_filename');
 
-        $this->messageProducer->expects($this->once())->method('send');
+        $this->messageProducer->expects($this->exactly(2))
+            ->method('send')
+            ->withConsecutive(
+                [
+                    NotificationTopics::SEND_NOTIFICATION_EMAIL,
+                    [
+                        'sender' => [],
+                        'toEmail' => 'test@example.com',
+                        'body' => [],
+                        'contentType' => 'text/html',
+                        'template' => 'resultTemplate',
+                    ]
+                ],
+                [
+                    Topics::SAVE_IMPORT_EXPORT_RESULT,
+                    ['jobId' => $job->getId(), 'type' => 'type', 'entity' => 'Acme']
+                ]
+            );
 
         $result = $this->postExportMessageProcessor->process($message, $session);
 
@@ -196,6 +216,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'outputFormat' => 'csv',
             'email' => 'test@example.com',
             'recipientUserId' => self::USER_ID,
+            'entity' => 'Acme',
         ];
         $message
             ->expects(self::once())
@@ -239,13 +260,19 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($summary);
 
         $this->messageProducer
-            ->expects(self::once())
+            ->expects($this->exactly(2))
             ->method('send')
-            ->with(
-                Topics::SEND_NOTIFICATION_EMAIL,
-                self::callback(function ($message) {
-                    return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
-                })
+            ->withConsecutive(
+                [
+                    NotificationTopics::SEND_NOTIFICATION_EMAIL,
+                    self::callback(function ($message) {
+                        return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
+                    })
+                ],
+                [
+                    Topics::SAVE_IMPORT_EXPORT_RESULT,
+                    ['jobId' => $job->getId(), 'type' => 'type', 'entity' => 'Acme']
+                ]
             );
 
         self::assertSame(
