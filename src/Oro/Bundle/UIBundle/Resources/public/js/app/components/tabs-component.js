@@ -150,6 +150,9 @@ define(function(require) {
         },
 
         dropdownUpdate: function() {
+            if (this.disposed) {
+                return;
+            }
             var self = this;
             var $tabsContainer = this.getElement('tabsContainer');
             var dropdownContainerWidth = $tabsContainer.width();
@@ -285,6 +288,7 @@ define(function(require) {
                 return;
             }
 
+            mediator.off(null, null, this);
             $(document).off('shown.bs.collapse', this.updateStateOfHiddenTabs);
             TabsComponent.__super__.dispose.apply(this, arguments);
         }
