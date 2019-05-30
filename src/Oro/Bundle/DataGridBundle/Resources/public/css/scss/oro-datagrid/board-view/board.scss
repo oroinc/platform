@@ -24,6 +24,7 @@
 
 .board-header {
     display: flex;
+    overflow: hidden;
 }
 
 .board-column-header {
@@ -101,6 +102,11 @@
 
 .board-column-title {
     @include text-line-truncate();
+
+    [data-grid-header-cell-text] {
+        display: inline-block;
+        @include text-line-truncate();
+    }
 }
 
 .board-body-loading-message {

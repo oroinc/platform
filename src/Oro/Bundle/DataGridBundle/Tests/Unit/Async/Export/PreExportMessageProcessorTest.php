@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor;
 use Oro\Bundle\DataGridBundle\Async\Topics;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
+use Oro\Bundle\ImportExportBundle\Async\Topics as ImportExportTopics;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler as DefaultExportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
@@ -31,6 +32,9 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([Topics::PRE_EXPORT], PreExportMessageProcessor::getSubscribedTopics());
     }
 
+    /**
+     * @return array
+     */
     public function invalidMessageBodyProvider()
     {
         return [
@@ -75,6 +79,9 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(PreExportMessageProcessor::REJECT, $result);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testShouldReturnMessageACKOnExportSuccess()
     {
         $jobUniqueName = 'oro_datagrid.pre_export.grid_name.user_1.csv';
@@ -97,8 +104,21 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             }));
 
         $dependentJobContext = $this->createDependentJobContextMock();
-        $dependentJobContext->expects($this->exactly(2))
-            ->method('addDependentJob');
+        $dependentJobContext->expects($this->once())
+            ->method('addDependentJob')
+            ->with(
+                ImportExportTopics::POST_EXPORT,
+                [
+                    'jobId' => 1,
+                    'email' => null,
+                    'recipientUserId' => 1,
+                    'jobName' => 'grid_name',
+                    'exportType' => 'export',
+                    'outputFormat' => 'csv',
+                    'entity' => 'Acme',
+                    'notificationTemplate' => 'export_result',
+                ]
+            );
 
         $dependentJob = $this->createDependentJobMock();
         $dependentJob->expects($this->once())

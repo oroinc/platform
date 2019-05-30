@@ -184,13 +184,9 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
             'jobName' => $body['jobName'],
             'exportType' => $body['exportType'],
             'outputFormat' => $body['outputFormat'],
+            'entity' => $body['entity'],
             'notificationTemplate' =>
                 $body['notificationTemplate'] ?? ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
-        ]);
-        $context->addDependentJob(Topics::SAVE_IMPORT_EXPORT_RESULT, [
-            'jobId' => $rootJob->getId(),
-            'type' => $body['exportType'],
-            'entity' => $body['entity']
         ]);
 
         $this->dependentJob->saveDependentJob($context);

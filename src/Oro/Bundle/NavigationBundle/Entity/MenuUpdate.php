@@ -7,6 +7,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
 
 /**
+ * Menu Update entity
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository")
  * @ORM\Table(
  *      name="oro_navigation_menu_upd",
@@ -62,7 +64,6 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *      )
  * })
  * @Config(
- *      routeName="oro_navigation_menu_update_index",
  *      defaultValues={
  *          "entity"={
  *              "icon"="fa-th"

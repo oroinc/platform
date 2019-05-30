@@ -44,10 +44,6 @@ class KernelStub extends OroKernel
         foreach ($bundleConfig as $config) {
             $bundle = new TestBundle($config['name']);
 
-            if (array_key_exists('parent', $config)) {
-                $bundle->setParent($config['parent']);
-            }
-
             if (array_key_exists('path', $config)) {
                 $bundle->setPath($config['path']);
             }

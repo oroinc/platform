@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topics as ImportExportTopics;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
@@ -34,6 +35,9 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([Topics::PRE_EXPORT], PreExportMessageProcessor::getSubscribedTopics());
     }
 
+    /**
+     * @return array
+     */
     public function invalidMessageBodyProvider()
     {
         return [
@@ -80,6 +84,9 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testShouldSetOrganizationAndACKMessage()
     {
         $exportHandler = $this->createMock(ExportHandler::class);
@@ -112,8 +119,21 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $dependentJobContext = $this->createDependentJobContextMock();
         $dependentJobContext
-            ->expects($this->exactly(2))
-            ->method('addDependentJob');
+            ->expects($this->once())
+            ->method('addDependentJob')
+            ->with(
+                ImportExportTopics::POST_EXPORT,
+                [
+                    'jobId' => 1,
+                    'email' => null,
+                    'recipientUserId' => 1,
+                    'jobName' => 'test',
+                    'exportType' => 'export',
+                    'outputFormat' => 'csv',
+                    'entity' => 'Acme',
+                    'notificationTemplate' => 'export_result',
+                ]
+            );
 
         $dependentJob = $this->createDependentJobMock();
         $dependentJob->expects($this->once())
