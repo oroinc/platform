@@ -7,6 +7,7 @@ define(function(require) {
      */
     var ColumnHeaderView;
     var BaseView = require('oroui/js/app/views/base/view');
+    var HintView = require('orodatagrid/js/app/views/hint-view');
 
     ColumnHeaderView = BaseView.extend({
         /**
@@ -18,6 +19,11 @@ define(function(require) {
          * @inheritDoc
          */
         template: require('tpl!../../../../templates/board/column-header-view.html'),
+
+        events: {
+            mouseenter: 'onMouseEnter',
+            mouseleave: 'onMouseLeave'
+        },
 
         /**
          * @inheritDoc
@@ -41,6 +47,42 @@ define(function(require) {
          */
         markIfEmpty: function() {
             this.$el.toggleClass('empty', this.model.get('items').length === 0);
+        },
+
+        /**
+         * Mouse Enter on column name to show popover
+         *
+         * @param {Event} e
+         */
+        onMouseEnter: function(e) {
+            this.subview('hint', new HintView({
+                el: this.$('[data-grid-header-cell-label]'),
+                offsetOfEl: this.$el,
+                autoRender: true,
+                popoverConfig: {
+                    content: this.model.get('label')
+                }
+            }));
+
+            this.hintTimeout = setTimeout(function() {
+                var hint = this.subview('hint');
+
+                if (hint && !hint.fullLabelIsVisible()) {
+                    hint.show();
+                }
+            }.bind(this), 300);
+        },
+
+        /**
+         * Mouse Leave from column name to hide popover
+         *
+         * @param {Event} e
+         */
+        onMouseLeave: function(e) {
+            clearTimeout(this.hintTimeout);
+            if (this.subview('hint')) {
+                this.removeSubview('hint');
+            }
         }
     });
 
