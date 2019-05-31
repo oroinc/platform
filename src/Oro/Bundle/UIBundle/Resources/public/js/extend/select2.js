@@ -284,7 +284,15 @@ define(function(require) {
                 options.ajax.url += (options.ajax.url.indexOf('?') < 0 ? '?' : '&') + $.param(additionalRequestParams);
             }
 
-            return prepareOpts.call(this, options);
+            var preparedOptions = prepareOpts.call(this, options);
+            var query = preparedOptions.query;
+
+            preparedOptions.query = function(queryOptions) {
+                queryOptions.term = queryOptions.term && queryOptions.term.trim();
+                return query.apply(this, arguments);
+            };
+
+            return preparedOptions;
         };
 
         prototype.positionDropdown = function() {
