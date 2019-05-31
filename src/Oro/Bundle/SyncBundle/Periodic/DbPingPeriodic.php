@@ -37,6 +37,7 @@ class DbPingPeriodic implements PeriodicInterface, LoggerAwareInterface
 
     /**
      * {@inheritdoc}
+     * @throws DBALException
      */
     public function tick(): void
     {
@@ -47,6 +48,8 @@ class DbPingPeriodic implements PeriodicInterface, LoggerAwareInterface
                 $stmt->execute();
             } catch (DBALException $e) {
                 $this->logger->error('Can\'t ping database connection', ['exception' => $e]);
+
+                throw $e;
             }
         }
     }
