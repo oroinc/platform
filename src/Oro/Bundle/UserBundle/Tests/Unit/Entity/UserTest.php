@@ -167,7 +167,9 @@ class UserTest extends AbstractUserTest
 
         $user = $this->getUser();
         $updatedAt = new \DateTime('2015-01-01');
-        $user->setUpdatedAt($updatedAt);
+        $user->setUpdatedAt($updatedAt)
+            ->setConfirmationToken('test_token')
+            ->setPasswordRequestedAt(new \DateTime());
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|PreUpdateEventArgs $event */
         $event = $this->getMockBuilder('Doctrine\ORM\Event\PreUpdateEventArgs')
@@ -177,17 +179,27 @@ class UserTest extends AbstractUserTest
             ->method('getEntityChangeSet')
             ->will($this->returnValue($changeSet));
 
+        $this->assertEquals($updatedAt, $user->getUpdatedAt());
+        $this->assertNotNull($user->getConfirmationToken());
+        $this->assertNotNull($user->getPasswordRequestedAt());
         $user->preUpdate($event);
         $this->assertEquals($updatedAt, $user->getUpdatedAt());
+        $this->assertNotNull($user->getConfirmationToken());
+        $this->assertNotNull($user->getPasswordRequestedAt());
     }
 
-    public function testPreUpdateChanged()
+    /**
+     * @dataProvider preUpdateDataProvider
+     *
+     * @param array $changeSet
+     */
+    public function testPreUpdateChanged(array $changeSet)
     {
-        $changeSet = ['lastname' => null];
-
         $user = $this->getUser();
         $updatedAt = new \DateTime('2015-01-01');
-        $user->setUpdatedAt($updatedAt);
+        $user->setUpdatedAt($updatedAt)
+            ->setConfirmationToken('test_token')
+            ->setPasswordRequestedAt(new \DateTime());
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|PreUpdateEventArgs $event */
         $event = $this->getMockBuilder('Doctrine\ORM\Event\PreUpdateEventArgs')
@@ -197,8 +209,43 @@ class UserTest extends AbstractUserTest
             ->method('getEntityChangeSet')
             ->will($this->returnValue($changeSet));
 
+        $this->assertEquals($updatedAt, $user->getUpdatedAt());
+        $this->assertNotNull($user->getConfirmationToken());
+        $this->assertNotNull($user->getPasswordRequestedAt());
         $user->preUpdate($event);
         $this->assertNotEquals($updatedAt, $user->getUpdatedAt());
+        $this->assertNull($user->getConfirmationToken());
+        $this->assertNull($user->getPasswordRequestedAt());
+    }
+
+    /**
+     * @return array
+     */
+    public function preUpdateDataProvider()
+    {
+        return [
+            [
+                'changeSet' => array_flip(['username'])
+            ],
+            [
+                'changeSet' => array_flip(['email'])
+            ],
+            [
+                'changeSet' => array_flip(['password'])
+            ],
+            [
+                'changeSet' => array_flip(['username', 'email'])
+            ],
+            [
+                'changeSet' => array_flip(['email', 'password'])
+            ],
+            [
+                'changeSet' => array_flip(['username', 'password'])
+            ],
+            [
+                'changeSet' => array_flip(['username', 'email', 'password'])
+            ],
+        ];
     }
 
     public function testBusinessUnit()

@@ -3,13 +3,13 @@
 $scrollspy-position: relative !default;
 $scrollspy-overflow: auto !default;
 
-$scrollspy-nav-background: $primary-900 !default;
+$scrollspy-nav-background: $primary-860 !default;
 $scrollspy-nav-offset: null !default;
 $scrollspy-nav-border-radius: 16px !default;
 $scrollspy-nav-position: relative !default;
+$scrollspy-nav-z-index: 2 !default;
 
 $scrollspy-nav-gradient: linear-gradient(to bottom, #ffffff, rgba(255, 255, 255, 0)) !default;
-$scrollspy-nav-gradient-z-index: 2 !default;
 $scrollspy-nav-gradient-height: 16px !default;
 
 $scrollspy-nav-target-height: 20px !default;
@@ -17,14 +17,14 @@ $scrollspy-nav-target-height: 20px !default;
 $scrollspy-nav-navbar-inner-nav-link-inner-offset: 6px 16px !default;
 $scrollspy-nav-navbar-inner-nav-link-color: $primary-100 !default;
 $scrollspy-nav-navbar-inner-nav-link-border-radius: 16px !default;
-$scrollspy-nav-navbar-inner-nav-link-background-color: $primary-900 !default;
-$scrollspy-nav-navbar-inner-nav-link-active-background-color: $primary-830 !default;
+$scrollspy-nav-navbar-inner-nav-link-background-color: $primary-860 !default;
+$scrollspy-nav-navbar-inner-nav-link-active-background-color: $primary-800 !default;
 $scrollspy-nav-navbar-inner-nav-link-active-font-weight: bold !default;
 
-$scrollspy-title-background: $primary-900 !default;
+$scrollspy-title-background: $primary-860 !default;
 $scrollspy-title-font-size: $base-font-size !default;
 $scrollspy-title-font-weight: bold !default;
-$scrollspy-title-color: $primary-200 !default;
+$scrollspy-title-color: $primary-100 !default;
 $scrollspy-title-offset: 0 !default;
 $scrollspy-title-inner-offset: 8px 16px !default;
 $scrollspy-title-border-radius: 4px !default;

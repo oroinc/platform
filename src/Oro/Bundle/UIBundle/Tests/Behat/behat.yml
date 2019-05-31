@@ -35,7 +35,6 @@ oro_behat_extension:
 
     Link:
       selector: 'a'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Entity Status:
       selector: '.badge'
@@ -43,27 +42,21 @@ oro_behat_extension:
 
     Breadcrumb Container:
       selector: 'ul.breadcrumb'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Page Title:
       selector: '.page-title'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Entity Edit Button:
       selector: 'a.edit-button'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Entity Delete Button:
       selector: 'a.edit-remove'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Flash Message:
       selector: '#flash-messages div.alert'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Flash Message Close Button:
       selector: '#flash-messages div.alert .notification-flash__close'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     ControlGroup:
       class: Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup
@@ -74,43 +67,33 @@ oro_behat_extension:
 
     UiDialog Title:
       selector: 'span.ui-dialog-title'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiDialog Content:
       selector: 'div.ui-dialog-content'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiDialog okButton:
       selector: 'div.ui-dialog-buttonpane button[type=submit]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiDialog cancelButton:
       selector: 'div.ui-dialog-buttonpane button[type=reset]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiDialog Disabled okButton:
       selector: 'div.ui-dialog-buttonpane button.disabled[type=submit]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiWindow:
       selector: 'div.modal'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiWindow Title:
       selector: 'div.modal-header h3, div.modal-dialog__body h2.page-title'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiWindow Content:
       selector: 'div.modal-body, div.modal-dialog__body'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiWindow okButton:
       selector: 'div.modal-footer .ok, div.buttons-equal button.ok'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiWindow cancelButton:
       selector: 'div.modal-footer .cancel, div.buttons-equal button.cancel'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     ContextSelector:
       selector:

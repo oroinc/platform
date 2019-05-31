@@ -1,8 +1,10 @@
 <% var togglerId = _.uniqueId('dropdown-') %>
 <li class="nav-item dropdown" data-dropdown>
     <a href="#" role="button" id="<%- togglerId %>" class="nav-link dropdown-toggle" data-toggle="dropdown"
-       data-dropdown-placeholder="<%- _.__('View more...') %>"
-       aria-label="<%- _.__('View more...') %>"
-       aria-haspopup="true" aria-expanded="false"></a>
+       data-dropdown-placeholder="<%- label %>"
+       data-flip="true"
+       data-position-fixed="true"
+       aria-label="<%- label %>"
+       aria-haspopup="true" aria-expanded="false"><span data-dropdown-label><%- label %></span></a>
     <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="<%- togglerId %>" data-dropdown-wrapper></ul>
 </li>

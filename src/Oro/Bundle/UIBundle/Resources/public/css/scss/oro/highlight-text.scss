@@ -2,8 +2,9 @@
 
 .highlight {
     &-text {
-        @at-root span#{&} {
+        @at-root mark#{&} {
             text-decoration: underline;
+            color: inherit;
             background-color: $highlight-text-color;
             font-family: inherit;
             font-weight: bold;
@@ -21,7 +22,7 @@
         }
 
         @at-root label#{&} {
-            span {
+            mark {
                 font-weight: normal;
             }
         }
@@ -44,11 +45,7 @@
         background: $highlight-text-color;
     }
 
-    @at-root input#{&}-element {
-        background: $highlight-text-color;
-    }
-
-    @at-root textarea#{&}-element {
+    &-element > .select2-container {
         background: $highlight-text-color;
     }
 
@@ -76,5 +73,20 @@
                 }
             }
         }
+    }
+}
+
+.select2-container-disabled,
+.selector.disabled {
+    mark {
+        background-color: transparent;
+    }
+}
+
+input,
+textarea,
+select[multiple] {
+    &.highlight-element:not([disabled]) {
+        background: $highlight-text-color;
     }
 }

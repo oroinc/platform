@@ -425,7 +425,7 @@ define(function(require) {
          * @param {string} message
          */
         showLabel: function(element, message) {
-            if (!message) {
+            if (!message || !element) {
                 return;
             }
 

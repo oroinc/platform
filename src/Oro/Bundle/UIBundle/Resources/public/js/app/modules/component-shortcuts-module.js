@@ -25,4 +25,9 @@ define(function(require) {
             widgetModule: 'oroui/js/widget/collapse-widget'
         }
     });
+
+    ComponentShortcutsManager.add('responsive-tabs', {
+        moduleName: 'oroui/js/app/components/tabs-component',
+        scalarOption: 'useDropdown'
+    });
 });

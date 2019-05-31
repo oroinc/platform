@@ -36,7 +36,7 @@
     .menu-item {
         &:not(.ui-helper) {
             &:after {
-                background-color: $menu-item-first-level-text-color;
+                background-color: $menu-item-divider-color;
             }
         }
     }

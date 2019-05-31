@@ -50,7 +50,6 @@ oro_behat_extension:
 
     Sided Main Menu:
       selector: 'div.main-menu-sided'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UserRoleView:
       selector:
@@ -76,6 +75,10 @@ oro_behat_extension:
     User Forgot Password:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserForgotPassword
       route: 'oro_user_reset_request'
+
+    User Password Reset:
+      class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserPasswordReset
+      route: 'oro_user_reset_reset'
 
     User Profile View:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserProfileView

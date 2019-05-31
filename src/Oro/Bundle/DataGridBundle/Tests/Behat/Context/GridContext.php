@@ -1798,10 +1798,16 @@ TEXT;
         // which one is the actual filter manager dropdown.
         $filterDropdowns = $grid->getElements($grid->getMappedChildElementName('GridFilterManager'));
         $filterDropdowns = array_filter($filterDropdowns, function (Element $element) {
-            return $element->isVisible();
+            return $this->spin(function () use ($element) {
+                if ($element->isVisible()) {
+                    return true;
+                }
+
+                return false;
+            }, 3);
         });
 
-        $filterManager =  array_shift($filterDropdowns);
+        $filterManager = array_shift($filterDropdowns);
         self::assertNotNull($filterManager, 'Filter manager dropdown was not found');
 
         /** @var GridFilterManager $filterManager */

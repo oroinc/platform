@@ -15,7 +15,6 @@ oro_behat_extension:
 
     Close Large Image Preview:
       selector: 'span.lg-close.lg-icon'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     AttachmentItem:
       selector: '.attachment-item'
@@ -23,7 +22,6 @@ oro_behat_extension:
 
     AttachmentListRow:
       selector: '.attachment-list-row'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Allowed MIME Types:
       selector:

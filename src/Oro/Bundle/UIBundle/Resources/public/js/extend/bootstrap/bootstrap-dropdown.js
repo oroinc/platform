@@ -226,6 +226,7 @@ define(function(require) {
                 if (!arrow) {
                     arrow = document.createElement(menu.tagName.toLowerCase() === 'ul' ? 'li' : 'span');
                     arrow.classList.add('arrow');
+                    arrow.setAttribute('data-helper-element', '');
                     menu.insertBefore(arrow, menu.firstChild);
                 }
 

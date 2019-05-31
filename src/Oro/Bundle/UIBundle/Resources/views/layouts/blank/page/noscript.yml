@@ -1,0 +1,10 @@
+layout:
+  actions:
+      - '@setBlockTheme':
+          themes: 'OroUIBundle:layouts:blank/page/noscript.html.twig'
+
+      - '@add':
+          id: nosctipt
+          parentId: body
+          blockType: block
+          prepend: true

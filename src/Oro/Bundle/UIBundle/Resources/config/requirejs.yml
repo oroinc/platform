@@ -33,46 +33,6 @@ config:
             deps:
                 - 'lightgallery'
                 - 'jquery'
-        'bootstrap-util':
-            deps:
-                - 'jquery'
-            exports: 'Util'
-        'bootstrap-alert':
-            deps:
-                - 'jquery'
-                - 'bootstrap-util'
-        'bootstrap-collapse':
-            deps:
-                - 'jquery'
-                - 'bootstrap-util'
-        'bootstrap-dropdown':
-            deps:
-                - 'jquery'
-                - 'popper'
-                - 'bootstrap-util'
-            exports: 'Dropdown'
-        'bootstrap-modal':
-            deps:
-                - 'jquery'
-                - 'bootstrap-util'
-        'bootstrap-popover':
-            deps:
-                - 'jquery'
-                - 'bootstrap-tooltip'
-            exports: 'Popover'
-        'bootstrap-scrollspy':
-            deps:
-                - 'jquery'
-                - 'bootstrap-util'
-        'bootstrap-tab':
-            deps:
-                - 'jquery'
-                - 'bootstrap-util'
-        'bootstrap-tooltip':
-            deps:
-                - 'jquery'
-                - 'popper'
-                - 'bootstrap-util'
         'bootstrap-typeahead':
             deps:
                 - 'jquery'
@@ -88,6 +48,16 @@ config:
             'bootstrap': 'oroui/js/extend/bootstrap'
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
             'jquery.timepicker': 'oroui/js/extend/jquery.timepicker'
+            'popper.js': 'popper'
+            'util.js': 'bootstrap-util'
+            'alert.js': 'bootstrap-alert'
+            'collapse.js': 'bootstrap-collapse'
+            'dropdown.js': 'bootstrap-dropdown'
+            'modal.js': 'bootstrap-modal'
+            'popover.js': 'bootstrap-popover'
+            'scrollspy.js': 'bootstrap-scrollspy'
+            'tab.js': 'bootstrap-tab'
+            'tooltip.js': 'bootstrap-tooltip'
         'oroui/js/extend/jquery':
             'jquery': 'jquery'
         'oroui/js/extend/select2':
@@ -140,16 +110,16 @@ config:
         'jquery.cookie': 'bundles/bowerassets/jquery-cookie/jquery.cookie.js'
         'jquery.mCustomScrollbar': 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js'
         'jquery.jstree': 'bundles/components/jstree/dist/jstree.js'
-        'popper': 'oroui/js/extend/bootstrap/vendor/popper'
-        'bootstrap-util': 'bundles/bowerassets/bootstrap/js/dist/util.js'
-        'bootstrap-alert': 'bundles/bowerassets/bootstrap/js/dist/alert.js'
-        'bootstrap-collapse': 'bundles/bowerassets/bootstrap/js/dist/collapse.js'
-        'bootstrap-dropdown': 'bundles/bowerassets/bootstrap/js/dist/dropdown.js'
-        'bootstrap-modal': 'bundles/bowerassets/bootstrap/js/dist/modal.js'
-        'bootstrap-popover': 'bundles/bowerassets/bootstrap/js/dist/popover.js'
-        'bootstrap-scrollspy': 'bundles/bowerassets/bootstrap/js/dist/scrollspy.js'
-        'bootstrap-tab': 'bundles/bowerassets/bootstrap/js/dist/tab.js'
-        'bootstrap-tooltip': 'bundles/bowerassets/bootstrap/js/dist/tooltip.js'
+        'popper': 'bundles/npmassets/popper.js/dist/umd/popper.js'
+        'bootstrap-util': 'bundles/npmassets/bootstrap/js/dist/util.js'
+        'bootstrap-alert': 'bundles/npmassets/bootstrap/js/dist/alert.js'
+        'bootstrap-collapse': 'bundles/npmassets/bootstrap/js/dist/collapse.js'
+        'bootstrap-dropdown': 'bundles/npmassets/bootstrap/js/dist/dropdown.js'
+        'bootstrap-modal': 'bundles/npmassets/bootstrap/js/dist/modal.js'
+        'bootstrap-popover': 'bundles/npmassets/bootstrap/js/dist/popover.js'
+        'bootstrap-scrollspy': 'bundles/npmassets/bootstrap/js/dist/scrollspy.js'
+        'bootstrap-tab': 'bundles/npmassets/bootstrap/js/dist/tab.js'
+        'bootstrap-tooltip': 'bundles/npmassets/bootstrap/js/dist/tooltip.js'
         'bootstrap-typeahead': 'bundles/oroui/lib/bootstrap/bootstrap-typeahead.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.js'
         'underscore': 'bundles/bowerassets/underscore/underscore.js'
@@ -312,8 +282,3 @@ build:
 #       use AMD without dependency, therefore it's excluded
         'jquery.multiselect': 'empty:'
         'jquery.multiselect.filter': 'empty:'
-#        Transpiled bootstrap modules don't support AMD, but requires Popper from global scope
-#        and it is actually in AMD module
-        'bootstrap-dropdown': 'empty:'
-        'bootstrap-tooltip': 'empty:'
-        'bootstrap-popover': 'empty:'

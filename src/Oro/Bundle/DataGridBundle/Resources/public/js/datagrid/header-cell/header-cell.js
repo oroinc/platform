@@ -5,6 +5,7 @@ define(function(require) {
     var _ = require('underscore');
     var Backgrid = require('backgrid');
     var textUtil = require('oroui/js/tools/text-util');
+    var HintView = require('orodatagrid/js/app/views/hint-view');
 
     /**
      * Datagrid header cell
@@ -18,13 +19,13 @@ define(function(require) {
         /** @property */
         template: _.template(
             '<% if (sortable) { %>' +
-                '<a class="grid-header-cell__link" href="#" role="button">' +
-                    '<span class="grid-header-cell__label"><%- label %></span>' +
+                '<a class="grid-header-cell__link" href="#" role="button" data-grid-header-cell-label>' +
+                    '<span class="grid-header-cell__label" data-grid-header-cell-text><%- label %></span>' +
                     '<span class="caret" aria-hidden="true"></span>' +
                 '</a>' +
             '<% } else { %>' +
-                '<span class="grid-header-cell__label-container">' +
-                    '<span class="grid-header-cell__label"><%- label %></span>' +
+                '<span class="grid-header-cell__label-container" data-grid-header-cell-label>' +
+                    '<span class="grid-header-cell__label" data-grid-header-cell-text><%- label %></span>' +
                 '</span>' +
             '<% } %>'
         ),
@@ -188,73 +189,43 @@ define(function(require) {
         },
 
         /**
-         * Mouse Enter on column name to show popover
+         * Mouse Enter on column name to show hint if label has been abbreviated
          *
          * @param {Event} e
          */
         onMouseEnter: function(e) {
-            var $label = this.$('.grid-header-cell__label');
-
-            // measure text content
-            var realWidth = $label[0].clientWidth;
-            $label.css({overflow: 'visible'});
-            var fullWidth = $label[0].clientWidth;
-            $label.css({overflow: ''});
-
-            if (!this.isLabelAbbreviated && fullWidth === realWidth) {
-                // hint is not required all text is visible
+            if (!this.isLabelAbbreviated) {
                 return;
             }
 
-            this.popoverAdded = true;
-            $label.popover({
-                content: this.column.get('label'),
-                trigger: 'manual',
-                placement: 'bottom',
-                animation: false,
-                container: 'body',
-                offset: this.calcPopoverOffset(),
-                template: '<div class="popover" role="tooltip">' +
-                              '<div class="arrow"></div>' +
-                              '<h3 class="popover-header"></h3>' +
-                              '<div class="popover-body popover-no-close-button"></div>' +
-                          '</div>'
-            });
+            this.subview('hint', new HintView({
+                el: this.$('[data-grid-header-cell-label]'),
+                offsetOfEl: this.$el,
+                autoRender: true,
+                popoverConfig: {
+                    content: this.column.get('label')
+                }
+            }));
 
-            this.hintTimeout = setTimeout(function addHeaderCellHint() {
-                $label.popover('show');
-            }, 300);
+            this.hintTimeout = setTimeout(function() {
+                var hint = this.subview('hint');
+
+                if (hint && (this.isLabelAbbreviated || !hint.fullLabelIsVisible())) {
+                    this.subview('hint').show();
+                }
+            }.bind(this), 300);
         },
 
         /**
-         * Mouse Leave from column name to hide popover
+         * Mouse Leave from column name to hide hint
          *
          * @param {Event} e
          */
         onMouseLeave: function(e) {
             clearTimeout(this.hintTimeout);
-            var $label = this.$('.grid-header-cell__label');
-            $label.popover('hide');
-            $label.popover('dispose');
-            this.popoverAdded = false;
-        },
-
-        /**
-         * Calculation offset of column label for popover
-         *
-         * @return {String}
-         */
-        calcPopoverOffset: function() {
-            var x = 0;
-            var y = 0;
-            var $label = this.$('.grid-header-cell__label');
-
-            var elBottom = this.$el[0].getBoundingClientRect().bottom;
-            var labelBottom = $label[0].getBoundingClientRect().bottom;
-
-            y = elBottom - labelBottom;
-
-            return [x, y].join(', ');
+            if (this.subview('hint')) {
+                this.removeSubview('hint');
+            }
         }
     });
 

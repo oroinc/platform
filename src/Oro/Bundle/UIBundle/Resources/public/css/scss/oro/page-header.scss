@@ -116,6 +116,11 @@
 }
 
 .customer-info-actions {
+    position: relative;
+    z-index: 2;
+    
+    margin-top: $content-padding-small;
+    
     background-color: $primary-860;
     border-bottom: 1px solid $additional-ultra-light;
 

@@ -5,6 +5,7 @@ define(function(require) {
     var _ = require('underscore');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
     var tools = require('oroui/js/tools');
+    var mediator = require('oroui/js/mediator');
 
     var SCROLLBAR_WIDTH = scrollHelper.scrollbarWidth() || 17;
     var DESKTOP_SERVICE_AREA = 80 + 32 + 24 * 2 + SCROLLBAR_WIDTH; // menu, sidebar, content paddings, scollbar widths;
@@ -100,6 +101,7 @@ define(function(require) {
 
             if (isChanged) {
                 this._trigger('reflow');
+                mediator.trigger('layout:reposition');
             }
         },
 
