@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProviderInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 use Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool;
 use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,9 +17,38 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * The CLI command to update schema according to data stored in entity config caches
  */
-class UpdateSchemaCommand extends ContainerAwareCommand
+class UpdateSchemaCommand extends Command
 {
     use SchemaTrait;
+
+    /** @var string */
+    protected static $defaultName = 'oro:entity-extend:update-schema';
+
+    /** @var ManagerRegistry */
+    private $registry;
+
+    /** @var ExtendEntityConfigProviderInterface */
+    private $extendEntityConfigProvider;
+
+    /** @var EnumSynchronizer */
+    private $enumSynchronizer;
+
+    /**
+     * @param ManagerRegistry $registry
+     * @param ExtendEntityConfigProviderInterface $extendEntityConfigProvider
+     * @param EnumSynchronizer $enumSynchronizer
+     */
+    public function __construct(
+        ManagerRegistry $registry,
+        ExtendEntityConfigProviderInterface $extendEntityConfigProvider,
+        EnumSynchronizer $enumSynchronizer
+    ) {
+        parent::__construct();
+
+        $this->registry = $registry;
+        $this->extendEntityConfigProvider = $extendEntityConfigProvider;
+        $this->enumSynchronizer = $enumSynchronizer;
+    }
 
     /**
      * Console command configuration
@@ -25,7 +56,6 @@ class UpdateSchemaCommand extends ContainerAwareCommand
     public function configure()
     {
         $this
-            ->setName('oro:entity-extend:update-schema')
             ->setDescription('Synchronize extended and custom entities metadata with a database schema')
             ->setDefinition(
                 [
@@ -55,7 +85,7 @@ class UpdateSchemaCommand extends ContainerAwareCommand
         $this->overrideSchemaDiff();
 
         /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em = $this->registry->getManager();
 
         $metadata = $this->getClassesMetadata($em);
 
@@ -79,9 +109,7 @@ class UpdateSchemaCommand extends ContainerAwareCommand
         }
 
         if (!$input->getOption('dry-run')) {
-            /** @var EnumSynchronizer $enumSynchronizer */
-            $enumSynchronizer = $this->getContainer()->get('oro_entity_extend.enum_synchronizer');
-            $enumSynchronizer->sync();
+            $this->enumSynchronizer->sync();
         }
     }
 
@@ -92,10 +120,7 @@ class UpdateSchemaCommand extends ContainerAwareCommand
      */
     protected function getClassesMetadata(EntityManager $em)
     {
-        $extendEntityConfigProvider = $this->getContainer()
-            ->get('oro_entity_config.provider.extend_entity_config_provider');
-
-        $extendConfigs = $extendEntityConfigProvider->getExtendEntityConfigs();
+        $extendConfigs = $this->extendEntityConfigProvider->getExtendEntityConfigs();
         $metadata = [];
         foreach ($extendConfigs as $extendConfig) {
             if (!$extendConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])) {

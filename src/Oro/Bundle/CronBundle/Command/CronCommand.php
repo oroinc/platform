@@ -3,26 +3,77 @@
 namespace Oro\Bundle\CronBundle\Command;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Helper\CronHelper;
 use Oro\Bundle\CronBundle\Tools\CommandRunner;
+use Oro\Bundle\PlatformBundle\Maintenance\Mode;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CronCommand extends ContainerAwareCommand
+/**
+ * Cron commands launcher.
+ */
+class CronCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:cron';
+
+    /** @var ManagerRegistry */
+    private $registry;
+
+    /** @var Mode */
+    private $maintenanceMode;
+
+    /** @var CronHelper */
+    private $cronHelper;
+
+    /** @var CommandRunner */
+    private $commandRunner;
+
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var string */
+    private $environment;
+
+    /**
+     * @param ManagerRegistry $registry
+     * @param Mode $maintenanceMode
+     * @param CronHelper $cronHelper
+     * @param CommandRunnerInterface $commandRunner
+     * @param LoggerInterface $logger
+     * @param string $environment
+     */
+    public function __construct(
+        ManagerRegistry $registry,
+        Mode $maintenanceMode,
+        CronHelper $cronHelper,
+        CommandRunnerInterface $commandRunner,
+        LoggerInterface $logger,
+        string $environment
+    ) {
+        parent::__construct();
+
+        $this->registry = $registry;
+        $this->maintenanceMode = $maintenanceMode;
+        $this->cronHelper = $cronHelper;
+        $this->commandRunner = $commandRunner;
+        $this->logger = $logger;
+        $this->environment = $environment;
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('oro:cron')
             ->setDescription('Cron commands launcher');
     }
 
@@ -31,16 +82,12 @@ class CronCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
-        /** @var $logger LoggerInterface */
-        $logger = $this->getContainer()->get('logger');
-
         // check for maintenance mode - do not run cron jobs if it is switched on
-        if ($this->getContainer()->get('oro_platform.maintenance')->isOn()) {
+        if ($this->maintenanceMode->isOn()) {
             $message = 'System is in maintenance mode, aborting';
             $output->writeln('');
             $output->writeln(sprintf('<error>%s</error>', $message));
-            $logger->error($message);
+            $this->logger->error($message);
             return;
         }
 
@@ -48,12 +95,11 @@ class CronCommand extends ContainerAwareCommand
 
         /** @var Schedule $schedule */
         foreach ($schedules as $schedule) {
-            $cronExpression = $this->getCronHelper()->createCron($schedule->getDefinition());
+            $cronExpression = $this->cronHelper->createCron($schedule->getDefinition());
             if ($cronExpression->isDue()) {
                 /** @var CronCommandInterface $command */
                 $command = $this->getApplication()->get($schedule->getCommand());
 
-                // TODO: Should be properly refactored at BAP-13973
                 if ($command instanceof CronCommandInterface && !$command->isActive()) {
                     $output->writeln(
                         'Skipping not enabled command ' . $schedule->getCommand(),
@@ -72,7 +118,7 @@ class CronCommand extends ContainerAwareCommand
                         $schedule->getCommand(),
                         array_merge(
                             $schedule->getArguments(),
-                            ['--env' => $this->getContainer()->getParameter('kernel.environment')]
+                            ['--env' => $this->environment]
                         )
                     );
                 } else {
@@ -81,7 +127,7 @@ class CronCommand extends ContainerAwareCommand
                         'Scheduling run for command ' . $schedule->getCommand(),
                         OutputInterface::VERBOSITY_DEBUG
                     );
-                    $this->getCommandRunner()->run(
+                    $this->commandRunner->run(
                         $schedule->getCommand(),
                         $this->resolveOptions($schedule->getArguments())
                     );
@@ -121,7 +167,7 @@ class CronCommand extends ContainerAwareCommand
      */
     protected function getEntityManager($className)
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($className);
+        return $this->registry->getManagerForClass($className);
     }
 
     /**
@@ -139,21 +185,5 @@ class CronCommand extends ContainerAwareCommand
     private function getAllSchedules()
     {
         return new ArrayCollection($this->getRepository('OroCronBundle:Schedule')->findAll());
-    }
-
-    /**
-     * @return CronHelper
-     */
-    private function getCronHelper()
-    {
-        return $this->getContainer()->get('oro_cron.helper.cron');
-    }
-
-    /**
-     * @return CommandRunnerInterface
-     */
-    private function getCommandRunner()
-    {
-        return $this->getContainer()->get('oro_cron.async.command_runner');
     }
 }

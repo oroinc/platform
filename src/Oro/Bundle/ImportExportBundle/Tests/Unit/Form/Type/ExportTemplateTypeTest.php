@@ -76,6 +76,7 @@ class ExportTemplateTypeTest extends FormIntegrationTestCase
 
         $form->submit(['processorAlias' => $usedAlias]);
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
 
         /** @var ExportData $data */
         $data = $form->getData();

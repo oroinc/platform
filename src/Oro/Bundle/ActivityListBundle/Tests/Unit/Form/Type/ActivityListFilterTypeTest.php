@@ -57,6 +57,7 @@ class ActivityListFilterTypeTest extends TypeTestCase
         $form->submit($formData);
         
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
     }
 
     protected function getExtensions()

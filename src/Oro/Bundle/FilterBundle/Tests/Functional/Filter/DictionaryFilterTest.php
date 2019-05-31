@@ -54,6 +54,7 @@ class DictionaryFilterTest extends WebTestCase
         $filterForm->submit($filterFormData());
 
         $this->assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isSynchronized());
 
         $this->filter->init($dataName, ['data_name' => $dataName]);
         $this->filter->apply($ds, $filterForm->getData());

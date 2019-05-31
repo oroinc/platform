@@ -6,20 +6,38 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
 use Oro\Component\Log\OutputLogger;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpdateCommand extends ContainerAwareCommand
+/**
+ * Updates configuration data for entities.
+ */
+class UpdateCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:entity-config:update';
+
+    /** @var ConfigLoader */
+    private $configLoader;
+
+    /**
+     * @param ConfigLoader $configLoader
+     */
+    public function __construct(ConfigLoader $configLoader)
+    {
+        parent::__construct();
+
+        $this->configLoader = $configLoader;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
         $this
-            ->setName('oro:entity-config:update')
             ->setDescription('Updates configuration data for entities.')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force overwrite config\'s option values')
             ->addOption(
@@ -63,8 +81,7 @@ class UpdateCommand extends ContainerAwareCommand
         }
         $logger = new ConfigLogger(new OutputLogger($output, true, $verbosity));
         /** @var ConfigLoader $loader */
-        $loader = $this->getContainer()->get('oro_entity_config.config_loader');
-        $loader->load(
+        $this->configLoader->load(
             $input->getOption('force'),
             $filter,
             $logger,

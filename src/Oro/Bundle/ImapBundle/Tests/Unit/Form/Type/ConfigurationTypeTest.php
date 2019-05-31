@@ -445,6 +445,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $form->submit($submitData);
 
         $this->assertEquals($expectedValid, $form->isValid());
+        $this->assertTrue($form->isSynchronized());
 
         if (!$expectedValid) {
             $constraint = new EmailFolders();

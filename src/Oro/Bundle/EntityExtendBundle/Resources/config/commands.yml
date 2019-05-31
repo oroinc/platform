@@ -1,45 +1,35 @@
 services:
-    Oro\Bundle\EntityExtendBundle\Command\CacheCheckCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\EntityExtendBundle\Command\CacheCheckCommand
+
+    Oro\Bundle\EntityExtendBundle\Command\CacheCheckCommand:
         tags:
             - { name: console.command }
 
     Oro\Bundle\EntityExtendBundle\Command\CacheClearCommand:
-        public: false
-        class: Oro\Bundle\EntityExtendBundle\Command\CacheClearCommand
         tags:
             - { name: console.command }
-
 
     Oro\Bundle\EntityExtendBundle\Command\CacheWarmupCommand:
-        public: false
-        class: Oro\Bundle\EntityExtendBundle\Command\CacheWarmupCommand
         tags:
             - { name: console.command }
 
-
     Oro\Bundle\EntityExtendBundle\Command\MigrationUpdateConfigCommand:
-        public: false
-        class: Oro\Bundle\EntityExtendBundle\Command\MigrationUpdateConfigCommand
         tags:
             - { name: console.command }
 
     Oro\Bundle\EntityExtendBundle\Command\RouterCacheClearCommand:
-        public: false
-        class: Oro\Bundle\EntityExtendBundle\Command\RouterCacheClearCommand
         tags:
             - { name: console.command }
 
     Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand:
-        public: false
-        class: Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand
         tags:
             - { name: console.command }
 
-
     Oro\Bundle\EntityExtendBundle\Command\UpdateSchemaCommand:
-        public: false
-        class: Oro\Bundle\EntityExtendBundle\Command\UpdateSchemaCommand
+        arguments:
+            - '@doctrine'
+            - '@oro_entity_config.provider.extend_entity_config_provider'
+            - '@oro_entity_extend.enum_synchronizer'
         tags:
             - { name: console.command }

@@ -1,24 +1,30 @@
 services:
-    Oro\Bundle\MessageQueueBundle\Command\CleanupCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\MessageQueueBundle\Command\CleanupCommand
+
+    Oro\Bundle\MessageQueueBundle\Command\CleanupCommand:
         tags:
             - { name: console.command }
 
     Oro\Bundle\MessageQueueBundle\Command\ClientConsumeMessagesCommand:
-        public: false
-        class: Oro\Bundle\MessageQueueBundle\Command\ClientConsumeMessagesCommand
+        arguments:
+            - '@oro_message_queue.client.queue_consumer'
+            - '@oro_message_queue.client.meta.destination_meta_registry'
+            - '@oro_message_queue.client.delegate_message_processor'
+            - '@oro_message_queue.log.consumer_state'
+            - '@monolog.logger.consumer'
         tags:
             - { name: console.command }
 
     Oro\Bundle\MessageQueueBundle\Command\ConsumerHeartbeatCommand:
-        public: false
-        class: Oro\Bundle\MessageQueueBundle\Command\ConsumerHeartbeatCommand
         tags:
             - { name: console.command }
 
     Oro\Bundle\MessageQueueBundle\Command\TransportConsumeMessagesCommand:
-        public: false
-        class: Oro\Bundle\MessageQueueBundle\Command\TransportConsumeMessagesCommand
+        arguments:
+            - '@oro_message_queue.consumption.queue_consumer'
+            - '@oro_message_queue.processor_locator'
+            - '@oro_message_queue.log.consumer_state'
+            - '@monolog.logger.consumer'
         tags:
             - { name: console.command }

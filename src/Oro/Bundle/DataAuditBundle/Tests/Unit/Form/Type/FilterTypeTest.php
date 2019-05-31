@@ -7,12 +7,18 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FilterTypeTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var FormFactoryInterface
+     */
+    private $factory;
+
     public function setUp()
     {
         parent::setUp();
@@ -58,6 +64,7 @@ class FilterTypeTest extends \PHPUnit\Framework\TestCase
         $form->submit($formData);
         
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
     }
 
     protected function getExtensions()

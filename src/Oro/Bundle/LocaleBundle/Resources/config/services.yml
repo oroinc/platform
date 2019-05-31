@@ -123,7 +123,9 @@ services:
     oro_locale.calendar_factory:
         class: '%oro_locale.calendar_factory.class%'
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
+        tags:
+            - { name: container.service_subscriber, id: 'oro_locale.calendar' }
 
     # Converters
     oro_locale.format_converter.date_time.registry:
@@ -242,17 +244,19 @@ services:
         class: Oro\Bundle\LocaleBundle\Twig\DateTimeExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: 'oro_locale.formatter.date_time' }
 
     oro_locale.twig.address:
         class: Oro\Bundle\LocaleBundle\Twig\AddressExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: 'oro_locale.formatter.address' }
 
     oro_locale.twig.number:
         class: Oro\Bundle\LocaleBundle\Twig\NumberExtension
@@ -369,6 +373,9 @@ services:
         deprecated: The "%service_id%" service is deprecated since 1.11, will be removed after 1.13.
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: 'oro_config.global' }
+            - { name: container.service_subscriber, id: 'oro_locale.formatter.date_time' }
+            - { name: container.service_subscriber, id: 'oro_locale.manager.localization' }
 
     oro_locale.layout.data_provider.locale:
         class: Oro\Bundle\LocaleBundle\Layout\LocaleProvider

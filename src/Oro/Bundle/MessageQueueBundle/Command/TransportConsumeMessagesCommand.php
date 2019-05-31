@@ -8,6 +8,7 @@ use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Log\ConsumerState;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,17 +18,43 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class TransportConsumeMessagesCommand extends ConsumeMessagesCommand
 {
+    /** @var string */
+    protected static $defaultName = 'oro:message-queue:transport:consume';
+
+    /** @var ConsumerState */
+    private $consumerState;
+
+    /** @var LoggerInterface */
+    private $logger;
+
+    /**
+     * @param QueueConsumer $queueConsumer
+     * @param ContainerInterface $processorLocator
+     * @param ConsumerState $consumerState
+     * @param LoggerInterface $logger
+     */
+    public function __construct(
+        QueueConsumer $queueConsumer,
+        ContainerInterface $processorLocator,
+        ConsumerState $consumerState,
+        LoggerInterface $logger
+    ) {
+        parent::__construct($queueConsumer, $processorLocator);
+
+        $this->consumerState = $consumerState;
+        $this->logger = $logger;
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function consume(QueueConsumer $consumer, ExtensionInterface $extension)
     {
-        $consumerState = $this->getConsumerState();
-        $consumerState->startConsumption();
+        $this->consumerState->startConsumption();
         try {
             parent::consume($consumer, $extension);
         } finally {
-            $consumerState->stopConsumption();
+            $this->consumerState->stopConsumption();
         }
     }
 
@@ -36,7 +63,7 @@ class TransportConsumeMessagesCommand extends ConsumeMessagesCommand
      */
     protected function getConsumerExtension(array $extensions)
     {
-        return new ChainExtension($extensions, $this->getConsumerState());
+        return new ChainExtension($extensions, $this->consumerState);
     }
 
     /**
@@ -44,17 +71,6 @@ class TransportConsumeMessagesCommand extends ConsumeMessagesCommand
      */
     protected function getLoggerExtension(InputInterface $input, OutputInterface $output)
     {
-        /** @var LoggerInterface $logger */
-        $logger = $this->container->get('monolog.logger.consumer');
-
-        return new LoggerExtension($logger);
-    }
-
-    /**
-     * @return ConsumerState
-     */
-    protected function getConsumerState()
-    {
-        return $this->container->get('oro_message_queue.log.consumer_state');
+        return new LoggerExtension($this->logger);
     }
 }

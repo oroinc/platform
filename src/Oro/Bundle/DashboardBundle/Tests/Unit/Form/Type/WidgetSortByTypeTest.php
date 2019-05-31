@@ -59,6 +59,7 @@ class WidgetSortByTypeTest extends TypeTestCase
         $form->submit($formData);
 
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
         $this->assertEquals(
             $formData,
             $form->getData()

@@ -14,13 +14,42 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
+/**
+ * A client's worker that processes messages.
+ */
+class ConsumeMessagesCommand extends Command
 {
-    use ContainerAwareTrait;
     use LimitsExtensionsCommandTrait;
+
+    /** @var string */
+    protected static $defaultName = 'oro:message-queue:consume';
+
+    /** @var QueueConsumer */
+    protected $queueConsumer;
+
+    /** @var DestinationMetaRegistry */
+    protected $destinationMetaRegistry;
+
+    /** @var MessageProcessorInterface */
+    protected $messageProcessor;
+
+    /**
+     * @param QueueConsumer $queueConsumer
+     * @param DestinationMetaRegistry $destinationMetaRegistry
+     * @param MessageProcessorInterface $messageProcessor
+     */
+    public function __construct(
+        QueueConsumer $queueConsumer,
+        DestinationMetaRegistry $destinationMetaRegistry,
+        MessageProcessorInterface $messageProcessor
+    ) {
+        parent::__construct();
+
+        $this->queueConsumer = $queueConsumer;
+        $this->destinationMetaRegistry = $destinationMetaRegistry;
+        $this->messageProcessor = $messageProcessor;
+    }
 
     /**
      * {@inheritdoc}
@@ -30,7 +59,6 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
         $this->configureLimitsExtensions();
 
         $this
-            ->setName('oro:message-queue:consume')
             ->setDescription('A client\'s worker that processes messages. '.
                 'By default it connects to default queue. '.
                 'It select an appropriate message processor based on a message headers')
@@ -42,18 +70,17 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $consumer = $this->getConsumer();
         $clientDestinationName = $input->getArgument('clientDestinationName');
         if ($clientDestinationName) {
-            $consumer->bind(
-                $this->getDestinationMetaRegistry()->getDestinationMeta($clientDestinationName)->getTransportName(),
-                $this->getProcessor()
+            $this->queueConsumer->bind(
+                $this->destinationMetaRegistry->getDestinationMeta($clientDestinationName)->getTransportName(),
+                $this->messageProcessor
             );
         } else {
-            foreach ($this->getDestinationMetaRegistry()->getDestinationsMeta() as $destinationMeta) {
-                $consumer->bind(
+            foreach ($this->destinationMetaRegistry->getDestinationsMeta() as $destinationMeta) {
+                $this->queueConsumer->bind(
                     $destinationMeta->getTransportName(),
-                    $this->getProcessor()
+                    $this->messageProcessor
                 );
             }
         }
@@ -61,7 +88,7 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
         $extensions = $this->getLimitsExtensions($input, $output);
         array_unshift($extensions, $this->getLoggerExtension($input, $output));
 
-        $this->consume($consumer, $this->getConsumerExtension($extensions));
+        $this->consume($this->queueConsumer, $this->getConsumerExtension($extensions));
     }
 
     /**
@@ -96,29 +123,5 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
     protected function getLoggerExtension(InputInterface $input, OutputInterface $output)
     {
         return new LoggerExtension(new ConsoleLogger($output));
-    }
-
-    /**
-     * @return QueueConsumer
-     */
-    private function getConsumer()
-    {
-        return $this->container->get('oro_message_queue.client.queue_consumer');
-    }
-
-    /**
-     * @return DestinationMetaRegistry
-     */
-    private function getDestinationMetaRegistry()
-    {
-        return $this->container->get('oro_message_queue.client.meta.destination_meta_registry');
-    }
-
-    /**
-     * @return MessageProcessorInterface
-     */
-    private function getProcessor()
-    {
-        return $this->container->get('oro_message_queue.client.delegate_message_processor');
     }
 }

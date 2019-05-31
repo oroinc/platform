@@ -2,25 +2,73 @@
 
 namespace Oro\Bundle\UserBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ImpersonateUserCommand extends ContainerAwareCommand
+/**
+ * Generates one-time impersonation link for a given user.
+ */
+class ImpersonateUserCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:user:impersonate';
+
+    /** @var ManagerRegistry */
+    private $registry;
+
+    /** @var Router */
+    private $router;
+
+    /** @var ConfigManager */
+    private $configManager;
+
+    /** @var UserManager */
+    private $userManager;
+
+    /** @var DateTimeFormatterInterface */
+    private $dateTimeFormatter;
+
+    /**
+     * ImpersonateUserCommand constructor.
+     * @param ManagerRegistry $registry
+     * @param Router $router
+     * @param ConfigManager $configManager
+     * @param UserManager $userManager
+     * @param DateTimeFormatterInterface $dateTimeFormatter
+     */
+    public function __construct(
+        ManagerRegistry $registry,
+        Router $router,
+        ConfigManager $configManager,
+        UserManager $userManager,
+        DateTimeFormatterInterface $dateTimeFormatter
+    ) {
+        parent::__construct();
+
+        $this->registry = $registry;
+        $this->router = $router;
+        $this->configManager = $configManager;
+        $this->userManager = $userManager;
+        $this->dateTimeFormatter = $dateTimeFormatter;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
         $this
-            ->setName('oro:user:impersonate')
             ->setDescription(
                 'Generates one-time impersonation link for a given user.' . PHP_EOL .
                 'Unused tokens expire after the specified time.'
@@ -44,7 +92,7 @@ class ImpersonateUserCommand extends ContainerAwareCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $username = $input->getArgument('username');
-        $user = $this->getContainer()->get('oro_user.manager')->findUserByUsername($username);
+        $user = $this->userManager->findUserByUsername($username);
 
         if (!$user) {
             throw new \InvalidArgumentException(sprintf('User with username "%s" does not exists', $username));
@@ -62,13 +110,12 @@ class ImpersonateUserCommand extends ContainerAwareCommand
         );
         $url = $this->generateUrl($input->getOption('route'), $impersonation->getToken());
 
-        $datetimeFormatter = $this->getContainer()->get('oro_locale.formatter.date_time');
         $output->writeln(
             sprintf(
                 '<info>To login as user <comment>%s</comment> open the following URL ' .
                 '(expires <comment>%s</comment>):</info>',
                 $user->getUsername(),
-                $datetimeFormatter->format(
+                $this->dateTimeFormatter->format(
                     $impersonation->getExpireAt(),
                     \IntlDateFormatter::MEDIUM,
                     \IntlDateFormatter::FULL
@@ -105,7 +152,7 @@ class ImpersonateUserCommand extends ContainerAwareCommand
      */
     protected function createImpersonation(User $user, $lifetime, $notify)
     {
-        $manager = $this->getContainer()->get('doctrine')->getManager();
+        $manager = $this->registry->getManagerForClass(Impersonation::class);
 
         if (is_numeric($lifetime)) {
             $lifetime .= ' sec';
@@ -129,10 +176,9 @@ class ImpersonateUserCommand extends ContainerAwareCommand
      */
     protected function generateUrl($route, $token)
     {
-        $router = $this->getContainer()->get('router');
-        $applicationUrl = $this->getContainer()->get('oro_config.manager')->get('oro_ui.application_url');
+        $applicationUrl = $this->configManager->get('oro_ui.application_url');
 
-        return $applicationUrl . $router->generate(
+        return $applicationUrl . $this->router->generate(
             $route,
             [
                 ImpersonationAuthenticator::TOKEN_PARAMETER => $token,

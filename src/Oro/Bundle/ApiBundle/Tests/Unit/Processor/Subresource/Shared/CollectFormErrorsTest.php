@@ -48,6 +48,7 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [$this->createErrorObject('not blank constraint', 'This value should not be blank.', '')],
@@ -77,6 +78,7 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [$this->createErrorObject('not blank constraint', 'This value should not be blank.', '1')],

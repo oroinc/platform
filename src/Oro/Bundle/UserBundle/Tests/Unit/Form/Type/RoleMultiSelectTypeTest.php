@@ -95,6 +95,7 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
         $form->submit($submittedData);
 
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
         $this->assertEquals($expected, $form->getData());
     }
 

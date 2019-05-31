@@ -46,6 +46,7 @@ class StringFilterTest extends WebTestCase
         $filterForm->submit($filterFormData);
 
         $this->assertTrue($filterForm->isValid());
+        $this->assertTrue($filterForm->isSynchronized());
 
         $this->filter->init($filterName, ['enabled' => true, 'type' => 'string', 'data_name' => $filterName]);
         $this->filter->apply($ds, $filterForm->getData());
@@ -147,6 +148,7 @@ class StringFilterTest extends WebTestCase
         $filterForm->submit(['type' => TextFilterType::TYPE_CONTAINS, 'value' => 'test2']);
 
         $this->assertTrue($filterForm->isValid());
+        $this->assertTrue($filterForm->isSynchronized());
 
         $this->filter->init('string', ['data_name' => 'e.email']);
         $this->filter->apply($ds, $filterForm->getData());
@@ -178,6 +180,7 @@ class StringFilterTest extends WebTestCase
         $filterForm->submit(['type' => TextFilterType::TYPE_IN, 'value' => 'test2@example.com']);
 
         $this->assertTrue($filterForm->isValid());
+        $this->assertTrue($filterForm->isSynchronized());
 
         $this->filter->init('string', ['data_name' => 'e.email']);
         $this->filter->apply($ds, $filterForm->getData());
@@ -208,6 +211,7 @@ class StringFilterTest extends WebTestCase
         $filterForm->submit(['type' => TextFilterType::TYPE_NOT_IN, 'value' => 'test1@example.com']);
 
         $this->assertTrue($filterForm->isValid());
+        $this->assertTrue($filterForm->isSynchronized());
 
         $this->filter->init('string', ['data_name' => 'e.email']);
         $this->filter->apply($ds, $filterForm->getData());

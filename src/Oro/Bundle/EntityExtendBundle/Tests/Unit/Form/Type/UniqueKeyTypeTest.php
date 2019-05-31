@@ -69,6 +69,7 @@ class UniqueKeyTypeTest extends TypeTestCase
 
         $form->submit($formData);
         $this->assertFalse($form->isValid());
+        $this->assertTrue($form->isSynchronized());
     }
 
     public function testNames()

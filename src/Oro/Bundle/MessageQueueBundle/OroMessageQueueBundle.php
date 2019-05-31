@@ -14,6 +14,7 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureClearers
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureDbalTransportExtensionsPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeAnnotationReaderServicesPersistentPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeLoggerServicesPersistentPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ProcessorLocatorPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\DbalTransportFactory;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\NullTransportFactory;
@@ -43,6 +44,7 @@ class OroMessageQueueBundle extends Bundle
         $container->addCompilerPass(new ConfigureClearersPass());
         $container->addCompilerPass(new MakeLoggerServicesPersistentPass());
         $container->addCompilerPass(new MakeAnnotationReaderServicesPersistentPass());
+        $container->addCompilerPass(new ProcessorLocatorPass());
 
         /** @var OroMessageQueueExtension $extension */
         $extension = $container->getExtension('oro_message_queue');

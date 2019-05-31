@@ -16,6 +16,7 @@ class UserApiKeyGenTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create(UserApiKeyGenType::class, $userApi);
         $form->submit([]);
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
 
         $this->assertEquals($userApi, $form->getData());
     }

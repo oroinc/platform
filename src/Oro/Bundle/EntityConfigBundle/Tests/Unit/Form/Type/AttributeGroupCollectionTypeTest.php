@@ -81,6 +81,7 @@ class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
 
         $form->submit($submittedData, [$existingEntity]);
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
 
         $existingEntity->addLabel($this->createLocalizedValue('Group1 Label 2'));
         $entity = new AttributeGroup();

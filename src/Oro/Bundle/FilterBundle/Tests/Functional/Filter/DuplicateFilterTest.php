@@ -46,6 +46,7 @@ class DuplicateFilterTest extends WebTestCase
         $filterForm->submit(['value' => $filterType]);
 
         $this->assertTrue($filterForm->isValid());
+        $this->assertTrue($filterForm->isSynchronized());
 
         $this->filter->init('duplicate', ['data_name' => 'u.firstName']);
         $this->filter->apply($ds, $filterForm->getData());
@@ -82,6 +83,7 @@ class DuplicateFilterTest extends WebTestCase
         $filterForm->submit(['value' => $filterType]);
 
         $this->assertTrue($filterForm->isValid());
+        $this->assertTrue($filterForm->isSynchronized());
 
         $this->filter->init('duplicate', ['data_name' => 'e.email']);
         $this->filter->apply($ds, $filterForm->getData());

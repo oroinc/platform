@@ -38,6 +38,7 @@ class FormTest extends WebTestCase
 
         $form->submit(['id' => 123, 'title' => 'test']);
         self::assertTrue($form->isSubmitted(), 'isSubmitted');
+        self::assertTrue($form->isSynchronized(), 'isSynchronized');
         self::assertTrue($form->isValid(), 'isValid');
 
         self::assertSame(123, $object->getId());
@@ -55,6 +56,7 @@ class FormTest extends WebTestCase
         $form->submit(['id' => 123, 'title' => 'test']);
         self::assertTrue($form->isSubmitted(), 'isSubmitted');
         self::assertTrue($form->isValid(), 'isValid');
+        self::assertTrue($form->isSynchronized(), 'isSynchronized');
 
         self::assertSame(123, $object->getId());
         self::assertSame('test', $object->getTitle());
@@ -70,6 +72,7 @@ class FormTest extends WebTestCase
         $form->submit(['title' => 'test']);
         self::assertTrue($form->isSubmitted(), 'isSubmitted');
         self::assertTrue($form->isValid(), 'isValid');
+        self::assertTrue($form->isSynchronized(), 'isSynchronized');
 
         self::assertSame('test', $object->getTitle());
     }
@@ -101,6 +104,7 @@ class FormTest extends WebTestCase
         $form->submit(['title' => 'test', 'enabled' => 'yes']);
         self::assertTrue($form->isSubmitted(), 'isSubmitted, TRUE');
         self::assertTrue($form->isValid(), 'isValid, TRUE');
+        self::assertTrue($form->isSynchronized(), 'isSynchronized');
         self::assertTrue($object->isEnabled(), 'value, TRUE');
 
         // test API boolean form type, FALSE value
@@ -112,6 +116,7 @@ class FormTest extends WebTestCase
         $form->submit(['title' => 'test', 'enabled' => 'no']);
         self::assertTrue($form->isSubmitted(), 'isSubmitted, FALSE');
         self::assertTrue($form->isValid(), 'isValid, FALSE');
+        self::assertTrue($form->isSynchronized(), 'isSynchronized');
         self::assertFalse($object->isEnabled(), 'value, FALSE');
 
         // test API boolean form type, NULL value
@@ -123,6 +128,7 @@ class FormTest extends WebTestCase
         $form->submit(['title' => 'test', 'enabled' => null]);
         self::assertTrue($form->isSubmitted(), 'isSubmitted, NULL');
         self::assertTrue($form->isValid(), 'isValid, NULL');
+        self::assertTrue($form->isSynchronized(), 'isSynchronized');
         self::assertNull($object->isEnabled(), 'value, NULL');
     }
 
@@ -135,6 +141,7 @@ class FormTest extends WebTestCase
         $form->submit(['id' => 123, 'title' => '']);
         self::assertTrue($form->isSubmitted(), 'isSubmitted');
         self::assertFalse($form->isValid(), 'isValid');
+        self::assertTrue($form->isSynchronized(), 'isSynchronized');
     }
 
     public function testApiFormValidation()
@@ -148,6 +155,7 @@ class FormTest extends WebTestCase
         $form->submit(['id' => 123, 'title' => '']);
         self::assertTrue($form->isSubmitted(), 'isSubmitted');
         self::assertFalse($form->isValid(), 'isValid');
+        self::assertTrue($form->isSynchronized(), 'isSynchronized');
     }
 
     public function testValidationConstraintFromAllGroups()
@@ -161,6 +169,7 @@ class FormTest extends WebTestCase
         $form->submit(['id' => 123, 'title' => 'test', 'description' => '12']);
         self::assertTrue($form->isSubmitted(), 'isSubmitted');
         self::assertTrue($form->isValid(), 'isValid');
+        self::assertTrue($form->isSynchronized(), 'isSynchronized');
     }
 
     public function testValidationConstraintFromApiGroup()
@@ -174,6 +183,7 @@ class FormTest extends WebTestCase
         $form->submit(['id' => 123, 'title' => 'test', 'description' => '1234']);
         self::assertTrue($form->isSubmitted(), 'isSubmitted');
         self::assertFalse($form->isValid(), 'isValid');
+        self::assertTrue($form->isSynchronized(), 'isSynchronized');
     }
 
     public function testValidationConstraintFromUiGroup()
@@ -187,6 +197,7 @@ class FormTest extends WebTestCase
         $form->submit(['id' => 123, 'title' => 'test', 'description' => '1234']);
         self::assertTrue($form->isSubmitted(), 'isSubmitted');
         self::assertTrue($form->isValid(), 'isValid');
+        self::assertTrue($form->isSynchronized(), 'isSynchronized');
     }
 
     /**
@@ -213,6 +224,7 @@ class FormTest extends WebTestCase
         $form->submit(['id' => 123, 'title' => 'test']);
         self::assertTrue($form->isSubmitted(), 'isSubmitted');
         self::assertTrue($form->isValid(), 'isValid');
+        self::assertTrue($form->isSynchronized(), 'isSynchronized');
 
         self::assertSame(123, $object->getId());
         self::assertSame('test', $object->getTitle());
@@ -236,6 +248,7 @@ class FormTest extends WebTestCase
         $form->submit(['code' => 123, 'title' => 'test']);
         self::assertTrue($form->isSubmitted(), 'isSubmitted');
         self::assertTrue($form->isValid(), 'isValid');
+        self::assertTrue($form->isSynchronized(), 'isSynchronized');
 
         self::assertSame(123, $object->getId());
         self::assertSame('test', $object->getTitle());

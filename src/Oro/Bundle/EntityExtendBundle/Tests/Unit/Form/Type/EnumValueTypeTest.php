@@ -74,6 +74,7 @@ class EnumValueTypeTest extends TypeTestCase
         $form->submit($inputData['form']);
 
         $this->assertEquals($expectedData['valid'], $form->isValid());
+        $this->assertTrue($form->isSynchronized());
     }
 
     public function testSubmitValidDataForNewEnumValue()

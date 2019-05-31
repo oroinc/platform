@@ -6,15 +6,11 @@ use Oro\Component\MessageQueue\Client\Meta\TopicMeta;
 use Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry;
 use Oro\Component\MessageQueue\Client\Meta\TopicsCommand;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\Container;
 
 class TopicsCommandTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TopicsCommand */
     private $command;
-
-    /** @var Container */
-    private $container;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $topicRegistry;
@@ -23,11 +19,7 @@ class TopicsCommandTest extends \PHPUnit\Framework\TestCase
     {
         $this->topicRegistry = $this->createMock(TopicMetaRegistry::class);
 
-        $this->command = new TopicsCommand();
-
-        $this->container = new Container();
-        $this->container->set('oro_message_queue.client.meta.topic_meta_registry', $this->topicRegistry);
-        $this->command->setContainer($this->container);
+        $this->command = new TopicsCommand($this->topicRegistry);
     }
 
     public function testShouldShowMessageFoundZeroTopicsIfAnythingInRegistry()

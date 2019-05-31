@@ -2,27 +2,50 @@
 
 namespace Oro\Bundle\UserBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\UserBundle\Entity\UserApi;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 
-class GenerateWSSEHeaderCommand extends ContainerAwareCommand
+/**
+ * Generate X-WSSE HTTP header for a given API key.
+ */
+class GenerateWSSEHeaderCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:wsse:generate-header';
+
+    /** @var ManagerRegistry */
+    private $registry;
+
+    /** @var MessageDigestPasswordEncoder */
+    private $messageDigestPasswordEncoder;
+
+    /**
+     * @param ManagerRegistry $registry
+     * @param MessageDigestPasswordEncoder $messageDigestPasswordEncoder
+     */
+    public function __construct(ManagerRegistry $registry, MessageDigestPasswordEncoder $messageDigestPasswordEncoder)
+    {
+        parent::__construct();
+
+        $this->registry = $registry;
+        $this->messageDigestPasswordEncoder = $messageDigestPasswordEncoder;
+    }
+
     /**
      * Console command configuration
      */
     public function configure()
     {
-        $this->setName('oro:wsse:generate-header');
         $this->setDescription('Generate X-WSSE HTTP header for a given API key');
         $this->setDefinition(
-            array(
+            [
                 new InputArgument('apiKey', InputArgument::REQUIRED, 'User API Key'),
-            )
+            ]
         );
     }
 
@@ -35,11 +58,9 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var ContainerInterface $container */
-        $container = $this->getContainer();
         $apiKey = $input->getArgument('apiKey');
         /** @var UserApi $userApi */
-        $userApi = $container->get('doctrine')->getRepository('OroUserBundle:UserApi')->findOneBy(
+        $userApi = $this->registry->getRepository('OroUserBundle:UserApi')->findOneBy(
             ['apiKey' => $apiKey]
         );
         if (!$userApi) {
@@ -68,9 +89,7 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
         $nonce  = base64_encode(substr(md5(uniqid($prefix . '_', true)), 0, 16));
         $salt   = ''; // do not use real salt here, because API key already encrypted enough
 
-        /** @var MessageDigestPasswordEncoder $encoder */
-        $encoder        = $container->get('escape_wsse_authentication.encoder.wsse_secured');
-        $passwordDigest = $encoder->encodePassword(
+        $passwordDigest = $this->messageDigestPasswordEncoder->encodePassword(
             sprintf(
                 '%s%s%s',
                 base64_decode($nonce),

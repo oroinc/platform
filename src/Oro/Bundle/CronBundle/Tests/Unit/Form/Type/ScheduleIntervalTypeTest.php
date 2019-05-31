@@ -45,6 +45,7 @@ class ScheduleIntervalTypeTest extends FormIntegrationTestCase
 
         $form->submit($submittedData);
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
         $data = $form->getData();
         $this->assertEquals($expected, $data);
     }

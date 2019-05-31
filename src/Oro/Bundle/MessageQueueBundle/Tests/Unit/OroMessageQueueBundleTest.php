@@ -53,6 +53,7 @@ class OroMessageQueueBundleTest extends \PHPUnit\Framework\TestCase
             new Compiler\ConfigureClearersPass(),
             new Compiler\MakeLoggerServicesPersistentPass(),
             new Compiler\MakeAnnotationReaderServicesPersistentPass(),
+            new Compiler\ProcessorLocatorPass(),
             $addTopicPass,
         ], $container->getCompilerPassConfig()->getBeforeOptimizationPasses());
     }

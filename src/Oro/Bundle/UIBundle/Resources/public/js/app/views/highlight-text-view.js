@@ -253,21 +253,6 @@ define(function(require) {
         },
 
         /**
-         * Highlight text in given element
-         *
-         * @param {Object} element
-         */
-        highlightElement: function(element) {
-            var $el = element.$el;
-
-            var $content = this.getElementContent($el);
-            if (this.findText) {
-                this.highlightElementContent($content);
-            }
-            this.setElementContent($el, $content);
-        },
-
-        /**
          * Check visible highlighted elements exists in given element
          *
          * @param {jQuery} $el
@@ -311,18 +296,18 @@ define(function(require) {
          * Remove highlight from all elements
          */
         clear: function() {
+            this.unhighlightElementContent(this.$el);
+
             _.each(this.$el.find(this.findElementHighlightClass), function(element) {
                 var $el = $(element);
-                var $content = this.getElementContent($el);
+                var popover = $el.data(Popover.DATA_KEY);
 
                 $el.removeClass(this.elementHighlightClass);
-                $content.find(this.findHighlightClass).each(function() {
-                    var $el = $(this);
-                    $el.replaceWith($el.html());
-                });
 
-                if (!this._isFieldChoice($el)) {
-                    this.setElementContent($el, $content);
+                if (popover !== void 0) {
+                    var $content = $('<div/>').html(popover.getContent());
+                    this.unhighlightElementContent($content);
+                    popover.updateContent($content.html());
                 }
             }, this);
 
@@ -331,74 +316,52 @@ define(function(require) {
         },
 
         /**
-         * Return element content, based on element type
+         * Highlight text in given element
          *
-         * @param {jQuery} $el
-         * @return {jQuery}
+         * @param {Object} element
          */
-        getElementContent: function($el) {
-            var content;
-            var popover = $el.data(Popover.DATA_KEY);
-
-            if (popover !== void 0) {
-                content = $('<div/>').html(popover.getContent());
-            } else if (this._isSelect2Multi($el)) {
-                content = $el.siblings('.select2-container').find('.select2-choices');
-            } else if (this._isSelect2($el)) {
-                content = $el.siblings('.select2-container').find('.select2-choice:not(.select2-default)')
-                    .find('.select2-chosen');
-            } else if (this._isField($el) && !this._isFieldChoice($el)) {
-                content = $('<div/>').html($el.val());
-            } else {
-                content = $el;
-            }
-
-            return content;
-        },
-
-        /**
-         * Set processed content to element
-         *
-         * @param {jQuery} $el
-         * @param {jQuery} $content
-         */
-        setElementContent: function($el, $content) {
+        highlightElement: function(element) {
+            var result = false;
+            var $content;
+            var $el = element.$el;
             var $highlightTarget = $el;
-            var isContentHighlighted = this.isElementContentHighlighted($content, false);
             var popover = $el.data(Popover.DATA_KEY);
 
             if (popover !== void 0) {
+                $content = $('<div/>').html(popover.getContent());
+                result = this.highlightElementContent($content);
                 popover.updateContent($content.html());
+            } else if (this._isField($el) && !this._isFieldChoice($el)) {
+                result = this.textContainsSearchTerm($el.val());
             } else if (this._isSelect2($el)) {
                 $highlightTarget = $el.parent();
 
-                if (this.findText && !isContentHighlighted) {
-                    if ($el.is('select')) {
-                        $el.children('option').each(function(i, option) {
-                            isContentHighlighted = this.findText.test($(option).text());
-
-                            return !isContentHighlighted;
-                        }.bind(this));
-                    } else {
-                        var initializeOptions = _.result($el.data('inputWidget'), 'initializeOptions');
-
-                        if (_.isArray(initializeOptions.data)) {
-                            isContentHighlighted = this.isSelect2DataContainsSearchText(initializeOptions.data);
-                        }
-                    }
+                if (this._isSelect2Multi($el)) {
+                    $content = $el.siblings('.select2-container').find('.select2-choices');
+                } else {
+                    $content = $el.siblings('.select2-container').find('.select2-choice:not(.select2-default)')
+                        .find('.select2-chosen');
                 }
+
+                result = this.highlightElementContent($content) || this.select2ContainsSearchText($el);
             } else if (this._isFieldChoice($el) && !this._isMultiselect($el)) {
+                result = this.highlightElementContent($el);
                 $highlightTarget = $el.parent();
 
                 if (inputWidgetManager.hasWidget($el)) {
                     $el.inputWidget('refresh');
                 }
-            } else if (!this._isField($el)) {
-                $el.get(0).normalize();
-                isContentHighlighted = this.isElementContentHighlighted($el);
+            } else {
+                result = this.highlightElementContent($el);
+
+                if (!this._isField($el)) {
+                    $el.get(0).normalize();
+                }
             }
 
-            $highlightTarget.toggleClass(this.elementHighlightClass, isContentHighlighted);
+            $highlightTarget.toggleClass(this.elementHighlightClass, result);
+
+            return result;
         },
 
         /**
@@ -407,22 +370,56 @@ define(function(require) {
          * @param {jQuery} $content
          */
         highlightElementContent: function($content) {
+            var result = false;
+
             _.each($content.contents(), function(children) {
                 var $children = $(children);
                 if (children.nodeName === '#text') {
                     var text = $children.text();
-                    if (!this.fuzzySearch || FuzzySearch.isMatched(_.trim(text), this.text)) {
+                    if (this.textContainsSearchTerm(text)) {
+                        result = true;
                         text = text.replace(this.findText, this.replaceBy);
                         $children.replaceWith(text);
                     }
                 } else {
                     if (!$children.is(this.highlightSelectors.join(', '))) {
-                        this.highlightElement({
+                        result = this.highlightElement({
                             $el: $children
-                        });
+                        }) || result;
                     }
                 }
             }, this);
+
+            return result;
+        },
+
+        /**
+         * Unhighlight text in given content
+         *
+         * @param {jQuery} $content
+         */
+        unhighlightElementContent: function($content) {
+            $content.find(this.findHighlightClass).each(function() {
+                var $el = $(this);
+                var parent = $el.parent()[0];
+
+                $el.contents().unwrap();
+                parent.normalize();
+            });
+        },
+
+        /**
+         * Checks if string is matched search term
+         *
+         * @param {string} text
+         * @return {boolean}
+         */
+        textContainsSearchTerm: function(text) {
+            if (!this.findText || this.fuzzySearch && !FuzzySearch.isMatched(_.trim(text), this.text)) {
+                return false;
+            }
+
+            return text.match(this.findText) !== null;
         },
 
         /**
@@ -551,17 +548,35 @@ define(function(require) {
         },
 
         /**
-         * Checks if Select2 data contains search text
+         * Checks if Select2 data or options contain search text
          *
-         * @param {Array.<string|Object>} data
+         * @param {jQuery} $el
          * @return {boolean}
          */
-        isSelect2DataContainsSearchText: function(data) {
-            return _.some(data, function(item) {
-                var text = _.isString(item) ? item : item.text;
+        select2ContainsSearchText: function($el) {
+            var result = false;
 
-                return this.findText.test(text);
-            }, this);
+            if (this.findText) {
+                if ($el.is('select')) {
+                    $el.children('option').each(function(i, option) {
+                        result = this.findText.test($(option).text());
+
+                        return !result;
+                    }.bind(this));
+                } else {
+                    var initializeOptions = _.result($el.data('inputWidget'), 'initializeOptions');
+
+                    if (_.isArray(initializeOptions.data)) {
+                        result = _.some(initializeOptions.data, function(item) {
+                            var text = _.isString(item) ? item : item.text;
+
+                            return this.findText.test(text);
+                        }, this);
+                    }
+                }
+            }
+
+            return result;
         },
 
         /**

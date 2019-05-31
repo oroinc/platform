@@ -41,6 +41,7 @@ class TagsDictionaryFilterTest extends WebTestCase
         $filterForm->submit($filterFormData());
 
         $this->assertTrue($filterForm->isValid());
+        $this->assertTrue($filterForm->isSynchronized());
 
         $this->filter->init('u.id', ['data_name' => 'u.id', 'entity_class' => User::class]);
         $this->filter->apply($ds, $filterForm->getData());

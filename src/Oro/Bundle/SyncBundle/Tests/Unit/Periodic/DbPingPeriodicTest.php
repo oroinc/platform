@@ -81,6 +81,8 @@ class DbPingPeriodicTest extends \PHPUnit\Framework\TestCase
 
         $this->assertLoggerErrorMethodCalled();
 
+        $this->expectException(DBALException::class);
+
         $this->dbPing->tick();
     }
 }

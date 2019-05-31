@@ -192,3 +192,11 @@ services:
             - '@monolog.logger.consumer'
         tags:
             - { name: kernel.event_listener, event: console.error, method: onConsoleError, priority: 255 }
+
+    oro_message_queue.processor_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        public: false
+        arguments:
+            - [] # processors. Will be set in Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ProcessorLocatorPass
+        tags:
+            - { name: container.service_locator }
