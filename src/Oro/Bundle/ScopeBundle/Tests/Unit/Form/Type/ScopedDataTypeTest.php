@@ -101,6 +101,7 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
         $form->submit($submittedData);
 
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
         // assert that when submitted all scopes added to form
         $this->assertSame(3, $form->count());
         $this->assertSame($submittedData[4], $form->get('4')->getData());

@@ -58,7 +58,6 @@ class AddressTypeTest extends AddressFormExtensionTestCase
         $form->submit($submittedData);
 
         $this->assertTrue($form->isValid(), $form->getErrors(true));
-        $this->assertTrue($form->isSubmitted());
         $this->assertTrue($form->isSynchronized());
 
         $this->assertEquals($expectedData, $form->getData());

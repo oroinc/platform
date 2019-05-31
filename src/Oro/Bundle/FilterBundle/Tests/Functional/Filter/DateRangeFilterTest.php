@@ -48,6 +48,7 @@ class DateRangeFilterTest extends WebTestCase
         $filterForm->submit($filterFormData());
 
         self::assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isSynchronized());
 
         $filter->init(
             'createdAt',
@@ -223,6 +224,7 @@ class DateRangeFilterTest extends WebTestCase
         $filterForm->submit($filterFormData);
 
         self::assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isSynchronized());
 
         $filter->init(
             'createdAt',
@@ -274,6 +276,7 @@ class DateRangeFilterTest extends WebTestCase
         $filterForm->submit($filterFormData);
 
         self::assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isSynchronized());
 
         $filter->init(
             'createdAt',

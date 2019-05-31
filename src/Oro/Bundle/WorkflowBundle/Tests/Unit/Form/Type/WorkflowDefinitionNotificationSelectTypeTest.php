@@ -58,6 +58,7 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
         $form->submit($workflow->getName());
 
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
         $this->assertEquals($workflow->getDefinition(), $form->getData());
     }
 

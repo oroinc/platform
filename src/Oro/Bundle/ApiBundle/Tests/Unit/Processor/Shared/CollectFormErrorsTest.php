@@ -82,6 +82,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -109,6 +110,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -142,6 +144,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -170,6 +173,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -196,6 +200,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -226,6 +231,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -254,6 +260,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -286,6 +293,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -319,6 +327,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -357,6 +366,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -398,6 +408,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -428,6 +439,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -464,6 +476,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [

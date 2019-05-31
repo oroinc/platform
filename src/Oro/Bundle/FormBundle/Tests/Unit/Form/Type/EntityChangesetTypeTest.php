@@ -87,6 +87,7 @@ class EntityChangesetTypeTest extends FormIntegrationTestCase
 
         $form->submit($submittedData);
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
 
         $data = $form->getData();
 

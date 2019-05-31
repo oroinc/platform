@@ -19,6 +19,7 @@ class WidgetFilterTypeTest extends TypeTestCase
         $form->submit($formData);
 
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
         $this->assertEquals(
             ['entity' => 'TestClass', 'definition' => ['filters' => []]],
             $form->getData()

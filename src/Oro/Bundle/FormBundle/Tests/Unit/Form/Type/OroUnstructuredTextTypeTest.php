@@ -34,6 +34,7 @@ class OroUnstructuredTextTypeTest extends FormIntegrationTestCase
         $form->submit($formData);
 
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
         $this->assertEquals($formData, $form->getData());
     }
 }

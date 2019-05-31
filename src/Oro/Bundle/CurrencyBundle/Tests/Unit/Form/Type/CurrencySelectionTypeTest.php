@@ -293,6 +293,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
 
         $form->submit($submittedData);
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
         $this->assertEquals($submittedData, $form->getData());
 
         return $form;

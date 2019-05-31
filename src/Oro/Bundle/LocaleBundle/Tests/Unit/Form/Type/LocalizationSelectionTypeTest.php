@@ -111,7 +111,8 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create(LocalizationSelectionType::class);
         $form->submit($submittedValue);
 
-        $this->assertSame($isValid, $form->isValid());
+        $this->assertEquals($isValid, $form->isValid());
+        $this->assertEquals($isValid, $form->isSynchronized());
     }
 
     /**

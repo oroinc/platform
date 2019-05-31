@@ -48,6 +48,7 @@ class DateTimeRangeFilterTest extends WebTestCase
         $filterForm->submit($filterFormData());
 
         self::assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isSynchronized());
 
         $filter->init(
             'createdAt',

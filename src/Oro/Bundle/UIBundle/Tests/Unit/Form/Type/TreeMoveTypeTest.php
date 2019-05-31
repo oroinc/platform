@@ -40,6 +40,7 @@ class TreeMoveTypeTest extends FormIntegrationTestCase
         $form->submit($submittedData);
 
         $this->assertEquals(true, $form->isValid());
+        $this->assertTrue($form->isSynchronized());
         $this->assertEquals($expectedData, $form->getData());
     }
 
