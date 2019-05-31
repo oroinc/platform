@@ -7,29 +7,26 @@ use Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\Container;
 
 class ConsumeMessagesCommandTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConsumeMessagesCommand */
     private $command;
 
-    /** @var Container */
-    private $container;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var QueueConsumer|\PHPUnit\Framework\MockObject\MockObject */
     private $consumer;
+
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $processorLocator;
 
     protected function setUp()
     {
         $this->consumer = $this->createMock(QueueConsumer::class);
+        $this->processorLocator = $this->createMock(ContainerInterface::class);
 
-        $this->command = new ConsumeMessagesCommand();
-
-        $this->container = new Container();
-        $this->container->set('oro_message_queue.consumption.queue_consumer', $this->consumer);
-        $this->command->setContainer($this->container);
+        $this->command = new ConsumeMessagesCommand($this->consumer, $this->processorLocator);
     }
 
     public function testShouldHaveCommandName()
@@ -62,7 +59,10 @@ class ConsumeMessagesCommandTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('Invalid message processor service given.'.
             ' It must be an instance of Oro\Component\MessageQueue\Consumption\MessageProcessorInterface but stdClass');
 
-        $this->container->set('processor-service', new \stdClass());
+        $this->processorLocator->expects($this->once())
+            ->method('get')
+            ->with('processor-service')
+            ->willReturn(new \stdClass());
 
         $tester = new CommandTester($this->command);
         $tester->execute([
@@ -89,7 +89,10 @@ class ConsumeMessagesCommandTest extends \PHPUnit\Framework\TestCase
             ->method('getConnection')
             ->will($this->returnValue($connection));
 
-        $this->container->set('processor-service', $processor);
+        $this->processorLocator->expects($this->once())
+            ->method('get')
+            ->with('processor-service')
+            ->willReturn($processor);
 
         $tester = new CommandTester($this->command);
         $tester->execute([

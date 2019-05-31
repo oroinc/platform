@@ -3,12 +3,13 @@
 namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 
 /**
  * Twig extension for DateTime formatting
  */
-class DateTimeExtension extends \Twig_Extension
+class DateTimeExtension extends \Twig_Extension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -199,5 +200,15 @@ class DateTimeExtension extends \Twig_Extension
     public function getName()
     {
         return 'oro_locale_datetime';
+    }
+
+    /**
+     * {@inheritdoc]
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_locale.formatter.date_time' => DateTimeFormatterInterface::class,
+        ];
     }
 }

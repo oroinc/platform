@@ -119,4 +119,18 @@ class DateTimeOrganizationExtension extends DateTimeExtension
 
         return $localizationData['formattingCode'] ?? Configuration::DEFAULT_LOCALE;
     }
+
+    /**
+     * {@inheritdoc]
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                'oro_config.global' => ConfigManager::class,
+                'oro_locale.manager.localization' => LocalizationManager::class,
+            ]
+        );
+    }
 }

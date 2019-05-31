@@ -7,12 +7,27 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class TopicsCommand extends Command implements ContainerAwareInterface
+/**
+ * Shows all available topics and some information about them.
+ */
+class TopicsCommand extends Command
 {
-    use ContainerAwareTrait;
+    /** @var string */
+    protected static $defaultName = 'oro:message-queue:topics';
+
+    /** @var TopicMetaRegistry */
+    private $topicMetaRegistry;
+
+    /**
+     * @param TopicMetaRegistry $topicMetaRegistry
+     */
+    public function __construct(TopicMetaRegistry $topicMetaRegistry)
+    {
+        parent::__construct();
+
+        $this->topicMetaRegistry = $topicMetaRegistry;
+    }
 
     /**
      * {@inheritdoc}
@@ -20,7 +35,6 @@ class TopicsCommand extends Command implements ContainerAwareInterface
     protected function configure()
     {
         $this
-            ->setName('oro:message-queue:topics')
             ->setDescription('A command shows all available topics and some information about them.');
     }
 
@@ -55,9 +69,6 @@ class TopicsCommand extends Command implements ContainerAwareInterface
      */
     private function getTopics()
     {
-        /** @var TopicMetaRegistry $topicRegistry */
-        $topicRegistry = $this->container->get('oro_message_queue.client.meta.topic_meta_registry');
-
-        return $topicRegistry->getTopicsMeta();
+        return $this->topicMetaRegistry->getTopicsMeta();
     }
 }

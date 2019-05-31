@@ -98,8 +98,8 @@ class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
     public function commandDataProvider()
     {
         return [
-            'client' => [new ClientConsumeMessagesCommand()],
-            'transport' => [new TransportConsumeMessagesCommand()]
+            'client' => [$this->createMock(ClientConsumeMessagesCommand::class)],
+            'transport' => [$this->createMock(TransportConsumeMessagesCommand::class)]
         ];
     }
 

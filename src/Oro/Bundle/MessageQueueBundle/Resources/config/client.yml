@@ -93,6 +93,8 @@ services:
 
     oro_message_queue.client.meta.topics_command:
         class: 'Oro\Component\MessageQueue\Client\Meta\TopicsCommand'
+        arguments:
+            - '@oro_message_queue.client.meta.topic_meta_registry'
         tags:
             - { name: console.command }
 

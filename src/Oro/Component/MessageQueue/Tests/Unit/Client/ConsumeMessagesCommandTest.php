@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
 use Oro\Component\MessageQueue\Client\ConsumeMessagesCommand;
@@ -9,15 +10,11 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\Container;
 
 class ConsumeMessagesCommandTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConsumeMessagesCommand */
     private $command;
-
-    /** @var Container */
-    private $container;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $consumer;
@@ -34,13 +31,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit\Framework\TestCase
         $this->registry = $this->createMock(DestinationMetaRegistry::class);
         $this->processor = $this->createMock(MessageProcessorInterface::class);
 
-        $this->command = new ConsumeMessagesCommand();
-
-        $this->container = new Container();
-        $this->container->set('oro_message_queue.client.queue_consumer', $this->consumer);
-        $this->container->set('oro_message_queue.client.meta.destination_meta_registry', $this->registry);
-        $this->container->set('oro_message_queue.client.delegate_message_processor', $this->processor);
-        $this->command->setContainer($this->container);
+        $this->command = new ConsumeMessagesCommand($this->consumer, $this->registry, $this->processor);
     }
 
     public function testShouldHaveCommandName()

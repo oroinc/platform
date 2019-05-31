@@ -4,12 +4,13 @@ namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Oro\Bundle\LocaleBundle\Formatter\AddressFormatter;
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 
 /**
  * Twig extension for Address manipulations
  */
-class AddressExtension extends \Twig_Extension
+class AddressExtension extends \Twig_Extension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -63,5 +64,15 @@ class AddressExtension extends \Twig_Extension
     public function getName()
     {
         return 'oro_locale_address';
+    }
+
+    /**
+     * {@inheritdoc]
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_locale.formatter.address' => AddressFormatter::class
+        ];
     }
 }

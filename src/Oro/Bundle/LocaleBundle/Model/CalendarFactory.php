@@ -2,9 +2,13 @@
 
 namespace Oro\Bundle\LocaleBundle\Model;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 
-class CalendarFactory implements CalendarFactoryInterface
+/**
+ * Calendar factory.
+ */
+class CalendarFactory implements CalendarFactoryInterface, ServiceSubscriberInterface
 {
     /**
      * @var ContainerInterface
@@ -29,5 +33,15 @@ class CalendarFactory implements CalendarFactoryInterface
         $result->setLocale($locale);
         $result->setLanguage($language);
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_locale.calendar' => Calendar::class
+        ];
     }
 }
