@@ -1,12 +1,15 @@
 services:
-    Oro\Bundle\LocaleBundle\Command\OroLocalizationDumpCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\LocaleBundle\Command\OroLocalizationDumpCommand
+
+    Oro\Bundle\LocaleBundle\Command\OroLocalizationDumpCommand:
+        arguments:
+            - '@oro_locale.settings'
+            - '@filesystem'
+            - '%kernel.project_dir%'
         tags:
             - { name: console.command }
 
-    Oro\Bundle\LocaleBundle\Command\UpdatelocalizationCommand:
-        public: false
-        class: Oro\Bundle\LocaleBundle\Command\UpdateLocalizationCommand
+    Oro\Bundle\LocaleBundle\Command\UpdateLocalizationCommand:
         tags:
             - { name: console.command }

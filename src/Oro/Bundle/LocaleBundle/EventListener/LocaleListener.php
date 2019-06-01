@@ -4,79 +4,64 @@ namespace Oro\Bundle\LocaleBundle\EventListener;
 
 use Doctrine\DBAL\DBALException;
 use Gedmo\Translatable\TranslatableListener;
-use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
+use Oro\Bundle\LocaleBundle\Provider\LocalizationProviderInterface;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Set current localization to all depended services
+ */
 class LocaleListener implements EventSubscriberInterface
 {
     /** @var LocaleSettings */
-    private $localeSettings = false;
+    private $localeSettings;
+
+    /** @var LocalizationProviderInterface */
+    private $currentLocalizationProvider;
 
     /** @var TranslatableListener */
-    private $translatableListener = false;
-
-    /** @var bool */
-    private $isInstalled = null;
-
-    /** @var RequestContextAwareInterface */
-    private $router = false;
+    private $translatableListener;
 
     /** @var TranslatorInterface */
-    private $translator = false;
+    private $translator;
 
-    /** @var Localization */
-    private $currentLocalization = false;
+    /** @var RequestContextAwareInterface|null */
+    private $router;
 
-    /** @var ContainerInterface */
-    private $container;
+    /** @var bool */
+    private $installed;
 
-    /**
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
+    /** @var string */
+    private $currentLanguage;
 
     /**
-     * @param Request $request
+     * @param LocaleSettings $localeSettings
+     * @param LocalizationProviderInterface $currentLocalizationProvider
+     * @param TranslatableListener $translatableListener
+     * @param TranslatorInterface $translator
+     * @param RequestContextAwareInterface|null $router
+     * @param string|bool|null $installed
      */
-    public function setRequest(Request $request = null)
-    {
-        if (!$request) {
-            return;
-        }
-
-        if ($this->getIsInstalled()) {
-            $localization = $this->getCurrentLocalization();
-            if (null !== $localization) {
-                $language = $localization->getLanguageCode();
-            } else {
-                $language = $this->getLocaleSettings()->getLanguage();
-            }
-            $locale = $this->getLocaleSettings()->getLocale();
-
-            if (!$request->attributes->get('_locale')) {
-                $request->setLocale($language);
-                if (null !== $this->getRouter()) {
-                    $this->getRouter()->getContext()->setParameter('_locale', $language);
-                }
-            }
-            $this->setPhpDefaultLocale($locale);
-
-            $this->getTranslatableListener()->setTranslatableLocale($language);
-            $this->getTranslator()->setLocale($language);
-        }
+    public function __construct(
+        LocaleSettings $localeSettings,
+        LocalizationProviderInterface $currentLocalizationProvider,
+        TranslatableListener $translatableListener,
+        TranslatorInterface $translator,
+        RequestContextAwareInterface $router,
+        $installed
+    ) {
+        $this->localeSettings = $localeSettings;
+        $this->currentLocalizationProvider = $currentLocalizationProvider;
+        $this->translatableListener = $translatableListener;
+        $this->translator = $translator;
+        $this->router = $router;
+        $this->installed = (bool) $installed;
     }
 
     /**
@@ -85,7 +70,21 @@ class LocaleListener implements EventSubscriberInterface
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        $this->setRequest($request);
+        if (!$request || !$this->installed) {
+            return;
+        }
+
+        $language = $this->getCurrentLanguage();
+        if (!$request->attributes->get('_locale')) {
+            $request->setLocale($language);
+
+            $this->router->getContext()->setParameter('_locale', $language);
+        }
+
+        $this->setPhpDefaultLocale($this->localeSettings->getLocale());
+
+        $this->translatableListener->setTranslatableLocale($language);
+        $this->translator->setLocale($language);
     }
 
     /**
@@ -101,25 +100,27 @@ class LocaleListener implements EventSubscriberInterface
      */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
+        if (!$this->installed) {
+            return;
+        }
+
         $isForced = $event->getInput()->hasParameterOption('--force');
         if ($isForced) {
-            $this->isInstalled = false;
+            $this->installed = false;
 
             return;
         }
 
-        if ($this->getIsInstalled()) {
-            try {
-                $locale   = $this->getLocaleSettings()->getLocale();
-                $language = $this->getLocaleSettings()->getLanguage();
-            } catch (DBALException $exception) {
-                // application is not installed
-                return;
-            }
-
-            $this->setPhpDefaultLocale($locale);
-            $this->getTranslatableListener()->setTranslatableLocale($language);
+        try {
+            $locale = $this->localeSettings->getLocale();
+            $language = $this->localeSettings->getLanguage();
+        } catch (DBALException $exception) {
+            // application is not installed
+            return;
         }
+
+        $this->setPhpDefaultLocale($locale);
+        $this->translatableListener->setTranslatableLocale($language);
     }
 
     /**
@@ -129,82 +130,23 @@ class LocaleListener implements EventSubscriberInterface
     {
         return [
             // must be registered after authentication
-            KernelEvents::REQUEST  => [['onKernelRequest', 7]],
+            KernelEvents::REQUEST => [['onKernelRequest', 7]],
             ConsoleEvents::COMMAND => [['onConsoleCommand']],
         ];
     }
 
     /**
-     * @return LocaleSettings
+     * @return string
      */
-    protected function getLocaleSettings()
+    private function getCurrentLanguage(): string
     {
-        if ($this->localeSettings === false) {
-            $this->localeSettings = $this->container->get('oro_locale.settings');
+        if (!$this->currentLanguage) {
+            $localization = $this->currentLocalizationProvider->getCurrentLocalization();
+            $this->currentLanguage = $localization
+                ? $localization->getLanguageCode()
+                : $this->localeSettings->getLanguage();
         }
 
-        return $this->localeSettings;
-    }
-
-    /**
-     * @return TranslatableListener
-     */
-    protected function getTranslatableListener()
-    {
-        if ($this->translatableListener === false) {
-            $this->translatableListener = $this->container->get('stof_doctrine_extensions.listener.translatable');
-        }
-
-        return $this->translatableListener;
-    }
-
-    /**
-     * @return bool
-     */
-    protected function getIsInstalled()
-    {
-        if ($this->isInstalled === null) {
-            $this->isInstalled = $this->container->getParameter('installed');
-        }
-
-        return $this->isInstalled;
-    }
-
-    /**
-     * @return RequestContextAwareInterface
-     */
-    protected function getRouter()
-    {
-        if ($this->router === false) {
-            $this->router = $this->container->get('router', ContainerInterface::NULL_ON_INVALID_REFERENCE);
-        }
-
-        return $this->router;
-    }
-
-    /**
-     * @return TranslatorInterface
-     */
-    protected function getTranslator()
-    {
-        if ($this->translator === false) {
-            $this->translator = $this->container->get('translator');
-        }
-
-        return $this->translator;
-    }
-
-    /**
-     * @return Localization|null
-     */
-    protected function getCurrentLocalization()
-    {
-        if ($this->currentLocalization === false) {
-            /** @var $provider CurrentLocalizationProvider */
-            $provider = $this->container->get('oro_locale.provider.current_localization');
-            $this->currentLocalization = $provider->getCurrentLocalization();
-        }
-
-        return $this->currentLocalization;
+        return $this->currentLanguage;
     }
 }

@@ -3,6 +3,8 @@ services:
         public: false
 
     Oro\Bundle\ApiBundle\Command\CacheClearCommand:
+        arguments:
+            - '@oro_api.cache_manager'
         tags:
             - { name: console.command }
 
@@ -11,6 +13,10 @@ services:
             - { name: console.command }
 
     Oro\Bundle\ApiBundle\Command\DocCacheClearCommand:
+        arguments:
+            - '@oro_api.cache_manager'
+            - '%oro_api.api_doc.views%'
+            - '%kernel.environment%'
         tags:
             - { name: console.command }
 

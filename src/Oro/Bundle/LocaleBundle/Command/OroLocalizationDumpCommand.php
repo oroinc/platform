@@ -3,22 +3,53 @@
 namespace Oro\Bundle\LocaleBundle\Command;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Console command to dump locale settings to the JS file for using on frontend.
  */
-class OroLocalizationDumpCommand extends ContainerAwareCommand
+class OroLocalizationDumpCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:localization:dump';
+
+    /** @var LocaleSettings */
+    private $localeSettings;
+
+    /** @var Filesystem */
+    private $filesystem;
+
+    /** @var string */
+    private $projectDir;
+
+    /**
+     * @param LocaleSettings $localeSettings
+     * @param Filesystem $filesystem
+     * @param string $projectDir
+     * @param string|null $name
+     */
+    public function __construct(
+        LocaleSettings $localeSettings,
+        Filesystem $filesystem,
+        string $projectDir,
+        ?string $name = null
+    ) {
+        $this->localeSettings = $localeSettings;
+        $this->filesystem = $filesystem;
+        $this->projectDir = $projectDir;
+
+        parent::__construct($name);
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName('oro:localization:dump')
-            ->setDescription('Dumps oro js-localization');
+        $this->setDescription('Dumps oro js-localization');
     }
 
     /**
@@ -26,17 +57,16 @@ class OroLocalizationDumpCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $targetDir = realpath($this->getContainer()->getParameter('kernel.project_dir') . '/public') . '/js';
-        /** @var LocaleSettings $localeSettings */
-        $localeSettings = $this->getContainer()->get('oro_locale.settings');
-        $addressFormats = $this->getAddressFormats($localeSettings);
-        $localeSettingsData = array(
-            'locale_data' => $localeSettings->getLocaleData(),
-            'format' => array(
+        $targetDir = realpath($this->projectDir . '/public') . '/js';
+
+        $addressFormats = $this->getAddressFormats($this->localeSettings);
+        $localeSettingsData = [
+            'locale_data' => $this->localeSettings->getLocaleData(),
+            'format' => [
                 'address' => $addressFormats,
-                'name' => $localeSettings->getNameFormats()
-            )
-        );
+                'name' => $this->localeSettings->getNameFormats()
+            ]
+        ];
 
         $file = $targetDir . '/oro.locale_data.js';
         $output->writeln(
@@ -48,7 +78,7 @@ class OroLocalizationDumpCommand extends ContainerAwareCommand
         );
 
         $content = 'define(' . json_encode($localeSettingsData) . ');';
-        $this->getContainer()->get('filesystem')->mkdir(dirname($file), 0777);
+        $this->filesystem->mkdir(dirname($file), 0777);
         if (false === @file_put_contents($file, $content)) {
             throw new \RuntimeException('Unable to write file ' . $file);
         }
@@ -62,7 +92,7 @@ class OroLocalizationDumpCommand extends ContainerAwareCommand
      */
     protected function getAddressFormats(LocaleSettings $localeSettings)
     {
-        $result = array();
+        $result = [];
         $formats = $localeSettings->getAddressFormats();
         foreach ($formats as $country => $formatData) {
             $result[$country] = $formatData[LocaleSettings::ADDRESS_FORMAT_KEY];

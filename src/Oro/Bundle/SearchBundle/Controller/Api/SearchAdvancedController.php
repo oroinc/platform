@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * Provide advanced search api method
+ *
  * @RouteResource("search_advanced")
  * @NamePrefix("oro_api_")
  */
@@ -124,7 +126,7 @@ class SearchAdvancedController extends FOSRestController
             $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
         }
 
-        return $this->get('fos_rest.view_handler')->handle(
+        return $this->handleView(
             $view->setData($result->toSearchResultData())
         );
     }

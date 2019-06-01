@@ -2,80 +2,53 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\EventListener;
 
+use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\EventListener\LocaleListener;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RequestContextAwareInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class LocaleListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var LocaleListener */
-    protected $listener;
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
+    private $localeSettings;
+
+    /** @var TranslatableListener|\PHPUnit\Framework\MockObject\MockObject */
+    private $transListener;
+
+    /** @var RequestContextAwareInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $localeSettings;
+    private $container;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $transListener;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
     /** @var CurrentLocalizationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $currentLocalizationProvider;
+    private $currentLocalizationProvider;
 
     /** @var string */
-    protected $defaultLocale;
+    private $defaultLocale;
 
     protected function setUp()
     {
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->translator =  $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->transListener = $this->createMock('Gedmo\Translatable\TranslatableListener');
-        $this->router = $this->createMock('Symfony\Component\Routing\RequestContextAwareInterface');
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->translator =  $this->createMock(TranslatorInterface::class);
+        $this->transListener = $this->createMock(TranslatableListener::class);
+        $this->router = $this->createMock(RequestContextAwareInterface::class);
         $this->currentLocalizationProvider = $this->createMock(CurrentLocalizationProvider::class);
 
         $this->defaultLocale = \Locale::getDefault();
-
-        $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\Container')
-            ->setMethods(['get', 'getParameter'])
-            ->getMock();
-
-        $this->container->expects($this->any())
-            ->method('get')
-            ->willReturnCallback(
-                function ($serviceName) {
-                    if ($serviceName === 'oro_locale.settings') {
-                        return $this->localeSettings;
-                    }
-                    if ($serviceName === 'stof_doctrine_extensions.listener.translatable') {
-                        return $this->transListener;
-                    }
-                    if ($serviceName === 'router') {
-                        return $this->router;
-                    }
-                    if ($serviceName === 'translator') {
-                        return $this->translator;
-                    }
-                    if ($serviceName === 'oro_locale.provider.current_localization') {
-                        return $this->currentLocalizationProvider;
-                    }
-                }
-            );
     }
 
     protected function tearDown()
@@ -112,12 +85,16 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
             $this->localeSettings->expects($this->never())->method('getLocale');
         }
 
-        $this->container->expects($this->any())
-            ->method('getParameter')
-            ->with('installed')
-            ->willReturn($installed);
-        $this->listener = new LocaleListener($this->container);
-        $this->listener->onKernelRequest($this->createGetResponseEvent($request));
+        $listener = new LocaleListener(
+            $this->localeSettings,
+            $this->currentLocalizationProvider,
+            $this->transListener,
+            $this->translator,
+            $this->router,
+            $installed
+        );
+
+        $listener->onKernelRequest($this->createGetResponseEvent($request));
 
         if ($isSetLocale) {
             $this->assertEquals($expectedLanguage, $request->getLocale());
@@ -172,12 +149,6 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnConsoleCommand()
     {
-        $this->container->expects($this->any())
-            ->method('getParameter')
-            ->with('installed')
-            ->willReturn(true);
-        $this->listener = new LocaleListener($this->container);
-
         $event = $this
             ->getMockBuilder('Symfony\Component\Console\Event\ConsoleCommandEvent')
             ->disableOriginalConstructor()
@@ -210,7 +181,15 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('setTranslatableLocale');
 
-        $this->listener->onConsoleCommand($event);
+        $listener = new LocaleListener(
+            $this->localeSettings,
+            $this->currentLocalizationProvider,
+            $this->transListener,
+            $this->translator,
+            $this->router,
+            true
+        );
+        $listener->onConsoleCommand($event);
     }
 
     /**
