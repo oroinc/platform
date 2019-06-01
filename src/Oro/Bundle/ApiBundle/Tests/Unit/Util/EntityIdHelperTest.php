@@ -318,4 +318,35 @@ class EntityIdHelperTest extends OrmRelatedTestCase
 
         $this->entityIdHelper->applyEntityIdentifierRestriction($qb, $entityId, $entityMetadata);
     }
+
+    /**
+     * @dataProvider isEntityIdentifierEmptyDataProvider
+     */
+    public function testIsEntityIdentifierEmpty($id, $expected)
+    {
+        self::assertSame($expected, $this->entityIdHelper->isEntityIdentifierEmpty($id));
+    }
+
+    public function isEntityIdentifierEmptyDataProvider()
+    {
+        return [
+            [null, true],
+            [[], true],
+            [['id1' => null], true],
+            [['id1' => null, 'id2' => null], true],
+            [0, false],
+            [1, false],
+            ['', false],
+            ['test', false],
+            [['id1' => 0], false],
+            [['id1' => 1], false],
+            [['id1' => ''], false],
+            [['id1' => 'test'], false],
+            [['id1' => null, 'id2' => 0], false],
+            [['id1' => null, 'id2' => 1], false],
+            [['id1' => null, 'id2' => ''], false],
+            [['id1' => null, 'id2' => 'test'], false],
+            [['id1' => 1, 'id2' => 2], false]
+        ];
+    }
 }

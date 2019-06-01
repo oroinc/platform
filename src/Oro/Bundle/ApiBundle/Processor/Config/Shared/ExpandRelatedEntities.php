@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomDataTypeHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -32,19 +33,25 @@ class ExpandRelatedEntities implements ProcessorInterface
     /** @var EntityOverrideProviderRegistry */
     private $entityOverrideProviderRegistry;
 
+    /** @var CompleteCustomDataTypeHelper */
+    private $customDataTypeHelper;
+
     /**
      * @param DoctrineHelper                 $doctrineHelper
      * @param ConfigProvider                 $configProvider
      * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
+     * @param CompleteCustomDataTypeHelper   $customDataTypeHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ConfigProvider $configProvider,
-        EntityOverrideProviderRegistry $entityOverrideProviderRegistry
+        EntityOverrideProviderRegistry $entityOverrideProviderRegistry,
+        CompleteCustomDataTypeHelper $customDataTypeHelper
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->configProvider = $configProvider;
         $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
+        $this->customDataTypeHelper = $customDataTypeHelper;
     }
 
     /**
@@ -142,7 +149,7 @@ class ExpandRelatedEntities implements ProcessorInterface
                 $field = $definition->getField($fieldName);
                 if (null !== $field && $field->getTargetClass()) {
                     $field->setTargetType(
-                        $this->getAssociationTargetType(
+                        ConfigUtil::getAssociationTargetType(
                             $targetMetadata->isCollectionValuedAssociation($targetFieldName)
                         )
                     );
@@ -150,7 +157,19 @@ class ExpandRelatedEntities implements ProcessorInterface
             } elseif ($definition->hasField($fieldName)) {
                 $field = $definition->getField($fieldName);
                 $targetClass = $field->getTargetClass();
-                if ($targetClass && $field->hasTargetType() && !$field->hasDataType()) {
+                if ($targetClass) {
+                    $dataType = $field->getDataType();
+                    if ($dataType) {
+                        $this->customDataTypeHelper->completeCustomDataType(
+                            $definition,
+                            $metadata,
+                            $fieldName,
+                            $field,
+                            $dataType,
+                            $version,
+                            $requestType
+                        );
+                    }
                     $this->completeAssociation(
                         $definition,
                         $fieldName,
@@ -257,16 +276,6 @@ class ExpandRelatedEntities implements ProcessorInterface
         }
 
         return $result;
-    }
-
-    /**
-     * @param bool $isCollection
-     *
-     * @return string
-     */
-    private function getAssociationTargetType($isCollection)
-    {
-        return $isCollection ? 'to-many' : 'to-one';
     }
 
     /**

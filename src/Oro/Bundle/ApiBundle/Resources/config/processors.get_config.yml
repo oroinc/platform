@@ -119,6 +119,7 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.config_provider'
             - '@oro_api.entity_override_provider_registry'
+            - '@oro_api.complete_definition_helper.custom_data_type'
         tags:
             - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&expand_related_entities&definition', priority: -20 }
             - { name: oro.api.processor, action: get_relation_config, extra: '!identifier_fields_only&expand_related_entities&definition', priority: -20 }

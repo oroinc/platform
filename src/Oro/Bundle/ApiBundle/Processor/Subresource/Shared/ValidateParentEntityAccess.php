@@ -2,17 +2,19 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
+use Doctrine\ORM\Query;
+use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\QueryFactory;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Loads the parent entity from the database and adds it to the context.
+ * Loads the parent entity from the database and checks whether an VIEW access to it is granted.
  */
-class LoadParentEntity implements ProcessorInterface
+class ValidateParentEntityAccess implements ProcessorInterface
 {
     /** @var DoctrineHelper */
     private $doctrineHelper;
@@ -43,12 +45,7 @@ class LoadParentEntity implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var ChangeRelationshipContext $context */
-
-        if ($context->hasParentEntity()) {
-            // the parent entity is already loaded
-            return;
-        }
+        /** @var SubresourceContext $context */
 
         $parentEntityClass = $this->doctrineHelper->getManageableEntityClass(
             $context->getParentClassName(),
@@ -60,6 +57,10 @@ class LoadParentEntity implements ProcessorInterface
         }
 
         $qb = $this->doctrineHelper->createQueryBuilder($parentEntityClass, 'e');
+        $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($parentEntityClass);
+        if (\count($idFieldNames) !== 0) {
+            $qb->select('e.' . \reset($idFieldNames));
+        }
         $this->entityIdHelper->applyEntityIdentifierRestriction(
             $qb,
             $context->getParentId(),
@@ -67,9 +68,9 @@ class LoadParentEntity implements ProcessorInterface
         );
         $query = $this->queryFactory->getQuery($qb, $context->getParentConfig());
 
-        $parentEntity = $query->getOneOrNullResult();
-        if (null !== $parentEntity) {
-            $context->setParentEntity($parentEntity);
+        $data = $query->getOneOrNullResult(Query::HYDRATE_ARRAY);
+        if (!$data) {
+            throw new NotFoundHttpException('The parent entity does not exist.');
         }
     }
 }

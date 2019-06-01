@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomDataTypeHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\ExpandRelatedEntities;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
@@ -24,6 +25,9 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
     private $entityOverrideProvider;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CompleteCustomDataTypeHelper */
+    private $customDataTypeHelper;
+
     /** @var ExpandRelatedEntities */
     private $processor;
 
@@ -34,6 +38,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->entityOverrideProvider = $this->createMock(EntityOverrideProviderInterface::class);
+        $this->customDataTypeHelper = $this->createMock(CompleteCustomDataTypeHelper::class);
 
         $entityOverrideProviderRegistry = $this->createMock(EntityOverrideProviderRegistry::class);
         $entityOverrideProviderRegistry->expects(self::any())
@@ -44,7 +49,8 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         $this->processor = new ExpandRelatedEntities(
             $this->doctrineHelper,
             $this->configProvider,
-            $entityOverrideProviderRegistry
+            $entityOverrideProviderRegistry,
+            $this->customDataTypeHelper
         );
     }
 
@@ -476,17 +482,17 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForAssociationWithTargetClassAndTargetTypeAndDataType()
+    public function testProcessForAssociationWithTargetClassAndDataType()
     {
         $config = [
             'fields' => [
                 'association1' => [
                     'data_type'    => 'some_custom_association',
-                    'target_class' => 'Test\Association1Target',
-                    'target_type'  => 'to-one'
+                    'target_class' => 'Test\Association1Target'
                 ]
             ]
         ];
+        $configObject = $this->createConfigObject($config);
 
         $this->context->setExtras([
             new ExpandRelatedEntitiesConfigExtra(['association1'])
@@ -506,19 +512,38 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->configProvider->expects(self::never())
-            ->method('getConfig');
+        $this->customDataTypeHelper->expects(self::once())
+            ->method('completeCustomDataType')
+            ->with(
+                self::identicalTo($configObject),
+                self::identicalTo($rootEntityMetadata),
+                'association1',
+                self::identicalTo($configObject->getField('association1')),
+                'some_custom_association',
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            );
 
-        $this->context->setResult($this->createConfigObject($config));
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                'Test\Association1Target',
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $this->context->getPropagableExtras()
+            )
+            ->willReturn($this->createRelationConfigObject(['exclusion_policy' => 'all']));
+
+        $this->context->setResult($configObject);
         $this->processor->process($this->context);
 
         $this->assertConfig(
             [
                 'fields' => [
                     'association1' => [
-                        'data_type'    => 'some_custom_association',
-                        'target_class' => 'Test\Association1Target',
-                        'target_type'  => 'to-one'
+                        'data_type'        => 'some_custom_association',
+                        'target_class'     => 'Test\Association1Target',
+                        'exclusion_policy' => 'all'
                     ]
                 ]
             ],

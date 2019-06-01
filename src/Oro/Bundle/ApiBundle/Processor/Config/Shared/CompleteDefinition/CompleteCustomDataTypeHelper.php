@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Psr\Container\ContainerInterface;
@@ -49,32 +50,59 @@ class CompleteCustomDataTypeHelper
     public function completeCustomDataTypes(
         EntityDefinitionConfig $definition,
         ClassMetadata $metadata,
-        $version,
+        string $version,
         RequestType $requestType
     ): void {
-        $completers = $this->getCustomDataTypeCompleters($requestType);
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             $dataType = $field->getDataType();
-            if (!$dataType) {
-                continue;
-            }
-
-            foreach ($completers as $serviceId) {
-                /** @var CustomDataTypeCompleterInterface $completer */
-                $completer = $this->container->get($serviceId);
-                $isCompleted = $completer->completeCustomDataType(
-                    $metadata,
+            if ($dataType) {
+                $this->completeCustomDataType(
                     $definition,
+                    $metadata,
                     $fieldName,
                     $field,
                     $dataType,
                     $version,
                     $requestType
                 );
-                if ($isCompleted) {
-                    break;
-                }
+            }
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig      $definition
+     * @param ClassMetadata               $metadata
+     * @param string                      $fieldName
+     * @param EntityDefinitionFieldConfig $field
+     * @param string                      $dataType
+     * @param string                      $version
+     * @param RequestType                 $requestType
+     */
+    public function completeCustomDataType(
+        EntityDefinitionConfig $definition,
+        ClassMetadata $metadata,
+        string $fieldName,
+        EntityDefinitionFieldConfig $field,
+        string $dataType,
+        string $version,
+        RequestType $requestType
+    ): void {
+        $completers = $this->getCustomDataTypeCompleters($requestType);
+        foreach ($completers as $serviceId) {
+            /** @var CustomDataTypeCompleterInterface $completer */
+            $completer = $this->container->get($serviceId);
+            $isCompleted = $completer->completeCustomDataType(
+                $metadata,
+                $definition,
+                $fieldName,
+                $field,
+                $dataType,
+                $version,
+                $requestType
+            );
+            if ($isCompleted) {
+                break;
             }
         }
     }

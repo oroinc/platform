@@ -166,11 +166,10 @@ class CompleteEntityDefinitionHelper
         $existingFields = [];
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            $propertyPath = $field->getPropertyPath();
-            if (!$propertyPath || ConfigUtil::IGNORE_PROPERTY_PATH === $propertyPath) {
-                $propertyPath = $fieldName;
+            $propertyPath = $field->getPropertyPath($fieldName);
+            if (ConfigUtil::IGNORE_PROPERTY_PATH !== $propertyPath) {
+                $existingFields[$propertyPath] = $fieldName;
             }
-            $existingFields[$propertyPath] = $fieldName;
         }
 
         return $existingFields;
@@ -298,8 +297,12 @@ class CompleteEntityDefinitionHelper
             if (isset($existingFields[$propertyPath])) {
                 $field = $definition->getField($existingFields[$propertyPath]);
             } else {
-                $field = $definition->getOrAddField($propertyPath);
+                $field = $this->getOrAddNotComputedField($definition, $propertyPath);
             }
+            if (null === $field) {
+                continue;
+            }
+
             if (!$field->hasExcluded()
                 && !$field->isExcluded()
                 && $exclusionProvider->isIgnoredField($metadata, $propertyPath)
@@ -343,9 +346,15 @@ class CompleteEntityDefinitionHelper
                 $fieldName = $existingFields[$propertyPath];
                 $field = $definition->getField($fieldName);
             } else {
-                $fieldName = $propertyPath;
-                $field = $definition->getOrAddField($fieldName);
+                $field = $this->getOrAddNotComputedField($definition, $propertyPath);
+                if (null !== $field) {
+                    $fieldName = $propertyPath;
+                }
             }
+            if (null === $field) {
+                continue;
+            }
+
             if (!$field->hasExcluded()
                 && !$field->isExcluded()
                 && $exclusionProvider->isIgnoredRelation($metadata, $propertyPath)
@@ -380,7 +389,7 @@ class CompleteEntityDefinitionHelper
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             $targetClass = $field->getTargetClass();
-            if ($targetClass && $field->hasTargetType() && !$field->hasDataType()) {
+            if ($targetClass && !$field->hasDataType()) {
                 $propertyPath = $field->getPropertyPath($fieldName);
                 if (!$metadata->hasAssociation($propertyPath)) {
                     $this->associationHelper->completeAssociation(
@@ -753,5 +762,27 @@ class CompleteEntityDefinitionHelper
                     \substr($associationName, \strlen(ExtendConfigDumper::DEFAULT_PREFIX))
                 )
             );
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $propertyPath
+     *
+     * @return EntityDefinitionFieldConfig|null
+     */
+    private function getOrAddNotComputedField(
+        EntityDefinitionConfig $definition,
+        string $propertyPath
+    ): ?EntityDefinitionFieldConfig {
+        $field = $definition->getField($propertyPath);
+        if (null === $field) {
+            return $definition->addField($propertyPath);
+        }
+
+        if (ConfigUtil::IGNORE_PROPERTY_PATH === $field->getPropertyPath()) {
+            return null;
+        }
+
+        return $field;
     }
 }

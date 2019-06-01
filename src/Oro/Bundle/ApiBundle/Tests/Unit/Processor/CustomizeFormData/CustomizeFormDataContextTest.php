@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
+use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\Test\FormInterface;
 
 class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
@@ -138,5 +139,18 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
     public function testRemoveResult()
     {
         $this->context->removeResult();
+    }
+
+    public function testEntityMapper()
+    {
+        $entityMapper = $this->createMock(EntityMapper::class);
+
+        self::assertNull($this->context->getEntityMapper());
+
+        $this->context->setEntityMapper($entityMapper);
+        self::assertSame($entityMapper, $this->context->getEntityMapper());
+
+        $this->context->setEntityMapper();
+        self::assertNull($this->context->getEntityMapper());
     }
 }

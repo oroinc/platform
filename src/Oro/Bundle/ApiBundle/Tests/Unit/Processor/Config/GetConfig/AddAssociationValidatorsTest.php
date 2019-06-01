@@ -147,22 +147,18 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
         $entityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $entityMetadata->expects(self::any())
             ->method('hasAssociation')
-            ->willReturnMap(
-                [
-                    ['field1', false],
-                    ['association1', true],
-                    ['association2', true],
-                    ['realAssociation3', true]
-                ]
-            );
+            ->willReturnMap([
+                ['field1', false],
+                ['association1', true],
+                ['association2', true],
+                ['realAssociation3', true]
+            ]);
         $entityMetadata->expects(self::any())
             ->method('isCollectionValuedAssociation')
-            ->willReturnMap(
-                [
-                    ['association2', true],
-                    ['realAssociation3', true]
-                ]
-            );
+            ->willReturnMap([
+                ['association2', true],
+                ['realAssociation3', true]
+            ]);
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
@@ -211,6 +207,76 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
                 ]
             ],
             $configObject->getField('association3')->getFormOptions()
+        );
+    }
+
+    public function testProcessForComputedCollectionValuedAssociationOfNotManageableEntity()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'target_class'  => 'Test\Association1Target',
+                    'target_type'   => 'to-many',
+                    'property_path' => '_'
+                ]
+            ]
+        ];
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
+        /** @var EntityDefinitionConfig $configObject */
+        $configObject = $this->createConfigObject($config);
+        $this->context->setResult($configObject);
+        $this->processor->process($this->context);
+
+        self::assertNull(
+            $configObject->getField('association1')->getFormOptions()
+        );
+    }
+
+    public function testProcessForComputedCollectionValuedAssociationOfManageableEntity()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'property_path' => '_'
+                ]
+            ]
+        ];
+
+        $entityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $entityMetadata->expects(self::any())
+            ->method('hasAssociation')
+            ->willReturnMap([
+                ['association1', true]
+            ]);
+        $entityMetadata->expects(self::any())
+            ->method('isCollectionValuedAssociation')
+            ->willReturnMap([
+                ['association1', true]
+            ]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($entityMetadata);
+
+        /** @var EntityDefinitionConfig $configObject */
+        $configObject = $this->createConfigObject($config);
+        $this->context->setResult($configObject);
+        $this->processor->process($this->context);
+
+        self::assertNull(
+            $configObject->getField('association1')->getFormOptions()
         );
     }
 }

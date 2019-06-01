@@ -507,15 +507,13 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     /**
      * Indicates whether a target association represents "to-many" or "to-one" relationship.
      *
-     * @return bool|null TRUE if a target association represents "to-many" relationship
+     * @return bool TRUE if a target association represents "to-many" relationship; otherwise, FALSE
      */
     public function isCollectionValuedAssociation()
     {
-        if (!\array_key_exists(ConfigUtil::TARGET_TYPE, $this->items)) {
-            return null;
-        }
-
-        return 'to-many' === $this->items[ConfigUtil::TARGET_TYPE];
+        return
+            \array_key_exists(ConfigUtil::TARGET_TYPE, $this->items)
+            && ConfigUtil::TO_MANY === $this->items[ConfigUtil::TARGET_TYPE];
     }
 
     /**

@@ -17,8 +17,6 @@ class ConfigNormalizer
      * Prepares a configuration to be used by ObjectNormalizer
      *
      * @param EntityDefinitionConfig $config
-     *
-     * @return EntityDefinitionConfig
      */
     public function normalizeConfig(EntityDefinitionConfig $config)
     {
@@ -30,8 +28,6 @@ class ConfigNormalizer
      * Remembers the current config state before it will be normalized
      *
      * @param EntityDefinitionConfig $config
-     *
-     * @return array
      */
     protected function preNormalizeConfig(EntityDefinitionConfig $config)
     {
@@ -66,8 +62,6 @@ class ConfigNormalizer
      * Performs the normalization of a configuration
      *
      * @param EntityDefinitionConfig $config
-     *
-     * @return array
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */

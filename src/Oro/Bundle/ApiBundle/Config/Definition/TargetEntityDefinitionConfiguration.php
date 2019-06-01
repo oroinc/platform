@@ -201,7 +201,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
             ->scalarNode(ConfigUtil::DATA_TYPE)->cannotBeEmpty()->end()
             ->scalarNode(ConfigUtil::TARGET_CLASS)->end()
             ->enumNode(ConfigUtil::TARGET_TYPE)
-                ->values(['to-many', 'to-one', 'collection'])
+                ->values([ConfigUtil::TO_MANY, ConfigUtil::TO_ONE, ConfigUtil::COLLECTION])
             ->end()
             ->booleanNode(ConfigUtil::COLLAPSE)->end()
             ->scalarNode(ConfigUtil::FORM_TYPE)->end()
@@ -228,12 +228,8 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
         if (empty($config[ConfigUtil::FORM_OPTIONS])) {
             unset($config[ConfigUtil::FORM_OPTIONS]);
         }
-        if (!empty($config[ConfigUtil::TARGET_TYPE])) {
-            if ('collection' === $config[ConfigUtil::TARGET_TYPE]) {
-                $config[ConfigUtil::TARGET_TYPE] = 'to-many';
-            }
-        } elseif (!empty($config[ConfigUtil::TARGET_CLASS])) {
-            $config[ConfigUtil::TARGET_TYPE] = 'to-one';
+        if (!empty($config[ConfigUtil::TARGET_TYPE]) && ConfigUtil::COLLECTION === $config[ConfigUtil::TARGET_TYPE]) {
+            $config[ConfigUtil::TARGET_TYPE] = ConfigUtil::TO_MANY;
         }
         if (empty($config[ConfigUtil::DEPENDS_ON])) {
             unset($config[ConfigUtil::DEPENDS_ON]);

@@ -12,4 +12,37 @@ use Oro\Bundle\ApiBundle\Processor\FormContextTrait;
 class ChangeRelationshipContext extends SubresourceContext implements FormContext
 {
     use FormContextTrait;
+
+    /** @var object|null */
+    private $parentEntity;
+
+    /**
+     * Checks whether the parent entity exists.
+     *
+     * @return bool
+     */
+    public function hasParentEntity()
+    {
+        return null !== $this->parentEntity;
+    }
+
+    /**
+     * Gets the parent entity object.
+     *
+     * @return object|null
+     */
+    public function getParentEntity()
+    {
+        return $this->parentEntity;
+    }
+
+    /**
+     * Sets the parent entity object.
+     *
+     * @param object|null $parentEntity
+     */
+    public function setParentEntity($parentEntity)
+    {
+        $this->parentEntity = $parentEntity;
+    }
 }

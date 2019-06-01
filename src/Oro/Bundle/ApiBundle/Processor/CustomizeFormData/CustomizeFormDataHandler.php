@@ -90,6 +90,7 @@ class CustomizeFormDataHandler
         if (null !== $includedEntities) {
             $context->setIncludedEntities($includedEntities);
         }
+        $context->setEntityMapper($formContext->getEntityMapper());
 
         return $context;
     }

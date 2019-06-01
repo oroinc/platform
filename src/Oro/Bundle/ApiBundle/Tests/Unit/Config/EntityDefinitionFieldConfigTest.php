@@ -228,7 +228,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         $config = new EntityDefinitionFieldConfig();
         self::assertFalse($config->hasTargetType());
         self::assertNull($config->getTargetType());
-        self::assertNull($config->isCollectionValuedAssociation());
+        self::assertFalse($config->isCollectionValuedAssociation());
 
         $config->setTargetType('to-one');
         self::assertTrue($config->hasTargetType());
@@ -245,7 +245,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         $config->setTargetType(null);
         self::assertFalse($config->hasTargetType());
         self::assertNull($config->getTargetType());
-        self::assertNull($config->isCollectionValuedAssociation());
+        self::assertFalse($config->isCollectionValuedAssociation());
         self::assertEquals([], $config->toArray());
     }
 
