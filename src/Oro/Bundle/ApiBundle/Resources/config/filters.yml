@@ -159,8 +159,10 @@ services:
           - { name: oro.api.query.comparison_expression, operator: 'ALL_MEMBER_OF' }
 
     oro_api.query.comparison_expression.all_not_member_of:
-        class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AllNotMemberOfComparisonExpression
+        class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AllMemberOfComparisonExpression
         public: false
+        arguments:
+            - true
         tags:
           - { name: oro.api.query.comparison_expression, operator: 'ALL_NOT_MEMBER_OF' }
 

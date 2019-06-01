@@ -7,7 +7,7 @@ use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
-use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AllNotMemberOfComparisonExpression;
+use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AllMemberOfComparisonExpression;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -16,7 +16,7 @@ class AllNotMemberOfComparisonExpressionTest extends OrmRelatedTestCase
 {
     public function testWalkComparisonExpressionWhenAssociationIsNotJoined()
     {
-        $expression = new AllNotMemberOfComparisonExpression();
+        $expression = new AllMemberOfComparisonExpression(true);
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -68,7 +68,7 @@ class AllNotMemberOfComparisonExpressionTest extends OrmRelatedTestCase
 
     public function testWalkComparisonExpressionForArrayValue()
     {
-        $expression = new AllNotMemberOfComparisonExpression();
+        $expression = new AllMemberOfComparisonExpression(true);
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -121,7 +121,7 @@ class AllNotMemberOfComparisonExpressionTest extends OrmRelatedTestCase
 
     public function testWalkComparisonExpressionForScalarValue()
     {
-        $expression = new AllNotMemberOfComparisonExpression();
+        $expression = new AllMemberOfComparisonExpression(true);
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -174,7 +174,7 @@ class AllNotMemberOfComparisonExpressionTest extends OrmRelatedTestCase
 
     public function testWalkComparisonExpressionWhenLastElementInPathIsField()
     {
-        $expression = new AllNotMemberOfComparisonExpression();
+        $expression = new AllMemberOfComparisonExpression(true);
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Filter;
 
+use Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException;
+
 /**
  * This interface can be implemented by a filter that should search its own value by itself.
  * E.g. if a filter has dynamic filter key.

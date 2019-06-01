@@ -13,6 +13,7 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class QueryBuilderUtilTest extends OrmTestCase
 {
@@ -232,9 +233,7 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     public function testGetSingleRootAlias()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
 
         $qb->expects($this->once())
             ->method('getRootAliases')
@@ -249,14 +248,12 @@ class QueryBuilderUtilTest extends OrmTestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Can't get single root alias for the given query. Reason: the query has several root aliases. "root_alias1, root_alias1".
+     * @expectedExceptionMessage Can't get single root alias for the given query. Reason: the query has several root aliases: root_alias1, root_alias1.
      */
     // @codingStandardsIgnoreEnd
     public function testGetSingleRootAliasWhenQueryHasSeveralRootAliases()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
 
         $qb->expects($this->once())
             ->method('getRootAliases')
@@ -273,9 +270,7 @@ class QueryBuilderUtilTest extends OrmTestCase
     // @codingStandardsIgnoreEnd
     public function testGetSingleRootAliasWhenQueryHasNoRootAlias()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
 
         $qb->expects($this->once())
             ->method('getRootAliases')
@@ -286,9 +281,7 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     public function testGetSingleRootAliasWhenQueryHasNoRootAliasAndNoExceptionRequested()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
 
         $qb->expects($this->once())
             ->method('getRootAliases')
@@ -297,11 +290,68 @@ class QueryBuilderUtilTest extends OrmTestCase
         $this->assertNull(QueryBuilderUtil::getSingleRootAlias($qb, false));
     }
 
+    public function testGetSingleRootEntity()
+    {
+        $qb = $this->createMock(QueryBuilder::class);
+
+        $qb->expects($this->once())
+            ->method('getRootEntities')
+            ->willReturn(['Test\Entity']);
+
+        $this->assertEquals(
+            'Test\Entity',
+            QueryBuilderUtil::getSingleRootEntity($qb)
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Doctrine\ORM\Query\QueryException
+     * @expectedExceptionMessage Can't get single root entity for the given query. Reason: the query has several root entities: Test\Entity1, Test\Entity1.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testGetSingleRootEntityWhenQueryHasSeveralRootEntities()
+    {
+        $qb = $this->createMock(QueryBuilder::class);
+
+        $qb->expects($this->once())
+            ->method('getRootEntities')
+            ->willReturn(['Test\Entity1', 'Test\Entity1']);
+
+        QueryBuilderUtil::getSingleRootEntity($qb);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Doctrine\ORM\Query\QueryException
+     * @expectedExceptionMessage Can't get single root entity for the given query. Reason: the query has no any root entities.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testGetSingleRootEntityWhenQueryHasNoRootEntity()
+    {
+        $qb = $this->createMock(QueryBuilder::class);
+
+        $qb->expects($this->once())
+            ->method('getRootEntities')
+            ->willReturn([]);
+
+        QueryBuilderUtil::getSingleRootEntity($qb);
+    }
+
+    public function testGetSingleRootEntityWhenQueryHasNoRootEntityAndNoExceptionRequested()
+    {
+        $qb = $this->createMock(QueryBuilder::class);
+
+        $qb->expects($this->once())
+            ->method('getRootEntities')
+            ->willReturn([]);
+
+        $this->assertNull(QueryBuilderUtil::getSingleRootEntity($qb, false));
+    }
+
     public function testApplyEmptyJoins()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
 
         $qb->expects($this->never())
             ->method('distinct');
@@ -330,9 +380,7 @@ class QueryBuilderUtilTest extends OrmTestCase
             ]
         ];
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
 
         $qb->expects($this->once())
             ->method('distinct')
@@ -389,9 +437,7 @@ class QueryBuilderUtilTest extends OrmTestCase
             'param2' => 'param2_value',
         ];
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())
             ->method('getDql')
             ->will($this->returnValue($dql));

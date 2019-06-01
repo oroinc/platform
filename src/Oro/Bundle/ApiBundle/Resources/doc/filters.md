@@ -221,9 +221,9 @@ The following query expressions are implemented out of the box:
 | EMPTY             | [EmptyComparisonExpression](../../Collection/QueryVisitorExpression/EmptyComparisonExpression.php) | EMPTY and NOT EMPTY comparisons for collections |
 | NEQ_OR_NULL       | [NeqOrNullComparisonExpression](../../Collection/QueryVisitorExpression/NeqOrNullComparisonExpression.php) | NOT EQUAL TO OR IS NULL comparison |
 | NEQ_OR_EMPTY      | [NeqOrEmptyComparisonExpression](../../Collection/QueryVisitorExpression/NeqOrEmptyComparisonExpression.php) | NOT EQUAL TO OR EMPTY comparison for collections |
-| MEMBER_OF         | [MemberOfComparisonExpression](../../Collection/QueryVisitorExpression/MemberOfComparisonExpression.php) | MEMBER OF comparison that checks whether a collection contains any of specific values |
-| ALL_MEMBER_OF     | [AllMemberOfComparisonExpression](../../Collection/QueryVisitorExpression/AllMemberOfComparisonExpression.php) | ALL MEMBER OF comparison that checks whether a collection contains all of specific values |
-| ALL_NOT_MEMBER_OF | [AllNotMemberOfComparisonExpression](../../Collection/QueryVisitorExpression/AllNotMemberOfComparisonExpression.php) | ALL NOT MEMBER OF comparison that checks whether a collection does not contain all of specific values |
+| MEMBER_OF         | [MemberOfComparisonExpression](../../Collection/QueryVisitorExpression/MemberOfComparisonExpression.php) | checks whether a collection contains any of specific values |
+| ALL_MEMBER_OF     | [AllMemberOfComparisonExpression](../../Collection/QueryVisitorExpression/AllMemberOfComparisonExpression.php) | checks whether a collection contains all of specific values |
+| ALL_NOT_MEMBER_OF | [AllMemberOfComparisonExpression](../../Collection/QueryVisitorExpression/AllMemberOfComparisonExpression.php) | checks whether a collection does not contain all of specific values |
 | CONTAINS          | [ContainsComparisonExpression](../../Collection/QueryVisitorExpression/ContainsComparisonExpression.php) | LIKE '%value%' comparison |
 | NOT_CONTAINS      | [NotContainsComparisonExpression](../../Collection/QueryVisitorExpression/NotContainsComparisonExpression.php) | NOT LIKE '%value%' comparison |
 | STARTS_WITH       | [StartsWithComparisonExpression](../../Collection/QueryVisitorExpression/StartsWithComparisonExpression.php) | LIKE 'value%' comparison |

@@ -371,6 +371,43 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('e.test');
     }
 
+    public function testCreateSubqueryWithoutField()
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            new EntityClassResolver($this->doctrine)
+        );
+
+        $qb = new QueryBuilder($this->em);
+        $qb
+            ->select('e')
+            ->from(Entity\User::class, 'e')
+            ->leftJoin('e.groups', 'groups');
+
+        $expressionVisitor->setQuery($qb);
+        $expressionVisitor->setQueryJoinMap(['groups' => 'groups']);
+        $expressionVisitor->setQueryAliases(['e', 'groups']);
+        $subquery = $expressionVisitor->createSubquery();
+
+        $expectedSubquery = 'SELECT e_subquery1'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User e_subquery1'
+            . ' WHERE e_subquery1 = e';
+        self::assertEquals($expectedSubquery, $subquery->getDQL());
+
+        // test that the subquery has valid SQL
+        $expectedSql = 'SELECT u0_.id AS id_0, u0_.name AS name_1,'
+            . ' u0_.category_name AS category_name_2, u0_.owner_id AS owner_id_3'
+            . ' FROM user_table u0_'
+            . ' LEFT JOIN user_to_group_table u2_ ON u0_.id = u2_.user_id'
+            . ' LEFT JOIN group_table g1_ ON g1_.id = u2_.user_group_id'
+            . ' WHERE EXISTS ('
+            . 'SELECT u3_.id'
+            . ' FROM user_table u3_'
+            . ' WHERE u3_.id = u0_.id)';
+        self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
+    }
+
     public function testCreateSubqueryForJoinedRootEntityAssociation()
     {
         $expressionVisitor = new QueryExpressionVisitor(

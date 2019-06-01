@@ -164,17 +164,20 @@ class QueryExpressionVisitor extends ExpressionVisitor
      * The returned subquery is joined to an association corresponds the specified field.
      * The type of root entity of the returned subquery is always equal to a target entity
      * of an association corresponds the specified field.
+     *
      * For example, if there is the following main query:
      * <code>
-     * SELECT a FROM Account a JOIN a.users users
+     * SELECT account FROM Account account JOIN account.users users
      * </code>
-     * The subquery for the path "a.users" will be:
+     *
+     * The subquery for the path "account.users" will be:
      * <code>
      * SELECT users_subquery1
      * FROM User users_subquery1
      * WHERE users_subquery1 = users
      * </code>
-     * The subquery for the path "a.users.groups" will be:
+     *
+     * The subquery for the path "account.users.groups" will be:
      * <code>
      * SELECT groups_subquery1
      * FROM Group groups_subquery1
@@ -185,21 +188,30 @@ class QueryExpressionVisitor extends ExpressionVisitor
      *   WHERE users_subquery2 = users
      * )
      * </code>
+     *
      * If the last element in the path is a field, the select part of the subquery will contain it,
-     * e.g., the subquery for the path "a.users.name" will be:
+     * e.g., the subquery for the path "account.users.name" will be:
      * <code>
      * SELECT users_subquery1.name
      * FROM User users_subquery1
      * WHERE users_subquery1 = users
      * </code>
      *
-     * @param string $field             The unique name of a field corresponds an association
-     *                                  for which the subquery should be created
-     * @param bool   $disallowJoinUsage Whether the usage of existing join to the association itself is disallowed
+     * The subquery for the empty path will be:
+     * <code>
+     * SELECT account_subquery1
+     * FROM Account account_subquery1
+     * WHERE account_subquery1 = account
+     * </code>
+     *
+     * @param string|null $field             The unique name of a field corresponds an association
+     *                                       for which the subquery should be created
+     * @param bool        $disallowJoinUsage Whether the usage of existing join to the association itself
+     *                                       is disallowed; this parameter is not used if $field equals to NULL
      *
      * @return QueryBuilder
      */
-    public function createSubquery(string $field, bool $disallowJoinUsage = false): QueryBuilder
+    public function createSubquery(string $field = null, bool $disallowJoinUsage = false): QueryBuilder
     {
         if (null === $this->query) {
             throw new QueryException('No query is set before invoking createSubquery().');
@@ -211,14 +223,26 @@ class QueryExpressionVisitor extends ExpressionVisitor
             throw new QueryException('No aliases are set before invoking createSubquery().');
         }
 
+        if (!$field) {
+            try {
+                return $this->createSubqueryToRoot();
+            } catch (\Throwable $e) {
+                throw new QueryException(
+                    \sprintf('Cannot build subquery. Reason: %s', $e->getMessage()),
+                    $e->getCode(),
+                    $e
+                );
+            }
+        }
+
         try {
             return $this->createSubqueryByPath($this->getSubqueryPath($field), $disallowJoinUsage);
         } catch (\Throwable $e) {
-            throw new QueryException(\sprintf(
-                'Cannot build subquery for the field "%s". Reason: %s',
-                $field,
-                $e->getMessage()
-            ));
+            throw new QueryException(
+                \sprintf('Cannot build subquery for the field "%s". Reason: %s', $field, $e->getMessage()),
+                $e->getCode(),
+                $e
+            );
         }
     }
 
@@ -378,6 +402,18 @@ class QueryExpressionVisitor extends ExpressionVisitor
         }
 
         return $path;
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    private function createSubqueryToRoot(): QueryBuilder
+    {
+        $subqueryAlias = $this->generateSubqueryAlias($this->getRootAlias());
+        $subquery = $this->createQueryBuilder($this->getRootEntityClass(), $subqueryAlias);
+        $subquery->where($subquery->expr()->eq($subqueryAlias, $this->getRootAlias()));
+
+        return $subquery;
     }
 
     /**

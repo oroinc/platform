@@ -178,7 +178,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('array')
                                 ->beforeNormalization()
                                     ->always(function ($value) {
-                                        if (is_string($value)) {
+                                        if (is_string($value) || $value === null) {
                                             $value = [['value' => $value, 'actions' => []]];
                                         }
 
@@ -189,7 +189,6 @@ class Configuration implements ConfigurationInterface
                                     ->children()
                                         ->scalarNode('value')
                                             ->info('The header value.')
-                                            ->cannotBeEmpty()
                                         ->end()
                                         ->arrayNode('actions')
                                             ->info('API actions for which this value should be used.')

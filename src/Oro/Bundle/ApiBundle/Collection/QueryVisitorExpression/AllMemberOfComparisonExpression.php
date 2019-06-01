@@ -8,12 +8,24 @@ use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
- * Represents ALL MEMBER OF comparison expression that checks
- * whether to-many association contains all of specific values.
- * This expression supports a scalar value and an array of scalar values.
+ * Represents ALL MEMBER OF and ALL NOT MEMBER OF comparison expressions.
+ * The ALL MEMBER OF expression checks whether to-many association contains all of specific values.
+ * The ALL NOT MEMBER OF expression checks whether to-many association does not contain all of specific values.
+ * These expressions support a scalar value and an array of scalar values.
  */
 class AllMemberOfComparisonExpression implements ComparisonExpressionInterface
 {
+    /** @var bool */
+    private $notExpression;
+
+    /**
+     * @param bool $notExpression
+     */
+    public function __construct(bool $notExpression = false)
+    {
+        $this->notExpression = $notExpression;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -53,8 +65,12 @@ class AllMemberOfComparisonExpression implements ComparisonExpressionInterface
      *
      * @return int
      */
-    protected function getExpectedNumberOfRecords($value): int
+    private function getExpectedNumberOfRecords($value): int
     {
+        if ($this->notExpression) {
+            return 0;
+        }
+
         return \is_array($value)
             ? \count($value)
             : 1;

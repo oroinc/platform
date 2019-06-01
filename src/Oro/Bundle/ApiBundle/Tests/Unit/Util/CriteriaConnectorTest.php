@@ -53,7 +53,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
                 'EXISTS'            => new Expression\ExistsComparisonExpression(),
                 'EMPTY'             => new Expression\EmptyComparisonExpression(),
                 'ALL_MEMBER_OF'     => new Expression\AllMemberOfComparisonExpression(),
-                'ALL_NOT_MEMBER_OF' => new Expression\AllNotMemberOfComparisonExpression()
+                'ALL_NOT_MEMBER_OF' => new Expression\AllMemberOfComparisonExpression(true)
             ],
             $entityClassResolver
         );
