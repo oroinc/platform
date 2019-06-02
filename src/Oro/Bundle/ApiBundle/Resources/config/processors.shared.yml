@@ -595,6 +595,14 @@ services:
             - { name: oro.api.processor, action: get_subresource, group: build_query, collection: true, priority: -70 }
             - { name: oro.api.processor, action: get_relationship, group: build_query, collection: true, priority: -70 }
 
+    oro_api.subresource.build_unidirectional_association_subresource_query:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildUnidirectionalAssociationSubresourceQuery
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: build_query, collection: true, priority: -90 }
+            - { name: oro.api.processor, action: get_relationship, group: build_query, collection: true, priority: -90 }
+
     oro_api.build_query:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery
         arguments:

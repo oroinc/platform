@@ -20,8 +20,25 @@ trusted_data:
                 parentAlias: true
                 parentJoinAlias: true
                 associationName: true
+        Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer:
+            tryGetValue:
+                fieldName: true
+        Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\UnidirectionalAssociationCompleter:
+            createAssociationQuery:
+                targetEntityClass: true
+                targetAssociationName: true
+        Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildUnidirectionalAssociationSubresourceQuery:
+            process:
+                targetAssociationName: true
 
     safe_methods:
+        Oro\Bundle\ApiBundle\Util\DoctrineHelper:
+            getSingleEntityIdentifier: true
+            getEntityIdentifierFieldNames: true
+            getEntityIdentifierFieldNamesForClass: true
+            getEntityIdentifier: true
+            getSingleEntityIdentifierFieldName: true
+            getSingleEntityIdentifierFieldType: true
         Oro\Bundle\ApiBundle\Processor\Subresource\Shared\AddParentEntityIdToQuery:
             getJoinFieldName: true
         Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig:

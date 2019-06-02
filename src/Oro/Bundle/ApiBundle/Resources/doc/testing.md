@@ -2,12 +2,12 @@
 
    - [Overview](#overview)
    - [Load Fixtures](#load-fixtures)
-   - [Alice references](#alice-references)
-   - [Yaml templates](#yaml-templates)
-   - [Assert expectations](#assert-expectations)
-   - [Yaml templates for request body](#yaml-templates-for-request-body)
-   - [Process single reference](#process-single-reference)
-   - [Dump response into Yaml template](#dump-response-into-yaml-template)
+   - [Alice References](#alice-references)
+   - [YAML Templates](#yaml-templates)
+   - [Assert the Expectations](#assert-the-expectations)
+   - [YAML Templates for a Request Body](#yaml-templates-for-a-request-body)
+   - [Process Single Reference](#process-single-reference)
+   - [Dump the Response into a YAML Template](#dump-the-response-into-a-yaml-template)
 
 ## Overview
 

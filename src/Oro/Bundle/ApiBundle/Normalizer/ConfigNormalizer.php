@@ -77,7 +77,9 @@ class ConfigNormalizer
             $propertyPath = $field->getPropertyPath();
             if ($propertyPath) {
                 if (ConfigUtil::IGNORE_PROPERTY_PATH === $propertyPath) {
-                    $toRemove[] = $fieldName;
+                    if (null === $field->getAssociationQuery()) {
+                        $toRemove[] = $fieldName;
+                    }
                 } elseif (false === strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
                     $renamedFields[$propertyPath] = $fieldName;
                 }

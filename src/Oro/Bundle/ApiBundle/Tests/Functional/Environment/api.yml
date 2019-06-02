@@ -290,7 +290,14 @@ api:
                         update_subresource: true
                         add_subresource: true
                         delete_subresource: true
-        Extend\Entity\TestApiE2: ~
+        Extend\Entity\TestApiE2:
+            fields:
+                targetSideOfUnidirectionalManyToOne:
+                    data_type: unidirectionalAssociation:uniM2O
+                    target_class: Extend\Entity\TestApiE1
+                targetSideOfUnidirectionalManyToMany:
+                    data_type: unidirectionalAssociation:uniM2M
+                    target_class: Extend\Entity\TestApiE1
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestActivity:

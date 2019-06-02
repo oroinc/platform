@@ -18,11 +18,13 @@ class AclProtectedEntitySerializer extends EntitySerializer
     {
         if (isset($context[Context::REQUEST_TYPE])) {
             $requestType = $context[Context::REQUEST_TYPE];
+            $this->configConverter->setRequestType($requestType);
             $this->queryFactory->setRequestType($requestType);
             $this->fieldAccessor->setRequestType($requestType);
             try {
                 return parent::serialize($qb, $config, $context);
             } finally {
+                $this->configConverter->setRequestType();
                 $this->queryFactory->setRequestType();
                 $this->fieldAccessor->setRequestType();
             }
@@ -38,11 +40,13 @@ class AclProtectedEntitySerializer extends EntitySerializer
     {
         if (isset($context[Context::REQUEST_TYPE])) {
             $requestType = $context[Context::REQUEST_TYPE];
+            $this->configConverter->setRequestType($requestType);
             $this->queryFactory->setRequestType($requestType);
             $this->fieldAccessor->setRequestType($requestType);
             try {
                 return parent::serializeEntities($entities, $entityClass, $config, $context);
             } finally {
+                $this->configConverter->setRequestType();
                 $this->queryFactory->setRequestType();
                 $this->fieldAccessor->setRequestType();
             }

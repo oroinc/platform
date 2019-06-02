@@ -67,6 +67,15 @@ services:
             - ~ # container of completers. Set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\CustomDataTypeCompleterCompilerPass
             - '@oro_api.request_expression_matcher'
 
+    oro_api.custom_data_type_completer.unidirectional_association:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\UnidirectionalAssociationCompleter
+        public: false
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_override_provider_registry'
+        tags:
+            - { name: oro.api.custom_data_type_completer, priority: -255 }
+
     oro_api.custom_data_type_completer.association:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CustomAssociationCompleter
         public: false

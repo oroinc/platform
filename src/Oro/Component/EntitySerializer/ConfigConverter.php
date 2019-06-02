@@ -61,6 +61,7 @@ class ConfigConverter
         $this->setExcluded($result, $config);
         $this->setCollapsed($result, $config);
         $this->setDataTransformers($result, $config);
+        $this->setAssociationQuery($result, $config);
 
         $targetEntity = new InternalEntityConfig();
         $this->buildEntityConfig($targetEntity, $config);
@@ -270,6 +271,17 @@ class ConfigConverter
                     $result->addDataTransformer($dataTransformer);
                 }
             }
+        }
+    }
+
+    /**
+     * @param FieldConfig $result
+     * @param array       $config
+     */
+    protected function setAssociationQuery(FieldConfig $result, array $config)
+    {
+        if (isset($config[ConfigUtil::ASSOCIATION_QUERY])) {
+            $result->set(ConfigUtil::ASSOCIATION_QUERY, $config[ConfigUtil::ASSOCIATION_QUERY]);
         }
     }
 }

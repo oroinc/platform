@@ -492,6 +492,8 @@ services:
     oro_api.entity_serializer.config_converter:
         class: Oro\Bundle\ApiBundle\Util\ConfigConverter
         public: false
+        arguments:
+            - '@oro_api.entity_override_provider_registry'
 
     oro_api.entity_serializer.data_normalizer:
         class: Oro\Component\EntitySerializer\DataNormalizer

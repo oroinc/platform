@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -591,6 +592,45 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expectedConfig' => [
                     'exclusion_policy' => 'all'
+                ]
+            ],
+            'computed association without query'                         => [
+                'config'         => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'association1' => [
+                            'target_class'  => 'Test\TargetClass',
+                            'target_type'   => 'to-many',
+                            'property_path' => '_'
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'exclusion_policy' => 'all'
+                ]
+            ],
+            'computed association with query'                            => [
+                'config'         => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'association1' => [
+                            'target_class'      => 'Test\TargetClass',
+                            'target_type'       => 'to-many',
+                            'property_path'     => '_',
+                            'association_query' => $this->createMock(QueryBuilder::class)
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'association1' => [
+                            'target_class'      => 'Test\TargetClass',
+                            'target_type'       => 'to-many',
+                            'property_path'     => '_',
+                            'association_query' => $this->createMock(QueryBuilder::class)
+                        ]
+                    ]
                 ]
             ]
         ];

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\EntitySerializer\FieldConfig;
@@ -547,6 +548,43 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
             $this->items[ConfigUtil::TARGET_TYPE] = $targetType;
         } else {
             unset($this->items[ConfigUtil::TARGET_TYPE]);
+        }
+    }
+
+    /**
+     * Gets ORM query builder for a query that should be used to load an association data.
+     *
+     * @return QueryBuilder|null
+     */
+    public function getAssociationQuery(): ?QueryBuilder
+    {
+        return $this->items[ConfigUtil::ASSOCIATION_QUERY] ?? null;
+    }
+
+    /**
+     * Sets ORM query builder for a query that should be used to load an association data.
+     *
+     * IMPORTANT: the query builder must follow the rules described in AssociationQuery class.
+     * @see \Oro\Component\EntitySerializer\AssociationQuery
+     *
+     * @param QueryBuilder|null $query
+     */
+    public function setAssociationQuery(QueryBuilder $query = null)
+    {
+        if (null === $query) {
+            unset($this->items[ConfigUtil::ASSOCIATION_QUERY]);
+        } else {
+            if (!$this->getTargetClass()) {
+                throw new \InvalidArgumentException(
+                    'The target class must be specified to be able to use an association query.'
+                );
+            }
+            if (!$this->isCollectionValuedAssociation()) {
+                throw new \InvalidArgumentException(
+                    'An association query can be used only for collection valued associations.'
+                );
+            }
+            $this->items[ConfigUtil::ASSOCIATION_QUERY] = $query;
         }
     }
 }
