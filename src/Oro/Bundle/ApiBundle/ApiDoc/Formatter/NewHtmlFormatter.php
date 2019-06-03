@@ -15,7 +15,8 @@ class NewHtmlFormatter extends HtmlFormatter
      */
     protected function renderOne(array $data)
     {
-        return $this->engine->render('NelmioApiDocBundle::resource.html.twig', array_merge(
+        // use overwritten template to render correct URL to documentation root
+        return $this->engine->render('OroApiBundle:ApiDoc:resource.html.twig', array_merge(
             [
                 'data'           => $this->reformatData($data),
                 'displayContent' => true,
@@ -29,7 +30,8 @@ class NewHtmlFormatter extends HtmlFormatter
      */
     protected function render(array $collection)
     {
-        return $this->engine->render('NelmioApiDocBundle::resources.html.twig', array_merge(
+        // use overwritten template to render correct URL to documentation root
+        return $this->engine->render('OroApiBundle:ApiDoc:resources.html.twig', array_merge(
             [
                 'resources' => $this->reformatDocData($collection),
                 'actions'   => $this->getActions($collection)
