@@ -82,7 +82,7 @@ services:
     oro_user.listener.password_changed_subscriber:
         class: Oro\Bundle\UserBundle\EventListener\PasswordChangedSubscriber
         arguments:
-            - '@service_container'
+            - '@oro_entity_extend.enum_value_provider'
         tags:
             - { name: doctrine.event_subscriber }
 

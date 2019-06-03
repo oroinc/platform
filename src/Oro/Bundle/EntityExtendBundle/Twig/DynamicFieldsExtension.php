@@ -14,13 +14,17 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
+/**
+ * Adds dynamic fields
+ */
+class DynamicFieldsExtension extends AbstractDynamicFieldsExtension implements ServiceSubscriberInterface
 {
     /** @var ConfigProvider|null */
     private $extendConfigProvider;
@@ -30,6 +34,23 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
 
     /** @var ConfigProvider|null */
     private $viewConfigProvider;
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_entity_extend.extend.field_type_helper' => FieldTypeHelper::class,
+            'oro_entity_config.provider.extend' => ConfigProvider::class,
+            'oro_entity_config.provider.entity' => ConfigProvider::class,
+            'oro_entity_config.provider.view' => ConfigProvider::class,
+            'property_accessor' => PropertyAccessorInterface::class,
+            'event_dispatcher' => EventDispatcherInterface::class,
+            'security.authorization_checker' => AuthorizationCheckerInterface::class,
+            'oro_featuretoggle.checker.feature_checker' => FeatureChecker::class,
+        ];
+    }
 
     /**
      * @return FieldTypeHelper

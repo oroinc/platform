@@ -3,6 +3,7 @@
 namespace Oro\Bundle\InstallerBundle\Command;
 
 use Composer\Question\StrictConfirmationQuestion;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -10,6 +11,7 @@ use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\InstallerBundle\InstallerEvents;
+use Oro\Bundle\InstallerBundle\Persister\YamlPersister;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 use Oro\Bundle\LocaleBundle\Command\UpdateLocalizationCommand;
@@ -33,11 +35,45 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
 {
     public const NAME = 'oro:install';
 
+    /** @var string */
+    protected static $defaultName = self::NAME;
+
     /** @var Process */
     private $assetsCommandProcess;
 
     /** @var InputOptionProvider */
-    protected $inputOptionProvider;
+    private $inputOptionProvider;
+
+    /** @var YamlPersister */
+    private $yamlPersister;
+
+    /** @var ScriptManager */
+    private $scriptManager;
+
+    /** @var Registry */
+    private $doctrine;
+
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
+    /**
+     * @param YamlPersister $yamlPersister
+     * @param ScriptManager $scriptManager
+     * @param Registry $doctrine
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function __construct(
+        YamlPersister $yamlPersister,
+        ScriptManager $scriptManager,
+        Registry $doctrine,
+        EventDispatcherInterface $eventDispatcher
+    ) {
+        $this->yamlPersister = $yamlPersister;
+        $this->scriptManager = $scriptManager;
+        $this->doctrine = $doctrine;
+        $this->eventDispatcher = $eventDispatcher;
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -45,7 +81,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     protected function configure()
     {
         $this
-            ->setName(self::NAME)
             ->setDescription('Oro Application Installer.')
             ->addOption('application-url', null, InputOption::VALUE_OPTIONAL, 'Application URL')
             ->addOption('organization-name', null, InputOption::VALUE_OPTIONAL, 'Organization name')
@@ -129,20 +164,19 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             return $exitCode;
         }
 
-        $eventDispatcher = $this->getEventDispatcher();
         $event = new InstallerEvent($this, $input, $output, $commandExecutor);
 
         try {
             $this->prepareStep($input, $output);
 
-            $eventDispatcher->dispatch(InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION, $event);
+            $this->eventDispatcher->dispatch(InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION, $event);
 
             if (!$skipAssets) {
                 $this->startBuildAssetsProcess($input);
             }
 
             $this->loadDataStep($commandExecutor, $output);
-            $eventDispatcher->dispatch(InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION, $event);
+            $this->eventDispatcher->dispatch(InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION, $event);
 
             $this->finalStep($commandExecutor, $output, $input, $skipAssets);
 
@@ -273,7 +307,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     {
         if ($input->getOption('drop-database')) {
             $output->writeln('<info>Drop schema.</info>');
-            $managers = $this->getContainer()->get('doctrine')->getManagers();
+            $managers = $this->doctrine->getManagers();
             foreach ($managers as $name => $manager) {
                 if ($manager instanceof EntityManager) {
                     $tool = new SchemaTool($manager);
@@ -584,18 +618,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      */
     protected function updateInstalledFlag($installed)
     {
-        $dumper                        = $this->getContainer()->get('oro_installer.yaml_persister');
-        $params                        = $dumper->parse();
+        $params                        = $this->yamlPersister->parse();
         $params['system']['installed'] = $installed;
-        $dumper->dump($params);
-    }
-
-    /**
-     * Clears the state of all database checkers to make sure they will recheck the database state
-     */
-    protected function clearCheckDatabaseState()
-    {
-        $this->getContainer()->get('oro_entity.database_checker.state_manager')->clearState();
+        $this->yamlPersister->dump($params);
     }
 
     /**
@@ -607,9 +632,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     protected function processInstallerScripts(OutputInterface $output, CommandExecutor $commandExecutor)
     {
         $scriptExecutor = new ScriptExecutor($output, $this->getContainer(), $commandExecutor);
-        /** @var ScriptManager $scriptManager */
-        $scriptManager = $this->getContainer()->get('oro_installer.script_manager');
-        $scriptFiles   = $scriptManager->getScriptFiles();
+
+        $scriptFiles   = $this->scriptManager->getScriptFiles();
         if (!empty($scriptFiles)) {
             foreach ($scriptFiles as $scriptFile) {
                 $scriptExecutor->runScript($scriptFile);
@@ -642,14 +666,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $commandExecutor
                 ->runCommand('oro:translation:load', ['--process-isolation' => true, '--rebuild-cache' => true]);
         }
-    }
-
-    /**
-     * @return EventDispatcherInterface
-     */
-    private function getEventDispatcher()
-    {
-        return $this->getContainer()->get('event_dispatcher');
     }
 
     /**

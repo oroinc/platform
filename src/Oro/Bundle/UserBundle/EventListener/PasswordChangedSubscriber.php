@@ -9,19 +9,21 @@ use Doctrine\ORM\Events;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Changes auth status on preupdate
+ */
 class PasswordChangedSubscriber implements EventSubscriber
 {
-    /** @var ContainerInterface */
-    private $container;
+    /** @var EnumValueProvider */
+    private $enumValueProvider;
 
     /**
-     * @param ContainerInterface $container
+     * @param EnumValueProvider $enumValueProvider
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(EnumValueProvider $enumValueProvider)
     {
-        $this->container = $container;
+        $this->enumValueProvider = $enumValueProvider;
     }
 
     /**
@@ -67,16 +69,8 @@ class PasswordChangedSubscriber implements EventSubscriber
 
         if ($user->getAuthStatus() && $user->getAuthStatus()->getId() === UserManager::STATUS_EXPIRED) {
             $user->setAuthStatus(
-                $this->getEnumValueProvider()->getEnumValueByCode('auth_status', UserManager::STATUS_ACTIVE)
+                $this->enumValueProvider->getEnumValueByCode('auth_status', UserManager::STATUS_ACTIVE)
             );
         }
-    }
-
-    /**
-     * @return EnumValueProvider
-     */
-    private function getEnumValueProvider()
-    {
-        return $this->container->get('oro_entity_extend.enum_value_provider');
     }
 }

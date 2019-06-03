@@ -5,10 +5,15 @@ namespace Oro\Bundle\EntityConfigBundle\Twig;
 use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Twig\AbstractDynamicFieldsExtension;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
-class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExtension
+/**
+ * Adds attributes to dynamic fields
+ */
+class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExtension implements
+    ServiceSubscriberInterface
 {
     /** @var AbstractDynamicFieldsExtension */
     private $extension;
@@ -21,6 +26,16 @@ class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExte
     {
         parent::__construct($container);
         $this->extension = $extension;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_entity_config.config.attributes_config_helper' => AttributeConfigHelper::class,
+        ];
     }
 
     /**

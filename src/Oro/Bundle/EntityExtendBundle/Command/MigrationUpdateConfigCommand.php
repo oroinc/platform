@@ -11,15 +11,38 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Updates extended entities configuration during a database structure migration process.
+ * This is an internal command. Please do not run it manually.
+ */
 class MigrationUpdateConfigCommand extends ContainerAwareCommand
 {
+    /** @var string */
+    protected static $defaultName = 'oro:entity-extend:migration:update-config';
+
+    /** var ExtendOptionsParser **/
+    private $extendOptionsParser;
+
+    /** var ExtendConfigProcessor **/
+    private $extendConfigProcessor;
+
+    /**
+     * @param ExtendOptionsParser $extendOptionsParser
+     * @param ExtendConfigProcessor $extendConfigProcessor
+     */
+    public function __construct(ExtendOptionsParser $extendOptionsParser, ExtendConfigProcessor $extendConfigProcessor)
+    {
+        $this->extendOptionsParser = $extendOptionsParser;
+        $this->extendConfigProcessor = $extendConfigProcessor;
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
         $this
-            ->setName('oro:entity-extend:migration:update-config')
             ->setDescription(
                 'Updates extended entities configuration during a database structure migration process.'
                 . ' This is an internal command. Please do not run it manually.'
@@ -43,14 +66,12 @@ class MigrationUpdateConfigCommand extends ContainerAwareCommand
         $optionsPath = $this->getContainer()->getParameter('oro_entity_extend.migration.config_processor.options.path');
         if (is_file($optionsPath)) {
             $options = unserialize(file_get_contents($optionsPath));
-            /** @var ExtendOptionsParser $parser */
-            $parser  = $this->getContainer()->get('oro_entity_extend.migration.options_parser');
-            $options = $parser->parseOptions($options);
+
+            $options = $this->extendOptionsParser->parseOptions($options);
 
             $logger = new ConfigLogger(new OutputLogger($output));
-            /** @var ExtendConfigProcessor $processor */
-            $processor = $this->getContainer()->get('oro_entity_extend.migration.config_processor');
-            $processor->processConfigs(
+
+            $this->extendConfigProcessor->processConfigs(
                 $options,
                 $logger,
                 $input->getOption('dry-run')

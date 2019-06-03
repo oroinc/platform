@@ -2,27 +2,50 @@ services:
     _defaults:
         public: false
 
+    Oro\Bundle\EntityExtendBundle\Command\CacheCommand:
+        abstract: true
+        arguments:
+            - '@oro_entity_extend.extend.entity_proxy_generator'
+            - '@oro_entity.entity_alias_resolver'
+            - '@oro_entity_extend.tools.dumper'
+            - '@doctrine'
+            - '@kernel'
+
     Oro\Bundle\EntityExtendBundle\Command\CacheCheckCommand:
+        class: Oro\Bundle\EntityExtendBundle\Command\CacheCheckCommand
         tags:
             - { name: console.command }
 
     Oro\Bundle\EntityExtendBundle\Command\CacheClearCommand:
+        parent: 'Oro\Bundle\EntityExtendBundle\Command\CacheCommand'
+        class: Oro\Bundle\EntityExtendBundle\Command\CacheClearCommand
+        public: false
         tags:
             - { name: console.command }
 
+
     Oro\Bundle\EntityExtendBundle\Command\CacheWarmupCommand:
+        parent: 'Oro\Bundle\EntityExtendBundle\Command\CacheCommand'
+        class: Oro\Bundle\EntityExtendBundle\Command\CacheWarmupCommand
+        public: false
         tags:
             - { name: console.command }
 
     Oro\Bundle\EntityExtendBundle\Command\MigrationUpdateConfigCommand:
+        class: Oro\Bundle\EntityExtendBundle\Command\MigrationUpdateConfigCommand
+        arguments:
+            - '@oro_entity_extend.migration.options_parser'
+            - '@oro_entity_extend.migration.config_processor'
         tags:
             - { name: console.command }
 
     Oro\Bundle\EntityExtendBundle\Command\RouterCacheClearCommand:
+        class: Oro\Bundle\EntityExtendBundle\Command\RouterCacheClearCommand
         tags:
             - { name: console.command }
 
     Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand:
+        class: Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand
         tags:
             - { name: console.command }
 
