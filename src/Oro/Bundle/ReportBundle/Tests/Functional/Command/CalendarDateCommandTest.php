@@ -33,6 +33,9 @@ class CalendarDateCommandTest extends WebTestCase
         $manager->flush();
 
         $this->runCommand(CalendarDateCommand::COMMAND_NAME);
+        // Check that another command execution does not add duplicate dates
+        $this->runCommand(CalendarDateCommand::COMMAND_NAME);
+
         $results = $repository->findAll();
         $this->assertNotEmpty($results);
         $this->assertCalendarDates($results);
@@ -45,8 +48,12 @@ class CalendarDateCommandTest extends WebTestCase
     {
         $generatedDates = [];
         foreach ($calendarDates as $calendarDate) {
+            $formattedDate = $calendarDate->getDate()->format(self::DATE_FORMAT);
+            // Assert that no duplicate dates present
+            $this->assertArrayNotHasKey($formattedDate, $generatedDates);
+
             /** @var CalendarDate $calendarDate */
-            $generatedDates[$calendarDate->getDate()->format(self::DATE_FORMAT)] = $calendarDate->getDate();
+            $generatedDates[$formattedDate] = $calendarDate->getDate();
         }
 
         $requiredDates = $this->getGeneratedDates();
