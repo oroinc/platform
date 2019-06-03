@@ -50,10 +50,11 @@ class UserController extends Controller
     /**
      * @Route("/profile/view", name="oro_user_profile_view")
      * @Template("OroUserBundle:User:view.html.twig")
-     * @AclAncestor("oro_user_user_view")
      */
     public function viewProfileAction()
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         return $this->view($this->getUser(), true);
     }
 

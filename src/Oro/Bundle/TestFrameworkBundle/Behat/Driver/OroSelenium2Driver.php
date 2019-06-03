@@ -164,8 +164,10 @@ JS;
             if (document.title === "Loading...") {
                 return false;
             }
-            
-            if (jQuery == null || jQuery.active) {
+
+            if (document.querySelector('script[src*="js/oro.min.js"]') !== null
+                && (typeof(jQuery) === 'undefined' || jQuery == null || jQuery.active)
+            ) {
                 return false;
             }
             
@@ -227,7 +229,9 @@ JS;
             }
             
             try {
-                if (typeof(jQuery) === 'undefined' || jQuery == null || jQuery.active) {
+                if (document.querySelector('script[src*="js/oro.min.js"]') !== null
+                    && (typeof(jQuery) === 'undefined' || jQuery == null || jQuery.active)
+                ) {
                     return false;
                 }
                 

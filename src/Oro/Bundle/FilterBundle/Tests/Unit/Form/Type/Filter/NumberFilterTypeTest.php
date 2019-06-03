@@ -128,7 +128,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                 ),
             ),
             'integer'              => array(
-                'bindData'      => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'),
+                'bindData'      => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345'),
                 'formData'      => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345),
                 'viewData'      => array(
                     'value'             => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345'),
@@ -325,7 +325,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                 ],
             ],
             'integer' => [
-                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'],
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345'],
                 'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345],
                 'viewData' => [
                     'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345'],

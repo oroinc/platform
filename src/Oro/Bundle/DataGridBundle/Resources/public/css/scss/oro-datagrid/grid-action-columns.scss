@@ -21,7 +21,7 @@
 
     .show {
         .dropdown-toggle {
-            background-color: $oro-datagrid-action-active;
+            background-color: $oro-datagrid-action-active-bg-color;
             box-shadow: none;
             color: $oro-datagrid-label-color;
         }
@@ -43,7 +43,7 @@
         line-height: $oro-datagrid-action-size;
 
         border-radius: $oro-datagrid-action-column-radius;
-        color: $oro-datagrid-action-active;
+        color: $oro-datagrid-action-color;
     }
 }
 

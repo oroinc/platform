@@ -15,6 +15,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
@@ -189,40 +190,38 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 ]
             ],
             'array_variables' => [
-                'submitData' => ['first' => ['element11', 'element12' ], 'second' => ['element21', 'element22']],
+                'submitData' => ['first' => ['option11', 'option12']],
                 'formData' => $this->createWorkflowData([
-                    'first' => ['element11', 'element12'],
-                    'second' => ['element21', 'element22']
+                    'first' => ['option11', 'option12'],
                 ]),
                 'form_options' => [
                     'workflow' => $this->createWorkflowWithVariables([
                         [
                             'name' => 'first',
                             'label' => 'First Label',
-                            'value' => ['element11', 'element12'],
-                            'type' => 'array'
-                        ],
-                        [
-                            'name' => 'second',
-                            'label' => 'Second Label',
-                            'value' => ['element21', 'element22'],
+                            'value' => ['option11', 'option12'],
                             'type' => 'array'
                         ]
                     ])
                 ],
                 'childrenOptions' => [
-                    'first' => ['label' => 'First Label'],
-                    'second' => ['label' => 'Second Label']
+                    'first' => [
+                        'label' => 'First Label',
+                        'choices' => ['option11' => 'option11', 'option12' => 'option12'],
+                        'multiple' => true,
+                        'expanded' => true,
+                    ],
                 ],
                 'guessedData' => [
                     [
-                        'form_type' => TextType::class,
-                        'form_options' => ['label' => 'First Label']
+                        'form_type' => ChoiceType::class,
+                        'form_options' => [
+                            'label' => 'First Label',
+                            'choices' => ['option11' => 'option11', 'option12' => 'option12'],
+                            'multiple' => true,
+                            'expanded' => true,
+                        ]
                     ],
-                    [
-                        'form_type' => TextType::class,
-                        'form_options' => ['label' => 'Second Label']
-                    ]
                 ]
             ],
             'entity_variable_without_identifier' => [

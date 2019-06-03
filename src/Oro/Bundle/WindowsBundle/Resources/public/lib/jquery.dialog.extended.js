@@ -755,18 +755,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             checkOption('titlebar', ['transparent']);
 
             return this;
-        },
-
-        /**
-         * Overrides parent implementation to make it possible to use HTML code and entities in title.
-         * Avoids double escaping when backend escapes characters, and frontend shows them as HTML entities in popup
-         * title instead of showing underlying characters.
-         *
-         * @param {String} title
-         * @private
-         */
-        _title: function (title) {
-            title.html(this.options.title);
         }
     });
 });

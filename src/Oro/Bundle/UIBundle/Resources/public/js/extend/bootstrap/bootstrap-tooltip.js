@@ -8,7 +8,29 @@ define(function(require) {
     require('bootstrap-tooltip');
 
     var Tooltip = $.fn.tooltip.Constructor;
-    var original = _.pick(Tooltip.prototype, 'show', 'hide');
+    var original = _.pick(Tooltip.prototype, 'show', 'hide', '_getContainer');
+
+    var DATA_ATTRIBUTE_PATTERN = /^data-[\w-]*$/i;
+    Tooltip.Default.whiteList['*'].push(DATA_ATTRIBUTE_PATTERN);
+    _.extend(Tooltip.Default.whiteList, {
+        mark: [],
+        table: [],
+        caption: [],
+        colgroup: [],
+        col: ['span'],
+        thead: [],
+        tbody: [],
+        tfoot: [],
+        tr: [],
+        th: ['colspan', 'rowspan', 'scope'],
+        td: ['colspan', 'rowspan'],
+        dl: [],
+        dd: [],
+        dt: [],
+        q: [],
+        blockquote: [],
+        figure: []
+    });
 
     Tooltip.prototype.show = function() {
         var result = original.show.apply(this, arguments);
@@ -33,6 +55,18 @@ define(function(require) {
         }
 
         return original.hide.apply(this, arguments);
+    };
+
+    Tooltip.prototype._getContainer = function() {
+        var modal;
+        if (
+            this.config.container === false &&
+            (modal = $(this.element).closest('.modal').get(0))
+        ) {
+            return modal;
+        }
+
+        return original._getContainer.apply(this, arguments);
     };
 
     var delegateAction = function(method, action) {

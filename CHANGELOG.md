@@ -170,6 +170,10 @@ css:
 #### ApiBundle
 * Fixed the `depends_on` configuration option of the `entities.fields` section of `Resources/config/oro/api.yml`. Now, only entity property names (or paths that contain entity property names) can be used in it. In addition, exception handling of invalid values for this option was improved to return more useful exception messages.
 
+#### LocaleBundle
+* Removed loading data about currency code and currency symbols from bundle's file `./Resources/config/oro/currency_data.yml`. Now app gets this data from the Intl component by `IntlNumberFormatter`.
+If you want to override some symbols, you can decorate `Oro\Bundle\LocaleBundle\Formatter\NumberFormatter::formatCurrency()` method.
+
 ## 3.1.0-rc (2018-11-30)
 [Show detailed list of changes](incompatibilities-3-1-rc.md)
 

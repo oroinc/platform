@@ -25,6 +25,13 @@ define(function(require) {
          */
         constructor: function PageLayoutView() {
             PageLayoutView.__super__.constructor.apply(this, arguments);
+
+            if (!this.settings.routeLinks) {
+                // in case route links is turned of -- prevent navigation on empty hash
+                this.delegate('click', 'a[href="#"]', function(event) {
+                    event.preventDefault();
+                });
+            }
         },
 
         /**

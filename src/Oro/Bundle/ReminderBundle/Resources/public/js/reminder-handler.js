@@ -128,7 +128,7 @@ define(
                 _.each(this.reminders, function(reminder, uniqueId) {
                     var message = this.getReminderMessage(reminder);
                     message += '(<a class="reminder-dismiss-link" data-id="' + reminder.id + '" data-unique-id="' +
-                        reminder.uniqueId + '" href="javascript:void(0);">dismiss</a>)';
+                        reminder.uniqueId + '" href="#">dismiss</a>)';
 
                     var actions = messenger.notificationFlashMessage('reminder', message, {delay: false, flash: false});
                     var data = {actions: actions, uniqueId: uniqueId};

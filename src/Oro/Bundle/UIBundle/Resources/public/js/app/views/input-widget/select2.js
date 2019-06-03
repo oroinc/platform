@@ -56,6 +56,8 @@ define(function(require) {
                 data.container.data('inputWidget', this);
                 data.dropdown.data('inputWidget', this);
             }
+
+            this.updateFixedMode();
         },
 
         resolveOptions: function(options) {
@@ -70,6 +72,28 @@ define(function(require) {
 
         isInitialized: function() {
             return Boolean(this.$el.data(this.widgetFunctionName));
+        },
+
+        /**
+         * Detects if the widget has a parent with fixed position, sets Select2 prop, and updates Select2 dropdown
+         * position if it's needed
+         *
+         * @param {boolean} [updatePosition]
+         */
+        updateFixedMode: function(updatePosition) {
+            var select2Inst = this.$el.data(this.widgetFunctionName);
+            var hasFixedParent = _.some(this.$el.parents(), function(el) {
+                return $(el).css('position') === 'fixed';
+            });
+
+            if (hasFixedParent !== select2Inst.dropdownFixedMode) {
+                select2Inst.dropdownFixedMode = hasFixedParent;
+
+                if (updatePosition) {
+                    // use defer to avoid blinking of dropdown
+                    _.defer(select2Inst.positionDropdown.bind(select2Inst));
+                }
+            }
         },
 
         disposeWidget: function() {

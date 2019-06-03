@@ -65,31 +65,12 @@ class OroMainContext extends MinkContext implements
     /** @var bool */
     private $debug = false;
 
-    /** @var bool */
-    private $skipWait = false;
-
     /**
      * @BeforeScenario
      */
     public function beforeScenario()
     {
         $this->getSession()->resizeWindow(1920, 1080, 'current');
-    }
-
-    /**
-     * @BeforeScenario @skipWait
-     */
-    public function applySkipWait()
-    {
-        $this->skipWait = true;
-    }
-
-    /**
-     * @AfterScenario @skipWait
-     */
-    public function cancelSkipWait()
-    {
-        $this->skipWait = false;
     }
 
     /** @return Stopwatch */
@@ -135,7 +116,7 @@ class OroMainContext extends MinkContext implements
      */
     public function beforeStep(BeforeStepScope $scope)
     {
-        if ($this->skipWait || !$this->getMink()->isSessionStarted()) {
+        if (!$this->getMink()->isSessionStarted()) {
             return;
         }
 
@@ -150,7 +131,7 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        if (1 === preg_match('/[\S]*\/user\/(login|two-factor-auth|reset-request)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
+        if (1 === preg_match('/[\S]*\/user\/(login|two-factor-auth)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
             return;
         } elseif (0 === preg_match('/^https?:\/\//', $url)) {
             return;
@@ -170,8 +151,7 @@ class OroMainContext extends MinkContext implements
      */
     public function afterStep(AfterStepScope $scope)
     {
-        if ($this->skipWait
-            || !$this->getMink()->isSessionStarted()
+        if (!$this->getMink()->isSessionStarted()
             || $this->isNextStepNeedSkip($scope->getStep(), $scope->getFeature())
         ) {
             return;
@@ -188,7 +168,7 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        if (1 === preg_match('/[\S]*\/user\/(login|two-factor-auth|reset-request)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
+        if (1 === preg_match('/[\S]*\/user\/(login|two-factor-auth)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
             return;
         } elseif (0 === preg_match('/^https?:\/\//', $url)) {
             return;

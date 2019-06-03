@@ -17,12 +17,12 @@ $primary-860: lighten($primary, 70%) !default; // #f3f3f3
 $primary-900: lighten($primary, 72%) !default; // #f8f8f8
 $primary-inverse: #fff !default;
 
-$secondary: #0c84a3 !default;
-$secondary-100: lighten($secondary, 6%) !default;  // #0e9bbf
-$secondary-150: lighten($secondary, 40%) !default; // #85dff6
-$secondary-200: lighten($secondary, 60%) !default; // #e4f8fd
-$secondary-300: lighten($secondary, 62%) !default; // #edfafe
-$secondary-dark: darken($secondary, 8%) !default;  // #09657d
+$secondary: #0c809e !default;
+$secondary-100: lighten($secondary, 6%) !default;  // #0e97ba
+$secondary-150: lighten($secondary, 40%) !default; // #81ddf5
+$secondary-200: lighten($secondary, 60%) !default; // #dff7fd
+$secondary-300: lighten($secondary, 62%) !default; // #e9f9fd
+$secondary-dark: darken($secondary, 8%) !default;  // #096178
 
 $extra: #f9b700 !default;
 $extra-100: lighten($extra, 22%) !default;     // #ffd86a
@@ -31,13 +31,13 @@ $extra-300: lighten($extra, 48%) !default;     // #fffbef
 $extra-dark: desaturate($extra, 96%) !default; // #817f78
 
 // UI Colors
-$danger: #e34627 !default;
-$danger-light: lighten($danger, 24%) !default;         // #f1a393
-$danger-lighten: lighten($danger, 40%) !default;       // #fae1dc
-$danger-ultra-light: lighten($danger, 44%) !default;   // #fdf0ee
-$danger-dark: darken($danger, 8%) !default;            // #c7361a
-$danger-darken: desaturate($danger, 24%) !default;     // #c65a44
-$danger-ultra-dark: darken($danger, 28%) !default;     // #6d1e0e
+$danger: #e62600 !default;
+$danger-light: lighten($danger, 24%) !default;         // #ff7b61
+$danger-lighten: lighten($danger, 40%) !default;       // #ffc0b3
+$danger-ultra-light: lighten($danger, 44%) !default;   // #ffd1c7
+$danger-dark: darken($danger, 12%) !default;           // #a91c00
+$danger-darken: desaturate($danger, 24%) !default;     // #ca381c
+$danger-ultra-dark: darken($danger, 28%) !default;     // #570e00
 
 $warning: #f9b700 !default;
 $warning-light: lighten($warning, 48%) !default;     // #fffbef
@@ -51,14 +51,14 @@ $info-dark: desaturate($info, 24%) !default;   // #549aac
 $info-darken: darken($info, 8%) !default;      // #2d91aa
 $info-ultra-dark: darken($info, 20%) !default; // #20687a
 
-$success: #5aa20f !default;
-$success-light: lighten($success, 4%) !default;           // #64b511
-$success-lighten: lighten($success, 10%) !default;        // #74d113
-$success-extra-light: lighten($success, 45%) !default;    // #ccf6a0
-$success-extra-lighten: lighten($success, 54%) !default;  // #e3faca
-$success-ultra-light: lighten($success, 58%) !default;    // #edfcdd
-$success-dark: darken($success, 8%) !default;             // #457d0c
-$success-darken: desaturate($success, 54%) !default;      // #59723f
+$success: #478507!default;
+$success-light: lighten($success, 4%) !default;           // #519808
+$success-lighten: lighten($success, 10%) !default;        // #61b50a
+$success-extra-light: lighten($success, 45%) !default;    // #baf87a
+$success-extra-lighten: lighten($success, 54%) !default;  // #d0faa5
+$success-ultra-light: lighten($success, 58%) !default;    // #dafbb9
+$success-dark: darken($success, 8%) !default;             // #325e05
+$success-darken: desaturate($success, 54%) !default;      // #465f2d
 
 $additional: #5c5c5c !default;
 $additional-light: lighten($additional, 26%) !default;          // #9e9e9e

@@ -80,7 +80,10 @@ class EntityType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
-            ->setDefaults(['compound' => false, 'entity_mapper' => null, 'included_entities' => null])
+            ->setDefault('compound', false)
+            ->setDefault('multiple', true)
+            ->setDefault('entity_mapper', null)
+            ->setDefault('included_entities', null)
             ->setRequired(['metadata'])
             ->setAllowedTypes('metadata', [AssociationMetadata::class])
             ->setAllowedTypes('entity_mapper', ['null', EntityMapper::class])
