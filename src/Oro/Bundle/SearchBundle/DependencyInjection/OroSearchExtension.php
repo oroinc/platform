@@ -28,6 +28,7 @@ class OroSearchExtension extends Extension
         $loader->load('services.yml');
         $loader->load('filters.yml');
         $loader->load('commands.yml');
+        $loader->load('controllers.yml');
 
         $configLoader = new CumulativeConfigLoader(
             'oro_search',

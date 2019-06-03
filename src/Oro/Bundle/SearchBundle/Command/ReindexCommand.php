@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Command;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,9 +14,38 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Update and reindex (automatically) fulltext-indexed table(s).
  * Use carefully on large data sets - do not run this task too often.
  */
-class ReindexCommand extends ContainerAwareCommand
+class ReindexCommand extends Command
 {
-    const COMMAND_NAME = 'oro:search:reindex';
+    public const COMMAND_NAME = 'oro:search:reindex';
+
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
+
+    /** @var IndexerInterface */
+    private $asyncIndexer;
+
+    /** @var IndexerInterface */
+    private $syncIndexer;
+
+    /**
+     * ReindexCommand constructor.
+     * @param DoctrineHelper $doctrineHelper
+     * @param IndexerInterface $asyncIndex
+     * @param IndexerInterface $syncIndexer
+     * @param string|null $name
+     */
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        IndexerInterface $asyncIndex,
+        IndexerInterface $syncIndexer,
+        ?string $name = null
+    ) {
+        $this->doctrineHelper = $doctrineHelper;
+        $this->asyncIndexer = $asyncIndex;
+        $this->syncIndexer = $syncIndexer;
+
+        parent::__construct($name);
+    }
 
     /**
      * {@inheritdoc}
@@ -50,7 +80,7 @@ class ReindexCommand extends ContainerAwareCommand
 
         // convert short class name to FQCN
         if ($class) {
-            $class = $this->getContainer()->get('oro_entity.doctrine_helper')->getEntityClass($class);
+            $class = $this->doctrineHelper->getEntityClass($class);
         }
 
         $message = $class
@@ -74,10 +104,6 @@ class ReindexCommand extends ContainerAwareCommand
      */
     protected function getSearchIndexer($asyncIndexer = false)
     {
-        if (true === $asyncIndexer) {
-            return $this->getContainer()->get('oro_search.async.indexer');
-        }
-
-        return $this->getContainer()->get('oro_search.search.engine.indexer');
+        return $asyncIndexer === true ? $this->asyncIndexer : $this->syncIndexer;
     }
 }
