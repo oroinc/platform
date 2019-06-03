@@ -14,7 +14,7 @@ use Oro\Component\PhpUtils\ReflectionUtil;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
-class EntityMetadata implements ToArrayInterface
+class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
 {
     /** @var string */
     private $className;
@@ -190,6 +190,23 @@ class EntityMetadata implements ToArrayInterface
     public function setInheritedType($inherited)
     {
         $this->inherited = $inherited;
+    }
+
+    /**
+     * Gets the name of the given property in the source entity.
+     *
+     * @param string $propertyName
+     *
+     * @return string|null The property path or NULL if the property does not exist.
+     */
+    public function getPropertyPath($propertyName)
+    {
+        $property = $this->getProperty($propertyName);
+        if (null === $property) {
+            return null;
+        }
+
+        return $property->getPropertyPath();
     }
 
     /**

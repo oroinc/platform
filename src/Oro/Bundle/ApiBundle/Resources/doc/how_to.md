@@ -14,6 +14,7 @@
  - [Configure an Extended Many-To-One Association](#configure-an-extended-many-to-one-association)
  - [Configure an Extended Many-To-Many Association](#configure-an-extended-many-to-many-association)
  - [Configure an Extended Multiple Many-To-One Association](#configure-an-extended-multiple-many-to-one-association)
+ - [Configure an Unidirectional Association](#configure-an-unidirectional-association)
  - [Add a Custom Controller](#add-a-custom-controller)
  - [Add a Custom Route](#add-a-custom-route)
  - [Using a Non-primary Key to Identify an Entity](#using-a-non-primary-key-to-identify-an-entity)
@@ -21,6 +22,7 @@
  - [Enable Custom API](#enable-custom-api)
  - [Add a Predefined Identifier for API Resource](#add-a-predefined-identifier-for-api-resource)
  - [Add a Computed Field](#add-a-computed-field)
+ - [Add an Association with a Custom Query](#add-an-association-with-a-custom-query)
  - [Disable HATEOAS](#disable-hateoas)
 
 
@@ -423,6 +425,32 @@ The `data_type` parameter has format: `association:relationType:associationKind`
 
  - `relationType` part should have the 'multipleManyToOne' value for the extended Multiple Many-To-One association;
  - `associationKind` is the optional part that represents the kind of the association.
+
+## Configure an Unidirectional Association
+
+To add to API an ORM association that is the inverse side of an unidirectional association, use a special
+`unidirectionalAssociation` data type.
+Its full definition is `unidirectionalAssociation:targetAssociationName`, where
+`targetAssociationName` is the name of the owning side association. To specify an entity that contains
+the owning side association, use the `target_class` option.
+
+To illustrate the configuration of an unidirectional association, consider two entities - `Product` and `Category`.
+Entity `Product` has an association `category` that is an unidirectional many-to-one association to entity `Category`.
+To add products to the `Category` API resource, use the following `Resources/config/oro/api.yml`:
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AppBundle\Entity\Category:
+            fields:
+                products:
+                    data_type: unidirectionalAssociation:category
+                    target_class: Acme\Bundle\AppBundle\Entity\Product
+```
+
+**Note:** only many-to-one and many-to-many unidirectional associations are supported.
+
+**Note:** this data type is not supported for [models that replace ORM entities](./configuration.md#entity_aliases-configuration-section).
 
 ## Add a Custom Controller
 
@@ -993,9 +1021,209 @@ services:
             - { name: oro.api.processor, action: customize_loaded_data, class: Acme\Bundle\AppBundle\Entity\Product }
 ```
 
+## Add an Association with a Custom Query
+
+Let's use the following schema of entities to illustrate how to use a custom query for an association in API:
+
+- Account entity
+
+```php
+    /**
+     * @ORM\OneToMany(targetEntity="AccountContactLink", mappedBy="account")
+     */
+    private $contactLinks;
+```
+
+- Contact entity
+
+```php
+    /**
+     * @ORM\OneToMany(targetEntity="AccountContactLink", mappedBy="contact")
+     */
+    private $accountLinks;
+```
+
+- AccountContactLink entity
+
+```php
+    /**
+     * @ORM\ManyToOne(targetEntity="Account", inversedBy="contactLinks")
+     */
+    private $account;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Contact", inversedBy="accountLinks")
+     */
+    private $contact;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false, options={"default"=true})
+     */
+    private $enabled = true;
+```
+
+This schema represents a many-to-many association between the Account and Contact entities but with an additional
+attribute for each associated record (e.g., attribute `enabled` in the example above).
+
+To elaborate illustration further, let's add `contacts` relationship to the Account API resource that will contain only
+enabled contacts. To achieve this:
+
+- Add the `contacts` field via `Resources/config/oro/api.yml`
+
+  ```yml
+  api:
+      entities:
+          Acme\Bundle\AppBundle\Entity\Account:
+          fields:
+              contacts:
+                  target_class: Acme\Bundle\AppBundle\Entity\Contact
+                  target_type: to-many
+                  property_path: _
+  ```
+
+- Add a processor to register QRM query that should be used to get enabled contacts for [get](./actions.md#get-action)
+  and [get_list](./actions.md#get_list-action) actions
+
+  **Note:** Aliases `e` and `r` are reserved and both must exist in the query. Alias `e` must be a root alias
+  and it must correspond to the entity that is the owner of the association. Alias `r` must correspond to
+  the target entity of the association.
+
+  ```php
+  <?php
+
+  namespace Acme\Bundle\AppBundle\Api\Processor;
+
+  use Acme\Bundle\AppBundle\Entity\Account;
+  use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+  use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+  use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+  use Oro\Component\ChainProcessor\ContextInterface;
+  use Oro\Component\ChainProcessor\ProcessorInterface;
+
+  /**
+   * Adds a query for "contacts" association of Account entity.
+   */
+  class SetAccountContactsAssociationQuery implements ProcessorInterface
+  {
+      /** @var DoctrineHelper */
+      private $doctrineHelper;
+
+      /**
+       * @param DoctrineHelper $doctrineHelper
+       */
+      public function __construct(DoctrineHelper $doctrineHelper)
+      {
+          $this->doctrineHelper = $doctrineHelper;
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function process(ContextInterface $context)
+      {
+          /** @var ConfigContext $context */
+
+          /** @var EntityDefinitionConfig $definition */
+          $definition = $context->getResult();
+          $contactsField = $definition->getField('contacts');
+          if (null !== $contactsField
+              && !$contactsField->isExcluded()
+              && null === $contactsField->getAssociationQuery()
+          ) {
+              $contactsField->setAssociationQuery(
+                  $this->doctrineHelper
+                      ->createQueryBuilder(Account::class, 'e')
+                      ->innerJoin('e.contactLinks', 'links')
+                      ->innerJoin('links.contact', 'r')
+                      ->where('links.enabled = :contacts_enabled')
+                      ->setParameter('contacts_enabled', true)
+              );
+          }
+      }
+  }
+  ```
+
+  ```yml
+  services:
+      acme.api.set_account_contacts_association_query:
+          class: Acme\Bundle\AppBundle\Api\Processor\SetAccountContactsAssociationQuery
+          arguments:
+              - '@oro_api.doctrine_helper'
+          tags:
+              - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&definition', class: Acme\Bundle\AppBundle\Entity\Account, priority: -35 }
+  ```
+
+- Add a processor to register QRM query that should be used to get enabled contacts for
+ [get_subresource](./actions.md#get_subresource-action) and [get_relationship](./actions.md#get_relationship-action) actions
+
+  ```php
+  <?php
+
+  namespace Acme\Bundle\AppBundle\Api\Processor;
+
+  use Acme\Bundle\AppBundle\Entity\Contact;
+  use Acme\Bundle\AppBundle\Entity\AccountContactLink;
+  use Doctrine\ORM\Query\Expr\Join;
+  use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\AddParentEntityIdToQuery;
+  use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+  use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+  use Oro\Component\ChainProcessor\ContextInterface;
+  use Oro\Component\ChainProcessor\ProcessorInterface;
+
+  /**
+   * Builds ORM QueryBuilder object that will be used to get a list of contacts
+   * for Account entity for "get_relationship" and "get_subresource" actions.
+   */
+  class BuildAccountContactsSubresourceQuery implements ProcessorInterface
+  {
+      /** @var DoctrineHelper */
+      private $doctrineHelper;
+
+      /**
+       * @param DoctrineHelper $doctrineHelper
+       */
+      public function __construct(DoctrineHelper $doctrineHelper)
+      {
+          $this->doctrineHelper = $doctrineHelper;
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function process(ContextInterface $context)
+      {
+          /** @var SubresourceContext $context */
+
+          if ($context->hasQuery()) {
+              // a query is already built
+              return;
+          }
+
+          $query = $this->doctrineHelper
+              ->createQueryBuilder(Contact::class, 'e')
+              ->innerJoin(AccountContactLink::class, 'links', Join::WITH, 'links.contact = e')
+              ->where('links.account = :' . AddParentEntityIdToQuery::PARENT_ENTITY_ID_QUERY_PARAM_NAME)
+              ->setParameter(AddParentEntityIdToQuery::PARENT_ENTITY_ID_QUERY_PARAM_NAME, $context->getParentId());
+
+          $context->setQuery($query);
+      }
+  }
+  ```
+
+  ```yml
+  services:
+      acme.api.build_account_contacts_subresource_query:
+          class: Acme\Bundle\AppBundle\Api\Processor\BuildAccountContactsSubresourceQuery
+          arguments:
+              - '@oro_api.doctrine_helper'
+          tags:
+              - { name: oro.api.processor, action: get_subresource, group: build_query, class: Acme\Bundle\AppBundle\Entity\Account, association: contacts, priority: -90 }
+              - { name: oro.api.processor, action: get_relationship, group: build_query, class: Acme\Bundle\AppBundle\Entity\Account, association: contacts, priority: -90 }
+  ```
+
 ## Disable HATEOAS
 
-It is not possible to disable [HATEOAS](https://restfulapi.net/hateoas/) via a configuration.
+It is not possible to disable [HATEOAS](https://restfulapi.net/hateoas/) via configuration.
 But you can send API request with `noHateoas` value in [X-Include header](./headers.md#existing-x-include-keys)
 to exclude HATEOAS links from a response of a particular request.
 

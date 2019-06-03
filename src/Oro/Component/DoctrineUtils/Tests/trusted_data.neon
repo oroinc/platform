@@ -30,6 +30,7 @@ trusted_data:
     safe_static_methods:
         Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil:
             getSingleRootAlias: true
+            getSingleRootEntity: true
             getSelectExpr: true
             getSelectExprByAlias: true
             getPageOffset: true

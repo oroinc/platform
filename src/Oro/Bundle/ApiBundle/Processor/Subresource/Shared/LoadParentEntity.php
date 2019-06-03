@@ -2,31 +2,40 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\ApiBundle\Util\EntityLoader;
+use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\EntitySerializer\QueryFactory;
 
 /**
- * Loads the parent entity from the database.
+ * Loads the parent entity from the database and adds it to the context.
  */
 class LoadParentEntity implements ProcessorInterface
 {
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
-    /** @var EntityLoader */
-    protected $entityLoader;
+    /** @var EntityIdHelper */
+    private $entityIdHelper;
+
+    /** @var QueryFactory */
+    private $queryFactory;
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param EntityLoader   $entityLoader
+     * @param EntityIdHelper $entityIdHelper
+     * @param QueryFactory   $queryFactory
      */
-    public function __construct(DoctrineHelper $doctrineHelper, EntityLoader $entityLoader)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        EntityIdHelper $entityIdHelper,
+        QueryFactory $queryFactory
+    ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->entityLoader = $entityLoader;
+        $this->entityIdHelper = $entityIdHelper;
+        $this->queryFactory = $queryFactory;
     }
 
     /**
@@ -34,7 +43,7 @@ class LoadParentEntity implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var SubresourceContext $context */
+        /** @var ChangeRelationshipContext $context */
 
         if ($context->hasParentEntity()) {
             // the parent entity is already loaded
@@ -50,11 +59,17 @@ class LoadParentEntity implements ProcessorInterface
             return;
         }
 
-        $parentEntity = $this->entityLoader->findEntity(
-            $parentEntityClass,
+        $qb = $this->doctrineHelper->createQueryBuilder($parentEntityClass, 'e');
+        $this->entityIdHelper->applyEntityIdentifierRestriction(
+            $qb,
             $context->getParentId(),
             $context->getParentMetadata()
         );
-        $context->setParentEntity($parentEntity);
+        $query = $this->queryFactory->getQuery($qb, $context->getParentConfig());
+
+        $parentEntity = $query->getOneOrNullResult();
+        if (null !== $parentEntity) {
+            $context->setParentEntity($parentEntity);
+        }
     }
 }

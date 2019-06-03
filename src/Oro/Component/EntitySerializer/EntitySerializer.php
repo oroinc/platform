@@ -535,32 +535,144 @@ class EntitySerializer
         $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
         $fields = $this->fieldAccessor->getFields($entityClass, $config);
         foreach ($fields as $field) {
-            $propertyPath = $this->getPropertyPath($field, $config->getField($field));
-            if (!$entityMetadata->isCollectionValuedAssociation($propertyPath)) {
-                continue;
-            }
-
-            $allowedIds = $entityIds;
-            if (null !== $this->fieldFilter) {
-                $allowedIds = $this->getAccessibleIds($entityIds, $entityClass, $propertyPath);
-            }
-            if (empty($allowedIds)) {
-                continue;
-            }
-
-            $mapping = $entityMetadata->getAssociationMapping($propertyPath);
-            $targetConfig = $this->getTargetEntity($config, $field);
-
-            if ($this->isSingleStepLoading($mapping['targetEntity'], $targetConfig)) {
-                $value = $this->loadRelatedItemsForSimpleEntity($allowedIds, $mapping, $targetConfig, $context);
+            $relatedValue = null;
+            $associationQuery = $this->getAssociationQuery($config, $field);
+            if (null !== $associationQuery) {
+                $relatedValue = $this->loadRelatedCollectionValuedAssociationDataForCustomAssociation(
+                    $config,
+                    $associationQuery,
+                    $entityClass,
+                    $field,
+                    $entityIds,
+                    $context
+                );
             } else {
-                $value = $this->loadRelatedItems($allowedIds, $mapping, $targetConfig, $context);
+                $propertyPath = $this->getPropertyPath($field, $config->getField($field));
+                if ($entityMetadata->isCollectionValuedAssociation($propertyPath)) {
+                    $accessibleIds = $this->getAccessibleIds($entityIds, $entityClass, $propertyPath);
+                    if (!empty($accessibleIds)) {
+                        $relatedValue = $this->loadRelatedCollectionValuedAssociationData(
+                            $config,
+                            $entityMetadata->getAssociationMapping($propertyPath),
+                            $field,
+                            $accessibleIds,
+                            $context
+                        );
+                    }
+                }
             }
-            $relatedData[$field] = $value;
+            if (null !== $relatedValue) {
+                $relatedData[$field] = $relatedValue;
+            }
         }
         if (!empty($relatedData)) {
             $this->applyRelatedData($result, $entityClass, $config, $relatedData);
         }
+    }
+
+    /**
+     * @param EntityConfig $config
+     * @param string       $field
+     *
+     * @return AssociationQuery|null
+     */
+    protected function getAssociationQuery(EntityConfig $config, $field)
+    {
+        $fieldConfig = $config->getField($field);
+        if (null === $fieldConfig) {
+            return null;
+        }
+
+        return $fieldConfig->get(ConfigUtil::ASSOCIATION_QUERY);
+    }
+
+    /**
+     * @param EntityConfig $config
+     * @param array        $associationMapping
+     * @param string       $field
+     * @param array        $entityIds
+     * @param array        $context
+     *
+     * @return array|null
+     */
+    protected function loadRelatedCollectionValuedAssociationData(
+        EntityConfig $config,
+        array $associationMapping,
+        $field,
+        $entityIds,
+        array $context
+    ) {
+        $targetEntityClass = $associationMapping['targetEntity'];
+        $targetConfig = $this->getTargetEntity($config, $field);
+
+        if ($this->isSingleStepLoading($targetEntityClass, $targetConfig)) {
+            return $this->loadRelatedItemsForSimpleEntity(
+                $this->queryFactory->getToManyAssociationQueryBuilder($associationMapping, $entityIds),
+                $targetEntityClass,
+                $targetConfig,
+                $context
+            );
+        }
+
+        return $this->loadRelatedItems(
+            $this->queryFactory->getRelatedItemsIds(
+                $this->queryFactory->getNotInitializedToManyAssociationQueryBuilder($associationMapping),
+                $associationMapping['sourceEntity'],
+                $targetEntityClass,
+                $entityIds,
+                $targetConfig
+            ),
+            $targetEntityClass,
+            $targetConfig,
+            $context
+        );
+    }
+
+    /**
+     * @param EntityConfig     $config
+     * @param AssociationQuery $associationQuery
+     * @param string           $entityClass
+     * @param string           $field
+     * @param array            $entityIds
+     * @param array            $context
+     *
+     * @return array|null
+     */
+    protected function loadRelatedCollectionValuedAssociationDataForCustomAssociation(
+        EntityConfig $config,
+        AssociationQuery $associationQuery,
+        $entityClass,
+        $field,
+        $entityIds,
+        array $context
+    ) {
+        $targetEntityClass = $associationQuery->getTargetEntityClass();
+        $targetConfig = $this->getTargetEntity($config, $field);
+
+        if ($this->isSingleStepLoading($targetEntityClass, $targetConfig)) {
+            $dataQb = clone $associationQuery->getQueryBuilder();
+            $this->queryFactory->initializeToManyAssociationQueryBuilder($dataQb, $entityClass, $entityIds);
+
+            return $this->loadRelatedItemsForSimpleEntity(
+                $dataQb,
+                $targetEntityClass,
+                $targetConfig,
+                $context
+            );
+        }
+
+        return $this->loadRelatedItems(
+            $this->queryFactory->getRelatedItemsIds(
+                clone $associationQuery->getQueryBuilder(),
+                $entityClass,
+                $targetEntityClass,
+                $entityIds,
+                $targetConfig
+            ),
+            $targetEntityClass,
+            $targetConfig,
+            $context
+        );
     }
 
     /**
@@ -641,18 +753,17 @@ class EntitySerializer
     }
 
     /**
-     * @param array        $entityIds
-     * @param array        $mapping
-     * @param EntityConfig $config
-     * @param array        $context
+     * @param array             $relatedItemsIds [['entityId' => mixed, 'relatedEntityId' => mixed], ...]
+     * @param string            $entityClass
+     * @param EntityConfig      $config
+     * @param array             $context
      *
      * @return array [entityId => [field => value, ...], ...]
      */
-    protected function loadRelatedItems($entityIds, $mapping, EntityConfig $config, array $context)
+    protected function loadRelatedItems($relatedItemsIds, $entityClass, EntityConfig $config, array $context)
     {
-        $entityClass = $mapping['targetEntity'];
         $limit = $config->getMaxResults();
-        $bindings = $this->getRelatedItemsBindings($entityIds, $mapping, $config);
+        $bindings = $this->getRelatedItemsBindings($relatedItemsIds, $entityClass);
 
         $items = [];
         $resultFieldName = $this->getIdFieldNameIfIdOnlyRequested($config, $entityClass);
@@ -726,20 +837,17 @@ class EntitySerializer
     }
 
     /**
-     * @param array        $entityIds
-     * @param array        $mapping
-     * @param EntityConfig $config
+     * @param array  $relatedItemsIds [['entityId' => mixed, 'relatedEntityId' => mixed], ...]
+     * @param string $entityClass
      *
      * @return array [entityId => [relatedEntityId, ...], ...]
      */
-    protected function getRelatedItemsBindings($entityIds, $mapping, EntityConfig $config)
+    protected function getRelatedItemsBindings($relatedItemsIds, $entityClass)
     {
-        $rows = $this->queryFactory->getRelatedItemsIds($mapping, $entityIds, $config);
-
         $result = [];
-        if (!empty($rows)) {
-            $relatedEntityIdType = $this->doctrineHelper->getEntityIdType($mapping['targetEntity']);
-            foreach ($rows as $row) {
+        if (!empty($relatedItemsIds)) {
+            $relatedEntityIdType = $this->doctrineHelper->getEntityIdType($entityClass);
+            foreach ($relatedItemsIds as $row) {
                 $result[$row['entityId']][] = $this->getTypedEntityId($row['relatedEntityId'], $relatedEntityIdType);
             }
         }
@@ -774,26 +882,24 @@ class EntitySerializer
     }
 
     /**
-     * @param array        $entityIds
-     * @param array        $mapping
+     * @param QueryBuilder $qb
+     * @param string       $entityClass
      * @param EntityConfig $config
      * @param array        $context
      *
      * @return array [entityId => [field => value, ...], ...]
      */
     protected function loadRelatedItemsForSimpleEntity(
-        $entityIds,
-        $mapping,
+        QueryBuilder $qb,
+        $entityClass,
         EntityConfig $config,
         array $context
     ) {
-        $qb = $this->queryFactory->getToManyAssociationQueryBuilder($mapping, $entityIds);
         $orderBy = $config->getOrderBy();
         foreach ($orderBy as $field => $direction) {
             $qb->addOrderBy(QueryBuilderUtil::getField('r', $field), QueryBuilderUtil::getSortOrder($direction));
         }
 
-        $entityClass = $mapping['targetEntity'];
         $fields = $this->fieldAccessor->getFieldsToSelect($entityClass, $config);
         $targetEntityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
         $isObject = false;
@@ -957,7 +1063,7 @@ class EntitySerializer
 
     /**
      * Check access to a specified field for each entity object from the given $entityIds list
-     * and returns ids only for entities for which this access is granted.
+     * and returns ids only for entities for which the access is granted.
      *
      * @param array  $entityIds
      * @param string $entityClass
@@ -967,7 +1073,11 @@ class EntitySerializer
      */
     private function getAccessibleIds(array $entityIds, $entityClass, $field)
     {
-        $allowedIds = [];
+        if (null === $this->fieldFilter) {
+            return $entityIds;
+        }
+
+        $accessibleIds = [];
         foreach ($entityIds as $entityId) {
             $isFieldAllowed = $this->fieldFilter->checkField(
                 ['entityId' => $entityId],
@@ -978,9 +1088,9 @@ class EntitySerializer
                 continue;
             }
 
-            $allowedIds[] = $entityId;
+            $accessibleIds[] = $entityId;
         }
 
-        return $allowedIds;
+        return $accessibleIds;
     }
 }

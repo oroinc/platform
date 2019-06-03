@@ -6,6 +6,9 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Bundle\ReportBundle\Entity\Repository\CalendarDateRepository;
 
+/**
+ * Inserts calendar dates since the beginning of the year till current date or appends dates from the last one.
+ */
 class CalendarDateManager
 {
     /**
@@ -49,7 +52,8 @@ class CalendarDateManager
         $startDate->setDate($startDate->format('Y'), 1, 1);
 
         if ($append) {
-            $startDate = $this->getLastDate() ?: $startDate;
+            $lastDate = $this->getLastDate();
+            $startDate = $lastDate ? $lastDate->add(new \DateInterval('P1D')) : $startDate;
         }
 
         $period = new \DatePeriod($startDate, new \DateInterval('P1D'), new \DateTime('tomorrow midnight', $timeZone));
@@ -67,7 +71,7 @@ class CalendarDateManager
 
         $calendarDate = $dateRepository->getDate();
         if ($calendarDate) {
-            return $calendarDate->getDate();
+            return clone $calendarDate->getDate();
         }
 
         return null;

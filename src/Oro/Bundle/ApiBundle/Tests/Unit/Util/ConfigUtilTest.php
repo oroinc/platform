@@ -92,4 +92,14 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
 
         self::assertNull(ConfigUtil::getPropertyPathOfMetaProperty('field1', $config));
     }
+
+    public function testGetAssociationTargetTypeForSingleValuedAssociation()
+    {
+        self::assertEquals(ConfigUtil::TO_ONE, ConfigUtil::getAssociationTargetType(false));
+    }
+
+    public function testGetAssociationTargetTypeForCollectionValuedAssociation()
+    {
+        self::assertEquals(ConfigUtil::TO_MANY, ConfigUtil::getAssociationTargetType(true));
+    }
 }

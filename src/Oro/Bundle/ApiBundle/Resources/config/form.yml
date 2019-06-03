@@ -113,3 +113,12 @@ services:
             - '@oro_api.security.authorization_checker'
         tags:
             - { name: validator.constraint_validator, alias: oro_api.validator.access_granted }
+
+    oro_api.form.unidirectional_association_handler:
+        class: Oro\Bundle\ApiBundle\Form\Handler\UnidirectionalAssociationHandler
+        public: false
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.form_property_accessor'
+            - '@oro_api.entity_id_helper'
+            - '@oro_api.entity_override_provider_registry'

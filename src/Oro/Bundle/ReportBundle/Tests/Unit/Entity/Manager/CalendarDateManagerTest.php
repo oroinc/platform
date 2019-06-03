@@ -79,7 +79,7 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
             ->with(CalendarDate::class)
             ->willReturn($entityManager);
         $entityManager
-            ->expects($this->exactly(10))
+            ->expects($this->exactly(9))
             ->method('persist')
             ->with($this->isInstanceOf(CalendarDate::class));
         $entityManager->expects($this->once())->method('flush');

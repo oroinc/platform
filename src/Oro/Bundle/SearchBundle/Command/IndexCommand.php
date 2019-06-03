@@ -10,17 +10,38 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Update search index for specified entities with the same type
+ */
 class IndexCommand extends ContainerAwareCommand
 {
-    const NAME = 'oro:search:index';
+    /** @var string */
+    protected static $defaultName = 'oro:search:index';
+
+    /** @var ManagerRegistry */
+    private $registry;
+
+    /** @var IndexerInterface */
+    private $asyncIndexer;
+
+    /**
+     * @param ManagerRegistry $registry
+     * @param IndexerInterface $asyncIndexer
+     */
+    public function __construct(ManagerRegistry $registry, IndexerInterface $asyncIndexer)
+    {
+        parent::__construct();
+
+        $this->registry = $registry;
+        $this->asyncIndexer = $asyncIndexer;
+    }
 
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName(self::NAME)
-            ->setDescription('Update search index for specified entities with the same type')
+        $this->setDescription('Update search index for specified entities with the same type')
             ->addArgument(
                 'class',
                 InputArgument::REQUIRED,
@@ -43,7 +64,7 @@ class IndexCommand extends ContainerAwareCommand
         $identifiers = $input->getArgument('identifiers');
 
         /** @var EntityManager $em */
-        $em = $this->getDoctrine()->getManagerForClass($class);
+        $em = $this->registry->getManagerForClass($class);
         if (null === $em) {
             throw new \LogicException(sprintf('Entity manager was not found for class: "%s"', $class));
         }
@@ -53,24 +74,8 @@ class IndexCommand extends ContainerAwareCommand
             $entities[] = $em->getReference($class, $id);
         }
 
-        $this->getSearchIndexer()->save($entities);
+        $this->asyncIndexer->save($entities);
 
         $output->writeln('Started index update for entities.');
-    }
-
-    /**
-     * @return ManagerRegistry
-     */
-    protected function getDoctrine()
-    {
-        return $this->getContainer()->get('doctrine');
-    }
-
-    /**
-     * @return IndexerInterface
-     */
-    protected function getSearchIndexer()
-    {
-        return $this->getContainer()->get('oro_search.async.indexer');
     }
 }

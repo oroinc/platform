@@ -438,14 +438,37 @@ field_target_class_without_target_type:
         fields:
             field1:
                 target_class: Test\Class
+
+field_target_class_with_target_type_to_one:
+    config:
+        fields:
+            field1:
+                target_class: Test\Class
+                target_type: to-one
+    expected:
+        fields:
+            field1:
+                target_class: Test\Class
                 target_type: to-one
 
-field_target_class_with_target_type:
+field_target_class_with_target_type_to_many:
     config:
         fields:
             field1:
                 target_class: Test\Class
                 target_type: to-many
+    expected:
+        fields:
+            field1:
+                target_class: Test\Class
+                target_type: to-many
+
+field_target_class_with_target_type_colection:
+    config:
+        fields:
+            field1:
+                target_class: Test\Class
+                target_type: collection
     expected:
         fields:
             field1:

@@ -76,6 +76,12 @@ class ConfigUtil
     /** a handler that can be used to modify serialized data for a list of items */
     public const POST_SERIALIZE_COLLECTION = 'post_serialize_collection';
 
+    /**
+     * a query that should be used to load an association data
+     * @see \Oro\Component\EntitySerializer\AssociationQuery
+     */
+    public const ASSOCIATION_QUERY = 'association_query';
+
     /** a flag indicates whether the field should be excluded */
     public const EXCLUDE = 'exclude';
 

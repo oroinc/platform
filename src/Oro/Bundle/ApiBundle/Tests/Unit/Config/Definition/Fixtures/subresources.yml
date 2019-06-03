@@ -116,14 +116,37 @@ target_class_without_target_type:
         subresources:
             testSubresource:
                 target_class: Test\Class
+
+target_class_with_target_type_to_one:
+    config:
+        subresources:
+            testSubresource:
+                target_class: Test\Class
+                target_type: to-one
+    expected:
+        subresources:
+            testSubresource:
+                target_class: Test\Class
                 target_type: to-one
 
-target_class_with_target_type:
+target_class_with_target_type_to_many:
     config:
         subresources:
             testSubresource:
                 target_class: Test\Class
                 target_type: to-many
+    expected:
+        subresources:
+            testSubresource:
+                target_class: Test\Class
+                target_type: to-many
+
+target_class_with_target_type_collection:
+    config:
+        subresources:
+            testSubresource:
+                target_class: Test\Class
+                target_type: collection
     expected:
         subresources:
             testSubresource:

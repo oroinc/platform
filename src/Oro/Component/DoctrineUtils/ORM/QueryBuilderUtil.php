@@ -119,26 +119,49 @@ class QueryBuilderUtil
     public static function getSingleRootAlias(QueryBuilder $qb, $throwException = true)
     {
         $rootAliases = $qb->getRootAliases();
-
-        $result = null;
-        if (count($rootAliases) !== 1) {
-            if ($throwException) {
-                $errorReason = count($rootAliases) === 0
-                    ? 'the query has no any root aliases'
-                    : sprintf('the query has several root aliases. "%s"', implode(', ', $rootAliases));
-
-                throw new QueryException(
-                    sprintf(
-                        'Can\'t get single root alias for the given query. Reason: %s.',
-                        $errorReason
-                    )
-                );
-            }
-        } else {
-            $result = $rootAliases[0];
+        if (count($rootAliases) === 1) {
+            return $rootAliases[0];
         }
 
-        return $result;
+        if ($throwException) {
+            throw new QueryException(sprintf(
+                'Can\'t get single root alias for the given query. Reason: %s.',
+                count($rootAliases) === 0
+                    ? 'the query has no any root aliases'
+                    : sprintf('the query has several root aliases: %s.', implode(', ', $rootAliases))
+            ));
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets the root entity of the query.
+     *
+     * @param QueryBuilder $qb             The query builder
+     * @param bool         $throwException Whether to throw exception in case the query does not have a root entity
+     *
+     * @return string|null
+     *
+     * @throws QueryException
+     */
+    public static function getSingleRootEntity(QueryBuilder $qb, $throwException = true)
+    {
+        $rootEntities = $qb->getRootEntities();
+        if (count($rootEntities) === 1) {
+            return $rootEntities[0];
+        }
+
+        if ($throwException) {
+            throw new QueryException(sprintf(
+                'Can\'t get single root entity for the given query. Reason: %s.',
+                count($rootEntities) === 0
+                    ? 'the query has no any root entities'
+                    : sprintf('the query has several root entities: %s.', implode(', ', $rootEntities))
+            ));
+        }
+
+        return null;
     }
 
     /**

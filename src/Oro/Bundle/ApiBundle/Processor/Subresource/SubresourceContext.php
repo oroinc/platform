@@ -36,9 +36,6 @@ class SubresourceContext extends Context
     /** a flag indicates if an association represents "to-many" or "to-one" relation */
     const COLLECTION = 'collection';
 
-    /** the parent entity object */
-    const PARENT_ENTITY = 'parentEntity';
-
     /** a configuration of the parent entity */
     const PARENT_CONFIG = 'parentConfig';
 
@@ -138,36 +135,6 @@ class SubresourceContext extends Context
     public function setIsCollection($value)
     {
         $this->set(self::COLLECTION, $value);
-    }
-
-    /**
-     * Checks whether the parent entity exists.
-     *
-     * @return bool
-     */
-    public function hasParentEntity()
-    {
-        return $this->has(self::PARENT_ENTITY);
-    }
-
-    /**
-     * Gets the parent entity object.
-     *
-     * @return object|null
-     */
-    public function getParentEntity()
-    {
-        return $this->get(self::PARENT_ENTITY);
-    }
-
-    /**
-     * Sets the parent entity object.
-     *
-     * @param object|null $parentEntity
-     */
-    public function setParentEntity($parentEntity)
-    {
-        $this->set(self::PARENT_ENTITY, $parentEntity);
     }
 
     /**

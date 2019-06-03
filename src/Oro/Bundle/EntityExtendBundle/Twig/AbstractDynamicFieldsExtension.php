@@ -3,8 +3,11 @@
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
+/**
+ * Adds twig functions to get dymanic fields
+ */
 abstract class AbstractDynamicFieldsExtension extends \Twig_Extension
 {
     const NAME = 'oro_entity_config_fields';

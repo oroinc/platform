@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\SearchBundle\Controller;
 
+use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Provider\ResultStatisticsProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Provides search functionality of quick search and search page
  */
-class SearchController extends Controller
+class SearchController extends AbstractController
 {
     /**
      * @Route("/advanced-search", name="oro_search_advanced")
@@ -35,7 +37,7 @@ class SearchController extends Controller
     {
         return $request->isXmlHttpRequest()
             ? new JsonResponse(
-                $this->get('oro_search.index')->advancedSearch(
+                $this->get(Indexer::class)->advancedSearch(
                     $request->get('query')
                 )->toSearchResultData()
             )
@@ -53,11 +55,11 @@ class SearchController extends Controller
      */
     public function searchBarAction(Request $request)
     {
-        return array(
-            'entities'     => $this->get('oro_search.index')->getAllowedEntitiesListAliases(),
+        return [
+            'entities'     => $this->get(Indexer::class)->getAllowedEntitiesListAliases(),
             'searchString' => $request->get('searchString'),
             'fromString'   => $request->get('fromString'),
-        );
+        ];
     }
 
     /**
@@ -71,17 +73,17 @@ class SearchController extends Controller
     {
         $searchString = trim($request->get('search'));
         if (!$searchString) {
-            return [];
+            return new JsonResponse([]);
         }
 
-        $searchResults = $this->get('oro_search.index')->simpleSearch(
+        $searchResults = $this->get(Indexer::class)->simpleSearch(
             $searchString,
             (int) $request->get('offset'),
             (int) $request->get('max_results'),
             $request->get('from')
         );
 
-        $dispatcher = $this->get('event_dispatcher');
+        $dispatcher = $this->get(EventDispatcherInterface::class);
         foreach ($searchResults->getElements() as $item) {
             $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
         }
@@ -113,7 +115,7 @@ class SearchController extends Controller
         }
 
         /** @var $resultProvider ResultStatisticsProvider */
-        $resultProvider = $this->get('oro_search.provider.result_statistics_provider');
+        $resultProvider = $this->get(ResultStatisticsProvider::class);
         $groupedResults = $resultProvider->getGroupedResults($string);
         $selectedResult = null;
 
@@ -123,11 +125,26 @@ class SearchController extends Controller
             }
         }
 
-        return array(
+        return [
             'from'           => $from,
             'searchString'   => $string,
             'groupedResults' => $groupedResults,
             'selectedResult' => $selectedResult
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                EventDispatcherInterface::class,
+                Indexer::class,
+                ResultStatisticsProvider::class
+            ]
         );
     }
 }

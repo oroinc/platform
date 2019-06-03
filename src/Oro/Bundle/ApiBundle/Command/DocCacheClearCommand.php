@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Command;
 
 use Oro\Bundle\ApiBundle\Provider\CacheManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,19 +12,45 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * The CLI command to clear Data API documentation cache (ApiDoc cache).
  */
-class DocCacheClearCommand extends ContainerAwareCommand
+class DocCacheClearCommand extends Command
 {
-    public const COMMAND_NAME = 'oro:api:doc:cache:clear';
+    private const ALL_VIEWS = 'all';
 
-    private const ALL_VIEWS                    = 'all';
-    private const API_DOC_VIEWS_PARAMETER_NAME = 'oro_api.api_doc.views';
+    /** @var string */
+    protected static $defaultName = 'oro:api:doc:cache:clear';
+
+    /** @var CacheManager */
+    private $cacheManager;
+
+    /** @var string[] */
+    private $allApiDocViews;
+
+    /** @var string */
+    private $environment;
+
+    /**
+     * @param CacheManager $cacheManager
+     * @param string[] $allApiDocViews
+     * @param string $environment
+     */
+    public function __construct(
+        CacheManager $cacheManager,
+        array $allApiDocViews,
+        string $environment
+    ) {
+        parent::__construct();
+
+        $this->cacheManager = $cacheManager;
+        $this->allApiDocViews = $allApiDocViews;
+        $this->environment = $environment;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function isEnabled()
     {
-        return $this->getCacheManager()->isApiDocCacheEnabled() && parent::isEnabled();
+        return $this->cacheManager->isApiDocCacheEnabled() && parent::isEnabled();
     }
 
     /**
@@ -33,7 +59,6 @@ class DocCacheClearCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName(self::COMMAND_NAME)
             ->setDescription('Clears API documentation cache.')
             ->addOption(
                 'view',
@@ -64,40 +89,31 @@ EOF
 
         $views = $input->getOption('view');
         $noWarmup = $input->getOption('no-warmup');
-        $cacheManager = $this->getCacheManager();
 
         if (1 === count($views) && self::ALL_VIEWS === reset($views)) {
-            $views = $this->getContainer()->getParameter(self::API_DOC_VIEWS_PARAMETER_NAME);
+            $views = $this->allApiDocViews;
         }
 
         // warm up API caches
         if (!$noWarmup) {
             $io->comment('Warming up API cache...');
-            $cacheManager->warmUpCaches();
+            $this->cacheManager->warmUpCaches();
         }
 
         // process documentation cache
         foreach ($views as $view) {
             if ($noWarmup) {
                 $io->comment(sprintf('Clearing the cache for the <info>%s</info> view...', $view));
-                $cacheManager->clearApiDocCache($view);
+                $this->cacheManager->clearApiDocCache($view);
             } else {
                 $io->comment(sprintf('Warming up cache for the <info>%s</info> view...', $view));
-                $cacheManager->warmUpApiDocCache($view);
+                $this->cacheManager->warmUpApiDocCache($view);
             }
         }
 
         $io->success(sprintf(
             'API documentation cache was successfully cleared for "%s" environment.',
-            $this->getContainer()->get('kernel')->getEnvironment()
+            $this->environment
         ));
-    }
-
-    /**
-     * @return CacheManager
-     */
-    private function getCacheManager()
-    {
-        return $this->getContainer()->get('oro_api.cache_manager');
     }
 }

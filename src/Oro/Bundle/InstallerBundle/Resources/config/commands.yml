@@ -8,6 +8,11 @@ services:
     Oro\Bundle\InstallerBundle\Command\InstallCommand:
         public: false
         class: Oro\Bundle\InstallerBundle\Command\InstallCommand
+        arguments:
+            - '@oro_installer.yaml_persister'
+            - '@oro_installer.script_manager'
+            - '@doctrine'
+            - '@event_dispatcher'
         tags:
             - { name: console.command }
 

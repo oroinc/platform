@@ -132,6 +132,12 @@ class ConfigUtil extends BaseConfigUtil
      */
     public const TARGET_TYPE = 'target_type';
 
+    /** the type that represents a single valued association */
+    public const TO_ONE = 'to-one';
+
+    /** the type that represents a collection valued association */
+    public const TO_MANY = 'to-many';
+
     /** a list of fields on which this field depends on */
     public const DEPENDS_ON = 'depends_on';
 
@@ -257,5 +263,15 @@ class ConfigUtil extends BaseConfigUtil
         }
 
         return $field->getPropertyPath($fieldName);
+    }
+
+    /**
+     * @param bool $isCollection
+     *
+     * @return string
+     */
+    public static function getAssociationTargetType($isCollection)
+    {
+        return $isCollection ? self::TO_MANY : self::TO_ONE;
     }
 }

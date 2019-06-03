@@ -85,7 +85,7 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
         $version,
         RequestType $requestType
     ) {
-        if ($field->getTargetType()) {
+        if ($field->hasTargetType()) {
             throw new \RuntimeException(sprintf(
                 'The "target_type" option cannot be configured for "%s::%s".',
                 $entityClass,

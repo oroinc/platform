@@ -9,7 +9,6 @@ use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\LayoutBuilderInterface;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -38,11 +37,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $container = TestContainerBuilder::create()
-            ->add('oro_layout.layout_manager', $this->layoutManager)
-            ->getContainer($this);
-
-        $this->listener = new LayoutListener($this->layoutHelper, $container);
+        $this->listener = new LayoutListener($this->layoutHelper, $this->layoutManager);
     }
 
     public function testShouldNotModifyResponseWithoutLayoutAnnotation()

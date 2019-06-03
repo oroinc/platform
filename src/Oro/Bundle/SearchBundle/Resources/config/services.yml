@@ -41,6 +41,9 @@ services:
             - '@oro_security.search.acl_helper'
             - '@event_dispatcher'
 
+    Oro\Bundle\SearchBundle\Engine\Indexer:
+        alias: oro_search.index
+
     oro_search.security_provider:
         class:                        '%oro_search.security_provider.class%'
         public:                       false
@@ -86,6 +89,9 @@ services:
             - '@oro_entity_config.config_manager'
             - '@translator'
         lazy: true
+
+    Oro\Bundle\SearchBundle\Provider\ResultStatisticsProvider:
+        alias: oro_search.provider.result_statistics_provider
 
     oro_search.formatter.result_formatter:
         class:                        '%oro_search.formatter.result_formatter.class%'

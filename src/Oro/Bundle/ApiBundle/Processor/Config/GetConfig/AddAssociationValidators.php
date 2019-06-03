@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Validator\Constraints as Assert;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -53,7 +54,9 @@ class AddAssociationValidators implements ProcessorInterface
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             $fieldName = $field->getPropertyPath($fieldName);
-            if ($metadata->hasAssociation($fieldName)) {
+            if (ConfigUtil::IGNORE_PROPERTY_PATH !== $fieldName
+                && $metadata->hasAssociation($fieldName)
+            ) {
                 if ($metadata->isCollectionValuedAssociation($fieldName)) {
                     $field->addFormConstraint(new Assert\HasAdderAndRemover([
                         'class'    => $entityClass,
@@ -80,7 +83,9 @@ class AddAssociationValidators implements ProcessorInterface
                 $fieldName = $field->getPropertyPath($fieldName);
                 // to avoid duplication, check if the constraint already exist
                 // e.g. the constraint can be already added if a model for API resource inherited from ORM entity
-                if (!$this->isHasAdderAndRemoverConstraintExist($field, $entityClass, $fieldName)) {
+                if (ConfigUtil::IGNORE_PROPERTY_PATH !== $fieldName
+                    && !$this->isHasAdderAndRemoverConstraintExist($field, $entityClass, $fieldName)
+                ) {
                     $field->addFormConstraint(new Assert\HasAdderAndRemover([
                         'class'    => $entityClass,
                         'property' => $fieldName,

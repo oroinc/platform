@@ -139,7 +139,7 @@ class CompleteAssociationHelper
      */
     public function getAssociationTargetType($isCollection)
     {
-        return $isCollection ? 'to-many' : 'to-one';
+        return ConfigUtil::getAssociationTargetType($isCollection);
     }
 
     /**

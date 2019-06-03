@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
@@ -25,12 +26,17 @@ class AddParentEntityIdToQuery implements ProcessorInterface
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
+    /** @var EntityIdHelper */
+    private $entityIdHelper;
+
     /**
      * @param DoctrineHelper $doctrineHelper
+     * @param EntityIdHelper $entityIdHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, EntityIdHelper $entityIdHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->entityIdHelper = $entityIdHelper;
     }
 
     /**
@@ -54,20 +60,20 @@ class AddParentEntityIdToQuery implements ProcessorInterface
 
         $associationName = $this->getAssociationName($context);
         if (ConfigUtil::IGNORE_PROPERTY_PATH !== $associationName) {
-            $parentConfig = $context->getParentConfig();
             $parentJoinAlias = $this->joinParentEntity(
                 $query,
                 $rootAlias,
-                $parentConfig,
+                $context->getParentConfig(),
                 $context->getParentClassName(),
                 $associationName,
                 $context->isCollection()
             );
-            $this->addParentEntityIdToWhereClause(
+            $this->entityIdHelper->applyEntityIdentifierRestriction(
                 $query,
-                $parentJoinAlias,
                 $context->getParentId(),
-                $parentConfig
+                $context->getParentMetadata(),
+                $parentJoinAlias,
+                self::PARENT_ENTITY_ID_QUERY_PARAM_NAME
             );
         } elseif (!$this->isParentEntityIdExistInQuery($query)) {
             throw new RuntimeException('The query is not valid. Reason: the parent entity ID is not set.');
@@ -147,45 +153,6 @@ class AddParentEntityIdToQuery implements ProcessorInterface
         }
 
         return $parentJoinAlias;
-    }
-
-    /**
-     * @param QueryBuilder           $query
-     * @param string                 $parentJoinAlias
-     * @param mixed                  $parentId
-     * @param EntityDefinitionConfig $parentConfig
-     */
-    private function addParentEntityIdToWhereClause(
-        QueryBuilder $query,
-        string $parentJoinAlias,
-        $parentId,
-        EntityDefinitionConfig $parentConfig
-    ): void {
-        $parentIdFieldNames = $parentConfig->getIdentifierFieldNames();
-        if (!is_array($parentId) && count($parentIdFieldNames) === 1) {
-            $query
-                ->andWhere(QueryBuilderUtil::sprintf(
-                    '%s.%s = :%s',
-                    $parentJoinAlias,
-                    $parentConfig->getField($parentIdFieldNames[0])->getPropertyPath($parentIdFieldNames[0]),
-                    self::PARENT_ENTITY_ID_QUERY_PARAM_NAME
-                ))
-                ->setParameter(self::PARENT_ENTITY_ID_QUERY_PARAM_NAME, $parentId);
-        } else {
-            $i = 0;
-            foreach ($parentIdFieldNames as $fieldName) {
-                $i++;
-                $parameterName = sprintf('%s%d', self::PARENT_ENTITY_ID_QUERY_PARAM_NAME, $i);
-                $query
-                    ->andWhere(QueryBuilderUtil::sprintf(
-                        '%s.%s = :%s',
-                        $parentJoinAlias,
-                        $parentConfig->getField($fieldName)->getPropertyPath($fieldName),
-                        $parameterName
-                    ))
-                    ->setParameter($parameterName, $parentId[$fieldName]);
-            }
-        }
     }
 
     /**

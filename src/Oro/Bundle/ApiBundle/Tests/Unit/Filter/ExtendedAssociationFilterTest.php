@@ -68,7 +68,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\ApiBundle\Filter\InvalidFilterValueKeyException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException
      * @expectedExceptionMessage The target type of an association is not specified.
      */
     public function testSearchFilterKeyWhenAssociationTargetWasNotSpecified()
@@ -83,7 +83,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\ApiBundle\Filter\InvalidFilterValueKeyException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException
      * @expectedExceptionMessage The target type of an association is not specified.
      */
     public function testSearchFilterKeyWhenAssociationTargetIsEmpty()
@@ -98,7 +98,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\ApiBundle\Filter\InvalidFilterValueKeyException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException
      * @expectedExceptionMessage Replace "type" placeholder with the target type of an association.
      */
     public function testSearchFilterKeyWhenAssociationTargetPlaceholderWasNotReplacedWithAssociationType()

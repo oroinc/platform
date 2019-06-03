@@ -39,6 +39,7 @@ parameters:
 services:
     oro_datagrid.datagrid.manager:
         class: '%oro_datagrid.datagrid.manager.class%'
+        public: true
         arguments:
             - '@oro_datagrid.configuration.provider.chain'
             - '@oro_datagrid.datagrid.builder'

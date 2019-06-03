@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Processor\CustomizeDataContext;
+use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormInterface;
 
 /**
@@ -61,6 +62,9 @@ class CustomizeFormDataContext extends CustomizeDataContext
 
     /** @var IncludedEntityCollection|null */
     private $includedEntities;
+
+    /** @var EntityMapper|null */
+    private $entityMapper;
 
     /**
      * Checks if the context is already initialized.
@@ -213,5 +217,25 @@ class CustomizeFormDataContext extends CustomizeDataContext
     public function removeResult()
     {
         throw new \BadMethodCallException('Not implemented.');
+    }
+
+    /**
+     * Gets a service that can be used to convert an entity object to a model object and vise versa.
+     *
+     * @return EntityMapper|null
+     */
+    public function getEntityMapper()
+    {
+        return $this->entityMapper;
+    }
+
+    /**
+     * Sets a service that can be used to convert an entity object to a model object and vise versa.
+     *
+     * @param EntityMapper|null $entityMapper
+     */
+    public function setEntityMapper(EntityMapper $entityMapper = null)
+    {
+        $this->entityMapper = $entityMapper;
     }
 }

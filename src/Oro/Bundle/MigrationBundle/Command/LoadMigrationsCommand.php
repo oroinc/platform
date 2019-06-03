@@ -4,9 +4,11 @@ namespace Oro\Bundle\MigrationBundle\Command;
 
 use Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader;
 use Oro\Bundle\MigrationBundle\Migration\MigrationExecutor;
+use Oro\Bundle\MigrationBundle\Migration\MigrationExecutorWithNameGenerator;
 use Oro\Component\Log\OutputLogger;
 use Oro\Component\PhpUtils\Tools\CommandExecutor\CommandExecutor;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Component\PhpUtils\Tools\CommandExecutor\CommandExecutorInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,14 +16,48 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * This command load migrations
  */
-class LoadMigrationsCommand extends ContainerAwareCommand
+class LoadMigrationsCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:migration:load';
+
+    /**
+     * @var MigrationsLoader
+     */
+    private $migrationLoader;
+
+    /**
+     * @var MigrationExecutorWithNameGenerator
+     */
+    private $migrationExecutor;
+
+    /**
+     * @var CommandExecutorInterface
+     */
+    private $commandExecutor;
+
+    /**
+     * @param MigrationsLoader $migrationLoader
+     * @param MigrationExecutor $migrationExecutor
+     * @param CommandExecutorInterface $commandExecutor
+     */
+    public function __construct(
+        MigrationsLoader $migrationLoader,
+        MigrationExecutor $migrationExecutor,
+        CommandExecutorInterface $commandExecutor
+    ) {
+        $this->migrationLoader = $migrationLoader;
+        $this->migrationExecutor = $migrationExecutor;
+        $this->commandExecutor = $commandExecutor;
+        parent::__construct();
+    }
+
     /**
      * @inheritdoc
      */
     protected function configure()
     {
-        $this->setName('oro:migration:load')
+        $this
             ->setDescription('Execute migration scripts.')
             ->addOption(
                 'force',
@@ -89,10 +125,10 @@ class LoadMigrationsCommand extends ContainerAwareCommand
                         $input->getOption('show-queries') ? null : OutputInterface::VERBOSITY_QUIET,
                         '    '
                     );
-                    $executor    = $this->getMigrationExecutor($input);
-                    $executor->setLogger($logger);
-                    $executor->getQueryExecutor()->setLogger($queryLogger);
-                    $executor->executeUp($migrations, $input->getOption('dry-run'));
+
+                    $this->migrationExecutor->setLogger($logger);
+                    $this->migrationExecutor->getQueryExecutor()->setLogger($queryLogger);
+                    $this->migrationExecutor->executeUp($migrations, $input->getOption('dry-run'));
                 }
             }
         } else {
@@ -111,26 +147,16 @@ class LoadMigrationsCommand extends ContainerAwareCommand
      */
     protected function getMigrationLoader(InputInterface $input)
     {
-        $migrationLoader = $this->getContainer()->get('oro_migration.migrations.loader');
         $bundles         = $input->getOption('bundles');
         if (!empty($bundles)) {
-            $migrationLoader->setBundles($bundles);
+            $this->migrationLoader->setBundles($bundles);
         }
         $excludeBundles = $input->getOption('exclude');
         if (!empty($excludeBundles)) {
-            $migrationLoader->setExcludeBundles($excludeBundles);
+            $this->migrationLoader->setExcludeBundles($excludeBundles);
         }
 
-        return $migrationLoader;
-    }
-
-    /**
-     * @param InputInterface $input
-     * @return MigrationExecutor
-     */
-    protected function getMigrationExecutor(InputInterface $input)
-    {
-        return $this->getContainer()->get('oro_migration.migrations.executor');
+        return $this->migrationLoader;
     }
 
     /**
@@ -138,15 +164,12 @@ class LoadMigrationsCommand extends ContainerAwareCommand
      */
     protected function initCommandExecutor(InputInterface $input)
     {
-        /** @var CommandExecutor $commandExecutor */
-        $commandExecutor = $this->getContainer()->get('oro_entity_config.tools.command_executor');
-
         $timeout = $input->getOption('timeout');
         if ($timeout >= 0) {
-            $commandExecutor->setDefaultOption('process-timeout', $timeout);
+            $this->commandExecutor->setDefaultOption('process-timeout', $timeout);
         }
         if (true === $input->getOption('no-debug')) {
-            $commandExecutor->setDefaultOption('no-debug');
+            $this->commandExecutor->setDefaultOption('no-debug');
         }
     }
 }

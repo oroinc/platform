@@ -37,7 +37,15 @@ class ConfigNormalizer extends BaseConfigNormalizer
             }
         }
 
-        return parent::doNormalizeConfig($config);
+        $config = parent::doNormalizeConfig($config);
+        if (isset($config[ConfigUtil::RENAMED_FIELDS][ConfigUtil::IGNORE_PROPERTY_PATH])) {
+            unset($config[ConfigUtil::RENAMED_FIELDS][ConfigUtil::IGNORE_PROPERTY_PATH]);
+            if (empty($config[ConfigUtil::RENAMED_FIELDS])) {
+                unset($config[ConfigUtil::RENAMED_FIELDS]);
+            }
+        }
+
+        return $config;
     }
 
     /**
@@ -101,7 +109,8 @@ class ConfigNormalizer extends BaseConfigNormalizer
     {
         return
             !empty($config[ConfigUtil::PROPERTY_PATH])
-            && ConfigUtil::IGNORE_PROPERTY_PATH === $config[ConfigUtil::PROPERTY_PATH];
+            && ConfigUtil::IGNORE_PROPERTY_PATH === $config[ConfigUtil::PROPERTY_PATH]
+            && !isset($config[ConfigUtil::ASSOCIATION_QUERY]);
     }
 
     /**

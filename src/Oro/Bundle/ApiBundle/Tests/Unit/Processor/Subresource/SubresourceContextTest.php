@@ -91,22 +91,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->get(SubresourceContext::COLLECTION));
     }
 
-    public function testParentEntity()
-    {
-        self::assertNull($this->context->getParentEntity());
-        self::assertFalse($this->context->hasParentEntity());
-
-        $entity = new \stdClass();
-        $this->context->setParentEntity($entity);
-        self::assertSame($entity, $this->context->getParentEntity());
-        self::assertSame($entity, $this->context->get(SubresourceContext::PARENT_ENTITY));
-        self::assertTrue($this->context->hasParentEntity());
-
-        $this->context->setParentEntity(null);
-        self::assertNull($this->context->getParentEntity());
-        self::assertTrue($this->context->hasParentEntity());
-    }
-
     public function testGetParentConfigExtras()
     {
         $action = 'update_relationship';

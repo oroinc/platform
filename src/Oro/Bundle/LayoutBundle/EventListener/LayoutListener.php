@@ -9,7 +9,6 @@ use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,17 +22,17 @@ class LayoutListener
     /** @var LayoutHelper */
     private $layoutHelper;
 
-    /** @var ContainerInterface */
-    private $container;
+    /** @var LayoutManager */
+    private $layoutManager;
 
     /**
-     * @param LayoutHelper       $layoutHelper
-     * @param ContainerInterface $container
+     * @param LayoutHelper $layoutHelper
+     * @param LayoutManager $layoutManager
      */
-    public function __construct(LayoutHelper $layoutHelper, ContainerInterface $container)
+    public function __construct(LayoutHelper $layoutHelper, LayoutManager $layoutManager)
     {
         $this->layoutHelper = $layoutHelper;
-        $this->container = $container;
+        $this->layoutManager = $layoutManager;
     }
 
     /**
@@ -85,10 +84,9 @@ class LayoutListener
             $response = new Response($layout->render());
         } else {
             $this->configureContext($context, $layoutAnnotation);
-            /** @var LayoutManager $layoutManager */
-            $layoutManager = $this->container->get('oro_layout.layout_manager');
-            $layoutManager->getLayoutBuilder()->setBlockTheme($layoutAnnotation->getBlockThemes());
-            $response = $this->getLayoutResponse($context, $request, $layoutManager);
+
+            $this->layoutManager->getLayoutBuilder()->setBlockTheme($layoutAnnotation->getBlockThemes());
+            $response = $this->getLayoutResponse($context, $request, $this->layoutManager);
         }
 
         $event->setResponse($response);

@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
@@ -228,7 +230,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         $config = new EntityDefinitionFieldConfig();
         self::assertFalse($config->hasTargetType());
         self::assertNull($config->getTargetType());
-        self::assertNull($config->isCollectionValuedAssociation());
+        self::assertFalse($config->isCollectionValuedAssociation());
 
         $config->setTargetType('to-one');
         self::assertTrue($config->hasTargetType());
@@ -245,7 +247,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         $config->setTargetType(null);
         self::assertFalse($config->hasTargetType());
         self::assertNull($config->getTargetType());
-        self::assertNull($config->isCollectionValuedAssociation());
+        self::assertFalse($config->isCollectionValuedAssociation());
         self::assertEquals([], $config->toArray());
     }
 
@@ -362,5 +364,43 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         $config->setDependsOn([]);
         self::assertNull($config->getDependsOn());
         self::assertEquals([], $config->toArray());
+    }
+
+    public function testAssociationQuery()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        self::assertNull($config->getAssociationQuery());
+
+        $query = $this->createMock(QueryBuilder::class);
+        $config->setTargetClass('Test\Class');
+        $config->setTargetType('to-many');
+        $config->setAssociationQuery($query);
+        self::assertSame($query, $config->getAssociationQuery());
+        self::assertEquals($query, $config->get(ConfigUtil::ASSOCIATION_QUERY));
+
+        $config->setAssociationQuery();
+        self::assertNull($config->getAssociationQuery());
+        self::assertFalse($config->has(ConfigUtil::ASSOCIATION_QUERY));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The target class must be specified to be able to use an association query.
+     */
+    public function testSetAssociationQueryWhenNoTargetClass()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $config->setAssociationQuery($this->createMock(QueryBuilder::class));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage An association query can be used only for collection valued associations.
+     */
+    public function testSetAssociationQueryForNotCollectionValuedAssociation()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $config->setTargetClass('Test\Class');
+        $config->setAssociationQuery($this->createMock(QueryBuilder::class));
     }
 }

@@ -17,8 +17,6 @@ class ConfigNormalizer
      * Prepares a configuration to be used by ObjectNormalizer
      *
      * @param EntityDefinitionConfig $config
-     *
-     * @return EntityDefinitionConfig
      */
     public function normalizeConfig(EntityDefinitionConfig $config)
     {
@@ -30,8 +28,6 @@ class ConfigNormalizer
      * Remembers the current config state before it will be normalized
      *
      * @param EntityDefinitionConfig $config
-     *
-     * @return array
      */
     protected function preNormalizeConfig(EntityDefinitionConfig $config)
     {
@@ -67,8 +63,6 @@ class ConfigNormalizer
      *
      * @param EntityDefinitionConfig $config
      *
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function doNormalizeConfig(EntityDefinitionConfig $config)
@@ -83,7 +77,9 @@ class ConfigNormalizer
             $propertyPath = $field->getPropertyPath();
             if ($propertyPath) {
                 if (ConfigUtil::IGNORE_PROPERTY_PATH === $propertyPath) {
-                    $toRemove[] = $fieldName;
+                    if (null === $field->getAssociationQuery()) {
+                        $toRemove[] = $fieldName;
+                    }
                 } elseif (false === strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
                     $renamedFields[$propertyPath] = $fieldName;
                 }

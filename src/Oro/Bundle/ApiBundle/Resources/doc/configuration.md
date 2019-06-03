@@ -9,8 +9,6 @@
  - [**filters** Configuration Section](#filters-configuration-section)
  - [**sorters** Configuration Section](#sorters-configuration-section)
  - [**actions** Configuration Section](#actions-configuration-section)
-   - [**status_codes** Configuration Section](#action-status_codes-configuration-section)
-   - [**fields** Configuration Section](#action-fields-configuration-section)
  - [**subresources** Configuration Section](#subresources-configuration-section)
  - [**relations** Configuration Section](#relations-configuration-section)
 
@@ -296,9 +294,10 @@ The **data_type** attribute can serve to specify a data type of a field. However
 | scalar | Represents a field of a to-one association as a field of a parent entity. In JSON.API, it means that the association's field should be in the "attributes" section instead of the "relationships" section. |
 | object | Represents a to-one association as a field. In JSON.API, it means that the association should be in the "attributes" section instead of the "relationships" section. |
 | array | Represent a to-many association as a field. In JSON.API, it means that the association should be in the "attributes" section instead of the "relationships" section. |
-| nestedObject | Helps configure nested objects. For details, see [Configure nested object](./how_to.md#configure-nested-object). |
-| nestedAssociation | Helps configure nested associations. For details, see [Configure nested association](./how_to.md#configure-nested-association). |
-| association:relationType\[:associationKind\] | Helps configure extended associations. For details, see [Configure Extended Many-To-One Association](./how_to.md#configure-extended-many-to-one-association), [Configure Extended Many-To-Many Association](./how_to.md#configure-extended-many-to-many-association), and [Configure Extended Multiple Many-To-One Association](./how_to.md#configure-extended-multiple-many-to-one-association). |
+| nestedObject | Helps configure nested objects. For details, see [Configure a Nested Object](./how_to.md#configure-a-nested-object). |
+| nestedAssociation | Helps configure nested associations. For details, see [Configure a Nested Association](./how_to.md#configure-a-nested-association). |
+| association:relationType\[:associationKind\] | Helps configure extended associations. For details, see [Configure an Extended Many-To-One Association](./how_to.md#configure-an-extended-many-to-one-association), [Configure an Extended Many-To-Many Association](./how_to.md#configure-an-extended-many-to-many-association) and [Configure an Extended Multiple Many-To-One Association](./how_to.md#configure-an-extended-multiple-many-to-one-association). |
+| unidirectionalAssociation:targetAssociationName | Helps configure unidirectional associations. For details, see [Configure an Unidirectional Association](./how_to.md#configure-an-unidirectional-association). |
 
 **Note:** To add a new special type of a field that requires an additional configuration of a field or an entity,
 create a class that implements [CustomDataTypeCompleterInterface](../../Processor/Config/Shared/CompleteDefinition/CustomDataTypeCompleterInterface.php)

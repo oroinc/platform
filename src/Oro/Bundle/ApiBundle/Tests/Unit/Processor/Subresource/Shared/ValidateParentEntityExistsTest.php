@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityExists;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 
-class ValidateParentEntityExistsTest extends GetSubresourceProcessorTestCase
+class ValidateParentEntityExistsTest extends ChangeRelationshipProcessorTestCase
 {
     /** @var ValidateParentEntityExists */
     private $processor;

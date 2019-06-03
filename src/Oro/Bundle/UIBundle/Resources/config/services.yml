@@ -51,6 +51,9 @@ services:
             - '@router'
             - '@security.authorization_checker'
 
+    Oro\Bundle\UIBundle\Route\Router:
+        alias:  oro_ui.router
+
     oro_ui.dynamic_asset_version_manager:
         class: Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager
         arguments:

@@ -2,6 +2,8 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+use Doctrine\ORM\QueryBuilder;
+use Oro\Component\EntitySerializer\AssociationQuery;
 use Oro\Component\EntitySerializer\ConfigConverter;
 
 class ConfigConverterTest extends \PHPUnit\Framework\TestCase
@@ -265,6 +267,29 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
+    }
+
+    public function testConvertConfigWithAssociationQuery()
+    {
+        $associationName = 'association1';
+        $associationQuery = new AssociationQuery($this->createMock(QueryBuilder::class), 'Test\TargetClass');
+
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                $associationName => [
+                    'association_query' => $associationQuery
+                ]
+            ]
+        ];
+
+        $configConverter = new ConfigConverter();
+        $convertedConfig = $configConverter->convertConfig($config);
+
+        $this->assertSame(
+            $associationQuery,
+            $convertedConfig->getField($associationName)->get('association_query')
+        );
     }
 
     public static function postSerialize1(array $item)

@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -110,7 +111,7 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
             $field = $definition->getField($fieldName);
             if (null !== $field && $field->getTargetClass()) {
                 $field->setTargetType(
-                    $this->getAssociationTargetType(!($mapping['type'] & ClassMetadata::TO_ONE))
+                    ConfigUtil::getAssociationTargetType(!($mapping['type'] & ClassMetadata::TO_ONE))
                 );
             }
         }
@@ -190,15 +191,5 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
             }
             $field->setTargetEntity($targetEntity);
         }
-    }
-
-    /**
-     * @param bool $isCollection
-     *
-     * @return string
-     */
-    private function getAssociationTargetType($isCollection)
-    {
-        return $isCollection ? 'to-many' : 'to-one';
     }
 }

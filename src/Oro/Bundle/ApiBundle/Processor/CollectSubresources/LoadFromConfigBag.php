@@ -203,8 +203,6 @@ class LoadFromConfigBag extends LoadSubresources
         if ($targetClass) {
             $subresource->setTargetClassName($targetClass);
             $subresource->setAcceptableTargetClassNames([$targetClass]);
-        }
-        if ($subresourceConfig->hasTargetType()) {
             $subresource->setIsCollection($subresourceConfig->isCollectionValuedAssociation());
         }
     }
@@ -253,9 +251,8 @@ class LoadFromConfigBag extends LoadSubresources
         ApiSubresource $subresource,
         SubresourceConfig $subresourceConfig
     ): void {
-        if ($subresourceConfig->getTargetClass()
-            && $subresourceConfig->getTargetClass() !== $subresource->getTargetClassName()
-        ) {
+        $targetClass = $subresourceConfig->getTargetClass();
+        if ($targetClass && $targetClass !== $subresource->getTargetClassName()) {
             throw new \RuntimeException(\sprintf(
                 'The target class for "%s" subresource of "%s" entity'
                 . ' cannot be overridden by a configuration.'
@@ -263,10 +260,10 @@ class LoadFromConfigBag extends LoadSubresources
                 $associationName,
                 $entityClass,
                 $subresource->getTargetClassName(),
-                $subresourceConfig->getTargetClass()
+                $targetClass
             ));
         }
-        if ($subresourceConfig->getTargetType()
+        if (($targetClass || $subresourceConfig->hasTargetType())
             && $subresourceConfig->isCollectionValuedAssociation() !== $subresource->isCollection()
         ) {
             throw new \RuntimeException(\sprintf(
@@ -275,8 +272,8 @@ class LoadFromConfigBag extends LoadSubresources
                 . 'Existing target type: %s. Target type from a configuration: %s.',
                 $associationName,
                 $entityClass,
-                $subresource->isCollection() ? 'to-many' : 'to-one',
-                $subresourceConfig->isCollectionValuedAssociation() ? 'to-many' : 'to-one'
+                ConfigUtil::getAssociationTargetType($subresource->isCollection()),
+                ConfigUtil::getAssociationTargetType($subresourceConfig->isCollectionValuedAssociation())
             ));
         }
     }

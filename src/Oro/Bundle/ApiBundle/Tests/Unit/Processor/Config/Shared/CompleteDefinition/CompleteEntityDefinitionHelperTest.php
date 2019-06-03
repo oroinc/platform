@@ -205,6 +205,66 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
+    public function testCompleteDefinitionForFieldReplacedWithComputedField()
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'field1' => [
+                    'data_type'     => 'integer',
+                    'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
+                ]
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'field1']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
+            ->method('isIgnoredField')
+            ->with(self::identicalTo($rootEntityMetadata), 'id')
+            ->willReturn(false);
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'     => null,
+                    'field1' => [
+                        'data_type'     => 'integer',
+                        'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
     public function testCompleteDefinitionForCompletedAssociation()
     {
         $config = $this->createConfigObject([
@@ -868,6 +928,71 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
+    public function testCompleteDefinitionForAssociationReplacedWithComputedField()
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'association1' => [
+                    'data_type'     => 'object',
+                    'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
+                ]
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::never())
+            ->method('isIgnoredRelation');
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
+                    'association1' => [
+                        'data_type'     => 'object',
+                        'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
     public function testCompleteDefinitionForAssociationWithDataType()
     {
         $config = $this->createConfigObject([
@@ -1403,8 +1528,8 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'fields' => [
-                'id'     => null,
-                'field1' => [
+                'id'      => null,
+                'field1'  => [
                     'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
                 ],
                 '_field1' => [

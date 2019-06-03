@@ -2,22 +2,26 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadParentEntity;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\ApiBundle\Util\EntityLoader;
+use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
+use Oro\Component\EntitySerializer\QueryFactory;
 
-class LoadParentEntityTest extends GetSubresourceProcessorTestCase
+class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
 {
-    private const TEST_PARENT_CLASS_NAME = 'Test\Class';
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityLoader */
-    private $entityLoader;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdHelper */
+    private $entityIdHelper;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryFactory */
+    private $queryFactory;
 
     /** @var LoadParentEntity */
     private $processor;
@@ -27,34 +31,40 @@ class LoadParentEntityTest extends GetSubresourceProcessorTestCase
         parent::setUp();
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->entityLoader = $this->createMock(EntityLoader::class);
+        $this->entityIdHelper = $this->createMock(EntityIdHelper::class);
+        $this->queryFactory = $this->createMock(QueryFactory::class);
 
-        $this->processor = new LoadParentEntity($this->doctrineHelper, $this->entityLoader);
+        $this->processor = new LoadParentEntity(
+            $this->doctrineHelper,
+            $this->entityIdHelper,
+            $this->queryFactory
+        );
     }
 
     public function testProcessWhenParentEntityIsAlreadyLoaded()
     {
-        $entity = new \stdClass();
+        $parentEntity = new \stdClass();
 
         $this->doctrineHelper->expects(self::never())
             ->method('getManageableEntityClass');
 
-        $this->context->setParentEntity($entity);
+        $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
 
-        self::assertSame($entity, $this->context->getParentEntity());
+        self::assertSame($parentEntity, $this->context->getParentEntity());
     }
 
     public function testProcessForNotManageableEntity()
     {
+        $parentClass = 'Test\Class';
         $parentConfig = new EntityDefinitionConfig();
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
-            ->with(self::TEST_PARENT_CLASS_NAME, $parentConfig)
+            ->with($parentClass, $parentConfig)
             ->willReturn(null);
 
-        $this->context->setParentClassName(self::TEST_PARENT_CLASS_NAME);
+        $this->context->setParentClassName($parentClass);
         $this->context->setParentConfig($parentConfig);
         $this->processor->process($this->context);
 
@@ -63,102 +73,124 @@ class LoadParentEntityTest extends GetSubresourceProcessorTestCase
 
     public function testProcessForManageableEntity()
     {
+        $parentClass = 'Test\Class';
         $parentId = 123;
         $parentConfig = new EntityDefinitionConfig();
         $parentMetadata = new EntityMetadata();
-        $entity = new \stdClass();
+        $parentEntity = new \stdClass();
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
-            ->with(self::TEST_PARENT_CLASS_NAME, $parentConfig)
-            ->willReturn(self::TEST_PARENT_CLASS_NAME);
-        $this->entityLoader->expects(self::once())
-            ->method('findEntity')
-            ->with(self::TEST_PARENT_CLASS_NAME, $parentId, self::identicalTo($parentMetadata))
-            ->willReturn($entity);
+            ->with($parentClass, $parentConfig)
+            ->willReturn($parentClass);
 
-        $this->context->setParentClassName(self::TEST_PARENT_CLASS_NAME);
+        $qb = $this->createMock(QueryBuilder::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('createQueryBuilder')
+            ->with($parentClass, 'e')
+            ->willReturn($qb);
+
+        $this->entityIdHelper->expects(self::once())
+            ->method('applyEntityIdentifierRestriction')
+            ->with(self::identicalTo($qb), $parentId, self::identicalTo($parentMetadata));
+
+        $query = $this->createMock(AbstractQuery::class);
+        $this->queryFactory->expects(self::once())
+            ->method('getQuery')
+            ->with(self::identicalTo($qb), self::identicalTo($parentConfig))
+            ->willReturn($query);
+        $query->expects(self::once())
+            ->method('getOneOrNullResult')
+            ->willReturn($parentEntity);
+
+        $this->context->setParentClassName($parentClass);
         $this->context->setParentId($parentId);
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);
         $this->processor->process($this->context);
 
-        self::assertSame($entity, $this->context->getParentEntity());
+        self::assertSame($parentEntity, $this->context->getParentEntity());
     }
 
     public function testProcessForManageableEntityWhenEntityNotFound()
     {
+        $parentClass = 'Test\Class';
         $parentId = 123;
         $parentConfig = new EntityDefinitionConfig();
         $parentMetadata = new EntityMetadata();
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
-            ->with(self::TEST_PARENT_CLASS_NAME, $parentConfig)
-            ->willReturn(self::TEST_PARENT_CLASS_NAME);
-        $this->entityLoader->expects(self::once())
-            ->method('findEntity')
-            ->with(self::TEST_PARENT_CLASS_NAME, $parentId, self::identicalTo($parentMetadata))
+            ->with($parentClass, $parentConfig)
+            ->willReturn($parentClass);
+
+        $qb = $this->createMock(QueryBuilder::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('createQueryBuilder')
+            ->with($parentClass, 'e')
+            ->willReturn($qb);
+
+        $this->entityIdHelper->expects(self::once())
+            ->method('applyEntityIdentifierRestriction')
+            ->with(self::identicalTo($qb), $parentId, self::identicalTo($parentMetadata));
+
+        $query = $this->createMock(AbstractQuery::class);
+        $this->queryFactory->expects(self::once())
+            ->method('getQuery')
+            ->with(self::identicalTo($qb), self::identicalTo($parentConfig))
+            ->willReturn($query);
+        $query->expects(self::once())
+            ->method('getOneOrNullResult')
             ->willReturn(null);
 
-        $this->context->setParentClassName(self::TEST_PARENT_CLASS_NAME);
+        $this->context->setParentClassName($parentClass);
         $this->context->setParentId($parentId);
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);
         $this->processor->process($this->context);
 
-        self::assertNull($this->context->getParentEntity());
-        self::assertTrue($this->context->hasParentEntity());
+        self::assertFalse($this->context->hasParentEntity());
     }
 
     public function testProcessForResourceBasedOnManageableEntity()
     {
+        $parentClass = 'Test\Class';
         $parentResourceClass = 'Test\ParentResourceClass';
         $parentId = 123;
-        $parentMetadata = new EntityMetadata();
-        $entity = new \stdClass();
-
         $parentConfig = new EntityDefinitionConfig();
-        $parentConfig->setParentResourceClass($parentResourceClass);
+        $parentMetadata = new EntityMetadata();
+        $parentEntity = new \stdClass();
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
-            ->willReturn($parentResourceClass);
-        $this->entityLoader->expects(self::once())
-            ->method('findEntity')
-            ->with($parentResourceClass, $parentId, self::identicalTo($parentMetadata))
-            ->willReturn($entity);
+            ->with($parentResourceClass, $parentConfig)
+            ->willReturn($parentClass);
 
-        $this->context->setParentClassName(self::TEST_PARENT_CLASS_NAME);
+        $qb = $this->createMock(QueryBuilder::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('createQueryBuilder')
+            ->with($parentClass, 'e')
+            ->willReturn($qb);
+
+        $this->entityIdHelper->expects(self::once())
+            ->method('applyEntityIdentifierRestriction')
+            ->with(self::identicalTo($qb), $parentId, self::identicalTo($parentMetadata));
+
+        $query = $this->createMock(AbstractQuery::class);
+        $this->queryFactory->expects(self::once())
+            ->method('getQuery')
+            ->with(self::identicalTo($qb), self::identicalTo($parentConfig))
+            ->willReturn($query);
+        $query->expects(self::once())
+            ->method('getOneOrNullResult')
+            ->willReturn($parentEntity);
+
+        $this->context->setParentClassName($parentResourceClass);
         $this->context->setParentId($parentId);
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);
         $this->processor->process($this->context);
 
-        self::assertSame($entity, $this->context->getParentEntity());
-    }
-
-    public function testProcessForResourceBasedOnNotManageableEntity()
-    {
-        $parentResourceClass = 'Test\ParentResourceClass';
-        $parentId = 123;
-        $parentMetadata = new EntityMetadata();
-
-        $parentConfig = new EntityDefinitionConfig();
-        $parentConfig->setParentResourceClass($parentResourceClass);
-
-        $this->doctrineHelper->expects(self::once())
-            ->method('getManageableEntityClass')
-            ->willReturn(null);
-        $this->entityLoader->expects(self::never())
-            ->method('findEntity');
-
-        $this->context->setParentClassName(self::TEST_PARENT_CLASS_NAME);
-        $this->context->setParentId($parentId);
-        $this->context->setParentConfig($parentConfig);
-        $this->context->setParentMetadata($parentMetadata);
-        $this->processor->process($this->context);
-
-        self::assertNull($this->context->getParentEntity());
+        self::assertSame($parentEntity, $this->context->getParentEntity());
     }
 }

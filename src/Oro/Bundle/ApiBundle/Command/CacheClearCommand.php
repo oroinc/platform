@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Command;
 
 use Oro\Bundle\ApiBundle\Provider\CacheManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,9 +12,23 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * The CLI command to clear Data API cache.
  */
-class CacheClearCommand extends ContainerAwareCommand
+class CacheClearCommand extends Command
 {
-    public const COMMAND_NAME = 'oro:api:cache:clear';
+    /** @var string */
+    protected static $defaultName = 'oro:api:cache:clear';
+
+    /** @var CacheManager */
+    private $cacheManager;
+
+    /**
+     * @param CacheManager $cacheManager
+     */
+    public function __construct(CacheManager $cacheManager)
+    {
+        parent::__construct();
+
+        $this->cacheManager = $cacheManager;
+    }
 
     /**
      * {@inheritdoc}
@@ -22,7 +36,6 @@ class CacheClearCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName(self::COMMAND_NAME)
             ->setDescription('Clears Data API cache.')
             ->addOption('no-warmup', null, InputOption::VALUE_NONE, 'Do not warm up the cache.')
             ->setHelp(
@@ -46,14 +59,12 @@ EOF
 
         $noWarmup = $input->getOption('no-warmup');
 
-        /** @var CacheManager $cacheManager */
-        $cacheManager = $this->getContainer()->get('oro_api.cache_manager');
         if ($noWarmup) {
             $io->comment('Clearing API cache...');
-            $cacheManager->clearCaches();
+            $this->cacheManager->clearCaches();
         } else {
             $io->comment('Warming up API cache...');
-            $cacheManager->warmUpCaches();
+            $this->cacheManager->warmUpCaches();
         }
 
         $io->success('API cache was successfully cleared.');

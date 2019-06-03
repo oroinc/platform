@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -178,7 +179,7 @@ class DumpCommand extends AbstractDebugCommand
                     $acceptableTargetEntityTypes[] = $this->resolveEntityType($className, $requestType);
                 }
                 $result .= sprintf("\n  <comment>%s</comment>", $associationName);
-                $result .= "\n   Type: " . ($subresource->isCollection() ? 'to-many' : 'to-one');
+                $result .= "\n   Type: " . ConfigUtil::getAssociationTargetType($subresource->isCollection());
                 $result .= "\n   Target: " . $targetEntityType;
                 $result .= "\n   Acceptable Targets: " . implode(', ', $acceptableTargetEntityTypes);
                 $subresourceExcludedActions = $subresource->getExcludedActions();

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Normalizer;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -154,6 +155,8 @@ class ObjectNormalizer
      * @param array                  $context
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function normalizeObjectByConfig($object, $level, EntityDefinitionConfig $config, $context)
     {
@@ -172,13 +175,15 @@ class ObjectNormalizer
         foreach ($fields as $fieldName => $field) {
             $propertyPath = $field->getPropertyPath($fieldName);
 
-            if (false !== strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
+            if (null === $field->getAssociationQuery()
+                && false !== strpos($propertyPath, ConfigUtil::PATH_DELIMITER)
+            ) {
                 $referenceFields[$fieldName] = ConfigUtil::explodePropertyPath($propertyPath);
                 continue;
             }
 
             $value = null;
-            if ($this->dataAccessor->tryGetValue($object, $propertyPath, $value)) {
+            if ($this->tryGetValue($object, $propertyPath, $field, $value)) {
                 if (null !== $value) {
                     $targetConfig = $field->getTargetEntity();
                     if (null !== $targetConfig) {
@@ -214,6 +219,35 @@ class ObjectNormalizer
         }
 
         return $result;
+    }
+
+    /**
+     * @param object                      $object
+     * @param string                      $propertyName
+     * @param EntityDefinitionFieldConfig $field
+     * @param mixed                       $value
+     *
+     * @return bool
+     */
+    protected function tryGetValue($object, $propertyName, EntityDefinitionFieldConfig $field, &$value)
+    {
+        $associationQuery = $field->getAssociationQuery();
+        if (null === $associationQuery) {
+            return $this->dataAccessor->tryGetValue($object, $propertyName, $value);
+        }
+
+        $qb = clone $associationQuery;
+        $qb->select('r');
+        $entityIdFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNames($object);
+        $entityId = $this->doctrineHelper->getEntityIdentifier($object);
+        foreach ($entityIdFieldNames as $fieldName) {
+            $qb
+                ->andWhere(\sprintf('e.%s = :id', $fieldName))
+                ->setParameter($fieldName, $entityId[$fieldName]);
+        }
+        $value = $qb->getQuery()->getResult();
+
+        return true;
     }
 
     /**

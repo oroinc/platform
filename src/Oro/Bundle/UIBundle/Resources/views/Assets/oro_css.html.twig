@@ -1,1 +1,4 @@
 <link rel="stylesheet" media="all" href="{{ asset('css/themes/oro/oro.css') }}" />
+{% if 'Trident' in app.request.headers.get('User-Agent') %}
+    <link rel="stylesheet" media="all" href="{{ asset('css/themes/oro/oro-ie.css') }}" />
+{% endif %}

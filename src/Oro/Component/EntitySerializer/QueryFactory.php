@@ -63,11 +63,13 @@ class QueryFactory
      *
      * @return QueryBuilder
      */
-    public function getRelatedItemsQueryBuilder($entityClass, $entityIds)
+    public function getRelatedItemsQueryBuilder(string $entityClass, array $entityIds): QueryBuilder
     {
-        return $this->doctrineHelper->createQueryBuilder($entityClass, 'r')
-            ->where(sprintf('r.%s IN (:ids)', $this->doctrineHelper->getEntityIdFieldName($entityClass)))
-            ->setParameter('ids', $entityIds);
+        $qb = $this->doctrineHelper->createQueryBuilder($entityClass, 'r');
+        $entityIdField = $this->doctrineHelper->getEntityIdFieldName($entityClass);
+        $this->applyEntityIdentifierRestriction($qb, 'r', $entityIdField, $entityIds);
+
+        return $qb;
     }
 
     /**
@@ -76,34 +78,35 @@ class QueryFactory
      *
      * @return QueryBuilder
      */
-    public function getToManyAssociationQueryBuilder($associationMapping, $entityIds)
+    public function getToManyAssociationQueryBuilder(array $associationMapping, array $entityIds): QueryBuilder
     {
-        $entityIdField = $this->doctrineHelper->getEntityIdFieldName($associationMapping['sourceEntity']);
+        $qb = $this->getNotInitializedToManyAssociationQueryBuilder($associationMapping);
+        $this->initializeToManyAssociationQueryBuilder($qb, $associationMapping['sourceEntity'], $entityIds);
 
-        $qb = $this->doctrineHelper->createQueryBuilder($associationMapping['targetEntity'], 'r')
-            ->select(sprintf('e.%s as entityId', $entityIdField));
-        if (count($entityIds) === 1) {
-            $qb
-                ->where(sprintf('e.%s = :id', $entityIdField))
-                ->setParameter('id', reset($entityIds));
-        } else {
-            $qb
-                ->where(sprintf('e.%s IN (:ids)', $entityIdField))
-                ->setParameter('ids', $entityIds);
-        }
+        return $qb;
+    }
+
+    /**
+     * @param array $associationMapping
+     *
+     * @return QueryBuilder
+     */
+    public function getNotInitializedToManyAssociationQueryBuilder(array $associationMapping): QueryBuilder
+    {
+        $qb = $this->doctrineHelper->createQueryBuilder($associationMapping['targetEntity'], 'r');
         if ($associationMapping['mappedBy'] && $associationMapping['type'] === ClassMetadata::ONE_TO_MANY) {
             $qb->innerJoin(
                 $associationMapping['sourceEntity'],
                 'e',
                 'WITH',
-                sprintf('r.%s = e', $associationMapping['mappedBy'])
+                \sprintf('r.%s = e', $associationMapping['mappedBy'])
             );
         } else {
             $qb->innerJoin(
                 $associationMapping['sourceEntity'],
                 'e',
                 'WITH',
-                sprintf('r MEMBER OF e.%s', $associationMapping['fieldName'])
+                \sprintf('r MEMBER OF e.%s', $associationMapping['fieldName'])
             );
         }
 
@@ -111,26 +114,51 @@ class QueryFactory
     }
 
     /**
-     * @param array        $associationMapping
+     * @param QueryBuilder $qb
+     * @param string       $entityClass
+     * @param array        $entityIds
+     */
+    public function initializeToManyAssociationQueryBuilder(
+        QueryBuilder $qb,
+        string $entityClass,
+        array $entityIds
+    ): void {
+        $entityIdField = $this->doctrineHelper->getEntityIdFieldName($entityClass);
+        $qb->select(\sprintf('e.%s as entityId', $entityIdField));
+        $this->applyEntityIdentifierRestriction($qb, 'e', $entityIdField, $entityIds);
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string       $entityClass
+     * @param string       $targetEntityClass
      * @param array        $entityIds
      * @param EntityConfig $config
      *
      * @return array [['entityId' => mixed, 'relatedEntityId' => mixed], ...]
      */
-    public function getRelatedItemsIds($associationMapping, $entityIds, EntityConfig $config)
-    {
+    public function getRelatedItemsIds(
+        QueryBuilder $qb,
+        string $entityClass,
+        string $targetEntityClass,
+        array $entityIds,
+        EntityConfig $config
+    ): array {
         $limit = $config->getMaxResults();
         if (null !== $limit && $config->getHasMore()) {
             $limit++;
         }
 
-        if ($limit > 0 && count($entityIds) > 1) {
-            $rows = $this->getRelatedItemsUnionAllQuery($associationMapping, $entityIds, $config, $limit)
+        if (null !== $limit && $limit > 0 && \count($entityIds) > 1) {
+            $this->initializeToManyAssociationQueryBuilder($qb, $entityClass, [self::FAKE_ID]);
+            $query = $this->getRelatedItemsIdsQuery($qb, $targetEntityClass, $config);
+            $rows = $this->getRelatedItemsUnionAllQuery($query, $entityIds, $limit)
                 ->getQuery()
                 ->getScalarResult();
         } else {
-            $query = $this->getRelatedItemsIdsQuery($associationMapping, $entityIds, $config);
-            if ($limit >= 0) {
+            $this->initializeToManyAssociationQueryBuilder($qb, $entityClass, $entityIds);
+            $query = $this->getRelatedItemsIdsQuery($qb, $targetEntityClass, $config);
+            if (null !== $limit && $limit >= 0) {
                 $query->setMaxResults($limit);
             }
             $rows = $query->getScalarResult();
@@ -140,21 +168,17 @@ class QueryFactory
     }
 
     /**
-     * @param array        $associationMapping
-     * @param array        $entityIds
-     * @param EntityConfig $config
-     * @param int          $relatedRecordsLimit
+     * @param Query $subQueryTemplate
+     * @param array $entityIds
+     * @param int   $relatedRecordsLimit
      *
      * @return SqlQueryBuilder
-     * @throws Query\QueryException
      */
     private function getRelatedItemsUnionAllQuery(
-        $associationMapping,
+        Query $subQueryTemplate,
         array $entityIds,
-        EntityConfig $config,
-        $relatedRecordsLimit
-    ) {
-        $subQueryTemplate = $this->getRelatedItemsIdsQuery($associationMapping, [self::FAKE_ID], $config);
+        int $relatedRecordsLimit
+    ): SqlQueryBuilder {
         $subQueryTemplate->setMaxResults($relatedRecordsLimit);
         $parsedSubQuery = QueryUtil::parseQuery($subQueryTemplate);
         // we should wrap all subqueries with brackets for PostgreSQL queries with UNION and LIMIT
@@ -165,14 +189,14 @@ class QueryFactory
         $subQueries = [];
         foreach ($entityIds as $id) {
             $fakeId = self::FAKE_ID;
-            if (!is_string($id)) {
+            if (!\is_string($id)) {
                 $fakeId = '\'' . $fakeId . '\'';
             }
-            $subQueries[] = str_replace($fakeId, $id, $subQuerySqlTemplate);
+            $subQueries[] = \str_replace($fakeId, $id, $subQuerySqlTemplate);
         }
 
         $subQueryMapping = $parsedSubQuery->getResultSetMapping();
-        $selectStmt = sprintf(
+        $selectStmt = \sprintf(
             'entity.%s AS entityId, entity.%s AS relatedEntityId',
             ResultSetMappingUtil::getColumnNameByAlias($subQueryMapping, 'entityId'),
             ResultSetMappingUtil::getColumnNameByAlias($subQueryMapping, 'relatedEntityId')
@@ -188,28 +212,48 @@ class QueryFactory
         $qb = new SqlQueryBuilder($subQueryTemplate->getEntityManager(), $rsm);
         $qb
             ->select($selectStmt)
-            ->from('(' . implode(' UNION ALL ', $subQueries) . ')', 'entity');
+            ->from('(' . \implode(' UNION ALL ', $subQueries) . ')', 'entity');
 
         return $qb;
     }
 
     /**
-     * @param array        $associationMapping
-     * @param array        $entityIds
+     * @param QueryBuilder $qb
+     * @param string       $targetEntityClass
      * @param EntityConfig $config
      *
      * @return Query
      */
-    private function getRelatedItemsIdsQuery($associationMapping, $entityIds, EntityConfig $config)
+    private function getRelatedItemsIdsQuery(QueryBuilder $qb, string $targetEntityClass, EntityConfig $config): Query
     {
-        $qb = $this->getToManyAssociationQueryBuilder($associationMapping, $entityIds)
-            ->addSelect(
-                sprintf(
-                    'r.%s as relatedEntityId',
-                    $this->doctrineHelper->getEntityIdFieldName($associationMapping['targetEntity'])
-                )
-            );
+        $qb->addSelect(\sprintf(
+            'r.%s as relatedEntityId',
+            $this->doctrineHelper->getEntityIdFieldName($targetEntityClass)
+        ));
 
         return $this->getQuery($qb, $config);
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string       $alias
+     * @param string       $entityIdField
+     * @param array        $entityIds
+     */
+    private function applyEntityIdentifierRestriction(
+        QueryBuilder $qb,
+        string $alias,
+        string $entityIdField,
+        array $entityIds
+    ): void {
+        if (\count($entityIds) === 1) {
+            $qb
+                ->where(\sprintf('%s.%s = :id', $alias, $entityIdField))
+                ->setParameter('id', \reset($entityIds));
+        } else {
+            $qb
+                ->where(\sprintf('%s.%s IN (:ids)', $alias, $entityIdField))
+                ->setParameter('ids', $entityIds);
+        }
     }
 }

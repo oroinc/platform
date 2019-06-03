@@ -2,8 +2,8 @@
 
  - [Overview](#overview)
  - [Creating a Configuration Extension](#creating-a-configuration-extension)
- - [Add Options to an Existing Configuration Section](#add-options-to-an-existing-configuration-section)
- - [Add a New Configuration Section](#add-a-new-configuration-section)
+ - [Add Options to Existing Configuration Section](#add-options-to-existing-configuration-section)
+ - [Add New Configuration Section](#add-new-configuration-section)
 
 ## Overview
 
@@ -113,7 +113,7 @@ class MyConfigExtension extends AbstractConfigExtension
 }
 ```
 
-## Add new configuration section
+## Add New Configuration Section
 
 To add a new configuration section, create a class that implements [ConfigurationSectionInterface](../../Config/Definition/ConfigurationSectionInterface.php) and return instance of it in the `getEntityConfigurationSections` method of your configuration extension. 
 

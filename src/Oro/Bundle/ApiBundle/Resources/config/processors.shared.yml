@@ -595,6 +595,14 @@ services:
             - { name: oro.api.processor, action: get_subresource, group: build_query, collection: true, priority: -70 }
             - { name: oro.api.processor, action: get_relationship, group: build_query, collection: true, priority: -70 }
 
+    oro_api.subresource.build_unidirectional_association_subresource_query:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildUnidirectionalAssociationSubresourceQuery
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: build_query, collection: true, priority: -90 }
+            - { name: oro.api.processor, action: get_relationship, group: build_query, collection: true, priority: -90 }
+
     oro_api.build_query:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery
         arguments:
@@ -628,6 +636,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\AddParentEntityIdToQuery
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: build_query, priority: -150 }
             - { name: oro.api.processor, action: get_relationship, group: build_query, priority: -150 }
@@ -656,6 +665,16 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: load_data, priority: 250 }
             - { name: oro.api.processor, action: add_relationship, group: load_data, priority: 250 }
             - { name: oro.api.processor, action: update_relationship, group: load_data, priority: 250 }
+
+    oro_api.subresource.validate_parent_entity_access:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityAccess
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
+            - '@oro_api.entity_serializer.query_factory'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: load_data, priority: 100 }
+            - { name: oro.api.processor, action: get_relationship, group: load_data, priority: 100 }
 
     oro_api.load_entity_by_entity_serializer:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByEntitySerializer
@@ -688,7 +707,8 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadParentEntity
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.entity_loader'
+            - '@oro_api.entity_id_helper'
+            - '@oro_api.entity_serializer.query_factory'
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: add_subresource, group: load_data, priority: -10 }

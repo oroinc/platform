@@ -162,6 +162,34 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($entityMetadata->hasIdentifierGenerator());
     }
 
+    public function testGetPropertyPath()
+    {
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->addMetaProperty(new MetaPropertyMetadata('property1'));
+        $entityMetadata->addMetaProperty(new MetaPropertyMetadata('renamedProperty2'))
+            ->setPropertyPath('property2');
+        $entityMetadata->addField(new FieldMetadata('field1'));
+        $entityMetadata->addField(new FieldMetadata('renamedField2'))
+            ->setPropertyPath('field2');
+        $entityMetadata->addAssociation(new AssociationMetadata('association1'));
+        $entityMetadata->addAssociation(new AssociationMetadata('renamedAssociation2'))
+            ->setPropertyPath('association2');
+
+        self::assertEquals('property1', $entityMetadata->getPropertyPath('property1'));
+        self::assertEquals('property2', $entityMetadata->getPropertyPath('renamedProperty2'));
+        self::assertNull($entityMetadata->getPropertyPath('property2'));
+
+        self::assertEquals('field1', $entityMetadata->getPropertyPath('field1'));
+        self::assertEquals('field2', $entityMetadata->getPropertyPath('renamedField2'));
+        self::assertNull($entityMetadata->getPropertyPath('field2'));
+
+        self::assertEquals('association1', $entityMetadata->getPropertyPath('association1'));
+        self::assertEquals('association2', $entityMetadata->getPropertyPath('renamedAssociation2'));
+        self::assertNull($entityMetadata->getPropertyPath('association2'));
+
+        self::assertNull($entityMetadata->getPropertyPath('unknown'));
+    }
+
     public function testMetaProperties()
     {
         $entityMetadata = new EntityMetadata();
