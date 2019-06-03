@@ -1,0 +1,5 @@
+/* @theme: admin.oro; */
+
+.app-page__central-panel {
+    z-index: 1; // fix overlapping bug in IE11
+}
