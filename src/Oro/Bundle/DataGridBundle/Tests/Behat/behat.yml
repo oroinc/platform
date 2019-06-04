@@ -12,6 +12,9 @@ oro_behat_extension:
       selector: 'tbody tr'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow
 
+    FirstTableRowColumn:
+      selector: 'tbody tr td:first-child'
+
     TableRowStrict:
       selector:
         type: 'xpath'
