@@ -9,6 +9,8 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * Extend options builder
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ExtendOptionsBuilder
 {
@@ -21,6 +23,9 @@ class ExtendOptionsBuilder
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var bool */
+    protected $isDryRunMode = false;
+
     /** @var array */
     protected $tableToEntitiesMap = [];
 
@@ -31,15 +36,18 @@ class ExtendOptionsBuilder
      * @param EntityMetadataHelper $entityMetadataHelper
      * @param FieldTypeHelper      $fieldTypeHelper
      * @param ConfigManager        $configManager
+     * @param bool                 $isDryRunMode
      */
     public function __construct(
         EntityMetadataHelper $entityMetadataHelper,
         FieldTypeHelper $fieldTypeHelper,
-        ConfigManager $configManager
+        ConfigManager $configManager,
+        bool $isDryRunMode = false
     ) {
         $this->entityMetadataHelper = $entityMetadataHelper;
         $this->fieldTypeHelper      = $fieldTypeHelper;
         $this->configManager        = $configManager;
+        $this->isDryRunMode         = $isDryRunMode;
     }
 
     /**
@@ -94,7 +102,6 @@ class ExtendOptionsBuilder
                 return $this->entityMetadataHelper->isEntityClassContainsColumn($className, $columnName);
             });
         }
-
         if (!$entityClassNames) {
             return;
         }
@@ -125,7 +132,8 @@ class ExtendOptionsBuilder
             foreach ($target as $optionName => $optionValue) {
                 switch ($optionName) {
                     case 'table_name':
-                        $targetEntityNames = $this->getEntityClassNames($optionValue);
+                        $throwExceptionIfNotFound = $this->isDryRunMode ? false : true;
+                        $targetEntityNames = $this->getEntityClassNames($optionValue, null, $throwExceptionIfNotFound);
                         if (count($targetEntityNames) > 1) {
                             throw new \LogicException(sprintf(
                                 'Table "%s" is expected to be related with 1 entity, but %d entities found',

@@ -13,7 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Updates extended entities configuration during a database structure migration process.
- * This is an internal command. Please do not run it manually.
  */
 class MigrationUpdateConfigCommand extends ContainerAwareCommand
 {
@@ -67,6 +66,12 @@ class MigrationUpdateConfigCommand extends ContainerAwareCommand
         if (is_file($optionsPath)) {
             $options = unserialize(file_get_contents($optionsPath));
 
+            $dryRun = $input->getOption('dry-run');
+
+            /** @var ExtendOptionsParser $parser */
+            $parser  = $this->getContainer()->get('oro_entity_extend.migration.options_parser');
+            $parser->setDryRunMode($dryRun);
+
             $options = $this->extendOptionsParser->parseOptions($options);
 
             $logger = new ConfigLogger(new OutputLogger($output));
@@ -74,7 +79,7 @@ class MigrationUpdateConfigCommand extends ContainerAwareCommand
             $this->extendConfigProcessor->processConfigs(
                 $options,
                 $logger,
-                $input->getOption('dry-run')
+                $dryRun
             );
         } else {
             $output->writeln(
