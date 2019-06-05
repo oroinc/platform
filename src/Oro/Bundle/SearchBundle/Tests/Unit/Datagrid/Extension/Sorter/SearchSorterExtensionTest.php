@@ -21,7 +21,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
     {
         parent::setUp();
 
-        $this->extension = new SearchSorterExtension($this->sortersStateProvider);
+        $this->extension = new SearchSorterExtension($this->sortersStateProvider, $this->resolver);
     }
 
     /**
@@ -31,6 +31,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
      */
     public function testVisitDatasourceWithValidType($configDataType)
     {
+        $this->configureResolver();
         $config = DatagridConfiguration::create([
             Configuration::SORTERS_KEY => [
                 Configuration::DEFAULT_SORTERS_KEY => [
@@ -85,6 +86,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
      */
     public function testVisitDatasourceWithInvalidType()
     {
+        $this->configureResolver();
         $config = DatagridConfiguration::create([
             Configuration::SORTERS_KEY => [
                 Configuration::DEFAULT_SORTERS_KEY => [
@@ -118,6 +120,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithDefaultSorterAndDefaultSortingIsNotDisabled()
     {
+        $this->configureResolver();
         $config = DatagridConfiguration::create([
             Configuration::SORTERS_KEY => [
                 Configuration::COLUMNS_KEY                 => [
@@ -159,6 +162,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithNoDefaultSorterAndDisableDefaultSorting()
     {
+        $this->configureResolver();
         $this->sortersStateProvider
             ->expects($this->any())
             ->method('getStateFromParameters')
@@ -184,6 +188,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithDefaultSorterAndDisableDefaultSorting()
     {
+        $this->configureResolver();
         $this->sortersStateProvider
             ->expects($this->any())
             ->method('getStateFromParameters')
