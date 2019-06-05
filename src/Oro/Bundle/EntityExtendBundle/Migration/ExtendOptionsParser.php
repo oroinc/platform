@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 
+/**
+ * Extend options parser
+ */
 class ExtendOptionsParser
 {
     /** @var EntityMetadataHelper */
@@ -15,6 +18,9 @@ class ExtendOptionsParser
 
     /** @var ConfigManager */
     protected $configManager;
+
+    /** @var bool */
+    protected $isDryRunMode = false;
 
     /**
      * @param EntityMetadataHelper $entityMetadataHelper
@@ -32,6 +38,14 @@ class ExtendOptionsParser
     }
 
     /**
+     * @param bool $isDryRunMode
+     */
+    public function setDryRunMode($isDryRunMode = false)
+    {
+        $this->isDryRunMode = $isDryRunMode;
+    }
+
+    /**
      * Gets all options
      *
      * @param array $options
@@ -39,7 +53,12 @@ class ExtendOptionsParser
      */
     public function parseOptions(array $options)
     {
-        $builder = new ExtendOptionsBuilder($this->entityMetadataHelper, $this->fieldTypeHelper, $this->configManager);
+        $builder = new ExtendOptionsBuilder(
+            $this->entityMetadataHelper,
+            $this->fieldTypeHelper,
+            $this->configManager,
+            $this->isDryRunMode
+        );
 
         $objectKeys = array_filter(
             array_keys($options),

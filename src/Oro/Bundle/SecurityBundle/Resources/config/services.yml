@@ -372,6 +372,7 @@ services:
 
     oro_security.encoder.default:
         class: Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter
+        public: true
         arguments: [ '%kernel.secret%' ]
 
     oro_security.encoder.repetitive_crypter:

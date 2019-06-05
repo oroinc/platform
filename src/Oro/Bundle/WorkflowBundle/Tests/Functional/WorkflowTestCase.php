@@ -22,7 +22,7 @@ abstract class WorkflowTestCase extends WebTestCase
     {
         self::setConfigLoadDirectory($directory);
 
-        return self::runCommand(LoadWorkflowDefinitionsCommand::NAME, [], true, true);
+        return self::runCommand(LoadWorkflowDefinitionsCommand::getDefaultName(), [], true, true);
     }
 
     /**

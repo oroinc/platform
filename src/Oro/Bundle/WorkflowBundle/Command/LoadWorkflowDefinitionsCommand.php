@@ -4,24 +4,62 @@ namespace Oro\Bundle\WorkflowBundle\Command;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
-class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
+/**
+ * Load workflow definitions from configuration files to the database
+ */
+class LoadWorkflowDefinitionsCommand extends Command
 {
-    const NAME = 'oro:workflow:definitions:load';
+    /** @var string */
+    protected static $defaultName = 'oro:workflow:definitions:load';
+
+    /** @var WorkflowConfigurationProvider */
+    private $configurationProvider;
+
+    /** @var WorkflowDefinitionHandler */
+    private $definitionHandler;
+
+    /** @var WorkflowDefinitionConfigurationBuilder */
+    private $configurationBuilder;
+
+    /** @var ManagerRegistry */
+    private $registry;
+
+    /**
+     * @param WorkflowConfigurationProvider $configurationProvider
+     * @param WorkflowDefinitionHandler $definitionHandler
+     * @param WorkflowDefinitionConfigurationBuilder $configurationBuilder
+     * @param ManagerRegistry $registry
+     */
+    public function __construct(
+        WorkflowConfigurationProvider $configurationProvider,
+        WorkflowDefinitionHandler $definitionHandler,
+        WorkflowDefinitionConfigurationBuilder $configurationBuilder,
+        ManagerRegistry $registry
+    ) {
+        parent::__construct();
+
+        $this->configurationProvider = $configurationProvider;
+        $this->definitionHandler = $definitionHandler;
+        $this->configurationBuilder = $configurationBuilder;
+        $this->registry = $registry;
+    }
 
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName(self::NAME)
+        $this
             ->setDescription('Load workflow definitions from configuration files to the database')
             ->addOption(
                 'directories',
@@ -42,31 +80,20 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $usedDirectories = $input->getOption('directories');
-        $usedDirectories = $usedDirectories ?: null;
+        $usedDirectories = $input->getOption('directories') ?: null;
+        $usedWorkflows = $input->getOption('workflows') ?: null;
 
-        $usedWorkflows = $input->getOption('workflows');
-        $usedWorkflows = $usedWorkflows ?: null;
-
-        $container = $this->getContainer();
-
-        /** @var WorkflowConfigurationProvider $configurationProvider */
-        $configurationProvider = $container->get('oro_workflow.configuration.provider.workflow_config');
-        $workflowConfiguration = $configurationProvider->getWorkflowDefinitionConfiguration(
+        $workflowConfiguration = $this->configurationProvider->getWorkflowDefinitionConfiguration(
             $usedDirectories,
             $usedWorkflows
         );
-        /** @var WorkflowDefinitionHandler $definitionHandler */
-        $definitionHandler = $container->get('oro_workflow.handler.workflow_definition');
 
         if ($workflowConfiguration) {
             $output->writeln('Loading workflow definitions...');
 
-            /** @var WorkflowDefinitionConfigurationBuilder $configurationBuilder */
-            $configurationBuilder = $container->get('oro_workflow.configuration.builder.workflow_definition');
-            $workflowDefinitionRepository = $container->get('oro_entity.doctrine_helper')
-                ->getEntityRepository(WorkflowDefinition::class);
-            $workflowDefinitions = $configurationBuilder->buildFromConfiguration($workflowConfiguration);
+            /** @var WorkflowDefinitionRepository $workflowDefinitionRepository */
+            $workflowDefinitionRepository = $this->registry->getRepository(WorkflowDefinition::class);
+            $workflowDefinitions = $this->configurationBuilder->buildFromConfiguration($workflowConfiguration);
 
             foreach ($workflowDefinitions as $workflowDefinition) {
                 $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $workflowDefinition->getName()));
@@ -74,12 +101,16 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
                 // all loaded workflows set as system by default
                 $workflowDefinition->setSystem(true);
 
+                /** @var WorkflowDefinition $existingWorkflowDefinition */
                 $existingWorkflowDefinition = $workflowDefinitionRepository->find($workflowDefinition->getName());
 
                 if ($existingWorkflowDefinition) {
-                    $definitionHandler->updateWorkflowDefinition($existingWorkflowDefinition, $workflowDefinition);
+                    $this->definitionHandler->updateWorkflowDefinition(
+                        $existingWorkflowDefinition,
+                        $workflowDefinition
+                    );
                 } else {
-                    $definitionHandler->createWorkflowDefinition($workflowDefinition);
+                    $this->definitionHandler->createWorkflowDefinition($workflowDefinition);
                 }
 
                 $output->writeln(

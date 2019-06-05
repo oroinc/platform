@@ -9,11 +9,15 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\AbstractSorterExtension;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration;
 use Oro\Bundle\DataGridBundle\Provider\State\SortersStateProvider;
+use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 
 abstract class AbstractSorterExtensionTestCase extends \PHPUnit\Framework\TestCase
 {
     /** @var SortersStateProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $sortersStateProvider;
+
+    /** @var SystemAwareResolver|\PHPUnit\Framework\MockObject\MockObject **/
+    protected $resolver;
 
     /** @var AbstractSorterExtension */
     protected $extension;
@@ -21,6 +25,7 @@ abstract class AbstractSorterExtensionTestCase extends \PHPUnit\Framework\TestCa
     public function setUp()
     {
         $this->sortersStateProvider = $this->createMock(SortersStateProvider::class);
+        $this->resolver = $this->createMock(SystemAwareResolver::class);
     }
 
     /**
@@ -345,5 +350,12 @@ abstract class AbstractSorterExtensionTestCase extends \PHPUnit\Framework\TestCa
                 'expectedMessage' => 'Could not found column(s) "unknown" for sorting',
             ],
         ];
+    }
+
+    protected function configureResolver()
+    {
+        $this->resolver->expects($this->any())
+            ->method('resolve')
+            ->willReturnArgument(1);
     }
 }

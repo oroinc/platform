@@ -82,7 +82,8 @@ services:
     oro_workflow.entity_listener.workflow_definition:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionEntityListener'
         arguments:
-            - '@service_container'
+            - '@oro_workflow.cache.entities_with_workflow'
+            - '@oro_workflow.registry.system'
         tags:
             - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: prePersist }
             - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: preUpdate }

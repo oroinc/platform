@@ -6,19 +6,15 @@ use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
+ * Controller provide information about installed packages
+ *
  * @Route("/platform")
  */
-class PlatformController extends Controller
+class PlatformController extends AbstractController
 {
-    /** @deprecated since 1.10 */
-    const ORO_NAMESPACE = PackageProvider::ORO_NAMESPACE;
-
-    /** @deprecated since 1.10 */
-    const NAMESPACE_DELIMITER = PackageProvider::NAMESPACE_DELIMITER;
-
     /**
      * @Route("/information", name="oro_platform_system_info")
      * @Template()
@@ -32,11 +28,21 @@ class PlatformController extends Controller
      */
     public function systemInfoAction()
     {
-        $packageProvider = $this->get('oro_platform.provider.package');
+        $packageProvider = $this->get(PackageProvider::class);
 
         return [
             'thirdPartyPackages' => $packageProvider->getThirdPartyPackages(),
             'oroPackages' => $packageProvider->getOroPackages(),
         ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            PackageProvider::class,
+        ]);
     }
 }

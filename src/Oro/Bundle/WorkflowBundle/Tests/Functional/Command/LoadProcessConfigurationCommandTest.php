@@ -35,7 +35,7 @@ class LoadProcessConfigurationCommandTest extends WebTestCase
         $definitionsBefore = $this->getRepository('OroWorkflowBundle:ProcessDefinition')->findAll();
         $triggersBefore = $this->getRepository('OroWorkflowBundle:ProcessTrigger')->findAll();
 
-        $result = $this->runCommand(LoadProcessConfigurationCommand::NAME);
+        $result = $this->runCommand(LoadProcessConfigurationCommand::getDefaultName());
 
         $this->assertNotEmpty($result);
         foreach ($expectedMessages as $message) {

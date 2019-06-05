@@ -64,7 +64,9 @@
 
             display: block;
 
-            overflow: hidden;
+            // workaround of `overflow: hidden;` to overcome issue in Safari
+            // https://bugs.webkit.org/show_bug.cgi?id=160953
+            clip: rect(-100vh, auto, 100vh, 0);
 
             .grid-header-row {
                 display: block;

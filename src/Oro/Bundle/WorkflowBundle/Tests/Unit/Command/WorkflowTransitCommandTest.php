@@ -10,17 +10,12 @@ use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use Symfony\Component\Console\Input\Input;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Console\Input\InputInterface;
 
 class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = 'OroWorkflowBundle:WorkflowItem';
-
     /** @var WorkflowTransitCommand */
     private $command;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     private $managerRegistry;
@@ -39,41 +34,25 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->repo = $this->createMock(EntityRepository::class);
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
-        $em->expects($this->any())
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->managerRegistry->expects($this->any())
             ->method('getRepository')
-            ->with(self::CLASS_NAME)
+            ->with(WorkflowItem::class)
             ->willReturn($this->repo);
 
-        $this->managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->managerRegistry->expects($this->any())
-            ->method('getManagerForClass')
-            ->with(self::CLASS_NAME)
-            ->willReturn($em);
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
 
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $this->command = new WorkflowTransitCommand($this->managerRegistry, $this->workflowManager);
 
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->command = new WorkflowTransitCommand();
-        $this->command->setContainer($this->container);
-
-        $this->input = $this->getMockForAbstractClass('Symfony\Component\Console\Input\InputInterface');
+        $this->input = $this->createMock(InputInterface::class);
         $this->output = new OutputStub();
     }
 
     protected function tearDown()
     {
         unset(
-            $this->container,
             $this->repo,
             $this->workflowManager,
             $this->managerRegistry,
@@ -106,7 +85,6 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
         \Exception $exception = null,
         \Exception $expectedException = null
     ) {
-        $this->expectContainerGetManagerRegistryAndWorkflowManager();
         $this->input->expects($this->exactly(2))
             ->method('getOption')
             ->willReturnMap([
@@ -217,21 +195,6 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
                 'exception' => new ForbiddenTransitionException('Transition "transit" is not allowed.'),
             ],
         ];
-    }
-
-    protected function expectContainerGetManagerRegistryAndWorkflowManager()
-    {
-        $this->container->expects($this->any())
-            ->method('getParameter')
-            ->with('oro_workflow.entity.workflow_item.class')
-            ->willReturn(self::CLASS_NAME);
-
-        $this->container->expects($this->any())
-            ->method('get')
-            ->willReturnMap([
-                ['oro_workflow.manager', 1, $this->workflowManager],
-                ['doctrine', 1, $this->managerRegistry],
-            ]);
     }
 
     /**

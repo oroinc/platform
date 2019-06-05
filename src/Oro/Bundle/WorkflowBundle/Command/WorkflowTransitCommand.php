@@ -2,26 +2,47 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class WorkflowTransitCommand extends ContainerAwareCommand
+/**
+ * Execute transition of workflow
+ */
+class WorkflowTransitCommand extends Command
 {
-    const NAME = 'oro:workflow:transit';
+    /** @var string */
+    protected static $defaultName = 'oro:workflow:transit';
+
+    /** @var ManagerRegistry */
+    private $registry;
+
+    /** @var WorkflowManager */
+    private $workflowManager;
+
+    /**
+     * @param ManagerRegistry $managerRegistry
+     * @param WorkflowManager $workflowManager
+     */
+    public function __construct(ManagerRegistry $managerRegistry, WorkflowManager $workflowManager)
+    {
+        parent::__construct();
+
+        $this->registry = $managerRegistry;
+        $this->workflowManager = $workflowManager;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
-        $this->setName(self::NAME)
-            ->setDescription('Execute transition of workflow')
+        $this->setDescription('Execute transition of workflow')
             ->addOption(
                 'workflow-item',
                 null,
@@ -54,7 +75,7 @@ class WorkflowTransitCommand extends ContainerAwareCommand
             }
 
             /** @var WorkflowItem $workflowItem */
-            $workflowItem = $this->getRepository()->find($workflowItemId);
+            $workflowItem = $this->registry->getRepository(WorkflowItem::class)->find($workflowItemId);
             if (!$workflowItem) {
                 throw new \RuntimeException('Workflow Item not found');
             }
@@ -63,12 +84,9 @@ class WorkflowTransitCommand extends ContainerAwareCommand
             throw $e;
         }
 
-        /** @var WorkflowManager $workflowManager */
-        $workflowManager = $this->getContainer()->get('oro_workflow.manager');
-
         $output->writeln('<info>Start transition...</info>');
         try {
-            $workflowManager->transit($workflowItem, $transitionName);
+            $this->workflowManager->transit($workflowItem, $transitionName);
             $output->writeln(
                 sprintf(
                     '<info>Workflow Item #%s transition #%s successfully finished</info>',
@@ -93,18 +111,5 @@ class WorkflowTransitCommand extends ContainerAwareCommand
 
             throw $e;
         }
-    }
-
-    /**
-     * @return ObjectRepository
-     */
-    protected function getRepository()
-    {
-        $className = $this->getContainer()->getParameter('oro_workflow.entity.workflow_item.class');
-
-        return $this->getContainer()
-            ->get('doctrine')
-            ->getManagerForClass($className)
-            ->getRepository($className);
     }
 }

@@ -87,11 +87,16 @@ class PopulateLocalizedFallbackCollectionMigrationQuery extends ParametrizedMigr
             $this->connection->executeQuery($localizedValueQuery, $params, $types);
         }
 
-        $params = ['id' => $id, 'valueId' => $this->connection->lastInsertId(
-            $this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform
-                ? 'oro_fallback_localization_val_id_seq'
-                : null
-        )];
+        $valueId = null;
+        if (!$dryRun) {
+            $valueId = $this->connection->lastInsertId(
+                $this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform
+                    ? 'oro_fallback_localization_val_id_seq'
+                    : null
+            );
+        }
+
+        $params = ['id' => $id, 'valueId' => $valueId];
         $types = ['id' => Type::INTEGER, 'valueId' => Type::INTEGER ];
 
         $this->logQuery($logger, $this->insertQuery, $params, $types);
