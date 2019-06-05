@@ -51,17 +51,23 @@ services:
         public: false
         class: Oro\Bundle\DataGridBundle\Extension\Pager\ArrayDatasource\ArrayPager
 
-    oro_datagrid.extension.orm_sorter:
-        class: '%oro_datagrid.extension.orm_sorter.class%'
+    oro_datagrid.extension.sorter.abstract:
+        class: Oro\Bundle\DataGridBundle\Extension\Sorter\AbstractSorterExtension
+        abstract: true
         arguments:
             - '@oro_datagrid.provider.state.sorters'
+        calls:
+            - [setSystemAwareResolver, ['@oro_datagrid.provider.resolver']]
+
+    oro_datagrid.extension.orm_sorter:
+        class: '%oro_datagrid.extension.orm_sorter.class%'
+        parent: oro_datagrid.extension.sorter.abstract
         tags:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.array_sorter:
         class: Oro\Bundle\DataGridBundle\Extension\Sorter\ArraySorterExtension
-        arguments:
-            - '@oro_datagrid.provider.state.sorters'
+        parent: oro_datagrid.extension.sorter.abstract
         tags:
             - { name: oro_datagrid.extension }
 

@@ -14,7 +14,7 @@ class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
     /** @var ArraySorterExtension */
     protected $extension;
 
-    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $config **/
+    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject **/
     protected $config;
 
     /** @var  ArrayDatasource */
@@ -51,6 +51,9 @@ class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
         $this->arrayDatasource->setArraySource($this->arraySource);
         $this->extension = new ArraySorterExtension($this->sortersStateProvider);
         $this->extension->setParameters(new ParameterBag());
+        $this->extension->setSystemAwareResolver(
+            $this->resolver
+        );
     }
 
     public function testIsApplicableWithArrayDatasource()
@@ -84,6 +87,7 @@ class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
      */
     public function testVisitDatasource(array $sorter, array $state, array $expectedData)
     {
+        $this->configureResolver();
         $this->config->expects($this->at(0))->method('offsetGetByPath')
             ->with(Configuration::COLUMNS_PATH)->willReturn($sorter);
 
@@ -99,6 +103,7 @@ class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
     /** @expectedException \Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException */
     public function testVisitDatasourceWithWrongDatasourceType()
     {
+        $this->configureResolver();
         $this->config->expects($this->at(0))->method('offsetGetByPath')
             ->with(Configuration::COLUMNS_PATH)
             ->willReturn(['priceListName' => ['data_name' => 'priceListName']]);
