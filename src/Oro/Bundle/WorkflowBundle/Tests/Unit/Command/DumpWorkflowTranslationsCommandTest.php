@@ -9,14 +9,10 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class DumpWorkflowTranslationsCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
-
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowManager;
 
@@ -50,19 +46,13 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit\Framework\TestCase
 
         $this->workflowTranslationHelper = $this->createMock(WorkflowTranslationHelper::class);
 
-        $this->container = $this->createMock(ContainerInterface::class);
-        $this->container->expects($this->any())
-            ->method('get')
-            ->will($this->returnValueMap([
-                ['oro_workflow.manager', 1, $this->workflowManager],
-                ['oro_workflow.helper.translation', 1, $this->workflowTranslationHelper],
-            ]));
-
         $this->input = $this->createMock(InputInterface::class);
         $this->output = $this->createMock(OutputInterface::class);
 
-        $this->command = new DumpWorkflowTranslationsCommand();
-        $this->command->setContainer($this->container);
+        $this->command = new DumpWorkflowTranslationsCommand(
+            $this->workflowManager,
+            $this->workflowTranslationHelper
+        );
     }
 
     /**
@@ -73,7 +63,6 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit\Framework\TestCase
         unset(
             $this->workflowManager,
             $this->workfow,
-            $this->container,
             $this->input,
             $this->output,
             $this->command,
@@ -83,7 +72,7 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testGetName()
     {
-        $this->assertEquals(DumpWorkflowTranslationsCommand::NAME, $this->command->getName());
+        $this->assertEquals(DumpWorkflowTranslationsCommand::getDefaultName(), $this->command->getName());
     }
 
     public function testConfigure()

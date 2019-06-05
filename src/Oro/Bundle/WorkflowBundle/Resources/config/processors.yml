@@ -43,3 +43,5 @@ services:
         tags:
             - { name: monolog.logger, channel: oro_workflow.processor }
 
+    Oro\Bundle\WorkflowBundle\Processor\TransitActionProcessor:
+        alias: oro_workflow.transit.action_processor
