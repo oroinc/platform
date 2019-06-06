@@ -5,8 +5,19 @@ namespace Oro\Bundle\FormBundle\Twig;
 use Oro\Bundle\FormBundle\Form\Twig\DataBlockRenderer;
 use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\Template;
+use Twig\TwigFunction;
 
-class FormExtension extends \Twig_Extension
+/**
+ * Provides Twig functions for form rendering:
+ *   - form_data_blocks
+ *   - oro_form_js_validation
+ *   - form_javascript
+ *   - form_stylesheet
+ */
+class FormExtension extends AbstractExtension
 {
     const DEFAULT_TEMPLATE = 'OroFormBundle:Form:fields.html.twig';
     const BLOCK_NAME       = 'oro_form_js_validation';
@@ -55,22 +66,22 @@ class FormExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'form_data_blocks',
                 [$this, 'renderFormDataBlocks'],
                 ['needs_context' => true, 'needs_environment' => true]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_form_js_validation',
                 [$this, 'renderFormJsValidationBlock'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'form_javascript',
                 [$this, 'renderJavascript'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'form_stylesheet',
                 null,
                 [
@@ -82,14 +93,14 @@ class FormExtension extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $env
+     * @param Environment       $env
      * @param array             $context
      * @param FormView          $form
      * @param string            $formVariableName
      *
      * @return array
      */
-    public function renderFormDataBlocks(\Twig_Environment $env, $context, FormView $form, $formVariableName = 'form')
+    public function renderFormDataBlocks(Environment $env, $context, FormView $form, $formVariableName = 'form')
     {
         return $this->getDataBlockRenderer()->render($env, $context, $form, $formVariableName);
     }
@@ -97,20 +108,20 @@ class FormExtension extends \Twig_Extension
     /**
      * Renders "oro_form_js_validation" block with init script for JS validation of form.
      *
-     * @param \Twig_Environment $environment
+     * @param Environment       $environment
      * @param FormView          $view
      * @param array             $options
      *
      * @return string
      * @throws \RuntimeException
      */
-    public function renderFormJsValidationBlock(\Twig_Environment $environment, FormView $view, $options = [])
+    public function renderFormJsValidationBlock(Environment $environment, FormView $view, $options = [])
     {
         $options = array_merge($this->defaultOptions, $options);
 
-        /** @var \Twig_Template $template */
+        /** @var Template $template */
         $template = $environment->loadTemplate($this->templateName);
-        if (!$template->hasBlock(self::BLOCK_NAME)) {
+        if (!$template->hasBlock(self::BLOCK_NAME, [])) {
             throw new \RuntimeException(
                 sprintf('Block "%s" is not found in template "%s".', self::BLOCK_NAME, $this->templateName)
             );

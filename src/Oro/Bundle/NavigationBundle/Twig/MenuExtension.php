@@ -8,11 +8,16 @@ use Knp\Menu\Twig\Helper;
 use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * Twig extension for menu & breadcrumbs rendering.
+ * Provides Twig functions to render menus and breadcrumbs:
+ *   - oro_menu_render
+ *   - oro_breadcrumbs
  */
-class MenuExtension extends \Twig_Extension
+class MenuExtension extends AbstractExtension
 {
     const MENU_NAME = 'oro_menu';
 
@@ -67,13 +72,13 @@ class MenuExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_menu_render',
                 [$this, 'render'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction('oro_menu_get', [$this, 'getMenu']),
-            new \Twig_SimpleFunction(
+            new TwigFunction('oro_menu_get', [$this, 'getMenu']),
+            new TwigFunction(
                 'oro_breadcrumbs',
                 [$this, 'renderBreadCrumbs'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
@@ -153,12 +158,12 @@ class MenuExtension extends \Twig_Extension
     /**
      * Render breadcrumbs for menu
      *
-     * @param \Twig_Environment $environment
+     * @param Environment $environment
      * @param string $menuName
      * @param bool $useDecorators
      * @return null|string
      */
-    public function renderBreadCrumbs(\Twig_Environment $environment, $menuName, $useDecorators = true)
+    public function renderBreadCrumbs(Environment $environment, $menuName, $useDecorators = true)
     {
         $breadcrumbs = $this->getBreadcrumbManager()->getBreadcrumbs($menuName, $useDecorators);
         if ($breadcrumbs) {

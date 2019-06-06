@@ -6,6 +6,8 @@
 {% set displaySQL = oro_config_value('oro_report.display_sql_query') and isDesktopVersion() %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if isDesktopVersion() and is_granted('EDIT', entity) %}
         {{ UI.editButton({
             'path': path('oro_report_update', {'id': entity.id}),
@@ -49,6 +51,8 @@
 {% endblock %}
 
 {% block content_data %}
+    {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+
     {% if gridName is defined %}
         {% if chartView is defined %}
             <div class="chart-wrapper">

@@ -14,6 +14,7 @@ use Oro\Bundle\WorkflowBundle\Processor\Transition\Template\CustomFormTemplateRe
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
 /**
  * Suppressing for stubs and mock classes
@@ -21,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \Twig_Environment|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
     protected $twig;
 
     /** @var FormTemplateDataProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
@@ -32,7 +33,7 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
 
     protected function setUp()
     {
-        $this->twig = $this->createMock(\Twig_Environment::class);
+        $this->twig = $this->createMock(Environment::class);
         $this->templateDataProviderRegistry = $this->createMock(FormTemplateDataProviderRegistry::class);
 
         $this->processor = new CustomFormTemplateResponseProcessor(

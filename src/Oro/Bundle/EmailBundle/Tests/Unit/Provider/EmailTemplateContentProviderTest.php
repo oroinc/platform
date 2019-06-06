@@ -15,6 +15,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
+use Twig\Error\Error;
 
 class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -53,8 +54,7 @@ class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->emailRenderer = $this->createMock(EmailRenderer::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->provider = new EmailTemplateContentProvider($this->doctrineHelper, $this->emailRenderer);
-        $this->provider->setLogger($this->logger);
+        $this->provider = new EmailTemplateContentProvider($this->doctrineHelper, $this->emailRenderer, $this->logger);
     }
 
     public function testGetTemplateContentWhenEmailTemplateIsNotFound(): void
@@ -101,7 +101,7 @@ class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
         $this->logger
             ->expects($this->once())
             ->method('error')
-            ->with('Could not find unique email template for the given criteria');
+            ->with('Could not find unique email template for the given criteria.');
 
         $this->expectException(EmailTemplateNotFoundException::class);
         $this->provider->getTemplateContent($criteria, self::LANGUAGE, self::TEMPLATE_PARAMS);
@@ -136,7 +136,7 @@ class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
             ->method('error')
             ->with($this->matchesRegularExpression('/Rendering of email template .* failed/'));
 
-        $twigException = new \Twig_Error('Some error');
+        $twigException = new Error('Some error');
         $this->emailRenderer
             ->expects($this->once())
             ->method('compileMessage')

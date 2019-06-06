@@ -4,6 +4,8 @@
 {% set pageTitle = 'oro.notification.emailnotification.entity_plural_label'|trans %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if is_granted('oro_notification_emailnotification_create') %}
         {{ UI.addButton({
             'path' : path('oro_notification_emailnotification_create'),

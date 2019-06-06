@@ -2,7 +2,16 @@
 
 namespace Oro\Bundle\SearchBundle\Twig;
 
-class OroSearchExtension extends \Twig_Extension
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+
+/**
+ * Provides Twig filters for substring highlighting in some text (e.g. in search results):
+ *   - highlight
+ *   - trim_string
+ *   - highlight_trim
+ */
+class OroSearchExtension extends AbstractExtension
 {
     /**
      * {@inheritdoc}
@@ -10,9 +19,9 @@ class OroSearchExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('highlight', [$this, 'highlight']),
-            new \Twig_SimpleFilter('trim_string', [$this, 'trimByString']),
-            new \Twig_SimpleFilter('highlight_trim', [$this, 'highlightTrim']),
+            new TwigFilter('highlight', [$this, 'highlight']),
+            new TwigFilter('trim_string', [$this, 'trimByString']),
+            new TwigFilter('highlight_trim', [$this, 'highlightTrim']),
         ];
     }
 

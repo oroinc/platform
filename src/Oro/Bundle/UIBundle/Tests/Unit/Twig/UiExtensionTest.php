@@ -14,6 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Twig\Environment;
 use Twig\Template;
 
 class UiExtensionTest extends \PHPUnit\Framework\TestCase
@@ -40,7 +41,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->environment = $this->createMock(\Twig_Environment::class);
+        $this->environment = $this->createMock(Environment::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->requestStack = $this->getMockBuilder(RequestStack::class)
             ->disableOriginalConstructor()

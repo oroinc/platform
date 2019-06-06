@@ -12,7 +12,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Twig\Environment;
-use Twig\Loader\LoaderInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -36,16 +35,12 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var TestAttachment */
     private $attachment;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoaderInterface */
-    private $loader;
-
     public function setUp()
     {
         $this->manager = $this->createMock(AttachmentManager::class);
         $this->attachmentConfigProvider = $this->createMock(ConfigProvider::class);
         $configManager = $this->createMock(ConfigManager::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
-        $this->loader = $this->createMock(LoaderInterface::class);
 
         $configManager->expects($this->any())
             ->method('getProvider')
@@ -123,7 +118,7 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
         $this->attachment->setFilename('test.doc');
         $environment = $this->createMock(Environment::class);
 
-        $template = new TestTemplate(new Environment($this->loader));
+        $template = new TestTemplate(new Environment($this->getLoader()));
         $environment->expects($this->once())
             ->method('loadTemplate')
             ->willReturn($template);
@@ -160,7 +155,7 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
         $this->attachment->setFilename('test.doc');
         $environment = $this->createMock(Environment::class);
 
-        $template = new TestTemplate(new Environment($this->loader));
+        $template = new TestTemplate(new Environment($this->getLoader()));
         $environment->expects($this->once())
             ->method('loadTemplate')
             ->willReturn($template);
@@ -181,7 +176,7 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
         $this->attachment->setFilename('test.doc');
         $environment = $this->createMock(Environment::class);
 
-        $template = new TestTemplate(new Environment($this->loader));
+        $template = new TestTemplate(new Environment($this->getLoader()));
         $environment->expects($this->once())
             ->method('loadTemplate')
             ->willReturn($template);
@@ -289,7 +284,7 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
 
         $environment = $this->createMock(Environment::class);
 
-        $template = new TestTemplate(new Environment($this->loader));
+        $template = new TestTemplate(new Environment($this->getLoader()));
         $environment->expects($this->once())
             ->method('loadTemplate')
             ->willReturn($template);

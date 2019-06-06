@@ -17,6 +17,8 @@
                             {% placeholder dashboard_navButtons_before %}
 
                             {% block navButtons %}
+                                {% import 'OroUIBundle::macros.html.twig' as UI %}
+
                                 {% if dashboards|length > 1 %}
                                     {% import 'OroUIBundle::macros.html.twig' as UI %}
 

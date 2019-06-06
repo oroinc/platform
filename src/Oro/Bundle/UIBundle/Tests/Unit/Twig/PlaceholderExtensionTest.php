@@ -8,6 +8,7 @@ use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
+use Twig\Environment;
 
 class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -54,7 +55,7 @@ class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->environment = $this->createMock(\Twig_Environment::class);
+        $this->environment = $this->createMock(Environment::class);
         $this->placeholderProvider = $this->getMockBuilder(PlaceholderProvider::class)
             ->disableOriginalConstructor()
             ->getMock();

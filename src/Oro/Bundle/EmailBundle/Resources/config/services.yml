@@ -487,7 +487,7 @@ services:
             - true # use sandbox globally in instance
 
     oro_email.twig.string_loader:
-        class: Twig_Loader_String
+        class: Twig\Loader\ArrayLoader
         public: false
 
     oro_email.twig.email_environment:
@@ -1354,6 +1354,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_email.email_renderer'
+            - '@logger'
 
     oro_email.provider.url_provider:
         class: 'Oro\Bundle\EmailBundle\Provider\UrlProvider'

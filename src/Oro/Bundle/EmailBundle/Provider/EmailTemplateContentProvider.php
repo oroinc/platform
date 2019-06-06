@@ -11,16 +11,14 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
+use Twig\Error\Error as TwigError;
 
 /**
  * Provides compiled email template information ready to be sent via email.
  */
-class EmailTemplateContentProvider implements LoggerAwareInterface
+class EmailTemplateContentProvider
 {
-    use LoggerAwareTrait;
-
     /**
      * @var DoctrineHelper
      */
@@ -32,13 +30,23 @@ class EmailTemplateContentProvider implements LoggerAwareInterface
     private $emailRenderer;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param DoctrineHelper $doctrineHelper
      * @param EmailRenderer $emailRenderer
+     * @param LoggerInterface $logger
      */
-    public function __construct(DoctrineHelper $doctrineHelper, EmailRenderer $emailRenderer)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        EmailRenderer $emailRenderer,
+        LoggerInterface $logger
+    ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->emailRenderer = $emailRenderer;
+        $this->logger = $logger;
     }
 
     /**
@@ -57,15 +65,19 @@ class EmailTemplateContentProvider implements LoggerAwareInterface
         $emailTemplate = $this->loadEmailTemplate($criteria, $language);
 
         try {
-            [$subject, $content] = $this->emailRenderer->compileMessage($emailTemplate, $params);
-        } catch (\Twig_Error $exception) {
-            $this->logError(
+            list($subject, $content) = $this->emailRenderer->compileMessage($emailTemplate, $params);
+        } catch (TwigError $exception) {
+            $this->logger->error(
                 sprintf(
                     'Rendering of email template "%s" failed. %s',
-                    $emailTemplate->getSubject(),
+                    $emailTemplate->getName(),
                     $exception->getMessage()
                 ),
-                ['exception' => $exception]
+                [
+                    'locale' => $emailTemplate->getLocale(),
+                    'entity_name' => $emailTemplate->getEntityName(),
+                    'exception' => $exception,
+                ]
             );
 
             throw new EmailTemplateCompilationException($criteria);
@@ -92,19 +104,6 @@ class EmailTemplateContentProvider implements LoggerAwareInterface
     }
 
     /**
-     * @param string $message
-     * @param array $params
-     */
-    private function logError(string $message, array $params = []): void
-    {
-        if (!$this->logger) {
-            return;
-        }
-
-        $this->logger->error($message, $params);
-    }
-
-    /**
      * @param EmailTemplateCriteria $criteria
      * @param string $language
      * @return EmailTemplate
@@ -117,9 +116,14 @@ class EmailTemplateContentProvider implements LoggerAwareInterface
         try {
             $emailTemplate = $emailTemplateRepository->findOneLocalized($criteria, $language);
         } catch (NonUniqueResultException $exception) {
-            $this->logError(
-                'Could not find unique email template for the given criteria',
-                ['exception' => $exception, 'criteria' => $criteria]
+            $this->logger->error(
+                'Could not find unique email template for the given criteria.',
+                [
+                    'name' => $criteria->getName(),
+                    'entity_name' => $criteria->getEntityName(),
+                    'language' => $language,
+                    'exception' => $exception,
+                ]
             );
             // If we have non unique result exception it can be treated similar to not found email template
             $emailTemplate = null;

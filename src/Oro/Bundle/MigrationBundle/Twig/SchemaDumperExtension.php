@@ -6,8 +6,14 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class SchemaDumperExtension extends \Twig_Extension
+/**
+ * Provides a Twig function used in generator of data migration classes:
+ *   - oro_migration_get_schema_column_options
+ */
+class SchemaDumperExtension extends AbstractExtension
 {
     /** @var ManagerRegistry */
     protected $doctrine;
@@ -55,7 +61,7 @@ class SchemaDumperExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_migration_get_schema_column_options', [$this, 'getColumnOptions']),
+            new TwigFunction('oro_migration_get_schema_column_options', [$this, 'getColumnOptions']),
         ];
     }
 

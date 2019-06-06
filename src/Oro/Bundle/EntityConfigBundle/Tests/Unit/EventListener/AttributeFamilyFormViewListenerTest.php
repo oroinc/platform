@@ -7,6 +7,7 @@ use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -16,7 +17,7 @@ class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
     protected $translator;
 
     /**
-     * @var \Twig_Environment|\PHPUnit\Framework\MockObject\MockObject
+     * @var Environment|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $environment;
 
@@ -39,7 +40,7 @@ class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->environment = $this->createMock(\Twig_Environment::class);
+        $this->environment = $this->createMock(Environment::class);
 
         $this->listener = new AttributeFamilyFormViewListener($this->translator);
     }

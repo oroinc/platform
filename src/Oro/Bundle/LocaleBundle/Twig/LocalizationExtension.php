@@ -8,11 +8,18 @@ use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
 /**
- * Localization related twig filters
+ * Provides Twig filters to format language and locale codes, and to retrieve the value in the specified localization
+ * from a localized value holder:
+ *   - oro_language_code_title
+ *   - oro_locale_code_title
+ *   - oro_formatting_code_title
+ *   - localized_value
  */
-class LocalizationExtension extends \Twig_Extension
+class LocalizationExtension extends AbstractExtension
 {
     const NAME = 'oro_locale_localization';
 
@@ -57,19 +64,19 @@ class LocalizationExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_language_code_title',
                 [$this, 'getLanguageTitleByCode']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_locale_code_title',
                 [$this, 'formatLocale']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_formatting_code_title',
                 [$this, 'getFormattingTitleByCode']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'localized_value',
                 [$this, 'getLocalizedValue'],
                 ['is_safe' => ['html']]

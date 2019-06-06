@@ -11,8 +11,22 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class DataGridExtension extends \Twig_Extension
+/**
+ * Provides Twig functions for datagrid rendering:
+ *   - oro_datagrid_build
+ *   - oro_datagrid_data
+ *   - oro_datagrid_metadata
+ *   - oro_datagrid_generate_element_id
+ *   - oro_datagrid_build_fullname
+ *   - oro_datagrid_build_inputname
+ *   - oro_datagrid_link
+ *   - oro_datagrid_column_attributes
+ *   - oro_datagrid_get_page_url
+ */
+class DataGridExtension extends AbstractExtension
 {
     const ROUTE = 'oro_datagrid_index';
 
@@ -97,15 +111,15 @@ class DataGridExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_datagrid_build', [$this, 'getGrid']),
-            new \Twig_SimpleFunction('oro_datagrid_data', [$this, 'getGridData']),
-            new \Twig_SimpleFunction('oro_datagrid_metadata', [$this, 'getGridMetadata']),
-            new \Twig_SimpleFunction('oro_datagrid_generate_element_id', [$this, 'generateGridElementId']),
-            new \Twig_SimpleFunction('oro_datagrid_build_fullname', [$this, 'buildGridFullName']),
-            new \Twig_SimpleFunction('oro_datagrid_build_inputname', [$this, 'buildGridInputName']),
-            new \Twig_SimpleFunction('oro_datagrid_link', [$this, 'generateGridUrl']),
-            new \Twig_SimpleFunction('oro_datagrid_column_attributes', [$this, 'getColumnAttributes']),
-            new \Twig_SimpleFunction('oro_datagrid_get_page_url', [$this, 'getPageUrl']),
+            new TwigFunction('oro_datagrid_build', [$this, 'getGrid']),
+            new TwigFunction('oro_datagrid_data', [$this, 'getGridData']),
+            new TwigFunction('oro_datagrid_metadata', [$this, 'getGridMetadata']),
+            new TwigFunction('oro_datagrid_generate_element_id', [$this, 'generateGridElementId']),
+            new TwigFunction('oro_datagrid_build_fullname', [$this, 'buildGridFullName']),
+            new TwigFunction('oro_datagrid_build_inputname', [$this, 'buildGridInputName']),
+            new TwigFunction('oro_datagrid_link', [$this, 'generateGridUrl']),
+            new TwigFunction('oro_datagrid_column_attributes', [$this, 'getColumnAttributes']),
+            new TwigFunction('oro_datagrid_get_page_url', [$this, 'getPageUrl']),
         ];
     }
 

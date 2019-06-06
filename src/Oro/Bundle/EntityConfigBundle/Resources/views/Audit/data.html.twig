@@ -10,7 +10,7 @@
             {% elseif items[key]['options']['label'] is defined %}
                 {% set label = items[key]['options']['label'] %}
             {% else %}
-                {% set label = key|capitalize|replace('_',' ') %}
+                {% set label = key|capitalize|replace({'_':' '}) %}
             {% endif %}
 
             {% if ('.entity_'~key not in data[1]|trans) %}

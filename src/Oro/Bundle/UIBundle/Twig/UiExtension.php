@@ -15,16 +15,41 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
+use Twig\Environment as TwigEnvironment;
+use Twig\Extension\AbstractExtension;
+use Twig\Template;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 /**
- * The extension adds:
- *  - common php functions as twig filters (uniqid, ceil, floor)
- *  - isMobileVersion and isDesktopVersion functions
- *  - series of processors for HTML (oro_form_process, oro_widget_render and other)
+ * Provides Twig functions for miscellaneous HTML processing tasks:
+ *   - oro_ui_scroll_data_before
+ *   - render_block
+ *   - oro_widget_render
+ *   - oro_form_process
+ *   - oro_view_process
+ *   - oro_get_content
+ *   - isMobileVersion
+ *   - isDesktopVersion
+ *   - oro_url_add_query
+ *   - oro_is_url_local
+ *   - skype_button
+ *
+ * Provides Twig filters that expose some common PHP functions:
+ *   - oro_js_template_content
+ *   - merge_recursive
+ *   - uniqid
+ *   - floor
+ *   - ceil
+ *   - oro_preg_replace
+ *   - oro_sort_by
+ *
+ * Provides a Twig tag to work with placeholders:
+ *   - placeholder
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class UiExtension extends \Twig_Extension
+class UiExtension extends AbstractExtension
 {
     const SKYPE_BUTTON_TEMPLATE = 'OroUIBundle::skype_button.html.twig';
 
@@ -102,16 +127,16 @@ class UiExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('oro_js_template_content', [$this, 'prepareJsTemplateContent']),
-            new \Twig_SimpleFilter(
+            new TwigFilter('oro_js_template_content', [$this, 'prepareJsTemplateContent']),
+            new TwigFilter(
                 'merge_recursive',
                 ['Oro\Component\PhpUtils\ArrayUtil', 'arrayMergeRecursiveDistinct']
             ),
-            new \Twig_SimpleFilter('uniqid', 'uniqid'),
-            new \Twig_SimpleFilter('floor', 'floor'),
-            new \Twig_SimpleFilter('ceil', 'ceil'),
-            new \Twig_SimpleFilter('oro_preg_replace', [$this, 'pregReplace']),
-            new \Twig_SimpleFilter('oro_sort_by', [$this, 'sortBy'])
+            new TwigFilter('uniqid', 'uniqid'),
+            new TwigFilter('floor', 'floor'),
+            new TwigFilter('ceil', 'ceil'),
+            new TwigFilter('oro_preg_replace', [$this, 'pregReplace']),
+            new TwigFilter('oro_sort_by', [$this, 'sortBy'])
         ];
     }
 
@@ -121,41 +146,41 @@ class UiExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_ui_scroll_data_before',
                 [$this, 'scrollDataBefore'],
                 ['needs_environment' => true]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'render_block',
                 [$this, 'renderBlock'],
                 ['needs_environment' => true, 'needs_context' => true, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_widget_render',
                 [$this, 'renderWidget'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_form_process',
                 [$this, 'processForm'],
                 ['needs_environment' => true]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_view_process',
                 [$this, 'processView'],
                 ['needs_environment' => true]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_get_content',
                 [$this, 'getContent'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction('isMobileVersion', [$this, 'isMobile']),
-            new \Twig_SimpleFunction('isDesktopVersion', [$this, 'isDesktop']),
-            new \Twig_SimpleFunction('oro_url_add_query', [$this, 'addUrlQuery']),
-            new \Twig_SimpleFunction('oro_is_url_local', [$this, 'isUrlLocal']),
-            new \Twig_SimpleFunction(
+            new TwigFunction('isMobileVersion', [$this, 'isMobile']),
+            new TwigFunction('isDesktopVersion', [$this, 'isDesktop']),
+            new TwigFunction('oro_url_add_query', [$this, 'addUrlQuery']),
+            new TwigFunction('oro_is_url_local', [$this, 'isUrlLocal']),
+            new TwigFunction(
                 'skype_button',
                 [$this, 'getSkypeButton'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
@@ -164,7 +189,7 @@ class UiExtension extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param TwigEnvironment   $environment
      * @param string            $pageIdentifier
      * @param array             $data
      * @param object            $entity
@@ -172,7 +197,7 @@ class UiExtension extends \Twig_Extension
      * @return array
      */
     public function scrollDataBefore(
-        \Twig_Environment $environment,
+        TwigEnvironment $environment,
         $pageIdentifier,
         array $data,
         $entity,
@@ -185,7 +210,7 @@ class UiExtension extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $env
+     * @param TwigEnvironment   $env
      * @param array             $context
      * @param string            $template
      * @param string            $block
@@ -193,23 +218,23 @@ class UiExtension extends \Twig_Extension
      *
      * @return string
      */
-    public function renderBlock(\Twig_Environment $env, $context, $template, $block, $extraContext = [])
+    public function renderBlock(TwigEnvironment $env, $context, $template, $block, $extraContext = [])
     {
-        /** @var \Twig_Template $template */
+        /** @var Template $template */
         $template = $env->loadTemplate($template);
 
         return $template->renderBlock($block, array_merge($context, $extraContext));
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param TwigEnvironment   $environment
      * @param array             $data
      * @param FormView          $form
      * @param object|null       $entity
      *
      * @return array
      */
-    public function processForm(\Twig_Environment $environment, array $data, FormView $form, $entity = null)
+    public function processForm(TwigEnvironment $environment, array $data, FormView $form, $entity = null)
     {
         $event = new BeforeFormRenderEvent($form, $data, $environment, $entity);
         $this->getEventDispatcher()->dispatch(Events::BEFORE_UPDATE_FORM_RENDER, $event);
@@ -218,13 +243,13 @@ class UiExtension extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param TwigEnvironment   $environment
      * @param array             $data
      * @param object            $entity
      *
      * @return array
      */
-    public function processView(\Twig_Environment $environment, array $data, $entity)
+    public function processView(TwigEnvironment $environment, array $data, $entity)
     {
         $event = new BeforeViewRenderEvent($environment, $data, $entity);
         $this->getEventDispatcher()->dispatch(Events::BEFORE_VIEW_RENDER, $event);
@@ -233,13 +258,13 @@ class UiExtension extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param TwigEnvironment   $environment
      * @param array             $options
      *
      * @throws \InvalidArgumentException
      * @return string
      */
-    public function renderWidget(\Twig_Environment $environment, array $options = [])
+    public function renderWidget(TwigEnvironment $environment, array $options = [])
     {
         $optionsHash = md5(json_encode($options));
 
@@ -586,13 +611,13 @@ class UiExtension extends \Twig_Extension
     /**
      * Skype.UI wrapper
      *
-     * @param \Twig_Environment $environment
+     * @param TwigEnvironment   $environment
      * @param string            $skypeUserName
      * @param array             $options
      *
      * @return int
      */
-    public function getSkypeButton(\Twig_Environment $environment, $skypeUserName, $options = [])
+    public function getSkypeButton(TwigEnvironment $environment, $skypeUserName, $options = [])
     {
         if (!isset($options['element'])) {
             $options['element'] = 'skype_button_' . md5($skypeUserName) . '_' . mt_rand(1, 99999);

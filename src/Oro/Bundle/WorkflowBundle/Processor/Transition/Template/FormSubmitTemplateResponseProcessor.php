@@ -9,7 +9,11 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
+/**
+ * Creates a response that contains transition completion data (success or failure).
+ */
 class FormSubmitTemplateResponseProcessor implements ProcessorInterface
 {
     const WIDGET_TEMPLATE_TRANSITION_COMPLETE = 'OroWorkflowBundle:Widget:widget/transitionComplete.html.twig';
@@ -17,14 +21,14 @@ class FormSubmitTemplateResponseProcessor implements ProcessorInterface
     /** @var ViewHandlerInterface */
     private $viewHandler;
 
-    /** @var \Twig_Environment */
+    /** @var Environment */
     private $twig;
 
     /**
      * @param ViewHandlerInterface $viewHandler
-     * @param \Twig_Environment $twig
+     * @param Environment $twig
      */
-    public function __construct(ViewHandlerInterface $viewHandler, \Twig_Environment $twig)
+    public function __construct(ViewHandlerInterface $viewHandler, Environment $twig)
     {
         $this->viewHandler = $viewHandler;
         $this->twig = $twig;

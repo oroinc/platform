@@ -1,3 +1,5 @@
+{% import _self as dialogMove %}
+
 {% if saved is defined and saved %}
     {% set widgetResponse = {
         widget: {
@@ -14,7 +16,7 @@
 
     {{ widgetResponse|json_encode|raw }}
 {% else %}
-    {% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
+    {% form_theme form with ['OroFormBundle:Form:fields.html.twig', dialogMove] %}
     <div class="widget-content">
         <div class="form-container">
             {% set formAction = app.request.uri %}

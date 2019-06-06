@@ -3,12 +3,14 @@
 namespace Oro\Bundle\NavigationBundle\Twig;
 
 use Twig\Compiler;
+use Twig\Error\SyntaxError;
+use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Node;
 
 /**
- * Used for compiling title nodes.
+ * Compile title node to template
  */
-class TitleNode extends \Twig_Node
+class TitleNode extends Node
 {
     /**
      * @param Node|null $expr
@@ -24,7 +26,7 @@ class TitleNode extends \Twig_Node
      * Compile title node to template
      *
      * @param  Compiler $compiler
-     * @throws \Twig_Error_Syntax
+     * @throws SyntaxError
      */
     public function compile(Compiler $compiler)
     {
@@ -36,7 +38,7 @@ class TitleNode extends \Twig_Node
 
         // take first argument array node
         foreach ($nodes as $childNode) {
-            if ($childNode instanceof \Twig_Node_Expression_Array) {
+            if ($childNode instanceof ArrayExpression) {
                 $arguments = $childNode;
 
                 break;
@@ -44,7 +46,7 @@ class TitleNode extends \Twig_Node
         }
 
         if ($arguments === null) {
-            throw new \Twig_Error_Syntax('Function oro_title_set expected argument: array');
+            throw new SyntaxError('Function oro_title_set expected argument: array');
         }
 
         $compiler

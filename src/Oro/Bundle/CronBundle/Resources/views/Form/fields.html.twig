@@ -28,9 +28,11 @@
 {% endmacro %}
 
 {% block oro_cron_schedule_intervals_collection_widget %}
+    {% import _self as cronFormFields %}
+
     {% spaceless %}
         {% if prototype is defined %}
-            {% set prototype_html = _self.schedule_interval_prototype(form) %}
+            {% set prototype_html = cronFormFields.schedule_interval_prototype(form) %}
         {% endif %}
         {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection collection-fields-list' }) %}
         {% set id = id ~ '_collection' %}
@@ -52,7 +54,7 @@
                     <tbody data-last-index="{{ form.children|length }}" data-row-count-add="{{ form.vars.row_count_add }}" data-prototype-name="{{ prototype_name }}"{% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}>
                     {% if form.children|length %}
                         {% for child in form.children %}
-                            {{ _self.schedule_interval_prototype(child) }}
+                            {{ cronFormFields.schedule_interval_prototype(child) }}
                         {% endfor %}
                     {% elseif show_form_when_empty and prototype_html is defined %}
                         {% for i in 0..(form.vars.row_count_initial - 1) %}
@@ -67,7 +69,7 @@
             </div>
         </div>
         {% if handle_primary and (prototype is not defined or prototype.primary is defined) %}
-            {{ _self.oro_collection_validate_primary_js(_context) }}
+            {{ cronFormFields.oro_collection_validate_primary_js(_context) }}
         {% endif %}
     {% endspaceless %}
 {% endblock %}

@@ -7,6 +7,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Twig\Loader\LoaderInterface;
 
 /**
  * Validates configuration of operations.
@@ -16,7 +17,7 @@ class OperationConfigurationValidator implements ConfigurationValidatorInterface
     /** @var ControllerClassProvider */
     protected $controllerClassProvider;
 
-    /** @var \Twig_ExistsLoaderInterface */
+    /** @var LoaderInterface */
     protected $twigLoader;
 
     /** @var DoctrineHelper */
@@ -33,14 +34,14 @@ class OperationConfigurationValidator implements ConfigurationValidatorInterface
 
     /**
      * @param ControllerClassProvider $controllerClassProvider
-     * @param \Twig_Loader_Filesystem $twigLoader
+     * @param LoaderInterface         $twigLoader
      * @param DoctrineHelper          $doctrineHelper
      * @param LoggerInterface         $logger
      * @param bool                    $debug
      */
     public function __construct(
         ControllerClassProvider $controllerClassProvider,
-        \Twig_Loader_Filesystem $twigLoader,
+        LoaderInterface $twigLoader,
         DoctrineHelper $doctrineHelper,
         LoggerInterface $logger,
         $debug

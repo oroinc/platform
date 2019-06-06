@@ -37,7 +37,7 @@
             removedVal: '#removeRelation',
             columnName: 'assigned',
             fieldTitles: relation.get('target_title'),
-            entityName: entity_class|replace('\\', '_'),
+            entityName: entity_class|replace({'\\':'_'}),
             fieldName: field_name,
             extraData: extraData,
             link: 'oro_entity_detailed'

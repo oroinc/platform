@@ -9,6 +9,7 @@ use Oro\Bundle\UIBundle\View\ScrollData;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
 {
@@ -70,7 +71,7 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
 
     public function testAddBlockToEntityView()
     {
-        $env = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
+        $env = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
         $env->expects($this->once())->method('render')->willReturn('Rendered template');
         $this->event->expects($this->once())->method('getEnvironment')->willReturn($env);
         $this->scrollData->expects($this->once())->method('addSubBlockData');
@@ -85,7 +86,7 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
 
     public function testAddBlockToEntityViewWithSectionTitle()
     {
-        $env = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
+        $env = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
         $env->expects($this->once())->method('render')->willReturn('Rendered template');
         $this->event->expects($this->once())->method('getEnvironment')->willReturn($env);
         $this->scrollData->expects($this->once())
@@ -108,7 +109,7 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
 
     public function testAddBlockToEntityEdit()
     {
-        $env = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
+        $env = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
         $env->expects($this->once())->method('render')->willReturn('Rendered template');
         $this->event->expects($this->once())->method('getEnvironment')->willReturn($env);
         $this->scrollData->expects($this->once())->method('getData')->willReturn(

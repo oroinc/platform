@@ -4,21 +4,35 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Twig;
 
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\FormBundle\Form\Twig\DataBlockRenderer;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Psr\Container\ContainerInterface;
+use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\Forms;
+use Twig\Environment;
+use Twig\Loader\ArrayLoader;
+use Twig\RuntimeLoader\ContainerRuntimeLoader;
 
 class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
 {
+    use TwigExtensionTestCaseTrait;
+
     /**
-     * @var \Twig_Environment
+     * @var Environment
      */
-    private $twig;
+    private $environment;
 
     /**
      * @var FormFactory
      */
     private $factory;
+
+    /**
+     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $container;
 
     /**
      * @var DataBlockRenderer
@@ -28,69 +42,69 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array
      */
-    private $testFormConfig = array(
-        0 => array(
+    private $testFormConfig = [
+        0 => [
             'title'       => 'Second',
             'class'       => null,
-            'subblocks'   => array(
-                0 => array(
+            'subblocks'   => [
+                0 => [
                     'code'        => 'text_3__subblock',
                     'title'       => null,
-                    'data'        => array(null),
+                    'data'        => [null],
                     'description' => null,
                     'useSpan'     => true,
                     'tooltip'     => null
-                ),
-            ),
+                ],
+            ],
             'description' => null
-        ),
-        1 => array(
+        ],
+        1 => [
             'title'       => 'First Block',
             'class'       => null,
-            'subblocks'   => array(
-                0 => array(
+            'subblocks'   => [
+                0 => [
                     'code'        => 'first',
                     'title'       => null,
-                    'data'        => array(null),
+                    'data'        => [null],
                     'description' => null,
                     'useSpan'     => true,
                     'tooltip'     => null
-                ),
-                1 => array(
+                ],
+                1 => [
                     'code'        => 'second',
                     'title'       => 'Second SubBlock',
-                    'data'        => array(null),
+                    'data'        => [null],
                     'description' => null,
                     'useSpan'     => true,
                     'tooltip'     => null
-                ),
-            ),
+                ],
+            ],
             'description' => 'some desc'
-        ),
-        2  => array(
+        ],
+        2  => [
             'title'       => 'Third',
             'class'       => null,
-            'subblocks'   => array(
-                0 => array(
+            'subblocks'   => [
+                0 => [
                     'code'        => 'text_4__subblock',
                     'title'       => null,
-                    'data'        => array(null),
+                    'data'        => [null],
                     'description' => null,
                     'useSpan'     => true,
                     'tooltip'     => null
-                ),
-                1 => array(
+                ],
+                1 => [
                     'code'        => 'first',
                     'title'       => null,
-                    'data'        => array(null),
+                    'data'        => [null],
                     'description' => null,
                     'useSpan'     => true,
                     'tooltip'     => null
-                ),
-            ),
+                ],
+            ],
             'description' => null
-        ),
-    );
+        ],
+    ];
 
     protected function setUp()
     {
@@ -100,50 +114,57 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
             ->addTypeExtension(new DataBlockExtension())
             ->getFormFactory();
 
-        $this->twig = $this->getMockBuilder('\Twig_Environment')
+        $this->twig = $this->getMockBuilder(Environment::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $this->container = $this->createMock(ContainerInterface::class);
 
-        $this->twig->expects($this->any())
-            ->method('render')
-            ->will($this->returnValue(null));
-        $this->twig->expects($this->any())
-            ->method('getLoader')
-            ->will($this->returnValue($this->getMockForAbstractClass('\Twig_LoaderInterface')));
+        $this->environment = new Environment(new ArrayLoader());
+        $this->environment->addExtension(new FormExtension());
+        $this->environment->addRuntimeLoader(new ContainerRuntimeLoader($this->container));
     }
 
     public function testRender()
     {
-        $options = array(
+        $options = [
             'block_config' =>
-                array(
-                    'first'  => array(
+                [
+                    'first'  => [
                         'priority'    => 1,
                         'title'       => 'First Block',
-                        'subblocks'   => array(
-                            'first'  => array(),
-                            'second' => array(
+                        'subblocks'   => [
+                            'first'  => [],
+                            'second' => [
                                 'title' => 'Second SubBlock'
-                            ),
-                        ),
+                            ],
+                        ],
                         'description' => 'some desc'
-                    ),
-                    'second' => array(
+                    ],
+                    'second' => [
                         'priority' => 2,
-                    )
-                )
-        );
+                    ]
+                ]
+        ];
         $builder = $this->factory->createNamedBuilder('test', FormType::class, null, $options);
-        $builder->add('text_1', null, array('block' => 'first', 'subblock' => 'second'));
-        $builder->add('text_2', null, array('block' => 'first'));
-        $builder->add('text_3', null, array('block' => 'second'));
-        $builder->add('text_4', null, array('block' => 'third'));
-        $builder->add('text_5', null, array('block' => 'third', 'subblock' => 'first'));
+        $builder->add('text_1', null, ['block' => 'first', 'subblock' => 'second']);
+        $builder->add('text_2', null, ['block' => 'first']);
+        $builder->add('text_3', null, ['block' => 'second']);
+        $builder->add('text_4', null, ['block' => 'third']);
+        $builder->add('text_5', null, ['block' => 'third', 'subblock' => 'first']);
         $builder->add('text_6', null);
 
         $formView = $builder->getForm()->createView();
 
-        $result = $this->renderer->render($this->twig, array('form' => $formView), $formView);
+        $formRenderer = $this->createMock(FormRenderer::class);
+        $this->container->expects($this->any())
+            ->method('has')
+            ->with(FormRenderer::class)
+            ->willReturn(true);
+        $this->container->expects($this->any())
+            ->method('get')
+            ->with(FormRenderer::class)
+            ->willReturn($formRenderer);
+        $result = $this->renderer->render($this->environment, ['form' => $formView], $formView);
 
         $this->assertEquals($this->testFormConfig, $result);
     }

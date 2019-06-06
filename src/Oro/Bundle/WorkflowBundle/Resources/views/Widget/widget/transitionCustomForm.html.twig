@@ -5,6 +5,7 @@
     {% block widget_context %}
     {% endblock widget_context %}
     {% block content %}
+        {% import 'OroUIBundle::macros.html.twig' as UI %}
         {% if saved %}
             <div {{ UI.renderPageComponentAttributes({
                 module: 'oroui/js/app/components/widget-form-component',

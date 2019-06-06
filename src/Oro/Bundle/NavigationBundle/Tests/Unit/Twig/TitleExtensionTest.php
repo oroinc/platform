@@ -41,11 +41,6 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new TitleExtension($container);
     }
 
-    public function testNameConfigured()
-    {
-        $this->assertInternalType('string', $this->extension->getName());
-    }
-
     public function testRenderSerialized()
     {
         $expectedResult = 'expected';

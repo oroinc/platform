@@ -7,13 +7,14 @@ use Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
 use Psr\Log\LoggerInterface;
+use Twig\Loader\LoaderInterface;
 
 class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ControllerClassProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $controllerClassProvider;
 
-    /** @var \Twig_Loader_Filesystem|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $twigLoader;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
@@ -28,7 +29,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $this->controllerClassProvider = $this->createMock(ControllerClassProvider::class);
-        $this->twigLoader = $this->createMock('Twig_Loader_Filesystem');
+        $this->twigLoader = $this->createMock(LoaderInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 

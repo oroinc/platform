@@ -52,6 +52,8 @@
 {% set pageTitle = 'oro.email.entity_plural_label'|trans %}
 
 {% block navButtons %}
+    {% import 'OroEmailBundle::actions.html.twig' as EmailActions %}
+
     {% if is_granted('oro_email_email_create') %}
         <div class="btn-group">
             {{ EmailActions.createEmailButton({

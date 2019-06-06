@@ -10,13 +10,14 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Template\FormSubmitTemplateResponseProcessor;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
 class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ViewHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $viewHandler;
 
-    /** @var \Twig_Environment|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
     protected $twig;
 
     /** @var FormSubmitTemplateResponseProcessor */
@@ -25,7 +26,7 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
     protected function setUp()
     {
         $this->viewHandler = $this->createMock(ViewHandlerInterface::class);
-        $this->twig = $this->createMock(\Twig_Environment::class);
+        $this->twig = $this->createMock(Environment::class);
 
         $this->processor = new FormSubmitTemplateResponseProcessor($this->viewHandler, $this->twig);
     }

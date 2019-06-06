@@ -12,7 +12,7 @@
 
 {% block list %}
     {% set favorites = [] %}
-    {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
+    {% if item.hasChildren and options.depth is not same as(0) and item.displayChildren %}
         {% for favoritesItem in item.children %}
             {% if favoritesItem.extras.isAllowed %}
                 {% set favorites = favorites|merge([{'id': favoritesItem.extras.id, 'title': favoritesItem.label, 'title_rendered': oro_title_render(favoritesItem.label),  'url': favoritesItem.uri, 'type': favoritesItem.extras.type}]) %}

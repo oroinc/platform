@@ -5,8 +5,21 @@ namespace Oro\Bundle\UIBundle\Twig;
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
-class FormatExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to render files:
+ *   - asset_path
+ *   - oro_format_filename
+ *
+ * Provides Twig filters for content formatting:
+ *   - oro_format
+ *   - age
+ *   - age_string
+ */
+class FormatExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     protected $container;
@@ -41,9 +54,9 @@ class FormatExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('oro_format', [$this, 'format'], ['is_safe' => ['html']]),
-            new \Twig_SimpleFilter('age', [$this, 'getAge']),
-            new \Twig_SimpleFilter('age_string', [$this, 'getAgeAsString']),
+            new TwigFilter('oro_format', [$this, 'format'], ['is_safe' => ['html']]),
+            new TwigFilter('age', [$this, 'getAge']),
+            new TwigFilter('age_string', [$this, 'getAgeAsString']),
         ];
     }
 
@@ -53,8 +66,8 @@ class FormatExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('asset_path', [$this, 'generateUrlWithoutFrontController']),
-            new \Twig_SimpleFunction('oro_format_filename', [$this, 'formatFilename']),
+            new TwigFunction('asset_path', [$this, 'generateUrlWithoutFrontController']),
+            new TwigFunction('oro_format_filename', [$this, 'formatFilename']),
         ];
     }
 

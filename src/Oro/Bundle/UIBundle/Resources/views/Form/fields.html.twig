@@ -6,7 +6,7 @@
             {% if hint|default() and hint_position|default() == 'above' %}
                 <div{{ block('hint_attributes') }}>{{ hint|raw }}</div>
             {% endif %}
-            {% if label is not sameas(false) %}
+            {% if label is not same as(false) %}
                 <div class="control-label wrap">
                     {{ form_label(form, '' , { label_attr: label_attr}) }}
                 </div>

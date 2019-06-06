@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Formatter\Property;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\LinkProperty;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyConfiguration;
+use Twig\Template;
 
 class LinkPropertyTest extends \PHPUnit\Framework\TestCase
 {
@@ -44,7 +45,7 @@ class LinkPropertyTest extends \PHPUnit\Framework\TestCase
 
         $record = new ResultRecord($data);
 
-        $template = $this->createMock('Twig_TemplateInterface');
+        $template = $this->createMock(Template::class);
 
         $this->twig
             ->expects($this->once())

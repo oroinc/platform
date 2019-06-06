@@ -1,9 +1,7 @@
 {% block oro_region_widget %}
     {# // check if block was not included yet #}
-    {% set _block = block('oro_region_updater_js') %}
-    {% if (_block is empty) %}
-        {% include 'OroAddressBundle:Include:javascript.html.twig' %}
-        {{ block('oro_region_updater_js')|raw }}
+    {% if block('oro_region_updater_js') is not defined %}
+        {{ block('oro_region_updater_js', 'OroAddressBundle:Include:javascript.html.twig')|raw }}
     {% endif %}
 
     {% if country_field is not defined or country_field is empty %}
@@ -137,10 +135,12 @@
 {%  endblock %}
 
 {% block oro_address_collection_widget %}
+    {% import _self as addressIncludeFields %}
+
     {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'collection-fields-list-bg oro-address-collection' }) %}
     {{ block('oro_collection_widget') }}
     {% set id = id ~ '_collection' %}
-    {{ _self.oro_collection_validate_types_js(_context) }}
+    {{ addressIncludeFields.oro_collection_validate_types_js(_context) }}
 {% endblock %}
 
 {% macro oro_collection_validate_types_js(context) %}

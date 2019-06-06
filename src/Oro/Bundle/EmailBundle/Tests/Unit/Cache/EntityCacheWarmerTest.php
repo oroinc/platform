@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Twig\Environment;
 
 class EntityCacheWarmerTest extends \PHPUnit\Framework\TestCase
 {
@@ -39,7 +40,7 @@ class EntityCacheWarmerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $twig = $this->getMockBuilder('\Twig_Environment')
+        $twig = $this->getMockBuilder(Environment::class)
             ->disableOriginalConstructor()
             ->getMock();
 

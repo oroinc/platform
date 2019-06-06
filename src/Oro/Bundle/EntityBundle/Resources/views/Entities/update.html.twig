@@ -9,11 +9,13 @@
 
 {% set formAction = path('oro_entity_update', {entityName: entity_name, id: entity.id}) %}
 
-{% set audit_entity_class = entity_config.getId.getClassName|replace('\\', '_') %}
+{% set audit_entity_class = entity_config.getId.getClassName|replace({'\\':'_'}) %}
 {% set audit_entity_id = entity.id %}
 {% set audit_title  = (entity_config.get('label')|trans)|default('N/A') %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if entity.id and is_granted('DELETE', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_entity_delete', {'entityName': entity_class, 'id': entity.id}),

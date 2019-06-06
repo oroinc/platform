@@ -1,27 +1,40 @@
 <?php
+
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig\Parser;
 
 use Oro\Bundle\UIBundle\Twig\Parser\PlaceholderTokenParser;
+use Twig\Compiler;
+use Twig\ExpressionParser;
+use Twig\Node\Expression\AbstractExpression;
+use Twig\Node\Expression\ConstantExpression;
+use Twig\Node\Expression\Filter\DefaultFilter;
+use Twig\Node\Expression\FunctionExpression;
+use Twig\Node\Expression\NameExpression;
+use Twig\Node\Node;
+use Twig\Node\PrintNode;
+use Twig\Parser;
+use Twig\Token;
+use Twig\TokenStream;
 
 class PlaceholderTokenParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject|Parser
      */
     private $parser;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject|ExpressionParser
      */
     private $expressionParser;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var TokenStream
      */
     private $stream;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject|Compiler
      */
     private $compiler;
 
@@ -30,12 +43,11 @@ class PlaceholderTokenParserTest extends \PHPUnit\Framework\TestCase
      */
     private $tokenParser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->stream = $this->createMock('Twig_TokenStream');
-        $this->expressionParser = $this->createMock('Twig_ExpressionParser');
-        $this->parser = $this->createMock('Twig_Parser');
-
+        $this->stream = new TokenStream([]);
+        $this->expressionParser = $this->createMock(ExpressionParser::class);
+        $this->parser = $this->createMock(Parser::class);
         $this->parser->expects($this->any())
             ->method('getStream')
             ->willReturn($this->stream);
@@ -43,181 +55,131 @@ class PlaceholderTokenParserTest extends \PHPUnit\Framework\TestCase
             ->method('getExpressionParser')
             ->willReturn($this->expressionParser);
 
-        $this->compiler = $this->getMockBuilder('Twig_Compiler')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->expressionParser->expects($this->any())
+            ->method('parseExpression')
+            ->willReturn($this->createExpressionNode());
 
+        $this->compiler = $this->createMock(Compiler::class);
         $this->tokenParser = new PlaceholderTokenParser();
         $this->tokenParser->setParser($this->parser);
     }
 
-    public function testParseSimpleNameWithoutVariables()
+    public function testParseSimpleNameWithoutVariables(): void
     {
-        $expectedLine = 101;
+        $expr = $this->createExpressionNode();
+        $tokenLine = 1;
+        $tokenValue = 'with';
 
-        $nameExpr = $this->createExpressionNode();
+        $endToken = $this->createToken(Token::BLOCK_END_TYPE, $tokenValue, $tokenLine);
+        $this->stream->injectTokens([$endToken, $endToken]);
+        $actualNode = $this->tokenParser->parse($endToken);
 
-        $token = $this->createToken();
-        $token->expects($this->any())
-            ->method('getLine')
-            ->willReturn($expectedLine);
-
-        $this->stream->expects($this->at(0))
-            ->method('test')
-            ->with(\Twig_Token::NAME_TYPE)
-            ->willReturn(false);
-
-        $this->expressionParser->expects($this->once())
-            ->method('parseExpression')
-            ->willReturn($nameExpr);
-
-        $this->stream->expects($this->at(1))
-            ->method('nextIf')
-            ->with(\Twig_Token::NAME_TYPE, 'with')
-            ->willReturn(false);
-
-        $this->stream->expects($this->at(2))
-            ->method('expect')
-            ->with(\Twig_Token::BLOCK_END_TYPE);
-
-        $actualNode = $this->tokenParser->parse($token);
-        $this->assertInstanceOf('\Twig_Node_Print', $actualNode);
-        $this->assertEquals($expectedLine, $actualNode->getTemplateLine());
-        $this->assertEquals('placeholder', $actualNode->getNodeTag());
-
-        $expectedExpr           = new \Twig_Node_Expression_Function(
+        $expectedExpr = new FunctionExpression(
             'placeholder',
-            new \Twig_Node(
-                array(
-                    'name'       => $nameExpr,
-                    'variables'  => new \Twig_Node_Expression_Constant(array(), $expectedLine)
-                )
-            ),
-            $expectedLine
+            new Node(['name' => $expr, 'variables' => new ConstantExpression([], $tokenLine)]),
+            $tokenLine
         );
-        $this->compiler->expects($this->once())
-            ->method('addDebugInfo')
-            ->with($this->identicalTo($actualNode))
-            ->will($this->returnSelf());
-        $this->compiler->expects($this->once())
-            ->method('write')
-            ->with('echo ')
-            ->will($this->returnSelf());
-        $this->compiler->expects($this->once())
-            ->method('subcompile')
-            ->with($expectedExpr)
-            ->will($this->returnSelf());
-        $this->compiler->expects($this->once())
-            ->method('raw')
-            ->with(";\n")
-            ->will($this->returnSelf());
+        $this->prepareCompiler($actualNode, $expectedExpr);
         $actualNode->compile($this->compiler);
+
+        $this->assertNode($actualNode, $tokenLine);
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testParseExpressionNameWithVariables()
+    public function testParseExpressionNameWithVariables(): void
     {
-        $expectedLine  = 101;
-        $variablesExpr = $this->createExpressionNode();
-
-        $token = $this->createToken();
-        $token->expects($this->any())
-            ->method('getLine')
-            ->willReturn($expectedLine);
-
-        $nameToken      = $this->createToken();
-        $nameTokenValue = 'nameTokenValue';
-        $nameTokenLine  = 102;
-        $nameToken->expects($this->once())
-            ->method('getValue')
-            ->willReturn($nameTokenValue);
-        $nameToken->expects($this->once())
-            ->method('getLine')
-            ->willReturn($nameTokenLine);
-
-        $this->stream->expects($this->at(0))
-            ->method('test')
-            ->with(\Twig_Token::NAME_TYPE)
-            ->willReturn(true);
-
-        $this->stream->expects($this->at(1))
-            ->method('getCurrent')
-            ->willReturn($nameToken);
-
-        $this->stream->expects($this->at(2))
-            ->method('next');
-
-        $this->stream->expects($this->at(3))
-            ->method('nextIf')
-            ->with(\Twig_Token::NAME_TYPE, 'with')
-            ->willReturn(true);
-
-        $this->expressionParser->expects($this->once())
-            ->method('parseExpression')
-            ->willReturn($variablesExpr);
-
-        $this->stream->expects($this->at(4))
-            ->method('expect')
-            ->with(\Twig_Token::BLOCK_END_TYPE);
-
-        $actualNode = $this->tokenParser->parse($token);
-        $this->assertInstanceOf('\Twig_Node_Print', $actualNode);
-        $this->assertEquals($expectedLine, $actualNode->getTemplateLine());
-        $this->assertEquals('placeholder', $actualNode->getNodeTag());
-
-        $expectedNameExpr       = new \Twig_Node_Expression_Filter_Default(
-            new \Twig_Node_Expression_Name($nameTokenValue, $nameTokenLine),
-            new \Twig_Node_Expression_Constant('default', $nameTokenLine),
-            new \Twig_Node(
-                array(
-                    new \Twig_Node_Expression_Constant(
-                        $nameTokenValue,
-                        $nameTokenLine
+        $expr = $this->createExpressionNode();
+        $tokenLine = 2;
+        $tokenValue = 'with';
+        $nameTypeToken = $this->createToken(Token::NAME_TYPE, $tokenValue, $tokenLine);
+        $blockEndTypeToken = $this->createToken(Token::BLOCK_END_TYPE, $tokenValue, $tokenLine);
+        $this->stream->injectTokens([$nameTypeToken, $nameTypeToken, $blockEndTypeToken, $blockEndTypeToken]);
+        $actualNode = $this->tokenParser->parse($nameTypeToken);
+        $expectedNameExpr = new DefaultFilter(
+            new NameExpression($tokenValue, $tokenLine),
+            new ConstantExpression('default', $tokenLine),
+            new Node(
+                [
+                    new ConstantExpression(
+                        $tokenValue,
+                        $tokenLine
                     )
-                ),
-                array(),
-                $nameTokenLine
+                ],
+                [],
+                $tokenLine
             ),
-            $nameTokenLine
+            $tokenLine
         );
-        $expectedExpr           = new \Twig_Node_Expression_Function(
+        $expectedExpr = new FunctionExpression(
             'placeholder',
-            new \Twig_Node(
-                array(
-                    'name'       => $expectedNameExpr,
-                    'variables'  => $variablesExpr
-                )
+            new Node(
+                [
+                    'name' => $expectedNameExpr,
+                    'variables' => $expr
+                ]
             ),
-            $expectedLine
+            $tokenLine
         );
+
+        $this->prepareCompiler($actualNode, $expectedExpr);
+        $actualNode->compile($this->compiler);
+        $this->assertNode($actualNode, $tokenLine);
+    }
+
+    /**
+     * @param PrintNode $node
+     * @param $expr
+     */
+    private function prepareCompiler(PrintNode $node, $expr): void
+    {
         $this->compiler->expects($this->once())
             ->method('addDebugInfo')
-            ->with($this->identicalTo($actualNode))
-            ->will($this->returnSelf());
+            ->with($this->identicalTo($node))
+            ->willReturnSelf();
         $this->compiler->expects($this->once())
             ->method('write')
             ->with('echo ')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $this->compiler->expects($this->once())
             ->method('subcompile')
-            ->with($expectedExpr)
-            ->will($this->returnSelf());
+            ->with($expr)
+            ->willReturnSelf();
         $this->compiler->expects($this->once())
             ->method('raw')
             ->with(";\n")
-            ->will($this->returnSelf());
-        $actualNode->compile($this->compiler);
+            ->willReturnSelf();
     }
 
+    /**
+     * @param PrintNode $node
+     * @param int $tokenLine
+     */
+    private function assertNode(PrintNode $node, int $tokenLine): void
+    {
+        $this->assertInstanceOf(PrintNode::class, $node);
+        $this->assertEquals($tokenLine, $node->getTemplateLine());
+        $this->assertEquals('placeholder', $node->getNodeTag());
+    }
+
+    /**
+     * @return \PHPUnit\Framework\MockObject\MockObject
+     */
     private function createExpressionNode()
     {
-        return $this->createMock('Twig_Node_Expression');
+        return $this->createMock(AbstractExpression::class);
     }
 
-    private function createToken()
+    /**
+     * @param int $type
+     * @param string $value
+     * @param int $lineno
+     *
+     * @return Token
+     */
+    private function createToken($type = Token::TEXT_TYPE, $value = 'with', $lineno = 1): Token
     {
-        return $this->createMock('Twig_Token');
+        return new Token($type, $value, $lineno);
     }
 }

@@ -11,6 +11,8 @@
 {% endblock before_content_addition %}
 
 {% block content %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if isWidgetContext and savedId is defined and savedId %}
         {% block widget_context %}
             <div {{ UI.renderPageComponentAttributes({

@@ -10,11 +10,16 @@ use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * Provides custom twig functions for security check purposes.
+ * Provides Twig functions to display organization information and permissions:
+ *   - get_enabled_organizations
+ *   - get_current_organization
+ *   - acl_permission
  */
-class OroSecurityExtension extends \Twig_Extension
+class OroSecurityExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     protected $container;
@@ -57,9 +62,9 @@ class OroSecurityExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('get_enabled_organizations', [$this, 'getOrganizations']),
-            new \Twig_SimpleFunction('get_current_organization', [$this, 'getCurrentOrganization']),
-            new \Twig_SimpleFunction('acl_permission', [$this, 'getPermission']),
+            new TwigFunction('get_enabled_organizations', [$this, 'getOrganizations']),
+            new TwigFunction('get_current_organization', [$this, 'getCurrentOrganization']),
+            new TwigFunction('acl_permission', [$this, 'getPermission']),
         ];
     }
 

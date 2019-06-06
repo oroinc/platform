@@ -4,11 +4,14 @@ namespace Oro\Bundle\ScopeBundle\Twig;
 
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * This extension provides some scope related helper functions for twig.
+ * Provides a Twig function to determine if the entity scope is empty:
+ *   - oro_scope_is_empty
  */
-class ScopeExtension extends \Twig_Extension
+class ScopeExtension extends AbstractExtension
 {
     const NAME = 'oro_scope';
 
@@ -31,7 +34,7 @@ class ScopeExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_scope_is_empty', [$this, 'isScopesEmpty'])
+            new TwigFunction('oro_scope_is_empty', [$this, 'isScopesEmpty'])
         ];
     }
 

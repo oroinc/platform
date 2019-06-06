@@ -9,8 +9,16 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class WindowsExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to display restored state of dialog window(s):
+ *   - oro_windows_restore
+ *   - oro_window_render_fragment
+ */
+class WindowsExtension extends AbstractExtension
 {
     const EXTENSION_NAME = 'oro_windows';
 
@@ -54,12 +62,12 @@ class WindowsExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_windows_restore',
                 [$this, 'render'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_window_render_fragment',
                 [$this, 'renderFragment'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
@@ -70,11 +78,11 @@ class WindowsExtension extends \Twig_Extension
     /**
      * Renders windows restore html block
      *
-     * @param \Twig_Environment $environment
+     * @param Environment $environment
      *
      * @return string
      */
-    public function render(\Twig_Environment $environment)
+    public function render(Environment $environment)
     {
         if ($this->rendered) {
             return '';
@@ -97,12 +105,12 @@ class WindowsExtension extends \Twig_Extension
     /**
      * Renders fragment by window state.
      *
-     * @param \Twig_Environment $environment
+     * @param Environment $environment
      * @param AbstractWindowsState $windowState
      *
      * @return string
      */
-    public function renderFragment(\Twig_Environment $environment, AbstractWindowsState $windowState)
+    public function renderFragment(Environment $environment, AbstractWindowsState $windowState)
     {
         $result = '';
         $scheduleDelete = false;

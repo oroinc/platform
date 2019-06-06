@@ -4,13 +4,15 @@ namespace Oro\Bundle\EntityExtendBundle\Twig;
 
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
 /**
- * Twig extension for filters:
- *  1) sort_enum - Sorts the given enum value identifiers according priorities specified for an enum values
- *  2) trans_enum - Translates the given enum value
+ * Provides Twig filters to sort and translate enum values:
+ *   - sort_enum - sorts the given enum value identifiers according to the priorities specified for this enum.
+ *   - trans_enum - translates the given enum value.
  */
-class EnumExtension extends \Twig_Extension
+class EnumExtension extends AbstractExtension
 {
     /** @var EnumValueProvider */
     protected $enumValueProvider;
@@ -29,8 +31,8 @@ class EnumExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('sort_enum', [$this, 'sortEnum']),
-            new \Twig_SimpleFilter('trans_enum', [$this, 'transEnum']),
+            new TwigFilter('sort_enum', [$this, 'sortEnum']),
+            new TwigFilter('trans_enum', [$this, 'transEnum']),
         ];
     }
 

@@ -4,11 +4,14 @@ namespace Oro\Bundle\UserBundle\Twig;
 
 use Oro\Bundle\UserBundle\Provider\GenderProvider;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * The user related TWIG extensions.
+ * Provides a Twig function to display a translated gender label:
+ *   - oro_gender
  */
-class OroUserExtension extends \Twig_Extension
+class OroUserExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     protected $container;
@@ -35,7 +38,7 @@ class OroUserExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_gender', [$this, 'getGenderLabel'])
+            new TwigFunction('oro_gender', [$this, 'getGenderLabel'])
         ];
     }
 

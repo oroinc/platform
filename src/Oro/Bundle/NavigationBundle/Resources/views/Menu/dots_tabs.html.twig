@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block root %}
-    {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
+    {% if item.hasChildren and options.depth is not same as(0) and item.displayChildren %}
         {{ block('navbar_tabs') }}
         {{ block('navbar_tabs_content') }}
     {% endif %}

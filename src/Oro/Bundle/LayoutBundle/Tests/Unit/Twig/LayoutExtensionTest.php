@@ -37,11 +37,6 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new LayoutExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('layout', $this->extension->getName());
-    }
-
     public function testInitRuntime()
     {
         /** @var Environment $environment */

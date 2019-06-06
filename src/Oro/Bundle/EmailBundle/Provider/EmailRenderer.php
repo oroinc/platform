@@ -9,6 +9,7 @@ use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRenderer;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorRegistry;
 use Symfony\Component\Translation\TranslatorInterface;
+use Twig\Environment;
 
 /**
  * Renders email template as TWIG template in a sandboxed environment.
@@ -21,13 +22,13 @@ class EmailRenderer extends TemplateRenderer
     private $translator;
 
     /**
-     * @param \Twig_Environment                       $environment
+     * @param Environment                             $environment
      * @param TemplateRendererConfigProviderInterface $configProvider
      * @param VariableProcessorRegistry               $variableProcessors
      * @param TranslatorInterface                     $translator
      */
     public function __construct(
-        \Twig_Environment $environment,
+        Environment $environment,
         TemplateRendererConfigProviderInterface $configProvider,
         VariableProcessorRegistry $variableProcessors,
         TranslatorInterface $translator
@@ -44,7 +45,7 @@ class EmailRenderer extends TemplateRenderer
      *
      * @return array [email subject, email body]
      *
-     * @throws \Twig_Error if the given template cannot be compiled
+     * @throws \Twig\Error\Error if the given template cannot be compiled
      */
     public function compileMessage(EmailTemplateInterface $template, array $templateParams = []): array
     {
@@ -65,7 +66,7 @@ class EmailRenderer extends TemplateRenderer
      *
      * @return string
      *
-     * @throws \Twig_Error if the given template cannot be compiled
+     * @throws \Twig\Error\Error if the given template cannot be compiled
      */
     public function compilePreview(EmailTemplate $template, string $locale = null): string
     {
@@ -81,7 +82,9 @@ class EmailRenderer extends TemplateRenderer
             }
         }
 
-        return $this->environment->render('{% verbatim %}' . $content . '{% endverbatim %}');
+        $templateWrapper = $this->environment->createTemplate('{% verbatim %}' . $content . '{% endverbatim %}');
+
+        return $templateWrapper->render();
     }
 
     /**

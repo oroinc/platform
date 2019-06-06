@@ -4,7 +4,12 @@ namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
+use Twig\Environment;
+use Twig\Template;
 
+/**
+ * Datagrid property formatter that uses a specified Twig template for rendering the value.
+ */
 class TwigTemplateProperty extends AbstractProperty
 {
     const CONTEXT_KEY  = 'context';
@@ -13,17 +18,17 @@ class TwigTemplateProperty extends AbstractProperty
     /** @var array */
     protected $excludeParams = [self::CONTEXT_KEY, self::TEMPLATE_KEY];
 
-    /** @var \Twig_Environment */
+    /** @var Environment */
     protected $environment;
 
     /**  @var array */
     protected $reservedKeys = ['record', 'value'];
 
     /**
-     * @param \Twig_Environment $environment
+     * @param Environment $environment
      */
     public function __construct(
-        \Twig_Environment $environment
+        Environment $environment
     ) {
         $this->environment = $environment;
     }
@@ -58,13 +63,13 @@ class TwigTemplateProperty extends AbstractProperty
             ]
         );
 
-        return $this->getTemplate()->render($context, false);
+        return $this->getTemplate()->render($context);
     }
 
     /**
      * Load twig template
      *
-     * @return \Twig_TemplateInterface
+     * @return Template
      */
     protected function getTemplate()
     {

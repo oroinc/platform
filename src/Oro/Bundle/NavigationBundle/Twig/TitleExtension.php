@@ -4,8 +4,19 @@ namespace Oro\Bundle\NavigationBundle\Twig;
 
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class TitleExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to render page (navigation) titles:
+ *   - oro_title_render
+ *   - oro_title_render_short
+ *   - oro_title_render_serialized
+ *
+ * Provides a Twig tag to work with page (navigation) titles:
+ *   - oro_title_set
+ */
+class TitleExtension extends AbstractExtension
 {
     const EXT_NAME = 'oro_title';
 
@@ -37,9 +48,9 @@ class TitleExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_title_render', [$this, 'render']),
-            new \Twig_SimpleFunction('oro_title_render_short', [$this, 'renderShort']),
-            new \Twig_SimpleFunction('oro_title_render_serialized', [$this, 'renderSerialized']),
+            new TwigFunction('oro_title_render', [$this, 'render']),
+            new TwigFunction('oro_title_render_short', [$this, 'renderShort']),
+            new TwigFunction('oro_title_render_serialized', [$this, 'renderSerialized']),
         ];
     }
 
@@ -171,15 +182,5 @@ class TitleExtension extends \Twig_Extension
             ->get('request_stack')
             ->getCurrentRequest()
             ->get('_route');
-    }
-
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return self::EXT_NAME;
     }
 }

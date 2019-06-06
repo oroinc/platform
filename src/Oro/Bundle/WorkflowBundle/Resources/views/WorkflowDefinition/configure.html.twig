@@ -8,6 +8,8 @@
 {% endblock stats %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% set html = UI.saveAndCloseButton({
         'route': 'oro_workflow_definition_view', 'params': {'name': entity.name}
     }) ~ UI.saveAndStayButton() %}
@@ -17,6 +19,8 @@
 {% endblock navButtons %}
 
 {% block breadcrumbs %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% set breadcrumbs = {
         'entity': entity,
         'indexPath': path('oro_workflow_definition_index'),
@@ -40,6 +44,7 @@
 {% endblock breadcrumbs %}
 
 {% block content_data %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set data = [] %}
     {% for child in form %}
         {% if child.children %}

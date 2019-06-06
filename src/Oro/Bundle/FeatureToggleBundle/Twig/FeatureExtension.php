@@ -4,8 +4,15 @@ namespace Oro\Bundle\FeatureToggleBundle\Twig;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class FeatureExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to check feature status:
+ *   - feature_enabled
+ *   - feature_resource_enabled
+ */
+class FeatureExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     protected $container;
@@ -32,8 +39,8 @@ class FeatureExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('feature_enabled', [$this, 'isFeatureEnabled']),
-            new \Twig_SimpleFunction('feature_resource_enabled', [$this, 'isResourceEnabled']),
+            new TwigFunction('feature_enabled', [$this, 'isFeatureEnabled']),
+            new TwigFunction('feature_resource_enabled', [$this, 'isResourceEnabled']),
         ];
     }
 

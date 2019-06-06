@@ -10,6 +10,8 @@ use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Twig\Environment;
+use Twig\Template;
 
 class MenuExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -54,11 +56,11 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testRenderBreadCrumbs()
     {
-        $environment = $this->getMockBuilder(\Twig_Environment::class)
+        $environment = $this->getMockBuilder(Environment::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $template = $this->getMockBuilder(\Twig_TemplateInterface::class)
+        $template = $this->getMockBuilder(Template::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -90,7 +92,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testWrongBredcrumbs()
     {
-        $environment = $this->getMockBuilder('\Twig_Environment')
+        $environment = $this->getMockBuilder(Environment::class)
             ->disableOriginalConstructor()
             ->getMock();
 

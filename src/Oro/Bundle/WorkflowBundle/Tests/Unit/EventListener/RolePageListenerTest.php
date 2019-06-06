@@ -9,6 +9,7 @@ use Oro\Bundle\WorkflowBundle\EventListener\RolePageListener;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Twig\Environment;
 
 class RolePageListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -36,7 +37,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
         $event = new BeforeFormRenderEvent(
             $this->createMock('Symfony\Component\Form\FormView'),
             [],
-            $this->createMock('\Twig_Environment'),
+            $this->createMock(Environment::class),
             null
         );
 
@@ -50,7 +51,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
         $event = new BeforeFormRenderEvent(
             $this->createMock('Symfony\Component\Form\FormView'),
             [],
-            $this->createMock('\Twig_Environment'),
+            $this->createMock(Environment::class),
             null
         );
 
@@ -66,7 +67,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
         $event = new BeforeFormRenderEvent(
             $this->createMock('Symfony\Component\Form\FormView'),
             [],
-            $this->createMock('\Twig_Environment'),
+            $this->createMock(Environment::class),
             null
         );
 
@@ -91,7 +92,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
         $entity = new Role();
         $form = new FormView();
         $form->vars['value'] = new \stdClass();
-        $twig = $this->createMock('\Twig_Environment');
+        $twig = $this->createMock(Environment::class);
         $event = new BeforeFormRenderEvent(
             $form,
             [
@@ -143,7 +144,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
         $entity = new Role();
         $form = new FormView();
         $form->vars['value'] = $entity;
-        $twig = $this->createMock('\Twig_Environment');
+        $twig = $this->createMock(Environment::class);
         $event = new BeforeFormRenderEvent(
             $form,
             [
@@ -199,7 +200,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnViewPageRenderWithoutRequest()
     {
         $event = new BeforeViewRenderEvent(
-            $this->createMock('\Twig_Environment'),
+            $this->createMock(Environment::class),
             [],
             new \stdClass()
         );
@@ -212,7 +213,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnViewPageRenderOnNonUpdateRolePage()
     {
         $event = new BeforeViewRenderEvent(
-            $this->createMock('\Twig_Environment'),
+            $this->createMock(Environment::class),
             [],
             new \stdClass()
         );
@@ -227,7 +228,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnViewPageRender()
     {
         $entity = new Role();
-        $twig = $this->createMock('\Twig_Environment');
+        $twig = $this->createMock(Environment::class);
         $event = new BeforeViewRenderEvent(
             $twig,
             [

@@ -19,11 +19,23 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * Registers twig function to work with email
+ * Provides Twig functions to work with emails:
+ *   - oro_get_email
+ *   - oro_get_full_name_email
+ *   - oro_get_email_address_name
+ *   - oro_get_email_address
+ *   - oro_get_email_thread_attachments
+ *   - oro_can_attache
+ *   - oro_get_mailbox_process_label
+ *   - oro_get_email_ws_event
+ *   - oro_get_unread_emails_count
+ *   - oro_get_absolute_url
  */
-class EmailExtension extends \Twig_Extension
+class EmailExtension extends AbstractExtension
 {
     const NAME = 'oro_email';
 
@@ -117,16 +129,16 @@ class EmailExtension extends \Twig_Extension
     public function getFunctions(): array
     {
         return [
-            new \Twig_SimpleFunction('oro_get_email', [$this, 'getEmail']),
-            new \Twig_SimpleFunction('oro_get_full_name_email', [$this, 'getFullNameEmail']),
-            new \Twig_SimpleFunction('oro_get_email_address_name', [$this, 'getEmailAddressName']),
-            new \Twig_SimpleFunction('oro_get_email_address', [$this, 'getEmailAddress']),
-            new \Twig_SimpleFunction('oro_get_email_thread_attachments', [$this, 'getEmailThreadAttachments']),
-            new \Twig_SimpleFunction('oro_can_attache', [$this, 'canReAttach']),
-            new \Twig_SimpleFunction('oro_get_mailbox_process_label', [$this, 'getMailboxProcessLabel']),
-            new \Twig_SimpleFunction('oro_get_email_ws_event', [$this, 'getEmailWSChannel']),
-            new \Twig_SimpleFunction('oro_get_unread_emails_count', [$this, 'getUnreadEmailsCount']),
-            new \Twig_SimpleFunction('oro_get_absolute_url', [$this, 'getAbsoluteUrl'])
+            new TwigFunction('oro_get_email', [$this, 'getEmail']),
+            new TwigFunction('oro_get_full_name_email', [$this, 'getFullNameEmail']),
+            new TwigFunction('oro_get_email_address_name', [$this, 'getEmailAddressName']),
+            new TwigFunction('oro_get_email_address', [$this, 'getEmailAddress']),
+            new TwigFunction('oro_get_email_thread_attachments', [$this, 'getEmailThreadAttachments']),
+            new TwigFunction('oro_can_attache', [$this, 'canReAttach']),
+            new TwigFunction('oro_get_mailbox_process_label', [$this, 'getMailboxProcessLabel']),
+            new TwigFunction('oro_get_email_ws_event', [$this, 'getEmailWSChannel']),
+            new TwigFunction('oro_get_unread_emails_count', [$this, 'getUnreadEmailsCount']),
+            new TwigFunction('oro_get_absolute_url', [$this, 'getAbsoluteUrl'])
         ];
     }
 

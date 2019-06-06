@@ -8,12 +8,15 @@ use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityFormatExtension;
 use Oro\Bundle\UIBundle\Twig\FormatExtension;
 use Oro\Bundle\UIBundle\Twig\HtmlTagExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Twig\Environment;
+use Twig\Node\Node;
+use Twig\TwigFunction;
 
 class EntityFormatExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \Twig_Environment|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
     private $environment;
 
     /** @var EntityExtension|\PHPUnit\Framework\MockObject\MockObject */
@@ -30,7 +33,7 @@ class EntityFormatExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->environment = $this->createMock(\Twig_Environment::class);
+        $this->environment = $this->createMock(Environment::class);
         $this->entityExtension = $this->createMock(EntityExtension::class);
         $this->formatExtension = $this->createMock(FormatExtension::class);
         $this->htmlTagExtension = $this->createMock(HtmlTagExtension::class);
@@ -58,12 +61,12 @@ class EntityFormatExtensionTest extends \PHPUnit\Framework\TestCase
         $functions = $this->extension->getFunctions();
         self::assertCount(1, $functions);
 
-        /** @var \Twig_SimpleFunction $formatFunction */
+        /** @var TwigFunction $formatFunction */
         $formatFunction = $functions[0];
-        self::assertInstanceOf(\Twig_SimpleFunction::class, $formatFunction);
+        self::assertInstanceOf(TwigFunction::class, $formatFunction);
         self::assertEquals('_entity_var', $formatFunction->getName());
         self::assertTrue($formatFunction->needsEnvironment());
-        self::assertEquals(['html'], $formatFunction->getSafe($this->createMock(\Twig_Node::class)));
+        self::assertEquals(['html'], $formatFunction->getSafe($this->createMock(Node::class)));
     }
 
     public function testGetSafeFormatExpressionWithoutNotDefinedMessage()

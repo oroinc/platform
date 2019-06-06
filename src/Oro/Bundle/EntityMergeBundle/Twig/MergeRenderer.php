@@ -9,11 +9,18 @@ use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\Metadata;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Twig\Environment;
 
+/**
+ * Provides implementation for Twig functions oro_entity_merge_render_field_value
+ * and oro_entity_merge_render_entity_label.
+ *
+ * @see \Oro\Bundle\EntityMergeBundle\Twig\MergeExtension
+ */
 class MergeRenderer
 {
     /**
-     * @var \Twig_Environment
+     * @var Environment
      */
     protected $environment;
 
@@ -28,12 +35,12 @@ class MergeRenderer
     protected $defaultTemplate;
 
     /**
-     * @param \Twig_Environment $environment
+     * @param Environment $environment
      * @param EventDispatcherInterface $eventDispatcher
      * @param string $defaultTemplate
      */
     public function __construct(
-        \Twig_Environment $environment,
+        Environment $environment,
         EventDispatcherInterface $eventDispatcher,
         $defaultTemplate
     ) {

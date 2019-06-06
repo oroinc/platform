@@ -6,8 +6,16 @@ use Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class DashboardExtension extends \Twig_Extension
+/**
+ * Provides Twig functions for working with dashboard filters:
+ *   - oro_filter_date_range_view
+ *   - oro_query_filter_metadata
+ *   - oro_query_filter_entities
+ */
+class DashboardExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     protected $container;
@@ -50,9 +58,9 @@ class DashboardExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_filter_date_range_view', [$this, 'getViewValue']),
-            new \Twig_SimpleFunction('oro_query_filter_metadata', [$this, 'getQueryFilterMetadata']),
-            new \Twig_SimpleFunction('oro_query_filter_entities', [$this, 'getQueryFilterEntities'])
+            new TwigFunction('oro_filter_date_range_view', [$this, 'getViewValue']),
+            new TwigFunction('oro_query_filter_metadata', [$this, 'getQueryFilterMetadata']),
+            new TwigFunction('oro_query_filter_entities', [$this, 'getQueryFilterEntities'])
         ];
     }
 

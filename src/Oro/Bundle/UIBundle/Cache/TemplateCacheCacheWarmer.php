@@ -3,7 +3,12 @@
 namespace Oro\Bundle\UIBundle\Cache;
 
 use Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer as SymfonyTemplateCacheCacheWarmer;
+use Twig\Error\Error;
 
+/**
+ * Overrides Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer->warmUp()
+ * to improve template cache warm-up performance.
+ */
 class TemplateCacheCacheWarmer extends SymfonyTemplateCacheCacheWarmer
 {
     /**
@@ -23,7 +28,7 @@ class TemplateCacheCacheWarmer extends SymfonyTemplateCacheCacheWarmer
 
             try {
                 $twig->generateTemplateCache($template);
-            } catch (\Twig_Error $e) {
+            } catch (Error $e) {
                 // problem during compilation, give up
             }
         }

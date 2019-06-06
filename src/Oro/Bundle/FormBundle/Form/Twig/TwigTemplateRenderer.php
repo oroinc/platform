@@ -3,20 +3,24 @@
 namespace Oro\Bundle\FormBundle\Form\Twig;
 
 use Oro\Bundle\FormBundle\Form\Builder\TemplateRendererInterface;
+use Twig\Environment;
 
+/**
+ * Renders a template
+ */
 class TwigTemplateRenderer implements TemplateRendererInterface
 {
-    /** @var \Twig_Environment */
+    /** @var Environment */
     protected $env;
 
     /** @var array */
     protected $context;
 
     /**
-     * @param \Twig_Environment $env
-     * @param array             $context
+     * @param Environment $env
+     * @param array       $context
      */
-    public function __construct(\Twig_Environment $env, $context)
+    public function __construct(Environment $env, $context)
     {
         $this->env     = $env;
         $this->context = $context;
@@ -27,6 +31,8 @@ class TwigTemplateRenderer implements TemplateRendererInterface
      */
     public function render($template)
     {
-        return $this->env->render($template, $this->context);
+        $templateWrapper = $this->env->createTemplate($template);
+
+        return $templateWrapper->render($this->context);
     }
 }

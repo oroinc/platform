@@ -32,6 +32,8 @@
 {% set saveAndTransitButtonId = 'save-and-transit' %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if indexPath %}
         {{ UI.cancelButton(indexPath) }}
     {% endif %}
@@ -92,7 +94,7 @@
                 'subblocks': [{'data' : [transitionFormWidget] }]
             }
         ] %}
-    
+
         {% set id = 'transitionPage' %}
         {% set data = {'dataBlocks': dataBlocks} %}
         {{ parent() }}

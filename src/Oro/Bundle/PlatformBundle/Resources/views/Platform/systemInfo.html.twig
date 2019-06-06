@@ -9,15 +9,17 @@
 {% block navButtons %}{% endblock navButtons %}
 
 {% block content_data %}
+    {% import _self as systeminfo %}
+
     {% set packagesSection %}
         <div class="row-fluid">
             <div class="responsive-block package-list">
                 <h3>{{ 'oro.platform.caption.oro'|trans }}</h3>
-                {{ _self.packagesTable(oroPackages) }}
+                {{ systeminfo.packagesTable(oroPackages) }}
             </div>
             <div class="responsive-block package-list">
                 <h3>{{ 'oro.platform.caption.thirdParty'|trans }}</h3>
-                {{ _self.packagesTable(thirdPartyPackages) }}
+                {{ systeminfo.packagesTable(thirdPartyPackages) }}
             </div>
         </div>
     {% endset %}

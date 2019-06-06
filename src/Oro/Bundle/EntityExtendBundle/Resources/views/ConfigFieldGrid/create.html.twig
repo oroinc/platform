@@ -8,6 +8,8 @@
 {% endif %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {{ UI.cancelButton(path('oro_entityconfig_view', {'id':entity_id})) }}
     {{ UI.saveActionButton({
         'label': 'Continue'|trans,

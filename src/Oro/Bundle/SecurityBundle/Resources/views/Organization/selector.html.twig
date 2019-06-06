@@ -1,4 +1,5 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import _self as organizationSelector %}
 
 {% set curr_organization = get_current_organization() %}
 {% set organizations = get_enabled_organizations() %}
@@ -20,7 +21,7 @@
             }) }}
         >
             {{ UI.app_logo(organization_name) }}
-            {{ _self.organization_name_and_logo(organization_name) }}
+            {{ organizationSelector.organization_name_and_logo(organization_name) }}
             {% set togglerId = 'dropdown-'|uniqid %}
             <span id="{{ togglerId }}" class="dropdown-toggle btn-organization-switcher" data-toggle="dropdown"
                   role="button" aria-label="{{ 'oro.security.organization.switch'|trans }}" aria-haspopup="true" aria-expanded="false"></span>
@@ -47,7 +48,7 @@
     {% else %}{# if organizations|length == 1 #}
         <div class="nav logo-wrapper">
             {{ UI.app_logo(organization_name) }}
-            {{ _self.organization_name_and_logo(organization_name) }}
+            {{ organizationSelector.organization_name_and_logo(organization_name) }}
         </div>
     {% endif %}
 {% else %}

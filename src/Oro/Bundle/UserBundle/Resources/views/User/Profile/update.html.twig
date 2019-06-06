@@ -7,6 +7,8 @@
 {% set formAction = path('oro_user_profile_update') %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if form.vars.value.id and is_granted('DELETE', form.vars.value) and form.vars.value.id != app.user.id %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_user', {'id': form.vars.value.id}),
@@ -61,6 +63,8 @@
 {% endblock stats %}
 
 {% block content_data %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
 <div class="user-profile-cols">
     {% set id = 'user-profile' %}
 
