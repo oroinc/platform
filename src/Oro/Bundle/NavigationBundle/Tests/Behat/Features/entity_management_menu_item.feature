@@ -12,3 +12,5 @@ Feature: Manage entity Menu Item
     And I click view Menu Item in grid
     Then I should not see "There was an error performing the requested operation" flash message
     And I should see "Create Field"
+    When I click "Number of records"
+    Then I should be on Menus page
