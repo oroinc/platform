@@ -6,11 +6,15 @@ use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * Hash navigation related twig extension
+ * Provides Twig functions to support hash navigation:
+ *   - oro_is_hash_navigation
+ *   - oro_hash_navigation_header
  */
-class HashNavExtension extends \Twig_Extension
+class HashNavExtension extends AbstractExtension
 {
     /** @var Request */
     protected $request;
@@ -35,11 +39,11 @@ class HashNavExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_is_hash_navigation',
                 [$this, 'checkIsHashNavigation']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_hash_navigation_header',
                 [$this, 'getHashNavigationHeaderConst']
             ),

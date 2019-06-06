@@ -5,8 +5,16 @@ namespace Oro\Bundle\TranslationBundle\Twig;
 use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class TranslationExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to debug translations:
+ *   - oro_translation_debug_translator
+ *   - oro_translation_debug_js_translations
+ *   - translation_grid_link
+ */
+class TranslationExtension extends AbstractExtension
 {
     const NAME = 'oro_translation';
 
@@ -43,9 +51,9 @@ class TranslationExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_translation_debug_translator', [$this, 'isDebugTranslator']),
-            new \Twig_SimpleFunction('oro_translation_debug_js_translations', [$this, 'isDebugJsTranslations']),
-            new \Twig_SimpleFunction('translation_grid_link', [$this, 'getTranslationGridLink'])
+            new TwigFunction('oro_translation_debug_translator', [$this, 'isDebugTranslator']),
+            new TwigFunction('oro_translation_debug_js_translations', [$this, 'isDebugJsTranslations']),
+            new TwigFunction('translation_grid_link', [$this, 'getTranslationGridLink'])
         ];
     }
 

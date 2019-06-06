@@ -1,4 +1,5 @@
 {% macro renderDynamicFields(entity, entity_class) %}
+    {% import _self as entityConfigMacros %}
     {% import 'OroUIBundle::macros.html.twig' as ui %}
     {% set dynamicFields = oro_get_dynamic_fields(entity, entity_class) %}
     {% if dynamicFields is defined and dynamicFields|length %}
@@ -6,7 +7,7 @@
             {% if feature_resource_enabled(fieldName, 'field_configs') %}
                 {{ ui.renderHtmlProperty(
                     item.label|trans,
-                    _self.formatDynamicFieldValue(
+                    entityConfigMacros.formatDynamicFieldValue(
                         entity,
                         entity_class,
                         fieldName,
@@ -20,11 +21,13 @@
 
 {% macro renderDynamicField(entity, field) %}
     {% import 'OroUIBundle::macros.html.twig' as ui %}
+    {% import _self as entityConfigMacros %}
+
     {% set dynamicField = oro_get_dynamic_field(entity, field) %}
     {% if dynamicField %}
         {{ ui.renderHtmlProperty(
             dynamicField.label|trans,
-            _self.formatDynamicFieldValue(
+            entityConfigMacros.formatDynamicFieldValue(
                 entity,
                 field.entity.className,
                 field.fieldName,
@@ -35,12 +38,14 @@
 {% endmacro %}
 
 {% macro formatDynamicFieldValue(entity, entity_class, field_name, item) %}
+    {% import _self as entityConfigMacros %}
+
     {% set hasLink = false %}
     {% set fieldValue = item.value %}
     {% if fieldValue is iterable %}
         {% if fieldValue.values is defined %}
             {%- for value in fieldValue.values -%}
-                {{- _self.renderField(value) -}}
+                {{- entityConfigMacros.renderField(value) -}}
                 {%- if not loop.last -%}
                     ,&nbsp;
                 {%- endif -%}
@@ -48,10 +53,10 @@
                 {{- 'N/A'|trans -}}
             {%- endfor -%}
         {% else %}
-            {{ _self.renderField(fieldValue) }}
+            {{ entityConfigMacros.renderField(fieldValue) }}
         {% endif %}
     {% else %}
-        {{ _self.renderFormatted(entity, entity_class, field_name, item) }}
+        {{ entityConfigMacros.renderFormatted(entity, entity_class, field_name, item) }}
     {% endif %}
 {% endmacro %}
 

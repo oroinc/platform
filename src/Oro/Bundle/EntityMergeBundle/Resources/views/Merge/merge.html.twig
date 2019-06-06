@@ -4,6 +4,8 @@
 {% oro_title_set({params : {'{{ label }}': entityLabel|trans }}) %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {{ UI.cancelButton(oro_url_add_query(cancelPath)) }}
     {{ UI.saveAndStayButton('oro.entity_merge.form.merge_button'|trans) }}
 {% endblock navButtons %}

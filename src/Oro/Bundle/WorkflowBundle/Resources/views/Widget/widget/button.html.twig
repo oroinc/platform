@@ -1,3 +1,5 @@
+{% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
+
 {% if workflow.transitionsData|length or workflow.resetAllowed|default(false) %}
     {% set blockId = 'entity-transitions-container-' ~ random() %}
     <div class="transitions-btn-group" id="{{ blockId }}">

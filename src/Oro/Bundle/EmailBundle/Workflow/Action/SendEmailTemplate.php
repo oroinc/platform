@@ -115,7 +115,7 @@ class SendEmailTemplate extends AbstractSendEmail
      * {@inheritdoc}
      *
      * @throws EntityNotFoundException if the specified email template cannot be found
-     * @throws \Twig_Error When an error occurred in Twig during email template loading, compilation or rendering
+     * @throws \Twig\Error\Error When an error occurred in Twig during email template loading, compilation or rendering
      */
     protected function executeAction($context)
     {

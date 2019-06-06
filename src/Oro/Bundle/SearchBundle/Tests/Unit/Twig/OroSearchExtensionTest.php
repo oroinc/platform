@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\SearchBundle\Twig\OroSearchExtension;
+use Twig\Environment;
 
 class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -10,7 +11,7 @@ class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $twigService = $this->createMock('Twig_Environment');
+        $twigService = $this->createMock(Environment::class);
         $this->extension = new OroSearchExtension($twigService, 'testLayout.html.twig');
     }
 

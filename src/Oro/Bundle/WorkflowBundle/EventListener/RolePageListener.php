@@ -7,7 +7,11 @@ use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
+use Twig\Environment;
 
+/**
+ * Adds a datagrid with workflow permissions to the role view and role edit page.
+ */
 class RolePageListener
 {
     /** @var TranslatorInterface */
@@ -91,13 +95,13 @@ class RolePageListener
      * Adds the Workflow ACL datagrid block to the page data and return updated data array.
      *
      * @param array             $pageData
-     * @param \Twig_Environment $twigEnvironment
+     * @param Environment       $twigEnvironment
      * @param Role              $entity
      * @param boolean           $readOnly
      *
      * @return array
      */
-    protected function addWorkflowAclDatagrid($pageData, \Twig_Environment $twigEnvironment, Role $entity, $readOnly)
+    protected function addWorkflowAclDatagrid($pageData, Environment $twigEnvironment, Role $entity, $readOnly)
     {
         $dataBlocks = $pageData['dataBlocks'];
         $resultBlocks = [];
@@ -126,13 +130,13 @@ class RolePageListener
     /**
      * Renders Datagrid html for given role
      *
-     * @param \Twig_Environment $twigEnvironment
+     * @param Environment $twigEnvironment
      * @param Role              $entity
      * @param boolean           $readOnly
      *
      * @return string
      */
-    protected function getRenderedGridHtml(\Twig_Environment $twigEnvironment, Role $entity, $readOnly)
+    protected function getRenderedGridHtml(Environment $twigEnvironment, Role $entity, $readOnly)
     {
         return $twigEnvironment->render(
             'OroWorkflowBundle:Datagrid:aclGrid.html.twig',

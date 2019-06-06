@@ -26,24 +26,15 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        $this->titleService = $this->getMockBuilder(TitleServiceInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->requestStack = $this->getMockBuilder(RequestStack::class)
-            ->getMock();
+        $this->titleService = $this->createMock(TitleServiceInterface::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_navigation.title_service', $this->titleService)
-            ->add('request_stack', $this->requestStack)
+            ->add(TitleServiceInterface::class, $this->titleService)
+            ->add(RequestStack::class, $this->requestStack)
             ->getContainer($this);
 
         $this->extension = new TitleExtension($container);
-    }
-
-    public function testNameConfigured()
-    {
-        $this->assertInternalType('string', $this->extension->getName());
     }
 
     public function testRenderSerialized()

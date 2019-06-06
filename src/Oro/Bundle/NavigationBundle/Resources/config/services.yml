@@ -40,6 +40,9 @@ parameters:
     oro_navigation.menu_update.scope_type:                     menu_default_visibility
 
 services:
+    Knp\Menu\Twig\Helper:
+        alias: knp_menu.helper
+
     oro_menu_acl_extension:
         class: '%oro_menu.factory.acl_extension.class%'
         arguments:
@@ -80,6 +83,9 @@ services:
         tags:
             - { name: knp_menu.provider }
 
+    Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider:
+        alias: oro_menu.builder_chain
+
     oro_menu.configuration_resolver:
         class: '%oro_menu.configuration_resolver.class%'
         arguments:
@@ -103,9 +109,10 @@ services:
     oro_menu.twig.extension:
         class: Oro\Bundle\NavigationBundle\Twig\MenuExtension
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber }
 
     oro_navigation.item.builder.pinbar:
         class: '%oro_navigation.item.builder.pinbar.class%'
@@ -247,6 +254,9 @@ services:
           - '@oro_navigation.chain_breadcrumb_manager.link'
         lazy: true
 
+    Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface:
+        alias: oro_navigation.title_service
+
     oro_navigation.title_service.link:
         tags:
             - { name: oro_service_link, service: oro_navigation.title_service }
@@ -288,9 +298,10 @@ services:
         class: Oro\Bundle\NavigationBundle\Twig\TitleExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber }
 
     oro_navigation.translation.extractor:
         class: Oro\Bundle\NavigationBundle\Title\TranslationExtractor
@@ -365,6 +376,9 @@ services:
         class: '%oro_navigation.chain_breadcrumbs_manager.class%'
         calls:
           - [ setDefaultManager, [ '@oro_navigation.breadcrumb_manager' ]]
+
+    Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface:
+        alias: oro_navigation.chain_breadcrumb_manager
 
     oro_navigation.menu_update.builder.menu_default_visibility:
         class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
@@ -499,6 +513,9 @@ services:
         arguments:
             - '%kernel.cache_dir%/oro/navigation.php'
             - '%kernel.debug%'
+
+    Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider:
+        alias: oro_navigation.configuration.provider
 
     oro_navigation.event_listener.scope_grid_listener:
         class: Oro\Bundle\NavigationBundle\EventListener\MenuGridListener

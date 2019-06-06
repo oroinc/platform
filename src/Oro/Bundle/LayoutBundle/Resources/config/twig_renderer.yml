@@ -12,6 +12,9 @@ services:
         arguments:
             - '@oro_layout.twig.renderer.engine'
 
+    Oro\Bundle\LayoutBundle\Twig\TwigRenderer:
+        alias: oro_layout.twig.renderer
+
     oro_layout.twig.renderer.engine:
         public: false
         class: Oro\Bundle\LayoutBundle\Form\TwigRendererEngine

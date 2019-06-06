@@ -19,6 +19,10 @@
 {% endblock pageActions %}
 
 {% block navButtons %}
+    {% import 'OroActivityBundle::macros.html.twig' as AC %}
+    {% import "OroEmailBundle::actions.html.twig" as Actions %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% set buttonsHtml %}
         {# Button for add context on the activity list item view page #}
         {{ AC.addContextButton(entity) }}
@@ -37,6 +41,8 @@
 {% endblock breadcrumb %}
 
 {% block stats %}
+    {% import 'OroActivityBundle::macros.html.twig' as AC %}
+
     {# Display contexts targets in the activity view page #}
     <li class="context-data activity-context-activity-block">
         {{ AC.activity_contexts(entity) }}

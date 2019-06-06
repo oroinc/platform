@@ -18,6 +18,8 @@
 {% endblock %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if form.vars.value.id and is_granted('CREATE', form.vars.value) %}
         {{ UI.button({
             'path' : path('oro_report_clone', {'id': form.vars.value.id}),
@@ -73,6 +75,8 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% set id = 'report-profile' %}
     {% set ownerDataBlock = {
         'dataBlocks': [{

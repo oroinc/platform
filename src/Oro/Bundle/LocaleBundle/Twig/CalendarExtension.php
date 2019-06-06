@@ -4,11 +4,16 @@ namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * Twig extension for calendar
+ * Provides Twig functions to retrieve calendar data:
+ *   - oro_calendar_month_names
+ *   - oro_calendar_day_of_week_names
+ *   - oro_calendar_first_day_of_week
  */
-class CalendarExtension extends \Twig_Extension
+class CalendarExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     protected $container;
@@ -35,15 +40,15 @@ class CalendarExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_calendar_month_names',
                 [$this, 'getMonthNames']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_calendar_day_of_week_names',
                 [$this, 'getDayOfWeekNames']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_calendar_first_day_of_week',
                 [$this, 'getFirstDayOfWeek']
             ),

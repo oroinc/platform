@@ -10,6 +10,8 @@
 {% endif %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if entity.id and is_granted('oro_attribute_family_delete', entity) and is_granted('delete', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_attribute_family_delete', {'id': entity.id}),

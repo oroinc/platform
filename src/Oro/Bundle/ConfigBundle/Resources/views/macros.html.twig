@@ -46,7 +46,9 @@
         routeParameters  - additional route parameters
 #}
 {% macro renderScrollData(configTree, form, activeTabName = false, activeSubTabName = false, routeName = 'oro_config_configuration_system', routeParameters = {}) %}
-    {{ _self.renderConfigurationScrollData({
+    {% import _self as configMacros %}
+
+    {{ configMacros.renderConfigurationScrollData({
         configTree: configTree,
         form: form,
         content: {},
@@ -59,6 +61,7 @@
 
 {% macro renderConfigurationScrollData(data) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import _self as configMacros %}
 
     {% set content %}
         <div class="layout-content" data-page-component-view="{{ {
@@ -79,7 +82,7 @@
             },
             viewGroup: 'configuration'
         }|json_encode }}">
-            {{ _self.renderTabContent(data.form, data.content) }}
+            {{ configMacros.renderTabContent(data.form, data.content) }}
         </div>
     {% endset %}
     <div class="system-configuration-container">
@@ -90,6 +93,7 @@
                 <div id="system-configuration-jstree-inline-actions"></div>
             {% endblock header %}
             {% block sidebar %}
+                {% import 'OroUIBundle::macros.html.twig' as UI %}
                 {{ UI.renderJsTree({
                     'label': null,
                     'treeOptions': {
@@ -122,6 +126,8 @@
         form        - form view for active tab tree configuration
 #}
 {% macro renderTabContent(form, content) %}
+    {% import _self as configMacros %}
+
     {% set content = content|default({}) %}
     {% set processForm = false %}
     {% if content.formErrors is not defined %}
@@ -173,7 +179,7 @@
 
                         {% for subblock in scrollBlock.subblocks %}
                             {% if subblock is iterable %}
-                                {{ _self.renderFieldset(subblock) }}
+                                {{ configMacros.renderFieldset(subblock) }}
                             {% else %}
                                 {{ subblock|raw }}
                             {% endif %}

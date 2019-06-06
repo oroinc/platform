@@ -2,7 +2,7 @@
 
 {% block list %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
+    {% if item.hasChildren and options.depth is not same as(0) and item.displayChildren %}
             {% set togglerId = 'dropdown-'|uniqid %}
             <div class="dropdown header-dropdown-shortcut" data-layout="separate"
                 {{ UI.renderPageComponentAttributes({view: 'oronavigation/js/app/views/shortcuts-view'}) }}>

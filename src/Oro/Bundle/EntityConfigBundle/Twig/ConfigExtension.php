@@ -13,11 +13,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * The TWIG extension that provides entity config related functions.
+ * Provides Twig functions to work with entity configs:
+ *   - oro_entity_config
+ *   - oro_entity_config_value
+ *   - oro_field_config
+ *   - oro_field_config_value
+ *   - oro_entity_route
+ *   - oro_entity_metadata_value
+ *   - oro_entity_view_link
+ *   - oro_entity_object_view_link
  */
-class ConfigExtension extends \Twig_Extension
+class ConfigExtension extends AbstractExtension
 {
     const NAME = 'oro_entity_config';
 
@@ -92,14 +102,14 @@ class ConfigExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_entity_config', [$this, 'getClassConfig']),
-            new \Twig_SimpleFunction('oro_entity_config_value', [$this, 'getClassConfigValue']),
-            new \Twig_SimpleFunction('oro_field_config', [$this, 'getFieldConfig']),
-            new \Twig_SimpleFunction('oro_field_config_value', [$this, 'getFieldConfigValue']),
-            new \Twig_SimpleFunction('oro_entity_route', [$this, 'getClassRoute']),
-            new \Twig_SimpleFunction('oro_entity_metadata_value', [$this, 'getClassMetadataValue']),
-            new \Twig_SimpleFunction('oro_entity_view_link', [$this, 'getViewLink']),
-            new \Twig_SimpleFunction('oro_entity_object_view_link', [$this, 'getEntityViewLink']),
+            new TwigFunction('oro_entity_config', [$this, 'getClassConfig']),
+            new TwigFunction('oro_entity_config_value', [$this, 'getClassConfigValue']),
+            new TwigFunction('oro_field_config', [$this, 'getFieldConfig']),
+            new TwigFunction('oro_field_config_value', [$this, 'getFieldConfigValue']),
+            new TwigFunction('oro_entity_route', [$this, 'getClassRoute']),
+            new TwigFunction('oro_entity_metadata_value', [$this, 'getClassMetadataValue']),
+            new TwigFunction('oro_entity_view_link', [$this, 'getViewLink']),
+            new TwigFunction('oro_entity_object_view_link', [$this, 'getEntityViewLink']),
         ];
     }
 

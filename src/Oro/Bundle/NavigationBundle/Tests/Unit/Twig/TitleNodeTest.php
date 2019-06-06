@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\NavigationBundle\Twig\TitleExtension;
 use Oro\Bundle\NavigationBundle\Twig\TitleNode;
 use Twig\Compiler;
+use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Node;
 
 class TitleNodeTest extends \PHPUnit\Framework\TestCase
@@ -37,7 +39,7 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests error in twig tag call
      *
-     * @expectedException \Twig_Error_Syntax
+     * @expectedException \Twig\Error\SyntaxError
      */
     public function testFailedCompile()
     {
@@ -51,7 +53,7 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
      */
     public function testSuccessCompile()
     {
-        $exprMock = $this->getMockBuilder('Twig_Node_Expression_Array')->disableOriginalConstructor()->getMock();
+        $exprMock = $this->getMockBuilder(ArrayExpression::class)->disableOriginalConstructor()->getMock();
 
         $this->node->expects($this->once())
             ->method('getIterator')
@@ -64,7 +66,7 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
 
         $this->compiler->expects($this->at(1))
             ->method('write')
-            ->with('$this->env->getExtension("Oro\Bundle\NavigationBundle\Twig\TitleExtension")->set(')
+            ->with('$this->env->getExtension("' . TitleExtension::class . '")->set(')
             ->will($this->returnSelf());
 
         $this->compiler->expects($this->at(2))

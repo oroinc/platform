@@ -17,6 +17,8 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% block content %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if isDesktopVersion() %}
         {% set saveButton = UI.saveAndStayButton({
             'label': 'oro.config.actions.save_settings'|trans

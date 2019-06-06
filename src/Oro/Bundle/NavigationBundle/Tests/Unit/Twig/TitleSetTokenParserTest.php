@@ -3,6 +3,11 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\NavigationBundle\Twig\TitleSetTokenParser;
+use Twig\ExpressionParser;
+use Twig\Node\Node;
+use Twig\Parser;
+use Twig\Token;
+use Twig\TokenStream;
 
 class TitleSetTokenParserTest extends \PHPUnit\Framework\TestCase
 {
@@ -11,23 +16,21 @@ class TitleSetTokenParserTest extends \PHPUnit\Framework\TestCase
      */
     public function testParsing()
     {
-        $node = $this->createMock('Twig_Node');
+        $node = $this->createMock(Node::class);
 
-        $exprParser = $this->getMockBuilder('Twig_ExpressionParser')
+        $exprParser = $this->getMockBuilder(ExpressionParser::class)
                            ->disableOriginalConstructor()
                            ->getMock();
         $exprParser->expects($this->once())
                    ->method('parseArguments')
                    ->will($this->returnValue($node));
 
-        $stream = $this->getMockBuilder('Twig_TokenStream')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $stream->expects($this->once())
-            ->method('expect')
-            ->with($this->equalTo(\Twig_Token::BLOCK_END_TYPE));
+        $stream = new TokenStream([
+            new Token(Token::BLOCK_END_TYPE, '', 1),
+            new Token(Token::EOF_TYPE, '', 1),
+        ]);
 
-        $parser = $this->getMockBuilder('Twig_Parser')
+        $parser = $this->getMockBuilder(Parser::class)
                        ->disableOriginalConstructor()
                        ->getMock();
         $parser->expects($this->once())
@@ -37,13 +40,7 @@ class TitleSetTokenParserTest extends \PHPUnit\Framework\TestCase
                ->method('getStream')
                ->will($this->returnValue($stream));
 
-        $token = $this->getMockBuilder('Twig_Token')
-                      ->disableOriginalConstructor()
-                      ->getMock();
-        $token->expects($this->once())
-              ->method('getLine')
-              ->will($this->returnValue(1));
-
+        $token = new Token(Token::NAME_TYPE, 'oro_title_set', 1);
         $tokenParser = new TitleSetTokenParser();
         $tokenParser->setParser($parser);
         $tokenParser->parse($token);

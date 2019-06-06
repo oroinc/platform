@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Represents a context in which AccessRuleWalker works in.

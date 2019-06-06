@@ -8,11 +8,19 @@ use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Intl\Intl;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 /**
- * Provides TWIG filters and functions for working with prices and currencies.
+ * Provides a Twig function to retrieve currency display configuration:
+ *   - oro_currency_view_type
+ *
+ * Provides Twig filter to format prices:
+ *   - oro_format_price
+ *   - oro_localized_currency_name
  */
-class CurrencyExtension extends \Twig_Extension
+class CurrencyExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     protected $container;
@@ -55,8 +63,8 @@ class CurrencyExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_currency_view_type', [$this, 'getViewType']),
-            new \Twig_SimpleFunction(
+            new TwigFunction('oro_currency_view_type', [$this, 'getViewType']),
+            new TwigFunction(
                 'oro_currency_symbol_collection',
                 [$this, 'getSymbolCollection'],
                 ['is_safe' => ['html']]
@@ -70,12 +78,12 @@ class CurrencyExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_format_price',
                 [$this, 'formatPrice'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFilter('oro_localized_currency_name', [$this, 'getCurrencyName'])
+            new TwigFilter('oro_localized_currency_name', [$this, 'getCurrencyName'])
         ];
     }
 
@@ -136,7 +144,7 @@ class CurrencyExtension extends \Twig_Extension
     {
         $currencySymbolCollection = $this->getCurrencyNameHelper()
             ->getCurrencyChoices(ViewTypeProviderInterface::VIEW_TYPE_SYMBOL);
-        
+
         $currencySymbolCollection = array_map(
             function ($symbol) {
                 return ['symbol' => $symbol];

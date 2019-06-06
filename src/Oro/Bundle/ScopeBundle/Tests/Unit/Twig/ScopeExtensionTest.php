@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Twig\ScopeExtension;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Twig\TwigFunction;
 
 class ScopeExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -29,7 +30,7 @@ class ScopeExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $functions = $this->scopeExtension->getFunctions();
         $this->assertCount(1, $functions);
-        $this->assertInstanceOf(\Twig_SimpleFunction::class, reset($functions));
+        $this->assertInstanceOf(TwigFunction::class, reset($functions));
     }
 
     public function testIsScopesEmptyWithMoreThanOneScope()

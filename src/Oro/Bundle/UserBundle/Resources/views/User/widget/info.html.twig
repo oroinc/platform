@@ -1,6 +1,7 @@
 {% import 'OroUIBundle::macros.html.twig' as ui %}
 {% import 'OroTagBundle::macros.html.twig' as tag %}
 {% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
+{% import _self as userInfo %}
 
 {% macro renderEmail(emailAddress, isPrimary, entity) %}
     {% import 'OroEmailBundle::macros.html.twig' as email %}
@@ -35,9 +36,9 @@
             {% endset %}
             {{ ui.renderProperty('oro.user.birthday.label'|trans, birthday_string) }}
 
-            {% set emails = [_self.renderEmail(entity.email, true, entity)] %}
+            {% set emails = [userInfo.renderEmail(entity.email, true, entity)] %}
             {% for emailEntity in entity.emails %}
-                {% set emails = emails|merge([_self.renderEmail(emailEntity.email, false, entity)]) %}
+                {% set emails = emails|merge([userInfo.renderEmail(emailEntity.email, false, entity)]) %}
             {% endfor %}
             {{ ui.renderHtmlProperty('oro.user.emails.label'|trans, emails|join('<br />')) }}
 
@@ -63,7 +64,7 @@
         </div>
 
         <div class="responsive-block">
-            {{ _self.renderApiBlock(entity, userApi, viewProfile) }}
+            {{ userInfo.renderApiBlock(entity, userApi, viewProfile) }}
 
             {% placeholder view_user_api_block_after with {entity: entity, viewProfile: viewProfile} %}
         </div>

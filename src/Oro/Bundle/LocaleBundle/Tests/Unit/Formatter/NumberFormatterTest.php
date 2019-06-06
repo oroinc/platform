@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use NumberFormatter as IntlNumberFormatter;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LocaleBundle\Configuration\LocaleConfigurationProvider;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface;
@@ -228,8 +229,11 @@ class NumberFormatterTest extends TestCase
         $configManager = $this->createMock(ConfigManager::class);
         $calendarFactory = $this->createMock(CalendarFactoryInterface::class);
         $localizationManager = $this->createMock(LocalizationManager::class);
+        $localeConfigProvider = $this->createMock(LocaleConfigurationProvider::class);
 
-        $formatter = new NumberFormatter(new LocaleSettings($configManager, $calendarFactory, $localizationManager));
+        $formatter = new NumberFormatter(
+            new LocaleSettings($configManager, $calendarFactory, $localizationManager, $localeConfigProvider)
+        );
         $this->assertEquals(
             $expected,
             $formatter->formatCurrency($value, $currency, [], [], [], $locale)

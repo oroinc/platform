@@ -3,11 +3,15 @@
 namespace Oro\Bundle\TestGeneratorBundle\Generator;
 
 use Symfony\Component\HttpKernel\KernelInterface;
+use Twig\Environment;
 
+/**
+ * Contains common methods used by test generators.
+ */
 abstract class AbstractTestGenerator
 {
     /**
-     * @var \Twig_Environment
+     * @var Environment
      */
     protected $twig;
 
@@ -37,13 +41,13 @@ abstract class AbstractTestGenerator
     protected static $availableApplications;
 
     const PACKAGE_FOLDER_NAME = 'package';
-    
+
     /**
-     * @param \Twig_Environment $twig
+     * @param Environment $twig
      * @param KernelInterface $kernelInterface
      */
     public function __construct(
-        \Twig_Environment $twig,
+        Environment $twig,
         KernelInterface $kernelInterface
     ) {
         $this->twig = $twig;

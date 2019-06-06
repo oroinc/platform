@@ -152,11 +152,13 @@ An example:
 1. Create a Twig extension:
 
 ```php
-class MyExtension extends \Twig_Extension
+use Twig\Extension\AbstractExtension;
+
+class MyExtension extends AbstractExtension
 {
     public function getFunctions()
     {
-        return [new \Twig_SimpleFunction('some_function', [$this, 'getSomeVariableValue'])];
+        return [new Twig\TwigFunction('some_function', [$this, 'getSomeVariableValue'])];
     }
 
     public function getSomeVariableValue(MyEntity $entity): array

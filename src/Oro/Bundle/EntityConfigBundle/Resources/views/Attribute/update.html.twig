@@ -7,6 +7,8 @@
 {% endif %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {{ UI.cancelButton(path('oro_attribute_index', {alias: entityAlias})) }}
     {% if is_granted('oro_attribute_create') %}
         {% set html = UI.saveAndCloseButton({'route': 'oro_attribute_index', 'params': {alias: entityAlias}}) %}

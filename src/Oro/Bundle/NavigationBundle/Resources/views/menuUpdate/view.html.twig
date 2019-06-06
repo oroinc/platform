@@ -1,14 +1,16 @@
 {% extends bap.layout %}
 
 {% import 'OroSyncBundle:Include:contentTags.html.twig' as navigationMacro %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% from _self import resetButton %}
+
 {% set reloadLink -%}
     <a href="#" onclick="window.location.reload(false);return false;">
         {{- 'oro.navigation.menuupdate.reload_link.label'|trans -}}
     </a>
 {%- endset %}
 {% block content %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import _self as menuUpdateView %}
+
     <div class="layout-content"{% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}>
         <div class="container-fluid page-title">
             <div class="navigation navbar-extra navbar-extra-right">
@@ -19,7 +21,7 @@
                         {% endblock pageHeader %}
                     </div>
                     <div class="pull-right">
-                        {{ resetButton({
+                        {{ menuUpdateView.resetButton({
                             'dataUrl': path(routePrefix ~ 'ajax_reset', {menuName: entity.root.name, context: context}),
                             'dataRedirect': path(routePrefix ~ 'view', {menuName: entity.root.name, context: context}),
                             'menuKey': entity.root.name,
@@ -83,6 +85,8 @@
                     scrollbar: '[data-role="jstree-container"]'
                 }} %}
                     {% block sidebar %}
+                        {% import 'OroUIBundle::macros.html.twig' as UI %}
+
                         {{ UI.renderJsTree(
                             {
                                 'label': 'oro.navigation.menu.menu_list_default.label'|trans,

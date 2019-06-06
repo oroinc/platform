@@ -166,7 +166,7 @@
 
 {% block form_label %}
     {% spaceless %}
-    {% if label is not sameas(false) %}
+    {% if label is not same as(false) %}
         {% if not compound %}
             {% set label_attr = label_attr|merge({'for': id}) %}
         {% endif %}
@@ -372,9 +372,10 @@
 {% endmacro %}
 
 {% block oro_collection_widget %}
+    {% import _self as formFields %}
     {% spaceless %}
         {% if prototype is defined %}
-            {% set prototype_html = _self.oro_collection_item_prototype(form) %}
+            {% set prototype_html = formFields.oro_collection_item_prototype(form) %}
         {% endif %}
         {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection collection-fields-list' }) %}
         {% set id = id ~ '_collection' %}
@@ -384,7 +385,7 @@
                 <input type="hidden" name="validate_{{ full_name }}" data-collection-name="{{ full_name }}" data-name="collection-validation" disabled data-validate-element>
                 {% if form.children|length %}
                     {% for child in form.children %}
-                        {{ _self.oro_collection_item_prototype(child) }}
+                        {{ formFields.oro_collection_item_prototype(child) }}
                     {% endfor %}
                 {% elseif show_form_when_empty and prototype_html is defined %}
                     {% for i in 0..(form.vars.row_count_initial - 1) %}
@@ -397,7 +398,7 @@
             {% endif %}
         </div>
         {% if handle_primary and (prototype is not defined or prototype.primary is defined) %}
-            {{ _self.oro_collection_validate_primary_js(_context) }}
+            {{ formFields.oro_collection_validate_primary_js(_context) }}
         {% endif %}
     {% endspaceless %}
 {% endblock %}
@@ -434,7 +435,7 @@
             {% if attr.class is defined %} {{ attr.class }}{% endif %}"
             id="{{ viewsContainerId }}"
         >
-            {% if label is not sameas(false) %}
+            {% if label is not same as(false) %}
                 <div class="control-label wrap">
                     {{ form_label(form, '' , { label_attr: label_attr}) }}
                 </div>
@@ -580,7 +581,7 @@
     {% set isButtonsEnabled = not disabled and (attr.readonly is not defined or not attr.readonly) %}
     <div id="{{ id }}-el"
             {% if configs.extra_config is not defined or not configs.extra_config %}
-                {% if form.vars.configs.async_dialogs|default(false) is sameas(true) %}
+                {% if form.vars.configs.async_dialogs|default(false) is same as(true) %}
                     {% set asyncNameSegment = 'async-' %}
                 {% endif %}
                 {% set urlParts = {
@@ -595,7 +596,7 @@
                     }
                 } %}
 
-                {% if form.vars.create_enabled|default(false) is sameas(true) %}
+                {% if form.vars.create_enabled|default(false) is same as(true) %}
                     {% set urlParts = urlParts|merge({
                         create: {
                             route:      form.vars.create_form_route,

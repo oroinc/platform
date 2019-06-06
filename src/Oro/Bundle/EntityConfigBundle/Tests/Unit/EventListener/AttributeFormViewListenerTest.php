@@ -13,13 +13,14 @@ use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Form\FormView;
+use Twig\Environment;
 
 class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     /**
-     * @var \Twig_Environment|\PHPUnit\Framework\MockObject\MockObject
+     * @var Environment|\PHPUnit\Framework\MockObject\MockObject
      */
     private $environment;
 
@@ -38,10 +39,10 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function setUp()
     {
-        $this->environment = $this->getMockBuilder('\Twig_Environment')
+        $this->environment = $this->getMockBuilder(Environment::class)
             ->disableOriginalConstructor()
             ->getMock();
-        
+
         $this->attributeManager = $this->getMockBuilder(AttributeManager::class)
             ->disableOriginalConstructor()
             ->getMock();

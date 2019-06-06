@@ -60,7 +60,7 @@
 {% block linkElement %}
     {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
 
-    {% if item.hasChildren and item.displayChildren and item.level is sameas(0) %}
+    {% if item.hasChildren and item.displayChildren and item.level is same as(0) %}
         {% set linkAttributes = linkAttributes|merge({
             'class':       oro_menu.add_attribute_values(linkAttributes, 'class', ['dropdown-toggle']),
             'data-toggle': 'dropdown'

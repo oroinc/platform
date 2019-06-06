@@ -7,6 +7,8 @@
 }) %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if is_granted('EDIT', entity) %}
         {{ UI.editButton({
             'path': path('oro_entity_update', {entityName: entity_name, id: entity.id}),
@@ -44,6 +46,8 @@
 {% endblock stats%}
 
 {% block content_data %}
+    {% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
+
     {% set data = { 'dataBlocks': [{
         'title': 'General'|trans,
         'class': 'active',

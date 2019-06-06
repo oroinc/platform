@@ -4,8 +4,14 @@ namespace Oro\Bundle\ImportExportBundle\Twig;
 
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistryInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class GetImportExportConfigurationExtension extends \Twig_Extension
+/**
+ * Provides a Twig function to render import/export buttons:
+ *   - get_import_export_configuration
+ */
+class GetImportExportConfigurationExtension extends AbstractExtension
 {
     /**
      * @var ImportExportConfigurationRegistryInterface
@@ -26,7 +32,7 @@ class GetImportExportConfigurationExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('get_import_export_configuration', [$this, 'getConfiguration'])
+            new TwigFunction('get_import_export_configuration', [$this, 'getConfiguration'])
         ];
     }
 

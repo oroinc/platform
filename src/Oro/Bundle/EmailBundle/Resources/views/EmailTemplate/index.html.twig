@@ -4,6 +4,8 @@
 {% set pageTitle = 'oro.email.emailtemplate.entity_plural_label'|trans %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if is_granted('oro_email_emailtemplate_create') %}
         {{ UI.addButton({
             'path' : path('oro_email_emailtemplate_create'),

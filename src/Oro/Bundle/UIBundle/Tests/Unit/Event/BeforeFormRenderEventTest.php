@@ -3,12 +3,13 @@
 namespace Oro\Bundle\UI\Tests\Unit\Event;
 
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
+use Twig\Environment;
 
 class BeforeFormRenderEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {
-        $env = $this->getMockBuilder('Twig_Environment')
+        $env = $this->getMockBuilder(Environment::class)
             ->disableOriginalConstructor()
             ->getMock();
         $formView = $this->getMockBuilder('Symfony\Component\Form\FormView')

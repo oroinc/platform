@@ -5,8 +5,15 @@ namespace Oro\Bundle\TagBundle\Twig;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class TagExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to render entity tags:
+ *   - oro_tag_get_list
+ *   - oro_is_taggable
+ */
+class TagExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     protected $container;
@@ -41,8 +48,8 @@ class TagExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_tag_get_list', [$this, 'getList']),
-            new \Twig_SimpleFunction('oro_is_taggable', [$this, 'isTaggable']),
+            new TwigFunction('oro_tag_get_list', [$this, 'getList']),
+            new TwigFunction('oro_is_taggable', [$this, 'isTaggable']),
         ];
     }
 

@@ -19,7 +19,7 @@
         "ext-openssl": "*",
         "symfony/symfony": "3.4.27",
         "symfony/security-acl": "~3.0.0",
-        "twig/twig": "1.40.*",
+        "twig/twig": "2.9.*",
         "doctrine/orm": "2.6.*",
         "doctrine/doctrine-bundle": "1.9.*",
         "doctrine/dbal": "2.7.*",

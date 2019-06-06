@@ -139,6 +139,8 @@
 {% endblock %}
 
 {% block oro_email_emailtemplate_translatation_widget %}
+    {% import _self as emailFormFealds %}
+
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     <div class="emailtemplate-translatation oro-tabs tabbable" {{ UI.renderPageComponentAttributes({
         view: 'oroemail/js/app/views/email-translation-view'
@@ -153,14 +155,14 @@
                     {% if simple_way %}
                         {% for translationsField in form %}
                             {% set tabId = tabId ~ '-' ~ loop.index %}
-                            {{ _self.renderTabNavItem(translationsField, labels, null, tabId) }}
+                            {{ emailFormFealds.renderTabNavItem(translationsField, labels, null, tabId) }}
                         {% endfor %}
                     {% else %}
                         {% for translationsLocales in form %}
                             {% set tabId = tabId ~ '-' ~ loop.index %}
                             {% for translationsField in translationsLocales %}
                                 {% set tabId = tabId ~ '-' ~ loop.index %}
-                                {{ _self.renderTabNavItem(translationsField, labels, ('defaultLocale' == translationsLocales.vars.name), tabId) }}
+                                {{ emailFormFealds.renderTabNavItem(translationsField, labels, ('defaultLocale' == translationsLocales.vars.name), tabId) }}
                             {% endfor %}
                         {% endfor %}
                     {% endif %}
@@ -173,14 +175,14 @@
                     {% if simple_way %}
                         {% for translationsField in form %}
                             {% set tabContentId = tabContentId ~ '-' ~ loop.index %}
-                            {{ _self.renderTab(translationsField, tabContentId) }}
+                            {{ emailFormFealds.renderTab(translationsField, tabContentId) }}
                         {% endfor %}
                     {% else %}
                         {% for translationsLocales in form %}
                             {% set tabContentId = tabContentId ~ '-' ~ loop.index %}
                             {% for translationsField in translationsLocales %}
                                 {% set tabContentId = tabContentId ~ '-' ~ loop.index %}
-                                {{ _self.renderTab(translationsField, tabContentId) }}
+                                {{ emailFormFealds.renderTab(translationsField, tabContentId) }}
                             {% endfor %}
                         {% endfor %}
                     {% endif %}
@@ -197,6 +199,8 @@
 {% endblock %}
 
 {% block oro_email_email_folder_tree_widget %}
+    {% import _self as emailFormFealds %}
+
     {% set options = {
         dataInputSelector: 'input[name="' ~ full_name ~ '"]',
         checkAllSelector: '.check-all',
@@ -211,7 +215,7 @@
         </label>
         <div class="folder-list">
             {% for key, folder in form.vars.value if folder.parentFolder is null and folder.outdatedAt is null %}
-                {{ _self.renderFolder(key, folder, form.vars.full_name) }}
+                {{ emailFormFealds.renderFolder(key, folder, form.vars.full_name) }}
             {% endfor %}
         </div>
         <input name="{{ full_name }}" type="hidden">
@@ -362,6 +366,7 @@
 {% endmacro %}
 
 {% macro renderFolder(key, folder, namePrefix, maxDepth = 10) %}
+    {% import _self as emailFormFealds %}
     {% if maxDepth %}
         <div>
             <label class="folder-label">
@@ -374,7 +379,7 @@
             {% if maxDepth > 1 and folder.subFolders|length > 0 %}
                 <div class="folder-sub-folders">
                     {% for subKey, subFolder in folder.subFolders %}
-                        {{ _self.renderFolder(subKey, subFolder, namePrefix ~ '[' ~ key ~ '][subFolders]', maxDepth - 1) }}
+                        {{ emailFormFealds.renderFolder(subKey, subFolder, namePrefix ~ '[' ~ key ~ '][subFolders]', maxDepth - 1) }}
                     {% endfor %}
                 </div>
             {% endif %}

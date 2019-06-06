@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ChartBundle\Model\ChartView;
+use Twig\Environment;
 
 class ChartViewTest extends \PHPUnit\Framework\TestCase
 {
@@ -27,7 +28,7 @@ class ChartViewTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->twig = $this->createMock('Twig_Environment');
+        $this->twig = $this->createMock(Environment::class);
         $this->data = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
         $this->chartView = new ChartView(
             $this->twig,

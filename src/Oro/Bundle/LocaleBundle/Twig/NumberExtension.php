@@ -4,12 +4,27 @@ namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 /**
- * Used to call number formatter to format numbers, currencies, percents etc
- * according to locale and additional parameters
+ * Provides Twig functions to access locale data:
+ *   - oro_locale_number_attribute
+ *   - oro_locale_number_text_attribute
+ *   - oro_locale_number_symbol
+ *   - oro_currency_symbol_prepend
+ *
+ * Provides Twig filters for number and currency formatting:
+ *   - oro_format_number
+ *   - oro_format_currency
+ *   - oro_format_decimal
+ *   - oro_format_percent
+ *   - oro_format_spellout
+ *   - oro_format_duration
+ *   - oro_format_ordinal
  */
-class NumberExtension extends \Twig_Extension
+class NumberExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     protected $container;
@@ -36,19 +51,19 @@ class NumberExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_locale_number_attribute',
                 [$this, 'getAttribute']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_locale_number_text_attribute',
                 [$this, 'getTextAttribute']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_locale_number_symbol',
                 [$this, 'getSymbol']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_currency_symbol_prepend',
                 [$this, 'isCurrencySymbolPrepend']
             )
@@ -61,32 +76,32 @@ class NumberExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_format_number',
                 [$this, 'format']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_format_currency',
                 [$this, 'formatCurrency'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_format_decimal',
                 [$this, 'formatDecimal']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_format_percent',
                 [$this, 'formatPercent']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_format_spellout',
                 [$this, 'formatSpellout']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_format_duration',
                 [$this, 'formatDuration']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_format_ordinal',
                 [$this, 'formatOrdinal']
             ),

@@ -17,6 +17,8 @@
 {% endblock pageHeader %}
 
 {% block navButtonContainer %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% block navButtons %}
         {% placeholder view_navButtons with {entity: entity} %}
         {% if entity.id is defined and is_granted('DELETE', entity) %}
@@ -35,6 +37,8 @@
 {% endblock navButtonContainer %}
 
 {% block content_data %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% set dataBlocks = [
         {
             'title': 'General'|trans,

@@ -4,11 +4,15 @@ namespace Oro\Bundle\EntityExtendBundle\Twig;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Psr\Container\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * Adds twig functions to get dymanic fields
+ * Abstract Twig extension for the implementations of the functions to get dynamic fields of entities:
+ *   - oro_get_dynamic_fields
+ *   - oro_get_dynamic_field
  */
-abstract class AbstractDynamicFieldsExtension extends \Twig_Extension
+abstract class AbstractDynamicFieldsExtension extends AbstractExtension
 {
     const NAME = 'oro_entity_config_fields';
 
@@ -29,8 +33,8 @@ abstract class AbstractDynamicFieldsExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_get_dynamic_fields', [$this, 'getFields']),
-            new \Twig_SimpleFunction('oro_get_dynamic_field', [$this, 'getField']),
+            new TwigFunction('oro_get_dynamic_fields', [$this, 'getFields']),
+            new TwigFunction('oro_get_dynamic_field', [$this, 'getField']),
         ];
     }
 

@@ -47,7 +47,7 @@ class AclHelperTest extends TestCase
         $this->container->expects($this->any())
             ->method('get')
             ->willReturnMap([
-                ['security.token_storage', 1, $this->tokenStorage]
+                [TokenStorageInterface::class, 1, $this->tokenStorage]
             ]);
         $this->helper = new AclHelper($this->container);
     }

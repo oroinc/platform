@@ -6,6 +6,8 @@
 {% set pageTitle = attributesLabel|trans %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if is_granted('oro_attribute_create') and is_granted('oro_attribute_update') %}
         {% include 'OroImportExportBundle:ImportExport:buttons_from_configuration.html.twig' with {
             'alias': 'oro_field_config_model_attribute',

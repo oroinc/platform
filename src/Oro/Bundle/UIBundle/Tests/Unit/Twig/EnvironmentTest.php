@@ -3,16 +3,20 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\UIBundle\Tests\Unit\Twig\Fixture\EnvironmentExtension;
+use Oro\Bundle\UIBundle\Tests\Unit\Twig\Fixture\EnvironmentNodeVisitor;
 use Oro\Bundle\UIBundle\Twig\Environment;
 use Oro\Component\Testing\TempDirExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Twig\Cache\CacheInterface;
 use Twig\Loader\ArrayLoader;
+use Twig\Source;
 
 /**
  * Copy of Twig_Tests_EnvironmentTest. Should be removed after merging of pull-request with this service changes.
  */
 class EnvironmentTest extends \PHPUnit\Framework\TestCase
 {
-    use TempDirExtension;
+    use TempDirExtension, TwigExtensionTestCaseTrait;
 
     public function testAutoescapeOption()
     {
@@ -62,7 +66,6 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         $twig = new Environment(new ArrayLoader());
         $twig->addGlobal('foo', 'foo');
         $twig->getGlobals();
-        $twig->initRuntime();
         $twig->addGlobal('foo', 'bar');
         $globals = $twig->getGlobals();
         $this->assertEquals('bar', $globals['foo']);
@@ -81,15 +84,14 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         $twig->addGlobal('foo', 'foo');
         $twig->getGlobals();
         $twig->getFunctions();
-        $twig->initRuntime();
         $twig->addGlobal('foo', 'bar');
         $globals = $twig->getGlobals();
         $this->assertEquals('bar', $globals['foo']);
 
-        $twig = new Environment(new \Twig_Loader_String());
+        $twig = new Environment(new ArrayLoader(['test' => '{{foo}}']));
         $twig->getGlobals();
         $twig->addGlobal('foo', 'bar');
-        $template = $twig->loadTemplate('{{foo}}');
+        $template = $twig->loadTemplate('test');
         $this->assertEquals('bar', $template->render(array()));
     }
 
@@ -102,17 +104,22 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         ];
 
         // force compilation
-        $twig = new Environment(new \Twig_Loader_String(), $options);
-        $cache = $twig->getCacheFilename('{{ foo }}');
+        $twig = new Environment(new ArrayLoader(['test' => '{{ foo }}']), $options);
+        $templateClass = $twig->getTemplateClass('test');
+        $cache = $twig->getCache(false)->generateKey('test', $templateClass);
+
         if (!is_dir(dirname($cache))) {
             mkdir(dirname($cache), 0777, true);
         }
-        file_put_contents($cache, $twig->compileSource('{{ foo }}', '{{ foo }}'));
+
+        $source = new Source('{{ foo }}', 'test');
+        file_put_contents($cache, $twig->compileSource($source));
 
         // check that extensions won't be initialized when rendering a template that is already in the cache
+        /** @var Environment|\PHPUnit\Framework\MockObject\MockObject $twig */
         $twig = $this
             ->getMockBuilder(Environment::class)
-            ->setConstructorArgs(array(new \Twig_Loader_String(), $options))
+            ->setConstructorArgs(array(new ArrayLoader(['test' => '{{ foo }}']), $options))
             ->setMethods(array('initExtensions'))
             ->getMock()
         ;
@@ -120,7 +127,7 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         $twig->expects($this->never())->method('initExtensions');
 
         // render template
-        $output = $twig->render('{{ foo }}', array('foo' => 'bar'));
+        $output = $twig->render('test', array('foo' => 'bar'));
         $this->assertEquals('bar', $output);
 
         unlink($cache);
@@ -139,9 +146,46 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('foo_binary', $twig->getBinaryOperators());
         $this->assertArrayHasKey('foo_global', $twig->getGlobals());
         $visitors = $twig->getNodeVisitors();
-        $this->assertEquals(
-            'Oro\Bundle\UIBundle\Tests\Unit\Twig\Fixture\EnvironmentNodeVisitor',
-            get_class($visitors[2])
-        );
+        $this->assertInstanceOf(EnvironmentNodeVisitor::class, $visitors[2]);
+    }
+
+    public function testGenerateTemplateCache()
+    {
+        $templateName = __FUNCTION__;
+
+        $loader = $this->getLoader();
+        $loader->method('getSourceContext')
+            ->willReturn(new Source('', ''));
+
+        $cache = $this->createMock(CacheInterface::class);
+        $cache->expects($this->once())
+            ->method('generateKey')
+            ->willReturn('key');
+        $cache->expects($this->once())
+            ->method('write');
+
+        $twig = new Environment($loader, ['cache' => $cache, 'auto_reload' => true, 'debug' => false]);
+        $twig->generateTemplateCache($templateName);
+    }
+
+    public function testGenerateTemplateCacheCachingIsDisabled()
+    {
+        $templateName = __FUNCTION__;
+
+        $loader = $this->getLoader();
+        $loader->expects($this->never())
+            ->method('getSourceContext')
+            ->willReturn(new Source('', ''));
+
+        $cache = $this->createMock(CacheInterface::class);
+        // Caching is disabled: generateKey returns false
+        $cache->expects($this->once())
+            ->method('generateKey')
+            ->willReturn(false);
+        $cache->expects($this->never())
+            ->method('write');
+
+        $twig = new Environment($loader, ['cache' => $cache, 'auto_reload' => true, 'debug' => false]);
+        $twig->generateTemplateCache($templateName);
     }
 }

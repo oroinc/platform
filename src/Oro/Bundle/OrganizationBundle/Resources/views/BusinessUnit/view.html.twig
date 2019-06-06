@@ -4,6 +4,8 @@
 {% oro_title_set({params : {"%business_unit.name%": entity.name|default('N/A') }}) %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if is_granted('EDIT', entity) %}
         {{ UI.editButton({
             'path' : path('oro_business_unit_update', { id: entity.id }),

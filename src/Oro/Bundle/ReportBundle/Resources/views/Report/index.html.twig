@@ -4,6 +4,8 @@
 {% set pageTitle = 'oro.report.entity_plural_label'|trans %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if isDesktopVersion() and is_granted('oro_report_create') %}
         {{ UI.addButton({
             'path': path('oro_report_create'),

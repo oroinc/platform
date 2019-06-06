@@ -16,9 +16,9 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Response;
-use Twig_Error_Loader;
-use Twig_Error_Runtime;
-use Twig_Error_Syntax;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 /**
  * Controller to work with email templates.
@@ -202,7 +202,7 @@ class EmailTemplateController extends RestController
                 ],
                 Codes::HTTP_OK
             );
-        } catch (Twig_Error_Syntax|Twig_Error_Loader|Twig_Error_Runtime $e) {
+        } catch (SyntaxError|LoaderError|RuntimeError $e) {
             $view = $this->view(
                 [
                     'reason' => $this->get('translator')->trans('oro.email.emailtemplate.failed_to_compile'),

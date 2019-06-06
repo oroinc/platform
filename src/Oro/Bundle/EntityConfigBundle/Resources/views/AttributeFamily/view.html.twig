@@ -4,6 +4,8 @@
 {% oro_title_set({params : {"%name%": entity.defaultLabel.string }}) %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if is_granted('oro_attribute_family_update') %}
         {{ UI.editButton({
             'path':  path('oro_attribute_family_update', { 'id': entity.id }),

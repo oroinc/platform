@@ -1,3 +1,5 @@
+{% import _self as distributionSettingsForm %}
+
 {% block javascripts %}
     <script type="text/javascript">
         $(function () {
@@ -20,7 +22,7 @@
     </script>
 {% endblock %}
 
-{% form_theme form _self %}
+{% form_theme form distributionSettingsForm %}
 {% block form_errors %}
     {% spaceless %}
         {% if errors is defined and errors|length > 0 %}

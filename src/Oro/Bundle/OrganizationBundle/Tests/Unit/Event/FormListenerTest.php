@@ -3,12 +3,13 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\OrganizationBundle\Event\FormListener;
+use Twig\Environment;
 
 class FormListenerTest extends \PHPUnit\Framework\TestCase
 {
     public function testAddOwnerField()
     {
-        $env = $this->getMockBuilder('Twig_Environment')
+        $env = $this->getMockBuilder(Environment::class)
             ->disableOriginalConstructor()
             ->getMock();
         $newField = "<input>";

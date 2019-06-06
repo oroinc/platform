@@ -9,8 +9,16 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
+use Twig\Environment as TwigEnvironment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class TabExtension extends \Twig_Extension
+/**
+ * Provides Twig functions for rendering tabs:
+ *   - menuTabPanel
+ *   - tabPanel
+ */
+class TabExtension extends AbstractExtension
 {
     const TEMPLATE = 'OroUIBundle::tab_panel.html.twig';
     const DEFAULT_WIDGET_TYPE = 'block';
@@ -64,12 +72,12 @@ class TabExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'menuTabPanel',
                 [$this, 'menuTabPanel'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'tabPanel',
                 [$this, 'tabPanel'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
@@ -78,13 +86,13 @@ class TabExtension extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param TwigEnvironment $environment
      * @param string $menuName
      * @param array $options
      *
      * @return string
      */
-    public function menuTabPanel(\Twig_Environment $environment, $menuName, $options = [])
+    public function menuTabPanel(TwigEnvironment $environment, $menuName, $options = [])
     {
         $tabs = $this->getTabs($menuName, $options);
 
@@ -159,12 +167,12 @@ class TabExtension extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param TwigEnvironment $environment
      * @param array $tabs
      * @param array $options
      * @return string
      */
-    public function tabPanel(\Twig_Environment $environment, $tabs, array $options = [])
+    public function tabPanel(TwigEnvironment $environment, $tabs, array $options = [])
     {
         return $environment->render(
             self::TEMPLATE,

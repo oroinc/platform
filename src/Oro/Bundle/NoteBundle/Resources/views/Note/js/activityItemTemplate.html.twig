@@ -18,6 +18,8 @@
 {% endblock %}
 
 {% block activityActions %}
+    {% import 'OroActivityBundle::macros.html.twig' as AC %}
+
     {% set action %}
         {# Add button for add context in the activity list item #}
         <% if (editable) { %>

@@ -6,11 +6,14 @@ use Oro\Bundle\LocaleBundle\Formatter\AddressFormatter;
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
 /**
- * Twig extension for Address manipulations
+ * Provides a Twig function for postal address formatting:
+ *   - oro_format_address
  */
-class AddressExtension extends \Twig_Extension implements ServiceSubscriberInterface
+class AddressExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -37,7 +40,7 @@ class AddressExtension extends \Twig_Extension implements ServiceSubscriberInter
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_format_address',
                 [$this, 'formatAddress']
             )

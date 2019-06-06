@@ -2,29 +2,45 @@
 
 namespace Oro\Bundle\UIBundle\Twig\Parser;
 
-class PlaceholderTokenParser extends \Twig_TokenParser
+use Twig\Node\Expression\ConstantExpression;
+use Twig\Node\Expression\Filter\DefaultFilter;
+use Twig\Node\Expression\FunctionExpression;
+use Twig\Node\Expression\NameExpression;
+use Twig\Node\Node;
+use Twig\Node\PrintNode;
+use Twig\Token;
+use Twig\TokenParser\AbstractTokenParser;
+
+/**
+ * Provides a Twig tag for using placeholders in Twig templates:
+ *   - placeholder
+ *
+ * Usage example:
+ *     {% placeholder page_header_stats_before with {entity: entity} %}
+ */
+class PlaceholderTokenParser extends AbstractTokenParser
 {
     /**
      * {@inheritDoc}
      */
-    public function parse(\Twig_Token $token)
+    public function parse(Token $token)
     {
         $stream           = $this->parser->getStream();
         $expressionParser = $this->parser->getExpressionParser();
 
-        if ($stream->test(\Twig_Token::NAME_TYPE)) {
+        if ($stream->test(Token::NAME_TYPE)) {
             $currentToken = $stream->getCurrent();
             $currentValue = $currentToken->getValue();
             $currentLine  = $currentToken->getLine();
 
             // Creates expression: placeholder_name|default('placeholder_name')
             // To parse either variable value or name
-            $name = new \Twig_Node_Expression_Filter_Default(
-                new \Twig_Node_Expression_Name($currentValue, $currentLine),
-                new \Twig_Node_Expression_Constant('default', $currentLine),
-                new \Twig_Node(
+            $name = new DefaultFilter(
+                new NameExpression($currentValue, $currentLine),
+                new ConstantExpression('default', $currentLine),
+                new Node(
                     array(
-                        new \Twig_Node_Expression_Constant(
+                        new ConstantExpression(
                             $currentValue,
                             $currentLine
                         )
@@ -40,18 +56,18 @@ class PlaceholderTokenParser extends \Twig_TokenParser
             $name = $expressionParser->parseExpression();
         }
 
-        if ($stream->nextIf(\Twig_Token::NAME_TYPE, 'with')) {
+        if ($stream->nextIf(Token::NAME_TYPE, 'with')) {
             $variables = $expressionParser->parseExpression();
         } else {
-            $variables = new \Twig_Node_Expression_Constant(array(), $token->getLine());
+            $variables = new ConstantExpression(array(), $token->getLine());
         }
 
-        $stream->expect(\Twig_Token::BLOCK_END_TYPE);
+        $stream->expect(Token::BLOCK_END_TYPE);
 
         // build expression to call 'placeholder' function
-        $expr = new \Twig_Node_Expression_Function(
+        $expr = new FunctionExpression(
             'placeholder',
-            new \Twig_Node(
+            new Node(
                 array(
                     'name'       => $name,
                     'variables'  => $variables
@@ -60,7 +76,7 @@ class PlaceholderTokenParser extends \Twig_TokenParser
             $token->getLine()
         );
 
-        return new \Twig_Node_Print($expr, $token->getLine(), $this->getTag());
+        return new PrintNode($expr, $token->getLine(), $this->getTag());
     }
 
     /**
