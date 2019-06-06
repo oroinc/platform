@@ -167,9 +167,7 @@ class AssociationManagerTest extends WebTestCase
      */
     protected function assertDispatchedEvents(array $expected)
     {
-        sort($this->dispatched);
-
-        $this->assertEquals($expected, $this->dispatched);
+        $this->assertEquals($expected, $this->dispatched, '', 0.0, 1, true);
     }
 
     /**

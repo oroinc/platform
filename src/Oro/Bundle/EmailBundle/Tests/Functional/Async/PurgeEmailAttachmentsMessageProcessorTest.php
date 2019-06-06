@@ -44,13 +44,18 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(PurgeEmailAttachmentsMessageProcessor::ACK, $result);
-        $this->assertMessageSent(Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS, [
-            'ids' => [
-                $allAttachments[0]->getId(),
-                $allAttachments[1]->getId(),
-                $allAttachments[2]->getId(),
-            ]
-        ], true);
+        $this->assertMessageSent(
+            Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS,
+            [
+                'ids' => [
+                    $allAttachments[0]->getId(),
+                    $allAttachments[1]->getId(),
+                    $allAttachments[2]->getId(),
+                ]
+            ],
+            true,
+            true
+        );
     }
 
     /**
