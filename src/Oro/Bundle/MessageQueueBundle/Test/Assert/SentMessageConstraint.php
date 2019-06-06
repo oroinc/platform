@@ -18,6 +18,11 @@ class SentMessageConstraint extends \PHPUnit\Framework\Constraint\Constraint
     protected $isSubJobMessage;
 
     /**
+     * @var bool
+     */
+    private $canonicalize = false;
+
+    /**
      * @param array $message ['topic' => topic name, 'message' => message] or ['topic' => topic name]
      * @param bool $isSubJobMessage
      */
@@ -26,6 +31,17 @@ class SentMessageConstraint extends \PHPUnit\Framework\Constraint\Constraint
         parent::__construct();
         $this->message = $message;
         $this->isSubJobMessage = $isSubJobMessage;
+    }
+
+    /**
+     * Arrays with integer keys and scalar values are sorted before comparison if set true
+     * @param bool $canonicalize
+     * @return self
+     */
+    public function setCanonicalize($canonicalize)
+    {
+        $this->canonicalize = $canonicalize;
+        return $this;
     }
 
     /**
@@ -38,7 +54,7 @@ class SentMessageConstraint extends \PHPUnit\Framework\Constraint\Constraint
         }
 
         if (array_key_exists('message', $this->message)) {
-            $constraint = new \PHPUnit\Framework\Constraint\IsEqual($this->message);
+            $constraint = new \PHPUnit\Framework\Constraint\IsEqual($this->canonicalizeRecursive($this->message));
             foreach ($other as $message) {
                 if ($this->isSubJobMessage && is_array($message['message'])) {
                     if (empty($message['message']['jobId'])) {
@@ -46,7 +62,8 @@ class SentMessageConstraint extends \PHPUnit\Framework\Constraint\Constraint
                     }
                     unset($message['message']['jobId']);
                 }
-                if ($constraint->evaluate($message, '', true)) {
+
+                if ($constraint->evaluate($this->canonicalizeRecursive($message), '', true)) {
                     return true;
                 }
             }
@@ -86,5 +103,24 @@ class SentMessageConstraint extends \PHPUnit\Framework\Constraint\Constraint
     protected function additionalFailureDescription($other)
     {
         return 'All sent messages: ' . $this->exporter->export($other);
+    }
+
+    /**
+     * @param mixed $message
+     * @return mixed
+     */
+    private function canonicalizeRecursive($message)
+    {
+        if ($this->canonicalize && is_array($message)) {
+            if (is_scalar(reset($message)) && is_int(key($message))) {
+                \sort($message);
+            } else {
+                foreach ($message as &$value) {
+                    $value = $this->canonicalizeRecursive($value);
+                }
+            }
+        }
+
+        return $message;
     }
 }
