@@ -3,7 +3,10 @@
 namespace Oro\Bundle\NavigationBundle\Twig;
 
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -16,7 +19,7 @@ use Twig\TwigFunction;
  * Provides a Twig tag to work with page (navigation) titles:
  *   - oro_title_set
  */
-class TitleExtension extends AbstractExtension
+class TitleExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const EXT_NAME = 'oro_title';
 
@@ -39,7 +42,7 @@ class TitleExtension extends AbstractExtension
      */
     protected function getTitleService()
     {
-        return $this->container->get('oro_navigation.title_service');
+        return $this->container->get(TitleServiceInterface::class);
     }
 
     /**
@@ -179,8 +182,19 @@ class TitleExtension extends AbstractExtension
     private function getCurrenRoute()
     {
         return $this->container
-            ->get('request_stack')
+            ->get(RequestStack::class)
             ->getCurrentRequest()
             ->get('_route');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            TitleServiceInterface::class,
+            RequestStack::class,
+        ];
     }
 }

@@ -133,6 +133,9 @@ services:
         class: '%oro_entity.entity_provider.class%'
         parent: oro_entity.entity_provider.abstract
 
+    Oro\Bundle\EntityBundle\Provider\EntityProvider:
+        alias: oro_entity.entity_provider
+
     oro_entity.entity_field_provider.abstract:
         abstract: true
         arguments:
@@ -262,9 +265,10 @@ services:
         class: Oro\Bundle\EntityBundle\Twig\EntityExtension
         public: false
         arguments:
-            - '@service_container'
+            -  '@Psr\Container\ContainerInterface'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber }
 
     oro_entity.routing_helper:
         class: '%oro_entity.routing_helper.class%'
@@ -272,6 +276,9 @@ services:
             - '@oro_entity.entity_class_name_helper'
             - '@oro_entity.doctrine_helper'
             - '@router'
+
+    Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper:
+        alias: oro_entity.routing_helper
 
     oro_entity.listener.orm.generated_value_strategy_listener:
         class: '%oro_entity.listener.orm.generated_value_strategy_listener.class%'
@@ -309,6 +316,9 @@ services:
             - '@logger'
         calls:
             - [ setConfigCacheState, [ '@oro_entity.entity_alias_config_cache_state' ] ]
+
+    Oro\Bundle\EntityBundle\ORM\EntityAliasResolver:
+        alias: oro_entity.entity_alias_resolver
 
     oro_entity.entity_alias_config_cache_state:
         alias: oro_entity.entity_configuration.provider
@@ -366,6 +376,9 @@ services:
             - !tagged oro_entity.name_provider
             - '%oro_entity.entity_name_format.default%'
             - '@oro_entity.entity_configuration.provider'
+
+    Oro\Bundle\EntityBundle\Provider\EntityNameResolver:
+        alias: oro_entity.entity_name_resolver
 
     oro_entity.entity_name_provider.default:
         class: Oro\Bundle\EntityBundle\Provider\EntityNameProvider

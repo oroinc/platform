@@ -9,6 +9,7 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Form\FormView;
 use Twig\Environment;
@@ -41,7 +42,7 @@ use Twig\TwigTest;
  * Provides a Twig tag for setting block theme:
  *   - block_theme
  */
-class LayoutExtension extends AbstractExtension implements InitRuntimeInterface
+class LayoutExtension extends AbstractExtension implements InitRuntimeInterface, ServiceSubscriberInterface
 {
     const RENDER_BLOCK_NODE_CLASS = 'Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode';
 
@@ -72,7 +73,7 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface
      */
     public function initRuntime(Environment $environment)
     {
-        $this->renderer = $this->container->get('oro_layout.twig.renderer');
+        $this->renderer = $this->container->get(TwigRenderer::class);
         $this->renderer->setEnvironment($environment);
     }
 
@@ -166,7 +167,7 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface
     public function processText($value, $domain = null)
     {
         if (null === $this->textHelper) {
-            $this->textHelper = $this->container->get('oro_layout.text.helper');
+            $this->textHelper = $this->container->get(TextHelper::class);
         }
 
         return $this->textHelper->processText($value, $domain);
@@ -278,5 +279,16 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface
     public function isString($value)
     {
         return is_string($value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            TwigRenderer::class,
+            TextHelper::class,
+        ];
     }
 }

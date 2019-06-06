@@ -7,7 +7,8 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -24,7 +25,7 @@ use Twig\TwigFunction;
  * Provides a Twig filters to render entity name:
  *   - oro_format_name
  */
-class EntityExtension extends AbstractExtension
+class EntityExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -42,7 +43,7 @@ class EntityExtension extends AbstractExtension
      */
     protected function getEntityIdAccessor()
     {
-        return $this->container->get('oro_entity.entity_identifier_accessor');
+        return $this->container->get(EntityIdAccessor::class);
     }
 
     /**
@@ -50,7 +51,7 @@ class EntityExtension extends AbstractExtension
      */
     protected function getEntityRoutingHelper()
     {
-        return $this->container->get('oro_entity.routing_helper');
+        return $this->container->get(EntityRoutingHelper::class);
     }
 
     /**
@@ -58,7 +59,7 @@ class EntityExtension extends AbstractExtension
      */
     protected function getEntityNameResolver()
     {
-        return $this->container->get('oro_entity.entity_name_resolver');
+        return $this->container->get(EntityNameResolver::class);
     }
 
     /**
@@ -66,7 +67,7 @@ class EntityExtension extends AbstractExtension
      */
     protected function getEntityAliasResolver()
     {
-        return $this->container->get('oro_entity.entity_alias_resolver');
+        return $this->container->get(EntityAliasResolver::class);
     }
 
     /**
@@ -74,7 +75,7 @@ class EntityExtension extends AbstractExtension
      */
     protected function getEntityFallbackResolver()
     {
-        return $this->container->get('oro_entity.fallback.resolver.entity_fallback_resolver');
+        return $this->container->get(EntityFallbackResolver::class);
     }
 
     /**
@@ -206,5 +207,19 @@ class EntityExtension extends AbstractExtension
     public function getName()
     {
         return 'oro_entity';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            EntityIdAccessor::class,
+            EntityRoutingHelper::class,
+            EntityNameResolver::class,
+            EntityAliasResolver::class,
+            EntityFallbackResolver::class,
+        ];
     }
 }

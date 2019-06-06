@@ -11,10 +11,12 @@ use Oro\Bundle\UIBundle\Provider\UserAgentProviderInterface;
 use Oro\Bundle\UIBundle\Twig\Parser\PlaceholderTokenParser;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Oro\Component\PhpUtils\ArrayUtil;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\AbstractExtension;
 use Twig\Template;
@@ -48,8 +50,9 @@ use Twig\TwigFunction;
  *   - placeholder
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class UiExtension extends AbstractExtension
+class UiExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const SKYPE_BUTTON_TEMPLATE = 'OroUIBundle::skype_button.html.twig';
 
@@ -76,7 +79,7 @@ class UiExtension extends AbstractExtension
      */
     protected function getEventDispatcher()
     {
-        return $this->container->get('event_dispatcher');
+        return $this->container->get(EventDispatcherInterface::class);
     }
 
     /**
@@ -84,7 +87,7 @@ class UiExtension extends AbstractExtension
      */
     protected function getRequest()
     {
-        return $this->container->get('request_stack')->getCurrentRequest();
+        return $this->container->get(RequestStack::class)->getCurrentRequest();
     }
 
     /**
@@ -92,7 +95,7 @@ class UiExtension extends AbstractExtension
      */
     protected function getContentProviderManager()
     {
-        return $this->container->get('oro_ui.content_provider.manager');
+        return $this->container->get(ContentProviderManager::class);
     }
 
     /**
@@ -100,7 +103,7 @@ class UiExtension extends AbstractExtension
      */
     protected function getUserAgentProvider()
     {
-        return $this->container->get('oro_ui.user_agent_provider');
+        return $this->container->get(UserAgentProviderInterface::class);
     }
 
     /**
@@ -633,5 +636,18 @@ class UiExtension extends AbstractExtension
         unset($options['template']);
 
         return $environment->render($templateName, ['options' => $options]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            EventDispatcherInterface::class,
+            RequestStack::class,
+            ContentProviderManager::class,
+            UserAgentProviderInterface::class,
+        ];
     }
 }

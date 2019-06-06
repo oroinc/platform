@@ -5,6 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
+use Oro\Bundle\LayoutBundle\Twig\TwigRenderer;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
@@ -30,8 +31,8 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
         $this->textHelper = $this->createMock(TextHelper::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_layout.twig.renderer', $this->renderer)
-            ->add('oro_layout.text.helper', $this->textHelper)
+            ->add(TwigRenderer::class, $this->renderer)
+            ->add(TextHelper::class, $this->textHelper)
             ->getContainer($this);
 
         $this->extension = new LayoutExtension($container);

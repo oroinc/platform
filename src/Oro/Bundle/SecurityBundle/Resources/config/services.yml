@@ -74,6 +74,9 @@ services:
         arguments:
             - '@security.token_storage'
 
+    Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface:
+        alias: oro_security.token_accessor
+
     oro_security.acl.object_identity_factory.link:
         tags:
             - { name: oro_service_link, service: oro_security.acl.object_identity_factory }
@@ -210,6 +213,9 @@ services:
             - '@oro_security.configuration.provider.permission_configuration'
             - '@oro_security.configuration.builder.permission_configuration'
             - '@oro_security.cache.provider.permission'
+
+    Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager:
+        alias: oro_security.acl.permission_manager
 
     oro_security.acl.configurable_permission_provider:
         class: Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider
@@ -366,9 +372,10 @@ services:
         class: Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber }
 
     oro_security.encoder.default:
         class: Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter
@@ -383,7 +390,9 @@ services:
     oro_security.acl_helper:
         class: '%oro_security.acl_helper.class%'
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
+        tags:
+            - { name: container.service_subscriber }
 
     oro_security.search.acl_helper:
         class: '%oro_security.search.acl_helper.class%'
@@ -757,6 +766,9 @@ services:
 
     oro_security.access_rule.chain_access_rule:
         class: Oro\Bundle\SecurityBundle\AccessRule\ChainAccessRule
+
+    Oro\Bundle\SecurityBundle\AccessRule\ChainAccessRule:
+        alias: oro_security.access_rule.chain_access_rule
 
     oro_security.access_rule.acl:
         class: Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule

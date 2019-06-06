@@ -493,7 +493,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 ]
             )
             ->runCommand(
-                LoadPermissionConfigurationCommand::NAME,
+                LoadPermissionConfigurationCommand::getDefaultName(),
                 [
                     '--process-isolation' => true
                 ]

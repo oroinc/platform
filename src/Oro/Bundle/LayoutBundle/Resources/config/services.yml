@@ -37,6 +37,9 @@ services:
         arguments:
             - '@translator'
 
+    Oro\Component\Layout\Templating\TextHelper:
+        alias: oro_layout.text.helper
+
     oro_layout.layout_context_configurator.application:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ApplicationContextConfigurator
         arguments:

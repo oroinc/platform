@@ -8,14 +8,16 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * This class adds the AccessRuleWalker tree walker with context to query to add ACL restrictions.
  *
  * @see \Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker
  */
-class AclHelper
+class AclHelper implements ServiceSubscriberInterface
 {
     public const CHECK_ROOT_ENTITY = 'checkRootEntity';
     public const CHECK_RELATIONS   = 'checkRelations';
@@ -49,7 +51,7 @@ class AclHelper
      */
     public function apply($query, string $permission = 'VIEW', array $options = [])
     {
-        $token = $this->container->get('security.token_storage')->getToken();
+        $token = $this->container->get(TokenStorageInterface::class)->getToken();
         $userId = null;
         $userClass = null;
         $organizationId = null;
@@ -82,5 +84,18 @@ class AclHelper
         $query->setHint(AccessRuleWalker::CONTEXT, $context);
 
         return $query;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            [
+                TokenStorageInterface::class,
+            ],
+            AccessRuleWalker::getSubscribedServices()
+        );
     }
 }

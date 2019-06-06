@@ -32,6 +32,9 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
 
+    Oro\Bundle\EntityBundle\ORM\EntityIdAccessor:
+        alias: oro_entity.entity_identifier_accessor
+
     oro_entity.orm.entity_class_resolver:
         class: '%oro_entity.orm.entity_class_resolver.class%'
         arguments:
