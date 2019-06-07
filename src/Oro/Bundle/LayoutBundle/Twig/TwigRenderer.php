@@ -5,6 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Twig;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererEngineInterface;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Component\Layout\Renderer;
+use Twig\Environment;
 
 /**
  * Heavily inspired by TwigRenderer class
@@ -29,7 +30,7 @@ class TwigRenderer extends Renderer implements TwigRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function setEnvironment(\Twig_Environment $environment)
+    public function setEnvironment(Environment $environment)
     {
         $this->engine->setEnvironment($environment);
     }

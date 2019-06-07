@@ -149,6 +149,8 @@
     ul {
         list-style: none;
         margin: 0;
+        overflow-y: auto;
+
         @include if-ltr() {
             right: 0;
             left: auto;

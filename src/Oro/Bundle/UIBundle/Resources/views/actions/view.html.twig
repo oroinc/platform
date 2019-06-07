@@ -7,6 +7,8 @@
 {% endblock before_content_addition %}
 
 {% block ownerLink %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if entity is not null %}
         {% set ownerLink -%}
             {{ UI.entityOwnerLink(entity) }}{% placeholder additional_owner_info with {entity: entity} %}
@@ -18,6 +20,8 @@
 {% endblock ownerLink %}
 
 {% block content %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
 <div class="layout-content"
         {% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}
         >

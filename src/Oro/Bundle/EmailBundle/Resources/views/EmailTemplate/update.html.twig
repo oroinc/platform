@@ -19,6 +19,8 @@
 %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if is_granted('oro_email_emailtemplate_preview') %}
         {{ UI.button({
             'path' :  path('oro_email_emailtemplate_preview', {'id': form.vars.value.id }),

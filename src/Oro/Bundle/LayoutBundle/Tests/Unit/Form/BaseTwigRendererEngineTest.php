@@ -5,6 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form;
 use Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine;
 use Symfony\Component\Form\FormView;
 use Twig\Environment;
+use Twig\Template;
 
 class BaseTwigRendererEngineTest extends RendererEngineTest
 {
@@ -119,7 +120,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
 
     /**
      * @param string $blockName
-     * @return \Twig_Template|\PHPUnit\Framework\MockObject\MockObject
+     * @return Template|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createTheme($blockName)
     {

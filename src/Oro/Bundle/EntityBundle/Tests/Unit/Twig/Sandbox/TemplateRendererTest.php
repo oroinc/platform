@@ -6,17 +6,27 @@ use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity as TestSubEntity
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\TestEntity as TestSubEntity1;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\TestEntity1 as TestMainEntity;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\TestEntity2 as TestSubEntity3;
+use Oro\Bundle\EntityBundle\Tests\Unit\Twig\Sandbox\Stub\TestTemplateStub;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateData;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRenderer;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorInterface;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorRegistry;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Twig\Environment;
+use Twig\Extension\SandboxExtension;
+use Twig\Loader\ArrayLoader;
+use Twig\Sandbox\SecurityPolicy;
+use Twig\Sandbox\SecurityPolicyInterface;
+use Twig\TemplateWrapper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class TemplateRendererTest extends \PHPUnit\Framework\TestCase
 {
+    use TwigExtensionTestCaseTrait;
+
     private const ENTITY_VARIABLE_TEMPLATE =
         '{% if %val% is defined %}'
         . '{{ _entity_var("%name%", %val%, %parent%) }}'
@@ -24,10 +34,10 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         . '{{ "variable_not_found_message" }}'
         . '{% endif %}';
 
-    /** @var \Twig_Environment|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
     private $environment;
 
-    /** @var \Twig_Sandbox_SecurityPolicy|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var SecurityPolicy */
     private $securityPolicy;
 
     /** @var TemplateRendererConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -41,15 +51,21 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->environment = $this->getMockBuilder(\Twig_Environment::class)
-            ->setMethods(['render'])
-            ->setConstructorArgs([new \Twig_Loader_String(), ['strict_variables' => true]])
+        $this->environment = $this->getMockBuilder(Environment::class)
+            ->setMethods(['createTemplate'])
+            ->setConstructorArgs([new ArrayLoader(), ['strict_variables' => true]])
             ->getMock();
-        $this->securityPolicy = $this->createMock(\Twig_Sandbox_SecurityPolicy::class);
+        $this->securityPolicy = $this->getMockBuilder(SecurityPolicyInterface::class)
+            ->setMethodsExcept()
+            ->setMethods([
+                'setAllowedProperties', 'setAllowedMethods', 'checkMethodAllowed',
+                'checkPropertyAllowed', 'checkSecurity'
+            ])
+            ->getMock();
         $this->configProvider = $this->createMock(TemplateRendererConfigProviderInterface::class);
         $this->variablesProcessorRegistry = $this->createMock(VariableProcessorRegistry::class);
 
-        $this->environment->addExtension(new \Twig_Extension_Sandbox($this->securityPolicy));
+        $this->environment->addExtension(new SandboxExtension($this->securityPolicy));
 
         $this->renderer = new TemplateRendererStub(
             $this->environment,
@@ -97,10 +113,9 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
 
     public function testConfigureSandbox()
     {
-        $entityClass = 'TestEntity';
+        $entityClass = TestSubEntity1::class;
         $properties = [$entityClass => ['field2']];
         $methods = [$entityClass => ['getField1']];
-        $allowedMethods = [$entityClass => ['getField1', '__toString']];
 
         $this->configProvider->expects(self::once())
             ->method('getConfiguration')
@@ -110,22 +125,23 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
                 'accessors'          => [$entityClass => ['field1' => 'getField1', 'field2' => null]],
                 'default_formatters' => []
             ]);
-        $this->securityPolicy->expects(self::once())
-            ->method('setAllowedProperties')
-            ->with($properties);
-        $this->securityPolicy->expects(self::once())
-            ->method('setAllowedMethods')
-            ->with($allowedMethods);
 
         $this->configProvider->expects(self::once())
             ->method('getSystemVariableValues')
             ->willReturn([]);
 
+        $templateStub = new TestTemplateStub($this->environment, '', '');
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
-            ->method('render')
-            ->willReturnArgument(0);
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $this->renderer->renderTemplate('');
+
+        $entity = new $entityClass;
+        $this->securityPolicy->checkPropertyAllowed($entity, 'field2');
+        $this->securityPolicy->checkMethodAllowed($entity, 'getField1');
+        $this->securityPolicy->checkMethodAllowed($entity, '__toString');
     }
 
     public function testRenderTemplateForVariablesWithFormatters()
@@ -160,10 +176,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
             'system' => $systemVars
         ];
 
+        $templateStub = new TestTemplateStub($this->environment, '', $template);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
-            ->method('render')
-            ->with($template, $templateParams)
-            ->willReturnArgument(0);
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, $templateParams);
         self::assertSame($template, $result);
@@ -205,9 +222,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
             get_class($entity) => []
         ]);
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnArgument(0);
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
@@ -247,9 +266,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $this->variablesProcessorRegistry->expects(self::never())
             ->method('get');
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnArgument(0);
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
@@ -298,14 +319,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
                 $data->setComputedVariable($variable, $computedValue);
             });
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnCallback(function ($template, array $data) use ($computedValue) {
-                self::assertEquals(['entity__computedField'], array_keys($data['computed']));
-                self::assertEquals($computedValue, $data['computed']['entity__computedField']);
-
-                return $template;
-            });
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
@@ -350,13 +368,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $computedFieldProcessor->expects(self::once())
             ->method('process');
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnCallback(function ($template, array $data) {
-                self::assertFalse(array_key_exists('computed', $data));
-
-                return $template;
-            });
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
@@ -406,14 +422,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
                 $data->setComputedVariable($variable, $entity1);
             });
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnCallback(function ($template, array $data) use ($entity1) {
-                self::assertEquals(['entity__computedField'], array_keys($data['computed']));
-                self::assertSame($entity1, $data['computed']['entity__computedField']);
-
-                return $template;
-            });
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
@@ -458,13 +471,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $computedFieldProcessor->expects(self::once())
             ->method('process');
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnCallback(function ($template, array $data) {
-                self::assertFalse(array_key_exists('computed', $data));
-
-                return $template;
-            });
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
@@ -516,14 +527,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
                 $data->setComputedVariable($variable, $computedValue);
             });
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnCallback(function ($template, array $data) use ($computedValue) {
-                self::assertEquals(['entity__field1__computedField'], array_keys($data['computed']));
-                self::assertEquals($computedValue, $data['computed']['entity__field1__computedField']);
-
-                return $template;
-            });
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
@@ -571,13 +579,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $computedFieldProcessor->expects(self::once())
             ->method('process');
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnCallback(function ($template, array $data) {
-                self::assertFalse(array_key_exists('computed', $data));
-
-                return $template;
-            });
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
@@ -630,14 +636,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
                 $data->setComputedVariable($variable, $entity2);
             });
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnCallback(function ($template, array $data) use ($entity2) {
-                self::assertEquals(['entity__field1__computedField'], array_keys($data['computed']));
-                self::assertSame($entity2, $data['computed']['entity__field1__computedField']);
-
-                return $template;
-            });
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
@@ -685,13 +688,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $computedFieldProcessor->expects(self::once())
             ->method('process');
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnCallback(function ($template, array $data) {
-                self::assertFalse(array_key_exists('computed', $data));
-
-                return $template;
-            });
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
@@ -794,18 +795,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
                 $data->setComputedVariable($variable, $entity2);
             });
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnCallback(function ($template, array $data) use ($entity1, $entity2) {
-                self::assertEquals(
-                    ['entity__computedField1', 'entity__field1__computedField2'],
-                    array_keys($data['computed'])
-                );
-                self::assertSame($entity1, $data['computed']['entity__computedField1']);
-                self::assertSame($entity2, $data['computed']['entity__field1__computedField2']);
-
-                return $template;
-            });
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
@@ -908,18 +902,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
                 $data->setComputedVariable($variable, $entity2);
             });
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnCallback(function ($template, array $data) use ($entity1, $entity2) {
-                self::assertEquals(
-                    ['entity__field1__computedField2', 'entity__computedField1'],
-                    array_keys($data['computed'])
-                );
-                self::assertSame($entity1, $data['computed']['entity__computedField1']);
-                self::assertSame($entity2, $data['computed']['entity__field1__computedField2']);
-
-                return $template;
-            });
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
@@ -968,14 +955,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
                 $data->setComputedVariable($variable, $computedValue);
             });
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnCallback(function ($template, array $data) use ($computedValue) {
-                self::assertEquals(['entity__computed_field'], array_keys($data['computed']));
-                self::assertEquals($computedValue, $data['computed']['entity__computed_field']);
-
-                return $template;
-            });
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
@@ -1024,14 +1008,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
                 $data->setComputedVariable($variable, $computedValue);
             });
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnCallback(function ($template, array $data) use ($computedValue) {
-                self::assertEquals(['entity__computedField'], array_keys($data['computed']));
-                self::assertSame($computedValue, $data['computed']['entity__computedField']);
-
-                return $template;
-            });
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
@@ -1083,14 +1064,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
                 $data->setComputedVariable($variable, $computedValue);
             });
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnCallback(function ($template, array $data) use ($computedValue) {
-                self::assertEquals(['entity__field1__computedField'], array_keys($data['computed']));
-                self::assertSame($computedValue, $data['computed']['entity__field1__computedField']);
-
-                return $template;
-            });
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);
@@ -1142,14 +1120,11 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
                 $data->setComputedVariable($variable, $computedValue);
             });
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnCallback(function ($template, array $data) use ($computedValue) {
-                self::assertEquals(['entity__field2__computedField'], array_keys($data['computed']));
-                self::assertEquals($computedValue, $data['computed']['entity__field2__computedField']);
-
-                return $template;
-            });
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
         self::assertSame($expectedRenderedResult, $result);

@@ -8,8 +8,14 @@ use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class ReminderExtension extends \Twig_Extension
+/**
+ * Provides a Twig function to retrieve reminders data for the current user:
+ *   - oro_reminder_get_requested_reminders_data
+ */
+class ReminderExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     protected $container;
@@ -52,7 +58,7 @@ class ReminderExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_reminder_get_requested_reminders_data',
                 [$this, 'getRequestedRemindersData']
             )

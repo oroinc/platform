@@ -9,7 +9,16 @@ use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEntityForVariableProvider;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorRegistry;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Oro\Bundle\UIBundle\Twig\HtmlTagExtension;
+use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Twig\Environment;
+use Twig\Extension\SandboxExtension;
+use Twig\Loader\ArrayLoader;
+use Twig\NodeVisitor\SandboxNodeVisitor;
+use Twig\Sandbox\SecurityPolicy;
 
 class EmailRendererTest extends \PHPUnit\Framework\TestCase
 {
@@ -20,43 +29,40 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
         . '{{ "oro.email.variable.not.found" }}'
         . '{% endif %}';
 
-    /** @var \Twig_Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $environment;
-
-    /** @var \Twig_Sandbox_SecurityPolicy|\PHPUnit\Framework\MockObject\MockObject */
-    private $securityPolicy;
-
     /** @var TemplateRendererConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
     /** @var VariableProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $variablesProcessorRegistry;
 
-    /** @var TranslatorInterface */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translation;
+
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
     /** @var EmailRenderer */
     private $renderer;
 
     protected function setUp()
     {
-        $this->environment = $this->getMockBuilder(\Twig_Environment::class)
-            ->setMethods(['render'])
-            ->setConstructorArgs([new \Twig_Loader_String(), ['strict_variables' => true]])
-            ->getMock();
-        $this->securityPolicy = $this->createMock(\Twig_Sandbox_SecurityPolicy::class);
+        $environment = new Environment(new ArrayLoader(), ['strict_variables' => true]);
         $this->configProvider = $this->createMock(TemplateRendererConfigProviderInterface::class);
         $this->variablesProcessorRegistry = $this->createMock(VariableProcessorRegistry::class);
         $this->translation = $this->createMock(TranslatorInterface::class);
+        $this->container = $this->createMock(ContainerInterface::class);
 
-        $this->translation->expects(self::any())
+        $this->translation->expects($this->any())
             ->method('trans')
             ->willReturnArgument(0);
 
-        $this->environment->addExtension(new \Twig_Extension_Sandbox($this->securityPolicy));
+        $environment->addExtension(new SandboxExtension(new SecurityPolicy()));
+        $environment->addExtension(new HttpKernelExtension());
+        $environment->addExtension(new HtmlTagExtension($this->container));
+        $environment->addNodeVisitor(new SandboxNodeVisitor());
 
         $this->renderer = new EmailRenderer(
-            $this->environment,
+            $environment,
             $this->configProvider,
             $this->variablesProcessorRegistry,
             $this->translation
@@ -107,10 +113,10 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
         foreach ($entityVariableProcessors as $entityClass => $processors) {
             $entityVariableProcessorsMap[] = [$entityClass, $processors];
         }
-        $this->configProvider->expects(self::any())
+        $this->configProvider->expects($this->any())
             ->method('getEntityVariableProcessors')
             ->willReturnMap($entityVariableProcessorsMap);
-        $this->configProvider->expects(self::any())
+        $this->configProvider->expects($this->any())
             ->method('getSystemVariableValues')
             ->willReturn($systemVariableValues);
     }
@@ -119,7 +125,7 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new TestEntityForVariableProvider();
 
-        $this->configProvider->expects(self::any())
+        $this->configProvider->expects($this->any())
             ->method('getConfiguration')
             ->willReturn([
                 'properties'         => [],
@@ -129,21 +135,12 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $template = 'test <a href="http://example.com">test</a> {{ system.testVar }}';
-        $expectedRenderedResult = '{% verbatim %}' . $template . '{% endverbatim %}';
 
         $emailTemplate = new EmailTemplateEntity();
         $emailTemplate->setContent($template);
         $emailTemplate->setSubject('');
 
-        $this->environment->expects(self::once())
-            ->method('render')
-            ->with($expectedRenderedResult, self::identicalTo([]))
-            ->willReturnArgument(0);
-
-        self::assertSame(
-            $expectedRenderedResult,
-            $this->renderer->compilePreview($emailTemplate)
-        );
+        $this->assertSame($template, $this->renderer->compilePreview($emailTemplate));
     }
 
     public function testCompileMessage()
@@ -158,13 +155,13 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
         $subject = 'subject';
         $content = 'test '
             . '<a href="http://example.com">test</a>'
-            . ' {{ entity.field1|oro_html_sanitize }}'
+            . ' {{ entity.getField1()|oro_html_sanitize }}'
             . ' {{ entity.field2|trim|raw }}'
-            . ' {{ func(entity.field3) }}'
+            . ' {{ max(0, 2) }}'
             . ' {{ system.testVar }}'
             . ' N/A';
 
-        $this->configProvider->expects(self::any())
+        $this->configProvider->expects($this->any())
             ->method('getConfiguration')
             ->willReturn([
                 'properties'         => [],
@@ -174,25 +171,25 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
             ]);
         $this->expectVariables($entityVariableProcessors, $systemVars);
 
+        $htmlTagHelper = $this->createMock(HtmlTagHelper::class);
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with('oro_ui.html_tag_helper')
+            ->willReturn($htmlTagHelper);
+
         $emailTemplate = $this->getEmailTemplate($content, $subject);
         $templateParams = [
             'entity' => $entity,
             'system' => $systemVars
         ];
 
-        $this->environment->expects(self::exactly(2))
-            ->method('render')
-            ->willReturnMap([
-                [$subject, $templateParams, $subject],
-                [$content, $templateParams, $content]
-            ]);
-
         $result = $this->renderer->compileMessage($emailTemplate, $templateParams);
+        $expectedContent = 'test <a href="http://example.com">test</a>   2 test_system N/A';
 
-        self::assertInternalType('array', $result);
-        self::assertCount(2, $result);
-        self::assertSame($subject, $result[0]);
-        self::assertSame($content, $result[1]);
+        $this->assertInternalType('array', $result);
+        $this->assertCount(2, $result);
+        $this->assertSame($subject, $result[0]);
+        $this->assertSame($expectedContent, $result[1]);
     }
 
     public function testRenderTemplate()
@@ -202,16 +199,9 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
             . '{{ entity.field1 }}'
             . "\n"
             . '{{ system.currentDate }}';
-        $expectedRenderedResult =
-            'test '
-            . "\n"
-            . $this->getEntityVariableTemplate('field1', 'entity.field1', 'entity')
-            . "\n"
-            . '{{ system.currentDate }}';
 
         $entity = new TestEntityForVariableProvider();
-
-        $this->configProvider->expects(self::any())
+        $this->configProvider->expects($this->any())
             ->method('getConfiguration')
             ->willReturn([
                 'properties'         => [],
@@ -221,13 +211,20 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
             ]);
         $this->expectVariables([
             get_class($entity) => []
-        ]);
+        ], ['currentDate' => '10-12-2019']);
 
-        $this->environment->expects(self::any())
-            ->method('render')
-            ->willReturnArgument(0);
+        $htmlTagHelper = $this->createMock(HtmlTagHelper::class);
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with('oro_ui.html_tag_helper')
+            ->willReturn($htmlTagHelper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
-        self::assertSame($expectedRenderedResult, $result);
+
+        $expectedRenderedResult =
+            'test '
+            . "\n"
+            . '10-12-2019';
+        $this->assertSame($expectedRenderedResult, $result);
     }
 }

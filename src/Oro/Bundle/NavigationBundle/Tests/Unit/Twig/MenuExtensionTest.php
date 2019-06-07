@@ -8,9 +8,15 @@ use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Twig\Helper;
 use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
+use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Twig\Environment;
+use Twig\Template;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class MenuExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
@@ -38,10 +44,10 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
 
         $container = self::getContainerBuilder()
-            ->add('knp_menu.helper', $this->helper)
-            ->add('oro_menu.builder_chain', $this->provider)
-            ->add('oro_navigation.chain_breadcrumb_manager', $this->breadcrumbManager)
-            ->add('oro_navigation.configuration.provider', $this->configurationProvider)
+            ->add(Helper::class, $this->helper)
+            ->add(BuilderChainProvider::class, $this->provider)
+            ->add(BreadcrumbManagerInterface::class, $this->breadcrumbManager)
+            ->add(ConfigurationProvider::class, $this->configurationProvider)
             ->getContainer($this);
 
         $this->extension = new MenuExtension($container);
@@ -54,11 +60,11 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testRenderBreadCrumbs()
     {
-        $environment = $this->getMockBuilder(\Twig_Environment::class)
+        $environment = $this->getMockBuilder(Environment::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $template = $this->getMockBuilder(\Twig_TemplateInterface::class)
+        $template = $this->getMockBuilder(Template::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -90,7 +96,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testWrongBredcrumbs()
     {
-        $environment = $this->getMockBuilder('\Twig_Environment')
+        $environment = $this->getMockBuilder(Environment::class)
             ->disableOriginalConstructor()
             ->getMock();
 

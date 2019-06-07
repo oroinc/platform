@@ -8,8 +8,19 @@ use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Translation\TranslatorInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
-class MergeExtension extends \Twig_Extension
+/**
+ * Provides Twig functions for rendering entity merge form:
+ *   - oro_entity_merge_render_field_value
+ *   - oro_entity_merge_render_entity_label
+ *
+ * Provides a Twig filter for sorting fields on entity merge form:
+ *   - oro_entity_merge_sort_fields
+ */
+class MergeExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     protected $container;
@@ -52,7 +63,7 @@ class MergeExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_entity_merge_sort_fields',
                 [$this, 'sortMergeFields']
             )
@@ -65,12 +76,12 @@ class MergeExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_entity_merge_render_field_value',
                 [$this, 'renderMergeFieldValue'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_entity_merge_render_entity_label',
                 [$this, 'renderMergeEntityLabel'],
                 ['is_safe' => ['html']]

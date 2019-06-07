@@ -60,7 +60,7 @@
     }) %}
     {% endif %}
 
-    {% if item.hasChildren and item.displayChildren and item.level is sameas(0) %}
+    {% if item.hasChildren and item.displayChildren and item.level is same as(0) %}
         {% set linkAttributes = linkAttributes|merge({
             'data-toggle': 'dropdown'
         }) %}
@@ -81,7 +81,7 @@
     {%- set content -%}
         {{- parent() -}}
     {%- endset -%}
-    {% if content and item.level is sameas(1) %}
+    {% if content and item.level is same as(1) %}
         {%- set labelAttributes = item.labelAttributes %}
         <li class="dropdown-menu-title {{ 'dropdown-menu-title-level-' ~ item.level }}">{{ block('spanElement') }}</li>
         <li class="divider"><span></span></li>

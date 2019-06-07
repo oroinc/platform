@@ -28,6 +28,8 @@
 %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {{ parent() }}
 
     {% if isActive %}
@@ -118,6 +120,8 @@
 {% endblock pageHeader %}
 
 {% block breadcrumbs %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {{ parent() }}
 
     <span class="page-title__status">
@@ -176,6 +180,8 @@
 {% endmacro %}
 
 {% macro view_start_step_row(entity) %}
+    {% import _self as workflowDefinitionView %}
+
     {% set startTransitionNames = [] %}
     {% for transitionName, transitionConfig in entity.configuration.transitions %}
         {% if transitionConfig.is_start %}
@@ -183,7 +189,7 @@
         {% endif %}
     {% endfor %}
     {{-
-        _self.view_step_row({
+        workflowDefinitionView.view_step_row({
             'label': '(' ~ 'Start'|trans ~ ')',
             'order': -1,
             'is_final': false,
@@ -193,6 +199,9 @@
 {% endmacro %}
 
 {% block content_data %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import _self as workflowDefinitionView %}
+
     {% set workflowDefinitionInfo %}
     <div class="widget-content">
         <div class="row-fluid form-horizontal">
@@ -282,12 +291,12 @@
                                 #}
                                 {% set stepData = stepData|merge({'name': stepName}) %}
                                 {% if loop.first and entity.isSystem %}
-                                    {{ _self.view_start_step_row(entity) }}
+                                    {{ workflowDefinitionView.view_start_step_row(entity) }}
                                 {% endif %}
 
-                                {{ _self.view_step_row(stepData, entity, translateLinks) }}
+                                {{ workflowDefinitionView.view_step_row(stepData, entity, translateLinks) }}
                             {%- else -%}
-                                {{ _self.view_start_step_row(entity) }}
+                                {{ workflowDefinitionView.view_start_step_row(entity) }}
                             {%- endfor -%}
                             </tbody>
                         </table>

@@ -13,6 +13,8 @@ use Oro\Bundle\NavigationBundle\Entity\AbstractPageState;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * Provides REST API CRUD actions for PageState entity
+ *
  * @NamePrefix("oro_api_")
  */
 class PagestateController extends FOSRestController implements ClassResourceInterface
@@ -194,7 +196,10 @@ class PagestateController extends FOSRestController implements ClassResourceInte
      */
     protected function getEntity($id)
     {
-        return $this->getPageStateRepository()->findOneById((int) $id);
+        return $this->getPageStateRepository()->findOneBy([
+            'id' => (int) $id,
+            'user' => $this->getUser(),
+        ]);
     }
 
     /**

@@ -10,8 +10,6 @@ use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionEntityListener;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
-use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -27,9 +25,6 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
     /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $entitiesWithWorkflowsCache;
 
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
-
     protected function setUp()
     {
         $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
@@ -39,12 +34,10 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->container = TestContainerBuilder::create()
-            ->add('oro_workflow.registry.system', $this->workflowRegistry)
-            ->add('oro_workflow.cache.entities_with_workflow', $this->entitiesWithWorkflowsCache)
-            ->getContainer($this);
-
-        $this->listener = new WorkflowDefinitionEntityListener($this->container);
+        $this->listener = new WorkflowDefinitionEntityListener(
+            $this->entitiesWithWorkflowsCache,
+            $this->workflowRegistry
+        );
     }
 
     public function testPrePersistNonActiveSkip()
@@ -54,10 +47,6 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
         $definitionMock->expects($this->once())->method('isActive')->willReturn(false);
         $definitionMock->expects($this->never())->method('hasExclusiveActiveGroups');
         $this->workflowRegistry->expects($this->never())->method('getActiveWorkflowsByActiveGroups');
-
-        $this->container->expects($this->never())
-            ->method('get')
-            ->with('oro_workflow.cache.entities_with_workflow');
 
         $this->listener->prePersist($definitionMock);
     }

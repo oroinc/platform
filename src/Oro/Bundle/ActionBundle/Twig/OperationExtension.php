@@ -9,8 +9,17 @@ use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class OperationExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to render operation (action) buttons:
+ *   - oro_action_widget_parameters
+ *   - oro_action_widget_route
+ *   - oro_action_frontend_options
+ *   - oro_action_has_buttons
+ */
+class OperationExtension extends AbstractExtension
 {
     const NAME = 'oro_action';
 
@@ -79,14 +88,14 @@ class OperationExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_action_widget_parameters',
                 [$this, 'getActionParameters'],
                 ['needs_context' => true]
             ),
-            new \Twig_SimpleFunction('oro_action_widget_route', [$this, 'getWidgetRoute']),
-            new \Twig_SimpleFunction('oro_action_frontend_options', [$this, 'getFrontendOptions']),
-            new \Twig_SimpleFunction('oro_action_has_buttons', [$this, 'hasButtons']),
+            new TwigFunction('oro_action_widget_route', [$this, 'getWidgetRoute']),
+            new TwigFunction('oro_action_frontend_options', [$this, 'getFrontendOptions']),
+            new TwigFunction('oro_action_has_buttons', [$this, 'hasButtons']),
         ];
     }
 

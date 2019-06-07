@@ -1,4 +1,5 @@
-{% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
+{% import _self as noteDialogUpdate %}
+{% form_theme form with ['OroFormBundle:Form:fields.html.twig', noteDialogUpdate] %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% if saved %}

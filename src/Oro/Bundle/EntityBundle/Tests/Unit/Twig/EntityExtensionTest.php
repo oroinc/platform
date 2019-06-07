@@ -32,24 +32,16 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->entityIdAccessor = $this->getMockBuilder(EntityIdAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityRoutingHelper = $this->getMockBuilder(EntityRoutingHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityAliasResolver = $this->getMockBuilder(EntityAliasResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityIdAccessor = $this->createMock(EntityIdAccessor::class);
+        $this->entityRoutingHelper = $this->createMock(EntityRoutingHelper::class);
+        $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
+        $this->entityAliasResolver = $this->createMock(EntityAliasResolver::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_entity.entity_identifier_accessor', $this->entityIdAccessor)
-            ->add('oro_entity.routing_helper', $this->entityRoutingHelper)
-            ->add('oro_entity.entity_name_resolver', $this->entityNameResolver)
-            ->add('oro_entity.entity_alias_resolver', $this->entityAliasResolver)
+            ->add(EntityIdAccessor::class, $this->entityIdAccessor)
+            ->add(EntityRoutingHelper::class, $this->entityRoutingHelper)
+            ->add(EntityNameResolver::class, $this->entityNameResolver)
+            ->add(EntityAliasResolver::class, $this->entityAliasResolver)
             ->getContainer($this);
 
         $this->extension = new EntityExtension($container);
@@ -77,6 +69,9 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function getClassNameDataProvider()
     {
         return [

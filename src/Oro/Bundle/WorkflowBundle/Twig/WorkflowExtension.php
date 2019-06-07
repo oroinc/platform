@@ -6,8 +6,19 @@ use Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
-class WorkflowExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to determine if an entity has associated workflows:
+ *   - has_workflows
+ *   - has_workflow_items
+ *
+ * Provides Twig filter to format a workflow variable value in workflow management:
+ *   - oro_format_workflow_variable_value
+ */
+class WorkflowExtension extends AbstractExtension
 {
     const NAME = 'oro_workflow';
 
@@ -36,8 +47,8 @@ class WorkflowExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('has_workflows', [$this, 'hasApplicableWorkflows']),
-            new \Twig_SimpleFunction('has_workflow_items', [$this, 'hasWorkflowItemsByEntity'])
+            new TwigFunction('has_workflows', [$this, 'hasApplicableWorkflows']),
+            new TwigFunction('has_workflow_items', [$this, 'hasWorkflowItemsByEntity'])
         ];
     }
 
@@ -47,7 +58,7 @@ class WorkflowExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_format_workflow_variable_value',
                 [$this, 'formatWorkflowVariableValue'],
                 ['is_safe' => ['html']]

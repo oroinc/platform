@@ -7,8 +7,16 @@ use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class EntityPaginationExtension extends \Twig_Extension
+/**
+ * Provides Twig functions for entity pagination:
+ *   - oro_entity_pagination_pager
+ *   - oro_entity_pagination_collect_data
+ *   - oro_entity_pagination_show_info_message
+ */
+class EntityPaginationExtension extends AbstractExtension
 {
     const NAME = 'oro_entity_pagination';
 
@@ -61,9 +69,9 @@ class EntityPaginationExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_entity_pagination_pager', [$this, 'getPager']),
-            new \Twig_SimpleFunction('oro_entity_pagination_collect_data', [$this, 'collectData']),
-            new \Twig_SimpleFunction('oro_entity_pagination_show_info_message', [$this, 'showInfoMessage']),
+            new TwigFunction('oro_entity_pagination_pager', [$this, 'getPager']),
+            new TwigFunction('oro_entity_pagination_collect_data', [$this, 'collectData']),
+            new TwigFunction('oro_entity_pagination_show_info_message', [$this, 'showInfoMessage']),
         ];
     }
 

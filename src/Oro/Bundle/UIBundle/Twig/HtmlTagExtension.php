@@ -4,11 +4,17 @@ namespace Oro\Bundle\UIBundle\Twig;
 
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
 /**
- * Twig extension with filters that helps prepare HTML for the output.
+ * Provides Twig filters for HTML output preparation:
+ *   - oro_html_strip_tags
+ *   - oro_attribute_name_purify
+ *   - oro_html_sanitize
+ *   - oro_html_escape
  */
-class HtmlTagExtension extends \Twig_Extension
+class HtmlTagExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     protected $container;
@@ -35,10 +41,10 @@ class HtmlTagExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('oro_html_strip_tags', [$this, 'htmlStripTags'], ['is_safe' => ['all']]),
-            new \Twig_SimpleFilter('oro_attribute_name_purify', [$this, 'attributeNamePurify']),
-            new \Twig_SimpleFilter('oro_html_sanitize', [$this, 'htmlSanitize'], ['is_safe' => ['html']]),
-            new \Twig_SimpleFilter('oro_html_escape', [$this, 'htmlEscape'], ['is_safe' => ['html']]),
+            new TwigFilter('oro_html_strip_tags', [$this, 'htmlStripTags'], ['is_safe' => ['all']]),
+            new TwigFilter('oro_attribute_name_purify', [$this, 'attributeNamePurify']),
+            new TwigFilter('oro_html_sanitize', [$this, 'htmlSanitize'], ['is_safe' => ['html']]),
+            new TwigFilter('oro_html_escape', [$this, 'htmlEscape'], ['is_safe' => ['html']]),
         ];
     }
 

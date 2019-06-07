@@ -4,8 +4,14 @@ namespace Oro\Bundle\PlatformBundle\Twig;
 
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class PlatformExtension extends \Twig_Extension
+/**
+ * Provides a Twig function to retrieve the application version:
+ *   - oro_version
+ */
+class PlatformExtension extends AbstractExtension
 {
     const EXTENSION_NAME = 'oro_platform';
 
@@ -34,7 +40,7 @@ class PlatformExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_version', [$this, 'getVersion'])
+            new TwigFunction('oro_version', [$this, 'getVersion'])
         ];
     }
 

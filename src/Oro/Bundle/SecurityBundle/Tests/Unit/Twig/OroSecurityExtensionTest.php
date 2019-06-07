@@ -36,9 +36,9 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->permissionManager = $this->createMock(PermissionManager::class);
 
         $container = self::getContainerBuilder()
-            ->add('security.authorization_checker', $this->authorizationChecker)
-            ->add('oro_security.token_accessor', $this->tokenAccessor)
-            ->add('oro_security.acl.permission_manager', $this->permissionManager)
+            ->add(AuthorizationCheckerInterface::class, $this->authorizationChecker)
+            ->add(TokenAccessorInterface::class, $this->tokenAccessor)
+            ->add(PermissionManager::class, $this->permissionManager)
             ->getContainer($this);
 
         $this->extension = new OroSecurityExtension($container);

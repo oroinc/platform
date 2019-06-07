@@ -3,6 +3,7 @@ define(function(require) {
 
     var DropdownCollectionView;
     var _ = require('underscore');
+    var $ = require('jquery');
     var Chaplin = require('chaplin');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     var utils = Chaplin.utils;
@@ -14,6 +15,11 @@ define(function(require) {
             'remove collection': 'updateDropdown',
             'page:afterChange mediator': 'updateDropdown',
             'layout:reposition mediator': 'updateDropdown'
+        },
+
+        events: {
+            'shown.bs.dropdown': 'updateDropdownMaxHeight',
+            'hidden.bs.dropdown': 'updateDropdownMaxHeight'
         },
 
         /**
@@ -46,6 +52,17 @@ define(function(require) {
         updateDropdown: function() {
             this.recheckItems();
             this.positionUpdate();
+            this.updateDropdownMaxHeight();
+        },
+
+        updateDropdownMaxHeight: function() {
+            var $list = this.$(this.listSelector);
+
+            if ($list.is(':visible')) {
+                $list.css('max-height', $(window).height() - $list.offset().top);
+            } else {
+                $list.css('max-height', '');
+            }
         },
 
         /**

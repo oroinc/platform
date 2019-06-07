@@ -3,10 +3,13 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\UIBundle\Twig\Environment;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\RouterInterface;
+use Twig\Environment;
 
+/**
+ * Datagrid property formatter that renders a URL as an <a> HTML tag.
+ */
 class LinkProperty extends UrlProperty
 {
     const TEMPLATE = 'OroDataGridBundle:Extension:Formatter/Property/linkProperty.html.twig';

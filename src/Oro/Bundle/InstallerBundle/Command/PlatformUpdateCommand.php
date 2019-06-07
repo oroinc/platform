@@ -119,7 +119,7 @@ class PlatformUpdateCommand extends AbstractCommand
                     '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
                 ]
             )
-            ->runCommand(LoadPermissionConfigurationCommand::NAME, ['--process-isolation' => true])
+            ->runCommand(LoadPermissionConfigurationCommand::getDefaultName(), ['--process-isolation' => true])
             ->runCommand(
                 'oro:cron:definitions:load',
                 [

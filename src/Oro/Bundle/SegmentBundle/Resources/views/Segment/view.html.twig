@@ -6,6 +6,8 @@
 {% set pageTitle = entity.name %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {{ segmentQD.runButton(entity, true) }}
     {% if isDesktopVersion() and is_granted('EDIT', entity) %}
         {{ UI.editButton({

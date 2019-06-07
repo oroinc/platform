@@ -68,6 +68,8 @@
                 {% endblock title %}
 
                 {% block navButtons %}
+                    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
                     {% if dashboards|length > 1 %}
                         <div class="dashboard-selector-container pull-right">
                             <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
@@ -146,13 +148,14 @@
         </div>
     </div>
     {% block widgets_content %}
+        {% import _self as dashboardMacros %}
         {% set contentClass = contentClass|default('dashboard-container') %}
         <div class="scrollable-container">
             <div class="responsive-section {{ contentClass }}">
                 <div class="clearfix">
                 {% block widgets %}
                     {{
-                        _self.renderWidgetsColumn({
+                        dashboardMacros.renderWidgetsColumn({
                             'widgets': dashboard.getOrderedColumnWidgets(0, false, true),
                             'columnElementId': 'dashboard-column-0',
                             'columnClass': 'dashboard-column',
@@ -161,7 +164,7 @@
                         })
                     }}
                     {{
-                        _self.renderWidgetsColumn({
+                        dashboardMacros.renderWidgetsColumn({
                             'widgets': dashboard.getOrderedColumnWidgets(1, true, false),
                             'columnElementId': 'dashboard-column-1',
                             'columnClass': 'dashboard-column',

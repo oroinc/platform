@@ -59,6 +59,9 @@ services:
         arguments:
             - '@oro_platform.composer.local_repo_factory'
 
+    Oro\Bundle\PlatformBundle\Provider\PackageProvider:
+        alias: oro_platform.provider.package
+
     oro_platform.twig.platform_extension:
         class: Oro\Bundle\PlatformBundle\Twig\PlatformExtension
         public: false

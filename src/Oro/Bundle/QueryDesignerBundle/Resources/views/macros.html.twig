@@ -44,6 +44,7 @@
 
 {% macro query_designer_column_list(attr, showItems = ['column', 'label', 'function', 'sorting', 'action']) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import _self as queryDesignerMacros %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container query-designer-columns-grid-container')|trim}) %}
     <div{{ UI.attributes(attr) }}>
         <table class="grid table-hover table table-bordered table-condensed" style="display: table;">
@@ -70,7 +71,7 @@
             </tbody>
         </table>
     </div>
-    {{ _self.query_designer_column_template(attr.rowId, showItems) }}
+    {{ queryDesignerMacros.query_designer_column_template(attr.rowId, showItems) }}
 {% endmacro %}
 
 {% macro query_designer_grouping_list(attr) %}

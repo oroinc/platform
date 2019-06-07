@@ -13,7 +13,7 @@ class TwigLayoutRendererTest extends \PHPUnit\Framework\TestCase
     {
         /** @var TwigRendererInterface|\PHPUnit\Framework\MockObject\MockObject $innerRenderer */
         $innerRenderer = $this->createMock(TwigRendererInterface::class);
-        /** @var \Twig_Environment $environment */
+        /** @var Environment $environment */
         $environment   = $this->createMock(Environment::class);
 
         $innerRenderer->expects($this->once())

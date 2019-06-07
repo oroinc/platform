@@ -4,8 +4,15 @@ namespace Oro\Bundle\ThemeBundle\Twig;
 
 use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class ThemeExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to render back-office theme logo and icon:
+ *   - oro_theme_logo
+ *   - oro_theme_icon
+ */
+class ThemeExtension extends AbstractExtension
 {
     const NAME = 'oro_theme';
 
@@ -34,8 +41,8 @@ class ThemeExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_theme_logo', [$this, 'getThemeLogo']),
-            new \Twig_SimpleFunction('oro_theme_icon', [$this, 'getThemeIcon']),
+            new TwigFunction('oro_theme_logo', [$this, 'getThemeLogo']),
+            new TwigFunction('oro_theme_icon', [$this, 'getThemeIcon']),
         ];
     }
 

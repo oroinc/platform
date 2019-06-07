@@ -140,3 +140,6 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Configuration\Checker\ConfigurationChecker'
         arguments:
             - '@oro_action.expression.context_accessor'
+
+    Oro\Bundle\WorkflowBundle\Configuration\Checker\ConfigurationChecker:
+        alias: 'oro_workflow.configuration.checker'

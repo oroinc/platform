@@ -6,6 +6,8 @@
 {% set formAction = path('oro_organization_update_current')  %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if is_granted('oro_organization_update') %}
         {% set html = UI.saveAndStayButton({'route': 'oro_organization_update_current'}) %}
         {{ UI.dropdownSaveButton({'html': html}) }}

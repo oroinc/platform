@@ -4,11 +4,14 @@ namespace Oro\Bundle\HelpBundle\Twig;
 
 use Oro\Bundle\HelpBundle\Provider\HelpLinkProvider;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * Provides "get_help_link" TWIG function.
+ * Provides a Twig function to retrieve the online help URL:
+ *   - get_help_link
  */
-class HelpExtension extends \Twig_Extension
+class HelpExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     private $container;
@@ -35,7 +38,7 @@ class HelpExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('get_help_link', [$this, 'getHelpLinkUrl'])
+            new TwigFunction('get_help_link', [$this, 'getHelpLinkUrl'])
         ];
     }
 

@@ -1,7 +1,5 @@
 {% extends '@WebProfiler/Collector/form.html.twig' %}
 
-{% import _self as tree %}
-
 {% block toolbar %}
     {% if collector.data.views|length %}
         {% set status_color = collector.data.not_applied_actions_count ? 'yellow' : '' %}
@@ -177,6 +175,8 @@
 {% endblock %}
 
 {% block panel %}
+    {% import _self as tree %}
+
     <h2>Layouts</h2>
     {% if collector.data.context.items.theme is defined %}
         <h4>Layout updates in the

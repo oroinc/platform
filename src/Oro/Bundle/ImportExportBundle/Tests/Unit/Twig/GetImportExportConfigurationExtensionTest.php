@@ -6,6 +6,7 @@ use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterfa
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistryInterface;
 use Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension;
 use PHPUnit\Framework\TestCase;
+use Twig\TwigFunction;
 
 class GetImportExportConfigurationExtensionTest extends TestCase
 {
@@ -29,7 +30,7 @@ class GetImportExportConfigurationExtensionTest extends TestCase
     public function testGetFunctions()
     {
         $expected = [
-            new \Twig_SimpleFunction('get_import_export_configuration', [$this->extension, 'getConfiguration'])
+            new TwigFunction('get_import_export_configuration', [$this->extension, 'getConfiguration'])
         ];
 
         static::assertEquals($expected, $this->extension->getFunctions());

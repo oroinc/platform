@@ -14,8 +14,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Twig\Environment;
 use Twig\Template;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class UiExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
@@ -40,7 +44,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->environment = $this->createMock(\Twig_Environment::class);
+        $this->environment = $this->createMock(Environment::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->requestStack = $this->getMockBuilder(RequestStack::class)
             ->disableOriginalConstructor()
@@ -51,10 +55,10 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         $this->userAgentProvider = $this->createMock(UserAgentProviderInterface::class);
 
         $container = self::getContainerBuilder()
-            ->add('event_dispatcher', $this->eventDispatcher)
-            ->add('request_stack', $this->requestStack)
-            ->add('oro_ui.content_provider.manager', $this->contentProviderManager)
-            ->add('oro_ui.user_agent_provider', $this->userAgentProvider)
+            ->add(EventDispatcherInterface::class, $this->eventDispatcher)
+            ->add(RequestStack::class, $this->requestStack)
+            ->add(ContentProviderManager::class, $this->contentProviderManager)
+            ->add(UserAgentProviderInterface::class, $this->userAgentProvider)
             ->getContainer($this);
 
         $this->extension = new UiExtension($container);

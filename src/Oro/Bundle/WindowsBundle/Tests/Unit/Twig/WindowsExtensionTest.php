@@ -11,6 +11,7 @@ use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Twig\Environment;
 
 class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -19,7 +20,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var WindowsExtension */
     protected $extension;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|\Twig_Environment */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Environment */
     protected $environment;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateManager */
@@ -36,7 +37,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->environment = $this->getMockBuilder(\Twig_Environment::class)
+        $this->environment = $this->getMockBuilder(Environment::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->stateManager = $this->getMockBuilder(WindowsStateManager::class)

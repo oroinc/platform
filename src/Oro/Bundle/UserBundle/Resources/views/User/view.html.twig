@@ -5,6 +5,8 @@
 {% oro_title_set({params : {"%username%": fullname }}) %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% placeholder view_navButtons with {entity: entity} %}
     {% if isDesktopVersion() %}
         {% if is_granted('CONFIGURE', entity) and not isProfileView %}
@@ -59,6 +61,8 @@
 {% endblock pageHeader %}
 
 {% block breadcrumbs %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {{ parent() }}
     <span class="page-title__status">
         {% if entity.enabled %}

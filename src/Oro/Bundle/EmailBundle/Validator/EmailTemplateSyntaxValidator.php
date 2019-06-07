@@ -11,6 +11,7 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Twig\Error\SyntaxError;
 
 /**
  * Validates email template syntax.
@@ -77,7 +78,7 @@ class EmailTemplateSyntaxValidator extends ConstraintValidator
 
             try {
                 $this->emailRenderer->validateTemplate($item['template']);
-            } catch (\Twig_Error_Syntax $e) {
+            } catch (SyntaxError $e) {
                 $errors[] = [
                     'field'  => $item['field'],
                     'locale' => $item['locale'],

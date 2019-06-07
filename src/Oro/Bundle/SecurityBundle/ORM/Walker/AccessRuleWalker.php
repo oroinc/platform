@@ -17,14 +17,15 @@ use Doctrine\ORM\Query\TreeWalkerAdapter;
 use Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule;
 use Oro\Bundle\SecurityBundle\AccessRule\ChainAccessRule;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 
 /**
  * Walker that apply access rule conditions to DBAL query.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class AccessRuleWalker extends TreeWalkerAdapter
+class AccessRuleWalker extends TreeWalkerAdapter implements ServiceSubscriberInterface
 {
     public const CONTEXT = 'oro_access_rule.context';
     public const ORM_RULES_TYPE = 'ORM';
@@ -345,7 +346,7 @@ class AccessRuleWalker extends TreeWalkerAdapter
     private function getChainAccessRule(ContainerInterface $container): ChainAccessRule
     {
         if (!$this->chainAccessRule) {
-            $this->chainAccessRule = $container->get('oro_security.access_rule.chain_access_rule');
+            $this->chainAccessRule = $container->get(ChainAccessRule::class);
         }
 
         return $this->chainAccessRule;
@@ -379,5 +380,15 @@ class AccessRuleWalker extends TreeWalkerAdapter
                 $this->setQueryComponent($alias, $queryComponent->toArray());
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            ChainAccessRule::class
+        ];
     }
 }

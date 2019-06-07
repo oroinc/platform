@@ -207,8 +207,10 @@
         label - [optional] A text representation of email address
 #}
 {% macro email_address_link(emailAddress, label) -%}
-    {{ _self.renderEmailAddressLink(
-        label|oro_html_strip_tags|default(_self.email_address_text(emailAddress)),
+    {% import _self as emailMacros %}
+
+    {{ emailMacros.renderEmailAddressLink(
+        label|oro_html_strip_tags|default(emailMacros.email_address_text(emailAddress)),
         emailAddress.owner.class,
         emailAddress.owner.id) }}
 {%- endmacro -%}
@@ -254,15 +256,17 @@
         knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
 #}
 {% macro email_address(emailAddress, emailAddressName, noLink, knownOnly) -%}
+    {% import _self as emailMacros %}
+
     {% if emailAddress.owner is null -%}
         {% if not knownOnly|default(false) -%}
             {{ emailAddressName|oro_html_strip_tags }}
         {%- endif %}
     {%- else -%}
         {% if noLink|default(false) -%}
-            {{ _self.email_address_text(emailAddress) }}
+            {{ emailMacros.email_address_text(emailAddress) }}
         {%- else -%}
-            {{ _self.email_address_link(emailAddress)|raw }}
+            {{ emailMacros.email_address_link(emailAddress)|raw }}
         {%- endif %}
     {%- endif %}
 {%- endmacro %}
@@ -276,6 +280,8 @@
         knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
 #}
 {% macro email_address_recipient(emailAddress, emailAddressName, noLink, knownOnly) -%}
+    {% import _self as emailMacros %}
+
     {% if emailAddress.owner is null -%}
         {% if not knownOnly|default(false) -%}
             {{ emailAddressName }}
@@ -284,7 +290,7 @@
         {% if noLink|default(false) -%}
             {{ emailAddressName }}
         {%- else -%}
-            {{ _self.email_address_recipient_link(emailAddress, emailAddressName)|raw }}
+            {{ emailMacros.email_address_recipient_link(emailAddress, emailAddressName)|raw }}
         {%- endif %}
     {%- endif %}
 {%- endmacro %}
@@ -325,13 +331,15 @@
         entity - related entity record
 #}
 {%- macro renderEmailWithActions(email, entity) -%}
+    {% import _self as emailMacros %}
+
     {% if email is not empty %}
         {%- set actions %}
             {%- placeholder email_actions with {email: email, entity: entity} -%}
         {% endset -%}
         {% set actions = actions|trim %}
         <span class="inline-actions-element{% if actions is empty %} inline-actions-element_no-actions{% endif %}">
-            <span class="inline-actions-element_wrapper">{{ _self.email_address_simple(email) }}</span>
+            <span class="inline-actions-element_wrapper">{{ emailMacros.email_address_simple(email) }}</span>
             {% if actions is not empty -%}
                 <span class="inline-actions-element_actions email-actions">{{ actions|raw }}</span>
             {%- endif %}
@@ -347,9 +355,11 @@
         knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
 #}
 {% macro recipient_email_addresses(recipients, noLink, knownOnly) -%}
+    {% import _self as emailMacros %}
+
     {% set addresses = {} -%}
     {% for recipient in recipients -%}
-        {% set address = _self.email_address_recipient(recipient.emailAddress, recipient.name, noLink, knownOnly) %}
+        {% set address = emailMacros.email_address_recipient(recipient.emailAddress, recipient.name, noLink, knownOnly) %}
         {%- if address|length > 0 -%}
             {% set addresses = addresses|merge([address]) %}
         {% else %}
@@ -455,17 +465,19 @@
         knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
 #}
 {% macro email_participant_name_or_me(emailAddress, emailAddressName, noLink, knownOnly) -%}
+    {% import _self as emailMacros %}
+
     {% if emailAddress.owner is not null and
           oro_class_name(emailAddress.owner, true) == oro_class_name(app.user, true) and
           emailAddress.owner.id == app.user.id -%}
         {% if noLink|default(false) -%}
             {{ 'Me'|trans|lower }}
         {%- else -%}
-            {{ _self.email_address_link(emailAddress, 'Me'|trans|lower)|raw }}
+            {{ emailMacros.email_address_link(emailAddress, 'Me'|trans|lower)|raw }}
         {%- endif %}
     {%- else -%}
         {%- set name = oro_get_email_address_name(emailAddressName)|default(oro_get_email_address(emailAddressName))|oro_html_strip_tags -%}
-        {{ _self.email_address(emailAddress, name, noLink, knownOnly) }}
+        {{ emailMacros.email_address(emailAddress, name, noLink, knownOnly) }}
     {%- endif %}
 {%- endmacro %}
 
@@ -477,10 +489,12 @@
         knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
 #}
 {% macro email_participants_name(recipients, noLink, knownOnly) -%}
+    {% import _self as emailMacros %}
+
     {% set recipientHtmlCollection = [] %}
     {% for recipient in recipients %}
         {% set recipientHtml -%}
-            <span class="email-recipient">{{ _self.email_participant_name_or_me(recipient.emailAddress, recipient.name, noLink, knownOnly) }}</span>
+            <span class="email-recipient">{{ emailMacros.email_participant_name_or_me(recipient.emailAddress, recipient.name, noLink, knownOnly) }}</span>
         {%- endset %}
         {% set recipientHtmlCollection = recipientHtmlCollection|merge([recipientHtml]) %}
     {% endfor %}

@@ -25,6 +25,9 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_form.form.handler.default'
 
+    Oro\Bundle\FormBundle\Model\UpdateHandler:
+        alias: oro_form.model.update_handler
+
     oro_form.provider.html_tag_provider:
         class: '%oro_form.provider.html_tag_provider.class%'
         arguments:
@@ -62,6 +65,9 @@ services:
             - '@oro_ui.router'
             - '@oro_entity.doctrine_helper'
             - '@oro_form.update_factory'
+
+    Oro\Bundle\FormBundle\Model\UpdateHandlerFacade:
+        alias: oro_form.update_handler
 
     oro_form.registry.form_template_data_provider:
         class: Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry

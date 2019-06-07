@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Command;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,18 +13,40 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Translation\Util\ArrayConverter;
 use Symfony\Component\Yaml\Yaml;
 
-class DumpWorkflowTranslationsCommand extends ContainerAwareCommand
+/**
+ * Dump workflow translations
+ */
+class DumpWorkflowTranslationsCommand extends Command
 {
-    const NAME = 'oro:workflow:translations:dump';
-    const INLINE_LEVEL = 10;
+    public const INLINE_LEVEL = 10;
+
+    /** @var string */
+    protected static $defaultName = 'oro:workflow:translations:dump';
+
+    /** @var WorkflowManager */
+    private $workflowManager;
+
+    /** @var WorkflowTranslationHelper */
+    private $workflowTranslationHelper;
+
+    /**
+     * @param WorkflowManager $workflowManager
+     * @param WorkflowTranslationHelper $workflowTranslationHelper
+     */
+    public function __construct(WorkflowManager $workflowManager, WorkflowTranslationHelper $workflowTranslationHelper)
+    {
+        parent::__construct();
+
+        $this->workflowManager = $workflowManager;
+        $this->workflowTranslationHelper = $workflowTranslationHelper;
+    }
 
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName(self::NAME)
-            ->setDescription('Dump translations')
+        $this->setDescription('Dump translations')
             ->addArgument(
                 'workflow',
                 InputArgument::REQUIRED,
@@ -47,16 +69,10 @@ class DumpWorkflowTranslationsCommand extends ContainerAwareCommand
         $locale = $input->getOption('locale');
         $workflowName = $input->getArgument('workflow');
 
-        /* @var $workflowManager WorkflowManager */
-        $workflowManager = $this->getContainer()->get('oro_workflow.manager');
-
-        /** @var WorkflowTranslationHelper $workflowTranslationHelper */
-        $workflowTranslationHelper = $this->getContainer()->get('oro_workflow.helper.translation');
-
-        $keys = $workflowTranslationHelper->generateDefinitionTranslationKeys(
-            $workflowManager->getWorkflow($workflowName)->getDefinition()
+        $keys = $this->workflowTranslationHelper->generateDefinitionTranslationKeys(
+            $this->workflowManager->getWorkflow($workflowName)->getDefinition()
         );
-        $translations = $workflowTranslationHelper->generateDefinitionTranslations($keys, $locale);
+        $translations = $this->workflowTranslationHelper->generateDefinitionTranslations($keys, $locale);
 
         $output->write(Yaml::dump(ArrayConverter::expandToTree($translations), self::INLINE_LEVEL));
     }

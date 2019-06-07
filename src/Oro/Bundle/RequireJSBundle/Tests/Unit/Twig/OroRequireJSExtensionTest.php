@@ -8,6 +8,7 @@ use Oro\Bundle\RequireJSBundle\Provider\ConfigProvider;
 use Oro\Bundle\RequireJSBundle\Twig\OroRequireJSExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Environment;
 
 class OroRequireJSExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -36,7 +37,7 @@ class OroRequireJSExtensionTest extends \PHPUnit\Framework\TestCase
             ->with('oro_requirejs_config_provider')
             ->will($this->returnValue($provider));
 
-        $twig = $this->createMock(\Twig_Environment::class);
+        $twig = $this->createMock(Environment::class);
 
         $this->container = self::getContainerBuilder()
             ->add('oro_requirejs.config_provider.manager', $manager)

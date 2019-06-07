@@ -8,6 +8,7 @@ use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class TabExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -33,7 +34,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->environment = $this->createMock(\Twig_Environment::class);
+        $this->environment = $this->createMock(Environment::class);
         $this->menuExtension = $this->getMockBuilder(MenuExtension::class)
             ->disableOriginalConstructor()
             ->setMethods(['getMenu'])

@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig\Node;
 
+use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
 use Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Twig\Compiler;
 use Twig\Environment;
-use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConditionalExpression;
 use Twig\Node\Expression\ConstantExpression;
@@ -17,16 +18,9 @@ use Twig\Node\Node;
  */
 class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 {
-    const RENDER_CALL = '$this->env->getExtension("Oro\Bundle\LayoutBundle\Twig\LayoutExtension")->renderer' .
-        '->searchAndRenderBlock';
+    use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoaderInterface */
-    private $loader;
-
-    public function setUp()
-    {
-        $this->loader = $this->createMock(LoaderInterface::class);
-    }
+    const RENDER_CALL = '$this->env->getExtension("' . LayoutExtension::class . '")->renderer->searchAndRenderBlock';
 
     /**
      * block_widget(block)
@@ -41,7 +35,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('block_widget', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->loader));
+        $compiler = new Compiler(new Environment($this->getLoader()));
 
         $this->assertEquals(
             sprintf(
@@ -72,7 +66,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('block_widget', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->loader));
+        $compiler = new Compiler(new Environment($this->getLoader()));
 
         $this->assertEquals(
             sprintf(
@@ -97,7 +91,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->loader));
+        $compiler = new Compiler(new Environment($this->getLoader()));
 
         $this->assertEquals(
             sprintf(
@@ -122,7 +116,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->loader));
+        $compiler = new Compiler(new Environment($this->getLoader()));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -149,7 +143,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->loader));
+        $compiler = new Compiler(new Environment($this->getLoader()));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -175,7 +169,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->loader));
+        $compiler = new Compiler(new Environment($this->getLoader()));
 
         $this->assertEquals(
             sprintf(
@@ -207,7 +201,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->loader));
+        $compiler = new Compiler(new Environment($this->getLoader()));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -244,7 +238,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->loader));
+        $compiler = new Compiler(new Environment($this->getLoader()));
 
         $this->assertEquals(
             sprintf(
@@ -274,7 +268,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->loader));
+        $compiler = new Compiler(new Environment($this->getLoader()));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -317,7 +311,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->loader));
+        $compiler = new Compiler(new Environment($this->getLoader()));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -343,7 +337,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new SearchAndRenderBlockNode('parent_block_widget', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->loader));
+        $compiler = new Compiler(new Environment($this->getLoader()));
 
         $this->assertEquals(
             self::RENDER_CALL . '($context[\'block\'], \'widget\', $context, true)',

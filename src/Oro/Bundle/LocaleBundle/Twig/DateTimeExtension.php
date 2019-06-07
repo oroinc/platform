@@ -5,11 +5,18 @@ namespace Oro\Bundle\LocaleBundle\Twig;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
 /**
- * Twig extension for DateTime formatting
+ * Provides Twig filters to format date and time using either the supplied or the default localization
+ * and timezone settings from the system configuration:
+ *   - oro_format_datetime
+ *   - oro_format_date
+ *   - oro_format_day
+ *   - oro_format_time
  */
-class DateTimeExtension extends \Twig_Extension implements ServiceSubscriberInterface
+class DateTimeExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -49,19 +56,19 @@ class DateTimeExtension extends \Twig_Extension implements ServiceSubscriberInte
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_format_datetime',
                 [$this, 'formatDateTime']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_format_date',
                 [$this, 'formatDate']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_format_day',
                 [$this, 'formatDay']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_format_time',
                 [$this, 'formatTime']
             ),

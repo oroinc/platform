@@ -6,11 +6,15 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\Twig\EntityExtension;
 use Oro\Bundle\UIBundle\Twig\FormatExtension;
 use Oro\Bundle\UIBundle\Twig\HtmlTagExtension;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * The TWIG extension for sandboxes that need to apply default formatting for entity fields.
+ * Provides a Twig function to apply default formatting for entity fields in sandboxes:
+ *   - _entity_var
  */
-class EntityFormatExtension extends \Twig_Extension
+class EntityFormatExtension extends AbstractExtension
 {
     private const EXPR_WITHOUT_ERROR_MESSAGE =
         '{% if %val% is defined %}{{ _entity_var("%name%", %val%, %parent%) }}{% endif %}';
@@ -34,7 +38,7 @@ class EntityFormatExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 '_entity_var',
                 [$this, 'format'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
@@ -79,14 +83,14 @@ class EntityFormatExtension extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param Environment       $environment
      * @param string            $name
      * @param mixed             $value
      * @param mixed             $parentValue
      *
      * @return mixed
      */
-    public function format(\Twig_Environment $environment, string $name, $value, $parentValue)
+    public function format(Environment $environment, string $name, $value, $parentValue)
     {
         if (\is_object($parentValue)) {
             $parentClass = ClassUtils::getClass($parentValue);
@@ -103,13 +107,13 @@ class EntityFormatExtension extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param Environment       $environment
      * @param mixed             $value
      * @param mixed             $formatter
      *
      * @return mixed
      */
-    protected function formatByFormatter(\Twig_Environment $environment, $value, $formatter)
+    protected function formatByFormatter(Environment $environment, $value, $formatter)
     {
         /** @var FormatExtension $formatExtension */
         $formatExtension = $environment->getExtension(FormatExtension::class);
@@ -126,12 +130,12 @@ class EntityFormatExtension extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param Environment $environment
      * @param object            $value
      *
      * @return mixed
      */
-    protected function formatObject(\Twig_Environment $environment, $value)
+    protected function formatObject(Environment $environment, $value)
     {
         /** @var EntityExtension $entityExtension */
         $entityExtension = $environment->getExtension(EntityExtension::class);
@@ -140,12 +144,12 @@ class EntityFormatExtension extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param Environment $environment
      * @param mixed             $value
      *
      * @return mixed
      */
-    protected function formatScalar(\Twig_Environment $environment, $value)
+    protected function formatScalar(Environment $environment, $value)
     {
         /** @var HtmlTagExtension $htmlTagExtension */
         $htmlTagExtension = $environment->getExtension(HtmlTagExtension::class);

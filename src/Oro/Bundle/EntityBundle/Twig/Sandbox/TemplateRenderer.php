@@ -4,7 +4,11 @@ namespace Oro\Bundle\EntityBundle\Twig\Sandbox;
 
 use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface as ConfigProvider;
+use Twig\Environment as TwigEnvironment;
+use Twig\Extension\ExtensionInterface;
 use Twig\Extension\SandboxExtension;
+use Twig\Sandbox\SecurityPolicy;
+use Twig\Source;
 
 /**
  * The base class to render TWIG templates in a sandboxed environment.
@@ -18,7 +22,7 @@ abstract class TemplateRenderer
     private const ENTITY_PREFIX    = self::ENTITY_SECTION . self::PATH_SEPARATOR;
     private const COMPUTED_PREFIX  = self::COMPUTED_SECTION . self::PATH_SEPARATOR;
 
-    /** @var \Twig_Environment */
+    /** @var TwigEnvironment */
     protected $environment;
 
     /** @var ConfigProvider */
@@ -37,12 +41,12 @@ abstract class TemplateRenderer
     private $entityDataAccessor;
 
     /**
-     * @param \Twig_Environment         $environment
+     * @param TwigEnvironment         $environment
      * @param ConfigProvider            $configProvider
      * @param VariableProcessorRegistry $variableProcessors
      */
     public function __construct(
-        \Twig_Environment $environment,
+        TwigEnvironment $environment,
         ConfigProvider $configProvider,
         VariableProcessorRegistry $variableProcessors
     ) {
@@ -59,9 +63,11 @@ abstract class TemplateRenderer
     /**
      * Registers TWIG extension in the sandbox.
      *
-     * @param \Twig_ExtensionInterface $extension
+     * @param ExtensionInterface $extension
+     *
+     * @return void
      */
-    public function addExtension(\Twig_ExtensionInterface $extension): void
+    public function addExtension(ExtensionInterface $extension): void
     {
         $this->environment->addExtension($extension);
     }
@@ -71,6 +77,8 @@ abstract class TemplateRenderer
      *
      * @param string $variable
      * @param string $filter
+     *
+     * @return void
      */
     public function addSystemVariableDefaultFilter(string $variable, string $filter): void
     {
@@ -85,7 +93,7 @@ abstract class TemplateRenderer
      *
      * @return string
      *
-     * @throws \Twig_Error if the given template cannot be rendered
+     * @throws \Twig\Error\Error if the given template cannot be rendered
      */
     public function renderTemplate(string $template, array $templateParams = []): string
     {
@@ -93,8 +101,9 @@ abstract class TemplateRenderer
 
         $data = $this->createTemplateData($templateParams);
         $template = $this->prepareTemplate($template, $data);
+        $templateWrapper = $this->environment->createTemplate($template);
 
-        return $this->environment->render($template, $data->getData());
+        return $templateWrapper->render($data->getData());
     }
 
     /**
@@ -102,13 +111,17 @@ abstract class TemplateRenderer
      *
      * @param string $template
      *
-     * @throws \Twig_Error_Syntax if the given template has errors
+     * @return void
+     *
+     * @throws \Twig\Error\SyntaxError if the given template has errors
      */
     public function validateTemplate(string $template): void
     {
         $this->ensureSandboxConfigured();
+        $source = new Source($template, '');
+        $stream = $this->environment->tokenize($source);
 
-        $this->environment->parse($this->environment->tokenize($template));
+        $this->environment->parse($stream);
     }
 
     /**
@@ -116,6 +129,9 @@ abstract class TemplateRenderer
      */
     abstract protected function getVariableNotFoundMessage(): ?string;
 
+    /**
+     * @return void
+     */
     protected function ensureSandboxConfigured(): void
     {
         if (!$this->sandboxConfigured) {
@@ -124,12 +140,15 @@ abstract class TemplateRenderer
         }
     }
 
+    /**
+     * @return void
+     */
     protected function configureSandbox(): void
     {
         $config = $this->configProvider->getConfiguration();
-        /** @var \Twig_Extension_Sandbox $sandbox */
+        /** @var SandboxExtension $sandbox */
         $sandbox = $this->environment->getExtension(SandboxExtension::class);
-        /** @var \Twig_Sandbox_SecurityPolicy $security */
+        /** @var SecurityPolicy $security */
         $security = $sandbox->getSecurityPolicy();
         $security->setAllowedProperties($config[ConfigProvider::PROPERTIES]);
         $methods = $this->enableToStringMethod($config[ConfigProvider::METHODS]);

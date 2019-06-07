@@ -22,6 +22,8 @@
 {% endblock pageHeader %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {{ parent() }}
 
     {{ UI.cancelButton(path('oro_locale_localization_index')) }}

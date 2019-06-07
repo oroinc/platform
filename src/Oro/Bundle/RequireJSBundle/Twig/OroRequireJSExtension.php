@@ -4,8 +4,17 @@ namespace Oro\Bundle\RequireJSBundle\Twig;
 
 use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class OroRequireJSExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to work with RequireJS configuration:
+ *   - get_requirejs_config
+ *   - get_requirejs_build_path
+ *   - requirejs_build_exists
+ *   - requirejs_build_logger
+ */
+class OroRequireJSExtension extends AbstractExtension
 {
     const DEFAULT_PROVIDER_ALIAS = 'oro_requirejs_config_provider';
     const BUILD_LOGGER_TEMPLATE = 'OroRequireJSBundle::requirejs_build_logger.html.twig';
@@ -45,20 +54,20 @@ class OroRequireJSExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'get_requirejs_config',
                 [$this, 'getRequireJSConfig'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'get_requirejs_build_path',
                 [$this, 'getRequireJSBuildPath']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'requirejs_build_exists',
                 [$this, 'isRequireJSBuildExists']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'requirejs_build_logger',
                 [$this, 'getRequireJSBuildLogger']
             ),

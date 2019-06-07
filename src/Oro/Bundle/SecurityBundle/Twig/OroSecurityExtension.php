@@ -8,13 +8,19 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * Provides custom twig functions for security check purposes.
+ * Provides Twig functions to display organization information and permissions:
+ *   - get_enabled_organizations
+ *   - get_current_organization
+ *   - acl_permission
  */
-class OroSecurityExtension extends \Twig_Extension
+class OroSecurityExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -32,7 +38,7 @@ class OroSecurityExtension extends \Twig_Extension
      */
     protected function getAuthorizationChecker()
     {
-        return $this->container->get('security.authorization_checker');
+        return $this->container->get(AuthorizationCheckerInterface::class);
     }
 
     /**
@@ -40,7 +46,7 @@ class OroSecurityExtension extends \Twig_Extension
      */
     protected function getTokenAccessor()
     {
-        return $this->container->get('oro_security.token_accessor');
+        return $this->container->get(TokenAccessorInterface::class);
     }
 
     /**
@@ -48,7 +54,7 @@ class OroSecurityExtension extends \Twig_Extension
      */
     protected function getPermissionManager()
     {
-        return $this->container->get('oro_security.acl.permission_manager');
+        return $this->container->get(PermissionManager::class);
     }
 
     /**
@@ -57,9 +63,9 @@ class OroSecurityExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('get_enabled_organizations', [$this, 'getOrganizations']),
-            new \Twig_SimpleFunction('get_current_organization', [$this, 'getCurrentOrganization']),
-            new \Twig_SimpleFunction('acl_permission', [$this, 'getPermission']),
+            new TwigFunction('get_enabled_organizations', [$this, 'getOrganizations']),
+            new TwigFunction('get_current_organization', [$this, 'getCurrentOrganization']),
+            new TwigFunction('acl_permission', [$this, 'getPermission']),
         ];
     }
 
@@ -106,5 +112,17 @@ class OroSecurityExtension extends \Twig_Extension
     public function getName()
     {
         return 'oro_security_extension';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            AuthorizationCheckerInterface::class,
+            TokenAccessorInterface::class,
+            PermissionManager::class
+        ];
     }
 }

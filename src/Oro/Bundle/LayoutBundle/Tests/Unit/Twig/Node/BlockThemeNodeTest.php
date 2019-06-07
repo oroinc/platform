@@ -2,22 +2,23 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig\Node;
 
+use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
 use Oro\Bundle\LayoutBundle\Twig\Node\BlockThemeNode;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Twig\Compiler;
 use Twig\Environment;
-use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\NameExpression;
 use Twig\Node\Node;
 
 class BlockThemeNodeTest extends \PHPUnit\Framework\TestCase
 {
-    const SET_THEME_CALL = '$this->env->getExtension("Oro\Bundle\LayoutBundle\Twig\LayoutExtension")->renderer' .
-        '->setTheme';
+    use TwigExtensionTestCaseTrait;
+
+    const SET_THEME_CALL = '$this->env->getExtension("' . LayoutExtension::class . '")->renderer->setTheme';
 
     public function testCompile()
     {
-        $loader = $this->createMock(LoaderInterface::class);
         $block = new Node(
             [
                 new NameExpression('layout', 0)
@@ -31,7 +32,7 @@ class BlockThemeNodeTest extends \PHPUnit\Framework\TestCase
 
         $node = new BlockThemeNode($block, $resources, 0);
 
-        $compiler = new Compiler(new Environment($loader));
+        $compiler = new Compiler(new Environment($this->getLoader()));
 
         $this->assertEquals(
             sprintf(

@@ -3,27 +3,46 @@
 namespace Oro\Bundle\SecurityBundle\Command;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class LoadPermissionConfigurationCommand extends ContainerAwareCommand
+/**
+ * Load permissions configuration from configuration files to the database.
+ */
+class LoadPermissionConfigurationCommand extends Command
 {
-    const NAME = 'security:permission:configuration:load';
+    /** @var string */
+    protected static $defaultName = 'security:permission:configuration:load';
+
+    /** @var PermissionManager */
+    private $permissionManager;
 
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
+
+    /**
+     * @param PermissionManager $permissionManager
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function __construct(PermissionManager $permissionManager, DoctrineHelper $doctrineHelper)
+    {
+        parent::__construct();
+
+        $this->permissionManager = $permissionManager;
+        $this->doctrineHelper = $doctrineHelper;
+    }
 
     /**
      * @inheritdoc
      */
     protected function configure()
     {
-        $this->setName(self::NAME)
-            ->setDescription('Load permissions configuration from configuration files to the database')
+        $this->setDescription('Load permissions configuration from configuration files to the database')
             ->addOption(
                 'permissions',
                 null,
@@ -39,13 +58,11 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
     {
         $acceptedPermissions = $input->getOption('permissions') ?: null;
 
-        $manager = $this->getContainer()->get('oro_security.acl.permission_manager');
-
-        $permissions = $manager->getPermissionsFromConfig($acceptedPermissions);
+        $permissions = $this->permissionManager->getPermissionsFromConfig($acceptedPermissions);
         if ($permissions) {
             $output->writeln('Loading permissions...');
 
-            $permissions = $manager->processPermissions($permissions);
+            $permissions = $this->permissionManager->processPermissions($permissions);
 
             foreach ($permissions as $permission) {
                 $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $permission->getName()));
@@ -59,7 +76,6 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
     /**
      * @param Permission $permission
      * @param OutputInterface $output
-     * @return array
      */
     protected function validatePermissionEntities(Permission $permission, OutputInterface $output)
     {
@@ -85,10 +101,6 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
      */
     protected function isManageableEntityClass($entityClass)
     {
-        if (!$this->doctrineHelper) {
-            $this->doctrineHelper = $this->getContainer()->get('oro_entity.doctrine_helper');
-        }
-
         try {
             return $this->doctrineHelper->isManageableEntityClass($entityClass);
         } catch (\Exception $e) {

@@ -14,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Twig\Error\SyntaxError;
 
 class EmailTemplateSyntaxValidatorTest extends \PHPUnit\Framework\TestCase
 {
@@ -77,7 +78,7 @@ class EmailTemplateSyntaxValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->emailRenderer->expects($this->exactly(3))
             ->method('validateTemplate')
-            ->willThrowException(new \Twig_Error_Syntax('message'));
+            ->willThrowException(new SyntaxError('message'));
 
         $this->entityConfigProvider->expects($this->exactly(3))
             ->method('hasConfig')

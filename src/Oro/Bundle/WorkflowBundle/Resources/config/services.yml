@@ -156,6 +156,9 @@ services:
             - ['addManager', ['@oro_workflow.manager', 'default']]
             - ['addManager', ['@oro_workflow.manager.system', 'system']]
 
+    Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry:
+        alias: oro_workflow.registry.workflow_manager
+
     oro_workflow.permission_registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry'
         public: false
@@ -193,12 +196,18 @@ services:
             - '@oro_workflow.provider.start_transition_route'
             - '@router'
 
+    Oro\Bundle\WorkflowBundle\Provider\PageData\StartTransitionPageDataProvider:
+        alias: 'oro_workflow.provider.page_data.start_transition'
+
     oro_workflow.provider.page_data.transition:
         class: Oro\Bundle\WorkflowBundle\Provider\PageData\TransitionPageDataProvider
         arguments:
             - '@oro_workflow.manager'
             - '@oro_workflow.provider.transition_route'
             - '@router'
+
+    Oro\Bundle\WorkflowBundle\Provider\PageData\TransitionPageDataProvider:
+        alias: 'oro_workflow.provider.page_data.transition'
 
     oro_workflow.handler.workflow_notification_handler:
         class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowNotificationHandler'
@@ -248,6 +257,9 @@ services:
             - '@oro_workflow.changes.event.dispatcher'
             - '@doctrine'
             - '@oro_workflow.manager'
+
+    Oro\Bundle\WorkflowBundle\Handler\WorkflowVariablesHandler:
+        alias: oro_workflow.handler.workflow_variables
 
     oro_workflow.process.cron_scheduler:
         class: 'Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler'
@@ -377,10 +389,16 @@ services:
             - '@oro_translation.manager.translation'
             - '@oro_translation.helper.translation'
 
+    Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper:
+        alias: 'oro_workflow.helper.translation'
+
     oro_workflow.translation.transition_translation_helper:
         class: 'Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper'
         arguments:
             - '@translator.default'
+
+    Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper:
+        alias: oro_workflow.translation.transition_translation_helper
 
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
@@ -389,6 +407,9 @@ services:
         tags:
             - { name: oro.workflow.configuration.handler, priority: 150 }
             - { name: oro.workflow.definition_builder.extension }
+
+    Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor:
+        alias: 'oro_workflow.translation.processor'
 
     oro_workflow.translation.keys_subscriber:
         class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowTranslationKeysSubscriber
@@ -402,6 +423,9 @@ services:
         arguments:
             - '@oro_translation.helper.translation_route'
             - '@oro_translation.provider.language'
+
+    Oro\Bundle\WorkflowBundle\Translation\TranslationsDatagridLinksProvider:
+        alias: 'oro_workflow.translation.translations_datagrid_links_provider'
 
     oro_workflow.extension.translation_context_resolver:
         class: 'Oro\Bundle\WorkflowBundle\Extension\TranslationContextResolver'
@@ -540,11 +564,17 @@ services:
         arguments:
             - '@oro_workflow.manager'
 
+    Oro\Bundle\WorkflowBundle\Provider\TransitionDataProvider:
+        alias: oro_workflow.transition_data.provider
+
     oro_workflow.workflow_data.provider:
         class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider'
         arguments:
             - '@oro_workflow.registry.workflow_manager'
             - '@oro_workflow.transition_data.provider'
+
+    Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider:
+        alias: oro_workflow.workflow_data.provider
 
     oro_workflow.variable_guesser:
         class: 'Oro\Bundle\WorkflowBundle\Model\VariableGuesser'
@@ -578,11 +608,17 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
 
+    Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper:
+        alias: oro_workflow.helper.transition_widget
+
     oro_workflow.helper.workflow_deactivation:
         class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowDeactivationHelper'
         arguments:
             - '@oro_workflow.registry.system'
             - '@oro_workflow.helper.translation'
+
+    Oro\Bundle\WorkflowBundle\Helper\WorkflowDeactivationHelper:
+        alias: oro_workflow.helper.workflow_deactivation
 
     oro_workflow.migration.demo_data_fixtures_listener.event_trigger:
         class: Oro\Bundle\WorkflowBundle\EventListener\EventTriggerDemoDataFixturesListener

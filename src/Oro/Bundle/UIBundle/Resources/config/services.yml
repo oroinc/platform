@@ -126,6 +126,9 @@ services:
     oro_ui.content_provider.manager:
         class: '%oro_ui.content_provider.manager.class%'
 
+    Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager:
+        alias: oro_ui.content_provider.manager
+
     oro_ui.provider.widget_context:
         class: '%oro_ui.provider.widget_context.class%'
         arguments:
@@ -148,6 +151,9 @@ services:
         class: '%oro_ui.user_agent_provider.class%'
         arguments:
             - '@request_stack'
+
+    Oro\Bundle\UIBundle\Provider\UserAgentProviderInterface:
+        alias: oro_ui.user_agent_provider
 
     oro_ui.formatter:
         class: Oro\Bundle\UIBundle\Formatter\FormatterManager
@@ -222,9 +228,10 @@ services:
         class: Oro\Bundle\UIBundle\Twig\UiExtension
         public: false
         arguments:
-            - '@service_container'
+            -  '@Psr\Container\ContainerInterface'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber }
 
     oro_ui.config.use_default_configurator:
         parent: oro_config.form.configurator.use_default_configurator.abstract

@@ -5,8 +5,14 @@ namespace Oro\Bundle\EmbeddedFormBundle\Twig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
-class BackLinkExtension extends \Twig_Extension
+/**
+ * Provides a Twig filter to generate a back link:
+ *   - back_link
+ */
+class BackLinkExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     protected $container;
@@ -44,12 +50,12 @@ class BackLinkExtension extends \Twig_Extension
     }
 
     /**
-     * @return \Twig_SimpleFilter[]
+     * @return TwigFilter[]
      */
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('back_link', [$this, 'backLinkFilter']),
+            new TwigFilter('back_link', [$this, 'backLinkFilter']),
         ];
     }
 

@@ -58,6 +58,8 @@
 {% set gridUrl = path('oro_workflow_definition_index') %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if entity.name and delete_allowed and is_granted('DELETE', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
@@ -96,6 +98,9 @@
 {% endblock stats %}
 
 {% block content_data %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import _self as workflowDefinitionUpdate %}
+
     {{ QD.query_designer_column_chain_template('entity-column-chain-template') }}
 
     {% set requiredConstraint = {
@@ -142,7 +147,7 @@
                             <div class="form-container">
                                 <form action="#" class="form-horizontal">
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.transition.name.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.transition.name.tooltip") }}
                                         <div class="controls">
                                             <input type="text" name="label" value="<%- label %>" data-validation="{{ requiredConstraint|json_encode }}">
                                             <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.label) { %>
@@ -155,7 +160,7 @@
                                     var stepFromName = stepFrom ? stepFrom.get('name') : '';
                                     %>
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.from_step.label"|trans, true, "oro.workflow.workflowdefinition.transition.step_from.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.from_step.label"|trans, true, "oro.workflow.workflowdefinition.transition.step_from.tooltip") }}
                                         <div class="controls">
                                             <select name="step_from" data-validation="{{ requiredConstraint|json_encode }}"
                                             <% if (name && !_is_clone) { %>disabled="disabled"<% } %>
@@ -174,7 +179,7 @@
                                     </div>
                                     <% } %>
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.to_step.label"|trans, true, "oro.workflow.workflowdefinition.transition.step_to.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.to_step.label"|trans, true, "oro.workflow.workflowdefinition.transition.step_to.tooltip") }}
                                         <div class="controls">
                                             <select name="step_to" data-validation="{{ requiredConstraint|json_encode }}">
                                                 <option value=""></option>
@@ -191,7 +196,7 @@
                                     </div>
 
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.view_form.label"|trans, true, "oro.workflow.workflowdefinition.transition.display_type.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.view_form.label"|trans, true, "oro.workflow.workflowdefinition.transition.display_type.tooltip") }}
                                         <div class="controls">
                                             <select name="display_type" data-validation="{{ requiredConstraint|json_encode }}">
                                                 <option value="dialog" <% if (display_type == 'dialog') { %>selected="selected"<% } %>>{{ "Popup window"|trans }}</value>
@@ -201,7 +206,7 @@
                                     </div>
 
                                     <div class="control-group destination-page-controls">
-                                        {{ _self.render_label("oro.workflow.form.destination_page.label"|trans, false) }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.destination_page.label"|trans, false) }}
                                         <div class="controls">
                                             <select name="destination_page">
                                                 {% for destination in availableDestinations %}
@@ -212,7 +217,7 @@
                                     </div>
 
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.warning_message.label"|trans, false, "oro.workflow.workflowdefinition.transition.message.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.warning_message.label"|trans, false, "oro.workflow.workflowdefinition.transition.message.tooltip") }}
                                         <div class="controls">
                                             <textarea name="message"><%= message %></textarea>
                                             <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.message) { %>
@@ -222,7 +227,7 @@
                                     </div>
 
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.button_label.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_label.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.button_label.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_label.tooltip") }}
                                         <div class="controls">
                                             <input type="text" name="button_label" value="<%- button_label %>">
                                             <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.button_label) { %>
@@ -231,7 +236,7 @@
                                         </div>
                                     </div>
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.button_title.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_title.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.button_title.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_title.tooltip") }}
                                         <div class="controls">
                                             <input type="text" name="button_title" value="<%- button_title %>">
                                             <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.button_title) { %>
@@ -249,7 +254,7 @@
                                     <% print('</sc' + 'ript>'); %>
 
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.button_style.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_color.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.button_style.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_color.tooltip") }}
                                         <div class="controls">
                                             <select name="button_color">
                                                 <% _.each(allowedButtonStyles, function (style) { %>
@@ -262,7 +267,7 @@
                                     </div>
 
                                     <div class="control-group transition-example-container">
-                                        {{ _self.render_label("oro.workflow.form.button_preview.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_preview.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.button_preview.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_preview.tooltip") }}
                                         <div class="controls">
                                             <div class="transition-btn-example"></div>
                                         </div>
@@ -314,7 +319,7 @@
                             <div class="tab-data">
                                 <form action="#" class="form-horizontal">
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.step.name.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.step.name.tooltip") }}
                                         <div class="controls">
                                             <input type="text" name="label" value="<%- label %>" data-validation="{{ requiredConstraint|json_encode }}">
                                             <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.label) { %>
@@ -324,14 +329,14 @@
                                     </div>
 
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.position.label"|trans, false, "oro.workflow.workflowdefinition.step.order.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.position.label"|trans, false, "oro.workflow.workflowdefinition.step.order.tooltip") }}
                                         <div class="controls">
                                             <input type="text" name="order" value="<%- order %>" data-validation="{{ orderConstraints|json_encode }}">
                                         </div>
                                     </div>
 
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.final.label"|trans, false, "oro.workflow.workflowdefinition.step.is_final.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.final.label"|trans, false, "oro.workflow.workflowdefinition.step.is_final.tooltip") }}
                                         <div class="controls">
                                             <input type="checkbox" name="is_final" <% if (is_final) { %>checked="checked"<% } %>>
                                         </div>
@@ -418,21 +423,21 @@
             <div class="form-horizontal" style="width: 436px;">
                 <input type="hidden" name="itemId" value="">
                 <div class="control-group">
-                    {{ _self.render_label("oro.workflow.form.entity_field.label"|trans, true, "oro.workflow.workflowdefinition.attribute.property_path.tooltip") }}
+                    {{ workflowDefinitionUpdate.render_label("oro.workflow.form.entity_field.label"|trans, true, "oro.workflow.workflowdefinition.attribute.property_path.tooltip") }}
                     <div class="controls">
                         <input type="hidden" name="property_path" data-validation="{{ requiredConstraint|json_encode }}"/>
                     </div>
                 </div>
 
                 <div class="control-group">
-                    {{ _self.render_label("oro.workflow.form.label.label"|trans, false, "oro.workflow.workflowdefinition.attribute.label.tooltip") }}
+                    {{ workflowDefinitionUpdate.render_label("oro.workflow.form.label.label"|trans, false, "oro.workflow.workflowdefinition.attribute.label.tooltip") }}
                     <div class="controls">
                         <input type="text" name="label" value="<%- label %>" placeholder="{{ 'Leave empty for system value'|trans }}"/>
                     </div>
                 </div>
 
                 <div class="control-group">
-                    {{ _self.render_label("oro.workflow.form.required.label"|trans, false, "oro.workflow.workflowdefinition.attribute.required.tooltip") }}
+                    {{ workflowDefinitionUpdate.render_label("oro.workflow.form.required.label"|trans, false, "oro.workflow.workflowdefinition.attribute.required.tooltip") }}
                     <div class="controls">
                         <input type="checkbox" name="required" <% if (required) { %>checked="checked"<% } %>/>
                     </div>
@@ -533,7 +538,7 @@
     {% set startStepSelector %}
         {% set startStep = entity.startStep ? entity.startStep.name : '' %}
         <div class="control-group">
-            {{ _self.render_label("oro.workflow.workflowdefinition.start_step.label"|trans, false, "oro.workflow.workflowdefinition.start_step.tooltip") }}
+            {{ workflowDefinitionUpdate.render_label("oro.workflow.workflowdefinition.start_step.label"|trans, false, "oro.workflow.workflowdefinition.start_step.tooltip") }}
             <div class="controls">
                 <input type="hidden" name="start_step" value="{{ startStep }}"/>
             </div>

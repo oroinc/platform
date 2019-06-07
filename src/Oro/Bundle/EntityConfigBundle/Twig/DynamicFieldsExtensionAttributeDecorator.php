@@ -10,7 +10,9 @@ use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
- * Adds attributes to dynamic fields
+ * Decorates existing Twig functions to render attributes along with dynamic fields:
+ *   - oro_get_dynamic_fields
+ *   - oro_get_dynamic_field
  */
 class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExtension implements
     ServiceSubscriberInterface

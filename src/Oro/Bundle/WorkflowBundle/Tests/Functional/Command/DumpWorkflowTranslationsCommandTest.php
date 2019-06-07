@@ -30,7 +30,7 @@ class DumpWorkflowTranslationsCommandTest extends WebTestCase
     public function testExecute()
     {
         $result = $this->runCommand(
-            DumpWorkflowTranslationsCommand::NAME,
+            DumpWorkflowTranslationsCommand::getDefaultName(),
             [
                 LoadWorkflowTranslations::WORKFLOW4,
                 '--locale' => LoadLanguages::LANGUAGE2,

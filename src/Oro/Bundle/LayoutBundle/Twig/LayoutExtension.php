@@ -9,14 +9,40 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Form\FormView;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\Extension\InitRuntimeInterface;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
+use Twig\TwigTest;
 
 /**
- * Extends TWIG with functions and filters to work with layout blocks, string manipulations and "is expression" test.
+ * Provides Twig functions to work with layout blocks:
+ *   - block_widget
+ *   - block_label
+ *   - block_row
+ *   - parent_block_widget
+ *   - layout_attr_defaults
+ *   - set_class_prefix_to_form
+ *   - convert_value_to_string
+ *   - highlight_string
+ *
+ * Provides Twig filters for string manipulations:
+ *   - block_text - normalizes and translates (if needed) labels in the given value.
+ *   - merge_context - merges additional context to BlockView.
+ *   - pluralize
+ *
+ * Provides Twig tests for string content identification:
+ *   - expression
+ *   - string
+ *
+ * Provides a Twig tag for setting block theme:
+ *   - block_theme
  */
-class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRuntimeInterface
+class LayoutExtension extends AbstractExtension implements InitRuntimeInterface, ServiceSubscriberInterface
 {
     const RENDER_BLOCK_NODE_CLASS = 'Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode';
 
@@ -45,9 +71,9 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
     /**
      * {@inheritdoc}
      */
-    public function initRuntime(\Twig_Environment $environment)
+    public function initRuntime(Environment $environment)
     {
-        $this->renderer = $this->container->get('oro_layout.twig.renderer');
+        $this->renderer = $this->container->get(TwigRenderer::class);
         $this->renderer->setEnvironment($environment);
     }
 
@@ -67,39 +93,39 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'block_widget',
                 null,
                 ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'block_label',
                 null,
                 ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'block_row',
                 null,
                 ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'parent_block_widget',
                 null,
                 ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'layout_attr_defaults',
                 [$this, 'defaultAttributes']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'set_class_prefix_to_form',
                 [$this, 'setClassPrefixToForm']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'convert_value_to_string',
                 [$this, 'convertValueToString']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'highlight_string',
                 [$this, 'highlightString'],
                 ['is_safe' => ['html']]
@@ -114,9 +140,9 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
     {
         return [
             // Normalizes and translates (if needed) labels in the given value.
-            new \Twig_SimpleFilter('block_text', [$this, 'processText']),
+            new TwigFilter('block_text', [$this, 'processText']),
             // Merge additional context to BlockView
-            new \Twig_SimpleFilter('merge_context', [$this, 'mergeContext']),
+            new TwigFilter('merge_context', [$this, 'mergeContext']),
             new TwigFilter('pluralize', [Inflector::class, 'pluralize']),
         ];
     }
@@ -127,8 +153,8 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
     public function getTests()
     {
         return [
-            new \Twig_SimpleTest('expression', [$this, 'isExpression']),
-            new \Twig_SimpleTest('string', [$this, 'isString']),
+            new TwigTest('expression', [$this, 'isExpression']),
+            new TwigTest('string', [$this, 'isString']),
         ];
     }
 
@@ -141,7 +167,7 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
     public function processText($value, $domain = null)
     {
         if (null === $this->textHelper) {
-            $this->textHelper = $this->container->get('oro_layout.text.helper');
+            $this->textHelper = $this->container->get(TextHelper::class);
         }
 
         return $this->textHelper->processText($value, $domain);
@@ -209,14 +235,6 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'layout';
-    }
-
-    /**
      * @param mixed $value
      * @return string
      */
@@ -261,5 +279,16 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
     public function isString($value)
     {
         return is_string($value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            TwigRenderer::class,
+            TextHelper::class,
+        ];
     }
 }

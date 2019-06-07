@@ -8,11 +8,14 @@ use Oro\Bundle\SidebarBundle\Configuration\WidgetDefinitionProvider;
 use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * Twig extension that provides sidebar widgets information.
+ * Provides a Twig function to retrieve sidebar widgets information:
+ *   - oro_sidebar_get_available_widgets
  */
-class SidebarExtension extends \Twig_Extension implements FeatureToggleableInterface
+class SidebarExtension extends AbstractExtension implements FeatureToggleableInterface
 {
     use FeatureCheckerHolderTrait;
 
@@ -59,7 +62,7 @@ class SidebarExtension extends \Twig_Extension implements FeatureToggleableInter
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_sidebar_get_available_widgets', [$this, 'getWidgetDefinitions']),
+            new TwigFunction('oro_sidebar_get_available_widgets', [$this, 'getWidgetDefinitions']),
         ];
     }
 

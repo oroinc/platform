@@ -21,11 +21,12 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
     {
         parent::setUp();
 
-        $this->extension = new OrmSorterExtension($this->sortersStateProvider);
+        $this->extension = new OrmSorterExtension($this->sortersStateProvider, $this->resolver);
     }
 
     public function testVisitDatasourceWithoutDefaultSorting()
     {
+        $this->configureResolver();
         $this->sortersStateProvider
             ->expects($this->once())
             ->method('getStateFromParameters')
@@ -69,6 +70,7 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWhenQueryAlreadyHasOrderBy()
     {
+        $this->configureResolver();
         $this->sortersStateProvider
             ->expects($this->once())
             ->method('getStateFromParameters')
@@ -104,6 +106,7 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithoutDefaultSortingForEmptyQuery()
     {
+        $this->configureResolver();
         $this->sortersStateProvider
             ->expects($this->once())
             ->method('getStateFromParameters')
@@ -138,6 +141,7 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithoutDefaultSortingAndGroupBy()
     {
+        $this->configureResolver();
         $this->sortersStateProvider
             ->expects($this->once())
             ->method('getStateFromParameters')
@@ -173,6 +177,7 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithoutDefaultSortingAndMultipleGroupBy()
     {
+        $this->configureResolver();
         $this->sortersStateProvider
             ->expects($this->once())
             ->method('getStateFromParameters')

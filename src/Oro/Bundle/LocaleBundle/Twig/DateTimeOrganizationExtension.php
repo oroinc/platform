@@ -6,13 +6,19 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Twig\TwigFilter;
 
 /**
- * Allows get formatted date and calendar date range by user localization settings
+ * Overrides existing Twig filters to use the default localization settings of the current organization:
+ *   - oro_format_datetime
+ *   - oro_format_date
+ *   - oro_format_day
+ *   - oro_format_time
  *
- * @deprecated Since 1.11, will be removed after 1.13.
+ * It also provides a new Twig filter to explicitly use the organization localization settings:
+ *   - oro_format_datetime_organization
  *
- * It's a temporary workaround to fix dates in reminder emails CRM-5745 until improvement CRM-5758 is implemented
+ * It's a temporary workaround to fix dates in notification emails until CRM-5758 is implemented.
  */
 class DateTimeOrganizationExtension extends DateTimeExtension
 {
@@ -38,7 +44,7 @@ class DateTimeOrganizationExtension extends DateTimeExtension
     public function getFilters()
     {
         $filters = parent::getFilters();
-        $filters[] = new \Twig_SimpleFilter(
+        $filters[] = new TwigFilter(
             'oro_format_datetime_organization',
             [$this, 'formatDateTimeOrganization']
         );

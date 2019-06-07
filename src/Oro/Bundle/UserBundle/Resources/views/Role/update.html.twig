@@ -7,6 +7,8 @@
 {% set formAction = entityId ? path('oro_user_role_update', { 'id': entityId}) : path('oro_user_role_create') %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {{ parent() }}
     {% if entityId and is_granted('DELETE', form.vars.value) %}
         {{ UI.deleteButton({
@@ -78,6 +80,8 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% set id = 'role-profile' %}
 
     {% set dataBlocks = [{

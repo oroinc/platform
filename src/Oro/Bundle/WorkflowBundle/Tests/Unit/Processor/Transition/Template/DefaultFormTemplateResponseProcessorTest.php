@@ -8,10 +8,11 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Template\DefaultFormTemplateResponseProcessor;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
 class DefaultFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \Twig_Environment|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
     protected $twig;
 
     /** @var DefaultFormTemplateResponseProcessor */
@@ -19,7 +20,7 @@ class DefaultFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCa
 
     protected function setUp()
     {
-        $this->twig = $this->createMock(\Twig_Environment::class);
+        $this->twig = $this->createMock(Environment::class);
 
         $this->processor = new DefaultFormTemplateResponseProcessor($this->twig);
     }

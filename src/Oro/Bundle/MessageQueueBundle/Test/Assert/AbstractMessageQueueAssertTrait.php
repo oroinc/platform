@@ -19,15 +19,21 @@ trait AbstractMessageQueueAssertTrait
      * @param string                    $expectedTopic   The expected topic name
      * @param string|array|Message|null $expectedMessage The expected message or NULL if a message is not matter
      * @param bool                      $isSubJobMessage true if the message is sent for runDelayed running
+     * @param bool                      $canonicalize    Arrays with integer keys and scalar values
+     *                                                   are sorted before comparison when set to true
      */
-    protected static function assertMessageSent($expectedTopic, $expectedMessage = null, $isSubJobMessage = false)
-    {
+    protected static function assertMessageSent(
+        $expectedTopic,
+        $expectedMessage = null,
+        bool $isSubJobMessage = false,
+        bool $canonicalize = false
+    ) {
         $message = ['topic' => $expectedTopic];
         if (null !== $expectedMessage) {
             $message['message'] = $expectedMessage;
         }
 
-        self::assertThat(self::getSentMessages(), new SentMessageConstraint($message, $isSubJobMessage));
+        self::assertThat(self::getSentMessages(), new SentMessageConstraint($message, $isSubJobMessage, $canonicalize));
     }
 
     /**
@@ -37,12 +43,18 @@ trait AbstractMessageQueueAssertTrait
      * @param string $expectedTopic    The expected topic name
      * @param array  $expectedMessages The expected messages
      *                                 Each message can be string, array or instance of Message class
-     * @param bool                     $isSubJobMessage true if the message is sent for runDelayed running
+     * @param bool   $isSubJobMessage  true if the message is sent for runDelayed running
+     * @param bool   $canonicalize     Arrays with integer keys and scalar values
+     *                                 are sorted before comparison when set to true
      */
-    protected static function assertMessagesSent($expectedTopic, array $expectedMessages, $isSubJobMessage = false)
-    {
+    protected static function assertMessagesSent(
+        $expectedTopic,
+        array $expectedMessages,
+        bool $isSubJobMessage = false,
+        bool $canonicalize = false
+    ) {
         foreach ($expectedMessages as $expectedMessage) {
-            self::assertMessageSent($expectedTopic, $expectedMessage, $isSubJobMessage);
+            self::assertMessageSent($expectedTopic, $expectedMessage, $isSubJobMessage, $canonicalize);
         }
 
         $topicMessages = [];

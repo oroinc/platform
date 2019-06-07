@@ -97,6 +97,9 @@ oro_behat_extension:
     Shortcut Actionslist:
       class: Oro\Bundle\NavigationBundle\Tests\Behat\Page\ShortcutActionslist
       route: 'oro_shortcut_actionslist'
+    Menus:
+      class: Oro\Bundle\NavigationBundle\Tests\Behat\Page\Menus
+      route: 'oro_navigation_global_menu_index'
 
   suites:
     OroNavigationBundle:

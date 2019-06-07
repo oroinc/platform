@@ -6,6 +6,8 @@
 {% set gridName  = 'oro-integration-grid' %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if is_granted('oro_integration_create') %}
         {{ UI.addButton({
             'path': path('oro_integration_create'),

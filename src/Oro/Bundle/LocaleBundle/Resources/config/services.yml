@@ -71,6 +71,9 @@ services:
             - '@oro_locale.manager.localization'
             - '@oro_locale.provider.current_localization'
 
+    Oro\Bundle\LocaleBundle\Helper\LocalizationHelper:
+        alias: oro_locale.helper.localization
+
     oro_locale.helper.default_locale_localization:
         class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationHelper'
         arguments:

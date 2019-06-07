@@ -6,8 +6,15 @@ use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class PlaceholderExtension extends \Twig_Extension
+/**
+ * Provides a Twig function to render placeholders:
+ *   - placeholder
+ */
+class PlaceholderExtension extends AbstractExtension
 {
     const EXTENSION_NAME = 'oro_placeholder';
 
@@ -52,7 +59,7 @@ class PlaceholderExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'placeholder',
                 [$this, 'renderPlaceholder'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
@@ -63,7 +70,7 @@ class PlaceholderExtension extends \Twig_Extension
     /**
      * Render placeholder by name
      *
-     * @param \Twig_Environment $environment ,
+     * @param Environment       $environment
      * @param string            $name
      * @param array             $variables
      * @param array             $attributes  Supported attributes:
@@ -72,7 +79,7 @@ class PlaceholderExtension extends \Twig_Extension
      * @return string|array
      */
     public function renderPlaceholder(
-        \Twig_Environment $environment,
+        Environment $environment,
         $name,
         array $variables = [],
         array $attributes = []
@@ -86,7 +93,7 @@ class PlaceholderExtension extends \Twig_Extension
     /**
      * Renders the given item.
      *
-     * @param \Twig_Environment $environment
+     * @param Environment       $environment
      * @param array             $item
      * @param array             $variables
      *
@@ -94,7 +101,7 @@ class PlaceholderExtension extends \Twig_Extension
      *
      * @throws \RuntimeException If placeholder cannot be rendered.
      */
-    protected function renderItemContent(\Twig_Environment $environment, array $item, array $variables)
+    protected function renderItemContent(Environment $environment, array $item, array $variables)
     {
         if (isset($item['data']) || array_key_exists('data', $item)) {
             $variables['data'] = $item['data'];
@@ -125,13 +132,13 @@ class PlaceholderExtension extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param Environment       $environment
      * @param string            $name
      * @param array             $variables
      *
      * @return array
      */
-    protected function getPlaceholderData(\Twig_Environment $environment, $name, $variables)
+    protected function getPlaceholderData(Environment $environment, $name, $variables)
     {
         $result = [];
 

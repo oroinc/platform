@@ -2,7 +2,16 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig\Fixture;
 
-class EnvironmentExtension extends \Twig_Extension
+use Twig\Extension\AbstractExtension;
+use Twig\Extension\GlobalsInterface;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
+use Twig\TwigTest;
+
+/**
+ * A test stub
+ */
+class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
 {
     public function getTokenParsers()
     {
@@ -21,21 +30,21 @@ class EnvironmentExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            new \Twig_SimpleFilter('foo_filter', 'foo_filter'),
+            new TwigFilter('foo_filter', 'foo_filter'),
         );
     }
 
     public function getTests()
     {
         return array(
-            new \Twig_SimpleTest('foo_test', 'foo_test'),
+            new TwigTest('foo_test', 'foo_test'),
         );
     }
 
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('foo_function', 'foo_function'),
+            new TwigFunction('foo_function', 'foo_function'),
         );
     }
 

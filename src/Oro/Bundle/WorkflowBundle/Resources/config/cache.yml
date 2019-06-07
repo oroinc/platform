@@ -16,6 +16,7 @@ services:
             - '@doctrine'
 
     oro_workflow.cache.entities_with_workflow:
+        public: false
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_workflow_entities_with_workflow' ] ]

@@ -3,6 +3,8 @@
 {% oro_title_set({params : {'%entityName%': 'oro.entity_config.attribute.entity_label'|trans}}) %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {{ UI.cancelButton(path('oro_attribute_index', {alias: entityAlias})) }}
     {{ UI.saveActionButton({
         'label': 'Continue'|trans,

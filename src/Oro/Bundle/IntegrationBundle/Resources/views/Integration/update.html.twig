@@ -14,6 +14,8 @@
 {% endif %}
 
 {% block breadcrumbs %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {{ parent() }}
     <span class="page-title__status">
         {% if entity.enabled %}
@@ -25,6 +27,8 @@
 {% endblock breadcrumbs %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {{ UI.cancelButton(path('oro_integration_index')) }}
 
     {% if entity.id %}
@@ -106,7 +110,7 @@
         }]) %}
     {% endif %}
 
-    {% if entity.id and isWidgetContext|default(false) is sameas(false) %}
+    {% if entity.id and isWidgetContext|default(false) is same as(false) %}
         {% set dataBlocks = dataBlocks|merge([{
             'title': 'Statuses'|trans,
                 'subblocks': [{

@@ -5,6 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Form;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Component\Form\FormView;
 use Twig\Environment;
+use Twig\Template;
 
 /**
  * Extends TwigRendererEngine to add possability to render parent blocks without "extend"
@@ -19,7 +20,7 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
     protected $environment;
 
     /**
-     * @var \Twig_Template
+     * @var Template
      */
     private $template;
 
@@ -75,7 +76,7 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
         parent::loadResourcesFromTheme($cacheKey, $theme);
 
         if (null === $this->template) {
-            // Store the first \Twig_Template instance that we find so that
+            // Store the first \Twig\Template instance that we find so that
             // we can call displayBlock() later on. It doesn't matter *which*
             // template we use for that, since we pass the used blocks manually
             // anyway.

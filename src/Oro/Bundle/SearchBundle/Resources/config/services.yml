@@ -307,8 +307,7 @@ services:
 
     oro_search.extension.search_sorter:
         class: '%oro_search.extension.search_sorter.class%'
-        arguments:
-            - '@oro_datagrid.provider.state.sorters'
+        parent: oro_datagrid.extension.sorter.abstract
         tags:
             - { name: oro_datagrid.extension }
 

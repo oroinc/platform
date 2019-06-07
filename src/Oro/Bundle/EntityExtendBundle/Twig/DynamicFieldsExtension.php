@@ -22,7 +22,9 @@ use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
- * Adds dynamic fields
+ * Provides Twig functions to get dynamic fields of extended entities:
+ *   - oro_get_dynamic_fields
+ *   - oro_get_dynamic_field
  */
 class DynamicFieldsExtension extends AbstractDynamicFieldsExtension implements ServiceSubscriberInterface
 {

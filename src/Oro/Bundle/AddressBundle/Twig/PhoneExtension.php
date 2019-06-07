@@ -4,8 +4,15 @@ namespace Oro\Bundle\AddressBundle\Twig;
 
 use Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class PhoneExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to extract phone number data from an entity:
+ *   - phone_number
+ *   - phone_numbers
+ */
+class PhoneExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     protected $container;
@@ -32,8 +39,8 @@ class PhoneExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('phone_number', [$this, 'getPhoneNumber']),
-            new \Twig_SimpleFunction('phone_numbers', [$this, 'getPhoneNumbers']),
+            new TwigFunction('phone_number', [$this, 'getPhoneNumber']),
+            new TwigFunction('phone_numbers', [$this, 'getPhoneNumbers']),
         ];
     }
 

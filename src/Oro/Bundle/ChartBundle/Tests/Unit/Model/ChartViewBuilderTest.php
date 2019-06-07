@@ -6,6 +6,7 @@ use Oro\Bundle\ChartBundle\Model\ChartViewBuilder;
 use Oro\Bundle\ChartBundle\Model\Data\ArrayData;
 use Oro\Bundle\ChartBundle\Model\Data\DataGridData;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Twig\Environment;
 
 class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 {
@@ -40,7 +41,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
             ->getMockBuilder('Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->twig = $this->createMock('Twig_Environment');
+        $this->twig = $this->createMock(Environment::class);
 
         $this->builder = new ChartViewBuilder($this->configProvider, $this->transformerFactory, $this->twig);
     }

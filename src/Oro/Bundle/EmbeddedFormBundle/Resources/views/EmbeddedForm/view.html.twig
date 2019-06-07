@@ -3,6 +3,8 @@
 {% oro_title_set({ params : {"%form.title%": entity.title} }) %}
 
 {% block navButtons %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
     {% if is_granted('oro_embedded_form_delete') %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_embedded_form_delete', {'id': entity.id}),
@@ -31,6 +33,8 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
+    {% import 'OroUIBundle::macros.html.twig' as ui %}
+
     {% set id = 'embedded-form-get-code' %}
 
     {% block stats %}

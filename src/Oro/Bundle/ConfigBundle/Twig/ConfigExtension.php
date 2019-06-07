@@ -4,11 +4,15 @@ namespace Oro\Bundle\ConfigBundle\Twig;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * This class adds twig functions for configurations reading
+ * Provides Twig functions to retrieve values of configuration settings and container parameters:
+ *   - oro_config_value
+ *   - oro_parameter
  */
-class ConfigExtension extends \Twig_Extension
+class ConfigExtension extends AbstractExtension
 {
     /** @var ContainerInterface */
     protected $container;
@@ -42,8 +46,8 @@ class ConfigExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_config_value', [$this, 'getConfigValue']),
-            new \Twig_SimpleFunction('oro_parameter', [$this, 'getParameter']),
+            new TwigFunction('oro_config_value', [$this, 'getConfigValue']),
+            new TwigFunction('oro_parameter', [$this, 'getParameter']),
         ];
     }
 

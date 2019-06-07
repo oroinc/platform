@@ -10,8 +10,25 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class FileExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to work with files, images and attachments:
+ *   - file_url
+ *   - file_size
+ *   - resized_image_url
+ *   - filtered_image_url
+ *   - oro_configured_image_url
+ *   - oro_attachment_icon
+ *   - oro_type_is_image
+ *   - oro_is_preview_available
+ *   - oro_file_icons_config
+ *   - oro_file_view
+ *   - oro_image_view
+ */
+class FileExtension extends AbstractExtension
 {
     const DEFAULT_THUMB_SIZE = 16;
 
@@ -59,21 +76,21 @@ class FileExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('file_url', [$this, 'getFileUrl']),
-            new \Twig_SimpleFunction('file_size', [$this, 'getFileSize']),
-            new \Twig_SimpleFunction('resized_image_url', [$this, 'getResizedImageUrl']),
-            new \Twig_SimpleFunction('filtered_image_url', [$this, 'getFilteredImageUrl']),
-            new \Twig_SimpleFunction('oro_configured_image_url', [$this, 'getConfiguredImageUrl']),
-            new \Twig_SimpleFunction('oro_attachment_icon', [$this, 'getAttachmentIcon']),
-            new \Twig_SimpleFunction('oro_type_is_image', [$this, 'getTypeIsImage']),
-            new \Twig_SimpleFunction('oro_is_preview_available', [$this, 'isPreviewAvailable']),
-            new \Twig_SimpleFunction('oro_file_icons_config', [$this, 'getFileIconsConfig']),
-            new \Twig_SimpleFunction(
+            new TwigFunction('file_url', [$this, 'getFileUrl']),
+            new TwigFunction('file_size', [$this, 'getFileSize']),
+            new TwigFunction('resized_image_url', [$this, 'getResizedImageUrl']),
+            new TwigFunction('filtered_image_url', [$this, 'getFilteredImageUrl']),
+            new TwigFunction('oro_configured_image_url', [$this, 'getConfiguredImageUrl']),
+            new TwigFunction('oro_attachment_icon', [$this, 'getAttachmentIcon']),
+            new TwigFunction('oro_type_is_image', [$this, 'getTypeIsImage']),
+            new TwigFunction('oro_is_preview_available', [$this, 'isPreviewAvailable']),
+            new TwigFunction('oro_file_icons_config', [$this, 'getFileIconsConfig']),
+            new TwigFunction(
                 'oro_file_view',
                 [$this, 'getFileView'],
                 ['is_safe' => ['html'], 'needs_environment' => true]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_image_view',
                 [$this, 'getImageView'],
                 ['is_safe' => ['html'], 'needs_environment' => true]
@@ -154,7 +171,7 @@ class FileExtension extends \Twig_Extension
     /**
      * Get file view html block
      *
-     * @param \Twig_Environment $environment
+     * @param Environment       $environment
      * @param mixed             $parentEntity
      * @param string            $fieldName
      * @param File              $attachment
@@ -163,15 +180,12 @@ class FileExtension extends \Twig_Extension
      * @return string
      */
     public function getFileView(
-        \Twig_Environment $environment,
+        Environment $environment,
         $parentEntity,
         $fieldName,
         $attachment = null,
         $additional = null
     ) {
-        /**
-         * @todo: should be refactored in BAP-5637
-         */
         if (filter_var($attachment, FILTER_VALIDATE_INT)) {
             $attachment = $this->getFileById($attachment);
         }
@@ -198,7 +212,7 @@ class FileExtension extends \Twig_Extension
     /**
      * Get Image html block
      *
-     * @param \Twig_Environment $environment
+     * @param Environment       $environment
      * @param object            $parentEntity
      * @param mixed             $attachment
      * @param string|object     $entityClass
@@ -207,15 +221,12 @@ class FileExtension extends \Twig_Extension
      * @return string
      */
     public function getImageView(
-        \Twig_Environment $environment,
+        Environment $environment,
         $parentEntity,
         $attachment = null,
         $entityClass = null,
         $fieldName = ''
     ) {
-        /**
-         * @todo: should be refactored in BAP-5637
-         */
         if (filter_var($attachment, FILTER_VALIDATE_INT)) {
             $attachment = $this->getFileById($attachment);
         }
