@@ -106,7 +106,7 @@ class DbalStateDriver implements StateDriverInterface
         $this->getConnection()->executeUpdate(
             $querySQL,
             ['updatedAt' => $date, 'id' => $this->key, 'dateWithGap' => $dateWithGap],
-            ['updatedAt' => Type::DATETIME, 'id' => Type::INTEGER, 'dateWithGap' => Type::DATETIME]
+            ['updatedAt' => Type::DATETIME, 'id' => Type::STRING, 'dateWithGap' => Type::DATETIME]
         );
     }
 
