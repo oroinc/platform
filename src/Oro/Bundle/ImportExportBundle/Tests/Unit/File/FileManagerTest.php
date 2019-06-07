@@ -5,7 +5,6 @@ namespace Oro\Bundle\ImportExportBundle\File;
 use Gaufrette\File;
 use Gaufrette\Filesystem;
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
-use Oro\Bundle\SEOBundle\Sitemap\Exception\LogicException;
 use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -81,7 +80,7 @@ class FileManagerTest extends TestCase
         $this->filesystem->expects($this->once())
             ->method('mimeType')
             ->with(self::FILENAME)
-            ->willThrowException(new LogicException('no mime type.'));
+            ->willThrowException(new \LogicException('no mime type.'));
         $this->assertNull($this->fileManager->getMimeType(self::FILENAME));
     }
 
