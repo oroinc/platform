@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Config\Definition\SortersConfiguration;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * Adds "sorters" section to entity configuration.
+ */
 class SortersConfigExtension extends AbstractConfigExtension
 {
     /**

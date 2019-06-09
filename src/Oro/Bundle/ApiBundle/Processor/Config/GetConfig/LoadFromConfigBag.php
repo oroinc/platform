@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityConfigMerger;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\LoadFromConfigBag as BaseLoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeActionConfigHelper;
@@ -120,7 +121,8 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
                         $parentConfig[ConfigUtil::SUBRESOURCES][$association],
                         $action,
                         $context->hasExtra(DescriptionsConfigExtra::NAME),
-                        $context->hasExtra(FiltersConfigExtra::NAME)
+                        $context->hasExtra(FiltersConfigExtra::NAME),
+                        $context->hasExtra(SortersConfigExtra::NAME)
                     );
                 }
             }

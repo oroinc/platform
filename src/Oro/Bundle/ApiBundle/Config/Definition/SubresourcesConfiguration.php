@@ -18,6 +18,9 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
     /** @var FiltersConfiguration */
     private $filtersConfiguration;
 
+    /** @var SortersConfiguration */
+    private $sortersConfiguration;
+
     /**
      * @param string[]               $permissibleActions
      * @param FilterOperatorRegistry $filterOperatorRegistry
@@ -29,6 +32,7 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
             'subresources.subresource.action'
         );
         $this->filtersConfiguration = new FiltersConfiguration($filterOperatorRegistry);
+        $this->sortersConfiguration = new SortersConfiguration();
     }
 
     /**
@@ -39,6 +43,7 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         parent::setSettings($settings);
         $this->actionsConfiguration->setSettings($settings);
         $this->filtersConfiguration->setSettings($settings);
+        $this->sortersConfiguration->setSettings($settings);
     }
 
     /**
@@ -99,6 +104,9 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         $this->filtersConfiguration->configure(
             $node->arrayNode(ConfigUtil::FILTERS)->children()
         );
+        $this->sortersConfiguration->configure(
+            $node->arrayNode(ConfigUtil::SORTERS)->children()
+        );
     }
 
     /**
@@ -116,6 +124,9 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         }
         if (empty($config[ConfigUtil::FILTERS])) {
             unset($config[ConfigUtil::FILTERS]);
+        }
+        if (empty($config[ConfigUtil::SORTERS])) {
+            unset($config[ConfigUtil::SORTERS]);
         }
 
         return $config;

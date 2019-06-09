@@ -27,12 +27,17 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeFilterConfigHelper
         public: false
 
+    oro_api.merge_config_helper.sorter:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeSorterConfigHelper
+        public: false
+
     oro_api.merge_config_helper.subresource:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeSubresourceConfigHelper
         public: false
         arguments:
             - '@oro_api.merge_config_helper.action'
             - '@oro_api.merge_config_helper.filter'
+            - '@oro_api.merge_config_helper.sorter'
 
     oro_api.complete_definition_helper.entity:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteEntityDefinitionHelper
