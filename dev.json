@@ -38,7 +38,7 @@
         "knplabs/knp-menu-bundle": "2.2.*",
         "friendsofsymfony/rest-bundle": "1.8.0",
         "friendsofsymfony/jsrouting-bundle": "2.2.*",
-        "nelmio/api-doc-bundle": "2.13.*",
+        "nelmio/api-doc-bundle": "2.13.3",
         "nelmio/security-bundle": "2.5.*",
         "ass/xmlsecurity": "1.1.1",
         "stof/doctrine-extensions-bundle": "1.3.*",
