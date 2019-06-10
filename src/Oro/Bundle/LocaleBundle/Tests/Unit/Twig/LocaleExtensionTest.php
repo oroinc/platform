@@ -26,7 +26,7 @@ class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $container = self::getContainerBuilder()
-            ->add('oro_locale.settings', $this->localeSettings)
+            ->add(LocaleSettings::class, $this->localeSettings)
             ->getContainer($this);
 
         $this->extension = new LocaleExtension($container);

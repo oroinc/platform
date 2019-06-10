@@ -15,18 +15,18 @@ use Oro\Bundle\ImportExportBundle\Form\Type\ExportType;
 use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
 use Oro\Bundle\ImportExportBundle\Handler\CsvFileHandler;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
-use Oro\Bundle\ImportExportBundle\Handler\ImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Client\MessageProducer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,6 +35,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Controller for import/export actions
@@ -43,7 +44,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  *
  * Responsible for the import and export
  */
-class ImportExportController extends Controller
+class ImportExportController extends AbstractController
 {
     /**
      * Take uploaded file and move it to temp dir
@@ -116,7 +117,7 @@ class ImportExportController extends Controller
         $entityName = $request->get('entity');
 
         $configurationsByAlias = $this
-            ->get('oro_importexport.twig_extension.get_import_export_configuration')
+            ->get(GetImportExportConfigurationExtension::class)
             ->getConfiguration($configAlias);
 
         $configsWithForm = [];
@@ -245,7 +246,7 @@ class ImportExportController extends Controller
         $fileName = $request->get('fileName', null);
         $originFileName = $request->get('originFileName', null);
 
-        $this->getMessageProducer()->send(
+        $this->get(MessageProducer::class)->send(
             Topics::PRE_IMPORT,
             [
                 'fileName' => $fileName,
@@ -260,7 +261,9 @@ class ImportExportController extends Controller
 
         return new JsonResponse([
             'success' => true,
-            'message' => $this->get('translator')->trans('oro.importexport.import.validate.success.message'),
+            'message' => $this
+                ->get(TranslatorInterface::class)
+                ->trans('oro.importexport.import.validate.success.message'),
         ]);
     }
 
@@ -284,7 +287,7 @@ class ImportExportController extends Controller
         $fileName = $request->get('fileName', null);
         $originFileName = $request->get('originFileName', null);
 
-        $this->getMessageProducer()->send(
+        $this->get(MessageProducer::class)->send(
             Topics::PRE_IMPORT,
             [
                 'fileName' => $fileName,
@@ -299,7 +302,7 @@ class ImportExportController extends Controller
 
         return new JsonResponse([
             'success' => true,
-            'message' => $this->get('translator')->trans('oro.importexport.import.success.message'),
+            'message' => $this->get(TranslatorInterface::class)->trans('oro.importexport.import.success.message'),
         ]);
     }
 
@@ -320,7 +323,7 @@ class ImportExportController extends Controller
         $options = $this->getOptionsFromRequest($request);
         $token = $this->getSecurityToken()->getToken();
 
-        $this->getMessageProducer()->send(Topics::PRE_EXPORT, [
+        $this->get(MessageProducer::class)->send(Topics::PRE_EXPORT, [
             'jobName' => $jobName,
             'processorAlias' => $processorAlias,
             'outputFilePrefix' => $filePrefix,
@@ -476,17 +479,9 @@ class ImportExportController extends Controller
             throw new NotFoundHttpException(sprintf('Job %s not found', $result->getJobId()));
         }
 
-        $content = $this->getImportExportResultSummarizer()->getErrorLog($job);
+        $content = $this->get(ImportExportResultSummarizer::class)->getErrorLog($job);
 
         return new Response($content, 200, ['Content-Type' => 'text/x-log']);
-    }
-
-    /**
-     * @return ImportHandler
-     */
-    protected function getImportHandler()
-    {
-        return $this->get('oro_importexport.handler.import');
     }
 
     /**
@@ -494,7 +489,7 @@ class ImportExportController extends Controller
      */
     protected function getFileManager()
     {
-        return $this->get('oro_importexport.file.file_manager');
+        return $this->get(FileManager::class);
     }
 
     /**
@@ -502,23 +497,7 @@ class ImportExportController extends Controller
      */
     protected function getExportHandler()
     {
-        return $this->get('oro_importexport.handler.export');
-    }
-
-    /**
-     * @return ImportExportResultSummarizer
-     */
-    protected function getImportExportResultSummarizer()
-    {
-        return $this->get('oro_importexport.async.import_export_result_summarizer');
-    }
-
-    /**
-     * @return JobExecutor
-     */
-    protected function getJobExecutor()
-    {
-        return $this->get('oro_importexport.job_executor');
+        return $this->get(ExportHandler::class);
     }
 
     /**
@@ -538,19 +517,11 @@ class ImportExportController extends Controller
     }
 
     /**
-     * @return MessageProducerInterface
-     */
-    protected function getMessageProducer()
-    {
-        return $this->get('oro_message_queue.client.message_producer');
-    }
-
-    /**
      * @return CsvFileHandler
      */
     protected function getCsvFileHandler()
     {
-        return $this->get('oro_importexport.handler.csv.file');
+        return $this->get(CsvFileHandler::class);
     }
 
     /**
@@ -577,5 +548,24 @@ class ImportExportController extends Controller
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                MessageProducer::class,
+                CsvFileHandler::class,
+                FileManager::class,
+                GetImportExportConfigurationExtension::class,
+                ExportHandler::class,
+                ImportExportResultSummarizer::class,
+            ]
+        );
     }
 }

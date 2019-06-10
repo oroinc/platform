@@ -48,6 +48,9 @@ services:
             - '@oro_attachment.protocol_validator'
         lazy: true
 
+    Oro\Bundle\AttachmentBundle\Manager\FileManager:
+        alias: 'oro_attachment.file_manager'
+
     oro_attachment.protocol_validator:
         class: Oro\Bundle\AttachmentBundle\Validator\ProtocolValidator
         public: false
@@ -93,6 +96,9 @@ services:
           - '@oro_attachment.liip_imagine.binary.factory.guess_mime_type'
           - '@oro_attachment.liip_imagine.binary.filter'
           - '@liip_imagine.filter.configuration'
+
+    Oro\Bundle\AttachmentBundle\Tools\ThumbnailFactory:
+        alias: 'oro_attachment.thumbnail_factory'
 
     oro_attachment.association_helper:
         class: Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper

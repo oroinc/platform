@@ -10,36 +10,30 @@ use Oro\Bundle\LocaleBundle\Extension\CurrentLocalizationExtensionInterface;
  */
 class CurrentLocalizationProvider implements LocalizationProviderInterface
 {
-    /** @var CurrentLocalizationExtensionInterface[] */
-    protected $extensions = [];
+    /** @var iterable|CurrentLocalizationExtensionInterface[] */
+    private $extensions;
 
-    /** @var Localization */
-    protected $currentLocalization = false;
+    /** @var Localization|null */
+    private $currentLocalization = false;
 
     /**
-     * @param string $name
-     * @param CurrentLocalizationExtensionInterface $extension
+     * @param iterable|CurrentLocalizationExtensionInterface[] $extensions
      */
-    public function addExtension($name, CurrentLocalizationExtensionInterface $extension)
+    public function __construct(iterable $extensions)
     {
-        $this->extensions[$name] = $extension;
+        $this->extensions = $extensions;
     }
 
     /**
-     * @return Localization|null
+     * {@inheritdoc}
      */
     public function getCurrentLocalization()
     {
         if (false === $this->currentLocalization) {
             $this->currentLocalization = null;
-
-            if (!$this->extensions) {
-                return null;
-            }
-
             foreach ($this->extensions as $extension) {
-                /* @var $extension CurrentLocalizationExtensionInterface */
-                if (null !== ($localization = $extension->getCurrentLocalization())) {
+                $localization = $extension->getCurrentLocalization();
+                if (null !== $localization) {
                     $this->currentLocalization = $localization;
                     break;
                 }

@@ -2,27 +2,58 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerProcessor;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Handler\TransitionCronTriggerHandler;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class HandleTransitionCronTriggerCommand extends ContainerAwareCommand
+/**
+ * The CLI command to identifier of the transition cron trigger
+ */
+class HandleTransitionCronTriggerCommand extends Command
 {
-    const NAME = 'oro:workflow:handle-transition-cron-trigger';
+    /** @var string */
+    protected static $defaultName = 'oro:workflow:handle-transition-cron-trigger';
+
+    /** @var ManagerRegistry */
+    private $registry;
+
+    /** @var MessageProducerInterface */
+    private $producer;
+
+    /** @var TransitionCronTriggerHandler */
+    private $triggerHandler;
+
+    /**
+     * @param ManagerRegistry $registry
+     * @param MessageProducerInterface $producer
+     * @param TransitionCronTriggerHandler $triggerHandler
+     */
+    public function __construct(
+        ManagerRegistry $registry,
+        MessageProducerInterface $producer,
+        TransitionCronTriggerHandler $triggerHandler
+    ) {
+        parent::__construct();
+
+        $this->registry = $registry;
+        $this->producer = $producer;
+        $this->triggerHandler = $triggerHandler;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
-        $this->setName(self::NAME)
+        $this
             ->setDescription('Handle workflow transition cron trigger with specified identifier')
             ->addOption(
                 'id',
@@ -55,9 +86,9 @@ class HandleTransitionCronTriggerCommand extends ContainerAwareCommand
             $message = TransitionTriggerMessage::create($trigger);
 
             if ($trigger->isQueued()) {
-                $this->getProducer()->send(TransitionTriggerProcessor::CRON_TOPIC_NAME, $message->toArray());
+                $this->producer->send(TransitionTriggerProcessor::CRON_TOPIC_NAME, $message->toArray());
             } else {
-                $this->getTransitionCronTriggerHandler()->process($trigger, $message);
+                $this->triggerHandler->process($trigger, $message);
             }
 
             $output->writeln(
@@ -82,6 +113,8 @@ class HandleTransitionCronTriggerCommand extends ContainerAwareCommand
 
             throw $e;
         }
+
+        return 0;
     }
 
     /**
@@ -89,25 +122,7 @@ class HandleTransitionCronTriggerCommand extends ContainerAwareCommand
      */
     protected function getTransitionCronTriggerRepository()
     {
-        $className = $this->getContainer()->getParameter('oro_workflow.entity.transition_trigger_cron.class');
-
-        return $this->getContainer()->get('doctrine')->getManagerForClass($className)->getRepository($className);
-    }
-
-    /**
-     * @return TransitionCronTriggerHandler
-     */
-    protected function getTransitionCronTriggerHandler()
-    {
-        return $this->getContainer()->get('oro_workflow.handler.transition_cron_trigger');
-    }
-
-
-    /**
-     * @return MessageProducerInterface
-     */
-    protected function getProducer()
-    {
-        return $this->getContainer()->get('oro_message_queue.client.message_producer');
+        return $this->registry->getManagerForClass(TransitionCronTrigger::class)
+            ->getRepository(TransitionCronTrigger::class);
     }
 }

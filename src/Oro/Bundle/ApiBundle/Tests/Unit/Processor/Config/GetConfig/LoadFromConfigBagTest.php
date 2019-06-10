@@ -15,6 +15,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\LoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeActionConfigHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeFilterConfigHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeParentResourceHelper;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeSorterConfigHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeSubresourceConfigHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigBagInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
@@ -68,7 +69,11 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             new EntityConfigMerger($this->configExtensionRegistry),
             new MergeParentResourceHelper($this->configProvider),
             $mergeActionConfigHelper,
-            new MergeSubresourceConfigHelper($mergeActionConfigHelper, new MergeFilterConfigHelper())
+            new MergeSubresourceConfigHelper(
+                $mergeActionConfigHelper,
+                new MergeFilterConfigHelper(),
+                new MergeSorterConfigHelper()
+            )
         );
     }
 
@@ -793,6 +798,177 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                 ]
             ],
             $this->context->getFilters()
+        );
+    }
+
+    public function testProcessMergeSubresourceSorters()
+    {
+        $config = [
+            'sorters' => [
+                'fields' => [
+                    'field1' => [
+                        'property_path' => 'sorter1'
+                    ],
+                    'field2' => [
+                        'property_path' => 'sorter2'
+                    ]
+                ]
+            ]
+        ];
+        $parentConfig = [
+            'subresources' => [
+                'testSubresource' => [
+                    'sorters' => [
+                        'fields' => [
+                            'field2' => [
+                                'property_path' => 'subresourceSorter2'
+                            ],
+                            'field3' => [
+                                'property_path' => 'subresourceSorter3'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->configBag->expects(self::exactly(2))
+            ->method('getConfig')
+            ->willReturnMap([
+                [User::class, $this->context->getVersion(), $config],
+                [Account::class, $this->context->getVersion(), $parentConfig]
+            ]);
+
+        $this->context->setClassName(User::class);
+        $this->context->setExtras([new DescriptionsConfigExtra()]);
+        $this->context->setExtras([new SortersConfigExtra()]);
+        $this->context->setTargetAction('create');
+        $this->context->setParentClassName(Account::class);
+        $this->context->setAssociationName('testSubresource');
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'field1' => [
+                        'property_path' => 'sorter1'
+                    ],
+                    'field2' => [
+                        'property_path' => 'subresourceSorter2'
+                    ],
+                    'field3' => [
+                        'property_path' => 'subresourceSorter3'
+                    ]
+                ]
+            ],
+            $this->context->getSorters()
+        );
+    }
+
+    public function testProcessSubresourceSortersShouldCompletelyReplaceOwnSorters()
+    {
+        $config = [
+            'sorters' => [
+                'fields' => [
+                    'field1' => [
+                        'property_path' => 'sorter1'
+                    ],
+                    'field2' => [
+                        'property_path' => 'sorter2'
+                    ]
+                ]
+            ]
+        ];
+        $parentConfig = [
+            'subresources' => [
+                'testSubresource' => [
+                    'sorters' => [
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'field2' => [
+                                'property_path' => 'subresourceSorter2'
+                            ],
+                            'field3' => [
+                                'property_path' => 'subresourceSorter3'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->configBag->expects(self::exactly(2))
+            ->method('getConfig')
+            ->willReturnMap([
+                [User::class, $this->context->getVersion(), $config],
+                [Account::class, $this->context->getVersion(), $parentConfig]
+            ]);
+
+        $this->context->setClassName(User::class);
+        $this->context->setExtras([new DescriptionsConfigExtra()]);
+        $this->context->setExtras([new SortersConfigExtra()]);
+        $this->context->setTargetAction('create');
+        $this->context->setParentClassName(Account::class);
+        $this->context->setAssociationName('testSubresource');
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field2' => [
+                        'property_path' => 'subresourceSorter2'
+                    ],
+                    'field3' => [
+                        'property_path' => 'subresourceSorter3'
+                    ]
+                ]
+            ],
+            $this->context->getSorters()
+        );
+    }
+
+    public function testProcessMergeSubresourceSortersWhenTargetEntityDoesNotHaveOwnSorters()
+    {
+        $config = [];
+        $parentConfig = [
+            'subresources' => [
+                'testSubresource' => [
+                    'sorters' => [
+                        'fields' => [
+                            'field1' => [
+                                'property_path' => 'subresourceSorter1'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->configBag->expects(self::exactly(2))
+            ->method('getConfig')
+            ->willReturnMap([
+                [User::class, $this->context->getVersion(), $config],
+                [Account::class, $this->context->getVersion(), $parentConfig]
+            ]);
+
+        $this->context->setClassName(User::class);
+        $this->context->setExtras([new DescriptionsConfigExtra()]);
+        $this->context->setExtras([new SortersConfigExtra()]);
+        $this->context->setTargetAction('create');
+        $this->context->setParentClassName(Account::class);
+        $this->context->setAssociationName('testSubresource');
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'field1' => [
+                        'property_path' => 'subresourceSorter1'
+                    ]
+                ]
+            ],
+            $this->context->getSorters()
         );
     }
 

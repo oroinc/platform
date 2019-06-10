@@ -33,8 +33,14 @@ services:
             - [setMimeTypeGuesser, ['@oro_importexport.file.mime_type_guesser']]
         lazy: true
 
+    Oro\Bundle\ImportExportBundle\Handler\ExportHandler:
+        alias: 'oro_importexport.handler.export'
+
     oro_importexport.handler.csv.file:
         class: '%oro_importexport.handler.csv.file.class%'
+
+    Oro\Bundle\ImportExportBundle\Handler\CsvFileHandler:
+        alias: 'oro_importexport.handler.csv.file'
 
     oro_importexport.handler.postpone:
         class: Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler

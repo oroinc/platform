@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit;
 
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\AddDateTimeFormatConverterCompilerPass;
-use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\CurrentLocalizationPass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensionPass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\PreferredLanguageProviderPass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
@@ -28,12 +27,11 @@ class OroLocaleBundleTest extends \PHPUnit\Framework\TestCase
         }));
 
         $this->assertInternalType('array', $passes);
-        $this->assertCount(5, $passes);
+        $this->assertCount(4, $passes);
         $this->assertInstanceOf(AddDateTimeFormatConverterCompilerPass::class, $passes[0]);
         $this->assertInstanceOf(TwigSandboxConfigurationPass::class, $passes[1]);
-        $this->assertInstanceOf(CurrentLocalizationPass::class, $passes[2]);
-        $this->assertInstanceOf(DefaultFallbackExtensionPass::class, $passes[3]);
-        $this->assertInstanceOf(PreferredLanguageProviderPass::class, $passes[4]);
+        $this->assertInstanceOf(DefaultFallbackExtensionPass::class, $passes[2]);
+        $this->assertInstanceOf(PreferredLanguageProviderPass::class, $passes[3]);
         $this->assertAttributeEquals(
             [
                 Localization::class => [
@@ -41,7 +39,7 @@ class OroLocaleBundleTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             'classes',
-            $passes[3]
+            $passes[2]
         );
     }
 }

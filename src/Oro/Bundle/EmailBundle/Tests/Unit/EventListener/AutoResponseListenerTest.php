@@ -9,7 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\EventListener\AutoResponseListener;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
@@ -25,14 +25,12 @@ class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->autoResponseManager = $this->getMockBuilder(AutoResponseManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->producer = $this->createMock(MessageProducerInterface::class);
+        $this->autoResponseManager = $this->createMock(AutoResponseManager::class);
+        $this->producer = $this->createMock(MessageProducer::class);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_email.autoresponserule_manager', $this->autoResponseManager)
-            ->add('oro_message_queue.client.message_producer', $this->producer)
+            ->add(AutoResponseManager::class, $this->autoResponseManager)
+            ->add(MessageProducer::class, $this->producer)
             ->getContainer($this);
 
         $this->listener = new AutoResponseListener($container);
@@ -42,7 +40,7 @@ class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->autoResponseManager->expects($this->exactly(2))
             ->method('hasAutoResponses')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->producer->expects($this->once())
             ->method('send')
@@ -80,10 +78,10 @@ class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->autoResponseManager->expects($this->at(0))
             ->method('hasAutoResponses')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->autoResponseManager->expects($this->at(1))
             ->method('hasAutoResponses')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->producer->expects($this->once())
             ->method('send')

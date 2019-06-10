@@ -5,6 +5,8 @@ namespace Oro\Bundle\AttachmentBundle\Controller;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Exception\InvalidAttachmentEncodedParametersException;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use Oro\Bundle\AttachmentBundle\Tools\ThumbnailFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -66,7 +68,7 @@ class FileController extends Controller
         }
 
         $response->headers->set('Content-Length', $attachment->getFileSize());
-        $response->setContent($this->get('oro_attachment.file_manager')->getContent($attachment));
+        $response->setContent($this->get(FileManager::class)->getContent($attachment));
 
         return $response;
     }
@@ -80,8 +82,8 @@ class FileController extends Controller
     public function getResizedAttachmentImageAction($id, $width, $height, $filename, Request $request)
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
-        $thumbnail = $this->get('oro_attachment.thumbnail_factory')->createThumbnail(
-            $this->get('oro_attachment.file_manager')->getContent($file),
+        $thumbnail = $this->get(ThumbnailFactory::class)->createThumbnail(
+            $this->get(FileManager::class)->getContent($file),
             $width,
             $height
         );

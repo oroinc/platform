@@ -2,7 +2,6 @@ parameters:
     oro_locale.entity.localization.class: Oro\Bundle\LocaleBundle\Entity\Localization
     oro_locale.entity.localized_fallback_value.class: Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue
 
-    oro_locale.settings.class: Oro\Bundle\LocaleBundle\Model\LocaleSettings
     oro_locale.calendar.class: Oro\Bundle\LocaleBundle\Model\Calendar
     oro_locale.calendar_factory.class: Oro\Bundle\LocaleBundle\Model\CalendarFactory
 
@@ -26,12 +25,15 @@ parameters:
 
 services:
     oro_locale.settings:
-        class: '%oro_locale.settings.class%'
+        class: 'Oro\Bundle\LocaleBundle\Model\LocaleSettings'
         arguments:
             - '@oro_config.manager'
             - '@oro_locale.calendar_factory'
             - '@oro_locale.manager.localization'
             - '@oro_locale.configuration_provider'
+
+    Oro\Bundle\LocaleBundle\Model\LocaleSettings:
+        alias: 'oro_locale.settings'
 
     oro_locale.configuration_provider:
         class: Oro\Bundle\LocaleBundle\Configuration\LocaleConfigurationProvider
@@ -236,17 +238,19 @@ services:
         class: Oro\Bundle\LocaleBundle\Twig\LocaleExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber }
 
     oro_locale.twig.calendar:
         class: Oro\Bundle\LocaleBundle\Twig\CalendarExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber }
 
     oro_locale.twig.date_time:
         class: Oro\Bundle\LocaleBundle\Twig\DateTimeExtension
@@ -363,6 +367,8 @@ services:
 
     oro_locale.provider.current_localization:
         class: 'Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider'
+        arguments:
+            - !tagged oro_locale.extension.current_localization
 
     oro_locale.provider.config_default_localization:
         class: 'Oro\Bundle\LocaleBundle\Provider\ConfigDefaultLocalizationProvider'

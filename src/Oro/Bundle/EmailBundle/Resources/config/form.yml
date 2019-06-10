@@ -132,10 +132,16 @@ services:
             - '@oro_email.mailer.processor'
             - '@logger'
 
+    Oro\Bundle\EmailBundle\Form\Handler\EmailHandler:
+        alias: 'oro_email.form.handler.email'
+
     oro_email.form.email:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
         arguments: ["oro_email_email", Oro\Bundle\EmailBundle\Form\Type\EmailType, null]
+
+    Oro\Bundle\EmailBundle\Form\Type\EmailType:
+        alias: 'oro_email.form.email'
 
     oro_email.form.type.email:
         class: '%oro_email.form.type.email.class%'

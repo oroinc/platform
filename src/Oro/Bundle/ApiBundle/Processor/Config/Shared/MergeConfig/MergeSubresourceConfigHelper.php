@@ -15,16 +15,22 @@ class MergeSubresourceConfigHelper
     /** @var MergeFilterConfigHelper */
     private $mergeFilterConfigHelper;
 
+    /** @var MergeSorterConfigHelper */
+    private $mergeSorterConfigHelper;
+
     /**
      * @param MergeActionConfigHelper $mergeActionConfigHelper
      * @param MergeFilterConfigHelper $mergeFilterConfigHelper
+     * @param MergeSorterConfigHelper $mergeSorterConfigHelper
      */
     public function __construct(
         MergeActionConfigHelper $mergeActionConfigHelper,
-        MergeFilterConfigHelper $mergeFilterConfigHelper
+        MergeFilterConfigHelper $mergeFilterConfigHelper,
+        MergeSorterConfigHelper $mergeSorterConfigHelper
     ) {
         $this->mergeActionConfigHelper = $mergeActionConfigHelper;
         $this->mergeFilterConfigHelper = $mergeFilterConfigHelper;
+        $this->mergeSorterConfigHelper = $mergeSorterConfigHelper;
     }
 
     /**
@@ -33,6 +39,7 @@ class MergeSubresourceConfigHelper
      * @param string $action
      * @param bool   $withStatusCodes
      * @param bool   $withFilters
+     * @param bool   $withSorters
      *
      * @return array
      */
@@ -41,7 +48,8 @@ class MergeSubresourceConfigHelper
         array $subresourceConfig,
         $action,
         $withStatusCodes,
-        $withFilters
+        $withFilters,
+        $withSorters
     ) {
         if (!empty($subresourceConfig[ConfigUtil::ACTIONS][$action])) {
             $config = $this->mergeActionConfigHelper->mergeActionConfig(
@@ -54,6 +62,12 @@ class MergeSubresourceConfigHelper
             $config = $this->mergeFilterConfigHelper->mergeFiltersConfig(
                 $config,
                 $subresourceConfig[ConfigUtil::FILTERS]
+            );
+        }
+        if ($withSorters && !empty($subresourceConfig[ConfigUtil::SORTERS])) {
+            $config = $this->mergeSorterConfigHelper->mergeSortersConfig(
+                $config,
+                $subresourceConfig[ConfigUtil::SORTERS]
             );
         }
 

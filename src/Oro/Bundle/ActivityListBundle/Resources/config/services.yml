@@ -45,6 +45,9 @@ services:
             - "@oro_workflow.data_helper"
             - "@oro_ui.html_tag_helper"
 
+    Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager:
+        alias: 'oro_activity_list.manager'
+
     oro_activity_list.provider.identifiers:
         class: Oro\Bundle\ActivityListBundle\Provider\ActivityListIdProvider
         public: false

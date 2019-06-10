@@ -605,6 +605,7 @@ The `subresources` configuration section enables you to provide options for sub-
 * **target_type** (*string*) - The type of a target association. Can be *to-one* or *to-many*. Additionally, *collection* can be used as an alias for *to-many*. *to-one* can be omitted as it is used by default.
 * **actions** (*array*) - The actions supported by the sub-resource. This section has the same options as the [entity **actions** section](#actions-configuration-section). If an option exists in both [entity **actions** section](#actions-configuration-section) and sub-resource **actions** section, the sub-resource option wins.
 * **filters** - The filters supported by the sub-resource. This section has the same options as the [entity **filters** section](#filters-configuration-section). If an option exists in both [entity **filters** section](#filters-configuration-section) and sub-resource **filters** section, the sub-resource option wins.
+* **sorters** - The sorters supported by the sub-resource. This section has the same options as the [entity **sorters** section](#sorters-configuration-section). If an option exists in both [entity **sorters** section](#sorters-configuration-section) and sub-resource **sorters** section, the sub-resource option wins.
 
 **Example:**
 

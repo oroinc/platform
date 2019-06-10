@@ -33,7 +33,10 @@ class HandleTransitionCronTriggerCommandTest extends WebTestCase
         $trigger = $this->getReference(LoadTransitionTriggers::TRIGGER_CRON);
         $this->assertNotNull($trigger);
 
-        $result = $this->runCommand(HandleTransitionCronTriggerCommand::NAME, ['--id' => (string)$trigger->getId()]);
+        $result = $this->runCommand(
+            HandleTransitionCronTriggerCommand::getDefaultName(),
+            ['--id' => (string)$trigger->getId()]
+        );
 
         $this->assertNotEmpty($result);
         $this->assertContains(

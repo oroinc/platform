@@ -40,11 +40,8 @@ define(function(require) {
 
             this.$el.addClass('with-floating-header');
 
-            this.isHeaderCellWidthFixed = false;
             this.rescrollCb = this.enableOtherScroll();
-            if (!this.isHeaderCellWidthFixed) {
-                this.fixHeaderCellWidth();
-            }
+            this.fixHeaderCellWidth();
             this.supportDropdowns();
 
             this.listenTo(mediator, 'layout:headerStateChange', this.checkLayout);
@@ -68,7 +65,6 @@ define(function(require) {
                 this.$grid.off('.float-thead');
                 // remove css
                 this.domCache.headerCells.attr('style', '');
-                this.domCache.firstRowCells.attr('style', '');
             }
 
             this.$el.removeClass('with-floating-header');
@@ -84,7 +80,6 @@ define(function(require) {
                 body: $(document.body),
                 gridContainer: this.$grid.parent(),
                 headerCells: this.$grid.find('th:first').parent().find('th.renderable'),
-                firstRowCells: this.$grid.find('tbody tr:not(.thead-sizing-row):first').children('td'),
                 otherScrollContainer: this.$grid.parents('.other-scroll-container:first'),
                 gridScrollableContainer: this.$grid.parents('.grid-scrollable-container:first'),
                 otherScroll: this.$el.find('.other-scroll'),
@@ -126,10 +121,8 @@ define(function(require) {
         fixHeaderCellWidth: function() {
             mediator.trigger('gridHeaderCellWidth:beforeUpdate');
 
-            this.isHeaderCellWidthFixed = true;
             this.setupCache();
             var headerCells = this.domCache.headerCells;
-            var firstRowCells = this.domCache.firstRowCells;
             var scrollLeft = this.domCache.gridScrollableContainer[0].scrollLeft;
             var totalWidth;
             var sumWidth;
@@ -137,7 +130,6 @@ define(function(require) {
             var widths = [];
             // remove style
             headerCells.attr('style', '');
-            firstRowCells.attr('style', '');
             this.$grid.css({width: ''});
             this.domCache.gridContainer.css({width: ''});
             this.$el.removeClass('floatThead');
@@ -165,12 +157,6 @@ define(function(require) {
                 headerCell.style.maxWidth = cellWidth + 'px';
                 headerCell.style.minWidth = cellWidth + 'px';
                 headerCell.style.boxSizing = 'border-box';
-                if (firstRowCells[i]) {
-                    firstRowCells[i].style.width = cellWidth + 'px';
-                    firstRowCells[i].style.maxWidth = cellWidth + 'px';
-                    firstRowCells[i].style.minWidth = cellWidth + 'px';
-                    firstRowCells[i].style.boxSizing = 'border-box';
-                }
             });
 
             if (this.currentFloatTheadMode !== 'default') {
@@ -348,7 +334,6 @@ define(function(require) {
                     display: val ? 'block' : 'none'
                 });
                 scrollContainer.toggleClass('scrollbar-is-visible', Boolean(val));
-                this.fixHeaderCellWidth();
             }, this);
             scrollStateModel.on('change:clientHeight', function(model, val) {
                 otherScroll.css({
@@ -389,12 +374,13 @@ define(function(require) {
                     headerHeight: self.headerHeight
                 });
 
-                var height = scrollContainer[0].getBoundingClientRect().height;
+                var clientRectHeight = scrollContainer[0].getBoundingClientRect().height;
                 var scrollHeight = scrollContainer[0].scrollHeight;
+                var offsetHeight = scrollContainer[0].offsetHeight;
 
-                if (scrollHeight - height < 1) {
+                if (offsetHeight !== clientRectHeight && offsetHeight === Math.round(clientRectHeight)) {
                     // ie/edge bounding rect height may include fraction
-                    scrollHeight = Math.floor(height);
+                    scrollHeight -= 1;
                 }
 
                 self.scrollVisible = scrollContainer[0].clientHeight < scrollHeight;

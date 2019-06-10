@@ -7,6 +7,7 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -110,7 +111,7 @@ class ActivityListController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_activity_list.manager');
+        return $this->get(ActivityListManager::class);
     }
 
     /**

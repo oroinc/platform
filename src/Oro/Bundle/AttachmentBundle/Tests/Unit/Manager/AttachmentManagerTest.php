@@ -153,8 +153,12 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
                     'filename' => 'test.doc',
                     'filter' => $filerName
                 ]
-            );
-        $this->attachmentManager->getFilteredImageUrl($this->attachment, $filerName);
+            )
+            ->willReturn('/test/1/test.doc');
+        $this->assertEquals(
+            '/test/1/test.doc',
+            $this->attachmentManager->getFilteredImageUrl($this->attachment, $filerName)
+        );
     }
 
     /**

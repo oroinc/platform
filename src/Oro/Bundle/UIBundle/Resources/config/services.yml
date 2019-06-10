@@ -147,6 +147,9 @@ services:
             - '@translator'
             - '@oro_ui.html_tag_helper'
 
+    Oro\Bundle\UIBundle\Tools\FlashMessageHelper:
+        alias: 'oro_ui.flash_message_helper'
+
     oro_ui.user_agent_provider:
         class: '%oro_ui.user_agent_provider.class%'
         arguments:

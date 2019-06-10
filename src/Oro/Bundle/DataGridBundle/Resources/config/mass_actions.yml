@@ -50,6 +50,9 @@ services:
             - '@oro_datagrid.mass_action.parameters_parser'
             - '@oro_datagrid.extension.mass_action.iterable_result_factory_registry'
 
+    Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher:
+        alias: 'oro_datagrid.mass_action.dispatcher'
+
     oro_datagrid.extension.mass_action.type.ajax:
         class: '%oro_datagrid.extension.mass_action.type.ajax.class%'
         shared: false
