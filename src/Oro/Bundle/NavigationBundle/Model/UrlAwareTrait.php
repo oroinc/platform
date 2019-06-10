@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\NavigationBundle\Model;
 
+/**
+ * Provides basic implementation for entities which implement UrlAwareInterface.
+ */
 trait UrlAwareTrait
 {
     /**

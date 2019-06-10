@@ -29,4 +29,11 @@ class NavigationHistoryItem extends AbstractNavigationHistoryItem
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected $user;
+
+    /**
+     * @var string $url
+     *
+     * @ORM\Column(name="url", type="string", length=8190)
+     */
+    protected $url;
 }

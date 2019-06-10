@@ -82,6 +82,13 @@ class MenuUpdate extends ExtendMenuUpdate implements
     }
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="uri", type="string", length=8190, nullable=true)
+     */
+    protected $uri;
+
+    /**
      * {@inheritdoc}
      */
     public function __construct()
