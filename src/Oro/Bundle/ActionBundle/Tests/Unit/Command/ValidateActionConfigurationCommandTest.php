@@ -7,9 +7,7 @@ use Oro\Bundle\ActionBundle\Command\ValidateActionConfigurationCommand;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationValidatorInterface;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
-use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ValidateActionConfigurationCommandTest extends \PHPUnit\Framework\TestCase
 {
@@ -22,9 +20,6 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurationValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $validator;
 
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
     /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $input;
 
@@ -36,16 +31,10 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit\Framework\TestCase
         $this->provider = $this->createMock(ConfigurationProviderInterface::class);
         $this->validator = $this->createMock(ConfigurationValidatorInterface::class);
 
-        $this->container = TestContainerBuilder::create()
-            ->add('oro_action.configuration.provider.operations', $this->provider)
-            ->add('oro_action.configuration.validator.operations', $this->validator)
-            ->getContainer($this);
-
         $this->input = $this->createMock(InputInterface::class);
         $this->output = new OutputStub();
 
-        $this->command = new ValidateActionConfigurationCommand();
-        $this->command->setContainer($this->container);
+        $this->command = new ValidateActionConfigurationCommand($this->provider, $this->validator);
     }
 
     public function testConfigure()

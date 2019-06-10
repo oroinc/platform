@@ -144,6 +144,9 @@ services:
             - '@event_dispatcher'
             - '@oro_email.email_body_synchronizer'
 
+    Oro\Bundle\EmailBundle\Cache\EmailCacheManager:
+        alias: 'oro_email.email.cache.manager'
+
     oro_email.email_holder_helper:
         class: '%oro_email.email_holder_helper.class%'
         arguments:
@@ -228,6 +231,9 @@ services:
             - '@oro_email.form.factory'
             - '@request_stack'
 
+    Oro\Bundle\EmailBundle\Builder\EmailModelBuilder:
+        alias: 'oro_email.email.model.builder'
+
     oro_email.email_websocket.processor:
         class: '%oro_email.email_websocket.processor.class%'
         arguments:
@@ -281,11 +287,12 @@ services:
         class: '%oro_email.listener.auto_response_listener.class%'
         public: false
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
             - { name: oro_featuretogle.feature, feature: email }
+            - { name: container.service_subscriber }
 
     oro_email.async.auto_response:
         class: 'Oro\Bundle\EmailBundle\Async\AutoResponseMessageProcessor'
@@ -397,6 +404,9 @@ services:
             - '@translator'
             - '%oro_locale.language%'
 
+    Oro\Bundle\EmailBundle\Manager\AutoResponseManager:
+        alias: 'oro_email.autoresponserule_manager'
+
     oro_email.link.autoresponserule_manager:
         deprecated: The "%service_id%" service is deprecated since 2.1.
         tags:
@@ -422,8 +432,6 @@ services:
         arguments:
             - '@mailer'
             - '@service_container'
-        calls:
-            - [setLogger, ['@oro_email.logger.link']]
 
     # Email template API
     oro_email.manager.emailtemplate.api:
@@ -694,6 +702,9 @@ services:
             - '@oro_activity.manager'
             - '%oro_user.entity.class%'
 
+    Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper:
+        alias: 'oro_email.helper.datagrid.emails'
+
     oro_email.email_grid_result_helper:
         class: Oro\Bundle\EmailBundle\Datagrid\EmailGridResultHelper
         public: false
@@ -757,6 +768,9 @@ services:
         arguments:
             - '@service_container'
 
+    Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager:
+        alias: 'oro_email.email_synchronization_manager'
+
     oro_email.known_email_address_checker_factory:
         class: '%oro_email.known_email_address_checker_factory.class%'
         public: false
@@ -781,6 +795,9 @@ services:
     oro_email.email.thread.provider:
         class: '%oro_email.email.thread.provider.class%'
 
+    Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider:
+        alias: 'oro_email.email.thread.provider'
+
     oro_email.email.thread.manager:
         class: '%oro_email.email.thread.manager.class%'
         arguments:
@@ -795,6 +812,9 @@ services:
             - '@oro_email.email.thread.provider'
             - '@oro_security.token_accessor'
             - '@oro_email.mailbox.manager'
+
+    Oro\Bundle\EmailBundle\Entity\Manager\EmailManager:
+        alias: 'oro_email.email.manager'
 
     oro_email.twig.extension.email:
         class: Oro\Bundle\EmailBundle\Twig\EmailExtension
@@ -863,6 +883,9 @@ services:
             - '@translator'
             - '@oro_email.provider.email_recipients.helper'
 
+    Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider:
+        alias: 'oro_email.email_recipients.provider'
+
     oro_email.recent_email_recipients.provider:
         class: '%oro_email.recent_email_recipients.provider.class%'
         arguments:
@@ -902,6 +925,9 @@ services:
             - '@oro_email.email.address.helper'
             - '@oro_search.index'
 
+    Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper:
+        alias: 'oro_email.provider.email_recipients.helper'
+
     oro_email.link.formatter.name:
         tags:
             - { name: oro_service_link,  service: oro_locale.formatter.name }
@@ -914,6 +940,9 @@ services:
             - '@router'
             - '@oro_attachment.validator.file_config_validator'
             - '@oro_attachment.association_helper'
+
+    Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager:
+        alias: 'oro_email.manager.email_attachment_manager'
 
     oro_email.listener.email_body_add_listener:
         class: '%oro_email.listener.email_body_add_listener.class%'
@@ -959,9 +988,10 @@ services:
     oro_email.acl.voter.email_voter:
         class: '%oro_email.acl.voter.email_voter.class%'
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: security.voter }
+            - { name: container.service_subscriber }
 
     oro_email.entity_alias_provider:
         class: Oro\Bundle\EmailBundle\Provider\EmailEntityAliasProvider
@@ -1032,6 +1062,9 @@ services:
             - '@oro_ui.html_tag_helper'
             - '@router'
             - '@oro_entity_config.config_manager'
+
+    Oro\Bundle\EmailBundle\Manager\EmailNotificationManager:
+        alias: 'oro_email.manager.notification'
 
     oro_email.datagrid.origin_folder.provider:
         class: '%oro_email.datagrid.origin_folder.provider.class%'
@@ -1127,6 +1160,9 @@ services:
         class: '%oro_email.mailbox.manager.class%'
         arguments:
             - '@doctrine'
+
+    Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager:
+        alias: 'oro_email.mailbox.manager'
 
     oro_email.workflow.condition.instanceof:
         class: '%oro_email.workflow.condition.instanceof.class%'
@@ -1266,10 +1302,16 @@ services:
             - '@oro_config.scope.global'
             - '@oro_security.encoder.default'
 
+    Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider:
+        alias: oro_email.provider.smtp_settings
+
     oro_email.mailer.checker.smtp_settings:
         class: Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker
         arguments:
             - '@oro_email.direct_mailer'
+
+    Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker:
+        alias: 'oro_email.mailer.checker.smtp_settings'
 
     oro_email.listener.datagrid.user_email_grid_listener:
         class: Oro\Bundle\EmailBundle\EventListener\Datagrid\UserEmailGridListener

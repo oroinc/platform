@@ -26,7 +26,7 @@ abstract class ActionTestCase extends WebTestCase
     protected function getActionGroupRegistry()
     {
         if (null === $this->actionGroupRegistry) {
-            $this->actionGroupRegistry = $this->getContainer()->get('oro_action.action_group_registry');
+            $this->actionGroupRegistry = $this->getContainer()->get(ActionGroupRegistry::class);
         }
 
         return $this->actionGroupRegistry;

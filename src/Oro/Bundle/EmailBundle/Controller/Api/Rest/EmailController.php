@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * The api controller for the email related functionality.
+ *
  * @RouteResource("email")
  * @NamePrefix("oro_api_")
  */
@@ -124,7 +126,7 @@ class EmailController extends RestController
      */
     protected function getEmailCacheManager()
     {
-        return $this->container->get('oro_email.email.cache.manager');
+        return $this->container->get(EmailCacheManager::class);
     }
 
     /**

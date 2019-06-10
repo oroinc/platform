@@ -6,7 +6,7 @@ use Doctrine\Common\Util\Debug;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -15,14 +15,49 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * The CLI command to debug configuration of actions.
  */
-class DebugOperationCommand extends ContainerAwareCommand
+class DebugOperationCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:debug:operation';
+
+    /** @var ConfigurationProviderInterface */
+    private $operationsProvider;
+
+    /** @var OperationRegistry */
+    private $operationRegistry;
+
+    /** @var ConfigurationProviderInterface */
+    private $actionGroupsProvider;
+
+    /** @var ActionGroupRegistry */
+    private $actionGroupRegistry;
+
+    /**
+     * @param ConfigurationProviderInterface $operationsProvider
+     * @param OperationRegistry $operationRegistry
+     * @param ConfigurationProviderInterface $actionGroupsProvider
+     * @param ActionGroupRegistry $actionGroupRegistry
+     */
+    public function __construct(
+        ConfigurationProviderInterface $operationsProvider,
+        OperationRegistry $operationRegistry,
+        ConfigurationProviderInterface $actionGroupsProvider,
+        ActionGroupRegistry $actionGroupRegistry
+    ) {
+        parent::__construct();
+
+        $this->operationsProvider = $operationsProvider;
+        $this->operationRegistry = $operationRegistry;
+        $this->actionGroupsProvider = $actionGroupsProvider;
+        $this->actionGroupRegistry = $actionGroupRegistry;
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName('oro:debug:operation')
+        $this
             ->setDescription('Debug operation configuration')
             ->addArgument('name', InputArgument::OPTIONAL, 'Names of the name of node that should be dumped')
             ->addOption('action-group', null, InputOption::VALUE_NONE, 'Debug action_group')
@@ -36,19 +71,19 @@ class DebugOperationCommand extends ContainerAwareCommand
     {
         if ($input->getOption('action-group')) {
             $output->writeln('Load action_groups ...');
-            $provider = $this->getActionGroupsProvider();
+            $provider = $this->actionGroupsProvider;
         } else {
             $output->writeln('Load operations ...');
-            $provider = $this->getOperationsProvider();
+            $provider = $this->operationsProvider;
         }
 
         $configuration = $provider->getConfiguration();
 
         if ($input->getOption('assemble')) {
             if ($input->getOption('action-group')) {
-                $registry = $this->getActionGroupRegistry();
+                $registry = $this->actionGroupRegistry;
             } else {
-                $registry = $this->getOperationRegistry();
+                $registry = $this->operationRegistry;
             }
 
             foreach ($configuration as $name => &$value) {
@@ -70,37 +105,5 @@ class DebugOperationCommand extends ContainerAwareCommand
         } else {
             $output->writeln('No actions found.');
         }
-    }
-
-    /**
-     * @return ConfigurationProviderInterface
-     */
-    protected function getOperationsProvider()
-    {
-        return $this->getContainer()->get('oro_action.configuration.provider.operations');
-    }
-
-    /**
-     * @return ConfigurationProviderInterface
-     */
-    protected function getActionGroupsProvider()
-    {
-        return $this->getContainer()->get('oro_action.configuration.provider.action_groups');
-    }
-
-    /**
-     * @return ActionGroupRegistry
-     */
-    public function getActionGroupRegistry()
-    {
-        return $this->getContainer()->get('oro_action.action_group_registry');
-    }
-
-    /**
-     * @return OperationRegistry
-     */
-    public function getOperationRegistry()
-    {
-        return $this->getContainer()->get('oro_action.operation_registry');
     }
 }

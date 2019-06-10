@@ -28,6 +28,7 @@ class OroDataGridExtension extends Extension
         $loader->load('importexport.yml');
         $loader->load('layouts.yml');
         $loader->load('datagrid_state.yml');
+        $loader->load('controllers.yml');
 
         if ($container->getParameter('kernel.environment') === 'test') {
             $loader->load('services_test.yml');

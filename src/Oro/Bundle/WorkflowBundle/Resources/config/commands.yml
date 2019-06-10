@@ -18,6 +18,10 @@ services:
             - { name: console.command }
 
     Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand:
+        arguments:
+            - '@doctrine'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_workflow.handler.transition_cron_trigger'
         tags:
             - { name: console.command }
 

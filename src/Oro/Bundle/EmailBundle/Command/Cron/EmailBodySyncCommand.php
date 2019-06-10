@@ -4,20 +4,19 @@ namespace Oro\Bundle\EmailBundle\Command\Cron;
 
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\Log\OutputLogger;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\LockHandler;
 
-class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandInterface
+/**
+ * The CLI command to synchronize email body.
+ */
+class EmailBodySyncCommand extends Command implements CronCommandInterface
 {
-    /**
-     * Command name
-     */
-    const COMMAND_NAME = 'oro:cron:email-body-sync';
-
     /**
      * Number of emails in batch
      */
@@ -27,6 +26,27 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
      * The maximum execution time (in minutes)
      */
     const MAX_EXEC_TIME_IN_MIN = 15;
+
+    /** @var string */
+    protected static $defaultName = 'oro:cron:email-body-sync';
+
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
+    /** @var EmailBodySynchronizer */
+    protected $synchronizer;
+
+    /**
+     * @param FeatureChecker $featureChecker
+     * @param EmailBodySynchronizer $synchronizer
+     */
+    public function __construct(FeatureChecker $featureChecker, EmailBodySynchronizer $synchronizer)
+    {
+        parent::__construct();
+
+        $this->featureChecker = $featureChecker;
+        $this->synchronizer = $synchronizer;
+    }
 
     /**
      * {@inheritdoc}
@@ -41,9 +61,7 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
      */
     public function isActive()
     {
-        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
-
-        return $featureChecker->isResourceEnabled(self::COMMAND_NAME, 'cron_jobs');
+        return $this->featureChecker->isResourceEnabled(self::getDefaultName(), 'cron_jobs');
     }
 
     /**
@@ -52,7 +70,6 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
     protected function configure()
     {
         $this
-            ->setName(self::COMMAND_NAME)
             ->setDescription('Synchronize email body')
             ->addOption(
                 'max-exec-time',
@@ -75,8 +92,7 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
-        if (!$featureChecker->isFeatureEnabled('email')) {
+        if (!$this->featureChecker->isFeatureEnabled('email')) {
             $output->writeln('The email feature is disabled. The command will not run.');
 
             return 0;
@@ -88,10 +104,9 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
 
             return 0;
         }
-        /** @var EmailBodySynchronizer $synchronizer */
-        $synchronizer = $this->getContainer()->get('oro_email.email_body_synchronizer');
-        $synchronizer->setLogger(new OutputLogger($output));
-        $synchronizer->sync((int)$input->getOption('max-exec-time'), (int)$input->getOption('batch-size'));
+
+        $this->synchronizer->setLogger(new OutputLogger($output));
+        $this->synchronizer->sync((int)$input->getOption('max-exec-time'), (int)$input->getOption('batch-size'));
 
         $lock->release();
 

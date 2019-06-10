@@ -22,13 +22,28 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class DebugCommand extends AbstractDebugCommand
 {
+    /** @var string */
+    protected static $defaultName = 'oro:api:debug';
+
+    /** @var ActionProcessorBagInterface */
+    private $actionProcessorBag;
+
+    /**
+     * @param ActionProcessorBagInterface $actionProcessorBag
+     */
+    public function __construct(ActionProcessorBagInterface $actionProcessorBag)
+    {
+        parent::__construct();
+
+        $this->actionProcessorBag = $actionProcessorBag;
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('oro:api:debug')
             ->setDescription('Shows details about registered Data API actions and processors.')
             ->addArgument(
                 'action',
@@ -113,11 +128,9 @@ class DebugCommand extends AbstractDebugCommand
      */
     protected function dumpActions(OutputInterface $output)
     {
-        /** @var ActionProcessorBagInterface $processorBag */
-        $actionProcessorBag = $this->getContainer()->get('oro_api.action_processor_bag');
         /** @var ProcessorBagInterface $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
-        $publicActions = $actionProcessorBag->getActions();
+        $publicActions = $this->actionProcessorBag->getActions();
 
         $processorsForPublicActions = [];
         $processorsForOtherActions = [];

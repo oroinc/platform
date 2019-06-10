@@ -7,12 +7,18 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-class EmailVoter implements VoterInterface
+/**
+ * Security voter that prevents finding available mailboxes
+ */
+class EmailVoter implements VoterInterface, ServiceSubscriberInterface
 {
     /**
      * If you want to change content of this array, please pay attention to classes
@@ -88,13 +94,13 @@ class EmailVoter implements VoterInterface
         $emailUsers = $object->getEmailUsers();
         foreach ($attributes as $attribute) {
             foreach ($emailUsers as $emailUser) {
-                if ($this->container->get('security.authorization_checker')->isGranted($attribute, $emailUser)) {
+                if ($this->container->get(AuthorizationCheckerInterface::class)->isGranted($attribute, $emailUser)) {
                     return self::ACCESS_GRANTED;
                 }
-                if ($mailbox = $emailUser->getMailboxOwner() !== null
-                    && $token instanceof UsernamePasswordOrganizationToken
-                ) {
-                    $manager = $this->container->get('oro_email.mailbox.manager');
+
+                $mailbox = $emailUser->getMailboxOwner();
+                if ($mailbox !== null && $token instanceof UsernamePasswordOrganizationToken) {
+                    $manager = $this->container->get(MailboxManager::class);
                     $mailboxes = $manager->findAvailableMailboxes(
                         $token->getUser(),
                         $token->getOrganizationContext()
@@ -126,5 +132,16 @@ class EmailVoter implements VoterInterface
         }
 
         return $object;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            AuthorizationCheckerInterface::class,
+            MailboxManager::class,
+        ];
     }
 }

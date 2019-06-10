@@ -1,12 +1,16 @@
 services:
-    Oro\Bundle\EmailBundle\Command\UpdateAssociationsCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\EmailBundle\Command\UpdateAssociationsCommand
+
+    Oro\Bundle\EmailBundle\Command\UpdateAssociationsCommand:
+        arguments:
+            - '@oro_message_queue.client.message_producer'
         tags:
             - { name: console.command }
 
     Oro\Bundle\EmailBundle\Command\Cron\EmailBodySyncCommand:
-        public: false
-        class: Oro\Bundle\EmailBundle\Command\Cron\EmailBodySyncCommand
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+            - '@oro_email.email_body_synchronizer'
         tags:
             - { name: console.command }

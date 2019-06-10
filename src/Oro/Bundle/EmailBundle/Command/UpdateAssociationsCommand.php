@@ -4,20 +4,37 @@ namespace Oro\Bundle\EmailBundle\Command;
 
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpdateAssociationsCommand extends ContainerAwareCommand
+/**
+ * The CLI command to update associations to emails
+ */
+class UpdateAssociationsCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:email:update-associations';
+
+    /** @var MessageProducerInterface */
+    private $producer;
+
+    /**
+     * @param MessageProducerInterface $producer
+     */
+    public function __construct(MessageProducerInterface $producer)
+    {
+        parent::__construct();
+
+        $this->producer = $producer;
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this
-            ->setName('oro:email:update-associations')
-            ->setDescription('Update associations to emails');
+        $this->setDescription('Update associations to emails');
     }
 
     /**
@@ -25,18 +42,8 @@ class UpdateAssociationsCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this
-            ->getProducer()
-            ->send(Topics::UPDATE_ASSOCIATIONS_TO_EMAILS, []);
+        $this->producer->send(Topics::UPDATE_ASSOCIATIONS_TO_EMAILS, []);
 
         $output->writeln('<info>Update of associations has been scheduled.</info>');
-    }
-
-    /**
-     * @return MessageProducerInterface
-     */
-    protected function getProducer()
-    {
-        return $this->getContainer()->get('oro_message_queue.client.message_producer');
     }
 }

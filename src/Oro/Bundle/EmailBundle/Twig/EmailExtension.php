@@ -71,7 +71,7 @@ class EmailExtension extends AbstractExtension
      */
     protected function getEmailAttachmentManager()
     {
-        return $this->container->get('oro_email.manager.email_attachment_manager');
+        return $this->container->get(EmailAttachmentManager::class);
     }
 
     /**

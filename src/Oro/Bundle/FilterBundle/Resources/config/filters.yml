@@ -129,6 +129,9 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: datetime }
 
+    Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter:
+        alias: 'oro_filter.datetime_range_filter'
+
     oro_filter.many_to_many_filter:
         class: Oro\Bundle\FilterBundle\Filter\ManyToManyFilter
         public: false
