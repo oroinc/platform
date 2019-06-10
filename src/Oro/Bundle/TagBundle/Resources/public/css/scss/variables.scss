@@ -37,9 +37,9 @@ $tag-item-font-size:                    12px !default;
 $tag-item-offset-vertical:              $content-padding-small / 2 !default;
 $tag-item-offset-horizontal:            $content-padding-small / 2 !default;
 $tag-item-offset:                       side-values($tag-item-offset-vertical $tag-item-offset-horizontal 0 0) !default;
-$tag-item-line-height:                  absolute-line-height($oro-datagrid-font-size, $oro-datagrid-body-cell-line-height);
+$tag-item-line-height:                  1.2 !default;
 $tag-item-inner-offset-horizontal:      12px !default;
-$tag-item-inner-offset-vertical:        ($tag-item-height - $tag-item-line-height)/2 !default;
+$tag-item-inner-offset-vertical:        5px !default;
 $tag-item-inner-offset:                 side-values($tag-item-inner-offset-vertical $tag-item-inner-offset-horizontal) !default;
 $tag-item-border-radius:                ($tag-item-height / 2) !default;
 
