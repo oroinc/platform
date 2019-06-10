@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * Completes the configuration of fields with data-type equal to
- * "localized_fallback_value:localizedFallbackValueFieldName".
+ * "localizedFallbackValue:{localizedFallbackValueFieldName}".
  * These fields are represented by to-many association to LocalizedFallbackValue.
  * @see \Oro\Bundle\LocaleBundle\Api\Processor\ComputeLocalizedFallbackValues
  */
@@ -20,7 +20,7 @@ class LocalizedFallbackValueCompleter implements CustomDataTypeCompleterInterfac
 {
     public const LOCALIZED_FALLBACK_VALUE_FIELDS = 'localized_fallback_value_fields';
 
-    private const LOCALIZED_FALLBACK_VALUE_PREFIX = 'localized_fallback_value:';
+    private const LOCALIZED_FALLBACK_VALUE_PREFIX = 'localizedFallbackValue:';
 
     /**
      * {@inheritdoc}

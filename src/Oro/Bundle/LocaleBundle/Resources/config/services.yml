@@ -363,6 +363,8 @@ services:
 
     oro_locale.provider.current_localization:
         class: 'Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider'
+        arguments:
+            - !tagged oro_locale.extension.current_localization
 
     oro_locale.provider.config_default_localization:
         class: 'Oro\Bundle\LocaleBundle\Provider\ConfigDefaultLocalizationProvider'

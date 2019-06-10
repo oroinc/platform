@@ -225,3 +225,22 @@ services:
         public: false
         tags:
           - { name: oro.api.query.comparison_expression, operator: 'NOT_ENDS_WITH' }
+
+    oro_api.query.comparison_expression.nested_tree:
+        class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NestedTreeComparisonExpression
+        public: false
+        arguments:
+            - '@stof_doctrine_extensions.listener.tree'
+            - '@doctrine'
+        tags:
+          - { name: oro.api.query.comparison_expression, operator: 'NESTED_TREE' }
+
+    oro_api.query.comparison_expression.nested_tree_with_root:
+        class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NestedTreeComparisonExpression
+        public: false
+        arguments:
+            - '@stof_doctrine_extensions.listener.tree'
+            - '@doctrine'
+            - true
+        tags:
+          - { name: oro.api.query.comparison_expression, operator: 'NESTED_TREE_WITH_ROOT' }
