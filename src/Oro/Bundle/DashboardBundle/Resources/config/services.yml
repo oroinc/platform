@@ -4,7 +4,6 @@ parameters:
     oro_dashboard.config_resolver.class:         Oro\Component\Config\Resolver\SystemAwareResolver
     oro_dashboard.manager.state.class:           Oro\Bundle\DashboardBundle\Model\StateManager
     oro_dashboard.manager.class:                 Oro\Bundle\DashboardBundle\Model\Manager
-    oro_dashboard.widget_configs.class:          Oro\Bundle\DashboardBundle\Model\WidgetConfigs
     oro_dashboard.factory.class:                 Oro\Bundle\DashboardBundle\Model\Factory
     oro_dashboard.dashboard_entity.class:        Oro\Bundle\DashboardBundle\Entity\Dashboard
     oro_dashboard.dashboard_widget_entity.class: Oro\Bundle\DashboardBundle\Entity\Widget
@@ -59,7 +58,7 @@ services:
         public: false
 
     oro_dashboard.widget_configs:
-        class: '%oro_dashboard.widget_configs.class%'
+        class: Oro\Bundle\DashboardBundle\Model\WidgetConfigs
         arguments:
             - '@oro_dashboard.config_provider'
             - '@oro_dashboard.config_resolver'
@@ -69,6 +68,9 @@ services:
             - '@event_dispatcher'
             - '@oro_dashboard.widget_config_visibility_filter'
             - '@request_stack'
+
+    Oro\Bundle\DashboardBundle\Model\WidgetConfigs:
+        alias: 'oro_dashboard.widget_configs'
 
     oro_dashboard.manager:
         class: '%oro_dashboard.manager.class%'

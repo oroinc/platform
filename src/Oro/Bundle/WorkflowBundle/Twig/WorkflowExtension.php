@@ -5,7 +5,9 @@ namespace Oro\Bundle\WorkflowBundle\Twig;
 use Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -18,7 +20,7 @@ use Twig\TwigFunction;
  * Provides Twig filter to format a workflow variable value in workflow management:
  *   - oro_format_workflow_variable_value
  */
-class WorkflowExtension extends AbstractExtension
+class WorkflowExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const NAME = 'oro_workflow';
 
@@ -36,9 +38,9 @@ class WorkflowExtension extends AbstractExtension
     /**
      * @return WorkflowManager
      */
-    protected function getWorkflowManager()
+    protected function getWorkflowManager(): WorkflowManager
     {
-        return $this->container->get('oro_workflow.registry.workflow_manager')->getManager();
+        return $this->container->get(WorkflowManagerRegistry::class)->getManager();
     }
 
     /**
@@ -107,8 +109,19 @@ class WorkflowExtension extends AbstractExtension
     /**
      * @return WorkflowVariableFormatter
      */
-    protected function getWorkflowVariableFormatter()
+    protected function getWorkflowVariableFormatter(): WorkflowVariableFormatter
     {
-        return $this->container->get('oro_workflow.formatter.workflow_variable');
+        return $this->container->get(WorkflowVariableFormatter::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return [
+            WorkflowVariableFormatter::class,
+            WorkflowManagerRegistry::class,
+        ];
     }
 }

@@ -5,6 +5,9 @@ services:
             - '@oro_action.attribute_guesser'
             - '@translator'
 
+    Oro\Bundle\WorkflowBundle\Model\AttributeAssembler:
+        alias: 'oro_workflow.attribute_assembler'
+
     oro_workflow.variable_assembler:
         class: 'Oro\Bundle\WorkflowBundle\Model\VariableAssembler'
         public: false
@@ -16,6 +19,9 @@ services:
     oro_workflow.step_assembler:
         class: 'Oro\Bundle\WorkflowBundle\Model\StepAssembler'
 
+    Oro\Bundle\WorkflowBundle\Model\StepAssembler:
+        alias: 'oro_workflow.step_assembler'
+
     oro_workflow.transition_assembler:
         class: 'Oro\Bundle\WorkflowBundle\Model\TransitionAssembler'
         arguments:
@@ -25,15 +31,15 @@ services:
             - '@oro_workflow.form_options_configuration_assembler'
             - '@oro_workflow.resolver.transition_options_resolver'
 
+    Oro\Bundle\WorkflowBundle\Model\TransitionAssembler:
+        alias: 'oro_workflow.transition_assembler'
+
     oro_workflow.workflow_assembler:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler'
         arguments:
-            - '@service_container'
-            - '@oro_workflow.attribute_assembler'
-            - '@oro_workflow.step_assembler'
-            - '@oro_workflow.transition_assembler'
-            - '@oro_workflow.restriction_assembler'
-            - '@translator'
+            - '@Psr\Container\ContainerInterface'
+        tags:
+            - { name: container.service_subscriber }
 
     oro_workflow.form_options_assembler:
         class: 'Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler'
@@ -62,6 +68,9 @@ services:
 
     oro_workflow.restriction_assembler:
         class: 'Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler'
+
+    Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler:
+        alias: 'oro_workflow.restriction_assembler'
 
     oro_workflow.form_options_configuration_assembler:
         class: 'Oro\Bundle\WorkflowBundle\Model\FormOptionsConfigurationAssembler'
