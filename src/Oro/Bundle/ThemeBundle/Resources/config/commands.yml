@@ -1,6 +1,11 @@
 services:
+    _defaults:
+        public: false
+
     Oro\Bundle\ThemeBundle\Command\ThemeCommand:
         public: false
         class: Oro\Bundle\ThemeBundle\Command\ThemeCommand
+        arguments:
+            - '@oro_theme.registry'
         tags:
             - { name: console.command }

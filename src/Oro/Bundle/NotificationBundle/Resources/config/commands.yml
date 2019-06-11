@@ -1,6 +1,10 @@
 services:
-    Oro\Bundle\NotificationBundle\Command\MassNotificationCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\NotificationBundle\Command\MassNotificationCommand
+
+    Oro\Bundle\NotificationBundle\Command\MassNotificationCommand:
+        arguments:
+            - '@oro_notification.mass_notification_sender'
+            - '@logger'
         tags:
             - { name: console.command }

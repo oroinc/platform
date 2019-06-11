@@ -11,15 +11,9 @@ use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $container;
-
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject
      */
@@ -47,20 +41,18 @@ class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->container = $this->createMock(ContainerInterface::class);
         $this->sender = $this->createMock(MassNotificationSender::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->in  = $this->createMock(InputInterface::class);
         $this->out = $this->createMock(OutputInterface::class);
 
-        $this->command = new MassNotificationCommand();
-        $this->command->setContainer($this->container);
+        $this->command = new MassNotificationCommand($this->sender, $this->logger);
     }
 
     public function testConfigure()
     {
         $this->command->configure();
-        $this->assertEquals($this->command->getName(), MassNotificationCommand::COMMAND_NAME);
+        $this->assertEquals($this->command->getName(), 'oro:maintenance-notification');
         $definition = $this->command->getDefinition();
         $this->assertTrue($definition->hasOption('subject'));
         $this->assertTrue($definition->hasOption('message'));
@@ -94,8 +86,6 @@ class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
             From::emailAddress('test@test.com', 'test name')
         )->will($this->returnValue($count));
 
-        $this->configureContainer();
-
         $this->command->execute($this->in, $this->out);
     }
 
@@ -120,8 +110,6 @@ class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
         $this->sender->expects($this->once())->method('send')->willThrowException($exception);
         $this->logger->expects($this->once())->method('error')
             ->with('An error occurred while sending mass notification');
-
-        $this->configureContainer();
 
         $this->command->execute($this->in, $this->out);
     }
@@ -151,8 +139,6 @@ class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
             null
         )->will($this->returnValue($count));
 
-        $this->configureContainer();
-
         $this->command->execute($this->in, $this->out);
     }
 
@@ -171,23 +157,5 @@ class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->command->execute($this->in, $this->out);
-    }
-
-    private function configureContainer(): void
-    {
-        $this->container->expects($this->any())
-            ->method('get')
-            ->willReturnMap([
-                [
-                    'oro_notification.mass_notification_sender',
-                    ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                    $this->sender
-                ],
-                [
-                    'logger',
-                    ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                    $this->logger
-                ],
-            ]);
     }
 }

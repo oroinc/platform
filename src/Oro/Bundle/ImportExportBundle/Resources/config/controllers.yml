@@ -2,12 +2,8 @@ services:
     _defaults:
         public: true
 
-    oro_importexport.controller.import_export:
-        class: 'Oro\Bundle\ImportExportBundle\Controller\ImportExportController'
+    Oro\Bundle\ImportExportBundle\Controller\ImportExportController:
         calls:
             - [setContainer, ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: 'container.service_subscriber' }
-
-    Oro\Bundle\ImportExportBundle\Controller\ImportExportController:
-        alias: 'oro_importexport.controller.import_export'

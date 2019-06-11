@@ -6,7 +6,7 @@ use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\NotificationBundle\Exception\NotificationSendException;
 use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,16 +16,34 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @package Oro\Bundle\NotificationBundle\Command
  */
-class MassNotificationCommand extends ContainerAwareCommand
+class MassNotificationCommand extends Command
 {
-    const COMMAND_NAME = 'oro:maintenance-notification';
+    /** @var string */
+    protected static $defaultName = 'oro:maintenance-notification';
+
+    /** @var MassNotificationSender */
+    private $massNotificationSender;
+
+    /** @var LoggerInterface */
+    private $logger;
+
+    /**
+     * @param MassNotificationSender $massNotificationSender
+     * @param LoggerInterface $logger
+     */
+    public function __construct(MassNotificationSender $massNotificationSender, LoggerInterface $logger)
+    {
+        $this->massNotificationSender = $massNotificationSender;
+        $this->logger = $logger;
+        parent::__construct();
+    }
 
     /**
      * Console command configuration
      */
     public function configure()
     {
-        $this->setName(self::COMMAND_NAME)
+        $this
             ->setDescription(
                 'Send mass notifications to all active application users ' .
                 'or to the emails specified in the Recipients list under ' .
@@ -87,36 +105,18 @@ class MassNotificationCommand extends ContainerAwareCommand
             $message = file_get_contents($filePath);
         }
 
-        $massNotificationSender = $this->getMassNotificationSender();
-
         $sender = $senderEmail
             ? From::emailAddress($senderEmail, $senderName)
             : null;
 
         try {
-            $count = $massNotificationSender->send($message, $subject, $sender);
+            $count = $this->massNotificationSender->send($message, $subject, $sender);
         } catch (NotificationSendException $exception) {
-            $this->getLogger()->error('An error occurred while sending mass notification', ['exception' => $exception]);
+            $this->logger->error('An error occurred while sending mass notification', ['exception' => $exception]);
             $output->writeln('An error occurred while sending mass notification');
             return;
         }
 
         $output->writeln(sprintf('%s notifications have been added to the queue', $count));
-    }
-
-    /**
-     * @return MassNotificationSender
-     */
-    private function getMassNotificationSender()
-    {
-        return $this->getContainer()->get('oro_notification.mass_notification_sender');
-    }
-
-    /**
-     * @return LoggerInterface
-     */
-    private function getLogger(): LoggerInterface
-    {
-        return $this->getContainer()->get('logger');
     }
 }

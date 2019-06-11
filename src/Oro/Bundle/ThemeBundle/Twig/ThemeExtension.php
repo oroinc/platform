@@ -3,7 +3,8 @@
 namespace Oro\Bundle\ThemeBundle\Twig;
 
 use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -12,12 +13,12 @@ use Twig\TwigFunction;
  *   - oro_theme_logo
  *   - oro_theme_icon
  */
-class ThemeExtension extends AbstractExtension
+class ThemeExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const NAME = 'oro_theme';
 
     /** @var ContainerInterface */
-    protected $container;
+    private $container;
 
     /**
      * @param ContainerInterface $container
@@ -28,11 +29,19 @@ class ThemeExtension extends AbstractExtension
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [ThemeRegistry::class];
+    }
+
+    /**
      * @return ThemeRegistry
      */
     protected function getThemeRegistry()
     {
-        return $this->container->get('oro_theme.registry');
+        return $this->container->get(ThemeRegistry::class);
     }
 
     /**

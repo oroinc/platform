@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Command\Cron;
 
+use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData;
 use Oro\Bundle\EmailBundle\Tests\Functional\EmailFeatureTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -15,9 +16,7 @@ class EmailBodySyncCommandTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-        $this->loadFixtures([
-            'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData'
-        ]);
+        $this->loadFixtures([LoadEmailData::class]);
     }
 
     /**
