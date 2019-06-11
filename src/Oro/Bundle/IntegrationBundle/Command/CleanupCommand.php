@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
@@ -10,7 +11,7 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,12 +19,32 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Command to clean up old integration status records
  */
-class CleanupCommand extends ContainerAwareCommand implements CronCommandInterface
+class CleanupCommand extends Command implements CronCommandInterface
 {
     const BATCH_SIZE = 100;
-    const COMMAND_NAME = 'oro:cron:integration:cleanup';
     const FAILED_STATUSES_INTERVAL = '1 month';
     const DEFAULT_COMPLETED_STATUSES_INTERVAL =  '1 week';
+
+    /** @var string */
+    protected static $defaultName = 'oro:cron:integration:cleanup';
+
+    /** var ManagerRegistry **/
+    private $registry;
+
+    /** @var NativeQueryExecutorHelper */
+    private $nativeQueryExecutorHelper;
+
+    /**
+     * @param ManagerRegistry $registry
+     * @param NativeQueryExecutorHelper $nativeQueryExecutorHelper
+     */
+    public function __construct(ManagerRegistry $registry, NativeQueryExecutorHelper $nativeQueryExecutorHelper)
+    {
+        parent::__construct();
+
+        $this->registry = $registry;
+        $this->nativeQueryExecutorHelper = $nativeQueryExecutorHelper;
+    }
 
     /**
      * {@inheritdoc}
@@ -59,7 +80,6 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     protected function configure()
     {
         $this
-            ->setName(self::COMMAND_NAME)
             ->setDescription('Clean up integration statuses history')
             ->addOption(
                 'interval',
@@ -133,8 +153,9 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
      */
     protected function processDeletion($ids, $className)
     {
-        $this->getEntityManager()
-            ->getRepository($className)
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass($className);
+        $em->getRepository($className)
             ->createQueryBuilder('entity')
             ->delete($className, 'entity')
             ->where('entity.id IN (:ids)')
@@ -151,8 +172,10 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
      */
     protected function getOldIntegrationStatusesQueryBuilder($completedInterval, $failedInterval)
     {
-        $queryBuilder = $this->getEntityManager()
-            ->getRepository('OroIntegrationBundle:Status')
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass(Status::class);
+
+        $queryBuilder = $em->getRepository(Status::class)
             ->createQueryBuilder('status');
 
         $expr = $queryBuilder->expr();
@@ -179,25 +202,19 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     }
 
     /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->getContainer()->get('doctrine')->getManager();
-    }
-
-    /**
      * Exclude last connector status by date
      *
      * @return array
      */
     protected function prepareExcludes()
     {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass(Status::class);
+
         /** @var Connection $connection */
-        $connection = $this->getEntityManager()->getConnection();
-        /** @var NativeQueryExecutorHelper $nativeQueryExecutorHelper */
-        $nativeQueryExecutorHelper = $this->getContainer()->get('oro_entity.orm.native_query_executor_helper');
-        $tableName = $nativeQueryExecutorHelper->getTableName(Status::class);
+        $connection = $em->getConnection();
+
+        $tableName = $this->nativeQueryExecutorHelper->getTableName(Status::class);
         $selectQuery = <<<SQL
 SELECT MAX(a.id) AS id
 FROM 

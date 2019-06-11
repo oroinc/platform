@@ -17,6 +17,10 @@ services:
             - { name: console.command }
 
     Oro\Bundle\MessageQueueBundle\Command\ConsumerHeartbeatCommand:
+        arguments:
+            - '@oro_message_queue.consumption.consumer_heartbeat'
+            - '@oro_sync.client.connection_checker'
+            - '@oro_sync.websocket_client'
         tags:
             - { name: console.command }
 

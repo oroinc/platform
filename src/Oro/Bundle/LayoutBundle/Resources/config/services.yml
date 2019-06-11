@@ -29,6 +29,9 @@ services:
             - '@oro_layout.layout_context_holder'
             - '@oro_layout.profiler.layout_data_collector'
 
+    Oro\Bundle\LayoutBundle\Layout\LayoutManager:
+        alias: oro_layout.layout_manager
+
     layout:
         alias: oro_layout.layout_manager
 

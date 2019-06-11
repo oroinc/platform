@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\ThemeBundle\Model\Theme;
@@ -31,7 +30,7 @@ class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $container = self::getContainerBuilder()
-            ->add('oro_theme.registry', $this->themeRegistry)
+            ->add(ThemeRegistry::class, $this->themeRegistry)
             ->getContainer($this);
 
         $this->extension = new ThemeExtension($container);

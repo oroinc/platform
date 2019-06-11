@@ -1,16 +1,17 @@
-parameters:
-    oro_theme.registry.class: Oro\Bundle\ThemeBundle\Model\ThemeRegistry
-
 services:
     oro_theme.registry:
-        class: '%oro_theme.registry.class%'
+        class: Oro\Bundle\ThemeBundle\Model\ThemeRegistry
         arguments:
             - '%oro_theme.settings%'
+
+    Oro\Bundle\ThemeBundle\Model\ThemeRegistry:
+        alias: oro_theme.registry
 
     oro_theme.twig.extension:
         class: Oro\Bundle\ThemeBundle\Twig\ThemeExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber }
