@@ -7,7 +7,6 @@ use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
-use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
@@ -82,7 +81,7 @@ class AutoResponseListener extends MailboxEmailListener implements
      */
     protected function getProducer()
     {
-        return $this->container->get(MessageProducer::class);
+        return $this->container->get(MessageProducerInterface::class);
     }
 
     /**
@@ -92,7 +91,7 @@ class AutoResponseListener extends MailboxEmailListener implements
     {
         return [
             AutoResponseManager::class,
-            MessageProducer::class
+            MessageProducerInterface::class
         ];
     }
 }

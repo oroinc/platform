@@ -9,7 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\EventListener\AutoResponseListener;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Component\MessageQueue\Client\MessageProducer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
@@ -26,11 +26,11 @@ class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->autoResponseManager = $this->createMock(AutoResponseManager::class);
-        $this->producer = $this->createMock(MessageProducer::class);
+        $this->producer = $this->createMock(MessageProducerInterface::class);
 
         $container = TestContainerBuilder::create()
             ->add(AutoResponseManager::class, $this->autoResponseManager)
-            ->add(MessageProducer::class, $this->producer)
+            ->add(MessageProducerInterface::class, $this->producer)
             ->getContainer($this);
 
         $this->listener = new AutoResponseListener($container);

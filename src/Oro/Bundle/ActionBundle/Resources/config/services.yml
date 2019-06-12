@@ -26,6 +26,9 @@ services:
             - '@property_accessor'
             - '@request_stack'
 
+    Oro\Bundle\ActionBundle\Helper\ContextHelper:
+        alias: 'oro_action.helper.context'
+
     oro_action.helper.default_operation_request:
         class: 'Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper'
         public: true
