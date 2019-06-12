@@ -329,23 +329,6 @@ class ACLContext extends OroFeatureContext implements
     }
 
     /**
-     * @Then /^(?:|I )click update schema$/
-     */
-    public function iClickUpdateSchema()
-    {
-        try {
-            $page = $this->getPage();
-
-            $page->clickLink('Update schema');
-            $this->waitForAjax();
-            $page->clickLink('Yes, Proceed');
-            $this->waitForAjax();
-        } catch (\Exception $e) {
-            throw $e;
-        }
-    }
-
-    /**
      * Click edit entity button on entity view page
      * Example: Given I'm edit entity
      *
