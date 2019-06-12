@@ -9,11 +9,14 @@ use Gaufrette\Stream\InMemoryBuffer;
 use Gaufrette\StreamMode;
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
+use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\AttachmentBundle\Validator\ProtocolValidatorInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FileManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  \PHPUnit\Framework\MockObject\MockObject */
@@ -25,7 +28,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     /** @var FileManager */
     protected $fileManager;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->filesystem = $this->createMock(Filesystem::class);
 
@@ -45,11 +48,11 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
      * @param string|null $originalFileName
      * @param string|null $fileName
      *
-     * @return TestAttachment
+     * @return TestFile
      */
     protected function createFileEntity($originalFileName = 'testFile.txt', $fileName = 'testFile.txt')
     {
-        $fileEntity = new TestAttachment();
+        $fileEntity = new TestFile();
         if (null !== $originalFileName) {
             $fileEntity->setOriginalFilename($originalFileName);
         }

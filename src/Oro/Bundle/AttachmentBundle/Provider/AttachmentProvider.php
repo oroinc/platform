@@ -9,6 +9,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Component\PhpUtils\Formatter\BytesFormatter;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
@@ -21,6 +22,9 @@ class AttachmentProvider
 
     /** @var AttachmentAssociationHelper */
     protected $attachmentAssociationHelper;
+
+    /** @var AttachmentManager */
+    private $attachmentManager;
 
     /**
      * @param EntityManager               $entityManager
@@ -92,8 +96,9 @@ class AttachmentProvider
                 );
             }
             $result = [
-                'attachmentURL'       => $this->getAttachmentURL($entity, $attachment),
-                'attachmentSize'      => $this->attachmentManager->getFileSize($attachment->getFileSize()),
+                'attachmentURL'       => $this->attachmentManager
+                    ->getFileUrl($attachment, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD),
+                'attachmentSize'      => BytesFormatter::format($attachment->getFileSize()),
                 'attachmentFileName'  => $attachment->getOriginalFilename(),
                 'attachmentIcon'      => $this->attachmentManager->getAttachmentIconClass($attachment),
                 'attachmentThumbnail' => $thumbnail
@@ -101,16 +106,5 @@ class AttachmentProvider
         }
 
         return $result;
-    }
-
-    /**
-     * @param $entity
-     * @param File $attachment
-     *
-     * @return string
-     */
-    private function getAttachmentURL($entity, $attachment)
-    {
-        return $this->attachmentManager->getFileUrl($entity, 'attachment', $attachment, 'download');
     }
 }

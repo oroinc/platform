@@ -5,11 +5,13 @@ namespace Oro\Bundle\AttachmentBundle\ImportExport;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
@@ -113,13 +115,10 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        return $this->attachmentManager->getAttachment(
-            $context['entityName'],
-            $context['entityId'],
-            $context['fieldName'],
+        return $this->attachmentManager->getFileUrl(
             $object,
-            'download',
-            true
+            FileUrlProviderInterface::FILE_ACTION_DOWNLOAD,
+            UrlGeneratorInterface::ABSOLUTE_URL
         );
     }
 

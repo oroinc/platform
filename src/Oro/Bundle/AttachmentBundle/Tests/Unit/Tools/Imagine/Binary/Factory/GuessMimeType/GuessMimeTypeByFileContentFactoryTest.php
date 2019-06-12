@@ -4,13 +4,13 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Tools\Imagine\Binary\Factory\Gu
 
 use Liip\ImagineBundle\Binary\MimeTypeGuesserInterface;
 use Liip\ImagineBundle\Model\Binary;
-use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\GuessMimeType\GuessMimeTypeByFileContextFactory;
+use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\GuessMimeType\GuessMimeTypeByFileContentFactory;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
 
-class GuessMimeTypeByFileContextFactoryTest extends \PHPUnit\Framework\TestCase
+class GuessMimeTypeByFileContentFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var GuessMimeTypeByFileContextFactory
+     * @var GuessMimeTypeByFileContentFactory
      */
     private $factory;
 
@@ -32,7 +32,7 @@ class GuessMimeTypeByFileContextFactoryTest extends \PHPUnit\Framework\TestCase
         $this->mimeTypeGuesser = $this->createMock(MimeTypeGuesserInterface::class);
         $this->extensionGuesser = $this->createMock(ExtensionGuesserInterface::class);
 
-        $this->factory = new GuessMimeTypeByFileContextFactory($this->mimeTypeGuesser, $this->extensionGuesser);
+        $this->factory = new GuessMimeTypeByFileContentFactory($this->mimeTypeGuesser, $this->extensionGuesser);
     }
 
     public function testCreateImagineBinary()
