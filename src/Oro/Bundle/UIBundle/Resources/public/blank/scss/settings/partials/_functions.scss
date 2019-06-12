@@ -27,6 +27,12 @@
     }
 }
 
+// @return the value in a $font-weights map associated with a given key;
+// Use: color: font-weight('bold') => font-weight: 700;
+@function font-weight($key) {
+    @return map-get($font-weights, $key);
+}
+
 // @return the value in a $theme-fonts map associated with a given key;
 // Use: font-family: get-font-name('main') => font-family: 'Lato';
 
@@ -111,4 +117,20 @@
 
 @function merge-breakpoints($breakpoints1, $news-breakpoint2) {
     @return map-merge-wo-null($breakpoints1, $news-breakpoint2);
+}
+
+/// Replace `$search` with `$replace` in `$string`
+/// @author Hugo Giraudel
+/// @param {String} $string - Initial string
+/// @param {String} $search - Substring to replace
+/// @param {String} $replace ('') - New value
+/// @return {String} - Updated string
+@function str-replace($string, $search, $replace: '') {
+    $index: str-index($string, $search);
+
+    @if $index {
+        @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+    }
+
+    @return $string;
 }
