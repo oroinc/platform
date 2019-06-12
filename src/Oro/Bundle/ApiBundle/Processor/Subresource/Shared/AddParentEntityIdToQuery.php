@@ -59,6 +59,11 @@ class AddParentEntityIdToQuery implements ProcessorInterface
         }
 
         $associationName = $this->getAssociationName($context);
+        if (null === $associationName) {
+            // skip sub-resources that do not associated with any field in the parent entity config
+            return;
+        }
+
         if (ConfigUtil::IGNORE_PROPERTY_PATH !== $associationName) {
             $parentJoinAlias = $this->joinParentEntity(
                 $query,
@@ -207,11 +212,12 @@ class AddParentEntityIdToQuery implements ProcessorInterface
     private function getAssociationName(SubresourceContext $context)
     {
         $associationName = $context->getAssociationName();
-        $propertyPath = $context->getParentConfig()
-            ->getField($associationName)
-            ->getPropertyPath();
+        $associationField = $context->getParentConfig()->getField($associationName);
+        if (null === $associationField) {
+            return null;
+        }
 
-        return $propertyPath ?: $associationName;
+        return $associationField->getPropertyPath($associationName);
     }
 
     /**

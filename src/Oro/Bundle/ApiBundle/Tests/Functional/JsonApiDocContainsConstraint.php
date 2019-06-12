@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
+use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 
 /**
@@ -10,6 +11,20 @@ use Oro\Component\Testing\Assert\ArrayContainsConstraint;
  */
 class JsonApiDocContainsConstraint extends ArrayContainsConstraint
 {
+    /** @var bool */
+    protected $strictPrimaryData;
+
+    /**
+     * @param array $expected          The expected array
+     * @param bool  $strict            Whether the order of elements in an array is important
+     * @param bool  $strictPrimaryData Whether the order of elements in the primary data is important
+     */
+    public function __construct(array $expected, $strict = true, $strictPrimaryData = true)
+    {
+        parent::__construct($expected, $strict);
+        $this->strictPrimaryData = $strictPrimaryData;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -26,11 +41,18 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
             if (is_array($expectedData) && isset($expectedData[0][JsonApiDoc::TYPE])) {
                 $expectedItems = $this->getDataItems($expectedData);
                 $actualItems = $this->getDataItems($other[JsonApiDoc::DATA]);
+                if (!$this->strictPrimaryData) {
+                    ArrayUtil::sortBy($expectedItems, false, JsonApiDoc::ID, SORT_STRING);
+                    ArrayUtil::sortBy($actualItems, false, JsonApiDoc::ID, SORT_STRING);
+                }
                 try {
                     \PHPUnit\Framework\Assert::assertSame(
                         $expectedItems,
                         $actualItems,
-                        'Failed asserting the primary data collection items count and order.'
+                        sprintf(
+                            'Failed asserting the primary data collection items count%s.',
+                            $this->strictPrimaryData ? ' and order' : ''
+                        )
                     );
                 } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
                     $this->errors[] = [[JsonApiDoc::DATA], $e->getMessage()];
