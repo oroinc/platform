@@ -2,226 +2,230 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
-use Oro\Bundle\AttachmentBundle\Exception\InvalidAttachmentEncodedParametersException;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
+use Oro\Bundle\AttachmentBundle\Provider\FileIconProvider;
+use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
+use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
+use Oro\Bundle\AttachmentBundle\Tools\MimeTypeChecker;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
-use Symfony\Component\Routing\RouterInterface;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AttachmentManager  */
-    protected $attachmentManager;
+    /** @var FileUrlProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $fileUrlProvider;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject|RouterInterface */
-    protected $router;
+    /** @var FileIconProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $fileIconProvider;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
-    protected $associationManager;
+    /** @var MimeTypeChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $mimeTypeChecker;
 
-    /** @var TestAttachment */
-    protected $attachment;
+    /** @var AssociationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $associationManager;
 
-    /** @var array */
-    protected $fileIcons;
+    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $urlGenerator;
+
+    /** @var RegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
+
+    /** @var AttachmentManager */
+    private $attachmentManager;
+
+    /** @var TestFile */
+    private $file;
 
     public function setUp()
     {
-        $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->fileUrlProvider = $this->createMock(FileUrlProviderInterface::class);
+        $this->fileIconProvider = $this->createMock(FileIconProvider::class);
+        $this->mimeTypeChecker = $this->createMock(MimeTypeChecker::class);
+        $this->associationManager = $this->createMock(AssociationManager::class);
+        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $this->registry = $this->createMock(RegistryInterface::class);
 
-        $this->fileIcons = [
-            'default' => 'icon_default',
-            'txt' => 'icon_txt'
-        ];
-
-        $this->attachment = new TestAttachment();
-        $this->attachment->setFilename('testFile.txt');
-        $this->attachment->setOriginalFilename('testFile.txt');
-
-        $this->associationManager = $this
-            ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->file = new TestFile();
+        $this->file->setFilename('testFile.txt');
+        $this->file->setOriginalFilename('testFile.txt');
 
         $this->attachmentManager = new AttachmentManager(
-            $this->router,
-            $this->fileIcons,
+            $this->fileUrlProvider,
+            $this->fileIconProvider,
+            $this->mimeTypeChecker,
             $this->associationManager,
-            true,
-            true
+            $this->urlGenerator,
+            $this->registry
         );
     }
 
-    public function testGetFileUrl()
+    public function testGetFileRestApiUrl(): void
     {
-        $this->attachment->setId(1);
-        $this->attachment->setExtension('txt');
-        $this->attachment->setOriginalFilename('testFile.withForwardSlash?.txt');
-        $fieldName = 'testField';
-        $parentEntity = new TestClass();
-        $expectsString = 'T3JvXEJ1bmRsZVxBdHRhY2htZW50QnVuZGxlXFRlc3RzXFVuaXRcRml4dHVyZXNcVGVzdENsYXNzfHRlc3RG'.
-            'aWVsZHwxfGRvd25sb2FkfHRlc3RGaWxlLndpdGhGb3J3YXJkU2xhc2g_LnR4dA==';
-        //Underscore should replace / character
-        $this->router->expects($this->once())
+        $this->urlGenerator
+            ->expects(self::once())
             ->method('generate')
-            ->with(
-                AttachmentManager::ATTACHMENT_FILE_ROUTE,
-                [
-                    'codedString' => $expectsString,
-                    'extension' => 'txt'
-                ],
-                RouterInterface::ABSOLUTE_URL
-            );
-        $this->attachmentManager->getFileUrl($parentEntity, $fieldName, $this->attachment, 'download', true);
+            ->with('oro_api_get_file', ['id' => $fileId = 1, '_format' => 'binary'])
+            ->willReturn($url = '/sample-url');
+
+        self::assertEquals($url, $this->attachmentManager->getFileRestApiUrl($fileId));
     }
 
-    public function testDecodeAttachmentUrl()
+    public function testGetFileUrl(): void
     {
-        $this->assertEquals(
-            [
-                'Oro\Test\TestClass',
-                'testField',
-                1,
-                'download',
-                'testFile.withForwardSlash?.txt'
-            ],
-            $this->attachmentManager->decodeAttachmentUrl(
-                'T3JvXFRlc3RcVGVzdENsYXNzfHRlc3RGaWVsZHwxfGRvd25sb2FkfHRlc3RGaWxlLndpdGhGb3J3YXJkU2xhc2g/LnR4dA=='
+        $this->fileUrlProvider
+            ->expects(self::once())
+            ->method('getFileUrl')
+            ->with($file = new File(), $action = 'sample-action', $referenceType = 1)
+            ->willReturn($url = '/sample-url');
+
+        self::assertEquals($url, $this->attachmentManager->getFileUrl($file, $action, $referenceType));
+    }
+
+    public function testGetResizedImageUrl(): void
+    {
+        $this->fileUrlProvider
+            ->expects(self::once())
+            ->method('getResizedImageUrl')
+            ->with($file = new File(), $width = 10, $height = 20, $referenceType = 1)
+            ->willReturn($url = '/sample-url');
+
+        self::assertEquals($url, $this->attachmentManager->getResizedImageUrl($file, $width, $height, $referenceType));
+    }
+
+    public function testGetFilteredImageUrl(): void
+    {
+        $this->fileUrlProvider
+            ->expects(self::once())
+            ->method('getFilteredImageUrl')
+            ->with($file = new File(), $filter = 'sample-filter', $referenceType = 1)
+            ->willReturn($url = '/sample-url');
+
+        self::assertEquals($url, $this->attachmentManager->getFilteredImageUrl($file, $filter, $referenceType));
+    }
+
+    public function testGetFilteredImageUrlByIdAndFilename(): void
+    {
+        $this->registry
+            ->expects(self::once())
+            ->method('getEntityManagerForClass')
+            ->with(File::class)
+            ->willReturn($entityManager = $this->createMock(EntityManager::class));
+
+        $entityManager
+            ->expects(self::once())
+            ->method('getRepository')
+            ->with(File::class)
+            ->willReturn($repo = $this->createMock(EntityRepository::class));
+
+        $repo
+            ->expects(self::once())
+            ->method('find')
+            ->with($fileId = 1)
+            ->willReturn($file = (new File())->setFilename($filename = 'sample-filename'));
+
+        $this->fileUrlProvider
+            ->expects(self::once())
+            ->method('getFilteredImageUrl')
+            ->with($file, $filter = 'sample-filter', $referenceType = 1)
+            ->willReturn($url = '/sample-url');
+
+        self::assertEquals(
+            $url,
+            $this->attachmentManager->getFilteredImageUrlByIdAndFilename($fileId, $filename, $filter, $referenceType)
+        );
+    }
+
+    public function testGetFilteredImageUrlByIdAndFilenameWhenNoFile(): void
+    {
+        $this->registry
+            ->expects(self::once())
+            ->method('getEntityManagerForClass')
+            ->with(File::class)
+            ->willReturn($entityManager = $this->createMock(EntityManager::class));
+
+        $entityManager
+            ->expects(self::once())
+            ->method('getRepository')
+            ->with(File::class)
+            ->willReturn($repo = $this->createMock(EntityRepository::class));
+
+        $repo
+            ->expects(self::once())
+            ->method('find')
+            ->with($fileId = 1)
+            ->willReturn(null);
+
+        $this->fileUrlProvider
+            ->expects(self::never())
+            ->method('getFilteredImageUrl');
+
+        self::assertEmpty($this->attachmentManager->getFilteredImageUrlByIdAndFilename(
+            $fileId,
+            'sample-filename',
+            'sample-filter',
+            1
+        ));
+    }
+
+    public function testGetAttachmentIconClass(): void
+    {
+        $file = $this->createMock(FileExtensionInterface::class);
+
+        $this->fileIconProvider
+            ->expects(self::once())
+            ->method('getAttachmentIconClass')
+            ->with($file)
+            ->willReturn($icon = 'sample-icon');
+
+        self::assertEquals($icon, $this->attachmentManager->getAttachmentIconClass($file));
+    }
+
+    public function testIsImageType(): void
+    {
+        $this->mimeTypeChecker
+            ->method('isImageMimeType')
+            ->withConsecutive([$mimeType1 = 'sample/type'], [$mimeType2 = 'sample/not-image'])
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        self::assertTrue($this->attachmentManager->isImageType($mimeType1));
+        self::assertFalse($this->attachmentManager->isImageType($mimeType2));
+    }
+
+    public function testGetFileIcons(): void
+    {
+        $this->fileIconProvider
+            ->method('getFileIcons')
+            ->willReturn($fileIcons = ['icon1', 'icon2']);
+
+        self::assertEquals($fileIcons, $this->attachmentManager->getFileIcons());
+    }
+
+    public function testGetAttachmentTargets(): void
+    {
+        $this->associationManager
+            ->expects(self::once())
+            ->method('getSingleOwnerFilter')
+            ->with('attachment')
+            ->willReturn(function () {
+            });
+
+        $this->associationManager
+            ->expects(self::once())
+            ->method('getAssociationTargets')
+            ->with(
+                AttachmentScope::ATTACHMENT,
+                $this->isType('callable'),
+                RelationType::MANY_TO_ONE
             )
-        );
-    }
+            ->willReturn($targets = ['sample_target_cntity_class' => 'sample_field_name']);
 
-    public function testDecodeAttachmentUrlException()
-    {
-        $this->expectException(InvalidAttachmentEncodedParametersException::class);
-        $this->expectExceptionMessage('Attachment parameters cannot be decoded');
-
-        $this->attachmentManager->decodeAttachmentUrl('some_string');
-    }
-
-    public function testWrongAttachmentUrl()
-    {
-        $this->expectException('\LogicException');
-        $this->attachmentManager->decodeAttachmentUrl('bm90Z29vZHN0cmluZw==');
-    }
-
-    public function testNoneBase64AttachmentUrl()
-    {
-        $this->expectException('\LogicException');
-        $this->attachmentManager->decodeAttachmentUrl('bad string');
-    }
-
-    public function testGetResizedImageUrl()
-    {
-        $this->attachment->setId(1);
-        $this->router->expects($this->once())
-            ->method('generate')
-            ->with(
-                'oro_resize_attachment',
-                [
-                    'width' => 100,
-                    'height' => 50,
-                    'id' => 1,
-                    'filename' => 'testFile.txt'
-                ]
-            );
-        $this->attachmentManager->getResizedImageUrl($this->attachment, 100, 50);
-    }
-
-    public function testGetAttachmentIconClass()
-    {
-        $this->attachment->setExtension('txt');
-        $this->assertEquals('icon_txt', $this->attachmentManager->getAttachmentIconClass($this->attachment));
-        $this->attachment->setExtension('doc');
-        $this->assertEquals('icon_default', $this->attachmentManager->getAttachmentIconClass($this->attachment));
-    }
-
-    public function testGetFilteredImageUrl()
-    {
-        $this->attachment->setId(1);
-        $filerName = 'testFilter';
-        $this->attachment->setFilename('test.doc');
-        $this->router->expects($this->once())
-            ->method('generate')
-            ->with(
-                'oro_filtered_attachment',
-                [
-                    'id' => 1,
-                    'filename' => 'test.doc',
-                    'filter' => $filerName
-                ]
-            )
-            ->willReturn('/test/1/test.doc');
-        $this->assertEquals(
-            '/test/1/test.doc',
-            $this->attachmentManager->getFilteredImageUrl($this->attachment, $filerName)
-        );
-    }
-
-    /**
-     * @dataProvider getData
-     */
-    public function testGetFileSize($value, $expected)
-    {
-        $this->assertEquals($expected, $this->attachmentManager->getFileSize($value));
-    }
-
-    public function getData()
-    {
-        return [
-            [0, '0.00 B'],
-            [pow(1024, 0), '1.00 B'],
-            [pow(1024, 1), '1.02 KB'],
-            [pow(1024, 2), '1.05 MB'],
-            [pow(1024, 3), '1.07 GB'],
-            [pow(1024, 4), pow(1024, 4)],
-        ];
-    }
-
-    public function testFileKey()
-    {
-        $fileId           = 123;
-        $ownerEntityClass = 'Acme\MyClass';
-        $ownerEntityId    = 456;
-
-        $key = $this->attachmentManager->buildFileKey($fileId, $ownerEntityClass, $ownerEntityId);
-        $this->assertNotEmpty($key);
-        $this->assertTrue(is_string($key));
-
-        list($extractedFileId, $extractedOwnerEntityClass, $extractedOwnerEntityId) =
-            $this->attachmentManager->parseFileKey($key);
-
-        $this->assertSame($fileId, $extractedFileId);
-        $this->assertSame($ownerEntityClass, $extractedOwnerEntityClass);
-        $this->assertSame($ownerEntityId, $extractedOwnerEntityId);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid file key: "Invalid Key".
-     */
-    public function testParseInvalidFileKey()
-    {
-        $this->attachmentManager->parseFileKey('Invalid Key');
-    }
-
-    public function testIsImageType()
-    {
-        $this->assertTrue($this->attachmentManager->isImageType('image/png'));
-        $this->assertFalse($this->attachmentManager->isImageType('application/pdf'));
-    }
-
-    public function testGetFileIcons()
-    {
-        $this->assertEquals(
-            $this->attachmentManager->getFileIcons(),
-            [
-                'default' => 'icon_default',
-                'txt' => 'icon_txt'
-            ]
-        );
+        self::assertEquals($targets, $this->attachmentManager->getAttachmentTargets());
     }
 }

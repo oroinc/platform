@@ -4,7 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Formatter;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * The formatter that returns image URL.
@@ -40,7 +40,7 @@ class ImageSrcFormatter implements FormatterInterface
             $width = (int)$formatterArguments[self::WIDTH_ATTRIBUTE];
         }
 
-        return $this->manager->getResizedImageUrl($value, $width, $height, Router::ABSOLUTE_URL);
+        return $this->manager->getResizedImageUrl($value, $width, $height, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     /**

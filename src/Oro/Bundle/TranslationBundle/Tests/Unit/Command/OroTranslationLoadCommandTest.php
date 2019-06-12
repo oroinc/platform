@@ -48,24 +48,15 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        $this->translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translator = $this->createMock(Translator::class);
+        $this->languageProvider = $this->createMock(LanguageProvider::class);
+        $this->translationManager = $this->createMock(TranslationManager::class);
 
         $this->translator->expects($this->any())
             ->method('getCatalogue')
-            ->will($this->returnValueMap($this->getCatalogueMap()));
-
-        $this->languageProvider = $this->getMockBuilder(LanguageProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translationManager = $this->getMockBuilder(TranslationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->willReturnMap($this->getCatalogueMap());
 
         $this->translationLoader = new EmptyArrayLoader();
-
         $language = new Language();
 
         $entityRepository = $this->createMock(EntityRepository::class);
@@ -80,19 +71,21 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
         $this->container = $this->createMock(ContainerInterface::class);
         $this->container->expects($this->any())
             ->method('get')
-            ->will($this->returnValueMap([
-                ['translator', 1, $this->translator],
-                ['oro_translation.provider.language', 1, $this->languageProvider],
+            ->willReturnMap([
                 ['oro_translation.manager.translation', 1, $this->translationManager],
                 ['oro_translation.database_translation.loader', 1, $this->translationLoader],
-                ['doctrine', 1, $managerRegistry],
-                ['oro_translation.database_translation.persister', 1, $databasePersister],
-            ]));
+            ]);
 
         $this->input = $this->createMock(InputInterface::class);
         $this->output = new OutputStub();
 
-        $this->command = new OroTranslationLoadCommand();
+        $this->command = new OroTranslationLoadCommand(
+            $managerRegistry,
+            $this->translator,
+            $databasePersister,
+            $this->languageProvider
+        );
+
         $this->command->setContainer($this->container);
     }
 

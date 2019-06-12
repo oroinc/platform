@@ -8,7 +8,10 @@ use Liip\ImagineBundle\Model\Binary;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFileContentFactoryInterface;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
 
-class GuessMimeTypeByFileContextFactory implements ImagineBinaryByFileContentFactoryInterface
+/**
+ * Creates Liip Imagine Binary from raw file content, guesses extension and mime type.
+ */
+class GuessMimeTypeByFileContentFactory implements ImagineBinaryByFileContentFactoryInterface
 {
     /**
      * @var MimeTypeGuesserInterface

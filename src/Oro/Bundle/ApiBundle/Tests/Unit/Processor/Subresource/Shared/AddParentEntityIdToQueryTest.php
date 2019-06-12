@@ -62,6 +62,36 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
+    public function testProcessForSubresourceThatDoesNotAssociatedWithAnyFieldInParentEntityConfig()
+    {
+        $associationName = 'association';
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->setIdentifierFieldNames(['id']);
+        $parentConfig->addField('id');
+        $parentMetadata = new EntityMetadata();
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
+
+        $query = $this->doctrineHelper
+            ->getEntityRepositoryForClass(Entity\User::class)
+            ->createQueryBuilder('e');
+
+        $this->context->setParentClassName(Entity\Product::class);
+        $this->context->setParentId(-1);
+        $this->context->setAssociationName($associationName);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->context->setQuery($query);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            'SELECT e FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User e',
+            $this->context->getQuery()->getDQL()
+        );
+        self::assertCount(0, $this->context->getQuery()->getParameters());
+    }
+
     public function testProcessForComputedAssociationWhenQueryForItIsPreparedByAnotherProcessor()
     {
         $associationName = 'owner';

@@ -47,6 +47,11 @@ class ValidateParentEntityAccess implements ProcessorInterface
     {
         /** @var SubresourceContext $context */
 
+        if (null === $context->getParentConfig()->getField($context->getAssociationName())) {
+            // skip sub-resources that do not associated with any field in the parent entity config
+            return;
+        }
+
         $parentEntityClass = $this->doctrineHelper->getManageableEntityClass(
             $context->getParentClassName(),
             $context->getParentConfig()

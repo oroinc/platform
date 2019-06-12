@@ -21,7 +21,7 @@ use Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
-use Oro\Component\MessageQueue\Client\MessageProducer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -246,7 +246,7 @@ class ImportExportController extends AbstractController
         $fileName = $request->get('fileName', null);
         $originFileName = $request->get('originFileName', null);
 
-        $this->get(MessageProducer::class)->send(
+        $this->get(MessageProducerInterface::class)->send(
             Topics::PRE_IMPORT,
             [
                 'fileName' => $fileName,
@@ -287,7 +287,7 @@ class ImportExportController extends AbstractController
         $fileName = $request->get('fileName', null);
         $originFileName = $request->get('originFileName', null);
 
-        $this->get(MessageProducer::class)->send(
+        $this->get(MessageProducerInterface::class)->send(
             Topics::PRE_IMPORT,
             [
                 'fileName' => $fileName,
@@ -323,7 +323,7 @@ class ImportExportController extends AbstractController
         $options = $this->getOptionsFromRequest($request);
         $token = $this->getSecurityToken()->getToken();
 
-        $this->get(MessageProducer::class)->send(Topics::PRE_EXPORT, [
+        $this->get(MessageProducerInterface::class)->send(Topics::PRE_EXPORT, [
             'jobName' => $jobName,
             'processorAlias' => $processorAlias,
             'outputFilePrefix' => $filePrefix,
@@ -559,7 +559,7 @@ class ImportExportController extends AbstractController
             parent::getSubscribedServices(),
             [
                 TranslatorInterface::class,
-                MessageProducer::class,
+                MessageProducerInterface::class,
                 CsvFileHandler::class,
                 FileManager::class,
                 GetImportExportConfigurationExtension::class,

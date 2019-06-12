@@ -84,7 +84,7 @@
         {% set value = value ? value | oro_format_datetime : null %}
     {% elseif type == 'file' %}
         {% set value %}
-            {{ oro_file_view(entity, field_name, value) }}
+            {{ oro_file_view(value) }}
         {% endset %}
     {% elseif type == 'image' %}
         {% if entity_class is null %}
@@ -93,7 +93,7 @@
             {% set entityInfo = entity_class %}
         {% endif %}
         {% set value %}
-            {{ oro_image_view(entity, value, entityInfo, field_name) }}
+            {{ oro_image_view(value) }}
         {% endset %}
     {% endif %}
 

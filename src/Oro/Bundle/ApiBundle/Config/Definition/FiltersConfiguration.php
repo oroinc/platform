@@ -51,7 +51,7 @@ class FiltersConfiguration extends AbstractConfigurationSection
                 ->values([ConfigUtil::EXCLUSION_POLICY_ALL, ConfigUtil::EXCLUSION_POLICY_NONE])
             ->end()
             ->arrayNode(ConfigUtil::FIELDS)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->normalizeKeys(false)
                 ->prototype('array')
                     ->children();
@@ -83,7 +83,7 @@ class FiltersConfiguration extends AbstractConfigurationSection
             ->scalarNode(ConfigUtil::PROPERTY_PATH)->cannotBeEmpty()->end()
             ->scalarNode(ConfigUtil::FILTER_TYPE)->cannotBeEmpty()->end()
             ->arrayNode(ConfigUtil::FILTER_OPTIONS)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
             ->end()

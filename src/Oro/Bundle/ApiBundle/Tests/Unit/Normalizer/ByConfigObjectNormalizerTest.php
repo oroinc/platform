@@ -789,7 +789,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                'name' => 'test_name'
+                'name' => 'test_name',
+                'id'   => 123
             ],
             $result
         );

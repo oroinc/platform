@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -37,7 +37,7 @@ class ParentEntityObjectSecurityCheck implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var SubresourceContext $context */
+        /** @var ChangeRelationshipContext $context */
 
         $isGranted = true;
         $parentEntity = $context->getParentEntity();
