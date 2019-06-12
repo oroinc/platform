@@ -2,13 +2,19 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Exception\InvalidAttachmentEncodedParametersException;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AttachmentManager  */
@@ -26,11 +32,12 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     protected $fileIcons;
 
+    /** @var FileUrlProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $fileUrlProvider;
+
     public function setUp()
     {
-        $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->router = $this->createMock(RouterInterface::class);
 
         $this->fileIcons = [
             'default' => 'icon_default',
@@ -41,10 +48,8 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
         $this->attachment->setFilename('testFile.txt');
         $this->attachment->setOriginalFilename('testFile.txt');
 
-        $this->associationManager = $this
-            ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->associationManager = $this->createMock(AssociationManager::class);
+        $this->fileUrlProvider = $this->createMock(FileUrlProviderInterface::class);
 
         $this->attachmentManager = new AttachmentManager(
             $this->router,
@@ -76,6 +81,25 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
                 RouterInterface::ABSOLUTE_URL
             );
         $this->attachmentManager->getFileUrl($parentEntity, $fieldName, $this->attachment, 'download', true);
+    }
+
+    public function testGetFileUrlWithFileUrlProvider()
+    {
+        $this->fileUrlProvider
+            ->expects($this->once())
+            ->method('getFileUrl')
+            ->with(
+                $file = new File(),
+                $action = FileUrlProviderInterface::FILE_ACTION_DOWNLOAD,
+                $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
+            )
+            ->willReturn($url = '/sample-url');
+
+        $this->attachmentManager->setFileUrlProvider($this->fileUrlProvider);
+        $this->assertEquals(
+            $url,
+            $this->attachmentManager->getFileUrl(new TestClass(), 'sampleField', $file, $action, false)
+        );
     }
 
     public function testDecodeAttachmentUrl()
@@ -131,6 +155,26 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
         $this->attachmentManager->getResizedImageUrl($this->attachment, 100, 50);
     }
 
+    public function testGetResizedImageUrlWithFileUrlProvider()
+    {
+        $this->fileUrlProvider
+            ->expects($this->once())
+            ->method('getResizedImageUrl')
+            ->with(
+                $file = new File(),
+                $width = 10,
+                $height = 20,
+                $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
+            )
+            ->willReturn($url = '/sample-url');
+
+        $this->attachmentManager->setFileUrlProvider($this->fileUrlProvider);
+        $this->assertEquals(
+            $url,
+            $this->attachmentManager->getResizedImageUrl($file, $width, $height, $referenceType)
+        );
+    }
+
     public function testGetAttachmentIconClass()
     {
         $this->attachment->setExtension('txt');
@@ -155,6 +199,26 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
                 ]
             );
         $this->attachmentManager->getFilteredImageUrl($this->attachment, $filerName);
+    }
+
+
+    public function testGetFilteredImageUrlWithFileUrlProvider()
+    {
+        $this->fileUrlProvider
+            ->expects($this->once())
+            ->method('getFilteredImageUrl')
+            ->with(
+                $file = new File(),
+                $filerName = 'testFilter',
+                UrlGeneratorInterface::ABSOLUTE_PATH
+            )
+            ->willReturn($url = '/sample-url');
+
+        $this->attachmentManager->setFileUrlProvider($this->fileUrlProvider);
+        $this->assertEquals(
+            $url,
+            $this->attachmentManager->getFilteredImageUrl($file, $filerName)
+        );
     }
 
     /**

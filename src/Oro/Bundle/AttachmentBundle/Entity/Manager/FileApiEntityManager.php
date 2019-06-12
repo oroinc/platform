@@ -50,13 +50,11 @@ class FileApiEntityManager extends ApiEntityManager
      */
     public function serializeOne($id)
     {
-        list($fileId, $ownerEntityClass, $ownerEntityId) = $this->attachmentManager->parseFileKey($id);
-
-        if (!$this->authorizationChecker->isGranted('VIEW', new ObjectIdentity($ownerEntityId, $ownerEntityClass))) {
+        if (!$this->authorizationChecker->isGranted('VIEW', new ObjectIdentity($id, File::class))) {
             throw new AccessDeniedException();
         }
 
-        return parent::serializeOne($fileId);
+        return parent::serializeOne($id);
     }
 
     /**

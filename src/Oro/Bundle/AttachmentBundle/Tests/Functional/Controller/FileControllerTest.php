@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Controller;
 
+use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class FileControllerTest extends WebTestCase
@@ -36,6 +37,23 @@ STR;
                 [
                     'codedString' => $decodedUrl,
                     'extension' => 'jpg'
+                ]
+            )
+        );
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 404);
+    }
+
+    public function testRequestNotExistedAttachmentForNewRoute()
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_attachment_get_file',
+                [
+                    'id' => 2,
+                    'action' => FileUrlProviderInterface::FILE_ACTION_DOWNLOAD,
+                    'filename' => 'sample-filename',
                 ]
             )
         );

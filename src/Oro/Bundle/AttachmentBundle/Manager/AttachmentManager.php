@@ -6,9 +6,11 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\AttachmentBundle\Exception\InvalidAttachmentEncodedParametersException;
+use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Component\PhpUtils\Formatter\BytesFormatter;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
@@ -52,6 +54,9 @@ class AttachmentManager
     /** @var bool */
     protected $debugImages;
 
+    /** @var FileUrlProviderInterface|null */
+    protected $fileUrlProvider;
+
     /**
      * @param RouterInterface    $router
      * @param array              $fileIcons
@@ -79,6 +84,18 @@ class AttachmentManager
     public function setFileManager(FileManager $fileManager)
     {
         $this->fileManager = $fileManager;
+    }
+
+    /**
+     * @param FileUrlProviderInterface $fileUrlProvider
+     *
+     * @return AttachmentManager
+     */
+    public function setFileUrlProvider(FileUrlProviderInterface $fileUrlProvider): AttachmentManager
+    {
+        $this->fileUrlProvider = $fileUrlProvider;
+
+        return $this;
     }
 
     /**
@@ -153,6 +170,12 @@ class AttachmentManager
         $type = 'get',
         $absolute = false
     ) {
+        $referenceType = $absolute ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
+
+        if ($this->fileUrlProvider) {
+            return $this->fileUrlProvider->getFileUrl($entity, $type, $referenceType);
+        }
+
         $urlString = str_replace(
             '/',
             '_',
@@ -175,7 +198,7 @@ class AttachmentManager
                 'codedString' => $urlString,
                 'extension'   => $entity->getExtension()
             ],
-            $absolute ? RouterInterface::ABSOLUTE_URL : RouterInterface::ABSOLUTE_PATH
+            $referenceType
         );
     }
 
@@ -220,6 +243,10 @@ class AttachmentManager
         $height = self::DEFAULT_IMAGE_HEIGHT,
         $referenceType = RouterInterface::ABSOLUTE_PATH
     ) {
+        if ($this->fileUrlProvider) {
+            return $this->fileUrlProvider->getResizedImageUrl($entity, $width, $height, $referenceType);
+        }
+
         return $this->router->generate(
             'oro_resize_attachment',
             [
@@ -254,6 +281,10 @@ class AttachmentManager
      */
     public function getFilteredImageUrl(File $entity, $filterName)
     {
+        if ($this->fileUrlProvider) {
+            return $this->fileUrlProvider->getFilteredImageUrl($entity, $filterName);
+        }
+
         return $this->generateUrl(
             'oro_filtered_attachment',
             [
