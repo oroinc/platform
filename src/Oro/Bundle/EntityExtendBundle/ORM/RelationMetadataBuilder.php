@@ -92,7 +92,6 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         $targetEntity = $relation['target_entity'];
         $targetIdColumn = $this->getSinglePrimaryKeyColumn($targetEntity);
         $cascade = $this->getCascadeOption($relation);
-        $cascade[] = 'detach';
 
         $builder = $metadataBuilder->createManyToOne($fieldId->getFieldName(), $targetEntity);
         if (!empty($relation['target_field_id'])) {
@@ -124,7 +123,6 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
     ) {
         $targetEntity = $relation['target_entity'];
         $cascade = $this->getCascadeOption($relation);
-        $cascade[] = 'detach';
 
         $builder = $metadataBuilder->createOneToMany($fieldId->getFieldName(), $targetEntity);
         if (!empty($relation['target_field_id'])) {

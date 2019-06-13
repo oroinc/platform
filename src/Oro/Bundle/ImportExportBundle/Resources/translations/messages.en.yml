@@ -61,7 +61,7 @@ oro:
             importance:     Important
             columns_notice: The file must be comma-separated only. Files containing other separators will be rejected.
             errors:
-                not_found_entity: Not found entity "%entity_name%"
+                not_found_entity: 'Not found entity "%entity_name%". Item data: %item_data%.'
                 access_denied_entity: Access denied to entity "%entity_name%"
                 access_denied_property_entity: Access denied to property %property_name% of entity "%entity_name%"
                 wrong_owner: You have no access to set given owner
