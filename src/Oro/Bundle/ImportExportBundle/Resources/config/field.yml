@@ -6,6 +6,12 @@ services:
         tags:
             - { name: oro_service_link, service: oro_entity.helper.field_helper }
 
+    oro_importexport.field.related_entity_state_helper:
+        class: Oro\Bundle\ImportExportBundle\Field\RelatedEntityStateHelper
+        arguments:
+            - '@oro_entity.helper.field_helper'
+            - '@oro_entity.doctrine_helper'
+
     oro_importexport.field.database_helper:
         class: '%oro_importexport.field.database_helper.class%'
         arguments:

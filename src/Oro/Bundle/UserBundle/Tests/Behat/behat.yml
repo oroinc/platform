@@ -140,5 +140,6 @@ oro_behat_extension:
         - OroActivityListBundle::ActivityContext
         - OroDataGridBundle::GridContext
         - OroEmailBundle::EmailContext
+        - OroSearchBundle::SearchContext
       paths:
         - '@OroUserBundle/Tests/Behat/Features'

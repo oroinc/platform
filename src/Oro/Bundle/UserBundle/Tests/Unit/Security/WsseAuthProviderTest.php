@@ -5,17 +5,21 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Security\WsseAuthProvider;
 use Oro\Bundle\UserBundle\Security\WsseTokenFactory;
 use Oro\Bundle\UserBundle\Tests\Unit\Fixture\RegularUser;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
+use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\DisabledException;
+use Symfony\Component\Security\Core\Exception\LockedException;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -120,6 +124,7 @@ class WsseAuthProviderTest extends \PHPUnit\Framework\TestCase
         $advancedUser->addOrganization($organization);
         $advancedUser->addApiKey($userApiKey);
         $advancedUser->setEnabled(true);
+        $advancedUser->setAuthStatus(new StubEnumValue(UserManager::STATUS_ACTIVE, UserManager::STATUS_ACTIVE));
         $role = $this->createMock(RoleInterface::class);
         $advancedUser->setRoles([$role]);
         $userApiKey->setUser($advancedUser);
@@ -138,8 +143,28 @@ class WsseAuthProviderTest extends \PHPUnit\Framework\TestCase
      * @param string $exceptionType
      * @param string $exceptionString
      */
-    public function testAuthenticateOnWrongData($user, $secret, $exceptionType, $exceptionString)
-    {
+    public function testAuthenticateOnWrongData(
+        $user,
+        $secret,
+        $exceptionType,
+        $exceptionString,
+        $isEnabledUser,
+        $isLockedUserAuthStatus
+    ) {
+        if (!$isEnabledUser) {
+            $this->userChecker->expects($this->once())
+                ->method('checkPreAuth')
+                ->with($user)
+                ->will($this->throwException(new DisabledException('User account is disabled.')));
+        }
+
+        if ($isLockedUserAuthStatus) {
+            $this->userChecker->expects($this->once())
+                ->method('checkPreAuth')
+                ->with($user)
+                ->will($this->throwException(new LockedException('User account is locked.')));
+        }
+
         $token = $this->prepareTestInstance($user, $secret);
         $this->assertFalse($token->isAuthenticated());
 
@@ -169,10 +194,14 @@ class WsseAuthProviderTest extends \PHPUnit\Framework\TestCase
         $userApiKey->setApiKey(self::TEST_API_KEY);
         $userApiKey->setOrganization($disabledOrganization);
 
+        $activeAuthStatus = new StubEnumValue(UserManager::STATUS_ACTIVE, UserManager::STATUS_ACTIVE);
+        $lockedAuthStatus = new StubEnumValue('locked', 'locked');
+
         $user = new User();
         $user->addOrganization($disabledOrganization);
         $user->addApiKey($userApiKey);
         $user->setEnabled(true);
+        $user->setAuthStatus($activeAuthStatus);
         $userApiKey->setUser($user);
 
         $org1ApiKey = new UserApi();
@@ -183,6 +212,7 @@ class WsseAuthProviderTest extends \PHPUnit\Framework\TestCase
         $userWithWrongKey->addOrganization($organization2);
         $userWithWrongKey->addApiKey($org1ApiKey);
         $userWithWrongKey->setEnabled(true);
+        $userWithWrongKey->setAuthStatus($activeAuthStatus);
 
         $org2ApiKey = new UserApi();
         $org2ApiKey->setApiKey(self::TEST_API_KEY);
@@ -192,19 +222,54 @@ class WsseAuthProviderTest extends \PHPUnit\Framework\TestCase
         $disabledUser->addOrganization($organization2);
         $disabledUser->addApiKey($org2ApiKey);
         $disabledUser->setEnabled(false);
+        $disabledUser->setAuthStatus($activeAuthStatus);
+
+        $lockedUser = new User();
+        $lockedUser->addOrganization($organization2);
+        $lockedUser->addApiKey($org2ApiKey);
+        $lockedUser->setEnabled(true);
+        $lockedUser->setAuthStatus($lockedAuthStatus);
 
         return [
             'disabled organization' => [
-                $user, self::TEST_API_KEY, BadCredentialsException::class, 'Organization is not active.'
+                $user,
+                self::TEST_API_KEY,
+                BadCredentialsException::class,
+                'Organization is not active.',
+                $user->isEnabled(),
+                $user->getAuthStatus()->getId() === $lockedAuthStatus->getId()
             ],
             'wrong API key' => [
-                $user, 'wrong key', AuthenticationException::class, 'WSSE authentication failed.'
+                $user,
+                'wrong key',
+                AuthenticationException::class,
+                'WSSE authentication failed.',
+                $user->isEnabled(),
+                $user->getAuthStatus()->getId() === $lockedAuthStatus->getId()
             ],
             'API key from another organization' => [
-                $userWithWrongKey, self::TEST_API_KEY, BadCredentialsException::class, 'Wrong API key.'
+                $userWithWrongKey,
+                self::TEST_API_KEY,
+                BadCredentialsException::class,
+                'Wrong API key.',
+                $userWithWrongKey->isEnabled(),
+                $userWithWrongKey->getAuthStatus()->getId() === $lockedAuthStatus->getId()
             ],
             'disabled user' => [
-                $disabledUser, self::TEST_API_KEY, BadCredentialsException::class, 'User is not active.'
+                $disabledUser,
+                self::TEST_API_KEY,
+                DisabledException::class,
+                'User account is disabled.',
+                $disabledUser->isEnabled(),
+                $disabledUser->getAuthStatus()->getId() === $lockedAuthStatus->getId()
+            ],
+            'locked user' => [
+                $lockedUser,
+                self::TEST_API_KEY,
+                LockedException::class,
+                'User account is locked.',
+                $lockedUser->isEnabled(),
+                $lockedUser->getAuthStatus()->getId() === $lockedAuthStatus->getId()
             ]
         ];
     }
@@ -223,7 +288,6 @@ class WsseAuthProviderTest extends \PHPUnit\Framework\TestCase
         $noApiKeyUser->expects(static::never())->method('getPassword');
         $noApiKeyUser->expects(static::never())->method('getSalt');
         $noApiKeyUser->expects(static::never())->method('getRoles');
-        $noApiKeyUser->expects(static::once())->method('isEnabled')->willReturn(true);
 
         $this->userProvider
             ->expects(self::once())
