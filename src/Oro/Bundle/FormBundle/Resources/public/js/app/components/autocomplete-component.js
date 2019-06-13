@@ -256,6 +256,18 @@ define(function(require) {
                 }
             }
             return title;
+        },
+
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
+            if (this.jqXHR) {
+                this.jqXHR.abort();
+            }
+
+            AutocompleteComponent.__super__.dispose.call(this);
         }
     });
 

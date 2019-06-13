@@ -341,6 +341,10 @@ define(function(require) {
                 return !this.findByName(name)[0];
             }, this);
 
+            _.each(_.keys(result), function(name) {
+                this.invalid[name] = true;
+            }, this);
+
             if (!_.isEmpty(result)) {
                 this.showErrors(result);
             }
