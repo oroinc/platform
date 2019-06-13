@@ -14,9 +14,19 @@ services:
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
         calls:
+            - [setOwnerChecker, ['@oro_security.owner.checker']]
             - [setConfigProvider, ['@oro_entity_config.provider.extend']]
 
     oro_importexport.strategy.add:
+        abstract: true
+        arguments:
+            - '@event_dispatcher'
+            - '@oro_importexport.strategy.import.helper'
+            - '@oro_entity.helper.field_helper'
+            - '@oro_importexport.field.database_helper'
+
+    oro_importexport.strategy.abstract_import_strategy:
+        class: Oro\Bundle\ImportExportBundle\Strategy\Import\AbstractImportStrategy
         abstract: true
         arguments:
             - '@event_dispatcher'
@@ -37,6 +47,8 @@ services:
             - '@oro_importexport.strategy.new_entities_helper'
             - '@oro_entity.doctrine_helper'
             - '@oro_security.owner.checker'
+        calls:
+            - [setRelatedEntityStateHelper, ['@oro_importexport.field.related_entity_state_helper']]
 
     oro_importexport.strategy.new_entities_helper:
         class: Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper
