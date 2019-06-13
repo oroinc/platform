@@ -62,6 +62,38 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Checks, that entity types don't exist on search results page
+     * Example: And I should not see following search entity types:
+     *            | Type            |
+     *            | Business Units  |
+     *            | Calendar Events |
+     *            | Organizations   |
+     *
+     * @param TableNode $table
+     *
+     * @Then /^(?:|I )should not see following search entity types:$/
+     */
+    public function iShouldNotSeeFollowingSearchEntityTypes(TableNode $table)
+    {
+        $entityTypes = $this->getPage()->find('css', '.search-entity-types-column');
+        self::assertNotNull($entityTypes, 'Search entity types column not found');
+
+        $crawler = new Crawler($entityTypes->getHtml());
+        $links = [];
+
+        /** @var \DOMElement $link */
+        foreach ($crawler->filter('ul li') as $link) {
+            preg_match('/([\w\s]+).(\d+)/', $link->textContent, $matches);
+            $links[trim($matches[1])] = $link;
+        }
+
+        foreach ($table as $row) {
+            $type = $row['Type'];
+            self::assertTrue(!array_key_exists($type, $links), sprintf('Type "%s" not found', $type));
+        }
+    }
+
+    /**
      * Assert search results with its types
      * Example: And I should see following search results:
      *            | Title                | Type          |
