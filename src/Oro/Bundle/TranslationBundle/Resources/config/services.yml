@@ -76,6 +76,8 @@ services:
         class: '%oro_translation.crowdin.adapter.class%'
         arguments:
             - '@oro_translation.guzzle_crowdin_client'
+        tags:
+            - { name: translation_adapter, alias: crowdin }
 
     oro_translation.oro_translation_adapter:
         class: '%oro_translation.oro_translation.adapter.class%'
@@ -376,3 +378,14 @@ services:
             - '%installed%'
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad, priority: -100 }
+
+    Oro\Bundle\TranslationBundle\Provider\TranslationPackDumper:
+        arguments:
+            - '@translation.writer'
+            - '@translation.extractor'
+            - '@translation.reader'
+            - '@filesystem'
+            - '@oro_translation.packages_provider.translation'
+            - "@=service('kernel').getBundles()"
+
+    Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationAdaptersCollection: ~

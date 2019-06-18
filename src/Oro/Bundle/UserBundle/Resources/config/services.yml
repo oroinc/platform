@@ -1,3 +1,5 @@
+imports:
+    - { resource: controllers.yml }
 parameters:
     oro_user.manager.api.class:                   Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_user.permission.manager.api.class:        Oro\Bundle\UserBundle\Entity\Manager\UserPermissionApiEntityManager

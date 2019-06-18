@@ -3,28 +3,27 @@
 namespace Oro\Bundle\SoapBundle\EventListener;
 
 use Gedmo\Translatable\TranslatableListener;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
+/**
+ * Sets translatable locale from current request
+ */
 class LocaleListener implements EventSubscriberInterface
 {
     const API_PREFIX = '/api/rest/';
 
     /** @var TranslatableListener */
-    private $translatableListener = false;
-
-    /** @var ContainerInterface */
-    private $container;
+    private $translatableListener;
 
     /**
-     * @param ContainerInterface $container
+     * @param TranslatableListener $translatableListener
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(TranslatableListener $translatableListener)
     {
-        $this->container = $container;
+        $this->translatableListener = $translatableListener;
     }
 
     /**
@@ -37,7 +36,7 @@ class LocaleListener implements EventSubscriberInterface
         $locale = str_replace('-', '_', $request->query->get('locale'));
         if ($locale && $this->isApiRequest($request)) {
             $request->setLocale($locale);
-            $this->getTranslatableListener()->setTranslatableLocale($locale);
+            $this->translatableListener->setTranslatableLocale($locale);
         }
     }
 
@@ -56,21 +55,9 @@ class LocaleListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             // must be registered after Symfony's original LocaleListener
-            KernelEvents::REQUEST  => array(array('onKernelRequest', -17)),
-        );
-    }
-
-    /**
-     * @return TranslatableListener
-     */
-    protected function getTranslatableListener()
-    {
-        if ($this->translatableListener === false) {
-            $this->translatableListener = $this->container->get('stof_doctrine_extensions.listener.translatable');
-        }
-
-        return $this->translatableListener;
+            KernelEvents::REQUEST  => [['onKernelRequest', -17]],
+        ];
     }
 }

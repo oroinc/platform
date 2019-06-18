@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle;
 
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\DebugTranslatorPass;
+use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationAdaptersPass;
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationContextResolverPass;
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationPackagesProviderPass;
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationStrategyPass;
@@ -11,6 +12,9 @@ use Oro\Bundle\UIBundle\DependencyInjection\Compiler\DynamicAssetVersionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * Registers compiler passes extensions
+ */
 class OroTranslationBundle extends Bundle
 {
     /**
@@ -24,5 +28,6 @@ class OroTranslationBundle extends Bundle
         $container->addCompilerPass(new TranslationStrategyPass());
         $container->addCompilerPass(new TranslationPackagesProviderPass());
         $container->addCompilerPass(new DynamicAssetVersionPass('translations'));
+        $container->addCompilerPass(new TranslationAdaptersPass());
     }
 }
