@@ -65,6 +65,6 @@ class InstallCommandListener
      */
     protected function isApplicable(Command $command): bool
     {
-        return $command->getName() === InstallCommand::NAME;
+        return $command->getName() === InstallCommand::getDefaultName();
     }
 }

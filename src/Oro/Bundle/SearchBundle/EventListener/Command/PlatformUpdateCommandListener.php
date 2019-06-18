@@ -62,7 +62,7 @@ class PlatformUpdateCommandListener
      */
     protected function isApplicable(Command $command): bool
     {
-        return $command->getName() === PlatformUpdateCommand::NAME;
+        return $command->getName() === PlatformUpdateCommand::getDefaultName();
     }
 
     /**

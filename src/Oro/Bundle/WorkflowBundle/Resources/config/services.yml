@@ -140,6 +140,9 @@ services:
             - '@oro_workflow.workflow_assembler'
             - '@oro_workflow.registry.definition_filters'
 
+    Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry:
+        alias: oro_workflow.registry
+
     # use only for system calls, cli, background listeners, etc, when main definition filters aren't available
     oro_workflow.registry.system:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'

@@ -394,6 +394,9 @@ services:
         tags:
             - { name: container.service_subscriber }
 
+    Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper:
+        alias: oro_security.acl_helper
+
     oro_security.search.acl_helper:
         class: '%oro_security.search.acl_helper.class%'
         arguments:

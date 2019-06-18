@@ -198,6 +198,9 @@ services:
         arguments:
             - '@oro_message_queue.message_producer'
 
+    Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler:
+        alias: oro_integration.genuine_sync_scheduler
+
     oro_integration.reverse_sync.processor:
         class: 'Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor'
         arguments:

@@ -24,6 +24,9 @@ services:
             - '@oro_chart.data_transformer.factory'
             - '@twig'
 
+    Oro\Bundle\ChartBundle\Model\ChartViewBuilder:
+        alias: oro_chart.view_builder
+
     oro_chart.form.type.settings:
         class: '%oro_chart.form.type.settings.class%'
         arguments:
