@@ -10,6 +10,9 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
+/**
+ * Loads translations
+ */
 class OrmTranslationLoader implements LoaderInterface
 {
     /** @var ManagerRegistry */
@@ -17,6 +20,11 @@ class OrmTranslationLoader implements LoaderInterface
 
     /** @var DatabaseChecker */
     protected $databaseChecker;
+
+    /** @var bool Determines whatever load method will process all translations. There is cases when it should not.
+     * Otherwise empty MessageCatalogue will be returned.
+     */
+    private $enabled = true;
 
     /**
      * @param ManagerRegistry $doctrine
@@ -29,6 +37,26 @@ class OrmTranslationLoader implements LoaderInterface
     }
 
     /**
+     * @return $this
+     */
+    public function setDisabled()
+    {
+        $this->enabled = false;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setEnabled()
+    {
+        $this->enabled = true;
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function load($resource, $locale, $domain = 'messages')
@@ -36,7 +64,7 @@ class OrmTranslationLoader implements LoaderInterface
         /** @var MessageCatalogue $catalogue */
         $catalogue = new MessageCatalogue($locale);
 
-        if ($this->checkDatabase()) {
+        if ($this->enabled && $this->checkDatabase()) {
             $messages = [];
             $translations = $this->getTranslationRepository()->findAllByLanguageAndDomain($locale, $domain);
             foreach ($translations as $translation) {

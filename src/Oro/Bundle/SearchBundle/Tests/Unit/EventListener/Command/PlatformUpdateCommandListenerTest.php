@@ -70,7 +70,7 @@ class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->command->expects($this->once())
             ->method('getName')
-            ->willReturn(PlatformUpdateCommand::NAME);
+            ->willReturn(PlatformUpdateCommand::getDefaultName());
 
         $this->input->expects($this->any())
             ->method('hasOption')

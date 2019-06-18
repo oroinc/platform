@@ -4,18 +4,53 @@ namespace Oro\Bundle\TranslationBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class OroTranslationResetCommand extends ContainerAwareCommand
+/**
+ * Reset user defined translations
+ */
+class OroTranslationResetCommand extends Command
 {
     const BATCH_SIZE = 1000;
 
+    /** @var string */
+    protected static $defaultName = 'oro:translation:reset';
+
     /** @var EntityManagerInterface */
-    protected $entityManager;
+    private $entityManager;
+
+    /** @var TranslatorInterface */
+    private $translator;
+
+    /** @var string */
+    private $kernelDefaultLocale;
+
+    /** @var OrmTranslationLoader */
+    private $ormTranslationLoader;
+
+    /**
+     * @param TranslatorInterface $translator
+     * @param EntityManagerInterface $entityManager
+     * @param OrmTranslationLoader $ormTranslationLoader
+     * @param string $kernelDefaultLocale
+     */
+    public function __construct(
+        TranslatorInterface $translator,
+        EntityManagerInterface $entityManager,
+        OrmTranslationLoader $ormTranslationLoader,
+        string $kernelDefaultLocale
+    ) {
+        $this->kernelDefaultLocale = $kernelDefaultLocale;
+        $this->translator = $translator;
+        $this->entityManager = $entityManager;
+        $this->ormTranslationLoader = $ormTranslationLoader;
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -23,7 +58,6 @@ class OroTranslationResetCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('oro:translation:reset')
             ->setDescription('Reset user defined translations')
             ->addOption(
                 'force',
@@ -38,19 +72,15 @@ class OroTranslationResetCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $locale                = $this->getContainer()->getParameter('kernel.default_locale');
-        $container             = $this->getContainer();
-        $translationRepository = $this->getEntityManager()->getRepository(Translation::class);
+        $translationRepository = $this->entityManager->getRepository(Translation::class);
+
         /**
          * disable database loader to not get translations from database
          */
-        $container->set(
-            'oro_translation.database_translation.loader',
-            new EmptyArrayLoader()
-        );
+        $this->ormTranslationLoader->setDisabled();
 
-        $translations       = $container->get('translator.default')->getTranslations();
-        $customTranslations = $translationRepository->findBy(['locale' => $locale]);
+        $translations       = $this->translator->getTranslations();
+        $customTranslations = $translationRepository->findBy(['locale' => $this->kernelDefaultLocale]);
         $force              = $input->getOption('force');
 
         if (!$force) {
@@ -76,7 +106,7 @@ class OroTranslationResetCommand extends ContainerAwareCommand
     protected function doResetCustomTranslations(array $customTranslations, array $translations)
     {
         $updated = 0;
-        $em = $this->getEntityManager();
+
         foreach ($customTranslations as $customTranslation) {
             $key = $customTranslation->getTranslationKey();
             if (isset($translations[$key->getDomain()][$key->getKey()])) {
@@ -85,14 +115,14 @@ class OroTranslationResetCommand extends ContainerAwareCommand
                 );
                 $updated++;
                 if (($updated % self::BATCH_SIZE) === 0) {
-                    $em->flush();
-                    $em->clear();
+                    $this->entityManager->flush();
+                    $this->entityManager->clear();
                 }
             }
         }
 
-        $em->flush();
-        $em->clear();
+        $this->entityManager->flush();
+        $this->entityManager->clear();
 
         return $updated;
     }
@@ -113,17 +143,5 @@ class OroTranslationResetCommand extends ContainerAwareCommand
         }
 
         return $updated;
-    }
-
-    /**
-     * @return EntityManagerInterface
-     */
-    protected function getEntityManager()
-    {
-        if (!$this->entityManager) {
-            $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
-        }
-
-        return $this->entityManager;
     }
 }

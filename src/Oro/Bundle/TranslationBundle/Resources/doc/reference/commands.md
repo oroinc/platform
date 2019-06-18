@@ -34,7 +34,7 @@ Command used to dump, upload, download and update translations data on third-par
 
 - `locale` - locale to process, default is `en`
 
-- `adapter` - optional parameter, default is crowdin, allows to use non-default adapter service, this value used to compose adapter service name `oro_translation.uploader.%s_adapter`, so it will look for `oro_translation.uploader.crowdin_adapter` in service container.
+- `adapter` - optional parameter, default is `crowdin`, allows to use non-default adapter service. To register new adapter service you need to add tag with name `translation_adapter` and appropriate alias which will be passed as command argument. 
 
 - `project-id` or `i` - API project id
 
