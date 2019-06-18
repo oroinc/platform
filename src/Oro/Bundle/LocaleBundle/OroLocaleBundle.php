@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LocaleBundle;
 
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\AddDateTimeFormatConverterCompilerPass;
-use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\CurrentLocalizationPass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensionPass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\PreferredLanguageProviderPass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
@@ -24,7 +23,6 @@ class OroLocaleBundle extends Bundle
 
         $container->addCompilerPass(new AddDateTimeFormatConverterCompilerPass());
         $container->addCompilerPass(new TwigSandboxConfigurationPass());
-        $container->addCompilerPass(new CurrentLocalizationPass());
         $container->addCompilerPass(new DefaultFallbackExtensionPass([
             'Oro\Bundle\LocaleBundle\Entity\Localization' => ['title' => 'titles']
         ]));

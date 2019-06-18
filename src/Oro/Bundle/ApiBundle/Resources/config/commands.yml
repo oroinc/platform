@@ -9,6 +9,8 @@ services:
             - { name: console.command }
 
     Oro\Bundle\ApiBundle\Command\DebugCommand:
+        arguments:
+            - '@oro_api.action_processor_bag'
         tags:
             - { name: console.command }
 

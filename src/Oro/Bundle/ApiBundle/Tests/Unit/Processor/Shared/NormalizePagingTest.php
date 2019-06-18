@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Collection\Criteria;
+use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Processor\Shared\NormalizePaging;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class NormalizePagingTest extends GetListProcessorTestCase
 {
@@ -36,9 +35,7 @@ class NormalizePagingTest extends GetListProcessorTestCase
 
     public function testProcessOnDisabledPaging()
     {
-        $resolver = $this->createMock(EntityClassResolver::class);
-
-        $criteria = new Criteria($resolver);
+        $criteria = new Criteria();
         $criteria->setFirstResult(12);
         $criteria->setMaxResults(-1);
 
@@ -51,9 +48,7 @@ class NormalizePagingTest extends GetListProcessorTestCase
 
     public function testProcess()
     {
-        $resolver = $this->createMock(EntityClassResolver::class);
-
-        $criteria = new Criteria($resolver);
+        $criteria = new Criteria();
         $criteria->setFirstResult(2);
         $criteria->setMaxResults(10);
 

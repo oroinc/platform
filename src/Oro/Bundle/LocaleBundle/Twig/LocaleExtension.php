@@ -3,7 +3,8 @@
 namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Intl\Intl;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -20,7 +21,7 @@ use Twig\TwigFunction;
  *   - oro_timezone_offset
  *   - oro_format_address_by_address_country
  */
-class LocaleExtension extends AbstractExtension
+class LocaleExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -36,9 +37,9 @@ class LocaleExtension extends AbstractExtension
     /**
      * @return LocaleSettings
      */
-    protected function getLocaleSettings()
+    protected function getLocaleSettings(): LocaleSettings
     {
-        return $this->container->get('oro_locale.settings');
+        return $this->container->get(LocaleSettings::class);
     }
 
     /**
@@ -147,5 +148,15 @@ class LocaleExtension extends AbstractExtension
     public function isFormatAddressByAddressCountry()
     {
         return $this->getLocaleSettings()->isFormatAddressByAddressCountry();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return [
+            LocaleSettings::class,
+        ];
     }
 }

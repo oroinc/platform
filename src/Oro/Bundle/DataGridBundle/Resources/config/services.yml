@@ -46,6 +46,9 @@ services:
             - '@oro_datagrid.datagrid.request_parameters_factory'
             - '@oro_datagrid.datagrid.name_strategy'
 
+    Oro\Bundle\DataGridBundle\Datagrid\Manager:
+        alias: 'oro_datagrid.datagrid.manager'
+
     oro_datagrid.datagrid.name_strategy:
         class: '%oro_datagrid.datagrid.name_strategy.class%'
         arguments:
@@ -72,6 +75,9 @@ services:
         arguments:
             - '%oro_datagrid.datagrid.parameters.class%'
             - '@request_stack'
+
+    Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory:
+        alias: 'oro_datagrid.datagrid.request_parameters_factory'
 
     oro_datagrid.datagrid.guesser:
         class: '%oro_datagrid.datagrid.guesser.class%'

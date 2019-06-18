@@ -7,12 +7,12 @@ use Oro\Bundle\AttachmentBundle\Exception\ProtocolNotSupportedException;
 use Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
-use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
@@ -21,7 +21,7 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var FileNormalizer */
     protected $normalizer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $attachmentManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
@@ -37,12 +37,7 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
     {
         $this->normalizer = new FileNormalizer();
 
-        $router = $this->createMock(Router::class);
-        $associationManager = $this->createMock(AssociationManager::class);
-        $this->attachmentManager = $this->getMockBuilder(AttachmentManager::class)
-            ->setConstructorArgs([$router, [], $associationManager, true, true])
-            ->setMethods(['getAttachment'])
-            ->getMock();
+        $this->attachmentManager = $this->createMock(AttachmentManager::class);
         $this->fileManager = $this->createMock(FileManager::class);
         $this->validator = $this->createMock(ConfigFileValidator::class);
         $this->logger = $this->createMock(LoggerInterface::class);
@@ -180,8 +175,8 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
     public function testNormalize()
     {
         $object = new File();
-        $this->attachmentManager->expects($this->once())->method('getAttachment')
-            ->with('testEntity', 1, 'testField', $object, 'download', true);
+        $this->attachmentManager->expects($this->once())->method('getFileUrl')
+            ->with($object, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD, UrlGeneratorInterface::ABSOLUTE_URL);
         $this->normalizer->normalize(
             $object,
             null,

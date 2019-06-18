@@ -30,5 +30,6 @@ class OroImportExportExtension extends Extension
         $loader->load('services.yml');
         $loader->load('mq_processor.yml');
         $loader->load('commands.yml');
+        $loader->load('controllers.yml');
     }
 }

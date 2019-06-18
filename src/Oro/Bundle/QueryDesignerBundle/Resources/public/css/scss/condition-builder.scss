@@ -226,7 +226,7 @@
         width: $condition-builder-condition-item-select2-container-width;
         max-width: $condition-builder-condition-item-select2-container-max-width;
         min-width: $condition-builder-condition-item-select2-container-min-width;
-        height: $condition-builder-condition-item-select2-container-height;
+        min-height: $condition-builder-condition-item-select2-container--min-height;
         vertical-align: initial;
         display: block;
 
@@ -267,6 +267,10 @@
                 content: ' ';
                 font-size: 0;
             }
+        }
+        
+        .select2-input {
+            margin-top: 0;
         }
     }
 

@@ -340,6 +340,7 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                     'fields'           => [
                         'association1' => [
                             'fields' => [
+                                'field11' => null,
                                 'field12' => null
                             ]
                         ],
@@ -575,7 +576,8 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                             'collapse'        => true,
                             '_collapse_field' => 'id',
                             'fields'          => [
-                                'id' => null
+                                'id'      => null,
+                                'field11' => null
                             ]
                         ]
                     ]

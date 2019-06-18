@@ -33,6 +33,7 @@ class OroEmailExtension extends Extension
         $loader->load('form.yml');
         $loader->load('mass_action.yml');
         $loader->load('commands.yml');
+        $loader->load('controllers.yml');
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');

@@ -20,7 +20,7 @@ class LocalizedFallbackValueCompleterTest extends CompleteDefinitionHelperTestCa
 
     public function testCompleteLocalizedFallbackValue()
     {
-        $dataType = 'localized_fallback_value:names';
+        $dataType = 'localizedFallbackValue:names';
         $fieldName = 'name';
         $config = $this->createConfigObject([
             'fields' => [
@@ -65,7 +65,7 @@ class LocalizedFallbackValueCompleterTest extends CompleteDefinitionHelperTestCa
     public function testCompleteLocalizedFallbackValueWhenItsNameEqualToTargetFieldName()
     {
         $fieldName = 'names';
-        $dataType = 'localized_fallback_value:' . $fieldName;
+        $dataType = 'localizedFallbackValue:' . $fieldName;
         $config = $this->createConfigObject([
             'fields' => [
                 $fieldName       => [
@@ -113,7 +113,7 @@ class LocalizedFallbackValueCompleterTest extends CompleteDefinitionHelperTestCa
     public function testCompleteLocalizedFallbackValueWhenItsNameEqualToTargetFieldNameAndTargetFieldWasNotRenamed()
     {
         $fieldName = 'names';
-        $dataType = 'localized_fallback_value:' . $fieldName;
+        $dataType = 'localizedFallbackValue:' . $fieldName;
         $config = $this->createConfigObject([
             'fields' => [
                 $fieldName => [
@@ -146,7 +146,7 @@ class LocalizedFallbackValueCompleterTest extends CompleteDefinitionHelperTestCa
 
     public function testCompleteLocalizedFallbackValueWhenAnotherLocalizedFallbackValueAlreadyCompleted()
     {
-        $dataType = 'localized_fallback_value:names';
+        $dataType = 'localizedFallbackValue:names';
         $fieldName = 'name';
         $config = $this->createConfigObject([
             'fields'                          => [

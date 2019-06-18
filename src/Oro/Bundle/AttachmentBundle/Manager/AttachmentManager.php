@@ -5,328 +5,185 @@ namespace Oro\Bundle\AttachmentBundle\Manager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
-use Oro\Bundle\AttachmentBundle\Exception\InvalidAttachmentEncodedParametersException;
+use Oro\Bundle\AttachmentBundle\Provider\FileIconProvider;
+use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
+use Oro\Bundle\AttachmentBundle\Tools\MimeTypeChecker;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Component\PhpUtils\Formatter\BytesFormatter;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * General methods of working with attachments
  */
 class AttachmentManager
 {
-    /**
-     * @deprecated since 1.10. Use Oro\Bundle\AttachmentBundle\Manager\FileManager::READ_BATCH_SIZE instead
-     */
-    const READ_COUNT = FileManager::READ_BATCH_SIZE;
+    public const DEFAULT_IMAGE_WIDTH = 100;
+    public const DEFAULT_IMAGE_HEIGHT = 100;
+    public const SMALL_IMAGE_WIDTH = 32;
+    public const SMALL_IMAGE_HEIGHT = 32;
+    public const THUMBNAIL_WIDTH = 110;
+    public const THUMBNAIL_HEIGHT = 80;
 
-    const ATTACHMENT_FILE_ROUTE = 'oro_attachment_file';
+    /** @var FileUrlProviderInterface */
+    private $fileUrlProvider;
 
-    const DEFAULT_IMAGE_WIDTH = 100;
-    const DEFAULT_IMAGE_HEIGHT = 100;
-    const SMALL_IMAGE_WIDTH = 32;
-    const SMALL_IMAGE_HEIGHT = 32;
-    const THUMBNAIL_WIDTH  = 110;
-    const THUMBNAIL_HEIGHT = 80;
+    /** @var FileIconProvider */
+    private $fileIconProvider;
 
-    /** this constant is used as a replacement of empty file name to avoid an error during URL generation */
-    const UNKNOWN_FILE_NAME = 'unknown.png';
-
-    /** @var FileManager */
-    private $fileManager;
-
-    /** @var RouterInterface */
-    protected $router;
-
-    /** @var array */
-    protected $fileIcons;
+    /** @var MimeTypeChecker */
+    private $mimeTypeChecker;
 
     /** @var AssociationManager */
-    protected $associationManager;
+    private $associationManager;
 
-    /** @var bool */
-    protected $debug;
+    /** @var UrlGeneratorInterface */
+    private $urlGenerator;
 
-    /** @var bool */
-    protected $debugImages;
+    /** @var RegistryInterface */
+    private $registry;
 
     /**
-     * @param RouterInterface    $router
-     * @param array              $fileIcons
+     * @param FileUrlProviderInterface $fileUrlProvider
+     * @param FileIconProvider $fileIconProvider
+     * @param MimeTypeChecker $mimeTypeChecker
      * @param AssociationManager $associationManager
-     * @param bool               $debug
-     * @param bool               $debugImages
+     * @param UrlGeneratorInterface $urlGenerator
+     * @param RegistryInterface $registry
      */
     public function __construct(
-        RouterInterface $router,
-        $fileIcons,
+        FileUrlProviderInterface $fileUrlProvider,
+        FileIconProvider $fileIconProvider,
+        MimeTypeChecker $mimeTypeChecker,
         AssociationManager $associationManager,
-        $debug,
-        $debugImages
+        UrlGeneratorInterface $urlGenerator,
+        RegistryInterface $registry
     ) {
-        $this->router = $router;
-        $this->fileIcons = $fileIcons;
+        $this->fileUrlProvider = $fileUrlProvider;
+        $this->fileIconProvider = $fileIconProvider;
+        $this->mimeTypeChecker = $mimeTypeChecker;
         $this->associationManager = $associationManager;
-        $this->debug = $debug;
-        $this->debugImages = $debugImages;
-    }
-
-    /**
-     * @param FileManager $fileManager
-     */
-    public function setFileManager(FileManager $fileManager)
-    {
-        $this->fileManager = $fileManager;
-    }
-
-    /**
-     * Get attachment url
-     *
-     * @param object $parentEntity
-     * @param string $fieldName
-     * @param File   $entity
-     * @param string $type
-     * @param bool   $absolute
-     * @return string
-     */
-    public function getFileUrl($parentEntity, $fieldName, File $entity, $type = 'get', $absolute = false)
-    {
-        return $this->getAttachment(
-            ClassUtils::getRealClass($parentEntity),
-            $parentEntity->getId(),
-            $fieldName,
-            $entity,
-            $type,
-            $absolute
-        );
+        $this->urlGenerator = $urlGenerator;
+        $this->registry = $registry;
     }
 
     /**
      * Get url of REST API resource which can be used to get the content of the given file
      *
-     * @param int    $fileId           The id of the File object
-     * @param string $ownerEntityClass The FQCN of an entity the File object belongs
-     * @param mixed  $ownerEntityId    The id of an entity the File object belongs
+     * @param int $fileId The id of the File object
      *
      * @return string
      */
-    public function getFileRestApiUrl($fileId, $ownerEntityClass, $ownerEntityId)
+    public function getFileRestApiUrl(int $fileId): string
     {
-        return $this->router->generate(
-            'oro_api_get_file',
-            [
-                'key' => $this->buildFileKey($fileId, $ownerEntityClass, $ownerEntityId),
-                '_format' => 'binary'
-            ]
-        );
+        return $this->urlGenerator->generate('oro_api_get_file', ['id' => $fileId, '_format' => 'binary']);
     }
 
     /**
-     * Get human readable file size
+     * Get file URL.
      *
-     * @param integer $bytes
+     * @param File $file
+     * @param string $action
+     * @param int $referenceType
+     *
      * @return string
      */
-    public function getFileSize($bytes)
-    {
-        return BytesFormatter::format($bytes);
-    }
-
-    /**
-     * Get attachment url
-     *
-     * @param string $parentClass
-     * @param int    $parentId
-     * @param string $fieldName
-     * @param File   $entity
-     * @param string $type
-     * @param bool   $absolute
-     * @return string
-     */
-    public function getAttachment(
-        $parentClass,
-        $parentId,
-        $fieldName,
-        File $entity,
-        $type = 'get',
-        $absolute = false
-    ) {
-        $urlString = str_replace(
-            '/',
-            '_',
-            base64_encode(
-                implode(
-                    '|',
-                    [
-                        $parentClass,
-                        $fieldName,
-                        $parentId,
-                        $type,
-                        $entity->getOriginalFilename()
-                    ]
-                )
-            )
-        );
-        return $this->router->generate(
-            static::ATTACHMENT_FILE_ROUTE,
-            [
-                'codedString' => $urlString,
-                'extension'   => $entity->getExtension()
-            ],
-            $absolute ? RouterInterface::ABSOLUTE_URL : RouterInterface::ABSOLUTE_PATH
-        );
-    }
-
-    /**
-     * Return url parameters from encoded string
-     *
-     * @param $urlString
-     * @return array
-     *   - parent class
-     *   - field name
-     *   - entity id
-     *   - download type
-     *   - original filename
-     * @throws InvalidAttachmentEncodedParametersException
-     */
-    public function decodeAttachmentUrl($urlString)
-    {
-        if (!($decodedString = base64_decode(str_replace('_', '/', $urlString)))
-            || count($result = explode('|', $decodedString)) < 5
-        ) {
-            throw new InvalidAttachmentEncodedParametersException(
-                'Attachment parameters cannot be decoded'
-            );
-        }
-
-        return $result;
+    public function getFileUrl(
+        File $file,
+        string $action = FileUrlProviderInterface::FILE_ACTION_GET,
+        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
+    ): string {
+        return $this->fileUrlProvider->getFileUrl($file, $action, $referenceType);
     }
 
     /**
      * Get resized image url
      *
-     * @param File        $entity
-     * @param int         $width
-     * @param int         $height
-     * @param bool|string $referenceType
+     * @param File $file
+     * @param int $width
+     * @param int $height
+     * @param int $referenceType
      *
      * @return string
      */
     public function getResizedImageUrl(
-        File $entity,
-        $width = self::DEFAULT_IMAGE_WIDTH,
-        $height = self::DEFAULT_IMAGE_HEIGHT,
-        $referenceType = RouterInterface::ABSOLUTE_PATH
-    ) {
-        return $this->router->generate(
-            'oro_resize_attachment',
-            [
-                'width'    => $width,
-                'height'   => $height,
-                'id'       => $entity->getId(),
-                'filename' => $entity->getFilename() ?: self::UNKNOWN_FILE_NAME
-            ],
-            $referenceType
-        );
-    }
-
-    /**
-     * Get filetype icon
-     *
-     * @param FileExtensionInterface $entity
-     * @return string
-     */
-    public function getAttachmentIconClass(FileExtensionInterface $entity)
-    {
-        return isset($this->fileIcons[$entity->getExtension()])
-            ? $this->fileIcons[$entity->getExtension()]
-            : $this->fileIcons['default'];
+        File $file,
+        int $width = self::DEFAULT_IMAGE_WIDTH,
+        int $height = self::DEFAULT_IMAGE_HEIGHT,
+        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
+    ): string {
+        return $this->fileUrlProvider->getResizedImageUrl($file, $width, $height, $referenceType);
     }
 
     /**
      * Get image attachment link with liip imagine filter applied to image
      *
-     * @param File   $entity
+     * @param File $file
      * @param string $filterName
+     * @param int $referenceType
+     *
      * @return string
      */
-    public function getFilteredImageUrl(File $entity, $filterName)
-    {
-        return $this->generateUrl(
-            'oro_filtered_attachment',
-            [
-                'id'       => $entity->getId(),
-                'filename' => $entity->getFilename() ?: self::UNKNOWN_FILE_NAME,
-                'filter'   => $filterName
-            ]
-        );
+    public function getFilteredImageUrl(
+        File $file,
+        string $filterName,
+        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
+    ): string {
+        return $this->fileUrlProvider->getFilteredImageUrl($file, $filterName, $referenceType);
     }
 
     /**
-     * Generate url for prod env (without prefix "/index_dev.php")
+     * @param int $fileId
+     * @param string $filename
+     * @param string $filterName
+     * @param int $referenceType
      *
-     * @param string $name
-     * @param array $parameters
      * @return string
      */
-    protected function generateUrl($name, $parameters = [])
-    {
-        if (!$this->debug || $this->debugImages) {
-            return $this->router->generate($name, $parameters);
+    public function getFilteredImageUrlByIdAndFilename(
+        int $fileId,
+        string $filename,
+        string $filterName,
+        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
+    ): string {
+        $file = $this->getFileByIdAndFilename($fileId, $filename);
+        if (!$file) {
+            return '';
         }
 
-        $routerContext = $this->router->getContext();
-        $prevBaseUrl = $routerContext->getBaseUrl();
-        $baseUrlWithoutFrontController = preg_replace('/\/[\w_]+\.php$/', '', $prevBaseUrl);
-        $routerContext->setBaseUrl($baseUrlWithoutFrontController);
-
-        $url = $this->router->generate($name, $parameters);
-
-        $routerContext->setBaseUrl($prevBaseUrl);
-
-        return $url;
+        return $this->getFilteredImageUrl($file, $filterName, $referenceType);
     }
 
     /**
-     * Builds the key of the File object
+     * Get file type icon
      *
-     * @param int    $fileId           The id of the File object
-     * @param string $ownerEntityClass The FQCN of an entity the File object belongs
-     * @param mixed  $ownerEntityId    The id of an entity the File object belongs
+     * @param FileExtensionInterface $entity
      *
      * @return string
      */
-    public function buildFileKey($fileId, $ownerEntityClass, $ownerEntityId)
+    public function getAttachmentIconClass(FileExtensionInterface $entity): string
     {
-        return str_replace(
-            '/',
-            '_',
-            base64_encode(serialize([$fileId, $ownerEntityClass, $ownerEntityId]))
-        );
+        return $this->fileIconProvider->getAttachmentIconClass($entity);
     }
 
     /**
-     * Extracts data from the given key of the File object
+     * Check if content type is an image
      *
-     * @param string $key
+     * @param string $mimeType
      *
-     * @return array [fileId, ownerEntityClass, ownerEntityId]
-     *
-     * @throws \InvalidArgumentException
+     * @return bool
      */
-    public function parseFileKey($key)
+    public function isImageType(string $mimeType): bool
     {
-        $decoded = base64_decode(str_replace('_', '/', $key));
-        if ($decoded) {
-            $result = @unserialize($decoded);
-            if (!empty($result) && count($result) === 3) {
-                return $result;
-            }
-        }
+        return $this->mimeTypeChecker->isImageMimeType($mimeType);
+    }
 
-        throw new \InvalidArgumentException(sprintf('Invalid file key: "%s".', $key));
+    /**
+     * @return array
+     */
+    public function getFileIcons(): array
+    {
+        return $this->fileIconProvider->getFileIcons();
     }
 
     /**
@@ -334,7 +191,7 @@ class AttachmentManager
      *
      * @return array [target_entity_class => field_name]
      */
-    public function getAttachmentTargets()
+    public function getAttachmentTargets(): array
     {
         return $this->associationManager->getAssociationTargets(
             AttachmentScope::ATTACHMENT,
@@ -344,25 +201,20 @@ class AttachmentManager
     }
 
     /**
-     * Check if content type is an image
+     * @param int $fileId
+     * @param string $filename
      *
-     * @param string $contentType
-     * @return bool
+     * @return File|null
      */
-    public function isImageType($contentType)
+    private function getFileByIdAndFilename(int $fileId, string $filename): ?File
     {
-        return in_array(
-            $contentType,
-            ['image/gif','image/jpeg','image/pjpeg','image/png'],
-            true
-        );
-    }
+        /** @var File $file */
+        $file = $this->registry->getEntityManagerForClass(File::class)->getRepository(File::class)->find($fileId);
 
-    /**
-     * @return array
-     */
-    public function getFileIcons()
-    {
-        return $this->fileIcons;
+        if (!$file || !\in_array($filename, [$file->getFilename(), $file->getOriginalFilename()], false)) {
+            return null;
+        }
+
+        return $file;
     }
 }

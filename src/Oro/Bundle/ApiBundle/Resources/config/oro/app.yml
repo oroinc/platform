@@ -138,6 +138,9 @@ oro_api:
             factory: ['@oro_api.filter_factory.extended_association', 'createFilter']
         primaryField:
             class: Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter
+        nestedTree:
+            class: Oro\Bundle\ApiBundle\Filter\NestedTreeFilter
+            supported_operators: ['>', '>=']
 
     form_types:
         - Symfony\Component\Form\Extension\Core\Type\FormType

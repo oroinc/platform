@@ -639,6 +639,9 @@ services:
         arguments:
             - '@translator'
 
+    Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter:
+        alias: 'oro_workflow.formatter.workflow_variable'
+
     oro_workflow.workflow_step_to_audit_field_converter:
         class: Oro\Bundle\WorkflowBundle\DataAudit\WorkflowStepToAuditFieldConverter
         decorates: oro_dataaudit.converter.change_set_to_audit_fields

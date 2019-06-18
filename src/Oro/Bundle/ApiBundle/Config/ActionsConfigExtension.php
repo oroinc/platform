@@ -6,6 +6,9 @@ use Oro\Bundle\ApiBundle\Config\Definition\ActionsConfiguration;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * Adds "actions" section to entity configuration.
+ */
 class ActionsConfigExtension extends AbstractConfigExtension
 {
     /** @var ActionProcessorBagInterface */

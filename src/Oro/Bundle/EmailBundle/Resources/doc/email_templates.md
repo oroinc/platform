@@ -2,8 +2,7 @@ Email templates
 ===============
 
 Any bundle can define it's own templates using Data Fixtures.
-To achieve this - add a fixture in SomeBundle\DataFixtures\ORM folder that extends Oro\Bundle\EmailBundle\DataFixtures\ORM\AbstractEmailFixture
-abstract class and implements the only method - getEmailsDir:
+To achieve this - add a fixture in SomeBundle\Migrations\Data\ORM folder that extends Oro\Bundle\EmailBundle\Migrations\Data\ORM\AbstractEmailFixture abstract class and implements the only method - getEmailsDir:
 ``` php
 class DataFixtureName extends AbstractEmailFixture
 {

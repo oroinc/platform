@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
-use Oro\Bundle\ApiBundle\Collection\Criteria;
+use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultSorting as BaseSetDefaultSorting;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;

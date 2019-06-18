@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
+ * File entity.
+ * Contains information about uploaded file. Can be attached to any entity which requires file or image functionality.
+ *
  * @ORM\Table(name="oro_attachment_file", indexes = {
  *      @ORM\Index("att_file_orig_filename_idx", columns = {"original_filename"})
  * })
@@ -88,6 +91,33 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
      * @ORM\Column(name="file_size", type="integer", nullable=true)
      */
     protected $fileSize;
+
+    /**
+     * Class name of the parent entity to which this file belongs. Needed in sake of ACL checks.
+     *
+     * @var string|null
+     *
+     * @ORM\Column(name="parent_entity_class", type="string", length=512, nullable=true)
+     */
+    protected $parentEntityClass;
+
+    /**
+     * Id of the parent entity to which this file belongs. Needed in sake of ACL checks.
+     *
+     * @var int|null
+     *
+     * @ORM\Column(name="parent_entity_id", type="integer", nullable=true)
+     */
+    protected $parentEntityId;
+
+    /**
+     * Field name where the file is stored in the parent entity to which it belongs. Needed in sake of ACL checks.
+     *
+     * @var string|null
+     *
+     * @ORM\Column(name="parent_entity_field_name", type="string", length=50, nullable=true)
+     */
+    protected $parentEntityFieldName;
 
     /**
      * @var \DateTime
@@ -402,5 +432,65 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
             $this->id,
             $this->filename,
             ) = unserialize($serialized);
+    }
+
+    /**
+     * @param string $parentEntityClass
+     *
+     * @return File
+     */
+    public function setParentEntityClass(?string $parentEntityClass): File
+    {
+        $this->parentEntityClass = $parentEntityClass;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getParentEntityClass(): ?string
+    {
+        return $this->parentEntityClass;
+    }
+
+    /**
+     * @param int $parentEntityId
+     *
+     * @return File
+     */
+    public function setParentEntityId(?int $parentEntityId): File
+    {
+        $this->parentEntityId = $parentEntityId;
+
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getParentEntityId(): ?int
+    {
+        return $this->parentEntityId;
+    }
+
+    /**
+     * @param string|null $parentEntityFieldName
+     *
+     * @return File
+     */
+    public function setParentEntityFieldName(?string $parentEntityFieldName): File
+    {
+        $this->parentEntityFieldName = $parentEntityFieldName;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getParentEntityFieldName(): ?string
+    {
+        return $this->parentEntityFieldName;
     }
 }

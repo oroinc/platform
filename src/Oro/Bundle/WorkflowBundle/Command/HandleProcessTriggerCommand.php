@@ -2,26 +2,48 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class HandleProcessTriggerCommand extends ContainerAwareCommand
+/**
+ * Handle process trigger with specified identifier and process name
+ */
+class HandleProcessTriggerCommand extends Command
 {
-    const NAME = 'oro:process:handle-trigger';
+    /** @var string */
+    protected static $defaultName = 'oro:process:handle-trigger';
+
+    /** @var ManagerRegistry */
+    private $registry;
+
+    /** @var ProcessHandler */
+    private $processHandler;
+
+    /**
+     * @param ManagerRegistry $registry
+     * @param ProcessHandler $processHandler
+     */
+    public function __construct(ManagerRegistry $registry, ProcessHandler $processHandler)
+    {
+        parent::__construct();
+
+        $this->registry = $registry;
+        $this->processHandler = $processHandler;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
-        $this->setName(self::NAME)
-            ->setDescription('Handle process trigger with specified identifier and process name')
+        $this->setDescription('Handle process trigger with specified identifier and process name')
             ->addOption(
                 'name',
                 null,
@@ -49,7 +71,8 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
             return;
         }
 
-        $processTrigger = $this->getRepository('OroWorkflowBundle:ProcessTrigger')->find($triggerId);
+        /** @var ProcessTrigger $processTrigger */
+        $processTrigger = $this->registry->getRepository('OroWorkflowBundle:ProcessTrigger')->find($triggerId);
         if (!$processTrigger) {
             $output->writeln('<error>Process trigger not found</error>');
             return;
@@ -62,18 +85,17 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
         }
 
         $processData = new ProcessData();
-        $processHandler = $this->getProcessHandler();
 
         /** @var EntityManager $entityManager */
-        $entityManager = $this->getContainer()->get('doctrine')->getManager();
+        $entityManager = $this->registry->getManager();
         $entityManager->beginTransaction();
 
         try {
             $start = microtime(true);
 
-            $processHandler->handleTrigger($processTrigger, $processData);
+            $this->processHandler->handleTrigger($processTrigger, $processData);
             $entityManager->flush();
-            $processHandler->finishTrigger($processTrigger, $processData);
+            $this->processHandler->finishTrigger($processTrigger, $processData);
             $entityManager->commit();
 
             $output->writeln(
@@ -86,7 +108,7 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
                 )
             );
         } catch (\Exception $e) {
-            $processHandler->finishTrigger($processTrigger, $processData);
+            $this->processHandler->finishTrigger($processTrigger, $processData);
             $entityManager->rollback();
 
             $output->writeln(
@@ -101,22 +123,5 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
 
             throw $e;
         }
-    }
-
-    /**
-     * @param string $className
-     * @return ObjectRepository
-     */
-    protected function getRepository($className)
-    {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($className)->getRepository($className);
-    }
-
-    /**
-     * @return ProcessHandler
-     */
-    protected function getProcessHandler()
-    {
-        return $this->getContainer()->get('oro_workflow.process.process_handler');
     }
 }

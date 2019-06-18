@@ -23,7 +23,7 @@ class ActivityListManagerTest extends WebTestCase
     {
         $this->initClient([]);
         $this->loadFixtures([LoadOrganization::class, LoadEmailActivityData::class]);
-        $this->manager = self::getContainer()->get('oro_activity_list.manager');
+        $this->manager = self::getContainer()->get(ActivityListManager::class);
     }
 
     /**

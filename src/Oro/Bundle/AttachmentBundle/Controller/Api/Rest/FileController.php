@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
+ * Provides REST API actions for File entity.
+ *
  * @RouteResource("file")
  * @NamePrefix("oro_api_")
  */
@@ -27,11 +29,11 @@ class FileController extends RestGetController implements ClassResourceInterface
      * Get file.
      *
      * @param Request $request
-     * @param string $key
+     * @param int $id
      * @param string $_format
      *
      * @Get(
-     *      "/files/{key}",
+     *      "/files/{id}",
      *      requirements={"_format"="json|binary"}
      * )
      * @ApiDoc(
@@ -41,16 +43,13 @@ class FileController extends RestGetController implements ClassResourceInterface
      *
      * @return Response
      */
-    public function getAction(Request $request, $key, $_format)
+    public function getAction(Request $request, $id, $_format)
     {
-        // @todo: For now I do not known why, but _format does not set automatically.
-        // @todo: It seems that it is a bug in FOS Rest Bundle
-        // @todo: https://magecore.atlassian.net/browse/BAP-8352
         if ($_format) {
             $request->setRequestFormat($_format);
         }
 
-        return $this->handleGetRequest($key);
+        return $this->handleGetRequest($id);
     }
 
     /**
@@ -66,8 +65,7 @@ class FileController extends RestGetController implements ClassResourceInterface
     /**
      * {@inheritdoc}
      *
-     * @todo: It seems that we need to implement a view handler for FOS Rest Bundle
-     * @todo: https://magecore.atlassian.net/browse/BAP-8351
+     * Implement a view handler for FOS Rest Bundle in BAP-8351.
      */
     protected function buildResponse($data, $action, $contextValues = [], $status = Codes::HTTP_OK)
     {

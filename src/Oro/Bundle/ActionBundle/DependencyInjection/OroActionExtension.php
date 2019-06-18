@@ -24,6 +24,7 @@ class OroActionExtension extends Extension
         $loader->load('services.yml');
         $loader->load('duplicator.yml');
         $loader->load('commands.yml');
+        $loader->load('controllers.yml');
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');

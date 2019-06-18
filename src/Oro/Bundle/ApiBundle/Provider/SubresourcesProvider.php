@@ -79,7 +79,7 @@ class SubresourcesProvider
      * @param string      $version         The Data API version
      * @param RequestType $requestType     The request type, for example "rest", "soap", etc.
      *
-     * @return ApiResourceSubresources|null
+     * @return ApiSubresource|null
      */
     public function getSubresource(
         string $entityClass,

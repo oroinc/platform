@@ -10,6 +10,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
+ * Provide functionality to manage activity lists
+ *
  * @Route("/activity-list")
  */
 class ActivityListController extends Controller
@@ -31,7 +33,7 @@ class ActivityListController extends Controller
         $activitiesProvider = $this->get('oro_activity_list.provider.chain');
 
         /** @var DateTimeRangeFilter $dateRangeFilter */
-        $dateRangeFilter = $this->get('oro_filter.datetime_range_filter');
+        $dateRangeFilter = $this->get(DateTimeRangeFilter::class);
 
         return [
             'entity'                  => $entity,

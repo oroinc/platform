@@ -8,9 +8,15 @@ use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 
-class AutoResponseListener extends MailboxEmailListener implements FeatureToggleableInterface
+/**
+ * Used to send auto response for multiple emails
+ */
+class AutoResponseListener extends MailboxEmailListener implements
+    FeatureToggleableInterface,
+    ServiceSubscriberInterface
 {
     use FeatureCheckerHolderTrait;
 
@@ -67,7 +73,7 @@ class AutoResponseListener extends MailboxEmailListener implements FeatureToggle
      */
     protected function getAutoResponseManager()
     {
-        return $this->container->get('oro_email.autoresponserule_manager');
+        return $this->container->get(AutoResponseManager::class);
     }
 
     /**
@@ -75,6 +81,17 @@ class AutoResponseListener extends MailboxEmailListener implements FeatureToggle
      */
     protected function getProducer()
     {
-        return $this->container->get('oro_message_queue.client.message_producer');
+        return $this->container->get(MessageProducerInterface::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            AutoResponseManager::class,
+            MessageProducerInterface::class
+        ];
     }
 }

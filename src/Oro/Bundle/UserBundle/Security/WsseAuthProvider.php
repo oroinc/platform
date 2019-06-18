@@ -9,7 +9,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -37,7 +36,12 @@ class WsseAuthProvider extends Provider
     private $firewallName;
 
     /**
-     * @param UserCheckerInterface     $userChecker  A UserChecketerInterface instance
+     * @var UserCheckerInterface
+     */
+    private $userChecker;
+
+    /**
+     * @param UserCheckerInterface     $userChecker  A UserCheckerInterface instance
      * @param UserProviderInterface    $userProvider An UserProviderInterface instance
      * @param string                   $providerKey  The provider key
      * @param PasswordEncoderInterface $encoder      A PasswordEncoderInterface instance
@@ -59,6 +63,7 @@ class WsseAuthProvider extends Provider
         $this->providerKey = $providerKey;
 
         parent::__construct($userChecker, $userProvider, $providerKey, $encoder, $nonceCache, $lifetime, $dateFormat);
+        $this->userChecker = $userChecker;
     }
 
     /**
@@ -114,9 +119,7 @@ class WsseAuthProvider extends Provider
 
         $user = $this->getUserProvider()->loadUserByUsername($token->getUsername());
         if ($user) {
-            if ($user instanceof AdvancedUserInterface && !$user->isEnabled()) {
-                throw new BadCredentialsException('User is not active.');
-            }
+            $this->userChecker->checkPreAuth($user);
             $secret = $this->getSecret($user);
             if ($secret instanceof Collection) {
                 $validUserApi = $this->getValidUserApi($token, $secret, $user);

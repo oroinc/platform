@@ -2,9 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Dashboard;
 
+use Oro\Bundle\EmailBundle\Manager\EmailNotificationManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+/**
+ * Provide functionality to manage recent emails on dashboard
+ */
 class DashboardController extends Controller
 {
     /**
@@ -36,7 +40,7 @@ class DashboardController extends Controller
             $unreadMailCount = 0;
             if ($this->isGranted('oro_email_email_user_view')) {
                 $unreadMailCount = $this
-                    ->get('oro_email.manager.notification')
+                    ->get(EmailNotificationManager::class)
                     ->getCountNewEmails($loggedUser, $currentOrganization);
             }
 

@@ -59,6 +59,24 @@ dash_in_field_name:
             fields:
                 test-field: []
 
+options_with_name_option:
+    config:
+        filters:
+            fields:
+                field1:
+                    options:
+                        mapping:
+                            item1: item_1
+                            name: name_1
+    expected:
+        filters:
+            fields:
+                field1:
+                    options:
+                        mapping:
+                            item1: item_1
+                            name: name_1
+
 full:
     config:
         filters:

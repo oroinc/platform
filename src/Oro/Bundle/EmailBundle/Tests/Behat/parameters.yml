@@ -4,8 +4,6 @@ services:
         arguments:
             - '@mailer'
             - '@service_container'
-        calls:
-            - [setLogger, ['@oro_email.logger.link']]
 
     oro_email.direct_mailer.cache:
         public: false

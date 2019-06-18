@@ -106,7 +106,8 @@ class ImportHandler extends AbstractHandler
             'counts'         => $counts,
             'errors'         => $errors,
             'entityName'     => $entityName,
-            'options'        => $options
+            'options'        => $options,
+            'postponedRows'  => $jobResult->getContext()->getPostponedRows(),
         ];
     }
 

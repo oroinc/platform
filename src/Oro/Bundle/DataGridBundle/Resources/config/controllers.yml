@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\DataGridBundle\Controller\GridController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: 'container.service_subscriber' }

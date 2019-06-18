@@ -61,6 +61,9 @@ services:
             - '@oro_importexport.file.file_manager'
         public: false
 
+    Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer:
+        alias: 'oro_importexport.async.import_export_result_summarizer'
+
     oro_importexport.writer.writer_chain:
         class: 'Oro\Bundle\ImportExportBundle\Writer\WriterChain'
 
@@ -71,6 +74,9 @@ services:
         class: 'Oro\Bundle\ImportExportBundle\File\FileManager'
         arguments:
           - '@knp_gaufrette.filesystem_map'
+
+    Oro\Bundle\ImportExportBundle\File\FileManager:
+        alias: 'oro_importexport.file.file_manager'
 
     oro_importexport.file.batch_file_manager.abstract:
         class: 'Oro\Bundle\ImportExportBundle\File\BatchFileManager'
@@ -119,6 +125,9 @@ services:
             - '@oro_importexport.configuration.registry'
         tags:
             - { name: 'twig.extension' }
+
+    Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension:
+        alias: 'oro_importexport.twig_extension.get_import_export_configuration'
 
     oro_importexport.twig_extension.basename:
         class: 'Oro\Bundle\ImportExportBundle\Twig\BasenameTwigExtension'

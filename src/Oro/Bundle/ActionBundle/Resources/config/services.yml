@@ -26,6 +26,9 @@ services:
             - '@property_accessor'
             - '@request_stack'
 
+    Oro\Bundle\ActionBundle\Helper\ContextHelper:
+        alias: 'oro_action.helper.context'
+
     oro_action.helper.default_operation_request:
         class: 'Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper'
         public: true
@@ -90,11 +93,17 @@ services:
             - '@oro_action.provider.current_application'
             - '@oro_entity.doctrine_helper'
 
+    Oro\Bundle\ActionBundle\Model\OperationRegistry:
+        alias: 'oro_action.operation_registry'
+
     oro_action.action_group_registry:
         class: '%oro_action.action_group_registry.class%'
         arguments:
             - '@oro_action.configuration.provider.action_groups'
             - '@oro_action.assembler.action_group'
+
+    Oro\Bundle\ActionBundle\Model\ActionGroupRegistry:
+        alias: 'oro_action.action_group_registry'
 
     oro_action.abstract_guesser:
         abstract: true
@@ -248,6 +257,9 @@ services:
             - '@oro_action.operation.execution.form_provider'
             - '@oro_action.helper.context'
             - '@logger'
+
+    Oro\Bundle\ActionBundle\Handler\ExecuteOperationHandler:
+        alias: 'oro_action.handler.execute_operation'
 
     oro_action.operation.execution.form_provider:
         class: 'Oro\Bundle\ActionBundle\Operation\Execution\FormProvider'

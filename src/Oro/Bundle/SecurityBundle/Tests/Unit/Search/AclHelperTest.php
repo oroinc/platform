@@ -32,6 +32,10 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
 
     /** @var array */
     protected $mappings = [
+        'Oro\Test\Entity\Organization'      => [
+            'alias'        => 'testOrganization',
+            'aclCondition' => [null, null, 'organization', 1, false] // no access
+        ],
         'Oro\Test\Entity\User'      => [
             'alias'        => 'testUser',
             'aclCondition' => [null, null, null, null] // no access

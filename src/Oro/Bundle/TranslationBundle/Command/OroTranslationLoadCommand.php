@@ -2,17 +2,18 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * This command loads translations to database
@@ -22,13 +23,47 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
 {
     const BATCH_INSERT_ROWS_COUNT = 50;
 
+    /** @var string */
+    protected static $defaultName = 'oro:translation:load';
+
+    /** @var ManagerRegistry */
+    private $registry;
+
+    /** @var TranslatorInterface */
+    private $translator;
+
+    /** @var DatabasePersister */
+    private $databasePersister;
+
+    /** @var LanguageProvider */
+    private $languageProvider;
+
+    /**
+     * @param ManagerRegistry $registry
+     * @param TranslatorInterface $translator
+     * @param DatabasePersister $databasePersister
+     * @param LanguageProvider $languageProvider
+     */
+    public function __construct(
+        ManagerRegistry $registry,
+        TranslatorInterface $translator,
+        DatabasePersister $databasePersister,
+        LanguageProvider $languageProvider
+    ) {
+        $this->registry = $registry;
+        $this->translator = $translator;
+        $this->databasePersister = $databasePersister;
+        $this->languageProvider = $languageProvider;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('oro:translation:load')
             ->setDescription('Loads translations into DB')
             ->addOption(
                 'languages',
@@ -44,9 +79,7 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var $languageProvider LanguageProvider */
-        $languageProvider = $this->getContainer()->get('oro_translation.provider.language');
-        $availableLocales = array_keys($languageProvider->getAvailableLanguages());
+        $availableLocales = array_keys($this->languageProvider->getAvailableLanguages());
 
         $locales = $input->getOption('languages') ?: $availableLocales;
 
@@ -65,7 +98,7 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
         $this->getContainer()->set('oro_translation.database_translation.loader', new EmptyArrayLoader());
 
         if ($input->getOption('rebuild-cache')) {
-            $this->getTranslator()->rebuildCache();
+            $this->translator->rebuildCache();
         }
 
         $em = $this->getEntityManager(Translation::class);
@@ -84,7 +117,7 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
 
         if ($input->getOption('rebuild-cache')) {
             $output->write(sprintf('<info>Rebuilding cache ... </info>'));
-            $this->getTranslator()->rebuildCache();
+            $this->translator->rebuildCache();
         }
 
         $output->writeln(sprintf('<info>Done.</info>'));
@@ -103,9 +136,9 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
                 $output->writeln(sprintf('<info>Language "%s" not found</info>', $locale));
                 continue;
             }
-            $catalogData = $this->getTranslator()->getCatalogue($locale)->all();
+            $catalogData = $this->translator->getCatalogue($locale)->all();
             $output->writeln(sprintf('<info>Loading translations [%s] (%d) ...</info>', $locale, count($catalogData)));
-            $this->getDatabasePersister()->persist($locale, $catalogData, Translation::SCOPE_SYSTEM);
+            $this->databasePersister->persist($locale, $catalogData, Translation::SCOPE_SYSTEM);
 
             foreach ($catalogData as $domain => $messages) {
                 $output->writeln(sprintf('  > loading [%s] ... processed %d records.', $domain, count($messages)));
@@ -120,22 +153,6 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
      */
     private function getEntityManager($class)
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($class);
-    }
-
-    /**
-     * @return Translator
-     */
-    private function getTranslator()
-    {
-        return $this->getContainer()->get('translator');
-    }
-
-    /**
-     * @return DatabasePersister
-     */
-    private function getDatabasePersister()
-    {
-        return $this->getContainer()->get('oro_translation.database_translation.persister');
+        return $this->registry->getManagerForClass($class);
     }
 }

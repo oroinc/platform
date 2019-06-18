@@ -16,6 +16,9 @@ services:
         arguments:
             - '@doctrine'
 
+    Oro\Bundle\EntityBundle\ORM\DoctrineHelper:
+        alias: 'oro_entity.doctrine_helper'
+
     oro_entity.abstract_repository:
         class: Doctrine\ORM\EntityRepository
         factory: ['@oro_entity.repository.factory', 'getDefaultRepository']

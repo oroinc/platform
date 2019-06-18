@@ -41,7 +41,7 @@ class DashboardExtension extends AbstractExtension
      */
     protected function getQueryDesignerManager()
     {
-        return $this->container->get('oro_query_designer.query_designer.manager');
+        return $this->container->get(QueryDesignerManager::class);
     }
 
     /**

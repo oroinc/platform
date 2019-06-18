@@ -34,7 +34,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
     {
         /** @var NodeBuilder $actionNode */
         $actionNode = $node->end()
-            ->useAttributeAsKey('name')
+            ->useAttributeAsKey('')
             ->beforeNormalization()
                 ->always(function ($value) {
                     return false === $value
@@ -104,7 +104,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->integerNode(ConfigUtil::PAGE_SIZE)->min(-1)->end()
             ->arrayNode(ConfigUtil::ORDER_BY)
                 ->performNoDeepMerging()
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->prototype('enum')->values(['ASC', 'DESC'])->end()
             ->end()
             ->booleanNode(ConfigUtil::DISABLE_SORTING)->end()
@@ -113,7 +113,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->booleanNode(ConfigUtil::DISABLE_META_PROPERTIES)->end()
             ->scalarNode(ConfigUtil::FORM_TYPE)->end()
             ->arrayNode(ConfigUtil::FORM_OPTIONS)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
             ->end()
@@ -135,7 +135,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
         $this->addStatusCodesNode($node);
         $fieldNode = $node
             ->arrayNode(ConfigUtil::FIELDS)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->normalizeKeys(false)
                 ->prototype('array')
                     ->children();
@@ -187,7 +187,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
         /** @var ArrayNodeDefinition $parentNode */
         $codeNode = $node
             ->arrayNode(ConfigUtil::STATUS_CODES)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->prototype('array')
                     ->beforeNormalization()
                         ->ifString()
@@ -249,7 +249,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->end()
             ->scalarNode(ConfigUtil::FORM_TYPE)->end()
             ->arrayNode(ConfigUtil::FORM_OPTIONS)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
             ->end();

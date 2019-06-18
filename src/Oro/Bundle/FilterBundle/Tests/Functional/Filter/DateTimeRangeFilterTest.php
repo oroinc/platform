@@ -206,7 +206,7 @@ class DateTimeRangeFilterTest extends WebTestCase
      */
     private function getFilter()
     {
-        return self::getContainer()->get('oro_filter.datetime_range_filter');
+        return self::getContainer()->get(DateTimeRangeFilter::class);
     }
 
     /**

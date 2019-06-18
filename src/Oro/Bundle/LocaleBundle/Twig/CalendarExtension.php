@@ -3,7 +3,8 @@
 namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -13,7 +14,7 @@ use Twig\TwigFunction;
  *   - oro_calendar_day_of_week_names
  *   - oro_calendar_first_day_of_week
  */
-class CalendarExtension extends AbstractExtension
+class CalendarExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -29,9 +30,9 @@ class CalendarExtension extends AbstractExtension
     /**
      * @return LocaleSettings
      */
-    protected function getLocaleSettings()
+    protected function getLocaleSettings(): LocaleSettings
     {
-        return $this->container->get('oro_locale.settings');
+        return $this->container->get(LocaleSettings::class);
     }
 
     /**
@@ -61,7 +62,7 @@ class CalendarExtension extends AbstractExtension
      * @param string      $width wide|abbreviation|short|narrow
      * @param string|null $locale
      *
-     * @return string
+     * @return string[]
      */
     public function getMonthNames($width = null, $locale = null)
     {
@@ -74,7 +75,7 @@ class CalendarExtension extends AbstractExtension
      * @param string      $width wide|abbreviation|short|narrow
      * @param string|null $locale
      *
-     * @return string
+     * @return string[]
      */
     public function getDayOfWeekNames($width = null, $locale = null)
     {
@@ -99,5 +100,15 @@ class CalendarExtension extends AbstractExtension
     public function getName()
     {
         return 'oro_locale_calendar';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return [
+            LocaleSettings::class,
+        ];
     }
 }

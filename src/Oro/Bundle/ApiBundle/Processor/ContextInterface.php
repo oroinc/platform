@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Oro\Bundle\ApiBundle\Collection\Criteria;
+use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;

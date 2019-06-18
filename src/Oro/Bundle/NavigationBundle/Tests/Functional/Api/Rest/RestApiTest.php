@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Api\Rest;
 
+use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -30,6 +31,22 @@ class RestApiTest extends WebTestCase
         );
     }
 
+    public function testPostPinbarWithLongUrlPath()
+    {
+        $path = $this->getQueryPath();
+        $url = 'http://some-url.com' . $path;
+        $parameters = [
+            'url' => $url,
+            'title' => 'Title',
+            'position' => 0,
+            'type' => 'pinbar'
+        ];
+
+        $result = $this->postNavigationItem('pinbar', $parameters);
+
+        $this->assertUrl((int)$result['id'], $path . '?restore=1');
+    }
+
     /**
      * Test POST
      *
@@ -38,26 +55,13 @@ class RestApiTest extends WebTestCase
     public function testPost($itemType)
     {
         self::$entities[$itemType] = array(
-            'url' => 'http://url.com',
+            'url' => 'http://some-url.com',
             'title' => 'Title',
             'position' => 0,
             'type' => $itemType
         );
 
-        $this->client->request(
-            'POST',
-            $this->getUrl('oro_api_post_navigationitems', array('type' => $itemType)),
-            self::$entities[$itemType],
-            array(),
-            $this->generateWsseAuthHeader()
-        );
-
-        /** @var $result Response */
-        $result = $this->client->getResponse();
-
-        $this->assertJsonResponseStatusCodeEquals($result, 201);
-
-        $resultJson = json_decode($result->getContent(), true);
+        $resultJson = $this->postNavigationItem($itemType, self::$entities[$itemType]);
 
         $this->assertArrayHasKey('id', $resultJson);
         $this->assertGreaterThan(0, $resultJson['id']);
@@ -333,5 +337,50 @@ class RestApiTest extends WebTestCase
 
             $this->client->restart();
         }
+    }
+
+    /**
+     * @param string $itemType
+     * @param array $parameters
+     * @return array
+     */
+    private function postNavigationItem(string $itemType, array $parameters): array
+    {
+        $this->client->request(
+            'POST',
+            $this->getUrl('oro_api_post_navigationitems', array('type' => $itemType)),
+            $parameters,
+            array(),
+            $this->generateWsseAuthHeader()
+        );
+
+        /** @var $result Response */
+        $result = $this->client->getResponse();
+
+        $this->assertJsonResponseStatusCodeEquals($result, 201);
+
+        return json_decode($result->getContent(), true);
+    }
+
+    /**
+     * @return string
+     */
+    private function getQueryPath(): string
+    {
+        // forms query path of 8150 characters long
+        return '/' . str_repeat('some_part/', 815);
+    }
+
+    /**
+     * @param int $id
+     * @param string $url
+     */
+    private function assertUrl(int $id, string $url): void
+    {
+        $em = self::getContainer()->get('doctrine')->getManagerForClass(PinbarTab::class);
+        /** @var PinbarTab $entity */
+        $entity = $em->find(PinbarTab::class, $id);
+
+        $this->assertEquals($url, $entity->getItem()->getUrl());
     }
 }

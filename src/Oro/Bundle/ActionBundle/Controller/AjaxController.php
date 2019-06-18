@@ -3,21 +3,25 @@
 namespace Oro\Bundle\ActionBundle\Controller;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\ActionBundle\Handler\ExecuteOperationHandler;
 use Oro\Bundle\ActionBundle\Handler\ExecuteOperationResult;
 use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Ajax Action execution controller
  */
-class AjaxController extends Controller
+class AjaxController extends AbstractController
 {
     /**
      * @Route("/operation/execute/{operationName}", name="oro_action_operation_execute")
@@ -31,7 +35,7 @@ class AjaxController extends Controller
      */
     public function executeAction(Request $request, $operationName): Response
     {
-        $operation = $this->get('oro_action.operation_registry')->findByName($operationName);
+        $operation = $this->get(OperationRegistry::class)->findByName($operationName);
         if (!$operation instanceof Operation) {
             $message = sprintf('Operation with name "%s" not found', $operationName);
 
@@ -48,7 +52,7 @@ class AjaxController extends Controller
                 Response::HTTP_NOT_FOUND
             );
         }
-        $executionResult = $this->get('oro_action.handler.execute_operation')->process($operation);
+        $executionResult = $this->get(ExecuteOperationHandler::class)->process($operation);
 
         return $this->handleExecutionResult($executionResult, $request);
     }
@@ -80,7 +84,7 @@ class AjaxController extends Controller
         } else {
             if (!$response['pageReload'] || $actionData->getRefreshGrid()) {
                 $response['refreshGrid'] = $actionData->getRefreshGrid();
-                $response['flashMessages'] = $this->get('session')->getFlashBag()->all();
+                $response['flashMessages'] = $this->get(SessionInterface::class)->getFlashBag()->all();
             } elseif ($actionData->getRedirectUrl()) {
                 if ($request->isXmlHttpRequest()) {
                     $response['redirectUrl'] = $actionData->getRedirectUrl();
@@ -101,7 +105,7 @@ class AjaxController extends Controller
      */
     protected function prepareMessages(Collection $messages): array
     {
-        $translator = $this->get('translator');
+        $translator = $this->get(TranslatorInterface::class);
         $result = [];
         foreach ($messages as $message) {
             $result[] = $translator->trans($message['message'], $message['parameters']);
@@ -120,8 +124,24 @@ class AjaxController extends Controller
      */
     protected function handleFailedNonAjaxResponse(string $message, string $routeName): RedirectResponse
     {
-        $this->get('session')->getFlashBag()->add('error', $message);
+        $this->get(SessionInterface::class)->getFlashBag()->add('error', $message);
 
         return $this->redirect($this->generateUrl($routeName));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                SessionInterface::class,
+                OperationRegistry::class,
+                ExecuteOperationHandler::class,
+            ]
+        );
     }
 }

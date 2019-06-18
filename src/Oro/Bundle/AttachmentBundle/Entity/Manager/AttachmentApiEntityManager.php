@@ -96,11 +96,7 @@ class AttachmentApiEntityManager extends ApiEntityManager
     protected function postSerializeAttachment(array $result): array
     {
         if (!empty($result['file'])) {
-            $result['file'] = $this->attachmentManager->getFileRestApiUrl(
-                $result['file']['id'],
-                $this->class,
-                $result['id']
-            );
+            $result['file'] = $this->attachmentManager->getFileRestApiUrl($result['file']['id']);
         }
 
         // move all attachment association fields into 'target' field

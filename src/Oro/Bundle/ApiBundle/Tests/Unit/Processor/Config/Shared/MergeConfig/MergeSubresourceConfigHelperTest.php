@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared\MergeConfig;
 
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeActionConfigHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeFilterConfigHelper;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeSorterConfigHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeSubresourceConfigHelper;
 
 class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
@@ -14,6 +15,9 @@ class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|MergeFilterConfigHelper */
     private $mergeFilterConfigHelper;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MergeSorterConfigHelper */
+    private $mergeSorterConfigHelper;
+
     /** @var MergeSubresourceConfigHelper */
     private $mergeSubresourceConfigHelper;
 
@@ -21,10 +25,12 @@ class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->mergeActionConfigHelper = $this->createMock(MergeActionConfigHelper::class);
         $this->mergeFilterConfigHelper = $this->createMock(MergeFilterConfigHelper::class);
+        $this->mergeSorterConfigHelper = $this->createMock(MergeSorterConfigHelper::class);
 
         $this->mergeSubresourceConfigHelper = new MergeSubresourceConfigHelper(
             $this->mergeActionConfigHelper,
-            $this->mergeFilterConfigHelper
+            $this->mergeFilterConfigHelper,
+            $this->mergeSorterConfigHelper
         );
     }
 
@@ -37,6 +43,8 @@ class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
             ->method('mergeActionConfig');
         $this->mergeFilterConfigHelper->expects(self::never())
             ->method('mergeFiltersConfig');
+        $this->mergeSorterConfigHelper->expects(self::never())
+            ->method('mergeSortersConfig');
 
         self::assertEquals(
             [],
@@ -44,6 +52,7 @@ class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
                 $config,
                 $subresourceConfig,
                 'action1',
+                true,
                 true,
                 true
             )
@@ -65,6 +74,11 @@ class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
                 'filter1' => [
                     'description' => 'filter 1'
                 ]
+            ],
+            'sorters' => [
+                'sorter1' => [
+                    'property_path' => 'sorter1Field'
+                ]
             ]
         ];
 
@@ -79,6 +93,8 @@ class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
             );
         $this->mergeFilterConfigHelper->expects(self::never())
             ->method('mergeFiltersConfig');
+        $this->mergeSorterConfigHelper->expects(self::never())
+            ->method('mergeSortersConfig');
 
         self::assertEquals(
             [
@@ -90,6 +106,7 @@ class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
                 $subresourceConfig,
                 'action1',
                 true,
+                false,
                 false
             )
         );
@@ -110,6 +127,11 @@ class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
                 'filter1' => [
                     'description' => 'filter 1'
                 ]
+            ],
+            'sorters' => [
+                'sorter1' => [
+                    'property_path' => 'sorter1Field'
+                ]
             ]
         ];
 
@@ -128,6 +150,8 @@ class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             );
+        $this->mergeSorterConfigHelper->expects(self::never())
+            ->method('mergeSortersConfig');
 
         self::assertEquals(
             [
@@ -142,6 +166,68 @@ class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
                 $config,
                 $subresourceConfig,
                 'anotherAction',
+                false,
+                true,
+                false
+            )
+        );
+    }
+
+    public function testMergeSubresourceSortersConfig()
+    {
+        $config = [
+            'key' => 'val'
+        ];
+        $subresourceConfig = [
+            'actions' => [
+                'action1' => [
+                    'description' => 'action 1'
+                ]
+            ],
+            'filters' => [
+                'filter1' => [
+                    'description' => 'filter 1'
+                ]
+            ],
+            'sorters' => [
+                'sorter1' => [
+                    'property_path' => 'sorter1Field'
+                ]
+            ]
+        ];
+
+        $this->mergeActionConfigHelper->expects(self::never())
+            ->method('mergeActionConfig');
+        $this->mergeFilterConfigHelper->expects(self::never())
+            ->method('mergeFiltersConfig');
+        $this->mergeSorterConfigHelper->expects(self::once())
+            ->method('mergeSortersConfig')
+            ->with($config, $subresourceConfig['sorters'])
+            ->willReturn(
+                [
+                    'key'     => 'val',
+                    'sorters' => [
+                        'sorter1' => [
+                            'property_path' => 'mergedSorter1Field'
+                        ]
+                    ]
+                ]
+            );
+
+        self::assertEquals(
+            [
+                'key'     => 'val',
+                'sorters' => [
+                    'sorter1' => [
+                        'property_path' => 'mergedSorter1Field'
+                    ]
+                ]
+            ],
+            $this->mergeSubresourceConfigHelper->mergeSubresourcesConfig(
+                $config,
+                $subresourceConfig,
+                'anotherAction',
+                false,
                 false,
                 true
             )

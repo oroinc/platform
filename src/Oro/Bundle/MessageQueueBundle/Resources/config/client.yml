@@ -31,6 +31,9 @@ services:
         lazy: true
         arguments: ['@oro_message_queue.client.driver']
 
+    Oro\Component\MessageQueue\Client\MessageProducerInterface:
+        alias: 'oro_message_queue.client.message_producer'
+
     oro_message_queue.message_producer:
         alias: 'oro_message_queue.client.message_producer'
 

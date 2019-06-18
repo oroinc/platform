@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer;
 
-use Monolog\Logger;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -27,40 +25,17 @@ class DirectMailer extends \Swift_Mailer
     /** @var ContainerInterface */
     protected $container;
 
-    /** @var ServiceLink  */
-    protected $loggerLink;
-
     /** @var \Swift_Transport */
     private $transport;
 
     /**
-     * Constructor
-     *
      * @param \Swift_Mailer      $baseMailer
      * @param ContainerInterface $container
      */
-    public function __construct(
-        \Swift_Mailer $baseMailer,
-        ContainerInterface $container
-    ) {
+    public function __construct(\Swift_Mailer $baseMailer, ContainerInterface $container)
+    {
         $this->baseMailer = $baseMailer;
         $this->container  = $container;
-    }
-
-    /**
-     * @param ServiceLink $loggerLink
-     */
-    public function setLogger(ServiceLink $loggerLink)
-    {
-        $this->loggerLink = $loggerLink;
-    }
-
-    /**
-     * @return Logger
-     */
-    protected function getLogger()
-    {
-        return $this->loggerLink->getService();
     }
 
     /**
@@ -70,11 +45,9 @@ class DirectMailer extends \Swift_Mailer
      */
     public function prepareSmtpTransport($emailOrigin)
     {
-        if ($emailOrigin instanceof UserEmailOrigin) {
-            /* Modify transport smtp settings */
-            if ($emailOrigin->isSmtpConfigured()) {
-                $this->prepareEmailOriginSmtpTransport($emailOrigin);
-            }
+        /* Modify transport smtp settings */
+        if (($emailOrigin instanceof UserEmailOrigin) && $emailOrigin->isSmtpConfigured()) {
+            $this->prepareEmailOriginSmtpTransport($emailOrigin);
         }
 
         $this->afterPrepareSmtpTransport();
@@ -225,12 +198,12 @@ class DirectMailer extends \Swift_Mailer
                 $result = $mailerInstance->send($message, $failedRecipients);
             }
         } catch (\Swift_TransportException $transportException) {
-            $logger = $this->getLogger();
+            $logger = $this->container->get('logger');
 
-            $logger->crit(sprintf("Mail message: %s", $message));
-            $logger->crit(sprintf("Mail recipients: %s", implode(',', $failedRecipients)));
+            $logger->crit(sprintf('Mail message: %s', $message));
+            $logger->crit(sprintf('Mail recipients: %s', implode(',', $failedRecipients)));
             $logger->crit(
-                sprintf("Error message: %s", $transportException->getMessage()),
+                sprintf('Error message: %s', $transportException->getMessage()),
                 ['exception' => $transportException]
             );
 

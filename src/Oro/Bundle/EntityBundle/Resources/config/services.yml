@@ -272,6 +272,7 @@ services:
 
     oro_entity.routing_helper:
         class: '%oro_entity.routing_helper.class%'
+        public: true
         arguments:
             - '@oro_entity.entity_class_name_helper'
             - '@oro_entity.doctrine_helper'

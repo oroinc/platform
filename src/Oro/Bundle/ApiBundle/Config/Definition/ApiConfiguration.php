@@ -99,7 +99,7 @@ class ApiConfiguration implements ConfigurationInterface
     {
         $node = $parentNode
             ->arrayNode(self::ENTITY_ALIASES_SECTION)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->prototype('array')
                 ->children();
         $configuration = new EntityAliasesConfiguration();
@@ -118,7 +118,7 @@ class ApiConfiguration implements ConfigurationInterface
     {
         $node = $parentNode
             ->arrayNode($configuration->getSectionName())
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->prototype('array')
                 ->children();
         $configuration->configure($node);

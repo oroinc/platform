@@ -2292,4 +2292,21 @@ JS;
 
         self::assertTrue((bool) preg_match($regex, $actual), $message);
     }
+
+    /**
+     * @Then /^(?:|I )click update schema$/
+     */
+    public function iClickUpdateSchema()
+    {
+        try {
+            $page = $this->getPage();
+
+            $page->clickLink('Update schema');
+            $this->waitForAjax();
+            $page->clickLink('Yes, Proceed');
+            $this->waitForAjax();
+        } catch (\Exception $e) {
+            throw $e;
+        }
+    }
 }

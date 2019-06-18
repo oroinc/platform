@@ -80,7 +80,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
         $this->configureEntityNode($node);
         $fieldNode = $node
             ->arrayNode(ConfigUtil::FIELDS)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->normalizeKeys(false)
                 ->prototype('array')
                     ->children();
@@ -132,7 +132,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
             ->integerNode(ConfigUtil::MAX_RESULTS)->min(-1)->end()
             ->arrayNode(ConfigUtil::ORDER_BY)
                 ->performNoDeepMerging()
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->prototype('enum')->values(['ASC', 'DESC'])->end()
             ->end()
             ->arrayNode(ConfigUtil::HINTS)
@@ -151,7 +151,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
             ->end()
             ->scalarNode(ConfigUtil::FORM_TYPE)->end()
             ->arrayNode(ConfigUtil::FORM_OPTIONS)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
             ->end()
@@ -206,7 +206,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
             ->booleanNode(ConfigUtil::COLLAPSE)->end()
             ->scalarNode(ConfigUtil::FORM_TYPE)->end()
             ->arrayNode(ConfigUtil::FORM_OPTIONS)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
             ->end()
