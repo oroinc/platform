@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "84209cfd4d18dd5bca2bca30dfa0f734",
+    "content-hash": "beac6b0afd798c85b66473eeedf38e5a",
     "packages": [
         {
             "name": "akeneo/batch-bundle",
@@ -180,16 +180,16 @@
         },
         {
             "name": "bower-asset/autolinker.js",
-            "version": "1.4.4",
+            "version": "1.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gregjacobs/Autolinker.js.git",
-                "reference": "355143d271c314e1cb68eb120b55450461927427"
+                "reference": "f99f4943b3f1fdab604659966c9903a775b03182"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gregjacobs/Autolinker.js/zipball/355143d271c314e1cb68eb120b55450461927427",
-                "reference": "355143d271c314e1cb68eb120b55450461927427"
+                "url": "https://api.github.com/repos/gregjacobs/Autolinker.js/zipball/f99f4943b3f1fdab604659966c9903a775b03182",
+                "reference": "f99f4943b3f1fdab604659966c9903a775b03182"
             },
             "type": "bower-asset",
             "license": [
@@ -604,6 +604,27 @@
             ]
         },
         {
+            "name": "bower-asset/jstree",
+            "version": "3.3.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vakata/jstree.git",
+                "reference": "c9d7c1425f2272c5400536fa631eba8657522ecf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vakata/jstree/zipball/c9d7c1425f2272c5400536fa631eba8657522ecf",
+                "reference": "c9d7c1425f2272c5400536fa631eba8657522ecf"
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.9.1"
+            },
+            "type": "bower-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
             "name": "bower-asset/lightgallery",
             "version": "1.4.0",
             "source": {
@@ -734,16 +755,16 @@
         },
         {
             "name": "bower-asset/underscore",
-            "version": "1.8.3",
+            "version": "1.9.1",
             "source": {
                 "type": "git",
-                "url": "git@github.com:jashkenas/underscore.git",
-                "reference": "e4743ab712b8ab42ad4ccb48b155034d02394e4d"
+                "url": "https://github.com/jashkenas/underscore.git",
+                "reference": "ae037f7c41323807ae6f1533c45512e6d31a1574"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jashkenas/underscore/zipball/e4743ab712b8ab42ad4ccb48b155034d02394e4d",
-                "reference": "e4743ab712b8ab42ad4ccb48b155034d02394e4d"
+                "url": "https://api.github.com/repos/jashkenas/underscore/zipball/ae037f7c41323807ae6f1533c45512e6d31a1574",
+                "reference": "ae037f7c41323807ae6f1533c45512e6d31a1574"
             },
             "type": "bower-asset"
         },
@@ -804,131 +825,6 @@
                 "math"
             ],
             "time": "2019-04-25T14:55:49+00:00"
-        },
-        {
-            "name": "components/jquery",
-            "version": "3.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/components/jquery.git",
-                "reference": "09a1658378bc1f818856086396ebeab7d0ec2276"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/components/jquery/zipball/09a1658378bc1f818856086396ebeab7d0ec2276",
-                "reference": "09a1658378bc1f818856086396ebeab7d0ec2276",
-                "shasum": ""
-            },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "scripts": [
-                        "jquery.js"
-                    ],
-                    "files": [
-                        "jquery.min.js",
-                        "jquery.min.map"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "John Resig",
-                    "email": "jeresig@gmail.com"
-                }
-            ],
-            "description": "jQuery JavaScript Library",
-            "homepage": "http://jquery.com",
-            "time": "2016-09-23T06:06:29+00:00"
-        },
-        {
-            "name": "components/jqueryui",
-            "version": "1.12.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/components/jqueryui.git",
-                "reference": "44ecf3794cc56b65954cc19737234a3119d036cc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/components/jqueryui/zipball/44ecf3794cc56b65954cc19737234a3119d036cc",
-                "reference": "44ecf3794cc56b65954cc19737234a3119d036cc",
-                "shasum": ""
-            },
-            "require": {
-                "components/jquery": ">=1.6"
-            },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "name": "jquery-ui",
-                    "scripts": [
-                        "jquery-ui.js"
-                    ],
-                    "files": [
-                        "ui/**",
-                        "themes/**",
-                        "jquery-ui.min.js"
-                    ],
-                    "shim": {
-                        "deps": [
-                            "jquery"
-                        ],
-                        "exports": "jQuery"
-                    }
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "jQuery UI Team",
-                    "homepage": "http://jqueryui.com/about"
-                },
-                {
-                    "name": "Joern Zaefferer",
-                    "email": "joern.zaefferer@gmail.com",
-                    "homepage": "http://bassistance.de"
-                },
-                {
-                    "name": "Scott Gonzalez",
-                    "email": "scott.gonzalez@gmail.com",
-                    "homepage": "http://scottgonzalez.com"
-                },
-                {
-                    "name": "Kris Borchers",
-                    "email": "kris.borchers@gmail.com",
-                    "homepage": "http://krisborchers.com"
-                },
-                {
-                    "name": "Mike Sherov",
-                    "email": "mike.sherov@gmail.com",
-                    "homepage": "http://mike.sherov.com"
-                },
-                {
-                    "name": "TJ VanToll",
-                    "email": "tj.vantoll@gmail.com",
-                    "homepage": "http://tjvantoll.com"
-                },
-                {
-                    "name": "Corey Frang",
-                    "email": "gnarf37@gmail.com",
-                    "homepage": "http://gnarf.net"
-                },
-                {
-                    "name": "Felix Nagel",
-                    "email": "info@felixnagel.com",
-                    "homepage": "http://www.felixnagel.com"
-                }
-            ],
-            "description": "jQuery UI is a curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library. Whether you're building highly interactive web applications or you just need to add a date picker to a form control, jQuery UI is the perfect choice.",
-            "time": "2016-09-16T05:47:55+00:00"
         },
         {
             "name": "composer/ca-bundle",
@@ -4176,16 +4072,16 @@
         },
         {
             "name": "knplabs/knp-menu-bundle",
-            "version": "v2.2.1",
+            "version": "2.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KnpLabs/KnpMenuBundle.git",
-                "reference": "6bea43eb84fc67c43ab2b43709194efffa8a8ac0"
+                "reference": "267027582a1f1e355276f796f8da0e9f82026bf1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KnpLabs/KnpMenuBundle/zipball/6bea43eb84fc67c43ab2b43709194efffa8a8ac0",
-                "reference": "6bea43eb84fc67c43ab2b43709194efffa8a8ac0",
+                "url": "https://api.github.com/repos/KnpLabs/KnpMenuBundle/zipball/267027582a1f1e355276f796f8da0e9f82026bf1",
+                "reference": "267027582a1f1e355276f796f8da0e9f82026bf1",
                 "shasum": ""
             },
             "require": {
@@ -4231,7 +4127,7 @@
             "keywords": [
                 "menu"
             ],
-            "time": "2017-12-24T16:32:39+00:00"
+            "time": "2019-06-17T12:58:15+00:00"
         },
         {
             "name": "kriswallsmith/assetic",
@@ -5054,6 +4950,21 @@
             "time": "2018-05-29T15:23:46+00:00"
         },
         {
+            "name": "npm-asset/backbone",
+            "version": "1.4.0",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/backbone/-/backbone-1.4.0.tgz"
+            },
+            "require": {
+                "npm-asset/underscore": ">=1.8.3"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
             "name": "npm-asset/bootstrap",
             "version": "4.3.1",
             "dist": {
@@ -5067,10 +4978,22 @@
         },
         {
             "name": "npm-asset/jquery",
-            "version": "1.12.4",
+            "version": "3.4.1",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/jquery/-/jquery-1.12.4.tgz"
+                "url": "https://registry.npmjs.org/jquery/-/jquery-3.4.1.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/jquery-ui",
+            "version": "1.12.1",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/jquery-ui/-/jquery-ui-1.12.1.tgz"
             },
             "type": "npm-asset",
             "license": [
@@ -5079,13 +5002,13 @@
         },
         {
             "name": "npm-asset/jquery.uniform",
-            "version": "4.2.0",
+            "version": "4.3.0",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/jquery.uniform/-/jquery.uniform-4.2.0.tgz"
+                "url": "https://registry.npmjs.org/jquery.uniform/-/jquery.uniform-4.3.0.tgz"
             },
             "require": {
-                "npm-asset/jquery": ">=1.6.0,<2.0.0"
+                "npm-asset/jquery": ">=3.3.1,<4.0.0"
             },
             "type": "npm-asset",
             "license": [
@@ -5122,6 +5045,18 @@
             "dist": {
                 "type": "tar",
                 "url": "https://registry.npmjs.org/requirejs/-/requirejs-2.3.3.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/underscore",
+            "version": "1.9.1",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/underscore/-/underscore-1.9.1.tgz"
             },
             "type": "npm-asset",
             "license": [
@@ -7704,63 +7639,6 @@
             "time": "2019-03-19T09:54:19+00:00"
         },
         {
-            "name": "vakata/jstree",
-            "version": "3.3.8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/vakata/jstree.git",
-                "reference": "c9d7c1425f2272c5400536fa631eba8657522ecf"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/vakata/jstree/zipball/c9d7c1425f2272c5400536fa631eba8657522ecf",
-                "reference": "c9d7c1425f2272c5400536fa631eba8657522ecf",
-                "shasum": ""
-            },
-            "require": {
-                "components/jquery": ">=1.9.1"
-            },
-            "suggest": {
-                "robloach/component-installer": "Allows installation of Components via Composer"
-            },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "scripts": [
-                        "dist/jstree.js"
-                    ],
-                    "styles": [
-                        "dist/themes/default/style.css"
-                    ],
-                    "images": [
-                        "dist/themes/default/32px.png",
-                        "dist/themes/default/40px.png",
-                        "dist/themes/default/throbber.gif"
-                    ],
-                    "files": [
-                        "dist/jstree.min.js",
-                        "dist/themes/default/style.min.css",
-                        "dist/themes/default/32px.png",
-                        "dist/themes/default/40px.png",
-                        "dist/themes/default/throbber.gif"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ivan Bozhanov",
-                    "email": "jstree@jstree.com"
-                }
-            ],
-            "description": "jsTree is jquery plugin, that provides interactive trees.",
-            "homepage": "http://jstree.com",
-            "time": "2019-04-28T21:22:05+00:00"
-        },
-        {
             "name": "willdurand/jsonp-callback-validator",
             "version": "v1.1.0",
             "source": {
@@ -9518,16 +9396,16 @@
         },
         {
             "name": "phpspec/prophecy",
-            "version": "1.8.0",
+            "version": "1.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/prophecy.git",
-                "reference": "4ba436b55987b4bf311cb7c6ba82aa528aac0a06"
+                "reference": "1927e75f4ed19131ec9bcc3b002e07fb1173ee76"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/4ba436b55987b4bf311cb7c6ba82aa528aac0a06",
-                "reference": "4ba436b55987b4bf311cb7c6ba82aa528aac0a06",
+                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/1927e75f4ed19131ec9bcc3b002e07fb1173ee76",
+                "reference": "1927e75f4ed19131ec9bcc3b002e07fb1173ee76",
                 "shasum": ""
             },
             "require": {
@@ -9548,8 +9426,8 @@
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Prophecy\\": "src/"
+                "psr-4": {
+                    "Prophecy\\": "src/Prophecy"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -9577,7 +9455,7 @@
                 "spy",
                 "stub"
             ],
-            "time": "2018-08-05T17:53:17+00:00"
+            "time": "2019-06-13T12:50:23+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -10939,16 +10817,16 @@
         },
         {
             "name": "theseer/tokenizer",
-            "version": "1.1.2",
+            "version": "1.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/theseer/tokenizer.git",
-                "reference": "1c42705be2b6c1de5904f8afacef5895cab44bf8"
+                "reference": "11336f6f84e16a720dae9d8e6ed5019efa85a0f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/1c42705be2b6c1de5904f8afacef5895cab44bf8",
-                "reference": "1c42705be2b6c1de5904f8afacef5895cab44bf8",
+                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/11336f6f84e16a720dae9d8e6ed5019efa85a0f9",
+                "reference": "11336f6f84e16a720dae9d8e6ed5019efa85a0f9",
                 "shasum": ""
             },
             "require": {
@@ -10975,7 +10853,7 @@
                 }
             ],
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
-            "time": "2019-04-04T09:56:43+00:00"
+            "time": "2019-06-13T22:48:21+00:00"
         },
         {
             "name": "webmozart/assert",
