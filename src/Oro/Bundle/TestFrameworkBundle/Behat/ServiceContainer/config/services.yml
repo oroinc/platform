@@ -58,6 +58,16 @@ services:
         tags:
             - { name: 'context.initializer' }
 
+    oro_behat_browser_tab_manager:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Context\BrowserTabManager
+
+    oro_behat_browser_tab_manager_initializer:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\BrowserTabManagerAwareInitializer'
+        arguments:
+            - '@oro_behat_browser_tab_manager'
+        tags:
+            - { name: 'context.initializer' }
+
     oro_behat_fixture_loader_initializer:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\FixtureLoaderInitializer
         arguments:
