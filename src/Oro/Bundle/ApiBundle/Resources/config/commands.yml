@@ -10,7 +10,10 @@ services:
 
     Oro\Bundle\ApiBundle\Command\DebugCommand:
         arguments:
+            - '@oro_api.value_normalizer'
+            - '@oro_api.resources_provider'
             - '@oro_api.action_processor_bag'
+            - '@oro_api.processor_bag'
         tags:
             - { name: console.command }
 
@@ -23,10 +26,21 @@ services:
             - { name: console.command }
 
     Oro\Bundle\ApiBundle\Command\DumpCommand:
+        arguments:
+            - '@oro_api.value_normalizer'
+            - '@oro_api.resources_provider'
+            - '@doctrine'
+            - '@oro_api.subresources_provider'
         tags:
             - { name: console.command }
 
     Oro\Bundle\ApiBundle\Command\DumpConfigCommand:
+        arguments:
+            - '@oro_api.value_normalizer'
+            - '@oro_api.resources_provider'
+            - '@oro_api.processor_bag'
+            - '@oro_api.config_provider'
+            - '@oro_api.relation_config_provider'
         tags:
             - { name: console.command }
 
@@ -37,5 +51,11 @@ services:
             - { name: console.command }
 
     Oro\Bundle\ApiBundle\Command\DumpMetadataCommand:
+        arguments:
+            - '@oro_api.value_normalizer'
+            - '@oro_api.resources_provider'
+            - '@oro_api.processor_bag'
+            - '@oro_api.metadata_provider'
+            - '@oro_api.config_provider'
         tags:
             - { name: console.command }

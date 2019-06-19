@@ -1,3 +1,10 @@
 "The given value {{ value }} cannot be set as {{ owner }} for given entity for security reason.": The given value {{ value }} cannot be set as {{ owner }} for given entity for security reason.
 "Business Unit can't set self as Parent.": Business Unit can't set self as Parent.
 "Business Unit cannot have a child as a Parent Business Unit.": Business Unit cannot have a child as a Parent Business Unit.
+
+oro:
+    organization:
+        validation:
+            business_unit:
+                website_url:
+                    message: 'This value is not a valid URL. Allowed URL protocols are: http, https.'

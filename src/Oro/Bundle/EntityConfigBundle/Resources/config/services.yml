@@ -1,6 +1,5 @@
 parameters:
     oro_entity_config.entity.entity_field.class:                Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel
-    oro_entity_config.config_manager.class:                     Oro\Bundle\EntityConfigBundle\Config\ConfigManager
     oro_entity_config.config_model_manager.class:               Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager
     oro_entity_config.tools.command_executor.class:             Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor
     oro_entity_config.config_loader.class:                      Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader
@@ -27,7 +26,7 @@ services:
             - '@doctrine'
 
     oro_entity_config.config_manager:
-        class: '%oro_entity_config.config_manager.class%'
+        class: Oro\Bundle\EntityConfigBundle\Config\ConfigManager
         arguments:
             - '@event_dispatcher'
             - '@oro_entity_config.metadata.annotation_metadata_factory'
