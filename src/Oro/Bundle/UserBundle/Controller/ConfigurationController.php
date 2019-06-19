@@ -3,14 +3,24 @@
 namespace Oro\Bundle\UserBundle\Controller;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Form\Handler\ConfigHandler;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
+use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class ConfigurationController extends Controller
+/**
+ * Provides actions to configure user profiles.
+ */
+class ConfigurationController extends AbstractController
 {
     /**
      * @Route(
@@ -67,7 +77,7 @@ class ConfigurationController extends Controller
      */
     protected function config(User $entity, $activeGroup = null, $activeSubGroup = null)
     {
-        $provider = $this->get('oro_user.provider.user_config_form_provider');
+        $provider = $this->get(UserConfigurationFormProvider::class);
         /** @var ConfigManager $manager */
         $manager = $this->get('oro_config.user');
         $prevScopeId = $manager->getScopeId();
@@ -82,19 +92,19 @@ class ConfigurationController extends Controller
         if ($activeSubGroup !== null) {
             $form = $provider->getForm($activeSubGroup);
 
-            if ($this->get('oro_config.form.handler.config')
+            if ($this->get(ConfigHandler::class)
                 ->setConfigManager($manager)
-                ->process($form, $this->get('request_stack')->getCurrentRequest())
+                ->process($form, $this->get(RequestStack::class)->getCurrentRequest())
             ) {
-                $this->get('session')->getFlashBag()->add(
+                $this->get(SessionInterface::class)->getFlashBag()->add(
                     'success',
-                    $this->get('translator')->trans('oro.config.controller.config.saved.message')
+                    $this->get(TranslatorInterface::class)->trans('oro.config.controller.config.saved.message')
                 );
 
                 // outdate content tags, it's only special case for generation that are not covered by NavigationBundle
                 $taggableData = ['name' => 'user_configuration', 'params' => [$activeGroup, $activeSubGroup]];
-                $tagGenerator = $this->get('oro_sync.content.tag_generator');
-                $dataUpdateTopicSender = $this->get('oro_sync.content.data_update_topic_sender');
+                $tagGenerator = $this->get(TagGeneratorInterface::class);
+                $dataUpdateTopicSender = $this->get(DataUpdateTopicSender::class);
 
                 $dataUpdateTopicSender->send($tagGenerator->generate($taggableData));
             }
@@ -110,5 +120,25 @@ class ConfigurationController extends Controller
             'activeSubGroup' => $activeSubGroup,
             'scopeInfo'      => $manager->getScopeInfo()
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                'oro_config.user' => ConfigManager::class,
+                RequestStack::class,
+                SessionInterface::class,
+                TranslatorInterface::class,
+                TagGeneratorInterface::class,
+                UserConfigurationFormProvider::class,
+                DataUpdateTopicSender::class,
+                ConfigHandler::class,
+            ]
+        );
     }
 }

@@ -42,8 +42,6 @@ parameters:
 
     oro_user.role.datagrid_helper.class:          Oro\Bundle\UserBundle\Datagrid\RoleGridHelper
 
-    oro_user.provider.user_configuration.form_provider.class: Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider
-
     # Validator
     oro_user.validator.user_custom_grid_field_validator.class: Oro\Bundle\UserBundle\Validator\UserGridFieldValidator
 
@@ -58,6 +56,9 @@ services:
             - '@security.encoder_factory'
             - '@oro_entity_extend.enum_value_provider'
             - '@oro_user.manager.mailer_processor_link'
+
+    Oro\Bundle\UserBundle\Entity\UserManager:
+        alias: oro_user.manager
 
     oro_user.manager.mailer_processor_link:
         public: false
@@ -518,9 +519,12 @@ services:
             - { name: kernel.event_listener, event: oro_filter.choice_tree_filter_load_data, method: fillData }
 
     oro_user.provider.user_config_form_provider:
-        class: '%oro_user.provider.user_configuration.form_provider.class%'
+        class: Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider
         parent: 'oro_config.provider.abstract_provider'
         lazy: true
+
+    Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider:
+        alias: oro_user.provider.user_config_form_provider
 
     oro_user.provider.user_logging_info_provider:
         class: Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider

@@ -3,16 +3,16 @@
 namespace Oro\Bundle\ConfigBundle\Twig;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 /**
- * Provides Twig functions to retrieve values of configuration settings and container parameters:
+ * Provides Twig functions to retrieve values of configuration settings:
  *   - oro_config_value
- *   - oro_parameter
  */
-class ConfigExtension extends AbstractExtension
+class ConfigExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -33,7 +33,7 @@ class ConfigExtension extends AbstractExtension
      */
     protected function getConfigManager()
     {
-        if (null === $this->configManager) {
+        if (!$this->configManager) {
             $this->configManager = $this->container->get('oro_config.user');
         }
 
@@ -47,7 +47,6 @@ class ConfigExtension extends AbstractExtension
     {
         return [
             new TwigFunction('oro_config_value', [$this, 'getConfigValue']),
-            new TwigFunction('oro_parameter', [$this, 'getParameter']),
         ];
     }
 
@@ -62,20 +61,20 @@ class ConfigExtension extends AbstractExtension
     }
 
     /**
-     * @param string $name
-     *
-     * @return mixed
-     */
-    public function getParameter($name)
-    {
-        return $this->container->getParameter($name);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getName()
     {
         return 'config_extension';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_config.user' => ConfigManager::class
+        ];
     }
 }

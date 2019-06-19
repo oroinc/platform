@@ -4,7 +4,6 @@ parameters:
     oro_config.provider.system_configuration.form_provider.class:                Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider
 
     oro_config.form.config_subscriber.class:                                     Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber
-    oro_config.form.handler.config.class:                                        Oro\Bundle\ConfigBundle\Form\Handler\ConfigHandler
 
     oro_config.type.form.class:                                                  Oro\Bundle\ConfigBundle\Form\Type\FormType
     oro_config.type.form_field.class:                                            Oro\Bundle\ConfigBundle\Form\Type\FormFieldType
@@ -71,9 +70,10 @@ services:
         class: Oro\Bundle\ConfigBundle\Twig\ConfigExtension
         public: false
         arguments:
-           - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: 'oro_config.user' }
 
     oro_config.provider.abstract_provider:
         class: Oro\Bundle\ConfigBundle\Provider\AbstractProvider
@@ -130,9 +130,12 @@ services:
             - { name: form.type }
 
     oro_config.form.handler.config:
-        class: '%oro_config.form.handler.config.class%'
+        class: Oro\Bundle\ConfigBundle\Form\Handler\ConfigHandler
         arguments:
             - '@oro_config.global'
+
+    Oro\Bundle\ConfigBundle\Form\Handler\ConfigHandler:
+        alias: oro_config.form.handler.config
 
     oro_config.manager.api:
         class: '%oro_config.manager.api.class%'
