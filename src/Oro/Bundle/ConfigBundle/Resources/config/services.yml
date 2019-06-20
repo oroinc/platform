@@ -66,6 +66,9 @@ services:
             - '@oro_config.config_definition_bag'
             - '@event_dispatcher'
 
+    Oro\Bundle\ConfigBundle\Config\ConfigManager:
+        alias: oro_config.manager
+
     oro_config.twig.config_extension:
         class: Oro\Bundle\ConfigBundle\Twig\ConfigExtension
         public: false

@@ -65,7 +65,6 @@ class SegmentHandlerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->handler = new SegmentHandler(
-            $this->form,
             $requestStack,
             $this->managerRegistry,
             $this->staticSegmentManager
@@ -86,7 +85,7 @@ class SegmentHandlerTest extends \PHPUnit\Framework\TestCase
         $this->form->expects($this->never())
             ->method('submit');
 
-        $this->assertFalse($this->handler->process($this->entity));
+        $this->assertFalse($this->handler->process($this->form, $this->entity));
     }
 
     public function testProcessValidData()
@@ -124,7 +123,7 @@ class SegmentHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('run')
             ->with($this->entity);
 
-        $this->assertTrue($this->handler->process($this->entity));
+        $this->assertTrue($this->handler->process($this->form, $this->entity));
     }
 
     /**
@@ -143,7 +142,7 @@ class SegmentHandlerTest extends \PHPUnit\Framework\TestCase
         $this->form->expects($this->once())->method('submit')
             ->with(self::FORM_DATA);
 
-        $this->assertFalse($this->handler->process($this->entity));
+        $this->assertFalse($this->handler->process($this->form, $this->entity));
     }
 
     /**

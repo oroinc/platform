@@ -865,7 +865,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
         $filterItem->open();
         $filterItem->selectType($type);
-        $filterItem->setFilterValue($value);
+        // does not need set value if use filter 'is empty' or 'is not empty'
+        if (!in_array($type, ['is empty', 'is not empty'])) {
+            $filterItem->setFilterValue($value);
+        }
         $filterItem->submit();
     }
 

@@ -34,15 +34,19 @@ services:
         class: 'Oro\Bundle\FeatureToggleBundle\Twig\FeatureExtension'
         public: false
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber }
 
     oro_featuretoggle.checker.feature_checker:
         class: Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker
         arguments:
             - '@oro_featuretoggle.configuration.manager'
             - []
+
+    Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker:
+        alias: oro_featuretoggle.checker.feature_checker
 
     oro_featuretoggle.layout.data_provider.feature_provider:
         class: 'Oro\Bundle\FeatureToggleBundle\Layout\DataProvider\FeatureProvider'
