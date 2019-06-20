@@ -196,19 +196,19 @@ define([
             var query = item.val();
 
             if (this.isEmptyType(type)) {
-                if (!this.isEmptyType(query)) {
+                if (query !== '') {
                     this.query = query;
                     this.revertQuery = true;
                 }
-
-                item.hide().val(type);
+                // for 'empty' and 'not empty' filter this value does not matter
+                item.hide().val('');
                 button.addClass(this.updateSelectorEmptyClass);
 
                 return;
             }
 
             // in case page was loaded with empty filter
-            if (this.isEmptyType(query)) {
+            if (query === '') {
                 item.val('');
             }
 
