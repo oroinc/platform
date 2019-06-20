@@ -16,6 +16,9 @@ services:
             - '%kernel.cache_dir%/oro/charts.php'
             - '%kernel.debug%'
 
+    Oro\Bundle\ChartBundle\Model\ConfigProvider:
+        alias: oro_chart.config_provider
+
     oro_chart.view_builder:
         class: '%oro_chart.view_builder.class%'
         shared: false
@@ -61,3 +64,6 @@ services:
 
     oro_chart.options_builder:
         class: '%oro_chart.options_builder.class%'
+
+    Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder:
+        alias: oro_chart.options_builder

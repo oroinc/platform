@@ -44,6 +44,9 @@ services:
             - '@oro_featuretoggle.configuration.manager'
             - []
 
+    Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker:
+        alias: oro_featuretoggle.checker.feature_checker
+
     oro_featuretoggle.layout.data_provider.feature_provider:
         class: 'Oro\Bundle\FeatureToggleBundle\Layout\DataProvider\FeatureProvider'
         arguments:

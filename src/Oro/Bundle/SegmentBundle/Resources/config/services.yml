@@ -109,6 +109,9 @@ services:
     oro_segment.entity_name_provider:
         class: '%oro_segment.entity_name_provider.class%'
 
+    Oro\Bundle\SegmentBundle\Provider\EntityNameProvider:
+        alias: oro_segment.entity_name_provider
+
     oro_segment.grid.datagrid_configuration_builder:
         class: '%oro_segment.grid.datagrid_configuration_builder.class%'
         public: false

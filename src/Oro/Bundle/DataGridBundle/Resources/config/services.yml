@@ -115,6 +115,9 @@ services:
     oro_datagrid.configuration.provider.chain:
         class: Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider
 
+    Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface:
+        alias: oro_datagrid.configuration.provider.chain
+
     oro_datagrid.twig.datagrid:
         class: 'Oro\Bundle\DataGridBundle\Twig\DataGridExtension'
         public: false

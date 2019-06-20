@@ -27,6 +27,9 @@ services:
         tags:
             - { name: oro_datagrid.configuration.provider }
 
+    Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider:
+        alias: oro_report.datagrid.configuration.provider
+
     oro_report.cache:
           parent: oro.cache.abstract
           public: false

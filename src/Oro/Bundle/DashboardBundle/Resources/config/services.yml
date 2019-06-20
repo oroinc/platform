@@ -80,6 +80,9 @@ services:
             - '@oro_security.acl_helper'
             - '@security.token_storage'
 
+    Oro\Bundle\DashboardBundle\Model\Manager:
+        alias: oro_dashboard.manager
+
     oro_dashboard.factory:
         class: '%oro_dashboard.factory.class%'
         lazy: true
@@ -128,12 +131,18 @@ services:
             - '@oro_dashboard.config_provider'
             - '@form.factory'
 
+    Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider:
+        alias: oro_dashboard.provider.widget_configuration_form_provider
+
     oro_dashboard.datetime.helper:
         class: '%oro_dashboard.datetime.helper.class%'
         arguments:
             - '@oro_locale.settings'
             - '@doctrine'
             - '@oro_security.acl_helper'
+
+    Oro\Bundle\DashboardBundle\Helper\DateHelper:
+        alias: oro_dashboard.datetime.helper
 
     oro_dashboard.event_listener.widget_configuration_load:
         class: '%oro_dashboard.event_listener.widget_configuration_load.class%'
