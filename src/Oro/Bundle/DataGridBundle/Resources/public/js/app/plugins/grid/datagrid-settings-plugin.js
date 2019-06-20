@@ -27,6 +27,7 @@ define(function(require) {
             var options = {
                 datagrid: this.main,
                 launcherOptions: _.extend(config, {
+                    allowDialog: _.isMobile(),
                     componentConstructor: toolbarOptions.componentConstructor || DatagridSettingView,
                     viewConstructors: toolbarOptions.viewConstructors || [
                         {

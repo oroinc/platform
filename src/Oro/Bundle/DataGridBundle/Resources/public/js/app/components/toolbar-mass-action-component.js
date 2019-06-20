@@ -35,13 +35,11 @@ define(function(require) {
 
             this.actions.each(function(Action) {
                 var ActionModule = Action.get('module');
+                var action = new ActionModule({datagrid: grid});
 
-                actions.push(
-                    new ActionModule({
-                        datagrid: grid
-                    })
-                );
-            });
+                this.listenTo(action, 'preExecute', this.onActionRun.bind(this));
+                actions.push(action);
+            }, this);
 
             this.actionsPanel = new ActionsPanel({actions: actions, el: options._sourceElement});
             this.actionsPanel.render();
@@ -52,6 +50,14 @@ define(function(require) {
                 }
             });
             ToolbarMassActionComponent.__super__.initialize.apply(this, arguments);
+        },
+
+        onActionRun: function(action) {
+            if (action && action.disposed) {
+                return;
+            }
+
+            action.launcherInstanse.$el.trigger('tohide.bs.dropdown');
         },
 
         /**
