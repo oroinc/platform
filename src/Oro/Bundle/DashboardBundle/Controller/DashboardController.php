@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DashboardBundle\Controller;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Form\Type\DashboardType;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
@@ -27,26 +26,12 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Handles dashboard actions
+ * CRUD controller for the Dashboard entity.
+ *
  * @Route("/dashboard")
  */
 class DashboardController extends AbstractController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedServices()
-    {
-        return array_merge(parent::getSubscribedServices(), [
-            WidgetConfigs::class,
-            TranslatorInterface::class,
-            Router::class,
-            WidgetConfigurationFormProvider::class,
-            Manager::class,
-            ConfigurationProviderInterface::class
-        ]);
-    }
-
     /**
      * @Route(
      *      ".{_format}",
@@ -136,7 +121,10 @@ class DashboardController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $widget->setOptions($form->getData());
-            $this->getDoctrine()->getManager()->flush();
+
+            $manager = $this->getDoctrine()->getManagerForClass(Widget::class);
+            $manager->flush();
+
             $saved = true;
         }
 
@@ -408,10 +396,20 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * @return DashboardRepository
+     * {@inheritdoc}
      */
-    protected function getDashboardRepository()
+    public static function getSubscribedServices()
     {
-        return $this->getDoctrine()->getRepository('OroDashboardBundle:Dashboard');
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                WidgetConfigs::class,
+                TranslatorInterface::class,
+                Router::class,
+                WidgetConfigurationFormProvider::class,
+                Manager::class,
+                ConfigurationProviderInterface::class
+            ]
+        );
     }
 }

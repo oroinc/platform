@@ -112,6 +112,9 @@ services:
         arguments:
             - '@oro_layout.theme_manager'
 
+    Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider:
+        alias: oro_layout.provider.image_type
+
     oro_layout.provider.requirejs_config:
         class: Oro\Bundle\LayoutBundle\Provider\RequireJSConfigProvider
         arguments:

@@ -34,9 +34,10 @@ services:
         class: 'Oro\Bundle\FeatureToggleBundle\Twig\FeatureExtension'
         public: false
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber }
 
     oro_featuretoggle.checker.feature_checker:
         class: Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker

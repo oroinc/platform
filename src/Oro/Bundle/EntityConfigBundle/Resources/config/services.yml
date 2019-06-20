@@ -353,6 +353,9 @@ services:
     oro_entity_config.slug.generator:
         class: 'Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator'
 
+    Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator:
+        alias: oro_entity_config.slug.generator
+
     oro_entity_config.block_type.abstract_attribute_block_type_mapper:
         class: 'Oro\Bundle\EntityConfigBundle\Layout\Mapper\AbstractAttributeBlockTypeMapper'
         abstract: true

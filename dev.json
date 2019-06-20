@@ -17,6 +17,7 @@
         "ext-xml": "*",
         "ext-zip": "*",
         "ext-openssl": "*",
+        "psr/container": "^1.0",
         "symfony/symfony": "3.4.27",
         "symfony/security-acl": "~3.0.0",
         "twig/twig": "2.9.*",

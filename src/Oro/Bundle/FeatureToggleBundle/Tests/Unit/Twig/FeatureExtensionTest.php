@@ -23,7 +23,7 @@ class FeatureExtensionTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $container = self::getContainerBuilder()
-            ->add('oro_featuretoggle.checker.feature_checker', $this->featureChecker)
+            ->add(FeatureChecker::class, $this->featureChecker)
             ->getContainer($this);
 
         $this->extension = new FeatureExtension($container);
