@@ -250,8 +250,15 @@ define(function(require) {
          * @inheritDoc
          */
         _triggerUpdate: function(newValue, oldValue) {
-            if (!tools.isEqualsLoosely(newValue, oldValue) && (!this._isEmpty(newValue.value) ||
-                (!this._isEmpty(oldValue.value) && this._isEmpty(newValue.value)))) {
+            if (
+                !tools.isEqualsLoosely(newValue, oldValue) &&
+                (
+                    this.isEmptyType(newValue.type) ||
+                    this.isEmptyType(oldValue.type) ||
+                    !this._isEmpty(newValue.value) ||
+                    (!this._isEmpty(oldValue.value) && this._isEmpty(newValue.value))
+                )
+            ) {
                 this.trigger('update');
             }
         },
