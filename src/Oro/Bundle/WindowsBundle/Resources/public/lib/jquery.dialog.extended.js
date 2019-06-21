@@ -12,8 +12,15 @@
  *   jQuery UI Dialog 1.10.2
  *
  */
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools', 'jquery-ui'], function ($, _, __, tools) {
+define(function (require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var tools = require('oroui/js/tools');
+    require('jquery-ui');
+
     $.widget( 'ui.dialog', $.ui.dialog, {
         version: '2.0.0',
 
@@ -332,7 +339,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                     }
                 });
                 this.widget().css('position', _.isMobile() ? 'relative' : 'fixed'); // remove scroll when maximized
-                if ($.isFunction(onResizeCallback)) {
+                if (typeof onResizeCallback === 'function') {
                     onResizeCallback();
                 }
             } else {
@@ -386,7 +393,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         _getContainerHeight: function() {
             var heightDelta = 0;
             if (this.options.maximizedHeightDecreaseBy) {
-                if ($.isNumeric(this.options.maximizedHeightDecreaseBy)) {
+                if (tools.isNumeric(this.options.maximizedHeightDecreaseBy)) {
                     heightDelta = this.options.maximizedHeightDecreaseBy;
                 } else if (this.options.maximizedHeightDecreaseBy === 'minimize-bar') {
                     heightDelta = this._getMinimizeTo().height();
@@ -628,7 +635,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         _restoreWithoutTriggerEvent: function () {
             var beforeState = this.state();
             var method = '_restoreFrom' + beforeState.charAt(0).toUpperCase() + beforeState.slice(1);
-            if ($.isFunction(this[method])) {
+            if (typeof this[method] === 'function') {
                 this[method]();
             } else {
                 $.error('jQuery.dialogExtend Error : Cannot restore dialog from unknown state "' + beforeState + '"');

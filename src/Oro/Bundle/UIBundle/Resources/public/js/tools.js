@@ -400,6 +400,16 @@ define(function(require) {
         },
 
         /**
+         * Checks if passed value represents a number (e.g. 3.5 and '3.5' are numeric)
+         *
+         * @param {*} value
+         * @return {boolean}
+         */
+        isNumeric: function(value) {
+            return !isNaN(parseFloat(value)) && isFinite(value);
+        },
+
+        /**
          * Adds css rules to the first style sheet
          *
          * @param {string} selector
