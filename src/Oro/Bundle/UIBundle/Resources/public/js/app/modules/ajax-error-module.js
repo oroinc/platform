@@ -3,5 +3,5 @@ define([
     'oroui/js/error'
 ], function($, error) {
     'use strict';
-    $(document).ajaxError($.proxy(error.handle, error));
+    $(document).ajaxError(error.handle.bind(error));
 });
