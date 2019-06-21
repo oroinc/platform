@@ -3,14 +3,39 @@
 namespace Oro\Bundle\OrganizationBundle\Controller;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Form\Handler\OrganizationHandler;
+use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationType;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class OrganizationController extends Controller
+/**
+ * Handles organization update action
+ */
+class OrganizationController extends AbstractController
 {
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            TokenStorageInterface::class,
+            OrganizationHandler::class,
+            FormFactoryInterface::class,
+            SessionInterface::class,
+            TranslatorInterface::class,
+            Router::class
+        ]);
+    }
+
     /**
      * Edit organization form
      *
@@ -26,7 +51,7 @@ class OrganizationController extends Controller
     public function updateCurrentAction()
     {
         /** @var UsernamePasswordOrganizationToken $token */
-        $token = $this->get('security.token_storage')->getToken();
+        $token = $this->get(TokenStorageInterface::class)->getToken();
         $organization = $token->getOrganizationContext();
 
         return $this->update($organization);
@@ -38,18 +63,24 @@ class OrganizationController extends Controller
      */
     protected function update(Organization $entity)
     {
-        if ($this->get('oro_organization.form.handler.organization')->process($entity)) {
-            $this->get('session')->getFlashBag()->add(
+        $organizationForm = $this->get(FormFactoryInterface::class)->createNamed(
+            'oro_organization_form',
+            OrganizationType::class,
+            $entity
+        );
+
+        if ($this->get(OrganizationHandler::class)->process($entity, $organizationForm)) {
+            $this->get(SessionInterface::class)->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.organization.controller.message.saved')
+                $this->get(TranslatorInterface::class)->trans('oro.organization.controller.message.saved')
             );
 
-            return $this->get('oro_ui.router')->redirect($entity);
+            return $this->get(Router::class)->redirect($entity);
         }
 
         return [
             'entity' => $entity,
-            'form' => $this->get('oro_organization.form.organization')->createView(),
+            'form' => $organizationForm->createView(),
         ];
     }
 }

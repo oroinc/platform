@@ -4,16 +4,35 @@ namespace Oro\Bundle\ApiBundle\Command;
 
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
  * The base class for CLI commands that shows a different kind of debug information about Data API configuration.
  */
-abstract class AbstractDebugCommand extends ContainerAwareCommand
+abstract class AbstractDebugCommand extends Command
 {
+    /** @var ValueNormalizer */
+    protected $valueNormalizer;
+
+    /** @var ResourcesProvider */
+    protected $resourcesProvider;
+
+    /**
+     * @param ValueNormalizer $valueNormalizer
+     * @param ResourcesProvider $resourcesProvider
+     */
+    public function __construct(ValueNormalizer $valueNormalizer, ResourcesProvider $resourcesProvider)
+    {
+        parent::__construct();
+
+        $this->valueNormalizer = $valueNormalizer;
+        $this->resourcesProvider = $resourcesProvider;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -114,15 +133,13 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
         $entityClass = $entityName;
         if (false === strpos($entityClass, '\\')) {
             $entityClass = ValueNormalizerUtil::convertToEntityClass(
-                $this->getContainer()->get('oro_api.value_normalizer'),
+                $this->valueNormalizer,
                 $entityName,
                 $requestType
             );
         }
 
-        /** @var ResourcesProvider $resourcesProvider */
-        $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
-        if (!$resourcesProvider->isResourceKnown($entityClass, $version, $requestType)) {
+        if (!$this->resourcesProvider->isResourceKnown($entityClass, $version, $requestType)) {
             throw new \RuntimeException(
                 sprintf('The "%s" entity is not configured to be used in Data API.', $entityClass)
             );

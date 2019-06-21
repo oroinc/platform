@@ -140,7 +140,7 @@ services:
     oro_soap.locale_listener:
         class: '%oro_soap.locale_listener.class%'
         arguments:
-            - '@service_container'
+            - '@stof_doctrine_extensions.listener.translatable'
         tags:
             - { name: kernel.event_subscriber }
 

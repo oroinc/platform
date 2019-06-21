@@ -41,7 +41,7 @@ define(function(require) {
 
         dialogWidget: null,
 
-        allowDialog: true,
+        allowDialog: false,
 
         /**
          * @inheritDoc
@@ -80,7 +80,7 @@ define(function(require) {
          */
         render: function() {
             ActionComponentDropdownLauncher.__super__.render.call(this);
-            if (_.isMobile() && this.allowDialog) {
+            if (this.allowDialog) {
                 this.$('.dropdown-toggle').dropdown('dispose');
                 this.$('.dropdown-toggle').on('click' + this.eventNamespace(), _.bind(this.openDialogWidget, this));
             }

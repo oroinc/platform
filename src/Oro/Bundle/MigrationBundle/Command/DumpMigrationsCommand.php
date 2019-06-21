@@ -2,17 +2,44 @@
 
 namespace Oro\Bundle\MigrationBundle\Command;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\MigrationBundle\Tools\SchemaDumper;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DumpMigrationsCommand extends ContainerAwareCommand
+/**
+ * Dump existing database structure.
+ */
+class DumpMigrationsCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:migration:dump';
+
+    /**
+     * @var ManagerRegistry
+     */
+    private $registry;
+
+    /**
+     * @var SchemaDumper
+     */
+    private $schemaDumper;
+
+    /**
+     * @var ConfigManager
+     */
+    private $configManager;
+
+    /**
+     * @var array
+     */
+    private $bundles;
+
     /**
      * @var array
      */
@@ -39,17 +66,31 @@ class DumpMigrationsCommand extends ContainerAwareCommand
     protected $version;
 
     /**
-     * @var ConfigManager
+     * @param ManagerRegistry $registry
+     * @param SchemaDumper $schemaDumper
+     * @param ConfigManager $configManager
+     * @param array $bundles
      */
-    protected $configManager;
+    public function __construct(
+        ManagerRegistry $registry,
+        SchemaDumper $schemaDumper,
+        ConfigManager $configManager,
+        array $bundles
+    ) {
+        parent::__construct();
+
+        $this->registry = $registry;
+        $this->schemaDumper = $schemaDumper;
+        $this->configManager = $configManager;
+        $this->bundles = $bundles;
+    }
 
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName('oro:migration:dump')
-            ->addOption('plain-sql', null, InputOption::VALUE_NONE, 'Out schema as plain sql queries')
+        $this->addOption('plain-sql', null, InputOption::VALUE_NONE, 'Out schema as plain sql queries')
             ->addOption(
                 'bundle',
                 null,
@@ -74,13 +115,13 @@ class DumpMigrationsCommand extends ContainerAwareCommand
         $this->version = $input->getOption('migration-version');
         $this->initializeBundleRestrictions($input->getOption('bundle'));
         $this->initializeMetadataInformation();
-        $doctrine = $this->getContainer()->get('doctrine');
+
+        $connection = $this->registry->getConnection();
+
         /** @var Schema $schema */
-        $schema = $doctrine->getConnection()->getSchemaManager()->createSchema();
+        $schema = $connection->getSchemaManager()->createSchema();
 
         if ($input->getOption('plain-sql')) {
-            /** @var Connection $connection */
-            $connection = $this->getContainer()->get('doctrine')->getConnection();
             $sqls = $schema->toSql($connection->getDatabasePlatform());
             foreach ($sqls as $sql) {
                 $output->writeln($sql . ';');
@@ -96,13 +137,12 @@ class DumpMigrationsCommand extends ContainerAwareCommand
     protected function initializeBundleRestrictions($bundle)
     {
         if ($bundle) {
-            $bundles = $this->getContainer()->getParameter('kernel.bundles');
-            if (!array_key_exists($bundle, $bundles)) {
+            if (!array_key_exists($bundle, $this->bundles)) {
                 throw new \InvalidArgumentException(
                     sprintf('Bundle "%s" is not a known bundle', $bundle)
                 );
             }
-            $this->namespace = str_replace($bundle, 'Entity', $bundles[$bundle]);
+            $this->namespace = str_replace($bundle, 'Entity', $this->bundles[$bundle]);
             $this->className = $bundle . 'Installer';
         }
     }
@@ -112,9 +152,8 @@ class DumpMigrationsCommand extends ContainerAwareCommand
      */
     protected function initializeMetadataInformation()
     {
-        $doctrine = $this->getContainer()->get('doctrine');
         /** @var ClassMetadata[] $allMetadata */
-        $allMetadata = $doctrine->getManager()->getMetadataFactory()->getAllMetadata();
+        $allMetadata = $this->registry->getManager()->getMetadataFactory()->getAllMetadata();
         array_walk(
             $allMetadata,
             function (ClassMetadata $entityMetadata) {
@@ -143,11 +182,10 @@ class DumpMigrationsCommand extends ContainerAwareCommand
      */
     protected function initializeExtendedFieldsOptions(ClassMetadata $classMetadata)
     {
-        $configManager = $this->getConfigManager();
         $className = $classMetadata->getName();
         $tableName = $classMetadata->getTableName();
         foreach ($classMetadata->getFieldNames() as $fieldName) {
-            if ($configManager->hasConfig($className, $fieldName)) {
+            if ($this->configManager->hasConfig($className, $fieldName)) {
                 $columnName = $classMetadata->getColumnName($fieldName);
                 $options = $this->getExtendedFieldOptions($className, $fieldName);
                 if (!empty($options['extend']['is_extend'])) {
@@ -166,11 +204,10 @@ class DumpMigrationsCommand extends ContainerAwareCommand
      */
     protected function getExtendedFieldOptions($className, $fieldName)
     {
-        $configManager = $this->getConfigManager();
-        $config = array();
-        foreach ($configManager->getProviders() as $provider) {
+        $config = [];
+        foreach ($this->configManager->getProviders() as $provider) {
             $fieldId = $provider->getId($className, $fieldName);
-            $extendedConfig = $configManager->getConfig($fieldId)->all();
+            $extendedConfig = $this->configManager->getConfig($fieldId)->all();
             if (!empty($extendedConfig)) {
                 $config[$provider->getScope()] = $extendedConfig;
             }
@@ -185,11 +222,10 @@ class DumpMigrationsCommand extends ContainerAwareCommand
      */
     protected function dumpPhpSchema(Schema $schema, OutputInterface $output)
     {
-        $visitor = $this->getContainer()->get('oro_migration.tools.schema_dumper');
-        $schema->visit($visitor);
+        $schema->visit($this->schemaDumper);
 
         $output->writeln(
-            $visitor->dump(
+            $this->schemaDumper->dump(
                 $this->allowedTables,
                 $this->namespace,
                 $this->className,
@@ -197,17 +233,5 @@ class DumpMigrationsCommand extends ContainerAwareCommand
                 $this->extendedFieldOptions
             )
         );
-    }
-
-    /**
-     * @return ConfigManager
-     */
-    protected function getConfigManager()
-    {
-        if (!$this->configManager) {
-            $this->configManager = $this->getContainer()->get('oro_entity_config.config_manager');
-        }
-
-        return $this->configManager;
     }
 }

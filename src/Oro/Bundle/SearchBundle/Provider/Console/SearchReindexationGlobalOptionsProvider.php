@@ -27,7 +27,7 @@ class SearchReindexationGlobalOptionsProvider extends AbstractGlobalOptionsProvi
             $command->getCommand()->getName() :
             $command->getName();
 
-        if ($name !== PlatformUpdateCommand::NAME) {
+        if ($name !== PlatformUpdateCommand::getDefaultName()) {
             return;
         }
 

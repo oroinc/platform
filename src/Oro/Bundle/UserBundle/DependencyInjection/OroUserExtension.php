@@ -29,6 +29,7 @@ class OroUserExtension extends Extension implements PrependExtensionInterface
         $loader->load('importexport.yml');
         $loader->load('mass_actions.yml');
         $loader->load('commands.yml');
+        $loader->load('controllers.yml');
 
         $container->setParameter('oro_user.reset.ttl', $config['reset']['ttl']);
         $container->setParameter('oro_user.privileges', $config['privileges']);

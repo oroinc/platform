@@ -1,6 +1,5 @@
 parameters:
     oro_entity_config.entity.entity_field.class:                Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel
-    oro_entity_config.config_manager.class:                     Oro\Bundle\EntityConfigBundle\Config\ConfigManager
     oro_entity_config.config_model_manager.class:               Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager
     oro_entity_config.tools.command_executor.class:             Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor
     oro_entity_config.config_loader.class:                      Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader
@@ -27,7 +26,7 @@ services:
             - '@doctrine'
 
     oro_entity_config.config_manager:
-        class: '%oro_entity_config.config_manager.class%'
+        class: Oro\Bundle\EntityConfigBundle\Config\ConfigManager
         arguments:
             - '@event_dispatcher'
             - '@oro_entity_config.metadata.annotation_metadata_factory'
@@ -353,6 +352,9 @@ services:
 
     oro_entity_config.slug.generator:
         class: 'Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator'
+
+    Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator:
+        alias: oro_entity_config.slug.generator
 
     oro_entity_config.block_type.abstract_attribute_block_type_mapper:
         class: 'Oro\Bundle\EntityConfigBundle\Layout\Mapper\AbstractAttributeBlockTypeMapper'

@@ -25,6 +25,30 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class DumpCommand extends AbstractDebugCommand
 {
+    /** @var ManagerRegistry */
+    private $registry;
+
+    /** @var SubresourcesProvider */
+    private $subresourcesProvider;
+
+    /**
+     * @param ValueNormalizer $valueNormalizer
+     * @param ResourcesProvider $resourcesProvider
+     * @param ManagerRegistry $registry
+     * @param SubresourcesProvider $subresourcesProvider
+     */
+    public function __construct(
+        ValueNormalizer $valueNormalizer,
+        ResourcesProvider $resourcesProvider,
+        ManagerRegistry $registry,
+        SubresourcesProvider $subresourcesProvider
+    ) {
+        parent::__construct($valueNormalizer, $resourcesProvider);
+
+        $this->registry = $registry;
+        $this->resourcesProvider = $resourcesProvider;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -76,9 +100,7 @@ class DumpCommand extends AbstractDebugCommand
         // API version is not supported for now
         $version = Version::normalizeVersion(null);
 
-        /** @var ResourcesProvider $resourcesProvider */
-        $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
-        $resources = $resourcesProvider->getResources($version, $requestType);
+        $resources = $this->resourcesProvider->getResources($version, $requestType);
         $accessibleEntities = [];
         foreach ($resources as $resource) {
             $accessibleEntities[$resource->getEntityClass()] = true;
@@ -86,8 +108,7 @@ class DumpCommand extends AbstractDebugCommand
 
         $notAccessibleEntities = [];
         /** @var ManagerRegistry $doctrine */
-        $doctrine = $this->getContainer()->get('doctrine');
-        $managers = $doctrine->getManagers();
+        $managers = $this->registry->getManagers();
         foreach ($managers as $manager) {
             if (!$manager instanceof EntityManager) {
                 continue;
@@ -123,18 +144,13 @@ class DumpCommand extends AbstractDebugCommand
         $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $version, $requestType);
         $isSubresourcesRequested = $input->getOption('sub-resources');
 
-        /** @var ResourcesProvider $resourcesProvider */
-        $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
-        $resources = $resourcesProvider->getResources($version, $requestType);
+        $resources = $this->resourcesProvider->getResources($version, $requestType);
         /** @var ApiResource[] $sortedResources */
         $sortedResources = [];
         foreach ($resources as $resource) {
             $sortedResources[$resource->getEntityClass()] = $resource;
         }
         ksort($sortedResources);
-
-        /** @var SubresourcesProvider $subresourcesProvider */
-        $subresourcesProvider = $this->getContainer()->get('oro_api.subresources_provider');
 
         foreach ($sortedResources as $resource) {
             if ($entityClass && $resource->getEntityClass() !== $entityClass) {
@@ -148,7 +164,7 @@ class DumpCommand extends AbstractDebugCommand
             );
             if ($isSubresourcesRequested) {
                 $subresourcesText = $this->getEntitySubresourcesText(
-                    $subresourcesProvider->getSubresources($resource->getEntityClass(), $version, $requestType),
+                    $this->subresourcesProvider->getSubresources($resource->getEntityClass(), $version, $requestType),
                     $requestType
                 );
                 if ($subresourcesText) {
@@ -204,9 +220,7 @@ class DumpCommand extends AbstractDebugCommand
 
         $entityClass = $resource->getEntityClass();
 
-        /** @var ValueNormalizer $valueNormalizer */
-        $valueNormalizer = $this->getContainer()->get('oro_api.value_normalizer');
-        $result['Entity Type'] = $valueNormalizer->normalizeValue(
+        $result['Entity Type'] = $this->valueNormalizer->normalizeValue(
             $entityClass,
             DataType::ENTITY_TYPE,
             $requestType
@@ -254,7 +268,7 @@ class DumpCommand extends AbstractDebugCommand
         }
 
         return ValueNormalizerUtil::convertToEntityType(
-            $this->getContainer()->get('oro_api.value_normalizer'),
+            $this->valueNormalizer,
             $entityClass,
             $requestType
         );

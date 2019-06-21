@@ -2,15 +2,29 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Dashboard;
 
+use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\EmailBundle\Manager\EmailNotificationManager;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * Provide functionality to manage recent emails on dashboard
  */
-class DashboardController extends Controller
+class DashboardController extends AbstractController
 {
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            TokenAccessorInterface::class,
+            WidgetConfigs::class,
+            EmailNotificationManager::class
+        ]);
+    }
+
     /**
      * @Route(
      *      "/recent_emails/{widget}/{activeTab}/{contentType}",
@@ -35,7 +49,7 @@ class DashboardController extends Controller
         if ($contentType === 'tab') {
             return $activeTabContent;
         } else {
-            $currentOrganization = $this->get('oro_security.token_accessor')->getOrganization();
+            $currentOrganization = $this->get(TokenAccessorInterface::class)->getOrganization();
 
             $unreadMailCount = 0;
             if ($this->isGranted('oro_email_email_user_view')) {
@@ -51,7 +65,7 @@ class DashboardController extends Controller
                     'activeTabContent' => $activeTabContent,
                     'unreadMailCount'  => $unreadMailCount,
                 ],
-                $this->get('oro_dashboard.widget_configs')->getWidgetAttributesForTwig($widget)
+                $this->get(WidgetConfigs::class)->getWidgetAttributesForTwig($widget)
             );
 
             return $this->render(
