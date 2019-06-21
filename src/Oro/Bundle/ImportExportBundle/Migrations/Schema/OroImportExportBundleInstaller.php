@@ -13,7 +13,7 @@ class OroImportExportBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_1';
+        return 'v1_2';
     }
 
     /**
@@ -38,6 +38,7 @@ class OroImportExportBundleInstaller implements Installation
         $table->addColumn('job_id', 'integer', ['unique' => true, 'notnull' => true]);
         $table->addColumn('type', 'string', ['unique' => false, 'length' => 255, 'notnull' => true]);
         $table->addColumn('entity', 'string', ['unique' => false, 'length' => 255, 'notnull' => true]);
+        $table->addColumn('options', 'array', ['comment' => '(DC2Type:array)']);
         $table->addColumn('expired', 'boolean', ['default' => '0']);
         $table->addColumn('created_at', 'datetime', []);
         $table->setPrimaryKey(['id']);

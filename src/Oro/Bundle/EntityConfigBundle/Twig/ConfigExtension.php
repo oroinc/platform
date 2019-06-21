@@ -9,7 +9,8 @@ use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
@@ -27,7 +28,7 @@ use Twig\TwigFunction;
  *   - oro_entity_view_link
  *   - oro_entity_object_view_link
  */
-class ConfigExtension extends AbstractExtension
+class ConfigExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const NAME = 'oro_entity_config';
 
@@ -54,7 +55,7 @@ class ConfigExtension extends AbstractExtension
     protected function getConfigManager()
     {
         if (null === $this->configManager) {
-            $this->configManager = $this->container->get('oro_entity_config.config_manager');
+            $this->configManager = $this->container->get(ConfigManager::class);
         }
 
         return $this->configManager;
@@ -65,7 +66,7 @@ class ConfigExtension extends AbstractExtension
      */
     protected function getEntityClassNameHelper()
     {
-        return $this->container->get('oro_entity.entity_class_name_helper');
+        return $this->container->get(EntityClassNameHelper::class);
     }
 
     /**
@@ -74,7 +75,7 @@ class ConfigExtension extends AbstractExtension
     protected function getRouter()
     {
         if (null === $this->router) {
-            $this->router = $this->container->get('router');
+            $this->router = $this->container->get(RouterInterface::class);
         }
 
         return $this->router;
@@ -85,7 +86,7 @@ class ConfigExtension extends AbstractExtension
      */
     protected function getDoctrineHelper()
     {
-        return $this->container->get('oro_entity.doctrine_helper');
+        return $this->container->get(DoctrineHelper::class);
     }
 
     /**
@@ -312,5 +313,18 @@ class ConfigExtension extends AbstractExtension
         $id = $this->getDoctrineHelper()->getSingleEntityIdentifier($entity);
 
         return $this->getViewLink($className, $id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            ConfigManager::class,
+            EntityClassNameHelper::class,
+            RouterInterface::class,
+            DoctrineHelper::class,
+        ];
     }
 }

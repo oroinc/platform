@@ -12,6 +12,7 @@ oro:
             owner.label: Owner
             entity.label: Entity name
             type.label: Type
+            options.label: Options
 
         action:
             export:  "Export entity records"

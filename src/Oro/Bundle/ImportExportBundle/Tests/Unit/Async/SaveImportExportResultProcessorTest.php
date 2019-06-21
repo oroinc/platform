@@ -34,10 +34,10 @@ class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->jobStorage = self::createMock(JobStorage::class);
-        $this->userManager = self::createMock(UserManager::class);
-        $this->importExportResultManager = self::createMock(ImportExportResultManager::class);
-        $this->logger = self::createMock(LoggerInterface::class);
+        $this->jobStorage = $this->createMock(JobStorage::class);
+        $this->userManager = $this->createMock(UserManager::class);
+        $this->importExportResultManager = $this->createMock(ImportExportResultManager::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->saveExportResultProcessor = new SaveImportExportResultProcessor(
             $this->importExportResultManager,
@@ -56,74 +56,127 @@ class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
     public function testProcessWithValidMessage(): void
     {
         $this->logger
-            ->expects(self::never())
+            ->expects($this->never())
             ->method('critical');
         /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject */
-        $session = self::createMock(SessionInterface::class);
+        $session = $this->createMock(SessionInterface::class);
         /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject */
-        $message = self::createMock(MessageInterface::class);
+        $message = $this->createMock(MessageInterface::class);
 
         $message
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getBody')
             ->willReturn(JSON::encode([
                 'jobId' => '1',
                 'type' => ProcessorRegistry::TYPE_EXPORT,
-                'entity' => 'Acme'
+                'entity' => 'Acme',
+                'options' => ['test1' => 'test2']
             ]));
 
         $job = new Job();
         $job->setId(1);
 
         $this->importExportResultManager
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('saveResult')
             ->with(1, ProcessorRegistry::TYPE_EXPORT, 'Acme', null, null);
 
         $this->jobStorage
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('findJobById')
             ->willReturn($job);
 
         $result = $this->saveExportResultProcessor->process($message, $session);
 
-        self::assertEquals(MessageProcessorInterface::ACK, $result);
+        $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testProcessWithInvalidMessage(): void
+    /**
+     * @param array $parameters
+     * @param string $expectedError
+     * @dataProvider getProcessWithInvalidMessageDataProvider
+     */
+    public function testProcessWithInvalidMessage(array $parameters, $expectedError): void
     {
         $this->logger
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('critical')
-            ->with(self::stringContains('Not enough required parameters:'));
+            ->with($this->stringContains($expectedError));
         /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject */
-        $session = self::createMock(SessionInterface::class);
+        $session = $this->createMock(SessionInterface::class);
         /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject */
-        $message = self::createMock(MessageInterface::class);
+        $message = $this->createMock(MessageInterface::class);
 
         $message
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getBody')
-            ->willReturn(JSON::encode([
-                'jobId' => 1,
-                'type' => 'invalid_processor_type',
-                'entity' => null
-            ]));
+            ->willReturn(JSON::encode($parameters));
 
         $job = new Job();
         $job->setId(1);
 
         $this->importExportResultManager
-            ->expects(self::never())
+            ->expects($this->never())
             ->method('saveResult');
 
         $this->jobStorage
-            ->expects(self::never())
+            ->expects($this->never())
             ->method('findJobById')
             ->willReturn($job);
 
         $result = $this->saveExportResultProcessor->process($message, $session);
 
-        self::assertEquals(MessageProcessorInterface::REJECT, $result);
+        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function getProcessWithInvalidMessageDataProvider()
+    {
+        return [
+            'without jobId' => [
+                'parameters' => [
+                    'type' => ProcessorRegistry::TYPE_EXPORT,
+                    'entity' => '1',
+                    'options' => ['test1' => 'test2']
+                ],
+                'expectedError' => 'Error occurred during save result: The required option "jobId" is missing.'
+            ],
+            'without entity' => [
+                'parameters' => [
+                    'jobId' => 1,
+                    'type' => ProcessorRegistry::TYPE_EXPORT,
+                    'options' => ['test1' => 'test2']
+                ],
+                'expectedError' => 'Error occurred during save result: The required option "entity" is missing.'
+            ],
+            'without type' => [
+                'parameters' => [
+                    'jobId' => 1,
+                    'entity' => '1',
+                    'options' => ['test1' => 'test2']
+                ],
+                'expectedError' => 'Error occurred during save result: The required option "type" is missing.'
+            ],
+            'invalid processor' => [
+                'parameters' => [
+                    'jobId' => 1,
+                    'type' => 'invalid_type',
+                    'entity' => '1',
+                    'options' => ['test1' => 'test2']
+                ],
+                'expectedError' => 'The option "type" with value "invalid_type" is invalid. Accepted values are:'
+            ],
+            'options not array' => [
+                'parameters' => [
+                    'jobId' => 1,
+                    'type' => ProcessorRegistry::TYPE_EXPORT,
+                    'entity' => '1',
+                    'options' => 1
+                ],
+                'expectedError' => 'is expected to be of type "array", but is of type'
+            ]
+        ];
     }
 }

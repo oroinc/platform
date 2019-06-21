@@ -10,6 +10,7 @@ use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Component\PhpUtils\Formatter\BytesFormatter;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
@@ -31,14 +32,14 @@ use Twig\TwigFunction;
  *   - oro_file_view
  *   - oro_image_view
  */
-class FileExtension extends AbstractExtension
+class FileExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     private const DEFAULT_THUMB_SIZE = 16;
     private const FILES_TEMPLATE = 'OroAttachmentBundle:Twig:file.html.twig';
     private const IMAGES_TEMPLATE = 'OroAttachmentBundle:Twig:image.html.twig';
 
     /** @var ContainerInterface */
-    protected $container;
+    private $container;
 
     /**
      * @param ContainerInterface $container
@@ -53,7 +54,7 @@ class FileExtension extends AbstractExtension
      */
     protected function getAttachmentManager()
     {
-        return $this->container->get('oro_attachment.manager');
+        return $this->container->get(AttachmentManager::class);
     }
 
     /**
@@ -61,7 +62,7 @@ class FileExtension extends AbstractExtension
      */
     protected function getConfigManager()
     {
-        return $this->container->get('oro_entity_config.config_manager');
+        return $this->container->get(ConfigManager::class);
     }
 
     /**
@@ -69,7 +70,7 @@ class FileExtension extends AbstractExtension
      */
     protected function getDoctrine()
     {
-        return $this->container->get('doctrine');
+        return $this->container->get(ManagerRegistry::class);
     }
 
     /**
@@ -323,6 +324,19 @@ class FileExtension extends AbstractExtension
      */
     private function getPropertyAccessor(): PropertyAccessorInterface
     {
-        return $this->container->get('property_accessor');
+        return $this->container->get(PropertyAccessorInterface::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            AttachmentManager::class,
+            ConfigManager::class,
+            ManagerRegistry::class,
+            PropertyAccessorInterface::class,
+        ];
     }
 }

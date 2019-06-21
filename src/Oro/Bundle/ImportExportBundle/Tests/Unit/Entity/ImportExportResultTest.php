@@ -22,6 +22,7 @@ class ImportExportResultTest extends \PHPUnit\Framework\TestCase
             ['jobId', 1, false],
             ['type', 'import_or_export', false],
             ['expired', false, true],
+            ['options', ['option1' => 'test'], []],
         ];
 
         self::assertPropertyAccessors(new ImportExportResult(), $properties);

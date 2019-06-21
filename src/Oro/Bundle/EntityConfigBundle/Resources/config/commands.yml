@@ -3,6 +3,9 @@ services:
         public: false
 
     Oro\Bundle\EntityConfigBundle\Command\CacheClearCommand:
+        arguments:
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity_config.config_cache_warmer'
         tags:
             - { name: console.command }
 
@@ -11,6 +14,9 @@ services:
             - { name: console.command }
 
     Oro\Bundle\EntityConfigBundle\Command\DebugCommand:
+        arguments:
+            - '@doctrine'
+            - '@oro_entity_config.config_manager'
         tags:
             - { name: console.command }
 
