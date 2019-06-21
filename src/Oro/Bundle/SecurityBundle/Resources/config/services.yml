@@ -713,6 +713,9 @@ services:
         arguments:
             - '@oro_security.encoder.default'
 
+    Oro\Bundle\SecurityBundle\Generator\RandomTokenGeneratorInterface:
+        alias: oro_security.generator.random_token
+
     oro_security.form.data_transformer.factory.crypted_data:
         class: 'Oro\Bundle\SecurityBundle\Form\DataTransformer\Factory\CryptedDataTransformerFactory'
         arguments:

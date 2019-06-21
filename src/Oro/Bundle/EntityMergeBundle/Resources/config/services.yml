@@ -1,14 +1,8 @@
 parameters:
-    # Doctrine Helper
-    oro_entity_merge.doctrine_helper.class: Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper
-
     # Metadata
     oro_entity_merge.metadata.builder.class: Oro\Bundle\EntityMergeBundle\Metadata\MetadataBuilder
     oro_entity_merge.metadata.factory.class: Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory
     oro_entity_merge.metadata.registry.class: Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry
-
-    # Entity Data
-    oro_entity_merge.data.entity_data_factory.class: Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory
 
     # Merger
     oro_entity_merge.merger.class: Oro\Bundle\EntityMergeBundle\Model\EntityMerger
@@ -47,17 +41,23 @@ parameters:
 
 services:
     oro_entity_merge.doctrine_helper:
-        class: '%oro_entity_merge.doctrine_helper.class%'
+        class: Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_entity.orm.mapping.additional_metadata_provider'
 
+    Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper:
+        alias: oro_entity_merge.doctrine_helper
+
     oro_entity_merge.data.entity_data_factory:
-        class: '%oro_entity_merge.data.entity_data_factory.class%'
+        class: Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory
         arguments:
             - '@oro_entity_merge.metadata.registry'
             - '@oro_entity_merge.doctrine_helper'
             - '@event_dispatcher'
+
+    Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory:
+        alias: oro_entity_merge.data.entity_data_factory
 
     oro_entity_merge.metadata.builder:
         class: '%oro_entity_merge.metadata.builder.class%'
@@ -81,6 +81,9 @@ services:
         arguments:
             - []
             - '@event_dispatcher'
+
+    Oro\Bundle\EntityMergeBundle\Model\EntityMergerInterface:
+        alias: oro_entity_merge.merger
 
     # Steps
     oro_entity_merge.step.validate:

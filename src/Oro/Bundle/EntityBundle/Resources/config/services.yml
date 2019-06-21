@@ -17,14 +17,12 @@ parameters:
     oro_entity.event_listener.entity_modify_created_updated_properties_listener.class: Oro\Bundle\EntityBundle\EventListener\ModifyCreatedAndUpdatedPropertiesListener
     oro_entity.exclusion_provider.chain.class:                                         Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
     oro_entity.entity_provider.class:                                                  Oro\Bundle\EntityBundle\Provider\EntityProvider
-    oro_entity.entity_field_provider.class:                                            Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
     oro_entity.entity_field_list_provider.class:                                       Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
     oro_entity.routing_helper.class:                                                   Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper
     oro_entity.extension.unique_entity_extension.class:                                Oro\Bundle\EntityBundle\Form\Extension\UniqueEntityExtension
     oro_entity.listener.orm.generated_value_strategy_listener.class: Oro\Bundle\EntityBundle\EventListener\ORM\GeneratedValueStrategyListener
     oro_entity.migration.extension.change_type.class: Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtension
     oro_entity.entity_alias_resolver.class:                  Oro\Bundle\EntityBundle\ORM\EntityAliasResolver
-    oro_entity.entity_class_name_helper.class:               Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper
     oro_entity.entity_class_name_provider.default.class:     Oro\Bundle\EntityBundle\Provider\EntityClassNameProvider
     oro_entity.dictionary_value_list_provider.default.class: Oro\Bundle\EntityBundle\Provider\DictionaryValueListProvider
     oro_entity.orm.mapping.additional_metadata_provider.class: Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider
@@ -239,8 +237,11 @@ services:
             - '@oro_entity.entity_manager_bag'
 
     oro_entity.entity_field_provider:
-        class: '%oro_entity.entity_field_provider.class%'
+        class: Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
         parent: oro_entity.entity_field_provider.abstract
+
+    Oro\Bundle\EntityBundle\Provider\EntityFieldProvider:
+        alias: oro_entity.entity_field_provider
 
     oro_entity.entity_field_provider.link:
         tags:
@@ -367,9 +368,12 @@ services:
             - { name: oro_entity.class_provider }
 
     oro_entity.entity_class_name_helper:
-        class: '%oro_entity.entity_class_name_helper.class%'
+        class: Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper
         arguments:
             - '@oro_entity.entity_alias_resolver'
+
+    Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper:
+        alias: oro_entity.entity_class_name_helper
 
     oro_entity.entity_name_resolver:
         class: Oro\Bundle\EntityBundle\Provider\EntityNameResolver

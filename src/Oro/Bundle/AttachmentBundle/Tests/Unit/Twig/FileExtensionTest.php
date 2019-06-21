@@ -57,10 +57,10 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
         $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
 
         $serviceLocator = self::getContainerBuilder()
-            ->add('oro_attachment.manager', $this->attachmentManager)
-            ->add('oro_entity_config.config_manager', $configManager)
-            ->add('doctrine', $this->doctrine)
-            ->add('property_accessor', $this->propertyAccessor)
+            ->add(AttachmentManager::class, $this->attachmentManager)
+            ->add(ConfigManager::class, $configManager)
+            ->add(ManagerRegistry::class, $this->doctrine)
+            ->add(PropertyAccessorInterface::class, $this->propertyAccessor)
             ->getContainer($this);
 
         $this->extension = new FileExtension($serviceLocator);

@@ -1,6 +1,5 @@
 parameters:
     oro_organization.business_unit.entity.class:               Oro\Bundle\OrganizationBundle\Entity\BusinessUnit
-    oro_organization.business_unit.manager.class:              Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager
     oro_organization.organization.manager.class:               Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager
     oro_organization.organization.entity.class:                Oro\Bundle\OrganizationBundle\Entity\Organization
 
@@ -44,11 +43,14 @@ services:
             - '@doctrine.orm.entity_manager'
 
     oro_organization.business_unit_manager:
-        class: '%oro_organization.business_unit.manager.class%'
+        class: Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_security.token_accessor'
             - '@oro_security.acl_helper'
+
+    Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager:
+        alias: oro_organization.business_unit_manager
 
     oro_organization.organization_manager:
         class: '%oro_organization.organization.manager.class%'
@@ -68,9 +70,12 @@ services:
     # Ownership
     #
     oro_organization.form.type.ownership_type:
-        class: '%oro_organization.form.type.ownership_type.class%'
+        class: Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType
         tags:
             - { name: form.type, alias: oro_type_choice_ownership_type }
+
+    Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType:
+        alias: oro_organization.form.type.ownership_type
 
     oro_organization.owner_assignment_checker.default:
         class: '%oro_organization.owner_assignment_checker.default.class%'
@@ -93,9 +98,10 @@ services:
         class: Oro\Bundle\OrganizationBundle\Twig\OrganizationExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber }
 
     #
     # Listeners / Subscribers
