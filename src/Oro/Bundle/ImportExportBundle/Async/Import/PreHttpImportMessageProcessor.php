@@ -6,7 +6,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Context\Context;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotifcationTopics;
+use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
+use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
@@ -23,11 +24,24 @@ class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
     protected $managerRegistry;
 
     /**
+     * @var HttpImportHandler
+     */
+    protected $importHandler;
+
+    /**
      * @param ManagerRegistry $managerRegistry
      */
     public function setManagerRegistry(ManagerRegistry $managerRegistry)
     {
         $this->managerRegistry = $managerRegistry;
+    }
+
+    /**
+     * @param HttpImportHandler $importHandler
+     */
+    public function setImportHandler(HttpImportHandler $importHandler)
+    {
+        $this->importHandler = $importHandler;
     }
 
     /**
@@ -101,6 +115,16 @@ class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
                         'process' => $body['process'],
                     ]
                 );
+                $context->addDependentJob(Topics::SAVE_IMPORT_EXPORT_RESULT, [
+                    'jobId' => $job->getRootJob()->getId(),
+                    'userId' => $body['userId'],
+                    'type' => $body['process'],
+                    'entity' => $this->importHandler->getEntityName(
+                        $body['process'],
+                        $body['processorAlias']
+                    ),
+                    'options' => $body['options']
+                ]);
                 $this->dependentJob->saveDependentJob($context);
 
                 return true;
@@ -146,7 +170,7 @@ class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
         }
 
         $sender = $this->notificationSettings->getSender();
-        $this->producer->send(NotifcationTopics::SEND_NOTIFICATION_EMAIL, [
+        $this->producer->send(NotificationTopics::SEND_NOTIFICATION_EMAIL, [
             'sender' => $sender->toArray(),
             'toEmail' => $user->getEmail(),
             'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_ERROR,
