@@ -128,6 +128,10 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
             return $this->findOwnerById($options['userId']);
         });
 
+        $optionResolver->setDefined('options')
+            ->setAllowedTypes('options', ['array'])
+            ->setDefault('options', []);
+
         return $optionResolver->resolve($parameters);
     }
 
@@ -157,7 +161,8 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
             $parameters['type'],
             $parameters['entity'],
             $parameters['owner'],
-            $jobData['file'] ?? null
+            $jobData['file'] ?? null,
+            $parameters['options']
         );
     }
 
