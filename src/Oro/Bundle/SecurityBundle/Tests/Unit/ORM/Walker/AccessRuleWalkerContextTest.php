@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 
+use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalkerContext;
 use Oro\Bundle\UserBundle\Entity\User;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AccessRuleWalkerContextTest extends TestCase
 {
     public function testPermissionWithDefaultValue()
     {
         $context = new AccessRuleWalkerContext(
-            $this->createMock(ContainerInterface::class)
+            $this->createMock(AccessRuleExecutor::class)
         );
 
         $this->assertEquals('VIEW', $context->getPermission());
@@ -21,7 +21,7 @@ class AccessRuleWalkerContextTest extends TestCase
     public function testPermission()
     {
         $context = new AccessRuleWalkerContext(
-            $this->createMock(ContainerInterface::class),
+            $this->createMock(AccessRuleExecutor::class),
             'EDIT'
         );
 
@@ -31,7 +31,7 @@ class AccessRuleWalkerContextTest extends TestCase
     public function testUserClassWithDefaultValue()
     {
         $context = new AccessRuleWalkerContext(
-            $this->createMock(ContainerInterface::class),
+            $this->createMock(AccessRuleExecutor::class),
             'EDIT'
         );
 
@@ -41,7 +41,7 @@ class AccessRuleWalkerContextTest extends TestCase
     public function testUserClass()
     {
         $context = new AccessRuleWalkerContext(
-            $this->createMock(ContainerInterface::class),
+            $this->createMock(AccessRuleExecutor::class),
             'EDIT',
             User::class
         );
@@ -52,7 +52,7 @@ class AccessRuleWalkerContextTest extends TestCase
     public function testUserIdWithDefaultValue()
     {
         $context = new AccessRuleWalkerContext(
-            $this->createMock(ContainerInterface::class),
+            $this->createMock(AccessRuleExecutor::class),
             'EDIT',
             User::class
         );
@@ -63,7 +63,7 @@ class AccessRuleWalkerContextTest extends TestCase
     public function testUserId()
     {
         $context = new AccessRuleWalkerContext(
-            $this->createMock(ContainerInterface::class),
+            $this->createMock(AccessRuleExecutor::class),
             'EDIT',
             User::class,
             75
@@ -76,7 +76,7 @@ class AccessRuleWalkerContextTest extends TestCase
     public function testOrganizationIdWithDefaultValue()
     {
         $context = new AccessRuleWalkerContext(
-            $this->createMock(ContainerInterface::class),
+            $this->createMock(AccessRuleExecutor::class),
             'EDIT',
             User::class,
             75
@@ -88,7 +88,7 @@ class AccessRuleWalkerContextTest extends TestCase
     public function testOrganizationId()
     {
         $context = new AccessRuleWalkerContext(
-            $this->createMock(ContainerInterface::class),
+            $this->createMock(AccessRuleExecutor::class),
             'EDIT',
             User::class,
             75,
@@ -98,18 +98,18 @@ class AccessRuleWalkerContextTest extends TestCase
         $this->assertEquals(2, $context->getOrganizationId());
     }
 
-    public function testGetContainer()
+    public function testGetAccessRuleExecutor()
     {
-        $container = $this->createMock(ContainerInterface::class);
-        $context = new AccessRuleWalkerContext($container);
+        $accessRuleExecutor = $this->createMock(AccessRuleExecutor::class);
+        $context = new AccessRuleWalkerContext($accessRuleExecutor);
 
-        $this->assertSame($container, $context->getContainer());
+        $this->assertSame($accessRuleExecutor, $context->getAccessRuleExecutor());
     }
 
     public function testAdditionalParameters()
     {
         $context = new AccessRuleWalkerContext(
-            $this->createMock(ContainerInterface::class)
+            $this->createMock(AccessRuleExecutor::class)
         );
 
         $this->assertFalse($context->hasOption('test'));
@@ -118,14 +118,14 @@ class AccessRuleWalkerContextTest extends TestCase
 
         $context->setOption('test', 'test_value');
 
-        $this->asserttrue($context->hasOption('test'));
+        $this->assertTrue($context->hasOption('test'));
         $this->assertEquals('test_value', $context->getOption('test', 'default'));
     }
 
     public function testSerialize()
     {
         $context = new AccessRuleWalkerContext(
-            $this->createMock(ContainerInterface::class),
+            $this->createMock(AccessRuleExecutor::class),
             'EDIT',
             User::class,
             75,
@@ -147,7 +147,7 @@ class AccessRuleWalkerContextTest extends TestCase
     public function testUnserialize()
     {
         $context = new AccessRuleWalkerContext(
-            $this->createMock(ContainerInterface::class)
+            $this->createMock(AccessRuleExecutor::class)
         );
         $context->unserialize('');
     }
@@ -155,7 +155,7 @@ class AccessRuleWalkerContextTest extends TestCase
     public function testGetOptions()
     {
         $context = new AccessRuleWalkerContext(
-            $this->createMock(ContainerInterface::class)
+            $this->createMock(AccessRuleExecutor::class)
         );
         $context->setOption('parameter1', 'value1');
         $context->setOption('parameter2', 'value2');
@@ -163,7 +163,7 @@ class AccessRuleWalkerContextTest extends TestCase
         $this->assertEquals(
             [
                 'parameter1' => 'value1',
-                'parameter2' => 'value2',
+                'parameter2' => 'value2'
             ],
             $context->getOptions()
         );

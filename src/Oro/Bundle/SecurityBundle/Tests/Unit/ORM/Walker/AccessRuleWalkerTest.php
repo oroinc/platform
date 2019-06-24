@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
-use Oro\Bundle\SecurityBundle\AccessRule\ChainAccessRule;
+use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\AccessDenied;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Association;
@@ -25,7 +25,6 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsOrganization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -36,11 +35,11 @@ class AccessRuleWalkerTest extends OrmTestCase
     /** @var EntityManagerMock */
     private $em;
 
-    /** @var MockObject */
-    private $container;
-
     /** @var DynamicAccessRule */
     private $rule;
+
+    /** @var AccessRuleExecutor */
+    private $accessRuleExecutor;
 
     protected function setUp()
     {
@@ -58,14 +57,16 @@ class AccessRuleWalkerTest extends OrmTestCase
             ]
         );
 
-        $chainAccessRule = new ChainAccessRule();
         $this->rule = new DynamicAccessRule();
-        $chainAccessRule->addRule($this->rule);
-
-        $this->container = $this->createMock(ContainerInterface::class);
-        $this->container->expects($this->once())
+        $container = $this->createMock(ContainerInterface::class);
+        $container->expects(self::any())
             ->method('get')
-            ->willReturn($chainAccessRule);
+            ->with('rule')
+            ->willReturn($this->rule);
+        $this->accessRuleExecutor = new AccessRuleExecutor(
+            ['rule'],
+            $container
+        );
     }
 
     public function testWalkerWithEmptyRules()
@@ -414,7 +415,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 9);
+        $context = new AccessRuleWalkerContext($this->accessRuleExecutor, 'VIEW', CmsUser::class, 9);
         $context->setOption(AclHelper::CHECK_ROOT_ENTITY, false);
         $context->setOption(AclHelper::CHECK_RELATIONS, false);
         $originalContext = clone $context;
@@ -592,7 +593,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             }
         });
 
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 1);
+        $context = new AccessRuleWalkerContext($this->accessRuleExecutor, 'VIEW', CmsUser::class, 1);
         $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')->getQuery();
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [AccessRuleWalker::class]);
         $query->setHint(AccessRuleWalker::CONTEXT, $context);
@@ -613,7 +614,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             }
         });
 
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 1);
+        $context = new AccessRuleWalkerContext($this->accessRuleExecutor, 'VIEW', CmsUser::class, 1);
         $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('u')->getQuery();
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [AccessRuleWalker::class]);
         $query->setHint(AccessRuleWalker::CONTEXT, $context);
@@ -802,7 +803,7 @@ class AccessRuleWalkerTest extends OrmTestCase
      */
     private function assertResultQueryEquals(string $expectedQuery, Query $dqlQuery, array $contextOptions = []): void
     {
-        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 1);
+        $context = new AccessRuleWalkerContext($this->accessRuleExecutor, 'VIEW', CmsUser::class, 1);
         foreach ($contextOptions as $optionName => $optionValue) {
             $context->setOption($optionName, $optionValue);
         }

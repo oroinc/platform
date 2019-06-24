@@ -15,23 +15,17 @@ use Doctrine\ORM\Query\AST\Subselect;
 use Doctrine\ORM\Query\AST\WhereClause;
 use Doctrine\ORM\Query\TreeWalkerAdapter;
 use Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule;
-use Oro\Bundle\SecurityBundle\AccessRule\ChainAccessRule;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
-use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 
 /**
  * Walker that apply access rule conditions to DBAL query.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class AccessRuleWalker extends TreeWalkerAdapter implements ServiceSubscriberInterface
+class AccessRuleWalker extends TreeWalkerAdapter
 {
     public const CONTEXT = 'oro_access_rule.context';
     public const ORM_RULES_TYPE = 'ORM';
-
-    /** @var ChainAccessRule */
-    private $chainAccessRule;
 
     /** @var QueryComponent[] */
     private $queryComponents;
@@ -293,7 +287,7 @@ class AccessRuleWalker extends TreeWalkerAdapter implements ServiceSubscriberInt
             $criteria->setOption($optionName, $optionValue);
         }
 
-        $this->getChainAccessRule($context->getContainer())->process($criteria);
+        $context->getAccessRuleExecutor()->process($criteria);
 
         return $criteria;
     }
@@ -339,20 +333,6 @@ class AccessRuleWalker extends TreeWalkerAdapter implements ServiceSubscriberInt
     }
 
     /**
-     * @param ContainerInterface $container
-     *
-     * @return ChainAccessRule
-     */
-    private function getChainAccessRule(ContainerInterface $container): ChainAccessRule
-    {
-        if (!$this->chainAccessRule) {
-            $this->chainAccessRule = $container->get(ChainAccessRule::class);
-        }
-
-        return $this->chainAccessRule;
-    }
-
-    /**
      * Collects existing array query components to array of objects.
      */
     private function collectQueryComponents(): void
@@ -380,15 +360,5 @@ class AccessRuleWalker extends TreeWalkerAdapter implements ServiceSubscriberInt
                 $this->setQueryComponent($alias, $queryComponent->toArray());
             }
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedServices()
-    {
-        return [
-            ChainAccessRule::class
-        ];
     }
 }
