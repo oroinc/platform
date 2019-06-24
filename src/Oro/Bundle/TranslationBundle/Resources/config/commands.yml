@@ -7,6 +7,10 @@ services:
             - { name: console.command }
 
     Oro\Bundle\TranslationBundle\Command\OroTranslationDumpCommand:
+        public: false
+        class: Oro\Bundle\TranslationBundle\Command\OroTranslationDumpCommand
+        arguments:
+            - '@oro_translation.js_dumper'
         tags:
             - { name: console.command }
 
