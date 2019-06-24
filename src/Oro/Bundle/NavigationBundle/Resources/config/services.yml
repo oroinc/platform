@@ -9,7 +9,6 @@ parameters:
     oro_menu.factory.class:                                    Knp\Menu\MenuFactory
 
     oro_menu.configuration_resolver.class:                     Oro\Component\Config\Resolver\SystemAwareResolver
-    oro_menu.builder_chain.class:                              Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider
     oro_menu.configuration_builder.class:                      Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder
 
     oro_navigation.navigation_item_menu.builder.class:         Oro\Bundle\NavigationBundle\Menu\NavigationItemBuilder
@@ -75,7 +74,7 @@ services:
         public: false
 
     oro_menu.builder_chain:
-        class: '%oro_menu.builder_chain.class%'
+        class: Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider
         arguments:
             - '@oro_menu.factory'
             - '@oro_menu.array_loader'

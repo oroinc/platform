@@ -1,5 +1,4 @@
 parameters:
-    oro_chart.view_builder.class:                  Oro\Bundle\ChartBundle\Model\ChartViewBuilder
     oro_chart.options_builder.class:               Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder
     oro_chart.data_transformer.factory.class:      Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory
     oro_chart.data_transformer.pie_chart.class:    Oro\Bundle\ChartBundle\Model\Data\Transformer\PieChartDataTransformer
@@ -20,7 +19,7 @@ services:
         alias: oro_chart.config_provider
 
     oro_chart.view_builder:
-        class: '%oro_chart.view_builder.class%'
+        class: Oro\Bundle\ChartBundle\Model\ChartViewBuilder
         shared: false
         arguments:
             - '@oro_chart.config_provider'

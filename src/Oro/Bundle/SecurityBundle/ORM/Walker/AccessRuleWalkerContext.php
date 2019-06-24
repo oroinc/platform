@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
-use Psr\Container\ContainerInterface;
+use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor;
 
 /**
  * Represents a context in which AccessRuleWalker works in.
  */
 class AccessRuleWalkerContext implements \Serializable
 {
+    /** @var AccessRuleExecutor Not serializable */
+    private $accessRuleExecutor;
+
     /** @var string */
     private $permission;
 
@@ -21,31 +24,38 @@ class AccessRuleWalkerContext implements \Serializable
     /** @var integer */
     private $organizationId;
 
-    /** @var ContainerInterface Not serialized */
-    private $container;
-
     /** @var array [option name => option value, ...] */
     private $options = [];
 
     /**
-     * @param ContainerInterface $container
+     * @param AccessRuleExecutor $accessRuleExecutor
      * @param string             $permission
      * @param string             $userClass
      * @param null               $userId
      * @param null               $organizationId
      */
     public function __construct(
-        ContainerInterface $container,
+        AccessRuleExecutor $accessRuleExecutor,
         $permission = 'VIEW',
         $userClass = '',
         $userId = null,
         $organizationId = null
     ) {
+        $this->accessRuleExecutor = $accessRuleExecutor;
         $this->permission = $permission;
-        $this->container = $container;
         $this->userClass = $userClass;
         $this->userId = $userId;
         $this->organizationId = $organizationId;
+    }
+
+    /**
+     * Gets the access rule executor.
+     *
+     * @return AccessRuleExecutor
+     */
+    public function getAccessRuleExecutor(): AccessRuleExecutor
+    {
+        return $this->accessRuleExecutor;
     }
 
     /**
@@ -89,16 +99,6 @@ class AccessRuleWalkerContext implements \Serializable
     }
 
     /**
-     * Returns container instance.
-     *
-     * @return ContainerInterface
-     */
-    public function getContainer(): ContainerInterface
-    {
-        return $this->container;
-    }
-
-    /**
      * Returns true if the additional parameter exists.
      *
      * @param string $key
@@ -138,7 +138,7 @@ class AccessRuleWalkerContext implements \Serializable
     }
 
     /**
-     * Sets the additional option.
+     * Sets an additional option.
      *
      * @param string $key
      * @param mixed  $value

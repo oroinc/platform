@@ -8,102 +8,69 @@ use Monolog\Logger;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DetailedLogsHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $config;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $config;
 
-    /**
-     * @var HandlerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $nestedHandler;
+    /** @var HandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $nestedHandler;
 
-    /**
-     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $container;
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $loggerCache;
 
-    /**
-     * @var DetailedLogsHandler
-     */
-    protected $handler;
+    /** @var DetailedLogsHandler */
+    private $handler;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->config = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->config = $this->createMock(ConfigManager::class);
+        $this->loggerCache = $this->createMock(CacheProvider::class);
 
-        $this->container = $this->getMockBuilder(ContainerInterface::class)->disableOriginalConstructor()->getMock();
-        $this->container->expects($this->any())
-            ->method('has')
-            ->with('oro_config.user')
-            ->willReturn(true);
-
-        $this->handler = new DetailedLogsHandler();
-        $this->handler->setContainer($this->container);
+        $this->handler = new DetailedLogsHandler(
+            $this->config,
+            $this->loggerCache,
+            1,
+            'warning'
+        );
     }
 
     public function testIsHandlingApplicationIsNotInstalled()
     {
-        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cacheProvider */
-        $cacheProvider = $this->getMockBuilder(CacheProvider::class)->getMock();
-
-        $cacheProvider->expects($this->once())
+        $this->loggerCache->expects($this->once())
             ->method('fetch')
             ->with(Configuration::LOGS_LEVEL_KEY)
             ->willReturn(false);
 
-        $this->container
-            ->expects($this->once())
-            ->method('get')
-            ->willReturnMap([
-                ['oro_logger.cache', 1, $cacheProvider],
-            ]);
-
-        $cacheProvider->expects($this->once())
+        $this->loggerCache->expects($this->once())
             ->method('fetch')
             ->with(Configuration::LOGS_LEVEL_KEY)
             ->willReturn(false);
 
         $this->config->expects($this->never())->method('get');
 
-        $this->container
-            ->expects($this->once())
-            ->method('getParameter')
-            ->with('oro_logger.detailed_logs_default_level')
-            ->willReturn('warning');
+        $handler = new DetailedLogsHandler(
+            $this->config,
+            $this->loggerCache,
+            0,
+            'warning'
+        );
 
-        $this->assertTrue($this->handler->isHandling(['level' => Logger::WARNING]));
+        $this->assertTrue($handler->isHandling(['level' => Logger::WARNING]));
     }
 
     private function configureMethods()
     {
-        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cacheProvider */
-        $cacheProvider = $this->getMockBuilder(CacheProvider::class)->getMock();
-
-        $cacheProvider->expects($this->once())
+        $this->loggerCache->expects($this->once())
             ->method('fetch')
             ->with(Configuration::LOGS_LEVEL_KEY)
             ->willReturn('warning');
 
-        $this->container
-            ->expects($this->exactly(1))
-            ->method('get')
-            ->willReturnMap([
-                ['oro_logger.cache', 1, $cacheProvider],
-            ]);
-
         $this->config->expects($this->never())->method('get');
-        $this->container->expects($this->never())->method('hasParameter');
-        $this->container->expects($this->never())->method('getParameter');
     }
 
     public function testIsHandlingWithCache()

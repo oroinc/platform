@@ -23,8 +23,12 @@ services:
     oro_logger.monolog.detailed_logs.handler.prototype:
         abstract: true
         class: Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler
-        calls:
-            - ['setContainer', ['@service_container']]
+        arguments:
+            - '@?oro_config.user'
+            - '@oro_logger.cache'
+            - '%installed%'
+            - '%oro_logger.detailed_logs_default_level%'
+            - true
 
     oro_logger.monolog.detailed_logs.handler:
         parent: oro_logger.monolog.detailed_logs.handler.prototype

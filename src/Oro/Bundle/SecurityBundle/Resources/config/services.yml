@@ -34,7 +34,6 @@ parameters:
     oro_security.token.factory.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
     oro_security.token.factory.organization_rememberme.class: Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory
 
-    oro_security.acl_helper.class:                             Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper
     oro_security.search.acl_helper.class:                      Oro\Bundle\SecurityBundle\Search\AclHelper
     oro_security.orm.ownership_sql_walker_builder.class:       Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder
     oro_security.ownership_tree_provider.class:                Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider
@@ -388,11 +387,10 @@ services:
         arguments: [ '%kernel.secret%']
 
     oro_security.acl_helper:
-        class: '%oro_security.acl_helper.class%'
+        class: Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper
         arguments:
-            - '@Psr\Container\ContainerInterface'
-        tags:
-            - { name: container.service_subscriber }
+            - '@security.token_storage'
+            - '@oro_security.access_rule_executor'
 
     Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper:
         alias: oro_security.acl_helper
@@ -770,11 +768,10 @@ services:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -10 }
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse, priority: -10 }
 
-    oro_security.access_rule.chain_access_rule:
-        class: Oro\Bundle\SecurityBundle\AccessRule\ChainAccessRule
-
-    Oro\Bundle\SecurityBundle\AccessRule\ChainAccessRule:
-        alias: oro_security.access_rule.chain_access_rule
+    # this service is initialized by Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AccessRulesPass
+    oro_security.access_rule_executor:
+        class: Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor
+        public: false
 
     oro_security.access_rule.acl:
         class: Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule

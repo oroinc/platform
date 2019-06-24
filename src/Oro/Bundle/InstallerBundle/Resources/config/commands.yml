@@ -19,6 +19,11 @@ services:
     Oro\Bundle\InstallerBundle\Command\LoadPackageDemoDataCommand:
         public: false
         class: Oro\Bundle\InstallerBundle\Command\LoadPackageDemoDataCommand
+        arguments:
+            - '@kernel'
+            - '@?oro_migration.data_fixtures.loader'
+            - '@?oro_migration.data_fixtures.executor'
+            - '@?oro_migration.locator.fixture_path_locator'
         tags:
             - { name: console.command }
 

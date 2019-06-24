@@ -3,35 +3,36 @@
 namespace Oro\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Compiler pass that collects access rules.
+ * Collects and register access rules.
  */
 class AccessRulesPass implements CompilerPassInterface
 {
-    use PriorityTaggedServiceTrait;
-
-    private const TAG_NAME = 'oro_security.access_rule';
-    private const SERVICE_ID = 'oro_security.access_rule.chain_access_rule';
+    private const EXECUTOR_SERVICE_ID = 'oro_security.access_rule_executor';
+    private const RULE_TAG_NAME       = 'oro_security.access_rule';
 
     /**
      * {@inheritDoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has(self::SERVICE_ID)) {
-            return;
+        $serviceIds = [];
+        $services = [];
+        foreach ($container->findTaggedServiceIds(self::RULE_TAG_NAME, true) as $serviceId => $attributes) {
+            $priority = $attributes[0]['priority'] ?? 0;
+            $serviceIds[$priority][] = $serviceId;
+            $services[$serviceId] = new Reference($serviceId);
         }
-
-        $taggedServices = $this->findAndSortTaggedServices(self::TAG_NAME, $container);
-
-        if ($taggedServices) {
-            $collectionServiceDefinition = $container->getDefinition(self::SERVICE_ID);
-            foreach ($taggedServices as $service) {
-                $collectionServiceDefinition->addMethodCall('addRule', [$service]);
-            }
+        if ($serviceIds) {
+            krsort($serviceIds);
+            $serviceIds = array_merge(...$serviceIds);
         }
+        $container->findDefinition(self::EXECUTOR_SERVICE_ID)
+            ->setArgument(0, $serviceIds)
+            ->setArgument(1, ServiceLocatorTagPass::register($container, $services));
     }
 }
