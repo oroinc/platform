@@ -12,6 +12,11 @@ services:
             - { name: console.command }
 
     Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand:
+        arguments:
+            - '@kernel'
+            - '@oro_migration.data_fixtures.loader'
+            - '@oro_migration.data_fixtures.executor'
+            - '@oro_migration.locator.fixture_path_locator'
         tags:
             - { name: console.command }
 
