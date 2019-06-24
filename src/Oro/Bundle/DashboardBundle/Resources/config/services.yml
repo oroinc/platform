@@ -3,13 +3,11 @@ parameters:
 
     oro_dashboard.config_resolver.class:         Oro\Component\Config\Resolver\SystemAwareResolver
     oro_dashboard.factory.class:                 Oro\Bundle\DashboardBundle\Model\Factory
-    oro_dashboard.dashboard_entity.class:        Oro\Bundle\DashboardBundle\Entity\Dashboard
     oro_dashboard.dashboard_widget_entity.class: Oro\Bundle\DashboardBundle\Entity\Widget
     oro_dashboard.navigation_listener.class:     Oro\Bundle\DashboardBundle\EventListener\NavigationListener
     oro_dashboard.form.type.edit.class:          Oro\Bundle\DashboardBundle\Form\Type\DashboardType
     oro_dashboard.form.type.select.class:        Oro\Bundle\DashboardBundle\Form\Type\DashboardSelectType
     oro_dashboard.widget_config_value.provider.class: Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider
-    oro_dashboard.datetime.helper.class: Oro\Bundle\DashboardBundle\Helper\DateHelper
     oro_dashboard.event_listener.widget_configuration_load.class: Oro\Bundle\DashboardBundle\EventListener\WidgetConfigurationLoadListener
     oro_dashboard.event_listener.widget_items_load_data.class: Oro\Bundle\DashboardBundle\EventListener\WidgetItemsLoadDataListener
     oro_dashboard.event_listener.widget_sort_by.class: Oro\Bundle\DashboardBundle\EventListener\WidgetSortByListener
@@ -105,6 +103,9 @@ services:
             - '%kernel.debug%'
             - '@event_dispatcher'
 
+    Oro\Bundle\DashboardBundle\Model\ConfigProvider:
+        alias: oro_dashboard.config_provider
+
     oro_dashboard.navigation_listener:
         class: '%oro_dashboard.navigation_listener.class%'
         arguments:
@@ -135,7 +136,7 @@ services:
         alias: oro_dashboard.provider.widget_configuration_form_provider
 
     oro_dashboard.datetime.helper:
-        class: '%oro_dashboard.datetime.helper.class%'
+        class: Oro\Bundle\DashboardBundle\Helper\DateHelper
         arguments:
             - '@oro_locale.settings'
             - '@doctrine'

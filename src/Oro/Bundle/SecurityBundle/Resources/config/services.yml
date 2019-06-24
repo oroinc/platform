@@ -34,7 +34,6 @@ parameters:
     oro_security.token.factory.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
     oro_security.token.factory.organization_rememberme.class: Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory
 
-    oro_security.acl_helper.class:                             Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper
     oro_security.search.acl_helper.class:                      Oro\Bundle\SecurityBundle\Search\AclHelper
     oro_security.orm.ownership_sql_walker_builder.class:       Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder
     oro_security.ownership_tree_provider.class:                Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider
@@ -388,7 +387,7 @@ services:
         arguments: [ '%kernel.secret%']
 
     oro_security.acl_helper:
-        class: '%oro_security.acl_helper.class%'
+        class: Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper
         arguments:
             - '@Psr\Container\ContainerInterface'
         tags:
