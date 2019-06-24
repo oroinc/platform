@@ -14,19 +14,14 @@ services:
         tags:
             - { name: form.type, alias: oro_report }
 
-    oro_report.form.report:
-        class: Symfony\Component\Form\Form
-        factory: ['@form.factory', createNamed]
-        arguments:
-            - "oro_report_form"
-            - Oro\Bundle\ReportBundle\Form\Type\ReportType
-
     oro_report.form.handler.report:
         class: '%oro_report.form.handler.report.class%'
         arguments:
-            - '@oro_report.form.report'
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
+
+    Oro\Bundle\ReportBundle\Form\Handler\ReportHandler:
+        alias: oro_report.form.handler.report
 
     oro_report.report.manager.api:
         class: '%oro_report.report.manager.api.class%'

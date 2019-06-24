@@ -32,32 +32,34 @@ class ImportExportResultManager
      * @param string $entity
      * @param User|null $owner
      * @param string|null $fileName
+     * @param array $options
      *
      * @return ImportExportResult
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function saveResult(
         int $jobId,
         string $type,
         string $entity,
         User $owner = null,
-        string $fileName = null
+        string $fileName = null,
+        array $options = []
     ): ImportExportResult {
         $importExportResult = new ImportExportResult();
         $importExportResult
             ->setJobId($jobId)
             ->setEntity($entity)
             ->setFilename($fileName)
-            ->setType($type);
+            ->setType($type)
+            ->setOptions($options);
 
-        /** @var EntityManager $em */
-        $em = $this->registry->getManagerForClass(ImportExportResult::class);
-        $em->persist($importExportResult);
         if ($owner) {
             $importExportResult->setOwner($owner);
             $importExportResult->setOrganization($owner->getOrganization());
         }
+
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass(ImportExportResult::class);
+        $em->persist($importExportResult);
         $em->flush();
 
         return $importExportResult;

@@ -9,14 +9,12 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Handles segment form.
+ */
 class SegmentHandler
 {
     use RequestHandlerTrait;
-
-    /**
-     * @var FormInterface
-     */
-    protected $form;
 
     /**
      * @var RequestStack
@@ -34,18 +32,15 @@ class SegmentHandler
     protected $staticSegmentManager;
 
     /**
-     * @param FormInterface $form
      * @param RequestStack $requestStack
      * @param ManagerRegistry $managerRegistry
      * @param StaticSegmentManager $staticSegmentManager
      */
     public function __construct(
-        FormInterface $form,
         RequestStack $requestStack,
         ManagerRegistry $managerRegistry,
         StaticSegmentManager $staticSegmentManager
     ) {
-        $this->form = $form;
         $this->requestStack = $requestStack;
         $this->managerRegistry = $managerRegistry;
         $this->staticSegmentManager = $staticSegmentManager;
@@ -54,18 +49,19 @@ class SegmentHandler
     /**
      * Process form
      *
-     * @param  Segment $entity
+     * @param FormInterface $form
+     * @param Segment $entity
      * @return bool  True on successful processing, false otherwise
      */
-    public function process(Segment $entity)
+    public function process(FormInterface $form, Segment $entity)
     {
-        $this->form->setData($entity);
+        $form->setData($entity);
 
         $request = $this->requestStack->getCurrentRequest();
         if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
-            $this->submitPostPutRequest($this->form, $request);
+            $this->submitPostPutRequest($form, $request);
 
-            if ($this->form->isValid()) {
+            if ($form->isValid()) {
                 $this->onSuccess($entity);
 
                 return true;

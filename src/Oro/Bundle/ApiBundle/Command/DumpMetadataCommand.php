@@ -8,7 +8,9 @@ use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\HateoasMetadataExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,13 +24,45 @@ use Symfony\Component\Yaml\Yaml;
  */
 class DumpMetadataCommand extends AbstractDebugCommand
 {
+    /** @var string */
+    protected static $defaultName = 'oro:api:metadata:dump';
+
+    /** @var ProcessorBagInterface */
+    private $processorBag;
+
+    /** @var MetadataProvider */
+    private $metadataProvider;
+
+    /** @var ConfigProvider */
+    private $configProvider;
+
+    /**
+     * @param ValueNormalizer $valueNormalizer
+     * @param ResourcesProvider $resourcesProvider
+     * @param ProcessorBagInterface $processorBag
+     * @param MetadataProvider $metadataProvider
+     * @param ConfigProvider $configProvider
+     */
+    public function __construct(
+        ValueNormalizer $valueNormalizer,
+        ResourcesProvider $resourcesProvider,
+        ProcessorBagInterface $processorBag,
+        MetadataProvider $metadataProvider,
+        ConfigProvider $configProvider
+    ) {
+        parent::__construct($valueNormalizer, $resourcesProvider);
+
+        $this->processorBag = $processorBag;
+        $this->metadataProvider = $metadataProvider;
+        $this->configProvider = $configProvider;
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('oro:api:metadata:dump')
             ->setDescription('Dumps entity metadata used in Data API.')
             ->addArgument(
                 'entity',
@@ -63,9 +97,7 @@ class DumpMetadataCommand extends AbstractDebugCommand
         $action = $input->getOption('action');
         $hateoas = $input->getOption('hateoas');
 
-        /** @var ProcessorBagInterface $processorBag */
-        $processorBag = $this->getContainer()->get('oro_api.processor_bag');
-        $processorBag->addApplicableChecker(new Util\RequestTypeApplicableChecker());
+        $this->processorBag->addApplicableChecker(new Util\RequestTypeApplicableChecker());
 
         $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $version, $requestType);
 
@@ -84,11 +116,6 @@ class DumpMetadataCommand extends AbstractDebugCommand
      */
     protected function getMetadata($entityClass, $version, RequestType $requestType, $action, $hateoas)
     {
-        /** @var MetadataProvider $configProvider */
-        $metadataProvider = $this->getContainer()->get('oro_api.metadata_provider');
-        /** @var ConfigProvider $configProvider */
-        $configProvider = $this->getContainer()->get('oro_api.config_provider');
-
         $configExtras = [
             new EntityDefinitionConfigExtra($action)
         ];
@@ -99,8 +126,8 @@ class DumpMetadataCommand extends AbstractDebugCommand
             $metadataExtras[] = new HateoasMetadataExtra(new NullFilterValueAccessor());
         }
 
-        $config   = $configProvider->getConfig($entityClass, $version, $requestType, $configExtras);
-        $metadata = $metadataProvider->getMetadata(
+        $config   = $this->configProvider->getConfig($entityClass, $version, $requestType, $configExtras);
+        $metadata = $this->metadataProvider->getMetadata(
             $entityClass,
             $version,
             $requestType,

@@ -11,26 +11,19 @@ use Oro\Component\EntitySerializer\EntitySerializer;
  */
 class AclProtectedEntitySerializer extends EntitySerializer
 {
+    private $contextStack = [];
+
     /**
      * {@inheritdoc}
      */
     public function serialize(QueryBuilder $qb, $config, array $context = [])
     {
-        if (isset($context[Context::REQUEST_TYPE])) {
-            $requestType = $context[Context::REQUEST_TYPE];
-            $this->configConverter->setRequestType($requestType);
-            $this->queryFactory->setRequestType($requestType);
-            $this->fieldAccessor->setRequestType($requestType);
-            try {
-                return parent::serialize($qb, $config, $context);
-            } finally {
-                $this->configConverter->setRequestType();
-                $this->queryFactory->setRequestType();
-                $this->fieldAccessor->setRequestType();
-            }
+        $this->setContext($context);
+        try {
+            return parent::serialize($qb, $config, $context);
+        } finally {
+            $this->resetContext();
         }
-
-        return parent::serialize($qb, $config, $context);
     }
 
     /**
@@ -38,20 +31,53 @@ class AclProtectedEntitySerializer extends EntitySerializer
      */
     public function serializeEntities(array $entities, $entityClass, $config, array $context = [])
     {
+        $this->setContext($context);
+        try {
+            return parent::serializeEntities($entities, $entityClass, $config, $context);
+        } finally {
+            $this->resetContext();
+        }
+    }
+
+    /**
+     * @param array $context
+     */
+    private function setContext(array $context): void
+    {
+        // push the context to the stack
+        $this->contextStack[] = $context;
+
+        // apply the context
+        $this->applyContext($context);
+    }
+
+    private function resetContext(): void
+    {
+        // remove the last context from the stack
+        array_pop($this->contextStack);
+
+        $context = end($this->contextStack);
+        if (false !== $context) {
+            // apply the previous context
+            $this->applyContext($context);
+        } else {
+            // clear the context
+            $this->configConverter->setRequestType();
+            $this->queryFactory->setRequestType();
+            $this->fieldAccessor->setRequestType();
+        }
+    }
+
+    /**
+     * @param array $context
+     */
+    private function applyContext(array $context): void
+    {
         if (isset($context[Context::REQUEST_TYPE])) {
             $requestType = $context[Context::REQUEST_TYPE];
             $this->configConverter->setRequestType($requestType);
             $this->queryFactory->setRequestType($requestType);
             $this->fieldAccessor->setRequestType($requestType);
-            try {
-                return parent::serializeEntities($entities, $entityClass, $config, $context);
-            } finally {
-                $this->configConverter->setRequestType();
-                $this->queryFactory->setRequestType();
-                $this->fieldAccessor->setRequestType();
-            }
         }
-
-        return parent::serializeEntities($entities, $entityClass, $config, $context);
     }
 }

@@ -75,7 +75,7 @@ class InstallCommandListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->command->expects($this->once())
             ->method('getName')
-            ->willReturn(InstallCommand::NAME);
+            ->willReturn(InstallCommand::getDefaultName());
 
         $this->input->expects($this->never())
             ->method($this->anything());

@@ -1,6 +1,5 @@
 parameters:
     oro_entity_config.entity.entity_field.class:                Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel
-    oro_entity_config.config_manager.class:                     Oro\Bundle\EntityConfigBundle\Config\ConfigManager
     oro_entity_config.config_model_manager.class:               Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager
     oro_entity_config.tools.command_executor.class:             Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor
     oro_entity_config.config_loader.class:                      Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader
@@ -27,13 +26,16 @@ services:
             - '@doctrine'
 
     oro_entity_config.config_manager:
-        class: '%oro_entity_config.config_manager.class%'
+        class: Oro\Bundle\EntityConfigBundle\Config\ConfigManager
         arguments:
             - '@event_dispatcher'
             - '@oro_entity_config.metadata.annotation_metadata_factory'
             - '@oro_entity_config.config_model_manager'
             - '@oro_entity_config.audit_manager'
             - '@oro_entity_config.cache'
+
+    Oro\Bundle\EntityConfigBundle\Config\ConfigManager:
+        alias: oro_entity_config.config_manager
 
     oro_entity_config.config_model_lock_object:
         public: false
@@ -158,9 +160,10 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber }
 
     oro_entity_config.migration.post_up.listener:
         class: '%oro_entity_config.migration.post_up.listener.class%'
@@ -274,6 +277,9 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
 
+    Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper:
+        alias: oro_entity_config.helper.entity_config_provider_helper
+
     oro_entity_config.event_listener.attributes_form_view.abstract:
         class: Oro\Bundle\EntityConfigBundle\EventListener\AttributeFormViewListener
         abstract: true
@@ -304,6 +310,9 @@ services:
 
     oro_entity_config.attribute_render_registry:
         class: 'Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry'
+
+    Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry:
+        alias: 'oro_entity_config.attribute_render_registry'
 
     oro_entity_config.form.extension.dynamic_attributes:
         class: Oro\Bundle\EntityConfigBundle\Form\Extension\DynamicAttributesExtension
@@ -353,6 +362,9 @@ services:
 
     oro_entity_config.slug.generator:
         class: 'Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator'
+
+    Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator:
+        alias: oro_entity_config.slug.generator
 
     oro_entity_config.block_type.abstract_attribute_block_type_mapper:
         class: 'Oro\Bundle\EntityConfigBundle\Layout\Mapper\AbstractAttributeBlockTypeMapper'

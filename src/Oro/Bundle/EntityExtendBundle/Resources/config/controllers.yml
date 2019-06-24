@@ -1,0 +1,10 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\EntityExtendBundle\Controller\ConfigEntityGridController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: 'oro_entity_config.provider.entity' }

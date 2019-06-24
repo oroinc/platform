@@ -11,8 +11,6 @@ parameters:
     oro_organization.form.type.organization_select.class:            Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType
     oro_organization.form.type.organizations_select.class:           Oro\Bundle\OrganizationBundle\Form\Type\OrganizationsSelectType
 
-    oro_organization.form.type.ownership_type.class:                 Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType
-
     oro_organization.form.extension.owner.class:                     Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension
     oro_organization.form.extension.organization.class:              Oro\Bundle\OrganizationBundle\Form\Extension\OrganizationFormExtension
 
@@ -101,19 +99,14 @@ services:
         tags:
             - { name: form.type, alias: oro_organization }
 
-    oro_organization.form.organization:
-        class: Symfony\Component\Form\Form
-        factory: ['@form.factory', createNamed]
-        arguments:
-            - 'oro_organization_form'
-            - Oro\Bundle\OrganizationBundle\Form\Type\OrganizationType
-
     oro_organization.form.handler.organization:
         class: '%oro_organization.form.handler.organization.class%'
         arguments:
-            - '@oro_organization.form.organization'
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
+
+    Oro\Bundle\OrganizationBundle\Form\Handler\OrganizationHandler:
+        alias: oro_organization.form.handler.organization
 
     oro_organization.form.type.organization_select:
         class: '%oro_organization.form.type.organization_select.class%'

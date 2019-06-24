@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Controller;
 
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * EntityBundle controller.
  * @Route("/entity/config")
  */
-class AuditController extends Controller
+class AuditController extends AbstractController
 {
     /**
      * @Route(
@@ -27,13 +28,13 @@ class AuditController extends Controller
      *
      * @param $entity
      * @param $id
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return array
      */
     public function auditAction($entity, $id)
     {
         return [
             'gridName'    => 'audit-log-grid',
-            'entityClass' => $this->get('oro_entity.routing_helper')->resolveEntityClass($entity),
+            'entityClass' => $this->get(EntityRoutingHelper::class)->resolveEntityClass($entity),
             'entityId'    => $id,
         ];
     }
@@ -50,7 +51,7 @@ class AuditController extends Controller
      *
      * @param $entity
      * @param $id
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return array
      */
     public function auditFieldAction($entity, $id)
     {
@@ -62,7 +63,7 @@ class AuditController extends Controller
 
         return [
             'gridName'    => 'auditfield-log-grid',
-            'entityClass' => $this->get('oro_entity.routing_helper')->resolveEntityClass($entity),
+            'entityClass' => $this->get(EntityRoutingHelper::class)->resolveEntityClass($entity),
             'fieldName'   => $fieldName->getFieldName(),
             'entityId'    => $id,
         ];
@@ -73,6 +74,17 @@ class AuditController extends Controller
      */
     protected function getConfigManager()
     {
-        return $this->get('oro_entity_config.config_manager');
+        return $this->get(ConfigManager::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            ConfigManager::class,
+            EntityRoutingHelper::class,
+        ];
     }
 }

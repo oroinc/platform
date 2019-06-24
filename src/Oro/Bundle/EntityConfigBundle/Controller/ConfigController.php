@@ -9,18 +9,22 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigFieldHandler;
 use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * EntityConfig controller.
@@ -34,7 +38,7 @@ use Symfony\Component\HttpFoundation\Response;
  *      category="entity"
  * )
  */
-class ConfigController extends Controller
+class ConfigController extends AbstractController
 {
     /**
      * @var EntityRoutingHelper
@@ -48,8 +52,8 @@ class ConfigController extends Controller
      */
     public function indexAction()
     {
-        $actions       = [];
-        $modules       = [];
+        $actions = [];
+        $modules = [];
 
         $providers = $this->getConfigManager()->getProviders();
         foreach ($providers as $provider) {
@@ -98,10 +102,11 @@ class ConfigController extends Controller
                 //persist data inside the form
                 $this->get('session')->getFlashBag()->add(
                     'success',
-                    $this->get('translator')->trans('oro.entity_config.controller.config_entity.message.saved')
+                    $this->get(TranslatorInterface::class)
+                        ->trans('oro.entity_config.controller.config_entity.message.saved')
                 );
 
-                return $this->get('oro_ui.router')->redirect($entity);
+                return $this->get(Router::class)->redirect($entity);
             }
         }
 
@@ -184,10 +189,11 @@ class ConfigController extends Controller
     public function fieldUpdateAction(FieldConfigModel $fieldConfigModel)
     {
         $formAction = $this->generateUrl('oro_entityconfig_field_update', ['id' => $fieldConfigModel->getId()]);
-        $successMessage = $this->get('translator')->trans('oro.entity_config.controller.config_field.message.saved');
+        $successMessage = $this->get(TranslatorInterface::class)
+            ->trans('oro.entity_config.controller.config_field.message.saved');
         
         return $this
-            ->get('oro_entity_config.form.handler.config_field_handler')
+            ->get(ConfigFieldHandler::class)
             ->handleUpdate($fieldConfigModel, $formAction, $successMessage);
     }
 
@@ -200,11 +206,11 @@ class ConfigController extends Controller
     {
         $fields = [];
         if ($id) {
-            $entityRoutingHelper = $this->get('oro_entity.routing_helper');
+            $entityRoutingHelper = $this->get(EntityRoutingHelper::class);
             $className           = $entityRoutingHelper->resolveEntityClass($id);
 
             /** @var EntityFieldProvider $fieldProvider */
-            $fieldProvider = $this->get('oro_entity.entity_field_provider');
+            $fieldProvider = $this->get(EntityFieldProvider::class);
 
             $entityFields = $fieldProvider->getFields($className);
             foreach ($entityFields as $field) {
@@ -222,7 +228,7 @@ class ConfigController extends Controller
          * in case no fields were found - add empty_value into result
          */
         if (empty($fields)) {
-            $fields[''] = $this->get('translator')->trans('oro.entity.form.choose_entity_field');
+            $fields[''] = $this->get(TranslatorInterface::class)->trans('oro.entity.form.choose_entity_field');
         }
 
         return new Response(json_encode($fields));
@@ -249,7 +255,7 @@ class ConfigController extends Controller
 
         /** @var ConfigProvider $ownershipConfigProvider */
         $ownershipConfigProvider = $this->get('oro_entity_config.provider.ownership');
-        $ownerTypes              = $this->get('oro_organization.form.type.ownership_type')->getOwnershipsArray();
+        $ownerTypes              = $this->get(OwnershipType::class)->getOwnershipsArray();
         $ownerType               = $ownershipConfigProvider->getConfig($entity->getClassName())->get('owner_type');
         $ownerType               = $ownerTypes[empty($ownerType) ? 'NONE' : $ownerType];
 
@@ -278,7 +284,7 @@ class ConfigController extends Controller
         /** @var ConfigProvider $entityConfigProvider */
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
         $entityConfig         = $entityConfigProvider->getConfig($className);
-        $translator           = $this->get('translator');
+        $translator           = $this->get(TranslatorInterface::class);
 
         $uniqueKeys = $entityConfig->get('unique_key', false, ['keys' => []]);
 
@@ -366,7 +372,7 @@ class ConfigController extends Controller
     protected function getRoutingHelper()
     {
         if (!$this->routingHelper) {
-            $this->routingHelper = $this->get('oro_entity.routing_helper');
+            $this->routingHelper = $this->get(EntityRoutingHelper::class);
         }
 
         return $this->routingHelper;
@@ -377,7 +383,7 @@ class ConfigController extends Controller
      */
     protected function getConfigManager()
     {
-        return $this->get('oro_entity_config.config_manager');
+        return $this->get(ConfigManager::class);
     }
 
     /**
@@ -385,6 +391,29 @@ class ConfigController extends Controller
      */
     private function getConfigProviderHelper()
     {
-        return $this->get('oro_entity_config.helper.entity_config_provider_helper');
+        return $this->get(EntityConfigProviderHelper::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                'oro_entity_config.provider.entity' => ConfigProvider::class,
+                'oro_entity_config.provider.extend' => ConfigProvider::class,
+                'oro_entity_config.provider.ownership' => ConfigProvider::class,
+                ConfigManager::class,
+                EntityRoutingHelper::class,
+                EntityConfigProviderHelper::class,
+                TranslatorInterface::class,
+                Router::class,
+                ConfigFieldHandler::class,
+                EntityFieldProvider::class,
+                OwnershipType::class,
+            ]
+        );
     }
 }
