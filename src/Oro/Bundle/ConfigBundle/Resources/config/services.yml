@@ -12,8 +12,6 @@ parameters:
 
     oro_config.manager.api.class:                                                Oro\Bundle\ConfigBundle\Config\ConfigApiManager
 
-    oro_config.manager.class:                                                    Oro\Bundle\ConfigBundle\Config\ConfigManager
-
 services:
     oro_config.config_bag:
         class: Oro\Bundle\ConfigBundle\Config\ConfigBag
@@ -60,7 +58,7 @@ services:
     # a template definition for scoped config managers
     # actually this service is replaced with an alias to the most priority scoped config manager
     oro_config.manager:
-        class: '%oro_config.manager.class%'
+        class: 'Oro\Bundle\ConfigBundle\Config\ConfigManager'
         arguments:
             - ~ # scope; it is set by Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass
             - '@oro_config.config_definition_bag'

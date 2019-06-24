@@ -1,6 +1,5 @@
 parameters:
     oro_datagrid.extension.mass_action.handler.delete.class:  Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionHandler
-    oro_datagrid.mass_action.parameters_parser.class:         Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionParametersParser
     oro_datagrid.mass_action.dispatcher.class:                Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher
 
     oro_datagrid.extension.mass_action.type.ajax.class:       Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\AjaxMassAction
@@ -34,7 +33,10 @@ services:
             - '@request_stack'
 
     oro_datagrid.mass_action.parameters_parser:
-        class: '%oro_datagrid.mass_action.parameters_parser.class%'
+        class: 'Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionParametersParser'
+
+    Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionParametersParser:
+        alias: 'oro_datagrid.mass_action.parameters_parser'
 
     oro_datagrid.mass_action.helper:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHelper
