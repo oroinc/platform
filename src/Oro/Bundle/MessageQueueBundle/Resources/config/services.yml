@@ -59,7 +59,7 @@ services:
         public: false
         arguments:
             - '%oro_message_queue.consumer_heartbeat_update_period%'
-            - '@service_container'
+            - '@oro_message_queue.consumption.consumer_heartbeat'
         tags:
             - { name: 'oro_message_queue.consumption.extension', persistent: true }
 

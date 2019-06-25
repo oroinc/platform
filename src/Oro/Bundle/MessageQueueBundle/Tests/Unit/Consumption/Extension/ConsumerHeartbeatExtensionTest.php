@@ -6,7 +6,6 @@ use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ConsumerHeartbeatExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Psr\Log\LoggerInterface;
 
 class ConsumerHeartbeatExtensionTest extends \PHPUnit\Framework\TestCase
@@ -16,9 +15,6 @@ class ConsumerHeartbeatExtensionTest extends \PHPUnit\Framework\TestCase
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
     protected $logger;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    protected $container;
 
     /** @var Context */
     protected $context;
@@ -33,11 +29,7 @@ class ConsumerHeartbeatExtensionTest extends \PHPUnit\Framework\TestCase
         $this->context = new Context($this->createMock(SessionInterface::class));
         $this->context->setLogger($this->logger);
 
-        $this->container = TestContainerBuilder::create()
-            ->add('oro_message_queue.consumption.consumer_heartbeat', $this->consumerHeartbeat)
-            ->getContainer($this);
-
-        $this->extension = new ConsumerHeartbeatExtension(15, $this->container);
+        $this->extension = new ConsumerHeartbeatExtension(15, $this->consumerHeartbeat);
     }
 
     public function testOnBeforeReceiveOnStartConsumption()
@@ -65,7 +57,7 @@ class ConsumerHeartbeatExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testOnBeforeReceiveWithTurnedOffFunctionality()
     {
-        $this->extension = new ConsumerHeartbeatExtension(0, $this->container);
+        $this->extension = new ConsumerHeartbeatExtension(0, $this->consumerHeartbeat);
 
         $this->logger->expects($this->never())
             ->method('info');

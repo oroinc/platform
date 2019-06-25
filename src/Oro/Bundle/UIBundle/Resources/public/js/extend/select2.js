@@ -337,13 +337,13 @@ define(function(require) {
         prototype.init = function() {
             init.apply(this, arguments);
             this.breadcrumbs = $('<ul class="select2-breadcrumbs"></ul>');
-            this.breadcrumbs.on('click', '.select2-breadcrumb-item', $.proxy(function(e) {
+            this.breadcrumbs.on('click.select2', '.select2-breadcrumb-item', function(e) {
                 var data = $(e.currentTarget).data('select2-data');
                 this.pagePath = data.pagePath;
                 this.search.val('');
                 this.updateResults();
                 e.stopPropagation();
-            }, this));
+            }.bind(this));
             this.dropdown.prepend(this.breadcrumbs);
             this.search
                 .on('focus', function() {
@@ -364,6 +364,7 @@ define(function(require) {
                 delete this.propertyObserver;
                 this.propertyObserver = null;
             }
+            this.breadcrumbs.off('.select2');
             // Remove previously auto generated name
             this.search.removeAttr('name');
             destroy.call(this);
@@ -373,7 +374,7 @@ define(function(require) {
             var breadcrumbs = this.breadcrumbs;
             var opts = this.opts;
             breadcrumbs.empty();
-            if ($.isFunction(opts.formatBreadcrumbItem) && $.isFunction(opts.breadcrumbs)) {
+            if (typeof opts.formatBreadcrumbItem === 'function' && typeof opts.breadcrumbs === 'function') {
                 var items = opts.breadcrumbs(this.pagePath);
                 $.each(items, function(i, item) {
                     var itemHTML = opts.formatBreadcrumbItem(item, {index: i, length: items.length});

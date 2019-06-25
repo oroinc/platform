@@ -112,7 +112,7 @@ define(function(require) {
                         var built = $.Deferred();
                         buildersReadyPromises.push(built.promise());
 
-                        if (!_.has(builder, 'init') || !$.isFunction(builder.init)) {
+                        if (!_.has(builder, 'init') || typeof builder.init !== 'function') {
                             built.resolve();
                             _.defer(throwNoInitMethodError);
                             continue;

@@ -32,7 +32,7 @@ oro_form:
                     - height
             a:
                 attributes:
-                    - !href
+                    - "!href"
                     - target
                     - title
             dl: ~

@@ -5,6 +5,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
+    var tools = require('oroui/js/tools');
     var BaseView = require('oroui/js/app/views/base/view');
 
     JobQueueView = BaseView.extend({
@@ -66,11 +67,11 @@ define(function(require) {
                     $link.closest('div')
                         .find('span:first')
                         .toggleClass('label-success label-important')
-                        .text($.isNumeric(data.message) ? __('Running') : __('Not running'))
+                        .text(tools.isNumeric(data.message) ? __('Running') : __('Not running'))
                         .end()
                         .closest('div').find('span:last').text(data.message).end();
 
-                    this.updateButtons(!$.isNumeric(data.message));
+                    this.updateButtons(!tools.isNumeric(data.message));
                 }
 
                 $loader.hide();

@@ -91,7 +91,6 @@ full:
                     collection: true
                     allow_array: true
                     allow_range: true
-                    collection: true
                     description: description1
                 field4:
                     exclude: false

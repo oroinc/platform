@@ -44,22 +44,24 @@ class AccessRulesPassTest extends \PHPUnit\Framework\TestCase
         $definition->addTag('oro_security.access_rule', ['priority' => -255]);
 
         $definition = $this->container->register('rule1');
-        $definition->addTag('oro_security.access_rule', []);
+        $definition->addTag('oro_security.access_rule');
 
         $definition = $this->container->register('rule2');
-        $definition->addTag('oro_security.access_rule', []);
+        $definition->addTag('oro_security.access_rule', ['priority' => 10, 'type' => 'ORM']);
+        $definition->addTag('oro_security.access_rule', ['type' => 'ORM', 'entityClass' => 'Test\Entity']);
 
         $definition = $this->container->register('rule_should_be_first');
-        $definition->addTag('oro_security.access_rule', ['priority' => 255]);
+        $definition->addTag('oro_security.access_rule', ['priority' => 255, 'type' => 'ORM', 'permission' => 'VIEW']);
 
         $this->compilerPass->process($this->container);
 
         $this->assertSame(
             [
-                'rule_should_be_first',
-                'rule1',
-                'rule2',
-                'rule_should_be_last'
+                ['rule_should_be_first', ['type' => 'ORM', 'permission' => 'VIEW']],
+                ['rule2', ['type' => 'ORM']],
+                ['rule1', []],
+                ['rule2', ['type' => 'ORM', 'entityClass' => 'Test\Entity']],
+                ['rule_should_be_last', []]
             ],
             $serviceDefinition->getArgument(0)
         );

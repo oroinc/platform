@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
 use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor;
+use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleOptionMatcherInterface;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\AccessDenied;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Association;
@@ -63,9 +64,14 @@ class AccessRuleWalkerTest extends OrmTestCase
             ->method('get')
             ->with('rule')
             ->willReturn($this->rule);
+        $matcher = $this->createMock(AccessRuleOptionMatcherInterface::class);
+        $matcher->expects(self::any())
+            ->method('matches')
+            ->willReturn(true);
         $this->accessRuleExecutor = new AccessRuleExecutor(
-            ['rule'],
-            $container
+            [['rule', []]],
+            $container,
+            $matcher
         );
     }
 
