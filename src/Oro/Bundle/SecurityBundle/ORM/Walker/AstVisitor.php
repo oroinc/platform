@@ -2,36 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\ORM\Query\AST\ArithmeticExpression;
-use Doctrine\ORM\Query\AST\ComparisonExpression;
-use Doctrine\ORM\Query\AST\ConditionalExpression;
-use Doctrine\ORM\Query\AST\ConditionalPrimary;
-use Doctrine\ORM\Query\AST\ConditionalTerm;
-use Doctrine\ORM\Query\AST\ExistsExpression;
-use Doctrine\ORM\Query\AST\IdentificationVariableDeclaration;
-use Doctrine\ORM\Query\AST\InExpression;
-use Doctrine\ORM\Query\AST\Literal;
-use Doctrine\ORM\Query\AST\NullComparisonExpression;
-use Doctrine\ORM\Query\AST\PathExpression;
-use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
-use Doctrine\ORM\Query\AST\SimpleSelectClause;
-use Doctrine\ORM\Query\AST\SimpleSelectExpression;
-use Doctrine\ORM\Query\AST\Subselect;
-use Doctrine\ORM\Query\AST\SubselectFromClause;
-use Doctrine\ORM\Query\AST\WhereClause;
+use Doctrine\ORM\Query\AST;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\AccessDenied;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\Association;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\Comparison;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\CompositeExpression;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\Exists;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\NullComparison;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\Subquery;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\Value;
+use Oro\Bundle\SecurityBundle\AccessRule\Expr;
 use Oro\Bundle\SecurityBundle\AccessRule\Visitor;
 
 /**
@@ -39,79 +15,62 @@ use Oro\Bundle\SecurityBundle\AccessRule\Visitor;
  */
 class AstVisitor extends Visitor
 {
+    /** @var EntityManagerInterface */
+    private $em;
+
     /** @var string */
     private $alias;
 
-    /** @var QueryComponent[] */
+    /** @var QueryComponentCollection */
     private $queryComponents;
 
-    /** @var ObjectManager */
-    private $em;
-
     /**
-     * @param ObjectManager $em
+     * @param EntityManagerInterface   $em
+     * @param string                   $alias
+     * @param QueryComponentCollection $queryComponents
      */
-    public function setObjectManager(ObjectManager $em): void
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        string $alias,
+        QueryComponentCollection $queryComponents
+    ) {
         $this->em = $em;
-    }
-
-    /**
-     * @return QueryComponent[]
-     */
-    public function getQueryComponents(): array
-    {
-        return $this->queryComponents;
-    }
-
-    /**
-     * @param string $alias
-     */
-    public function setAlias(string $alias): void
-    {
         $this->alias = $alias;
-    }
-
-    /**
-     * @param QueryComponent[] $queryComponents
-     */
-    public function setQueryComponents(array $queryComponents): void
-    {
         $this->queryComponents = $queryComponents;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function walkComparison(Comparison $comparison): ConditionalPrimary
+    public function walkComparison(Expr\Comparison $comparison): AST\ConditionalPrimary
     {
-        $leftExpression = new ArithmeticExpression();
+        $leftExpression = new AST\ArithmeticExpression();
         $leftExpression->simpleArithmeticExpression = $comparison->getLeftOperand()->visit($this);
 
         $operator = $comparison->getOperator();
 
         switch ($operator) {
-            case Comparison::IN:
-                $resultExpression = new InExpression($leftExpression);
+            case Expr\Comparison::IN:
+                $resultExpression = new AST\InExpression($leftExpression);
                 $resultExpression->literals = $comparison->getRightOperand()->visit($this);
                 break;
-            case Comparison::NIN:
-                $resultExpression = new InExpression($leftExpression);
+            case Expr\Comparison::NIN:
+                $resultExpression = new AST\InExpression($leftExpression);
                 $resultExpression->not = true;
                 $resultExpression->literals = $comparison->getRightOperand()->visit($this);
                 break;
             default:
-                $rightExpression = new ArithmeticExpression();
+                $rightExpression = new AST\ArithmeticExpression();
                 $rightExpression->simpleArithmeticExpression = $comparison->getRightOperand()->visit($this);
 
-                $resultExpression = new ComparisonExpression(
+                $resultExpression = new AST\ComparisonExpression(
                     $leftExpression,
                     $comparison->getOperator(),
                     $rightExpression
                 );
         }
 
-        $primaryConditional = new ConditionalPrimary();
+        $primaryConditional = new AST\ConditionalPrimary();
         $primaryConditional->simpleConditionalExpression = $resultExpression;
 
         return $primaryConditional;
@@ -120,15 +79,19 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkValue(Value $value)
+    public function walkValue(Expr\Value $value)
     {
-        if (is_array($value->getValue())) {
-            $literalsArray = [];
+        // unfortunately we have to use literals
+        // because it is not possible to add query parameters in a query walker;
+        // walkers are executed only if a query is not cached in the query cache yet,
+        // as result it is not possible to prepare parameters for a cached query
+        if (\is_array($value->getValue())) {
+            $literalValues = [];
             foreach ($value->getValue() as $arrayItemValue) {
-                $literalsArray[] = $this->getValueLiteral($arrayItemValue);
+                $literalValues[] = $this->getValueLiteral($arrayItemValue);
             }
 
-            return $literalsArray;
+            return $literalValues;
         }
 
         return $this->getValueLiteral($value->getValue());
@@ -137,45 +100,45 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkCompositeExpression(CompositeExpression $expr)
+    public function walkCompositeExpression(Expr\CompositeExpression $expr)
     {
         $factors = [];
         foreach ($expr->getExpressionList() as $expression) {
             $factor = $expression->visit($this);
-            if ($factor instanceof ConditionalExpression || $factor instanceof ConditionalTerm) {
-                $conditionalPrimary = new ConditionalPrimary();
+            if ($factor instanceof AST\ConditionalExpression || $factor instanceof AST\ConditionalTerm) {
+                $conditionalPrimary = new AST\ConditionalPrimary();
                 $conditionalPrimary->conditionalExpression = $factor;
                 $factor = $conditionalPrimary;
             }
             $factors[] = $factor;
         }
 
-        if ($expr->getType() === CompositeExpression::TYPE_AND) {
-            return new ConditionalTerm($factors);
+        if ($expr->getType() === Expr\CompositeExpression::TYPE_AND) {
+            return new AST\ConditionalTerm($factors);
         }
 
         $terms = [];
         foreach ($factors as $factor) {
-            $terms[] = new ConditionalTerm([$factor]);
+            $terms[] = new AST\ConditionalTerm([$factor]);
         }
 
-        return new ConditionalExpression($terms);
+        return new AST\ConditionalExpression($terms);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function walkAccessDenied(AccessDenied $accessDenied): ConditionalPrimary
+    public function walkAccessDenied(Expr\AccessDenied $accessDenied): AST\ConditionalPrimary
     {
-        $leftExpression = new ArithmeticExpression();
-        $leftExpression->simpleArithmeticExpression  = new Literal(Literal::NUMERIC, 1);
+        $leftExpression = new AST\ArithmeticExpression();
+        $leftExpression->simpleArithmeticExpression = new AST\Literal(AST\Literal::NUMERIC, 1);
 
-        $rightExpression = new ArithmeticExpression();
-        $rightExpression->simpleArithmeticExpression = new Literal(Literal::NUMERIC, 0);
+        $rightExpression = new AST\ArithmeticExpression();
+        $rightExpression->simpleArithmeticExpression = new AST\Literal(AST\Literal::NUMERIC, 0);
 
-        $expression = new ComparisonExpression($leftExpression, '=', $rightExpression);
+        $expression = new AST\ComparisonExpression($leftExpression, '=', $rightExpression);
 
-        $primaryConditional = new ConditionalPrimary();
+        $primaryConditional = new AST\ConditionalPrimary();
         $primaryConditional->simpleConditionalExpression = $expression;
 
         return $primaryConditional;
@@ -184,15 +147,15 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkAssociation(Association $association)
+    public function walkAssociation(Expr\Association $association)
     {
         $alias = $this->alias;
         $associationName = $association->getAssociationName();
 
         /** @var ClassMetadataInfo $sourceMetadata */
-        $sourceMetadata = $this->queryComponents[$alias]->getMetadata();
+        $sourceMetadata = $this->queryComponents->get($alias)->getMetadata();
         if (empty($sourceMetadata->associationMappings[$associationName])) {
-            throw new \RuntimeException(sprintf(
+            throw new \RuntimeException(\sprintf(
                 'Parameter of Association expression should be the name of existing association'
                 . ' for alias \'%s\'. Given name: \'%s\'.',
                 $alias,
@@ -200,39 +163,41 @@ class AstVisitor extends Visitor
             ));
         }
         $associationMapping = $sourceMetadata->associationMappings[$associationName];
-        if (!in_array($associationMapping['type'], [ClassMetadataInfo::ONE_TO_ONE, ClassMetadataInfo::MANY_TO_ONE])) {
-            throw new \RuntimeException(sprintf(
+        if (!($associationMapping['type'] & ClassMetadataInfo::TO_ONE)) {
+            throw new \RuntimeException(\sprintf(
                 'Parameter of Association expression should be to-one association. Given name: \'%s\'.',
                 $associationName
             ));
         }
-        $targetEntityAlias = sprintf('_%s__%s_', $alias, $associationName);
+        $targetEntityAlias = \sprintf('_%s__%s_', $alias, $associationName);
         $targetEntityClass = $associationMapping['targetEntity'];
 
         /** @var ClassMetadataInfo $targetEntityMetadata */
         $targetMetadata = $this->em->getClassMetadata($targetEntityClass);
 
-        $queryComponent = new QueryComponent();
-        $queryComponent->setRelation($associationMapping);
-        $queryComponent->setMetadata($targetMetadata);
-        $this->queryComponents[$targetEntityAlias] = $queryComponent;
-
+        $queryComponentRelation = $associationMapping;
         if (!$associationMapping['isOwningSide']) {
-            $queryComponent->setRelation($targetMetadata->associationMappings[$associationMapping['mappedBy']]);
-            $leftPathExpression = new Path($targetMetadata->getSingleIdentifierFieldName(), $alias);
-            $rightPathExpression = new Path($associationMapping['mappedBy'], $targetEntityAlias);
+            $mappedBy = $associationMapping['mappedBy'];
+            $queryComponentRelation = $targetMetadata->associationMappings[$mappedBy];
+            $leftPathExpression = new Expr\Path($targetMetadata->getSingleIdentifierFieldName(), $alias);
+            $rightPathExpression = new Expr\Path($mappedBy, $targetEntityAlias);
         } else {
-            $leftPathExpression = new Path($targetMetadata->getSingleIdentifierFieldName(), $targetEntityAlias);
-            $rightPathExpression = new Path($associationName, $alias);
+            $leftPathExpression = new Expr\Path($targetMetadata->getSingleIdentifierFieldName(), $targetEntityAlias);
+            $rightPathExpression = new Expr\Path($associationName, $alias);
         }
+
+        $this->queryComponents->add(
+            $targetEntityAlias,
+            new QueryComponent($targetMetadata, $queryComponentRelation)
+        );
 
         $subqueryCriteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, $targetEntityClass, $targetEntityAlias);
         $subqueryCriteria->andExpression(
-            new Comparison($leftPathExpression, Comparison::EQ, $rightPathExpression)
+            new Expr\Comparison($leftPathExpression, Expr\Comparison::EQ, $rightPathExpression)
         );
 
-        $existExpression = new Exists(
-            new Subquery(
+        $existExpression = new Expr\Exists(
+            new Expr\Subquery(
                 $targetEntityClass,
                 $targetEntityAlias,
                 $subqueryCriteria
@@ -245,23 +210,23 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkPath(Path $path): PathExpression
+    public function walkPath(Expr\Path $path): AST\PathExpression
     {
         $alias = $path->getAlias() ?: $this->alias;
         $field = $path->getField();
 
         /** @var ClassMetadata $metadata */
-        $metadata = $this->queryComponents[$alias]->getMetadata();
+        $metadata = $this->queryComponents->get($alias)->getMetadata();
         if ($metadata->isSingleValuedAssociation($field)) {
-            $type = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
+            $type = AST\PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
         } elseif ($metadata->isCollectionValuedAssociation($field)) {
-            $type = PathExpression::TYPE_COLLECTION_VALUED_ASSOCIATION;
+            $type = AST\PathExpression::TYPE_COLLECTION_VALUED_ASSOCIATION;
         } else {
-            $type = PathExpression::TYPE_STATE_FIELD;
+            $type = AST\PathExpression::TYPE_STATE_FIELD;
         }
 
-        $expression = new PathExpression(
-            PathExpression::TYPE_STATE_FIELD | PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+        $expression = new AST\PathExpression(
+            AST\PathExpression::TYPE_STATE_FIELD | AST\PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
             $alias,
             $field
         );
@@ -273,33 +238,32 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkSubquery(Subquery $subquery): Subselect
+    public function walkSubquery(Expr\Subquery $subquery): AST\Subselect
     {
         $from = $subquery->getFrom();
         $alias = $subquery->getAlias();
         $subqueryCriteria = $subquery->getCriteria();
 
-        $literal = new Literal(Literal::NUMERIC, 1);
-        $simpleSelectEx = new SimpleSelectExpression($literal);
-        $simpleSelect = new SimpleSelectClause($simpleSelectEx, false);
-        $rangeVarDeclaration = new RangeVariableDeclaration($from, $alias, true);
-        $idVarDeclaration = new IdentificationVariableDeclaration($rangeVarDeclaration, null, []);
-        $subSelectFrom = new SubselectFromClause([$idVarDeclaration]);
+        $literal = new AST\Literal(AST\Literal::NUMERIC, 1);
+        $simpleSelectEx = new AST\SimpleSelectExpression($literal);
+        $simpleSelect = new AST\SimpleSelectClause($simpleSelectEx, false);
+        $rangeVarDeclaration = new AST\RangeVariableDeclaration($from, $alias, true);
+        $idVarDeclaration = new AST\IdentificationVariableDeclaration($rangeVarDeclaration, null, []);
+        $subSelectFrom = new AST\SubselectFromClause([$idVarDeclaration]);
 
-        $queryComponent = new QueryComponent();
-        $queryComponent->setMetadata($this->em->getClassMetadata($from));
+        if (!$this->queryComponents->has($alias)) {
+            $this->queryComponents->add(
+                $alias,
+                new QueryComponent($this->em->getClassMetadata($from))
+            );
+        }
 
-        $this->queryComponents[$alias] = $queryComponent;
-
-        $visitor = new self();
-        $visitor->setAlias($alias);
-        $visitor->setQueryComponents($this->queryComponents);
+        $visitor = new self($this->em, $alias, $this->queryComponents);
 
         $whereCondition = $visitor->dispatch($subqueryCriteria->getExpression());
-        $this->queryComponents = $visitor->getQueryComponents();
 
-        $subSelect = new Subselect($simpleSelect, $subSelectFrom);
-        $subSelect->whereClause = new WhereClause($whereCondition);
+        $subSelect = new AST\Subselect($simpleSelect, $subSelectFrom);
+        $subSelect->whereClause = new AST\WhereClause($whereCondition);
 
         return $subSelect;
     }
@@ -307,12 +271,12 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkExists(Exists $existsExpr): ConditionalPrimary
+    public function walkExists(Expr\Exists $existsExpr): AST\ConditionalPrimary
     {
-        $exist = new ExistsExpression($existsExpr->getExpression()->visit($this));
+        $exist = new AST\ExistsExpression($existsExpr->getExpression()->visit($this));
         $exist->not = $existsExpr->isNot();
 
-        $primaryConditional = new ConditionalPrimary();
+        $primaryConditional = new AST\ConditionalPrimary();
         $primaryConditional->simpleConditionalExpression = $exist;
 
         return $primaryConditional;
@@ -321,12 +285,12 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkNullComparison(NullComparison $comparison): ConditionalPrimary
+    public function walkNullComparison(Expr\NullComparison $comparison): AST\ConditionalPrimary
     {
-        $expression = new NullComparisonExpression($comparison->getExpression()->visit($this));
+        $expression = new AST\NullComparisonExpression($comparison->getExpression()->visit($this));
         $expression->not = $comparison->isNot();
 
-        $primaryConditional = new ConditionalPrimary();
+        $primaryConditional = new AST\ConditionalPrimary();
         $primaryConditional->simpleConditionalExpression = $expression;
 
         return $primaryConditional;
@@ -335,19 +299,19 @@ class AstVisitor extends Visitor
     /**
      * @param mixed $value
      *
-     * @return Literal
+     * @return AST\Literal
      */
-    protected function getValueLiteral($value): Literal
+    protected function getValueLiteral($value): AST\Literal
     {
-        if (is_numeric($value)) {
-            $type = Literal::NUMERIC;
-        } elseif (is_bool($value)) {
-            $type = Literal::BOOLEAN;
+        if (\is_numeric($value)) {
+            $type = AST\Literal::NUMERIC;
+        } elseif (\is_bool($value)) {
+            $type = AST\Literal::BOOLEAN;
             $value = $value ? 'true' : 'false';
         } else {
-            $type = Literal::STRING;
+            $type = AST\Literal::STRING;
         }
 
-        return new Literal($type, $value);
+        return new AST\Literal($type, $value);
     }
 }

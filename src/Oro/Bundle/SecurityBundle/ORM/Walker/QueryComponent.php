@@ -13,11 +13,11 @@ class QueryComponent
     /** @var ClassMetadata */
     private $metadata;
 
-    /** @var string|null */
-    private $parent;
-
     /** @var array|null */
     private $relation;
+
+    /** @var string|null */
+    private $parent;
 
     /** @var string|null */
     private $map;
@@ -29,6 +29,30 @@ class QueryComponent
     private $token;
 
     /**
+     * @param ClassMetadata $metadata
+     * @param array|null    $relation
+     * @param string|null   $parent
+     * @param string|null   $map
+     * @param int|null      $nestingLevel
+     * @param array|null    $token
+     */
+    public function __construct(
+        ClassMetadata $metadata,
+        array $relation = null,
+        string $parent = null,
+        string $map = null,
+        int $nestingLevel = null,
+        array $token = null
+    ) {
+        $this->metadata = $metadata;
+        $this->relation = $relation;
+        $this->parent = $parent;
+        $this->map = $map;
+        $this->nestingLevel = $nestingLevel;
+        $this->token = $token;
+    }
+
+    /**
      * Generates and returns query component from array representation.
      *
      * @param array $componentArray
@@ -37,20 +61,19 @@ class QueryComponent
      */
     public static function fromArray(array $componentArray): ?QueryComponent
     {
-        // Check if given query component is the table data.
         if (!array_key_exists('metadata', $componentArray)) {
+            // the given query component is not the table data
             return null;
         }
 
-        $result = new self();
-        $result->setMetadata($componentArray['metadata']);
-        $result->setParent($componentArray['parent']);
-        $result->setRelation($componentArray['relation']);
-        $result->setMap($componentArray['map']);
-        $result->setNestingLevel($componentArray['nestingLevel']);
-        $result->setToken($componentArray['token']);
-
-        return $result;
+        return new self(
+            $componentArray['metadata'],
+            $componentArray['relation'],
+            $componentArray['parent'],
+            $componentArray['map'],
+            $componentArray['nestingLevel'],
+            $componentArray['token']
+        );
     }
 
     /**
@@ -62,11 +85,11 @@ class QueryComponent
     }
 
     /**
-     * @param ClassMetadata $metadata
+     * @return array|null
      */
-    public function setMetadata(ClassMetadata $metadata): void
+    public function getRelation(): ?array
     {
-        $this->metadata = $metadata;
+        return $this->relation;
     }
 
     /**
@@ -78,43 +101,11 @@ class QueryComponent
     }
 
     /**
-     * @param null|string $parent
-     */
-    public function setParent(?string $parent): void
-    {
-        $this->parent = $parent;
-    }
-
-    /**
-     * @return array|null
-     */
-    public function getRelation(): ?array
-    {
-        return $this->relation;
-    }
-
-    /**
-     * @param array|null $relation
-     */
-    public function setRelation(?array $relation): void
-    {
-        $this->relation = $relation;
-    }
-
-    /**
      * @return string|null
      */
     public function getMap(): ?string
     {
         return $this->map;
-    }
-
-    /**
-     * @param string|null $map
-     */
-    public function setMap(?string $map): void
-    {
-        $this->map = $map;
     }
 
     /**
@@ -126,27 +117,11 @@ class QueryComponent
     }
 
     /**
-     * @param int|null $nestingLevel
-     */
-    public function setNestingLevel(?int $nestingLevel): void
-    {
-        $this->nestingLevel = $nestingLevel;
-    }
-
-    /**
      * @return array|null
      */
     public function getToken(): ?array
     {
         return $this->token;
-    }
-
-    /**
-     * @param array|null $token
-     */
-    public function setToken(?array $token): void
-    {
-        $this->token = $token;
     }
 
     /**
@@ -158,8 +133,8 @@ class QueryComponent
     {
         return [
             'metadata'     => $this->getMetadata(),
-            'parent'       => $this->getParent(),
             'relation'     => $this->getRelation(),
+            'parent'       => $this->getParent(),
             'map'          => $this->getMap(),
             'nestingLevel' => $this->getNestingLevel(),
             'token'        => $this->getToken()
