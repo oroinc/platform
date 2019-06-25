@@ -47,50 +47,24 @@ class AvailableOwnerAccessRuleTest extends TestCase
             ));
     }
 
-    public function testIsApplicableWithNotEnabledRule()
-    {
-        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e');
-        $this->assertFalse($this->rule->isApplicable($criteria));
-    }
-
-    public function testIsApplicableWithoutOptionsInCriteriaAndNotSupportedPermission()
-    {
-        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e');
-        $criteria->setOption(AvailableOwnerAccessRule::ENABLE_RULE, true);
-        $this->assertFalse($this->rule->isApplicable($criteria));
-    }
-
-    public function testIsApplicableWithNotSupportedPermission()
-    {
-        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e');
-        $criteria->setOption(AvailableOwnerAccessRule::ENABLE_RULE, true);
-        $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
-
-        $this->assertFalse($this->rule->isApplicable($criteria));
-    }
-
     public function testIsApplicableWithNotRootEntity()
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e', 'CREATE', false);
-        $criteria->setOption(AvailableOwnerAccessRule::ENABLE_RULE, true);
         $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
 
         $this->assertFalse($this->rule->isApplicable($criteria));
     }
 
-    public function testIsApplicableWithEditPermission()
+    public function testIsApplicableWithRootEntityButWithoutTargetEntityClass()
     {
-        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e', 'CREATE');
-        $criteria->setOption(AvailableOwnerAccessRule::ENABLE_RULE, true);
-        $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
+        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e', 'CREATE', true);
 
-        $this->assertTrue($this->rule->isApplicable($criteria));
+        $this->assertFalse($this->rule->isApplicable($criteria));
     }
 
-    public function testIsApplicableWithAssignPermission()
+    public function testIsApplicableWithRootEntityAndTargetEntityClass()
     {
-        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e', 'ASSIGN');
-        $criteria->setOption(AvailableOwnerAccessRule::ENABLE_RULE, true);
+        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e', 'CREATE', true);
         $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
 
         $this->assertTrue($this->rule->isApplicable($criteria));

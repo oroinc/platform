@@ -34,14 +34,6 @@ class AclAccessRuleTest extends TestCase
         $this->accessRule = new AclAccessRule($this->builder, $this->ownershipMetadataProvider);
     }
 
-    public function testIsApplicableIsRuleWasDisabled()
-    {
-        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'cmsUser');
-        $criteria->setOption('aclDisable', true);
-
-        $this->assertFalse($this->accessRule->isApplicable($criteria));
-    }
-
     public function testIsApplicableIfCriteriaShouldBeProtected()
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'cmsUser');

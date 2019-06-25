@@ -234,4 +234,4 @@ services:
             - "@oro_security.orm.ownership_sql_walker_builder"
             - "@oro_activity_list.provider.chain"
         tags:
-            - { name: oro_security.access_rule }
+            - { name: oro_security.access_rule, type: ORM, entityClass: Oro\Bundle\ActivityListBundle\Entity\ActivityList }

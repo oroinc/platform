@@ -772,6 +772,16 @@ services:
     oro_security.access_rule_executor:
         class: Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor
         public: false
+        arguments:
+            - []
+            - ~
+            - '@oro_security.access_rule_option_matcher'
+
+    oro_security.access_rule_option_matcher:
+        class: Oro\Bundle\SecurityBundle\AccessRule\AccessRuleOptionMatcher
+        public: false
+        arguments:
+            - '@oro_security.token_accessor'
 
     oro_security.access_rule.acl:
         class: Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule
@@ -780,7 +790,7 @@ services:
             - '@oro_security.orm.ownership_sql_walker_builder'
             - '@oro_security.owner.metadata_provider.chain'
         tags:
-            - { name: oro_security.access_rule }
+            - { name: oro_security.access_rule, aclDisable: false }
 
     oro_security.access_rule.available_owner_check:
         class: Oro\Bundle\SecurityBundle\AccessRule\AvailableOwnerAccessRule
@@ -789,7 +799,8 @@ services:
             - '@oro_security.orm.ownership_sql_walker_builder'
             - '@oro_security.owner.metadata_provider.chain'
         tags:
-            - { name: oro_security.access_rule }
+            - { name: oro_security.access_rule, permission: CREATE, availableOwnerEnable: true }
+            - { name: oro_security.access_rule, permission: ASSIGN, availableOwnerEnable: true }
 
     oro_security.form.extension.autocomplete_password_type:
         class: 'Oro\Bundle\SecurityBundle\Form\Extension\AutocompletePasswordTypeExtension'

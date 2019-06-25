@@ -3,10 +3,12 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\AccessRule;
 
 use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor;
+use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleOptionMatcher;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Comparison;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\CompositeExpression;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\AccessRule\AccessRule1;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\AccessRule\AccessRule2;
@@ -15,7 +17,7 @@ use Psr\Container\ContainerInterface;
 class AccessRuleExecutorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param array $rules [service id => AccessRuleInterface, ...]
+     * @param array $rules [service id => AccessRuleInterface or [AccessRuleInterface, options], ...]
      *
      * @return AccessRuleExecutor
      */
@@ -25,12 +27,20 @@ class AccessRuleExecutorTest extends \PHPUnit\Framework\TestCase
         $container->expects(self::any())
             ->method('get')
             ->willReturnCallback(function ($serviceId) use ($rules) {
-                return $rules[$serviceId];
+                return is_array($rules[$serviceId]) ? $rules[$serviceId][0] : $rules[$serviceId];
             });
 
+        $rulesForExecutor = [];
+        foreach ($rules as $serviceId => $rule) {
+            $rulesForExecutor[] = [$serviceId, is_array($rule) ? $rule[1] : []];
+        }
+
         return new AccessRuleExecutor(
-            array_keys($rules),
-            $container
+            $rulesForExecutor,
+            $container,
+            new AccessRuleOptionMatcher(
+                $this->createMock(TokenAccessorInterface::class)
+            )
         );
     }
 
@@ -65,10 +75,32 @@ class AccessRuleExecutorTest extends \PHPUnit\Framework\TestCase
 
         $accessRuleExecutor = $this->getAccessRuleExecutor([
             'rule1' => $rule1,
-            'rule2' => $rule2
+            'rule2' => [$rule2, ['option1' => true, 'option2' => true]]
         ]);
 
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'std');
+        $criteria->setOption('option1', true);
+        $criteria->setOption('option2', true);
+        $accessRuleExecutor->process($criteria);
+
+        $expression = $criteria->getExpression();
+        $this->assertTrue($expression instanceof Comparison);
+        $this->assertEquals(new Comparison(new Path('owner'), Comparison::IN, [1, 2, 3, 4, 5]), $expression);
+    }
+
+    public function testProcessWithNonApplicableRuleByOptions()
+    {
+        $rule1 = new AccessRule1();
+        $rule2 = new AccessRule2();
+
+        $accessRuleExecutor = $this->getAccessRuleExecutor([
+            'rule1' => $rule1,
+            'rule2' => [$rule2, ['option1' => true, 'option2' => true]]
+        ]);
+
+        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'std');
+        $criteria->setOption('option1', false);
+        $criteria->setOption('option2', true);
         $accessRuleExecutor->process($criteria);
 
         $expression = $criteria->getExpression();
