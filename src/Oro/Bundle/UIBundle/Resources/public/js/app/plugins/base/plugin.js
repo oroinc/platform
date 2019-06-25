@@ -48,6 +48,7 @@ define(function(require) {
             this.disposed = true;
             this.trigger('disposed');
             this.off();
+            this.stopListening();
             for (var prop in this) {
                 if (this.hasOwnProperty(prop)) {
                     delete this[prop];

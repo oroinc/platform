@@ -6,8 +6,9 @@
  *
  * Licensed under the MIT license
  */
-
-(function($) {
+define([
+  'jquery'
+], function($) {
   'use strict';
 
   /**
@@ -34,6 +35,11 @@
       self.options = $.extend({}, $.fn.simplecolorpicker.defaults, options);
 
       self.$colorList = null;
+
+      self.showPicker = self.showPicker.bind(self);
+      self.hidePicker = self.hidePicker.bind(self);
+      self.mousedown = self.mousedown.bind(self);
+      self.colorSpanClicked = self.colorSpanClicked.bind(self);
 
       var selectedVal = self.$select.val(),
           isDisabledVal = self.$select.is(':disabled');
@@ -69,14 +75,14 @@
                      + ' data-color="' + selectedVal + '"'
                      + (isDisabledVal === false ? ' role="button" tabindex="0"' : ' data-disabled')
                      + '></span>').insertAfter(self.$select);
-        self.$icon.on('click.' + self.type, $.proxy(self.showPicker, self));
+        self.$icon.on('click.' + self.type, self.showPicker);
 
         self.$picker = $('<span class="simplecolorpicker picker ' + self.options.theme + '"></span>').appendTo(document.body);
         self.$colorList = self.$picker;
 
         // Hide picker when clicking outside
-        $(document).on('mousedown.' + self.type, $.proxy(self.hidePicker, self));
-        self.$picker.on('mousedown.' + self.type, $.proxy(self.mousedown, self));
+        $(document).on('mousedown.' + self.type, self.hidePicker);
+        self.$picker.on('mousedown.' + self.type, self.mousedown);
       } else {
         self.$inline = $('<span class="simplecolorpicker inline ' + self.options.theme + '"></span>').insertAfter(self.$select);
         self.$colorList = self.$inline;
@@ -85,7 +91,7 @@
       // Build the list of colors
       // <span class="color selected" title="Green" style="background-color: #7bd148;" role="button"></span>
       var buildItemFunc = function($option, isSelect) {
-        if (!isSelect && (($.isArray($option) && !$option.length) || $.isEmptyObject($option))) {
+        if (!isSelect && ((Array.isArray($option) && !$option.length) || !$option || (typeof $option === 'object' && !Object.keys($option).length))) {
             // Vertical break, like hr
             self.$colorList.append('<span class="vr"></span>');
             return;
@@ -130,7 +136,7 @@
                          + '</span>');
 
         self.$colorList.append($colorSpan);
-        $colorSpan.on('click.' + self.type, $.proxy(self.colorSpanClicked, self));
+        $colorSpan.on('click.' + self.type, self.colorSpanClicked);
 
         if (!isSelect) {
             return;
@@ -464,4 +470,6 @@
     // also 'pickerDelay' and 'data' properties are ignored in this case
     table: false
   };
-})(jQuery);
+
+  return SimpleColorPicker;
+});

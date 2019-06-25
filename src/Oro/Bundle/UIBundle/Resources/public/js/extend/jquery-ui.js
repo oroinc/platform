@@ -105,7 +105,7 @@ define(function(require) {
             $input
                 .removeClass(dropdownClassName + ' ' + dropupClassName)
                 .parents().add(window).each(function() {
-                    $(this).on(events, $.proxy(updatePos, input));
+                    $(this).on(events, updatePos.bind(input));
                     // @TODO develop other approach than hide on scroll
                     // because on mobile devices it's impossible to open calendar without scrolling
                     /* $(this).on(events, function () {
@@ -315,26 +315,20 @@ define(function(require) {
              */
             _mouseInit: function() {
                 // Delegate the touch handlers to the widget's element
-                this.element.on({
-                    touchstart: $.proxy(this, '_touchStart'),
-                    touchmove: $.proxy(this, '_touchMove'),
-                    touchend: $.proxy(this, '_touchEnd')
-                });
+                var handlers = {
+                    touchstart: this._touchStart.bind(this),
+                    touchmove: this._touchMove.bind(this),
+                    touchend: this._touchEnd.bind(this)
+                };
+
+                Object.keys(handlers).forEach(function(eventName) {
+                    handlers[eventName + '.' + this.widgetName] = handlers[eventName];
+                    delete handlers[eventName];
+                }.bind(this));
+
+                this.element.on(handlers);
 
                 this._touchMoved = false;
-
-                this._superApply(arguments);
-            },
-
-            /**
-             * Remove the touch event handlers
-             */
-            _mouseDestroy: function() {
-                this.element.off({
-                    touchstart: $.proxy(this, '_touchStart'),
-                    touchmove: $.proxy(this, '_touchMove'),
-                    touchend: $.proxy(this, '_touchEnd')
-                });
 
                 this._superApply(arguments);
             },
