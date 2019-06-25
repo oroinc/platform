@@ -13,13 +13,32 @@
     .dropdown-menu {
         .action {
             display: block;
-            padding: $toolbar-mass-actions-action-offset;
             margin: 0;
-
-            line-height: $line-height-base;
-            font-family: $font-family-sans-serif;
-
-            color: $body-color;
+            padding: $dropdown-item-padding-y $dropdown-item-padding-x;
+            
+            font-weight: $font-weight-normal;
+            font-size: $dropdown-item-font-size;
+            line-height: $dropdown-item-line-height;
+            
+            color: $dropdown-link-color;
+    
+            white-space: nowrap;
+    
+            [class^="fa-"],
+            [class*=" fa-"] {
+                margin-#{$end}: $dropdown-item-icon-fa-offset;
+            }
+            
+            @include hover-focus {
+                color: $dropdown-link-hover-color;
+                @include gradient-bg($dropdown-link-hover-bg);
+            }
+    
+            &.active,
+            &:active {
+                color: $dropdown-link-active-color;
+                @include gradient-bg($dropdown-link-active-bg);
+            }
         }
     }
 }

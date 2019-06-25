@@ -54,7 +54,7 @@ class TranslationImportStrategyTest extends AbstractTranslationImportStrategyTes
     {
         $container = $this->getContainer();
 
-        return new TranslationImportStrategy(
+        $strategy = new TranslationImportStrategy(
             $container->get('event_dispatcher'),
             $container->get('oro_importexport.strategy.import.helper'),
             $container->get('oro_entity.helper.field_helper'),
@@ -65,5 +65,10 @@ class TranslationImportStrategyTest extends AbstractTranslationImportStrategyTes
             $container->get('oro_entity.doctrine_helper'),
             $container->get('oro_security.owner.checker')
         );
+        $strategy->setRelatedEntityStateHelper(
+            $container->get('oro_importexport.field.related_entity_state_helper')
+        );
+
+        return $strategy;
     }
 }

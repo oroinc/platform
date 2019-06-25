@@ -5,7 +5,7 @@ namespace Oro\Bundle\WindowsBundle\Tests\Functional\Api;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class WindowsStateController extends WebTestCase
+class WindowsStateControllerTest extends WebTestCase
 {
     /**
      * @var array
@@ -106,6 +106,7 @@ class WindowsStateController extends WebTestCase
 
         $this->assertNotEmpty($resultJson);
         $this->assertArrayHasKey('id', $resultJson[0]);
+        $this->assertArrayNotHasKey('user', $resultJson[0]);
     }
 
     /**

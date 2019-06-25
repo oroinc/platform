@@ -497,9 +497,9 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $dependentContext = $this->createDependentJobContextMock();
         $dependentContext
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('addDependentJob')
-            ->with(Topics::SEND_IMPORT_NOTIFICATION);
+            ->withConsecutive([Topics::SEND_IMPORT_NOTIFICATION], [Topics::SAVE_IMPORT_EXPORT_RESULT]);
 
         $dependentJob = $this->createDependentJobMock();
         $dependentJob

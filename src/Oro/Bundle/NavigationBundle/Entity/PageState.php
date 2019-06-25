@@ -3,7 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use JMS\Serializer\Annotation as Serializer;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -16,10 +16,11 @@ use Oro\Bundle\UserBundle\Entity\User;
 class PageState extends AbstractPageState
 {
     /**
-     * @var AbstractUser $user
+     * @var User $user
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @Serializer\Exclude()
      */
     protected $user;
 }

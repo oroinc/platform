@@ -13,7 +13,7 @@ class OroNavigationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_8_1';
+        return 'v1_8_2';
     }
 
     /**
@@ -50,7 +50,7 @@ class OroNavigationBundleInstaller implements Installation
         $table = $schema->createTable('oro_navigation_history');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', []);
-        $table->addColumn('url', 'string', ['length' => 1023]);
+        $table->addColumn('url', 'string', ['length' => 8190]);
         $table->addColumn('title', 'text', []);
         $table->addColumn('visited_at', 'datetime', []);
         $table->addColumn('visit_count', 'integer', []);
@@ -77,7 +77,7 @@ class OroNavigationBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', []);
         $table->addColumn('type', 'string', ['length' => 10]);
-        $table->addColumn('url', 'string', ['length' => 1023]);
+        $table->addColumn('url', 'string', ['length' => 8190]);
         $table->addColumn('title', 'text', []);
         $table->addColumn('position', 'smallint', []);
         $table->addColumn('created_at', 'datetime', []);
@@ -137,7 +137,7 @@ class OroNavigationBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('key', 'string', ['length' => 100]);
         $table->addColumn('parent_key', 'string', ['length' => 100, 'notnull' => false]);
-        $table->addColumn('uri', 'string', ['length' => 1023, 'notnull' => false]);
+        $table->addColumn('uri', 'string', ['length' => 8190, 'notnull' => false]);
         $table->addColumn('menu', 'string', ['length' => 100]);
         $table->addColumn('icon', 'string', ['length' => 150, 'notnull' => false]);
         $table->addColumn('is_active', 'boolean', []);

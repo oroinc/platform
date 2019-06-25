@@ -67,6 +67,10 @@
         .select2-choices {
             padding: $mobile-select2-search-multi-choices-inner-offset;
 
+            &:before {
+                height: $mobile-select2-search-multi-placeholder-height;
+            }
+
             .select2-search-choice {
                 font-size: $base-font-size--m;
                 white-space: nowrap;
@@ -84,7 +88,7 @@
 
                 .select2-search-choice-close {
                     width: 24px;
-                    height: 28px;
+                    height: $mobile-select2-search-multi-placeholder-height;
                     line-height: normal;
                     top: 0;
                     #{$end}: 5px;

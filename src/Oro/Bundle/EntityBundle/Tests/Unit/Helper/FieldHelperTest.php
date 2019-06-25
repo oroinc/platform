@@ -17,11 +17,21 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
         'TestEntity' => [
             'testField' => [
                 'testParameter' => 1,
+                'identity' => true,
+                'excluded' => false
             ],
         ],
         'TestEntityScalar' => [
             'ScalarField' => [
                 'process_as_scalar' => true,
+                'identity' => false,
+                'excluded' => false
+            ],
+        ],
+        'TestEntity2' => [
+            'testField' => [
+                'identity' => -1,
+                'excluded' => true
             ],
         ],
     ];
@@ -543,5 +553,63 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
             ->with($locale);
 
         $this->helper->setLocale($locale);
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $fieldName
+     * @param array $data
+     * @param bool $expected
+     *
+     * @dataProvider isFieldExcludedProvider
+     */
+    public function testIsFieldExcluded($entityName, $fieldName, $data, $expected)
+    {
+        $this->assertEquals($expected, $this->helper->isFieldExcluded($entityName, $fieldName, $data));
+    }
+
+    /**
+     * @return array
+     */
+    public function isFieldExcludedProvider()
+    {
+        return [
+            'non identity field, empty data' => [
+                'entityName' => 'TestEntityScalar',
+                'fieldName' => 'ScalarField',
+                'data' => [],
+                'expected' => true,
+            ],
+            'non identity field' => [
+                'entityName' => 'TestEntityScalar',
+                'fieldName' => 'ScalarField',
+                'data' => ['ScalarField' => 'test'],
+                'expected' => false,
+            ],
+            'identity field, empty data' => [
+                'entityName' => 'TestEntity',
+                'fieldName' => 'testField',
+                'data' => [],
+                'expected' => false,
+            ],
+            'identity field' => [
+                'entityName' => 'TestEntity',
+                'fieldName' => 'testField',
+                'data' => ['testField' => 'test'],
+                'expected' => false,
+            ],
+            'excluded field, empty data' => [
+                'entityName' => 'TestEntity2',
+                'fieldName' => 'testField',
+                'data' => [],
+                'expected' => true,
+            ],
+            'excluded field' => [
+                'entityName' => 'TestEntity2',
+                'fieldName' => 'testField',
+                'data' => ['testField' => 'test'],
+                'expected' => true,
+            ],
+        ];
     }
 }

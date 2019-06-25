@@ -65,6 +65,7 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *      )
  * })
  * @Config(
+ *      routeName="oro_navigation_global_menu_index",
  *      defaultValues={
  *          "entity"={
  *              "icon"="fa-th"
@@ -79,6 +80,13 @@ class MenuUpdate extends ExtendMenuUpdate implements
     use MenuUpdateTrait {
         MenuUpdateTrait::__construct as traitConstructor;
     }
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="uri", type="string", length=8190, nullable=true)
+     */
+    protected $uri;
 
     /**
      * {@inheritdoc}

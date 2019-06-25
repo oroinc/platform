@@ -17,6 +17,9 @@ use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * Date grouping filter.
+ */
 class DateGroupingFilter extends ChoiceFilter
 {
     use ArrayTrait;
@@ -148,7 +151,6 @@ class DateGroupingFilter extends ChoiceFilter
         QueryBuilderUtil::checkField($sortKey);
         $direction = QueryBuilderUtil::getSortOrder($direction);
 
-        /* @var OrmDatasource $datasource */
         $qb = $datasource->getQueryBuilder();
         $added = false;
 
@@ -159,7 +161,7 @@ class DateGroupingFilter extends ChoiceFilter
             /** @var Select $select */
             foreach ($qb->getDQLPart('select') as $select) {
                 foreach ($select->getParts() as $part) {
-                    if ($groupingName === $part) {
+                    if (\in_array($part, [$groupingName, sprintf('%s as %s', $groupingName, $columnName)], true)) {
                         $qb->addOrderBy($columnName, $direction);
                         $added = true;
                     }

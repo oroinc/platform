@@ -2,6 +2,7 @@
 
 .mobile-version {
     @import "oroui/css/scss/mobile/variables/layout";
+    @import "oroui/css/scss/mobile/variables/variables";
 
     @import "oro-grid";
     @import "datagrid-settings";

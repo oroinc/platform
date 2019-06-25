@@ -9,6 +9,9 @@ use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 
+/**
+ * Provides basic implementation for entities which implement MenuUpdateInterface.
+ */
 trait MenuUpdateTrait
 {
     use FallbackTrait;

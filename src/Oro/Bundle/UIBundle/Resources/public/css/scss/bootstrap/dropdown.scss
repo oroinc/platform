@@ -113,8 +113,10 @@
     }
 
     // Support of old markup
-    > li > a {
-        @extend .dropdown-item;
+    &, .dropdown-menu-items {
+        > li > a {
+            @extend .dropdown-item;
+        }
     }
     
     .btn-group {
@@ -135,14 +137,14 @@
 
     &--no-caret {
         &:after {
-            content: none;
+            content: none !important;
         }
     }
 }
 
 .dropleft > .dropdown-toggle--no-caret {
     &:before {
-        content: none;
+        content: none !important;
     }
 }
 

@@ -27,9 +27,17 @@ parameters:
     oro_attachment.attachments_dir:                              attachment
     oro_attachment.media_cache_dir:                              media/cache
 
+    oro_attachment.filesystem_name.attachment:                   attachments
+    oro_attachment.filesystem_name.mediacache:                   mediacache
+    oro_attachment.filesystem_name.protected_mediacache:         protected_mediacache
+
+    oro_attachment.filesystem_dir.protected_mediacache:          attachment/cache
+
     liip_imagine.meta_data.reader.class:                         Imagine\Image\Metadata\DefaultMetadataReader
 
     oro_attachment.liip_imagine.unsupported_mime_types:          ['image/svg+xml']
+
+    oro_attachment.provider.resized_image_path.skip_prefix:      'media/cache'
 
 services:
     oro_attachment.manager:
@@ -42,6 +50,7 @@ services:
             - '%oro_attachment.debug_images%'
         calls:
             - [setFileManager, ['@oro_attachment.file_manager']]
+            - [setFileUrlProvider, ['@oro_attachment.provider.file_url']]
 
     oro_attachment.file_manager:
         class: Oro\Bundle\AttachmentBundle\Manager\FileManager
@@ -263,3 +272,102 @@ services:
         arguments:
             - 'mediacache'
             - '%oro_attachment.media_cache_dir%'
+
+    oro_attachment.manager.protected_mediacache:
+        parent: 'oro_gaufrette.file_manager'
+        public: true
+        arguments:
+            - '%oro_attachment.filesystem_name.protected_mediacache%'
+
+    oro_attachment.manager.media_cache_manager_registry:
+        class: 'Oro\Bundle\AttachmentBundle\Manager\MediaCacheManagerRegistry'
+        arguments:
+            - '@oro_attachment.acl.file_access_control_checker'
+            - '@oro_attachment.media_cache_manager'
+            - '@oro_attachment.manager.protected_mediacache'
+
+    oro_attachment.event_listener.sets_parent_entity_on_flush:
+        class: 'Oro\Bundle\AttachmentBundle\EventListener\SetsParentEntityOnFlushListener'
+        arguments:
+            - '@property_accessor'
+        tags:
+            - { name: doctrine.event_listener, event: onFlush, connection: default }
+            - { name: doctrine.event_listener, event: prePersist, connection: default }
+            - { name: doctrine.event_listener, event: postPersist, connection: default }
+
+    oro_attachment.acl.voter.file:
+        class: 'Oro\Bundle\AttachmentBundle\Acl\Voter\FileVoter'
+        public: false
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_attachment.acl.file_access_control_checker'
+            - '@oro_attachment.provider.file_applications'
+            - '@oro_action.provider.current_application'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
+        calls:
+            - [setClassName, ['%oro_attachment.file.entity.class%']]
+        tags:
+            - { name: security.voter }
+
+    oro_attachment.acl.file_access_control_checker:
+        class: 'Oro\Bundle\AttachmentBundle\Acl\FileAccessControlChecker'
+        public: false
+        arguments:
+            - '@oro_entity_config.config_manager'
+
+    oro_attachment.provider.file_url:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlProvider'
+        arguments:
+            - '@router'
+
+    oro_attachment.provider.resized_image_path:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProvider'
+        arguments:
+            - '@oro_attachment.provider.file_url'
+
+    oro_attachment.provider.resized_image_path.base_url:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProviderDecorator'
+        decorates: oro_attachment.provider.resized_image_path
+        decoration_priority: 300
+        arguments:
+            - '@oro_attachment.provider.resized_image_path.base_url.inner'
+            - '@=service("router").getContext().getBaseUrl()'
+
+    oro_attachment.provider.resized_image_path.skip_prefix:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProviderDecorator'
+        decorates: oro_attachment.provider.resized_image_path
+        decoration_priority: 200
+        arguments:
+            - '@oro_attachment.provider.resized_image_path.skip_prefix.inner'
+            - '%oro_attachment.provider.resized_image_path.skip_prefix%'
+
+    oro_attachment.manager.image_resize:
+        class: 'Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager'
+        arguments:
+            - '@oro_attachment.image_resizer'
+            - '@oro_attachment.thumbnail_factory'
+            - '@oro_attachment.provider.resized_image_path'
+            - '@oro_attachment.manager.media_cache_manager_registry'
+            - '@oro_attachment.liip_imagine.binary.factory.guess_mime_type'
+            - '@oro_attachment.file_manager'
+
+    oro_attachment.provider.file_applications:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\FileApplicationsProvider'
+        public: false
+        arguments:
+            - '@oro_entity_config.config_manager'
+
+    oro_attachment.api.processor.file_view_security_check:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\FileViewSecurityCheck
+        arguments:
+            - '@oro_api.security.authorization_checker'
+        tags:
+            - { name: oro.api.processor, action: get, group: data_security_check, class: '%oro_attachment.file.entity.class%', priority: 10 }
+
+    oro_attachment.api.processor.files_view_security_check:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\FilesViewSecurityCheck
+        arguments:
+            - '@oro_api.security.authorization_checker'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: data_security_check, class: '%oro_attachment.file.entity.class%', priority: 10 }

@@ -31,6 +31,29 @@ trait AbstractMessageQueueAssertTrait
     }
 
     /**
+     * Arrays with integer keys and scalar values are sorted before comparison
+     *
+     * @param string $expectedTopic
+     * @param bool $expectedMessage
+     * @param bool $isSubJobMessage
+     */
+    protected static function assertMessageSentWithCanonicalize(
+        $expectedTopic,
+        $expectedMessage = null,
+        $isSubJobMessage = false
+    ) {
+        $message = ['topic' => $expectedTopic];
+        if (null !== $expectedMessage) {
+            $message['message'] = $expectedMessage;
+        }
+
+        self::assertThat(
+            self::getSentMessages(),
+            (new SentMessageConstraint($message, $isSubJobMessage))->setCanonicalize(true)
+        );
+    }
+
+    /**
      * Asserts that messages were sent to a topic.
      * The send order is not taken into account.
      *

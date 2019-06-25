@@ -5,6 +5,8 @@ namespace Oro\Bundle\AttachmentBundle\Controller;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Exception\InvalidAttachmentEncodedParametersException;
+use Oro\Bundle\AttachmentBundle\Manager\ImageResizeManagerInterface;
+use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,21 +54,39 @@ class FileController extends Controller
             throw $this->createNotFoundException();
         }
 
+        return $this->getFileAction($attachment->getId(), $attachment->getFilename(), $type);
+    }
+
+    /**
+     * @Route("attachment/{action}/{id}/{filename}",
+     *   name="oro_attachment_get_file",
+     *   requirements={"id"="\d+", "action"="(get|download)"}
+     * )
+     * @param int $id
+     * @param string $filename
+     * @param string $action
+     *
+     * @return Response
+     */
+    public function getFileAction(int $id, string $filename, string $action): Response
+    {
+        $file = $this->getFileByIdAndFileName($id, $filename);
+
         $response = new Response();
         $response->headers->set('Cache-Control', 'public');
 
-        if ($type == 'get') {
-            $response->headers->set('Content-Type', $attachment->getMimeType() ? : 'application/force-download');
+        if ($action === FileUrlProviderInterface::FILE_ACTION_GET) {
+            $response->headers->set('Content-Type', $file->getMimeType() ?: 'application/force-download');
         } else {
             $response->headers->set('Content-Type', 'application/force-download');
             $response->headers->set(
                 'Content-Disposition',
-                sprintf('attachment;filename="%s"', $attachment->getOriginalFilename())
+                sprintf('attachment;filename="%s"', addslashes($file->getOriginalFilename()))
             );
         }
 
-        $response->headers->set('Content-Length', $attachment->getFileSize());
-        $response->setContent($this->get('oro_attachment.file_manager')->getContent($attachment));
+        $response->headers->set('Content-Length', $file->getFileSize());
+        $response->setContent($this->get('oro_attachment.file_manager')->getContent($file));
 
         return $response;
     }
@@ -76,21 +96,25 @@ class FileController extends Controller
      *   name="oro_resize_attachment",
      *   requirements={"id"="\d+", "width"="\d+", "height"="\d+"}
      * )
+     * @param int $id
+     * @param int $width
+     * @param int $height
+     * @param string $filename
+     *
+     * @return Response
      */
     public function getResizedAttachmentImageAction($id, $width, $height, $filename, Request $request)
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
-        $thumbnail = $this->get('oro_attachment.thumbnail_factory')->createThumbnail(
-            $this->get('oro_attachment.file_manager')->getContent($file),
-            $width,
-            $height
-        );
 
-        $image = $thumbnail->getBinary();
-        $imageContent = $image->getContent();
-        $this->get('oro_attachment.media_cache_manager')->store($imageContent, $request->getPathInfo());
+        /** @var ImageResizeManagerInterface $resizeManager */
+        $resizeManager = $this->get('oro_attachment.manager.image_resize');
+        $binary = $resizeManager->resize($file, $width, $height);
+        if (!$binary) {
+            throw $this->createNotFoundException();
+        }
 
-        return new Response($imageContent, Response::HTTP_OK, ['Content-Type' => $image->getMimeType()]);
+        return new Response($binary->getContent(), Response::HTTP_OK, ['Content-Type' => $binary->getMimeType()]);
     }
 
     /**
@@ -98,24 +122,28 @@ class FileController extends Controller
      *   name="oro_filtered_attachment",
      *   requirements={"id"="\d+"}
      * )
+     * @param int $id
+     * @param string $filter
+     * @param string $filename
+     *
+     * @return Response
      */
     public function getFilteredImageAction($id, $filter, $filename, Request $request)
     {
-        if (!$file = $this->getFileByIdAndFileName($id, $filename)) {
-            throw $this->createNotFoundException('Image not found in the database');
+        $file = $this->getFileByIdAndFileName($id, $filename);
+
+        /** @var ImageResizeManagerInterface $resizeManager */
+        $resizeManager = $this->get('oro_attachment.manager.image_resize');
+        $binary = $resizeManager->applyFilter($file, $filter);
+        if (!$binary) {
+            throw $this->createNotFoundException();
         }
 
-        if (!$image = $this->get('oro_attachment.image_resizer')->resizeImage($file, $filter)) {
-            throw $this->createNotFoundException('Image not found in the filesystem');
-        }
-
-        $this->get('oro_attachment.media_cache_manager')->store($image->getContent(), $request->getPathInfo());
-
-        return new Response($image->getContent(), Response::HTTP_OK, ['Content-Type' => $image->getMimeType()]);
+        return new Response($binary->getContent(), Response::HTTP_OK, ['Content-Type' => $binary->getMimeType()]);
     }
 
     /**
-     * @param int    $id
+     * @param int $id
      * @param string $fileName
      *
      * @return File
@@ -127,6 +155,10 @@ class FileController extends Controller
         $file = $this->get('doctrine')->getRepository('OroAttachmentBundle:File')->find($id);
         if (!$file || ($file->getFilename() !== $fileName && $file->getOriginalFilename() !== $fileName)) {
             throw $this->createNotFoundException('File not found');
+        }
+
+        if (!$this->isGranted('VIEW', $file)) {
+            throw $this->createAccessDeniedException();
         }
 
         return $file;

@@ -75,6 +75,7 @@ services:
             - '%oro_importexport.import.size_of_batch%'
         calls:
             - [setManagerRegistry, ['@doctrine']]
+            - [setImportHandler, ['@oro_importexport.handler.import.http']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -139,5 +140,13 @@ services:
             - '@logger'
             - '@oro_notification.model.notification_settings'
             - '@doctrine'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_importexport.async.save_import_export_result_processor:
+        class: 'Oro\Bundle\ImportExportBundle\Async\SaveImportExportResultProcessor'
+        arguments:
+            - '@event_dispatcher'
+            - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }

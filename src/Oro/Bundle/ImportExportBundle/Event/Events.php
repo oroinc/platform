@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Event;
 
+/**
+ * Import/Export events
+ */
 final class Events
 {
     /**
@@ -87,4 +90,11 @@ final class Events
      * Can be used to do some staff after job. For example, clean cache.
      */
     const AFTER_JOB_EXECUTION = 'oro.import_export.after_job_execution';
+
+    /**
+     * This event occurs when http import was finished.
+     *
+     * Can be used to send extra messages when http import was finished.
+     */
+    const POST_HTTP_IMPORT = 'oro.import_export.post_http_import';
 }

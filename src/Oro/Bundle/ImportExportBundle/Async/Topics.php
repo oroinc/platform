@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async;
 
+/**
+ * Message Queue Import/Export topics
+ */
 class Topics
 {
     const PRE_CLI_IMPORT = 'oro.importexport.pre_cli_import';
@@ -12,6 +15,7 @@ class Topics
     const EXPORT = 'oro.importexport.export';
     const POST_EXPORT = 'oro.importexport.post_export';
     const SEND_IMPORT_NOTIFICATION = 'oro.importexport.send_import_notification';
+    const SAVE_IMPORT_EXPORT_RESULT = 'oro.importexport.save_import_export_result';
 
     /**
      * @deprecated since 2.1, will be removed in 2.3, please use notification bundle (SEND_NOTIFICATION_EMAIL topic)
