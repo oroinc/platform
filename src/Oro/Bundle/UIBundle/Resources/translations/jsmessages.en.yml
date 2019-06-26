@@ -62,6 +62,7 @@ oro:
         unexpected_error: An unexpected error has occurred. Please contact the system administrator.
         item_add_error: Item adding failed.
         item_delete_error: Item deleting failed.
+        malformed_url_loading_error: 'Could not load malformed url'
         leave_page_with_unsaved_data_confirm: 'You have unsaved changes, are you sure you want to leave this page?'
         leave_page_save_data_or_discard_title: "Navigation confirmation"
         leave_page_save_data_or_discard: "You have unsaved changes. Do you want to save them before leaving the page?"
