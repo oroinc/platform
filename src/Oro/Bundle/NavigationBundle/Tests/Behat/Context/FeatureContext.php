@@ -6,8 +6,11 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
@@ -537,5 +540,41 @@ class FeatureContext extends OroFeatureContext implements
         if ($link->isVisible()) {
             $link->click();
         }
+    }
+
+    /**
+     * Example: And there is malformed url for pinned tab
+     *
+     * @Given /^there is malformed url for pinned tab$/
+     */
+    public function thereIsMalformedUrlForPinnedTab()
+    {
+        // 1023 characters long malformed url
+        $malformedUrl = '/admin/user?grid%5Busers-grid%5D=a%3Dgrid%26c%3DfirstName1.lastName1.email1.username1'
+        . '.enabled0.auth_status1.createdAt1.updatedAt1.tags1%26f%255Benabled%255D%255Bvalue%255D%3D1%26f%255B'
+        . 'lastName%255D%255Bvalue%255D%3D012345678901234567890123456789012345678901234567890123456789012345678'
+        . '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789'
+        . '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789'
+        . '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789'
+        . '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789'
+        . '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789'
+        . '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789'
+        . '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789'
+        . '0123456789%26g%255BoriginalRoute%255D%3';
+
+        /** @var Registry $doctrine */
+        $doctrine =  $this->getContainer()->get('doctrine');
+        /** @var NavigationItem $navigationItem */
+        $navigationItem = $doctrine->getManagerForClass(NavigationItem::class)
+            ->getRepository(NavigationItem::class)
+            ->findOneBy([]);
+
+        /** @var Connection $connection */
+        $connection = $doctrine->getConnection();
+        $connection->update(
+            'oro_navigation_item',
+            ['url' => $malformedUrl],
+            ['id' => $navigationItem->getId()]
+        );
     }
 }

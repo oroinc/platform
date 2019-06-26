@@ -465,20 +465,37 @@ define([
          * @returns {boolean}
          */
         compareNormalizedUrl: function(url1, url2, options) {
-            if (_.isObject(url2)) {
-                options = url2;
-                url2 = undefined;
+            try {
+                if (_.isObject(url2)) {
+                    options = url2;
+                    url2 = undefined;
+                }
+
+                url1 = this.normalizeUrl(url1, options);
+
+                if (_.isUndefined(url2)) {
+                    url2 = this.currentUrl();
+                }
+
+                url2 = this.normalizeUrl(url2, options);
+
+                return url1 === url2;
+            } catch (e) {
+                // Skip malformed urls if there are any
+                if (e instanceof URIError) {
+                    if (console && (typeof console.log === 'function')) {
+                        console.log(
+                            'Exception occurred during urls comparison',
+                            {url1: url1, url2: url2, options: options},
+                            e
+                        );
+                    }
+
+                    return false;
+                }
+
+                throw e;
             }
-
-            url1 = this.normalizeUrl(url1, options);
-
-            if (_.isUndefined(url2)) {
-                url2 = this.currentUrl();
-            }
-
-            url2 = this.normalizeUrl(url2, options);
-
-            return url1 === url2;
         },
 
         /**
