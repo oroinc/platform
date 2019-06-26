@@ -315,12 +315,23 @@
         position: $select2-drop-position;
         z-index: $select2-drop-z-index;
         top: $select2-drop-top;
+        padding: 0 $select2-container-border-width;
 
-        background: $select2-drop-background;
         color: $select2-drop-color;
-        border: $select2-drop-border;
-        border-radius: $select2-drop-border-radius;
-        box-shadow: $select2-drop-box-shadow;
+
+        &:before {
+            position: absolute;
+            content: ' ';
+
+            border: $select2-drop-border;
+            background: $select2-drop-background;
+            border-radius: $select2-drop-border-radius;
+            box-shadow: $select2-drop-box-shadow;
+            left: $select2-container-border-width;
+            right: $select2-container-border-width;
+            height: 100%;
+        }
+
         .select2__result-entry-info {
             font-style: $select2-drop-result-font-style;
             color: $select2-drop-result-color;
@@ -345,7 +356,7 @@
             width: $select2-drop-auto-width;
         }
 
-        &.select2-drop-above {
+        &.select2-drop-above:before {
             border-radius: $select2-drop-above-border-radius;
             box-shadow: $select2-drop-above-box-shadow;
         }
