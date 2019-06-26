@@ -199,12 +199,24 @@ define([
      * @override
      */
     utils.redirectTo = _.wrap(utils.redirectTo, function(func, pathDesc, params, options) {
-        if (typeof pathDesc === 'object' && pathDesc.url !== null && pathDesc.url !== void 0 && tools.isErrorPage()) {
-            options = params || {};
-            options.fullRedirect = true;
-            Chaplin.mediator.execute('redirectTo', pathDesc, options);
-        } else {
-            func.apply(this, _.rest(arguments));
+        try {
+            if (typeof pathDesc === 'object' &&
+                pathDesc.url !== null &&
+                pathDesc.url !== void 0 &&
+                tools.isErrorPage()
+            ) {
+                options = params || {};
+                options.fullRedirect = true;
+                Chaplin.mediator.execute('redirectTo', pathDesc, options);
+            } else {
+                func.apply(this, _.rest(arguments));
+            }
+        } catch (e) {
+            if (e instanceof URIError) {
+                require(['oroui/js/messenger', 'orotranslation/js/translator'], function(messenger, __) {
+                    messenger.showErrorMessage(__('oro.ui.malformed_url_loading_error'));
+                });
+            }
         }
     });
 
