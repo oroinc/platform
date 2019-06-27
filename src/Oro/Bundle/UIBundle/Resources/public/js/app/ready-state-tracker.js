@@ -15,7 +15,7 @@ define([
             this.getDeferred(name).resolve();
         },
         whenReady: function(name, cb, ctx) {
-            this.getDeferred(name).done($.proxy(cb, ctx || window));
+            this.getDeferred(name).done(cb.bind(ctx || window));
         }
     };
 

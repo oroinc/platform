@@ -153,7 +153,7 @@ define(function(require) {
                             }
                             return isMatch;
                         },
-                        callback: !$.isFunction(callback) ? $.noop : function() {
+                        callback: typeof callback !== 'function' ? $.noop : function() {
                             callback(match);
                         }
                     });

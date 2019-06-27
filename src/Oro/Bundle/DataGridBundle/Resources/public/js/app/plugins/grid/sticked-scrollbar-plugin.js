@@ -25,7 +25,7 @@ define(function(require) {
             _.extend(this, _.pick(options || {}, ['viewport']));
             this.grid = grid;
             this.listenTo(this.grid, 'shown', this.enable);
-            mediator.on('viewport:change', this.onViewportChange, this);
+            this.listenTo(mediator, 'viewport:change', this.onViewportChange);
 
             return StickedScrollbarPlugin.__super__.initialize.apply(this, arguments);
         },
@@ -92,7 +92,6 @@ define(function(require) {
             }
 
             this.disable();
-            mediator.off('viewport:change', this.onViewportChange, this);
             delete this.domCache;
 
             return StickedScrollbarPlugin.__super__.dispose.apply(this, arguments);

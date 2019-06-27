@@ -3,20 +3,36 @@
 namespace Oro\Bundle\EntityBundle\Command;
 
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class EntityAliasDebugCommand extends ContainerAwareCommand
+/**
+ * Displays entity aliases.
+ */
+class EntityAliasDebugCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:entity-alias:debug';
+
+    /** @var EntityAliasResolver */
+    private $entityAliasResolver;
+
+    /**
+     * @param EntityAliasResolver $entityAliasResolver
+     */
+    public function __construct(EntityAliasResolver $entityAliasResolver)
+    {
+        $this->entityAliasResolver = $entityAliasResolver;
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
-        $this
-            ->setName('oro:entity-alias:debug')
-            ->setDescription('Displays entity aliases.');
+        $this->setDescription('Displays entity aliases.');
     }
 
     /**
@@ -32,10 +48,7 @@ class EntityAliasDebugCommand extends ContainerAwareCommand
      */
     protected function outputEntityAliases(OutputInterface $output)
     {
-        /** @var EntityAliasResolver $entityAliasResolver */
-        $entityAliasResolver = $this->getContainer()->get('oro_entity.entity_alias_resolver');
-
-        $entityAliases = $entityAliasResolver->getAll();
+        $entityAliases = $this->entityAliasResolver->getAll();
 
         // sort alphabetically by the entity class and move BAP entities at the top
         ksort($entityAliases);

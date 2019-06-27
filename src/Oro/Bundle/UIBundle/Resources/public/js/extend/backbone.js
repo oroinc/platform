@@ -334,5 +334,23 @@ define(function(require) {
         events.unshift(last[0]);
     };
 
+    var oldLoadUrl = Backbone.History.prototype.loadUrl;
+    _.extend(Backbone.History.prototype, {
+        loadUrl: function() {
+            try {
+                return oldLoadUrl.apply(this, arguments);
+            } catch (e) {
+                if (e instanceof URIError) {
+                    require(['oroui/js/messenger', 'orotranslation/js/translator'], function(messenger, __) {
+                        messenger.showErrorMessage(__('oro.ui.malformed_url_loading_error'));
+                    });
+                    return false;
+                }
+
+                throw e;
+            }
+        }
+    });
+
     return Backbone;
 });

@@ -5,11 +5,10 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
-use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
@@ -17,20 +16,25 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  *
  * @see \Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker
  */
-class AclHelper implements ServiceSubscriberInterface
+class AclHelper
 {
     public const CHECK_ROOT_ENTITY = 'checkRootEntity';
     public const CHECK_RELATIONS   = 'checkRelations';
 
-    /** @var ContainerInterface */
-    private $container;
+    /** @var TokenStorageInterface */
+    private $tokenStorage;
+
+    /** @var AccessRuleExecutor */
+    private $accessRuleExecutor;
 
     /**
-     * @param ContainerInterface $container
+     * @param TokenStorageInterface $tokenStorage
+     * @param AccessRuleExecutor    $accessRuleExecutor
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(TokenStorageInterface $tokenStorage, AccessRuleExecutor $accessRuleExecutor)
     {
-        $this->container = $container;
+        $this->tokenStorage = $tokenStorage;
+        $this->accessRuleExecutor = $accessRuleExecutor;
     }
 
     /**
@@ -51,7 +55,7 @@ class AclHelper implements ServiceSubscriberInterface
      */
     public function apply($query, string $permission = 'VIEW', array $options = [])
     {
-        $token = $this->container->get(TokenStorageInterface::class)->getToken();
+        $token = $this->tokenStorage->getToken();
         $userId = null;
         $userClass = null;
         $organizationId = null;
@@ -66,7 +70,7 @@ class AclHelper implements ServiceSubscriberInterface
             }
         }
         $context = new AccessRuleWalkerContext(
-            $this->container,
+            $this->accessRuleExecutor,
             $permission,
             $userClass,
             $userId,
@@ -84,18 +88,5 @@ class AclHelper implements ServiceSubscriberInterface
         $query->setHint(AccessRuleWalker::CONTEXT, $context);
 
         return $query;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedServices()
-    {
-        return array_merge(
-            [
-                TokenStorageInterface::class,
-            ],
-            AccessRuleWalker::getSubscribedServices()
-        );
     }
 }

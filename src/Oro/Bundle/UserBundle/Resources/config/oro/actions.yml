@@ -146,8 +146,6 @@ operations:
                 messages:
                     - success: oro.user.password.force_reset.mass_action.success
                     - failure: oro.user.password.force_reset.mass_action.failure
-        preconditions:
-            '@equal': [true, $isEnabled]
         actions:
             - '@run_action_group':
                 action_group: resetPassword

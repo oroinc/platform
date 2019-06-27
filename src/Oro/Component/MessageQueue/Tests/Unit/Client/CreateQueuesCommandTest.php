@@ -7,15 +7,11 @@ use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\Container;
 
 class CreateQueuesCommandTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CreateQueuesCommand */
     private $command;
-
-    /** @var Container */
-    private $container;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $registry;
@@ -28,12 +24,7 @@ class CreateQueuesCommandTest extends \PHPUnit\Framework\TestCase
         $this->registry = $this->createMock(DestinationMetaRegistry::class);
         $this->driver = $this->createMock(DriverInterface::class);
 
-        $this->command = new CreateQueuesCommand();
-
-        $this->container = new Container();
-        $this->container->set('oro_message_queue.client.meta.destination_meta_registry', $this->registry);
-        $this->container->set('oro_message_queue.client.driver', $this->driver);
-        $this->command->setContainer($this->container);
+        $this->command = new CreateQueuesCommand($this->driver, $this->registry);
     }
 
     public function testShouldHaveCommandName()

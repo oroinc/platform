@@ -48,10 +48,6 @@ Oro\Bundle\AddressBundle\Entity\AbstractAddress:
             - Length:
                   max: 255
 
-        organization:
-            - Length:
-                  max: 255
-
 Oro\Bundle\AddressBundle\Entity\Address:
     constraints:
         - Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion: ~

@@ -10,5 +10,10 @@ services:
             - { name: console.command }
 
     Oro\Bundle\IntegrationBundle\Command\SyncCommand:
+        arguments:
+            - '@oro_message_queue.job.processor'
+            - '@translator'
+            - '@oro_integration.genuine_sync_scheduler'
+            - '@doctrine.orm.entity_manager'
         tags:
             - { name: console.command }

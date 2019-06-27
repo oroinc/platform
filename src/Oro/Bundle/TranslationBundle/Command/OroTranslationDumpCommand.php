@@ -2,22 +2,41 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
+use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Component\Log\OutputLogger;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class OroTranslationDumpCommand extends ContainerAwareCommand
+/**
+ * Dumps oro js-translations
+ */
+class OroTranslationDumpCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:translation:dump';
+
+    /** @var JsTranslationDumper */
+    private $dumper;
+
+    /**
+     * @param JsTranslationDumper $dumper
+     */
+    public function __construct(JsTranslationDumper $dumper)
+    {
+        $this->dumper = $dumper;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('oro:translation:dump')
             ->setDescription('Dumps oro js-translations')
             ->addArgument(
                 'locale',
@@ -40,8 +59,7 @@ class OroTranslationDumpCommand extends ContainerAwareCommand
     {
         $locales = $input->getArgument('locale');
 
-        $dumper = $this->getContainer()->get('oro_translation.js_dumper');
-        $dumper->setLogger(new OutputLogger($output));
-        $dumper->dumpTranslations($locales);
+        $this->dumper->setLogger(new OutputLogger($output));
+        $this->dumper->dumpTranslations($locales);
     }
 }

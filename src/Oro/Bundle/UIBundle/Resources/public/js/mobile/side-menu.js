@@ -10,14 +10,14 @@ define(['../side-menu', '../mediator', 'oroui/js/tools/scroll-helper'], function
         _create: function() {
             this._super();
 
-            this.listener.listenTo(mediator, 'page:request', $.proxy(this._hide, this));
+            this.listener.listenTo(mediator, 'page:request', this._hide.bind(this));
 
             // handler for hiding menu on outside click
-            this._onOutsideClick = $.proxy(function(e) {
+            this._onOutsideClick = function(e) {
                 if (!$.contains(this.element.get(0), e.target)) {
                     this._hide();
                 }
-            }, this);
+            }.bind(this);
         },
 
         /**

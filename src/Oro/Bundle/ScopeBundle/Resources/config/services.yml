@@ -10,11 +10,17 @@ services:
     oro_scope.context_request_helper:
         class: 'Oro\Bundle\ScopeBundle\Helper\ContextRequestHelper'
 
+    Oro\Bundle\ScopeBundle\Helper\ContextRequestHelper:
+        alias: oro_scope.context_request_helper
+
     oro_scope.scope_manager:
         class: Oro\Bundle\ScopeBundle\Manager\ScopeManager
         arguments:
             - '@oro_scope.entity_storage'
             - '@oro_entity.entity_field_provider.link'
+
+    Oro\Bundle\ScopeBundle\Manager\ScopeManager:
+        alias: oro_scope.scope_manager
 
     oro_scope.scope_repository.cache:
         parent: oro.cache.abstract
@@ -49,6 +55,9 @@ services:
         arguments:
             - '@oro_scope.scope_manager'
             - '@doctrine'
+
+    Oro\Bundle\ScopeBundle\Manager\ContextNormalizer:
+        alias: oro_scope.context_normalizer
 
     oro_scope.twig.extension.scope:
         class: Oro\Bundle\ScopeBundle\Twig\ScopeExtension

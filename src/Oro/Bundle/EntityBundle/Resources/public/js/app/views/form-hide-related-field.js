@@ -31,8 +31,10 @@ define(function(require) {
             this.$trackedFieldUseFallback = $('[name="' + this.options.trackedFields + '[useFallback]"]');
             this.$hideField = $('[name="' + this.options.hideField + '"]').closest('.control-group');
 
-            this.$trackedFieldScalarValue.on('change', $.proxy(this.updateVisibility, this));
-            this.$trackedFieldUseFallback.on('change', $.proxy(this.updateVisibility, this));
+            this.updateVisibility = this.updateVisibility.bind(this);
+
+            this.$trackedFieldScalarValue.on('change', this.updateVisibility);
+            this.$trackedFieldUseFallback.on('change', this.updateVisibility);
 
             this.updateVisibility();
         },

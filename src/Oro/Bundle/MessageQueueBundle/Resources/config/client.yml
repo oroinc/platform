@@ -108,6 +108,9 @@ services:
 
     oro_message_queue.client.create_queues_command:
         class: 'Oro\Component\MessageQueue\Client\CreateQueuesCommand'
+        arguments:
+            - '@oro_message_queue.client.driver'
+            - '@oro_message_queue.client.meta.destination_meta_registry'
         tags:
             - { name: console.command }
 

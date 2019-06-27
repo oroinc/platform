@@ -19,7 +19,7 @@
             <% if (allowCancel) { %>
                 <a href="#" role="button" class="cancel <%= cancelButtonClass %>" data-dismiss="modal"><%- cancelText %></a>
             <% } %>
-                <a href="#" role="button" class="btn" data-button-id="secondary"><%- secondaryText %></a>
+                <a href="#" role="button" class="<%= secondaryButtonClass %>" data-button-id="secondary"><%- secondaryText %></a>
             <% if (allowOk) { %>
                 <a href="#" role="button" class="ok <%= okButtonClass %>"><%- okText %></a>
             <% } %>

@@ -27,11 +27,25 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * CRUD controller for the Dashboard entity.
- *
  * @Route("/dashboard")
  */
 class DashboardController extends AbstractController
 {
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            WidgetConfigs::class,
+            TranslatorInterface::class,
+            Router::class,
+            WidgetConfigurationFormProvider::class,
+            Manager::class,
+            ConfigurationProviderInterface::class
+        ]);
+    }
+
     /**
      * @Route(
      *      ".{_format}",
@@ -121,10 +135,7 @@ class DashboardController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $widget->setOptions($form->getData());
-
-            $manager = $this->getDoctrine()->getManagerForClass(Widget::class);
-            $manager->flush();
-
+            $this->getDoctrine()->getManagerForClass(Widget::class)->flush();
             $saved = true;
         }
 
@@ -396,20 +407,10 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * {@inheritdoc}
+     * @return DashboardRepository
      */
-    public static function getSubscribedServices()
+    protected function getDashboardRepository()
     {
-        return array_merge(
-            parent::getSubscribedServices(),
-            [
-                WidgetConfigs::class,
-                TranslatorInterface::class,
-                Router::class,
-                WidgetConfigurationFormProvider::class,
-                Manager::class,
-                ConfigurationProviderInterface::class
-            ]
-        );
+        return $this->getDoctrine()->getRepository('OroDashboardBundle:Dashboard');
     }
 }

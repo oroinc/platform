@@ -22,14 +22,17 @@ class ConsumerHeartbeatExtension extends AbstractExtension
     /** @var \DateTime */
     private $lastUpdatedTime;
 
+    /** @var ConsumerHeartbeat */
+    private $consumerHeartbeat;
+
     /**
-     * @param integer            $updateHeartbeatPeriod
-     * @param ContainerInterface $container
+     * @param integer $updateHeartbeatPeriod
+     * @param ConsumerHeartbeat $consumerHeartbeat
      */
-    public function __construct($updateHeartbeatPeriod, ContainerInterface $container)
+    public function __construct($updateHeartbeatPeriod, ConsumerHeartbeat $consumerHeartbeat)
     {
         $this->updateHeartbeatPeriod = $updateHeartbeatPeriod;
-        $this->container = $container;
+        $this->consumerHeartbeat = $consumerHeartbeat;
     }
 
     /**
@@ -50,16 +53,8 @@ class ConsumerHeartbeatExtension extends AbstractExtension
             )
         ) {
             $context->getLogger()->info('Update the consumer state time.');
-            $this->getConsumerHeartbeat()->tick();
+            $this->consumerHeartbeat->tick();
             $this->lastUpdatedTime = $currentTime;
         }
-    }
-
-    /**
-     * @return ConsumerHeartbeat
-     */
-    private function getConsumerHeartbeat()
-    {
-        return $this->container->get('oro_message_queue.consumption.consumer_heartbeat');
     }
 }
