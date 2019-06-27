@@ -44,7 +44,7 @@ class ExpressionConditionVisitorTest extends \PHPUnit\Framework\TestCase
 
         $strategy = new DefaultGeneratorStrategy();
         $this->assertSame(
-<<<CLASS
+            <<<CLASS
 class LayoutUpdateClass implements \Oro\Component\Layout\IsApplicableLayoutUpdateInterface
 {
     public function updateLayout(\$layoutManipulator, \$item)
