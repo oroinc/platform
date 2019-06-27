@@ -75,6 +75,8 @@ parameters:
     oro_security.serializer.filter_chain.class:                Oro\Component\EntitySerializer\Filter\EntityAwareFilterChain
     oro_security.serializer.acl_filter:                        Oro\Bundle\SecurityBundle\Filter\SerializerFieldFilter
 
+    oro_security.allowed_protocols: ['http', 'https']
+
 services:
     oro_security.request_authorization_checker:
         class: Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker
@@ -869,3 +871,22 @@ services:
         class: 'Oro\Bundle\SecurityBundle\Form\Extension\AutocompletePasswordTypeExtension'
         tags:
             - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\PasswordType }
+
+    oro_security.menu_builder.strip_dangerous_protocols:
+        class: Oro\Bundle\SecurityBundle\Menu\Builder\StripDangerousProtocolsBuilder
+        arguments:
+            - '@oro_security.util.uri_security_helper'
+        tags:
+            - { name: oro_menu.builder, priority: 300 }
+
+    oro_security.validator.constraints.not_dangerous_protocol:
+        class: Oro\Bundle\SecurityBundle\Validator\Constraints\NotDangerousProtocolValidator
+        arguments:
+            - '@oro_security.util.uri_security_helper'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_security.validator.constraints.not_dangerous_protocol }
+
+    oro_security.util.uri_security_helper:
+        class: Oro\Bundle\SecurityBundle\Util\UriSecurityHelper
+        arguments:
+            - '%oro_security.allowed_protocols%'

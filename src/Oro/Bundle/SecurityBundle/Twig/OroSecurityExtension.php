@@ -7,11 +7,15 @@ use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
+use Oro\Bundle\SecurityBundle\Util\UriSecurityHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Provides custom twig functions for security check purposes.
+ */
 class OroSecurityExtension extends \Twig_Extension
 {
     /** @var ContainerInterface */
@@ -50,6 +54,14 @@ class OroSecurityExtension extends \Twig_Extension
     }
 
     /**
+     * @return UriSecurityHelper
+     */
+    private function getUriSecurityHelper(): UriSecurityHelper
+    {
+        return $this->container->get('oro_security.util.uri_security_helper');
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFunctions()
@@ -63,6 +75,16 @@ class OroSecurityExtension extends \Twig_Extension
             new \Twig_SimpleFunction('get_enabled_organizations', [$this, 'getOrganizations']),
             new \Twig_SimpleFunction('get_current_organization', [$this, 'getCurrentOrganization']),
             new \Twig_SimpleFunction('acl_permission', [$this, 'getPermission']),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFilters()
+    {
+        return [
+            new \Twig_SimpleFilter('strip_dangerous_protocols', [$this, 'stripDangerousProtocols']),
         ];
     }
 
@@ -119,6 +141,16 @@ class OroSecurityExtension extends \Twig_Extension
     public function getPermission(AclPermission $aclPermission)
     {
         return $this->getPermissionManager()->getPermissionByName($aclPermission->getName());
+    }
+
+    /**
+     * @param mixed $uri
+     *
+     * @return string
+     */
+    public function stripDangerousProtocols($uri): string
+    {
+        return $this->getUriSecurityHelper()->stripDangerousProtocols((string) $uri);
     }
 
     /**
