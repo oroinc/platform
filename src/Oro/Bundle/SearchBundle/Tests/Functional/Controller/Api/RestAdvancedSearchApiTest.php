@@ -7,7 +7,6 @@ use Oro\Bundle\SearchBundle\Tests\Functional\Controller\SearchBundleWebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 /**
- * @dbIsolationPerTest
  * @group search
  */
 class RestAdvancedSearchApiTest extends SearchBundleWebTestCase
@@ -18,13 +17,7 @@ class RestAdvancedSearchApiTest extends SearchBundleWebTestCase
 
         $this->initClient([], $this->generateWsseAuthHeader());
 
-        $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
-        $this->getSearchIndexer()->resetIndex(Item::class);
-        $this->ensureItemsLoaded($alias, 0);
-
-        $this->loadFixtures([LoadSearchItemData::class]);
-        $this->getSearchIndexer()->reindex(Item::class);
-        $this->ensureItemsLoaded($alias, LoadSearchItemData::COUNT);
+        $this->loadFixture(Item::class, LoadSearchItemData::class, LoadSearchItemData::COUNT);
     }
 
     /**

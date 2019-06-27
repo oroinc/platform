@@ -16,17 +16,17 @@ trait SearchExtensionTrait
     /**
      * @return IndexerInterface
      */
-    protected function getSearchIndexer()
+    protected static function getSearchIndexer()
     {
-        return $this->getContainer()->get('oro_search.search.engine.indexer');
+        return static::getContainer()->get('oro_search.search.engine.indexer');
     }
 
     /**
      * @return ObjectMapper
      */
-    protected function getSearchObjectMapper()
+    protected static function getSearchObjectMapper()
     {
-        return $this->getContainer()->get('oro_search.mapper');
+        return static::getContainer()->get('oro_search.mapper');
     }
 
     /**
@@ -37,15 +37,15 @@ trait SearchExtensionTrait
      * @param string $searchService
      * @throws \LogicException
      */
-    protected function ensureItemsLoaded($alias, $itemsCount, $searchService = 'oro_search.search.engine')
+    protected static function ensureItemsLoaded($alias, $itemsCount, $searchService = 'oro_search.search.engine')
     {
         $query = new Query();
         $query->from($alias);
 
-        $requestCounts = 10;
+        $requestCounts = 30;
         do {
             /** @var Result $result */
-            $result = $this->getContainer()->get($searchService)->search($query);
+            $result = static::getContainer()->get($searchService)->search($query);
             $actualLoaded = $result->getRecordsCount();
             $isLoaded = $actualLoaded === $itemsCount;
             if (!$isLoaded) {
@@ -70,9 +70,9 @@ trait SearchExtensionTrait
      *
      * @param string $entity
      */
-    protected function clearTestData(string $entity = Item::class)
+    protected static function clearTestData(string $entity = Item::class)
     {
-        $manager = $this->getContainer()->get('doctrine')->getManager();
+        $manager = static::getContainer()->get('doctrine')->getManager();
         $repository = $manager->getRepository($entity);
         $repository->createQueryBuilder('qb')
             ->delete()

@@ -18,18 +18,12 @@ class LimitResultsListenerTest extends SearchBundleWebTestCase
 
         $this->initClient();
 
-        $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
-        $this->getSearchIndexer()->resetIndex(Item::class);
-        $this->ensureItemsLoaded($alias, 0);
+        $this->loadFixture(Item::class, LoadSearchItemData::class, LoadSearchItemData::COUNT);
     }
 
     public function testSearchWithLimit(): void
     {
         $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
-
-        $this->loadFixtures([LoadSearchItemData::class]);
-        $this->getSearchIndexer()->reindex(Item::class);
-        $this->ensureItemsLoaded($alias, LoadSearchItemData::COUNT);
 
         $query = new Query();
         $query->from($alias);
