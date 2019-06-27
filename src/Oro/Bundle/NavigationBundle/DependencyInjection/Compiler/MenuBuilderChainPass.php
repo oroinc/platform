@@ -1,12 +1,17 @@
 <?php
 namespace Oro\Bundle\NavigationBundle\DependencyInjection\Compiler;
 
+use Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Collects menu builders for menu builder chain.
+ */
 class MenuBuilderChainPass implements CompilerPassInterface
 {
+    use TaggedServicesCompilerPassTrait;
+
     const MENU_BUILDER_TAG = 'oro_menu.builder';
     const MENU_PROVIDER_KEY = 'oro_menu.builder_chain';
     const ITEMS_BUILDER_TAG = 'oro_navigation.item.builder';
@@ -27,11 +32,13 @@ class MenuBuilderChainPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition(self::MENU_PROVIDER_KEY);
-        $taggedServices = $container->findTaggedServiceIds(self::MENU_BUILDER_TAG);
+        $taggedServices = $this->findAndSortTaggedServices(self::MENU_BUILDER_TAG, $container);
 
-        foreach ($taggedServices as $id => $tagAttributes) {
+        foreach ($taggedServices as $reference) {
+            $builderDefinition = $container->getDefinition((string)$reference);
+            $tagAttributes = $builderDefinition->getTag(self::MENU_BUILDER_TAG);
             foreach ($tagAttributes as $attributes) {
-                $addBuilderArgs = array(new Reference($id));
+                $addBuilderArgs = [$reference];
 
                 if (!empty($attributes['alias'])) {
                     $addBuilderArgs[] = $attributes['alias'];
@@ -49,19 +56,19 @@ class MenuBuilderChainPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition(self::ITEMS_PROVIDER_KEY);
-        $taggedServices = $container->findTaggedServiceIds(self::ITEMS_BUILDER_TAG);
+        $taggedServices = $this->findAndSortTaggedServices(self::ITEMS_BUILDER_TAG, $container);
 
-        foreach ($taggedServices as $id => $tagAttributes) {
+        foreach ($taggedServices as $reference) {
+            $factoryDefinition = $container->getDefinition((string) $reference);
+            $tagAttributes = $factoryDefinition->getTag(self::ITEMS_BUILDER_TAG);
             foreach ($tagAttributes as $attributes) {
                 if (empty($attributes['alias'])) {
                     continue;
                 }
 
-                $builderDefinition = $container->getDefinition($id);
-                $builderDefinition->addArgument($attributes['alias']);
+                $factoryDefinition->addArgument($attributes['alias']);
 
-                $addBuilderArgs = array(new Reference($id));
-                $definition->addMethodCall('addBuilder', $addBuilderArgs);
+                $definition->addMethodCall('addBuilder', [$reference]);
             }
         }
     }
