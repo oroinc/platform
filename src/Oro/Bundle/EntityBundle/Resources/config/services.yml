@@ -266,10 +266,9 @@ services:
         class: Oro\Bundle\EntityBundle\Twig\EntityExtension
         public: false
         arguments:
-            -  '@Psr\Container\ContainerInterface'
+            -  '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber }
 
     oro_entity.routing_helper:
         class: '%oro_entity.routing_helper.class%'

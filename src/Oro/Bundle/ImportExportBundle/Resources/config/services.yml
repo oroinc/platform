@@ -120,12 +120,15 @@ services:
     oro_importexport.configuration.registry:
         class: 'Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistry'
 
+    Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistry:
+        alias: oro_importexport.configuration.registry
+
     oro_importexport.twig_extension.get_import_export_configuration:
         class: 'Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension'
         arguments:
-            - '@oro_importexport.configuration.registry'
+            - '@oro_platform.twig.service_locator'
         tags:
-            - { name: 'twig.extension' }
+            - { name: twig.extension }
 
     Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension:
         alias: 'oro_importexport.twig_extension.get_import_export_configuration'

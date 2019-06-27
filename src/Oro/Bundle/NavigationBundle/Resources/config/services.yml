@@ -108,10 +108,9 @@ services:
     oro_menu.twig.extension:
         class: Oro\Bundle\NavigationBundle\Twig\MenuExtension
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber }
 
     oro_navigation.item.builder.pinbar:
         class: '%oro_navigation.item.builder.pinbar.class%'
@@ -297,10 +296,9 @@ services:
         class: Oro\Bundle\NavigationBundle\Twig\TitleExtension
         public: false
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber }
 
     oro_navigation.translation.extractor:
         class: Oro\Bundle\NavigationBundle\Title\TranslationExtractor

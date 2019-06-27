@@ -5,18 +5,28 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Twig;
 use Oro\Bundle\SegmentBundle\Event\ConditionBuilderOptionsLoadEvent;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
 use Oro\Bundle\SegmentBundle\Twig\SegmentExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    protected $dispatcher;
+    use TwigExtensionTestCaseTrait;
 
-    protected $segmentExtension;
+    /** @var EventDispatcherInterface */
+    private $dispatcher;
+
+    /** @var SegmentExtension */
+    private $segmentExtension;
 
     public function setUp()
     {
-        $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->segmentExtension = new SegmentExtension($this->dispatcher);
+        $container = self::getContainerBuilder()
+            ->add('event_dispatcher', $this->dispatcher)
+            ->getContainer($this);
+
+        $this->segmentExtension = new SegmentExtension($container);
     }
 
     public function testUpdateSegmentWidgetOptionsShouldReturnOriginalOptionsIfThereAreNoListeners()

@@ -3,7 +3,7 @@ services:
         public: false
         class: Oro\Bundle\LayoutBundle\Twig\LayoutExtension
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -11,9 +11,6 @@ services:
         class: Oro\Bundle\LayoutBundle\Twig\TwigRenderer
         arguments:
             - '@oro_layout.twig.renderer.engine'
-
-    Oro\Bundle\LayoutBundle\Twig\TwigRenderer:
-        alias: oro_layout.twig.renderer
 
     oro_layout.twig.renderer.engine:
         public: false

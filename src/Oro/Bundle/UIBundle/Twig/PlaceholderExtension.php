@@ -3,9 +3,12 @@
 namespace Oro\Bundle\UIBundle\Twig;
 
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
+use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -14,7 +17,7 @@ use Twig\TwigFunction;
  * Provides a Twig function to render placeholders:
  *   - placeholder
  */
-class PlaceholderExtension extends AbstractExtension
+class PlaceholderExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const EXTENSION_NAME = 'oro_placeholder';
 
@@ -148,5 +151,17 @@ class PlaceholderExtension extends AbstractExtension
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_ui.placeholder.provider' => PlaceholderProvider::class,
+            'request_stack' => RequestStack::class,
+            'fragment.handler' => FragmentHandler::class,
+        ];
     }
 }

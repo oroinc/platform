@@ -5,7 +5,8 @@ namespace Oro\Bundle\EntityMergeBundle\Twig;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
@@ -20,7 +21,7 @@ use Twig\TwigFunction;
  * Provides a Twig filter for sorting fields on entity merge form:
  *   - oro_entity_merge_sort_fields
  */
-class MergeExtension extends AbstractExtension
+class MergeExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -156,5 +157,17 @@ class MergeExtension extends AbstractExtension
     public function getName()
     {
         return 'oro_entity_merge';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_entity_merge.accessor' => AccessorInterface::class,
+            'oro_entity_merge.twig.renderer' => MergeRenderer::class,
+            'translator' => TranslatorInterface::class,
+        ];
     }
 }

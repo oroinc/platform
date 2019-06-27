@@ -6,7 +6,7 @@ services:
         class: Oro\Bundle\CurrencyBundle\Twig\CurrencyExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 

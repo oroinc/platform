@@ -4,6 +4,8 @@ namespace Oro\Bundle\EntityExtendBundle\Twig;
 
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -12,17 +14,17 @@ use Twig\TwigFilter;
  *   - sort_enum - sorts the given enum value identifiers according to the priorities specified for this enum.
  *   - trans_enum - translates the given enum value.
  */
-class EnumExtension extends AbstractExtension
+class EnumExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var EnumValueProvider */
-    protected $enumValueProvider;
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * @param EnumValueProvider $enumValueProvider
+     * @param ContainerInterface $container
      */
-    public function __construct(EnumValueProvider $enumValueProvider)
+    public function __construct(ContainerInterface $container)
     {
-        $this->enumValueProvider = $enumValueProvider;
+        $this->container = $container;
     }
 
     /**
@@ -101,7 +103,8 @@ class EnumExtension extends AbstractExtension
             $enumValueEntityClassOrEnumCode = ExtendHelper::buildEnumValueClassName($enumValueEntityClassOrEnumCode);
         }
 
-        return $this->enumValueProvider->getEnumChoices($enumValueEntityClassOrEnumCode);
+        return $this->container->get('oro_entity_extend.enum_value_provider')
+            ->getEnumChoices($enumValueEntityClassOrEnumCode);
     }
 
     /**
@@ -110,5 +113,15 @@ class EnumExtension extends AbstractExtension
     public function getName()
     {
         return 'oro_enum';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_entity_extend.enum_value_provider' => EnumValueProvider::class,
+        ];
     }
 }

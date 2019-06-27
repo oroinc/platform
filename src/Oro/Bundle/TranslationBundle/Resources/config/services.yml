@@ -165,7 +165,9 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Twig\TranslationExtension'
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
+            - '%oro_translation.debug_translator%'
+            - '%oro_translation.js_translation.debug%'
         tags:
             - { name: twig.extension }
 

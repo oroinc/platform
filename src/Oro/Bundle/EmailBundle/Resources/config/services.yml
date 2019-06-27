@@ -820,7 +820,7 @@ services:
         class: Oro\Bundle\EmailBundle\Twig\EmailExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 

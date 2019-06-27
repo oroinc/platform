@@ -71,10 +71,9 @@ services:
         class: Oro\Bundle\ConfigBundle\Twig\ConfigExtension
         public: false
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber, id: 'oro_config.user' }
 
     oro_config.provider.abstract_provider:
         class: Oro\Bundle\ConfigBundle\Provider\AbstractProvider

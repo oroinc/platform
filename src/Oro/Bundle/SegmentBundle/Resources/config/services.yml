@@ -125,7 +125,7 @@ services:
         class: Oro\Bundle\SegmentBundle\Twig\SegmentExtension
         public: false
         arguments:
-            - '@event_dispatcher'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 

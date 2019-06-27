@@ -84,7 +84,7 @@ services:
         class: Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension
         public: false
         arguments:
-            - '@doctrine'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 

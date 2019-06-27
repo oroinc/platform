@@ -5,11 +5,14 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Twig;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistryInterface;
 use Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use PHPUnit\Framework\TestCase;
 use Twig\TwigFunction;
 
 class GetImportExportConfigurationExtensionTest extends TestCase
 {
+    use TwigExtensionTestCaseTrait;
+
     /**
      * @var ImportExportConfigurationRegistryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
@@ -24,7 +27,11 @@ class GetImportExportConfigurationExtensionTest extends TestCase
     {
         $this->configurationRegistry = $this->createMock(ImportExportConfigurationRegistryInterface::class);
 
-        $this->extension = new GetImportExportConfigurationExtension($this->configurationRegistry);
+        $container = self::getContainerBuilder()
+            ->add('oro_importexport.configuration.registry', $this->configurationRegistry)
+            ->getContainer($this);
+
+        $this->extension = new GetImportExportConfigurationExtension($container);
     }
 
     public function testGetFunctions()

@@ -6,7 +6,8 @@ use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Intl\Intl;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -20,7 +21,7 @@ use Twig\TwigFunction;
  *   - oro_format_price
  *   - oro_localized_currency_name
  */
-class CurrencyExtension extends AbstractExtension
+class CurrencyExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -185,5 +186,17 @@ class CurrencyExtension extends AbstractExtension
     public function getName()
     {
         return 'oro_currency';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_locale.formatter.number' => NumberFormatter::class,
+            'oro_currency.provider.view_type' => ViewTypeProviderInterface::class,
+            'oro_currency.helper.currency_name' => CurrencyNameHelper::class,
+        ];
     }
 }

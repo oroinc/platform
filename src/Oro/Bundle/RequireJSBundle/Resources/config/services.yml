@@ -1,12 +1,9 @@
-parameters:
-    oro_requirejs.twig.class:             Oro\Bundle\RequireJSBundle\Twig\OroRequireJSExtension
-
 services:
     oro_requirejs.twig.requirejs_extension:
         class: Oro\Bundle\RequireJSBundle\Twig\OroRequireJSExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
             - '%oro_require_js.web_root%'
             - '%oro_require_js.build_logger%'
         tags:

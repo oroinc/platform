@@ -14,7 +14,6 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\PhpUtils\ArrayUtil;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
@@ -26,7 +25,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  *   - oro_get_dynamic_fields
  *   - oro_get_dynamic_field
  */
-class DynamicFieldsExtension extends AbstractDynamicFieldsExtension implements ServiceSubscriberInterface
+class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
 {
     /** @var ConfigProvider|null */
     private $extendConfigProvider;

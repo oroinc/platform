@@ -13,6 +13,8 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionType
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator;
+use Oro\Bundle\SecurityBundle\Util\UriSecurityHelper;
+use Oro\Bundle\SecurityBundle\Validator\Constraints\NotDangerousProtocolValidator;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -45,6 +47,28 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
                 []
             ),
             $this->getValidatorExtension(true)
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getValidators(): array
+    {
+        $uriSecurityHelper = $this->createMock(UriSecurityHelper::class);
+        $uriSecurityHelper
+            ->method('uriHasDangerousProtocol')
+            ->willReturnMap([
+                ['javascript:alert(1)', true],
+                ['jAvAsCrIpt:alert(1)', true],
+                ['data:base64,samplebase64', true],
+                ['dAtA:base64,samplebase64', true],
+                [self::TEST_URI, false],
+            ]);
+
+        return [
+            'oro_security.validator.constraints.not_dangerous_protocol' =>
+                new NotDangerousProtocolValidator($uriSecurityHelper)
         ];
     }
 
@@ -175,6 +199,55 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
 
         $this->assertFormContainsField('aclResourceId', $form);
         $this->assertFormOptionEqual(true, 'disabled', $form->get('aclResourceId'));
+    }
+
+    /**
+     * @dataProvider submitCustomWithJavascriptUriDataProvider
+     *
+     * @param string $uri
+     */
+    public function testSubmitCustomWithJavascriptUri(string $uri): void
+    {
+        $menuUpdate = new MenuUpdate();
+        $menuUpdate->setCustom(true);
+        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate);
+
+        $form->submit(
+            [
+                'titles' => [
+                    'values' => [
+                        'default' => self::TEST_TITLE
+                    ]
+                ],
+                'uri' => $uri,
+            ]
+        );
+
+        $expected = new MenuUpdate();
+        $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
+        $expected
+            ->setCustom(true)
+            ->addDescription(new LocalizedFallbackValue)
+            ->addTitle($expectedTitle)
+            ->setUri($uri);
+
+        $this->assertFormIsNotValid($form);
+        $this->assertEquals($expected, $form->getData());
+    }
+
+    /**
+     * @return array
+     */
+    public function submitCustomWithJavascriptUriDataProvider(): array
+    {
+        return [
+            ['uri' => 'javascript:alert(1)'],
+            ['uri' => 'jAvAsCrIpt:alert(1)'],
+            ['uri' => 'data:base64,samplebase64'],
+            ['uri' => 'dAtA:base64,samplebase64'],
+            // We don't have to check other variants like with html-, ascii-, utf- encoded characters etc because
+            // all of them must be handled on the output by twig.
+        ];
     }
 
     /**

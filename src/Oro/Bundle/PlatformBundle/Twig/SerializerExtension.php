@@ -3,10 +3,17 @@
 namespace Oro\Bundle\PlatformBundle\Twig;
 
 use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 use JMS\Serializer\Twig\SerializerExtension as BaseSerializerExtension;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 
-class SerializerExtension extends BaseSerializerExtension
+/**
+ * Serializer helper twig extension
+ *
+ * Basically provides access to JMSSerializer from Twig
+ */
+class SerializerExtension extends BaseSerializerExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -19,6 +26,9 @@ class SerializerExtension extends BaseSerializerExtension
         $this->container = $container;
     }
 
+    /**
+     * @return SerializerInterface
+     */
     protected function getSerializer()
     {
         return $this->container->get('jms_serializer');
@@ -34,5 +44,15 @@ class SerializerExtension extends BaseSerializerExtension
         }
 
         return parent::serialize($object, $type, $context);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'jms_serializer' => SerializerInterface::class,
+        ];
     }
 }

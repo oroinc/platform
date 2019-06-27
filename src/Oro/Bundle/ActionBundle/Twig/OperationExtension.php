@@ -8,7 +8,8 @@ use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -19,7 +20,7 @@ use Twig\TwigFunction;
  *   - oro_action_frontend_options
  *   - oro_action_has_buttons
  */
-class OperationExtension extends AbstractExtension
+class OperationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const NAME = 'oro_action';
 
@@ -139,5 +140,19 @@ class OperationExtension extends AbstractExtension
                 $this->getContextHelper()->getContext($context)
             )
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_action.provider.route' => RouteProviderInterface::class,
+            'oro_action.helper.context' => ContextHelper::class,
+            'oro_action.helper.options' => OptionsHelper::class,
+            'oro_action.provider.button' => ButtonProvider::class,
+            'oro_action.provider.button_search_context' => ButtonSearchContextProvider::class,
+        ];
     }
 }
