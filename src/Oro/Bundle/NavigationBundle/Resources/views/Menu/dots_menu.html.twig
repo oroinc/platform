@@ -5,6 +5,7 @@
     {% set togglerId = 'dropdown-'|uniqid %}
     <li class="dot-menu dropdown">
         <a href="#" role="button" id="{{ togglerId }}" data-toggle="dropdown" class="dropdown-toggle dropdown-toggle--no-caret"
+           data-prevent-close-on-menu-click="true"
            title="{{ 'oro.navigation.menu.recent_pages.label'|trans }}"
            aria-label="{{ 'oro.navigation.menu.recent_pages.label'|trans }}" aria-haspopup="true" aria-expanded="false">
             <span class="fa-bars" aria-hidden="true"></span>
