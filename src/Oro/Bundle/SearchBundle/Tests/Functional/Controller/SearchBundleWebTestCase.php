@@ -3,12 +3,14 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
-use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class SearchBundleWebTestCase extends WebTestCase
 {
     use SearchExtensionTrait;
+
+    /** @var array */
+    protected static $entitiesToClear = [];
 
     /**
      * For InnoDB, all DML operations (INSERT, UPDATE, DELETE) involving columns with full-text indexes are
@@ -36,10 +38,75 @@ class SearchBundleWebTestCase extends WebTestCase
     {
     }
 
-
     protected function tearDown()
     {
-        $this->getSearchIndexer()->resetIndex(Item::class);
-        $this->clearTestData();
+        if (static::isDbIsolationPerTest()) {
+            static::clear();
+        }
+
+        parent::tearDown();
+    }
+
+
+    public static function tearDownAfterClass()
+    {
+        if (!static::isDbIsolationPerTest()) {
+            static::clear();
+        }
+
+        parent::tearDownAfterClass();
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $fixtureClass
+     * @param int $expectedCount
+     */
+    protected function loadFixture(string $entityClass, string $fixtureClass, int $expectedCount): void
+    {
+        $doReindex = static::isDbIsolationPerTest() || !\in_array($fixtureClass, static::$loadedFixtures, false);
+
+        $this->loadFixtures([$fixtureClass]);
+
+        if ($doReindex) {
+            $this->reindex($entityClass, $expectedCount);
+        }
+    }
+
+    /**
+     * @param string $entityClass
+     * @param int $expectedCount
+     */
+    protected function reindex(string $entityClass, int $expectedCount): void
+    {
+        static::$entitiesToClear[] = $entityClass;
+
+        static::clearIndex($entityClass);
+
+        static::getSearchIndexer()->reindex($entityClass);
+
+        $alias = static::getSearchObjectMapper()->getEntityAlias($entityClass);
+        static::ensureItemsLoaded($alias, $expectedCount);
+    }
+
+    /**
+     * @param string $entityClass
+     */
+    protected static function clearIndex(string $entityClass): void
+    {
+        static::getSearchIndexer()->resetIndex($entityClass);
+
+        $alias = static::getSearchObjectMapper()->getEntityAlias($entityClass);
+        static::ensureItemsLoaded($alias, 0);
+    }
+
+    protected static function clear(): void
+    {
+        foreach (static::$entitiesToClear as $entityClass) {
+            static::clearIndex($entityClass);
+            static::clearTestData($entityClass);
+        }
+
+        static::$entitiesToClear = [];
     }
 }
