@@ -371,10 +371,9 @@ services:
         class: Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
         public: false
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber }
 
     oro_security.encoder.default:
         class: Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter

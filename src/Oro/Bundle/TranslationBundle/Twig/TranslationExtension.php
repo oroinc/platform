@@ -3,7 +3,8 @@
 namespace Oro\Bundle\TranslationBundle\Twig;
 
 use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -14,19 +15,29 @@ use Twig\TwigFunction;
  *   - oro_translation_debug_js_translations
  *   - translation_grid_link
  */
-class TranslationExtension extends AbstractExtension
+class TranslationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const NAME = 'oro_translation';
 
     /** @var ContainerInterface */
-    protected $container;
+    private $container;
+
+    /** @var bool */
+    private $isDebugTranslator;
+
+    /** @var bool */
+    private $isDebugJsTranslations;
 
     /**
      * @param ContainerInterface $container
+     * @param bool $isDebugTranslator
+     * @param bool $isDebugJsTranslations
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, bool $isDebugTranslator, bool $isDebugJsTranslations)
     {
         $this->container = $container;
+        $this->isDebugTranslator = $isDebugTranslator;
+        $this->isDebugJsTranslations = $isDebugJsTranslations;
     }
 
     /**
@@ -62,7 +73,7 @@ class TranslationExtension extends AbstractExtension
      */
     public function isDebugTranslator()
     {
-        return $this->container->getParameter('oro_translation.debug_translator');
+        return $this->isDebugTranslator;
     }
 
     /**
@@ -70,7 +81,7 @@ class TranslationExtension extends AbstractExtension
      */
     public function isDebugJsTranslations()
     {
-        return $this->container->getParameter('oro_translation.js_translation.debug');
+        return $this->isDebugJsTranslations;
     }
 
     /**
@@ -82,5 +93,15 @@ class TranslationExtension extends AbstractExtension
     public function getTranslationGridLink(array $filters = [], $referenceType = RouterInterface::ABSOLUTE_PATH)
     {
         return $this->getTranslationsDatagridRouteHelper()->generate($filters, $referenceType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_translation.helper.translation_route' => TranslationsDatagridRouteHelper::class,
+        ];
     }
 }

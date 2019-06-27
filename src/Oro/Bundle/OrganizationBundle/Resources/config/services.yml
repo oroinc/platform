@@ -98,10 +98,9 @@ services:
         class: Oro\Bundle\OrganizationBundle\Twig\OrganizationExtension
         public: false
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber }
 
     #
     # Listeners / Subscribers

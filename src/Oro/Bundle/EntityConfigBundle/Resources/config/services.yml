@@ -160,10 +160,9 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension
         public: false
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber }
 
     oro_entity_config.migration.post_up.listener:
         class: '%oro_entity_config.migration.post_up.listener.class%'
@@ -336,9 +335,7 @@ services:
         decorates: oro_entity_extend.twig.extension.dynamic_fields
         arguments:
             - '@oro_entity_config.twig.extension.dynamic_fields_attribute_decorator.inner'
-            - '@Psr\Container\ContainerInterface'
-        tags:
-            - { name: container.service_subscriber, id: 'oro_entity_config.config.attributes_config_helper' }
+            - '@oro_platform.twig.service_locator'
 
     oro_entity_config.datagrid.attribute_family_actions_configuration:
         class: 'Oro\Bundle\EntityConfigBundle\Datagrid\AttributeFamilyActionsConfiguration'

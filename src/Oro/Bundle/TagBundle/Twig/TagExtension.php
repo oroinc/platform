@@ -4,7 +4,8 @@ namespace Oro\Bundle\TagBundle\Twig;
 
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -13,7 +14,7 @@ use Twig\TwigFunction;
  *   - oro_tag_get_list
  *   - oro_is_taggable
  */
-class TagExtension extends AbstractExtension
+class TagExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -81,5 +82,16 @@ class TagExtension extends AbstractExtension
     public function isTaggable($entity)
     {
         return $this->getTaggableHelper()->isTaggable($entity);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_tag.tag.manager' => TagManager::class,
+            'oro_tag.helper.taggable_helper' => TaggableHelper::class,
+        ];
     }
 }

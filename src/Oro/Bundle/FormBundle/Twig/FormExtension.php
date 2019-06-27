@@ -3,6 +3,8 @@
 namespace Oro\Bundle\FormBundle\Twig;
 
 use Oro\Bundle\FormBundle\Form\Twig\DataBlockRenderer;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
 use Twig\Environment;
@@ -17,15 +19,15 @@ use Twig\TwigFunction;
  *   - form_javascript
  *   - form_stylesheet
  */
-class FormExtension extends AbstractExtension
+class FormExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const DEFAULT_TEMPLATE = 'OroFormBundle:Form:fields.html.twig';
     const BLOCK_NAME       = 'oro_form_js_validation';
 
     /**
-     * @var FormRendererInterface
+     * @var ContainerInterface
      */
-    public $renderer;
+    private $container;
 
     /**
      * @var string
@@ -38,16 +40,16 @@ class FormExtension extends AbstractExtension
     protected $defaultOptions;
 
     /**
-     * @param FormRendererInterface $renderer
+     * @param ContainerInterface $container
      * @param string $templateName
      * @param array $defaultOptions
      */
     public function __construct(
-        FormRendererInterface $renderer,
+        ContainerInterface $container,
         $templateName = self::DEFAULT_TEMPLATE,
         $defaultOptions = []
     ) {
-        $this->renderer = $renderer;
+        $this->container = $container;
         $this->templateName = $templateName;
         $this->defaultOptions = $defaultOptions;
     }
@@ -149,7 +151,7 @@ class FormExtension extends AbstractExtension
     {
         $block = $prototype ? 'javascript_prototype' : 'javascript';
 
-        return $this->renderer->searchAndRenderBlock($view, $block);
+        return $this->container->get('twig.form.renderer')->searchAndRenderBlock($view, $block);
     }
 
     /**
@@ -179,5 +181,15 @@ class FormExtension extends AbstractExtension
     public function getName()
     {
         return 'oro_form';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'twig.form.renderer' => FormRendererInterface::class,
+        ];
     }
 }

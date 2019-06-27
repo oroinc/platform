@@ -9,7 +9,7 @@ services:
         class: Oro\Bundle\WindowsBundle\Twig\WindowsExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 

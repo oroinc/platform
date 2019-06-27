@@ -4,7 +4,8 @@ namespace Oro\Bundle\SyncBundle\Twig;
 
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -13,7 +14,7 @@ use Twig\TwigFunction;
  *   - check_ws
  *   - oro_sync_get_content_tags
  */
-class OroSyncExtension extends AbstractExtension
+class OroSyncExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -84,5 +85,16 @@ class OroSyncExtension extends AbstractExtension
     public function getName()
     {
         return 'sync_extension';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_sync.content.tag_generator' => TagGeneratorInterface::class,
+            'oro_sync.client.connection_checker' => ConnectionChecker::class,
+        ];
     }
 }

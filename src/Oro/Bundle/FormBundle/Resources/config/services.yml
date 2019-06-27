@@ -10,7 +10,7 @@ services:
     oro_form.twig.form_extension:
         class: Oro\Bundle\FormBundle\Twig\FormExtension
         arguments:
-            - '@twig.form.renderer'
+            - '@oro_platform.twig.service_locator'
         public: false
         tags:
             - { name: twig.extension }

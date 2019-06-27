@@ -21,19 +21,27 @@ class TranslationExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        $this->translationRouteHelper = $this->getMockBuilder(TranslationsDatagridRouteHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translationRouteHelper = $this->createMock(TranslationsDatagridRouteHelper::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_translation.helper.translation_route', $this->translationRouteHelper)
             ->getContainer($this);
 
-        $this->extension = new TranslationExtension($container, true);
+        $this->extension = new TranslationExtension($container, true, true);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals(TranslationExtension::NAME, $this->extension->getName());
+    }
+
+    public function testIsDebugTranslator(): void
+    {
+        $this->assertTrue($this->extension->isDebugTranslator());
+    }
+
+    public function testIsDebugJsTranslations(): void
+    {
+        $this->assertTrue($this->extension->isDebugJsTranslations());
     }
 }

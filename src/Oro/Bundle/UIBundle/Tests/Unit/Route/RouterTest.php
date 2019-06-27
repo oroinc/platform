@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Tests\Route;
+namespace Oro\Bundle\UIBundle\Tests\Unit\Route;
 
 use Oro\Bundle\UIBundle\Route\Router;
 use Symfony\Bundle\FrameworkBundle\Routing\Router as SymfonyRouter;

@@ -31,7 +31,7 @@ services:
         class: Oro\Bundle\SyncBundle\Twig\OroSyncExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 

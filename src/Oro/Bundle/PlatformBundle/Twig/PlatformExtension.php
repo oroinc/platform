@@ -3,7 +3,8 @@
 namespace Oro\Bundle\PlatformBundle\Twig;
 
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -11,7 +12,7 @@ use Twig\TwigFunction;
  * Provides a Twig function to retrieve the application version:
  *   - oro_version
  */
-class PlatformExtension extends AbstractExtension
+class PlatformExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const EXTENSION_NAME = 'oro_platform';
 
@@ -58,5 +59,15 @@ class PlatformExtension extends AbstractExtension
     public function getName()
     {
         return self::EXTENSION_NAME;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_platform.composer.version_helper' => VersionHelper::class,
+        ];
     }
 }

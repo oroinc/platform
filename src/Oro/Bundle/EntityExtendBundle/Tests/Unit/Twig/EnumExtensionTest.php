@@ -20,7 +20,11 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->enumValueProvider = $this->createMock(EnumValueProvider::class);
 
-        $this->extension = new EnumExtension($this->enumValueProvider);
+        $container = self::getContainerBuilder()
+            ->add('oro_entity_extend.enum_value_provider', $this->enumValueProvider)
+            ->getContainer($this);
+
+        $this->extension = new EnumExtension($container);
     }
 
     public function testTransEnum()

@@ -3,11 +3,12 @@
 namespace Oro\Bundle\DataGridBundle\Twig;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -26,7 +27,7 @@ use Twig\TwigFunction;
  *   - oro_datagrid_column_attributes
  *   - oro_datagrid_get_page_url
  */
-class DataGridExtension extends AbstractExtension
+class DataGridExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const ROUTE = 'oro_datagrid_index';
 
@@ -42,7 +43,7 @@ class DataGridExtension extends AbstractExtension
     }
 
     /**
-     * @return Manager
+     * @return ManagerInterface
      */
     protected function getManager()
     {
@@ -333,5 +334,21 @@ class DataGridExtension extends AbstractExtension
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_datagrid.datagrid.manager' => ManagerInterface::class,
+            'oro_datagrid.datagrid.name_strategy' => NameStrategyInterface::class,
+            'router' => RouterInterface::class,
+            'security.authorization_checker' => AuthorizationCheckerInterface::class,
+            'oro_datagrid.helper.route' => DatagridRouteHelper::class,
+            'request_stack' => RequestStack::class,
+            'logger' => LoggerInterface::class,
+        ];
     }
 }

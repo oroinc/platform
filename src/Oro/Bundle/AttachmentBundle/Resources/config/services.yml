@@ -137,10 +137,9 @@ services:
         class: 'Oro\Bundle\AttachmentBundle\Twig\FileExtension'
         public: false
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber }
 
     oro_attachment.entity_config_dumper.extension.file:
         class: '%oro_attachment.entity_config_dumper.extension.file.class%'

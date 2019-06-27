@@ -3,7 +3,8 @@
 namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -24,7 +25,7 @@ use Twig\TwigFunction;
  *   - oro_format_duration
  *   - oro_format_ordinal
  */
-class NumberExtension extends AbstractExtension
+class NumberExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -441,5 +442,15 @@ class NumberExtension extends AbstractExtension
     public function getName()
     {
         return 'oro_locale_number';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_locale.formatter.number' => NumberFormatter::class,
+        ];
     }
 }

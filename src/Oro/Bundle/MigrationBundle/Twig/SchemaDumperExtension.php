@@ -6,6 +6,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -13,10 +15,10 @@ use Twig\TwigFunction;
  * Provides a Twig function used in generator of data migration classes:
  *   - oro_migration_get_schema_column_options
  */
-class SchemaDumperExtension extends AbstractExtension
+class SchemaDumperExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    /** @var ContainerInterface */
+    private $container;
 
     /** @var AbstractPlatform */
     protected $platform;
@@ -40,11 +42,11 @@ class SchemaDumperExtension extends AbstractExtension
     ];
 
     /**
-     * @param ManagerRegistry $doctrine
+     * @param ContainerInterface $container
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ContainerInterface $container)
     {
-        $this->doctrine = $doctrine;
+        $this->container = $container;
     }
 
     /**
@@ -100,7 +102,7 @@ class SchemaDumperExtension extends AbstractExtension
      */
     protected function getColumnOption(Column $column, $optionName)
     {
-        $method = "get" . $optionName;
+        $method = 'get' . $optionName;
 
         return $column->$method();
     }
@@ -111,7 +113,9 @@ class SchemaDumperExtension extends AbstractExtension
     protected function getPlatform()
     {
         if (!$this->platform) {
-            $this->platform = $this->doctrine->getConnection()->getDatabasePlatform();
+            $this->platform = $this->container->get('doctrine')
+                ->getConnection()
+                ->getDatabasePlatform();
         }
 
         return $this->platform;
@@ -132,5 +136,15 @@ class SchemaDumperExtension extends AbstractExtension
         }
 
         return $this->defaultColumnOptions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'doctrine' => ManagerRegistry::class,
+        ];
     }
 }

@@ -14,7 +14,7 @@ services:
         class: Oro\Bundle\SidebarBundle\Twig\SidebarExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
             - { name: oro_featuretogle.feature, feature: email }

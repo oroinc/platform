@@ -4,17 +4,29 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\IntegrationBundle\Event\LoadIntegrationThemesEvent;
 use Oro\Bundle\IntegrationBundle\Twig\IntegrationExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 
 class IntegrationExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    protected $dispatcher;
-    protected $integrationExtension;
+    use TwigExtensionTestCaseTrait;
+
+    /** @var EventDispatcherInterface */
+    private $dispatcher;
+
+    /** @var IntegrationExtension */
+    private $integrationExtension;
 
     public function setUp()
     {
         $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->integrationExtension = new IntegrationExtension($this->dispatcher);
+
+        $container = self::getContainerBuilder()
+            ->add('event_dispatcher', $this->dispatcher)
+            ->getContainer($this);
+
+        $this->integrationExtension = new IntegrationExtension($container);
     }
 
     public function testGetThemesShouldReturnDefaultThemeIfNoListenerIsRegistered()
@@ -22,7 +34,7 @@ class IntegrationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('hasListeners')
             ->with(LoadIntegrationThemesEvent::NAME)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->dispatcher->expects($this->never())
             ->method('dispatch');
 
@@ -37,7 +49,7 @@ class IntegrationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('hasListeners')
             ->with(LoadIntegrationThemesEvent::NAME)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(LoadIntegrationThemesEvent::NAME)

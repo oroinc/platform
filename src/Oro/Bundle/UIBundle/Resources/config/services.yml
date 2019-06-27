@@ -200,7 +200,7 @@ services:
         class: Oro\Bundle\UIBundle\Twig\FormatExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -208,7 +208,7 @@ services:
         class: Oro\Bundle\UIBundle\Twig\TabExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -216,7 +216,7 @@ services:
         class: Oro\Bundle\UIBundle\Twig\HtmlTagExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -224,7 +224,7 @@ services:
         class: Oro\Bundle\UIBundle\Twig\PlaceholderExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -232,10 +232,9 @@ services:
         class: Oro\Bundle\UIBundle\Twig\UiExtension
         public: false
         arguments:
-            -  '@Psr\Container\ContainerInterface'
+            -  '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber }
 
     oro_ui.config.use_default_configurator:
         parent: oro_config.form.configurator.use_default_configurator.abstract
