@@ -45,28 +45,41 @@ define(function(require) {
         },
 
         /**
+         * Triggers the event in rest of browser tabs
+         * tabs communication is implemented over storage event
+         *
          * @param {string} eventName
          * @param {...(Object|Array|number|string|boolean|null}} - optional data that will be passed to a handler as arguments
          */
         trigger: function(eventName) {
             var eventData = {targetId: this.id, args: _.rest(arguments)};
-            localStorage.setItem(eventName, JSON.stringify(eventData));
-            localStorage.removeItem(eventName);
+            var storageKey = InterWindowMediator.NS + eventName;
+            localStorage.setItem(storageKey, JSON.stringify(eventData));
+            localStorage.removeItem(storageKey);
         },
 
+        /**
+         * Handles storage and triggers local event
+         *
+         * @param e
+         */
         onStorageChange: function(e) {
-            if (e.newValue !== null && e.newValue !== '') {
+            if (
+                e.key.substring(0, InterWindowMediator.NS.length) === InterWindowMediator.NS &&
+                e.newValue !== null && e.newValue !== ''
+            ) {
+                var eventName = e.key.substring(InterWindowMediator.NS.length);
                 var eventData = JSON.parse(e.newValue);
 
                 // Since IE11 triggers `storage` event on current window lets check and skip it
                 if (eventData.targetId !== this.id) {
-                    var triggerArguments = [e.key];
-                    triggerArguments.push.apply(triggerArguments, eventData.args);
-
-                    InterWindowMediator.__super__.trigger.apply(this, triggerArguments);
+                    // triggers the event over original Backbone.Event.trigger method to execute all inner handlers
+                    InterWindowMediator.__super__.trigger.apply(this, [eventName].concat(eventData.args));
                 }
             }
         }
+    }, {
+        NS: 'inter-window-mediator:'
     });
 
     return InterWindowMediator;
