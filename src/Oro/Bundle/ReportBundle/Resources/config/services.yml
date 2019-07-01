@@ -74,6 +74,8 @@ services:
         class: Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder
         arguments:
             - '%oro_report.calendar_date.entity.class%'
+        calls:
+            - [setDateHelper, ['@oro_datagrid.helper.date']]
 
     oro_report.listener.segment_subscriber:
         class: '%oro_report.listener.segment_subscriber.class%'
@@ -103,6 +105,8 @@ services:
         class: '%oro_report.calendar_date_manager.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
+        calls:
+            - [setLocaleSettings, ['@oro_locale.settings']]
 
     oro_report.validator.report_definition_validator:
         class: Oro\Bundle\ReportBundle\Validator\ReportDefinitionValidator
@@ -125,3 +129,10 @@ services:
             - "%oro_report.calendar_date.entity.class%"
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_report.event_listener.timezone_change:
+        class: Oro\Bundle\ReportBundle\EventListener\TimezoneChangeListener
+        arguments:
+            - '@oro_report.calendar_date_manager'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
