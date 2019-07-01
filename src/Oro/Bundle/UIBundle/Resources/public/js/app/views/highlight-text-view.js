@@ -26,8 +26,9 @@ define(function(require) {
 
         events: {
             'click [data-role="highlight-switcher"]': 'changeHighlightSwitcherState',
-            'change .select2-offscreen': 'onSelect2Change',
-            'select2-init .select2-offscreen[data-name]': 'onSelect2Change'
+            'change .select2-offscreen': 'onSelectChange',
+            'select2-init .select2-offscreen[data-name]': 'onSelectChange',
+            'change .input-widget-select select': 'onSelectChange'
         },
 
         /**
@@ -136,6 +137,9 @@ define(function(require) {
             this.findNotFoundClass = '.' + this.notFoundClass;
             this.findFoundClass = '.' + this.foundClass;
             this.replaceBy = '<mark class="' + this.highlightClass + '">$&</mark>';
+            this.findHighlightSelectors = this.findElements(this.highlightSelectors);
+            this.findToggleSelectors = this.findElements(_.keys(this.toggleSelectors));
+            this.combinedHighlightSelectors = this.highlightSelectors.join(', ');
 
             HighlightTextView.__super__.initialize.apply(this, arguments);
 
@@ -183,16 +187,16 @@ define(function(require) {
          * Highlight text in all found elements
          */
         highlightElements: function() {
-            _.each(this.findElements(this.highlightSelectors), this.highlightElement, this);
+            _.each(this.findHighlightSelectors, this.highlightElement, this);
         },
 
         /**
          * Toggle found/not-found class for all elements based on found highlighted elements
          */
         toggleElements: function() {
-            _.each(this.findElements(_.keys(this.toggleSelectors)), this.toggleElement, this);
+            _.each(this.findToggleSelectors, this.toggleElement, this);
             if (this.isElementHighlighted(this.$el)) {
-                _.each(this.findElements(_.keys(this.toggleSelectors)), this.toggleElement, this);
+                _.each(this.findToggleSelectors, this.toggleElement, this);
             }
 
             _.each(this.$(this.groupedElementSelector), this.showGroupContainingHighlighted, this);
@@ -325,9 +329,9 @@ define(function(require) {
             var $content;
             var $el = element.$el;
             var $highlightTarget = $el;
-            var popover = $el.data(Popover.DATA_KEY);
+            var popover;
 
-            if (popover !== void 0) {
+            if ($el.attr('data-toggle') === 'popover' && (popover = $el.data(Popover.DATA_KEY)) !== void 0) {
                 $content = $('<div/>').html(popover.getContent());
                 result = this.highlightElementContent($content);
                 popover.updateContent($content.html());
@@ -345,7 +349,8 @@ define(function(require) {
 
                 result = this.highlightElementContent($content) || this.select2ContainsSearchText($el);
             } else if (this._isFieldChoice($el) && !this._isMultiselect($el)) {
-                result = this.highlightElementContent($el);
+                result = this.highlightElementContent($('option:selected', $el));
+
                 $highlightTarget = $el.parent();
 
                 if (inputWidgetManager.hasWidget($el)) {
@@ -355,7 +360,7 @@ define(function(require) {
                 result = this.highlightElementContent($el);
 
                 if (!this._isField($el)) {
-                    $el.get(0).normalize();
+                    $el[0].normalize();
                 }
             }
 
@@ -374,15 +379,15 @@ define(function(require) {
 
             _.each($content.contents(), function(children) {
                 var $children = $(children);
-                if (children.nodeName === '#text') {
-                    var text = $children.text();
+                if (children.nodeType === Node.TEXT_NODE) {
+                    var text = children.textContent;
                     if (this.textContainsSearchTerm(text)) {
                         result = true;
                         text = text.replace(this.findText, this.replaceBy);
                         $children.replaceWith(text);
                     }
                 } else {
-                    if (!$children.is(this.highlightSelectors.join(', '))) {
+                    if (!$children.is(this.combinedHighlightSelectors)) {
                         result = this.highlightElement({
                             $el: $children
                         }) || result;
@@ -399,12 +404,15 @@ define(function(require) {
          * @param {jQuery} $content
          */
         unhighlightElementContent: function($content) {
-            $content.find(this.findHighlightClass).each(function() {
-                var $el = $(this);
-                var parent = $el.parent()[0];
+            $content.find(this.findHighlightClass).each(function(index, el) {
+                var $el = $(el);
+                var parent = el.parentNode;
 
                 $el.contents().unwrap();
-                parent.normalize();
+
+                if (parent) {
+                    parent.normalize();
+                }
             });
         },
 
@@ -495,7 +503,7 @@ define(function(require) {
             var $child;
             var isFieldChoice = this._isField($element) && $element.is('select');
             if (!isFieldChoice) {
-                $child = $element.children('select');
+                $child = $element.find('select');
                 if ($child.length) {
                     return true;
                 }
@@ -519,7 +527,7 @@ define(function(require) {
          * @param {jQuery} $element
          */
         _isField: function($element) {
-            var elementName = $element.data('name');
+            var elementName = $element[0].getAttribute('data-name');
             var fieldName = 'field__value';
 
             return elementName === fieldName;
@@ -543,7 +551,7 @@ define(function(require) {
             return this._isSelect2($element) && $element[0].hasAttribute('multiple');
         },
 
-        onSelect2Change: function(e) {
+        onSelectChange: function(e) {
             this.highlightElement({$el: $(e.currentTarget)});
         },
 

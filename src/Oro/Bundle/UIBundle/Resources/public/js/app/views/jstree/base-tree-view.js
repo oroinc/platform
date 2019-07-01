@@ -157,6 +157,8 @@ define(function(require) {
          * @inheritDoc
          */
         constructor: function BaseTreeView() {
+            this.onBeforeOpen = _.debounce(this.onBeforeOpen, this.searchTimeout);
+            this.onSearchDelay = _.debounce(this.onSearch, this.searchTimeout);
             BaseTreeView.__super__.constructor.apply(this, arguments);
         },
 
@@ -175,7 +177,6 @@ define(function(require) {
             this.$searchField = this.$('[data-name="search"]');
             this.$clearSearchButton = this.$('[data-name="clear-search"]');
             this.$tree.data('treeView', this);
-            this.onSearchDelay = _.debounce(this.onSearch, this.searchTimeout);
 
             var config = {
                 core: {

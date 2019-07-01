@@ -18,15 +18,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class PlatformUpdateCommand extends AbstractCommand
 {
-    const NAME = 'oro:platform:update';
+    /** @var string */
+    protected static $defaultName = 'oro:platform:update';
 
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName(self::NAME)
-            ->setDescription('Execute platform application update commands and init platform assets.')
+        $this->setDescription('Execute platform application update commands and init platform assets.')
             ->addOption(
                 'force',
                 null,
