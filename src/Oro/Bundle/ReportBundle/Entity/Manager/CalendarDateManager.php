@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ReportBundle\Entity\Manager;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Bundle\ReportBundle\Entity\Repository\CalendarDateRepository;
 
@@ -11,17 +12,20 @@ use Oro\Bundle\ReportBundle\Entity\Repository\CalendarDateRepository;
  */
 class CalendarDateManager
 {
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     protected $doctrineHelper;
+
+    /** @var LocaleSettings */
+    protected $localeSettings;
 
     /**
      * @param DoctrineHelper $doctrineHelper
+     * @param LocaleSettings $localeSettings
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, LocaleSettings $localeSettings)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -47,7 +51,7 @@ class CalendarDateManager
      */
     protected function getDatesFromInterval($append = false)
     {
-        $timeZone = new \DateTimeZone('UTC');
+        $timeZone = new \DateTimeZone($this->localeSettings->getTimeZone());
         $startDate = new \DateTime('now midnight', $timeZone);
         $startDate->setDate($startDate->format('Y'), 1, 1);
 
