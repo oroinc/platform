@@ -54,6 +54,29 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetEntityIdForEntityWithSingleZeroId()
+    {
+        $entity   = ['id' => 0, 'name' => 'val'];
+        $metadata = new EntityMetadata();
+        $metadata->setClassName('Test\Entity');
+        $metadata->setIdentifierFieldNames(['id']);
+        $requestType = new RequestType([RequestType::REST]);
+
+        $this->entityIdTransformerRegistry->expects(self::once())
+            ->method('getEntityIdTransformer')
+            ->with($requestType)
+            ->willReturn($this->entityIdTransformer);
+        $this->entityIdTransformer->expects(self::once())
+            ->method('transform')
+            ->with(0, self::identicalTo($metadata))
+            ->willReturn('0');
+
+        self::assertEquals(
+            '0',
+            $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType)
+        );
+    }
+
     /**
      * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage An object of the type "Test\Entity" does not have the identifier property "id".
