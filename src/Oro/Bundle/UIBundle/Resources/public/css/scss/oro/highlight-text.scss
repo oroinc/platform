@@ -57,6 +57,8 @@
         padding: $highlight-text-items-switcher-inner-offset;
 
         &__control {
+            font-size: $base-font-size;
+
             &:last-child {
                 display: none;
             }
