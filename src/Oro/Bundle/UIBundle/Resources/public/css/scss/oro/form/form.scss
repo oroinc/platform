@@ -42,6 +42,14 @@
         box-shadow: $input-error-box-shadow;
     }
 
+    // Disable platform styles of input search
+    &::-webkit-search-decoration,
+    &::-webkit-search-cancel-button,
+    &::-webkit-search-results-button,
+    &::-webkit-search-results-decoration {
+        display: none;
+    }
+
     .control-group & {
         margin-bottom: $input-control-group-outer-offset-bottom;
     }
