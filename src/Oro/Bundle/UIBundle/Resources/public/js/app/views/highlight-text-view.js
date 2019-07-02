@@ -137,8 +137,6 @@ define(function(require) {
             this.findNotFoundClass = '.' + this.notFoundClass;
             this.findFoundClass = '.' + this.foundClass;
             this.replaceBy = '<mark class="' + this.highlightClass + '">$&</mark>';
-            this.findHighlightSelectors = this.findElements(this.highlightSelectors);
-            this.findToggleSelectors = this.findElements(_.keys(this.toggleSelectors));
             this.combinedHighlightSelectors = this.highlightSelectors.join(', ');
 
             HighlightTextView.__super__.initialize.apply(this, arguments);
@@ -187,16 +185,16 @@ define(function(require) {
          * Highlight text in all found elements
          */
         highlightElements: function() {
-            _.each(this.findHighlightSelectors, this.highlightElement, this);
+            _.each(this.findElements(this.highlightSelectors), this.highlightElement, this);
         },
 
         /**
          * Toggle found/not-found class for all elements based on found highlighted elements
          */
         toggleElements: function() {
-            _.each(this.findToggleSelectors, this.toggleElement, this);
+            _.each(this.findElements(_.keys(this.toggleSelectors)), this.toggleElement, this);
             if (this.isElementHighlighted(this.$el)) {
-                _.each(this.findToggleSelectors, this.toggleElement, this);
+                _.each(this.findElements(_.keys(this.toggleSelectors)), this.toggleElement, this);
             }
 
             _.each(this.$(this.groupedElementSelector), this.showGroupContainingHighlighted, this);
