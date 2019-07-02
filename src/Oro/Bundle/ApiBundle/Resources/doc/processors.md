@@ -301,7 +301,11 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
             return;
         }
 
-        $result = $this->entitySerializer->serialize($query, $config);
+        $result = $this->entitySerializer->serialize(
+            $query,
+            $config,
+            $context->getNormalizationContext()
+        );
         if (empty($result)) {
             $result = null;
         } elseif (count($result) === 1) {

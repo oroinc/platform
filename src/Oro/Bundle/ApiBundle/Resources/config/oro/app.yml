@@ -141,6 +141,9 @@ oro_api:
         nestedTree:
             class: Oro\Bundle\ApiBundle\Filter\NestedTreeFilter
             supported_operators: ['>', '>=']
+        searchQuery:
+            factory: ['@oro_api.filter_factory.search_query', 'createFilter']
+            supported_operators: ['=']
 
     form_types:
         - Symfony\Component\Form\Extension\Core\Type\FormType

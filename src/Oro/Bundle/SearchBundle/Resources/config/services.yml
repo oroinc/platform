@@ -41,7 +41,6 @@ services:
             - '@oro_search.mapper'
             - '@oro_search.security_provider'
             - '@oro_security.search.acl_helper'
-            - '@event_dispatcher'
 
     Oro\Bundle\SearchBundle\Engine\Indexer:
         alias: oro_search.index

@@ -72,6 +72,12 @@ services:
             - '@oro_entity_extend.association_manager'
             - '@oro_api.entity_override_provider_registry'
 
+    oro_api.filter_factory.search_query:
+        class: Oro\Bundle\ApiBundle\Filter\SearchQueryFilterFactory
+        public: false
+        arguments:
+            - '@oro_search.provider.search_mapping'
+
     oro_api.query.expression_visitor_factory:
         class: Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory
         public: false

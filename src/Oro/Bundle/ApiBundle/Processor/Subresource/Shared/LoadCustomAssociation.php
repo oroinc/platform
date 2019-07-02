@@ -116,7 +116,8 @@ abstract class LoadCustomAssociation implements ProcessorInterface
                 $context->getParentId(),
                 $context->getParentMetadata()
             ),
-            $context->getParentConfig()
+            $context->getParentConfig(),
+            $context->getNormalizationContext()
         );
 
         return reset($data);
