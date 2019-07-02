@@ -37,8 +37,8 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->config        = require rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'searchConfig.php';
-        $this->engine        = $this->createMock(EngineInterface::class);
+        $this->config = require rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'searchConfig.php';
+        $this->engine = $this->createMock(EngineInterface::class);
 
         $configProvider = $this->createMock(MappingConfigurationProvider::class);
         $configProvider->expects($this->any())
@@ -86,8 +86,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
             $this->engine,
             $this->mapper,
             $this->securityProvider,
-            $searchAclHelper,
-            $eventDispatcher
+            $searchAclHelper
         );
     }
 

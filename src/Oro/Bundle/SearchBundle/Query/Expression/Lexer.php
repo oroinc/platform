@@ -5,6 +5,9 @@ namespace Oro\Bundle\SearchBundle\Query\Expression;
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 use Oro\Bundle\SearchBundle\Query\Query;
 
+/**
+ * Analyzes a search query string and converts it to TokenStream object.
+ */
 class Lexer
 {
     /** @var array */
@@ -25,8 +28,6 @@ class Lexer
     ];
 
     /**
-     * {@inheritdoc}
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
@@ -89,8 +90,8 @@ class Lexer
                 $tokens[] = new Token(Token::STRING_TYPE, stripcslashes(substr($match[0], 1, -1)), $cursor + 1);
                 $cursor += strlen($match[0]);
             } elseif (preg_match(
-                '/and(?=[\s(])|\>\=|or(?=[\s(])|\<\=|in(?=[\s(])|\=|\!\=|\*|~|\!~|\>|\<|' .
-                'exists(?=[\s(])|notexists(?=[\s(])|starts_with(?=[\s(])|like(?=[\s(])|notlike(?=[\s(])/A',
+                '/and(?=[\s(])|or(?=[\s(])|[\!\>\<]?\=|\!?in(?=[\s(])|\!?~|\>|\<|\*|' .
+                'exists((?=\s)|$)|notexists((?=\s)|$)|starts_with(?=[\s(])|like(?=[\s(])|notlike(?=[\s(])/A',
                 $expression,
                 $match,
                 null,

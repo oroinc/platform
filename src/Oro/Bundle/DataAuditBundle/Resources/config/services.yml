@@ -112,6 +112,8 @@ services:
 
     oro_dataaudit.audit.manager.api:
         class: 'Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: 'oro_soap.manager.entity_manager.abstract'
         arguments:
             - '%oro_dataaudit.loggable.entity.class%'
@@ -219,3 +221,5 @@ services:
 
     oro_dataaudit.model.fields_transformer:
         class: 'Oro\Bundle\DataAuditBundle\Model\FieldsTransformer'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true

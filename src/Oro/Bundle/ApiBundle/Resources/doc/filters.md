@@ -163,6 +163,7 @@ Examples of such filters are [ComparisonFilter](#comparisonfilter-filter),
 [ExtendedAssociationFilter](../../Filter/ExtendedAssociationFilter.php),
 [CompositeIdentifierFilter](../../Filter/CompositeIdentifierFilter.php),
 [NestedTreeFilter](../../Filter/NestedTreeFilter.php),
+[SearchQueryFilter](../../Filter/SearchQueryFilter.php)
 and [PrimaryFieldFilter](../../Filter/PrimaryFieldFilter.php).
 
 ## StandaloneFilterWithDefaultValue Base Class

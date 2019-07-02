@@ -16,6 +16,8 @@ parameters:
 
 services:
     oro_activity.manager:
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: '%oro_activity.manager.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
@@ -54,6 +56,8 @@ services:
             - { name: oro_migration.extension, extension_name: activity }
 
     oro_activity.widget_provider.activities:
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: '%oro_activity.widget_provider.activities.class%'
 
     oro_activity.widget_provider.activities.main:
@@ -102,6 +106,8 @@ services:
             - { name: oro_entity.exclusion_provider.api }
 
     oro_activity.manager.activity.api:
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: '%oro_activity.manager.activity.api.class%'
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -109,6 +115,8 @@ services:
             - '@oro_activity.manager'
 
     oro_activity.manager.activity_entity.api:
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: '%oro_activity.manager.activity_entity.api.class%'
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -116,6 +124,8 @@ services:
             - '@oro_activity.manager'
 
     oro_activity.manager.activity_search.api:
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: '%oro_activity.manager.activity_search.api.class%'
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -127,6 +137,8 @@ services:
         class: Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityDeleteHandlerRegistry
 
     oro_activity.handler.delete.activity_entity_proxy:
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityDeleteHandlerProxy
         arguments:
             - '@oro_activity.handler.delete.activity_entity_registry'
@@ -141,6 +153,8 @@ services:
             - { name: oro_activity.activity_entity_delete_handler }
 
     oro_activity.form.handler.autocomplete:
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler
         arguments:
             - '@translator'
@@ -153,6 +167,8 @@ services:
             - '@event_dispatcher'
 
     oro_activity.form.handler.activity_entity.api:
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: '%oro_activity.form.handler.activity_entity.api.class%'
         arguments:
             - '@oro_activity.form.activity_entity.api'
@@ -174,6 +190,8 @@ services:
                     minMessage: "The 'targets' collection should contain at least one element"
 
     oro_activity.manager.activity_target.api:
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: '%oro_activity.manager.activity_target.api.class%'
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -181,6 +199,8 @@ services:
             - '@oro_activity.manager'
 
     oro_activity.manager.activity_context.api:
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: Oro\Bundle\ActivityBundle\Entity\Manager\ActivityContextApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
