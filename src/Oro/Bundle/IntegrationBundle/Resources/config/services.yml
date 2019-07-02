@@ -95,6 +95,8 @@ services:
 
     oro_integration.form.handler.integration:
         class: '%oro_integration.form.handler.integration.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@request_stack'
             - '@oro_integration.form.channel'
@@ -150,6 +152,8 @@ services:
     # sync processor
     oro_integration.sync.processor:
         class: '%oro_integration.sync.processor.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
           - '@doctrine'
           - '@oro_importexport.processor.registry'
@@ -202,6 +206,8 @@ services:
 
     oro_integration.genuine_sync_scheduler:
         class: 'Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_message_queue.message_producer'
 
@@ -334,6 +340,8 @@ services:
 
     oro_integration.utils.edit_mode:
         class: 'Oro\Bundle\IntegrationBundle\Utils\EditModeUtils'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
 
     oro_integration.provider.integration_icon:
         class: 'Oro\Bundle\IntegrationBundle\Provider\IntegrationIconProvider'

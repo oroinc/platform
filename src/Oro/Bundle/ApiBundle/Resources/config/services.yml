@@ -506,6 +506,8 @@ services:
             - '@service_container'
 
     oro_api.rest.request_handler:
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: Oro\Bundle\ApiBundle\Request\Rest\RequestHandler
         arguments:
             - '@oro_api.rest.request_action_handler'

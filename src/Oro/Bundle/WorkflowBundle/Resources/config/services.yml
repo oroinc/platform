@@ -31,6 +31,8 @@ services:
 
     oro_workflow.manager:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowManager'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_workflow.registry'
             - '@oro_entity.doctrine_helper'
@@ -46,7 +48,8 @@ services:
     # use only for system calls, cli, background listeners, etc, when main definition filters aren't available
     oro_workflow.manager.system:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowManager'
-        public: false
+        # This service marked as public (origin private) for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_workflow.registry.system'
             - '@oro_entity.doctrine_helper'
@@ -153,6 +156,8 @@ services:
 
     oro_workflow.registry.workflow_manager:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_action.provider.current_application'
         calls:
@@ -249,6 +254,8 @@ services:
 
     oro_workflow.handler.workflow_definition:
         class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_workflow.changes.event.dispatcher'
             - '@doctrine'
@@ -405,6 +412,8 @@ services:
 
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_workflow.helper.translation'
         tags:

@@ -27,6 +27,8 @@ services:
 
     oro_entity_config.config_manager:
         class: Oro\Bundle\EntityConfigBundle\Config\ConfigManager
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@event_dispatcher'
             - '@oro_entity_config.metadata.annotation_metadata_factory'
@@ -62,9 +64,13 @@ services:
 
     oro_entity_config.attribute.config_model_manager:
         alias: oro_entity_config.config_model_manager
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
 
     oro_entity_config.helper.entity_config:
         class: '%oro_entity_config.helper.entity_config.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_entity_config.provider.entity'
             - '@oro_security.acl.group_provider.chain'
@@ -202,6 +208,8 @@ services:
 
     oro_entity_config.manager.attribute_manager:
         class: 'Oro\Bundle\EntityConfigBundle\Manager\AttributeManager'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity.doctrine_helper'
@@ -246,6 +254,8 @@ services:
 
     oro_entity_config.form.handler.create_update_config_field_handler:
         class: Oro\Bundle\EntityConfigBundle\Form\Handler\CreateUpdateConfigFieldHandler
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_entity_config.form.handler.config_helper_handler'
             - '@oro_entity_config.config_manager'
@@ -254,6 +264,8 @@ services:
 
     oro_entity_config.form.handler.remove_restore_field_handler:
         class: Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity_extend.extend.field_name_validation_helper'
@@ -273,6 +285,8 @@ services:
 
     oro_entity_config.helper.entity_config_provider_helper:
         class: 'Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_entity_config.config_manager'
 
@@ -359,6 +373,8 @@ services:
 
     oro_entity_config.slug.generator:
         class: 'Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
 
     Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator:
         alias: oro_entity_config.slug.generator

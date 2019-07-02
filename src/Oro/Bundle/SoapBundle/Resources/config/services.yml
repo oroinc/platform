@@ -16,6 +16,8 @@ services:
 
     oro_soap.handler.delete:
         class: '%oro_soap.handler.delete.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.handler.delete.abstract
 
     oro_soap.manager.entity_manager.abstract:
@@ -33,6 +35,8 @@ services:
 
     oro_soap.handler.include:
         alias: oro_soap.handler.include_delegate
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
 
     oro_soap.handler.include_total_header:
         class: '%oro_soap.handler.include_total_header.class%'
@@ -54,6 +58,8 @@ services:
 
     oro_soap.provider.metadata:
         alias: oro_soap.provider.metadata.chain
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
 
     oro_soap.entity_serializer:
         class: Oro\Component\EntitySerializer\EntitySerializer
@@ -83,6 +89,8 @@ services:
 
     oro_soap.entity_serializer.entity_accessor:
         class: Oro\Component\EntitySerializer\EntityDataAccessor
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
 
     oro_soap.entity_serializer.field_accessor:
         class: Oro\Component\EntitySerializer\FieldAccessor

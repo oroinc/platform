@@ -119,6 +119,8 @@ services:
 
     oro_entity_extend.tools.dumper:
         class: '%oro_entity_extend.tools.dumper.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - "@oro_entity_config.entity_manager_bag"
             - "@oro_entity_config.config_manager"
@@ -174,6 +176,8 @@ services:
 
     oro_entity_extend.db_id_name_generator:
         alias: oro_migration.db_id_name_generator
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
 
     oro_entity_extend.validator.not_sql_keyword:
         class: '%oro_entity_extend.validator.not_sql_keyword.class%'
@@ -258,6 +262,8 @@ services:
 
     oro_entity_extend.extend.entity_processor:
         class: '%oro_entity_extend.extend.entity_processor.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - "@oro_platform.maintenance"
             - "@oro_entity_config.tools.command_executor"
@@ -336,6 +342,8 @@ services:
 
     oro_entity_extend.migration.options_parser:
         class: '%oro_entity_extend.migration.options_parser.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - "@oro_entity_extend.migration.entity_metadata_helper"
             - "@oro_entity_extend.extend.field_type_helper"

@@ -15,6 +15,8 @@ services:
 
     oro_segment.static_segment_manager:
         class: Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_segment.query.dynamic_segment.query_builder'
@@ -25,6 +27,8 @@ services:
 
     oro_segment.segment_manager:
         class: '%oro_segment.segment_manager.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         lazy: true
         arguments:
             - '@doctrine.orm.entity_manager'
@@ -41,6 +45,8 @@ services:
 
     oro_segment.segment_manager.api:
         class: '%oro_segment.segment_manager.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_segment.segment.entity.class%'
