@@ -111,7 +111,8 @@
         "oro/redis-config": "4.0.*",
         "brick/math": "0.8.*",
         "bower-asset/fuse": "3.2.*",
-        "phpdocumentor/reflection-docblock": "4.3.*"
+        "phpdocumentor/reflection-docblock": "4.3.*",
+        "phpoffice/phpspreadsheet": "1.8.1"
     },
     "require-dev": {
         "sensio/generator-bundle": "3.1.*",

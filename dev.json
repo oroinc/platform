@@ -109,7 +109,8 @@
         "jms/cg": "1.2.*",
         "oro/redis-config": "4.0.x-dev",
         "brick/math": "0.8.*",
-        "bower-asset/fuse": "3.2.*"
+        "bower-asset/fuse": "3.2.*",
+        "phpoffice/phpspreadsheet": "1.8.1"
     },
     "require-dev": {
         "sensio/generator-bundle": "3.1.*",

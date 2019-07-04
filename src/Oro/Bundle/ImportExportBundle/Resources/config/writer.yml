@@ -19,11 +19,16 @@ services:
         tags:
             - { name: oro_importexport.writer, alias: csv }
 
+    oro_importexport.writer.xlsx.cache:
+        parent: oro.cache.simple.php_temp
+        arguments:
+            - 512
+
     oro_importexport.writer.xlsx:
         class: '%oro_importexport.writer.xlsx.class%'
         arguments:
             - '@oro_importexport.context_registry'
-            - '@phpexcel'
+            - '@oro_importexport.writer.xlsx.cache'
         calls:
             - [setClearWriter, ['@oro_importexport.writer.doctrine_clear']]
         tags:

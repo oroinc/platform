@@ -76,3 +76,7 @@ services:
     oro.cache.memory_cache_chain:
         public: false
         class: Oro\Bundle\CacheBundle\Provider\MemoryCacheChain
+
+    oro.cache.simple.php_temp:
+        public: false
+        class: Oro\Bundle\CacheBundle\Simple\PhpTempCache
