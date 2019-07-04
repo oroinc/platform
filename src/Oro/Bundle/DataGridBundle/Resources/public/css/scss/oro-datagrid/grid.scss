@@ -25,37 +25,26 @@
     text-transform: uppercase;
     font-size: $oro-datagrid-header-font-size;
 
-    .caret {
-        position: relative;
-
+    .sortable-icon {
         display: none;
-        height: $oro-datagrid-caret-size * 2;
-        margin-#{$start}: $oro-datagrid-caret-size;
-
-        border: none;
-        border-right: $oro-datagrid-caret-size solid transparent;
-        border-left: $oro-datagrid-caret-size solid transparent;
+        margin-#{$start}: $oro-datagrid-base-offset;
     }
 
     .ascending {
-        .caret {
+        .sortable-icon {
             display: inline-block;
-            top: $oro-datagrid-caret-ascending-offset;
 
-            border-top: $oro-datagrid-caret-size solid transparent;
-            border-bottom: $oro-datagrid-caret-size solid transparent;
-            border-bottom-color: inherit;
+            transform: translateY(0.5px);
+
+            @include fa-icon($oro-datagrid-caret-ascending-icon);
         }
     }
 
     .descending {
-        .caret {
+        .sortable-icon {
             display: inline-block;
-            top: $oro-datagrid-caret-descending-offset;
 
-            border-bottom: $oro-datagrid-caret-size solid transparent;
-            border-top: $oro-datagrid-caret-size solid transparent;
-            border-top-color: inherit;
+            @include fa-icon($oro-datagrid-caret-descending-icon);
         }
     }
 }
@@ -84,8 +73,13 @@
         line-height: $oro-datagrid-label-line-height;
 
         color: $oro-datagrid-label-color;
-
-        vertical-align: $oro-datagrid-label-align;
+    }
+    
+    &__link,
+    &__label-container {
+        display: flex;
+        align-items: center;
+        width: 100%;
     }
 
     &:first-child {

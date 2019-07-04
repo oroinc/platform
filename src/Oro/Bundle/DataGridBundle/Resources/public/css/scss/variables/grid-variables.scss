@@ -5,18 +5,17 @@ $oro-datagrid-body-color: $primary-200 !default;
 $oro-datagrid-radius: 2px !default;
 $oro-datagrid-base-offset: 4px !default;
 
-$oro-datagrid-caret-size: $oro-datagrid-base-offset !default;
-$oro-datagrid-caret-ascending-offset: -3px !default;
-$oro-datagrid-caret-descending-offset: 1px !default;
+$oro-datagrid-caret-ascending-icon: $fa-var-long-arrow-down !default;
+$oro-datagrid-caret-descending-icon: $fa-var-long-arrow-up !default;
 
 $oro-grid-first-cell-offset: 16px !default;
 $oro-datagrid-action-cell-color: $primary-400 !default;
 $oro-datagrid-action-cell-color-hover: $primary-100 !default;
 
+$oro-datagrid-label-offset: 10px !default;
 $oro-datagrid-label-line-height: 25px !default;
 $oro-datagrid-label-color: $primary-inverse !default;
 $oro-datagrid-label-active-color: $extra-100 !default;
-$oro-datagrid-label-align: middle !default;
 
 $oro-datagrid-cell-border-color: $primary-800 !default;
 $oro-datagrid-cell-background-hover: $primary-900 !default;
