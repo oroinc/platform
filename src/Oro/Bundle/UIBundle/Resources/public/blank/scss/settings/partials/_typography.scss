@@ -29,4 +29,7 @@ $font-weights: (
     'bold': 700, // Bold
     'extra-bold': 800, // Extra Bold (Ultra Bold)
     'black': 900 // Black (Heavy)
-);
+) !default;
+
+// Font smoothing
+$global-font-smoothing: true !default;
