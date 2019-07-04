@@ -13,6 +13,7 @@ use Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension;
 use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectAutocomplete;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Extension\Stub\OwnerFormExtensionStub;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
@@ -21,6 +22,7 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\UserAclSelectType;
+use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilder;
@@ -31,6 +33,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
 {
+    use EntityTrait;
+
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
@@ -533,5 +537,50 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('remove');
         $event = new FormEvent($form, $this->user);
         $this->extension->preSetData($event);
+    }
+
+    /**
+     * The test case, when default owner set from User's owner
+     */
+    public function testDefaultOwnerAvailableBusinessUnit()
+    {
+        $this->mockConfigs(['is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_BUSINESS_UNIT]);
+
+        $organization = $this->getEntity(Organization::class, ['id' => 1]);
+        $businessUnit = $this->getEntity(BusinessUnit::class, ['id' => 1, 'organization' => $organization]);
+        $this->user->expects($this->any())
+            ->method('getOwner')
+            ->will($this->returnValue($businessUnit));
+
+        $isAssignGranted = true;
+        $this->builder->expects($this->once())
+            ->method('addEventSubscriber')
+            ->with(
+                new OwnerFormSubscriber(
+                    $this->doctrineHelper,
+                    $this->fieldName,
+                    $this->fieldLabel,
+                    $isAssignGranted,
+                    $businessUnit
+                )
+            );
+
+        /** @var AclVoter|\PHPUnit\Framework\MockObject\MockObject $aclVoter */
+        $aclVoter = $this->createMock(AclVoter::class);
+        /** @var OwnerTreeProvider|\PHPUnit\Framework\MockObject\MockObject $treeProvider */
+        $treeProvider = $this->createMock(OwnerTreeProvider::class);
+
+        $this->extension = new OwnerFormExtensionStub(
+            $this->doctrineHelper,
+            $this->ownershipMetadataProvider,
+            $this->businessUnitManager,
+            $this->authorizationChecker,
+            $this->tokenAccessor,
+            $aclVoter,
+            $treeProvider,
+            $this->entityOwnerAccessor
+        );
+
+        $this->extension->buildForm($this->builder, ['ownership_disabled' => false]);
     }
 }
