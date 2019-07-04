@@ -19,7 +19,10 @@
         position: relative;
 
         .grid-toolbar {
+            display: flex;
             align-items: flex-start;
+
+            text-align: $start;
         }
 
         .filter-box {
