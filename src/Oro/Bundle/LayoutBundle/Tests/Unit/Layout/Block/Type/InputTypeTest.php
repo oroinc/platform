@@ -26,10 +26,18 @@ class InputTypeTest extends BlockTypeTestCase
         $value = 'test_value';
         $name = 'test_name';
         $placeholder = 'test_placeholder';
+        $required = 'required';
 
         $view = $this->getBlockView(
             InputType::NAME,
-            ['type' => $type, 'id' => $id, 'value' => $value, 'name' => $name, 'placeholder' => $placeholder]
+            [
+                'type' => $type,
+                'id' => $id,
+                'value' => $value,
+                'name' => $name,
+                'placeholder' => $placeholder,
+                'required' => $required,
+            ]
         );
 
         $this->assertEquals($type, $view->vars['type']);
@@ -37,6 +45,7 @@ class InputTypeTest extends BlockTypeTestCase
         $this->assertEquals($value, $view->vars['value']);
         $this->assertEquals($name, $view->vars['name']);
         $this->assertEquals($placeholder, $view->vars['placeholder']);
+        $this->assertEquals($required, $view->vars['required']);
     }
 
     public function testGetParent()
