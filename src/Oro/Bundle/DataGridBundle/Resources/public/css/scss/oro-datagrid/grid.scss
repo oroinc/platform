@@ -171,6 +171,10 @@
     text-align: #{$start};
 }
 
+.boolean-cell .checkbox-view {
+    vertical-align: $oro-datagrid-body-cell-checkbox-vertical-align;
+}
+
 .number-cell,
 .integer-cell {
     text-align: #{$end};
