@@ -5,12 +5,12 @@ namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @NamePrefix("oro_api_")
@@ -150,7 +150,7 @@ class RoleController extends RestController implements ClassResourceInterface
         return $this->handleView(
             $this->view(
                 $entity ? $this->getPreparedItem($entity) : null,
-                $entity ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND
+                $entity ? Response::HTTP_OK : Response::HTTP_NOT_FOUND
             )
         );
     }

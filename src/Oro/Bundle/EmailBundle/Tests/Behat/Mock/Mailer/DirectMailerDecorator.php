@@ -70,7 +70,7 @@ class DirectMailerDecorator extends DirectMailer
     /**
      * {@inheritdoc}
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $messages = $this->getSentMessages();
         $messages[] = $message;

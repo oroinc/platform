@@ -5,7 +5,6 @@ namespace Oro\Bundle\SearchBundle\Controller\Api;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -51,7 +50,7 @@ class SearchController extends FOSRestController
         return $this->handleView(
             $this->view(
                 $searchResults->toSearchResultData(),
-                Codes::HTTP_OK
+                Response::HTTP_OK
             )
         );
     }

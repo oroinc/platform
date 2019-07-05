@@ -5,7 +5,6 @@ namespace Oro\Bundle\SidebarBundle\Controller\Api\Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SidebarBundle\Entity\AbstractSidebarState;
 use Oro\Bundle\SidebarBundle\Entity\Repository\SidebarStateRepository;
@@ -34,7 +33,7 @@ class SidebarController extends FOSRestController
         $item = $this->getRepository()->getState($this->getUser(), $position);
 
         return $this->handleView(
-            $this->view($item, Codes::HTTP_OK)
+            $this->view($item, $item ? Response::HTTP_OK : Response::HTTP_NO_CONTENT)
         );
     }
 
@@ -62,7 +61,7 @@ class SidebarController extends FOSRestController
         $manager->flush();
 
         return $this->handleView(
-            $this->view(['id' => $entity->getId()], Codes::HTTP_CREATED)
+            $this->view(['id' => $entity->getId()], Response::HTTP_CREATED)
         );
     }
 
@@ -82,10 +81,10 @@ class SidebarController extends FOSRestController
     {
         $entity = $this->getManager()->find($this->getSidebarStateClass(), (int)$stateId);
         if (!$entity) {
-            return $this->handleView($this->view([], Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
         }
         if (!$this->validatePermissions($entity->getUser())) {
-            return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
+            return $this->handleView($this->view(null, Response::HTTP_FORBIDDEN));
         }
         $entity->setState($request->get('state', $entity->getState()));
 
@@ -93,7 +92,7 @@ class SidebarController extends FOSRestController
         $em->persist($entity);
         $em->flush();
 
-        return $this->handleView($this->view([], Codes::HTTP_OK));
+        return $this->handleView($this->view([], Response::HTTP_OK));
     }
 
     /**

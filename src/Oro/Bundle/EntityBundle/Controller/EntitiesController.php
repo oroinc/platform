@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Controller;
 
-use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\EntityBundle\Form\Type\CustomEntityType;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -17,6 +16,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -330,13 +330,13 @@ class EntitiesController extends Controller
 
         $record = $entityRepository->find($id);
         if (!$record) {
-            return new JsonResponse('', Codes::HTTP_FORBIDDEN);
+            return new JsonResponse('', Response::HTTP_FORBIDDEN);
         }
 
         $em->remove($record);
         $em->flush();
 
-        return new JsonResponse('', Codes::HTTP_OK);
+        return new JsonResponse('', Response::HTTP_OK);
     }
 
     /**

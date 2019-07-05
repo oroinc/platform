@@ -73,7 +73,7 @@ class DbSpool extends \Swift_ConfigurableSpool
     /**
      * {@inheritdoc}
      */
-    public function queueMessage(\Swift_Mime_Message $message)
+    public function queueMessage(\Swift_Mime_SimpleMessage $message)
     {
         $mailObject = new SpoolItem();
         $mailObject->setMessage($message);

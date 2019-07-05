@@ -5,9 +5,9 @@ namespace Oro\Bundle\EntityBundle\Entity\Manager\Field;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
 use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class EntityFieldValidator
@@ -99,7 +99,7 @@ class EntityFieldValidator
             if (false === $isValid) {
                 throw new FieldUpdateAccessException(
                     $this->translator->trans('oro.entity.controller.message.access_denied'),
-                    Codes::HTTP_FORBIDDEN
+                    Response::HTTP_FORBIDDEN
                 );
             }
         }
@@ -127,11 +127,11 @@ class EntityFieldValidator
     protected function validateFieldName($entity, $fieldName)
     {
         if (!$this->hasField($entity, $fieldName)) {
-            throw new EntityHasFieldException('oro.entity.controller.message.field_not_found', Codes::HTTP_NOT_FOUND);
+            throw new EntityHasFieldException('oro.entity.controller.message.field_not_found', Response::HTTP_NOT_FOUND);
         }
 
         if (!$this->hasAccessEditFiled($fieldName)) {
-            throw new FieldUpdateAccessException('oro.entity.controller.message.access_denied', Codes::HTTP_FORBIDDEN);
+            throw new FieldUpdateAccessException('oro.entity.controller.message.access_denied', Response::HTTP_FORBIDDEN);
         }
     }
 

@@ -4,11 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-// Annotations import
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
@@ -17,7 +15,6 @@ use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-// Exceptions
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -87,15 +84,15 @@ class WorkflowController extends FOSRestController
         } catch (HttpException $e) {
             return $this->handleError($e->getMessage(), $e->getStatusCode());
         } catch (WorkflowNotFoundException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_NOT_FOUND);
+            return $this->handleError($e->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (UnknownAttributeException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+            return $this->handleError($e->getMessage(), Response::HTTP_BAD_REQUEST);
         } catch (InvalidTransitionException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+            return $this->handleError($e->getMessage(), Response::HTTP_BAD_REQUEST);
         } catch (ForbiddenTransitionException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_FORBIDDEN);
+            return $this->handleError($e->getMessage(), Response::HTTP_FORBIDDEN);
         } catch (\Exception $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->handleError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $this->handleView(
@@ -103,7 +100,7 @@ class WorkflowController extends FOSRestController
                 array(
                     'workflowItem' => $workflowItem
                 ),
-                Codes::HTTP_OK
+                Response::HTTP_OK
             )
         );
     }
@@ -158,13 +155,13 @@ class WorkflowController extends FOSRestController
         try {
             $this->get('oro_workflow.manager')->transit($workflowItem, $transitionName);
         } catch (WorkflowNotFoundException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_NOT_FOUND);
+            return $this->handleError($e->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (InvalidTransitionException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+            return $this->handleError($e->getMessage(), Response::HTTP_BAD_REQUEST);
         } catch (ForbiddenTransitionException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_FORBIDDEN);
+            return $this->handleError($e->getMessage(), Response::HTTP_FORBIDDEN);
         } catch (\Exception $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->handleError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $this->handleView(
@@ -173,7 +170,7 @@ class WorkflowController extends FOSRestController
                     'workflowItem' => $workflowItem,
                     'redirectUrl' => $workflowItem->getResult()->redirectUrl,
                 ),
-                Codes::HTTP_OK
+                Response::HTTP_OK
             )
         );
     }
@@ -200,7 +197,7 @@ class WorkflowController extends FOSRestController
                 array(
                     'workflowItem' => $workflowItem
                 ),
-                Codes::HTTP_OK
+                Response::HTTP_OK
             )
         );
     }
@@ -225,7 +222,7 @@ class WorkflowController extends FOSRestController
     public function deleteAction(WorkflowItem $workflowItem)
     {
         $this->get('oro_workflow.manager')->resetWorkflowItem($workflowItem);
-        return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
+        return $this->handleView($this->view(null, Response::HTTP_NO_CONTENT));
     }
 
     /**
@@ -257,7 +254,7 @@ class WorkflowController extends FOSRestController
                     'successful' => true,
                     'message' => $this->get('translator')->trans('Workflow activated')
                 ),
-                Codes::HTTP_OK
+                Response::HTTP_OK
             )
         );
     }
@@ -291,7 +288,7 @@ class WorkflowController extends FOSRestController
                     'successful' => true,
                     'message' => $this->get('translator')->trans('Workflow deactivated')
                 ),
-                Codes::HTTP_OK
+                Response::HTTP_OK
             )
         );
     }

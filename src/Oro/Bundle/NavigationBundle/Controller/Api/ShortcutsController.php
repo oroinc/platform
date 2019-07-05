@@ -5,7 +5,6 @@ namespace Oro\Bundle\NavigationBundle\Controller\Api;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Iterator\RecursiveItemIterator;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -44,7 +43,7 @@ class ShortcutsController extends FOSRestController
         $result = array_merge($this->getResults($shortcuts, $query), $this->getResults($menuItems, $query));
 
         return $this->handleView(
-            $this->view($result, is_array($result) ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND)
+            $this->view($result, is_array($result) ? Response::HTTP_OK : Response::HTTP_NOT_FOUND)
         );
     }
 

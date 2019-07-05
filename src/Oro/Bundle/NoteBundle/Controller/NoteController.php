@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NoteBundle\Controller;
 
-use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
@@ -61,7 +60,7 @@ class NoteController extends Controller
             $manager->getList($entityClass, $entityId, $sorting)
         );
 
-        return new Response(json_encode($result), Codes::HTTP_OK);
+        return new Response(json_encode($result), Response::HTTP_OK);
     }
 
     /**
