@@ -3,7 +3,6 @@
 // In blank theme has not use custom fonts.
 // This variable update in child's themes.
 $theme-fonts: () !default;
-$google-fonts-map: () !default;
 
 $base-font: Arial, sans-serif !default;
 // include in assets
@@ -18,16 +17,3 @@ $base-font-size--m: 20px !default;
 $base-font-size--l: 22px !default;
 $base-font-size--xl: 26px !default;
 $base-line-height: 1.35 !default;
-
-// Fonts weights
-$font-weights: (
-    'thin': 100, // Thin (Hairline)
-    'extra': 200, // Extra Light (Ultra Light)
-    'light': 300, // Light
-    'normal': 400, // Normal
-    'medium': 500, // Medium
-    'semi-bold': 600, // Semi Bold (Demi Bold)
-    'bold': 700, // Bold
-    'extra-bold': 800, // Extra Bold (Ultra Bold)
-    'black': 900 // Black (Heavy)
-);
