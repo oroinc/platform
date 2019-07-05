@@ -11,7 +11,7 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Psr\SimpleCache\CacheInterface;
 
 /**
- * Write XLSX to file
+ * Write xlsx to file
  */
 class XlsxFileWriter extends XlsxFileStreamWriter implements StepExecutionAwareInterface
 {
@@ -72,6 +72,7 @@ class XlsxFileWriter extends XlsxFileStreamWriter implements StepExecutionAwareI
         }
 
         $this->setFilePath($context->getOption('filePath'));
+
         parent::setImportExportContext($context);
     }
 

@@ -5,13 +5,20 @@ services:
             - '@oro_importexport.context_registry'
         tags:
             - { name: oro_importexport.reader, alias: csv }
+
+    oro_importexport.reader.xlsx.cache:
+        parent: oro.cache.simple.php_temp
+        arguments:
+            - 512
+
     oro_importexport.reader.xlsx:
         class: 'Oro\Bundle\ImportExportBundle\Reader\XlsxFileReader'
         arguments:
             - '@oro_importexport.context_registry'
-            - '@phpexcel'
+            - '@oro_importexport.reader.xlsx.cache'
         tags:
             - { name: oro_importexport.reader, alias: xlsx }
+
     oro_importexport.reader.entity:
         class: Oro\Bundle\ImportExportBundle\Reader\EntityReader
         arguments:
@@ -23,6 +30,7 @@ services:
             - [setAclHelper, ['@oro_security.acl_helper']]
         tags:
             - { name: oro_importexport.reader, alias: entity }
+
     oro_importexport.reader.template_fixture:
         class: 'Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader'
         arguments:
