@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -53,7 +52,7 @@ class ProcessController extends FOSRestController
                     'message'    => $this->get('translator')->trans('oro.workflow.notification.process.activated'),
                     'successful' => true,
                 ),
-                Codes::HTTP_OK
+                Response::HTTP_OK
             )
         );
     }
@@ -89,7 +88,7 @@ class ProcessController extends FOSRestController
                     'message'    => $this->get('translator')->trans('oro.workflow.notification.process.deactivated'),
                     'successful' => true,
                 ),
-                Codes::HTTP_OK
+                Response::HTTP_OK
             )
         );
     }

@@ -5,7 +5,6 @@ namespace Oro\Bundle\SidebarBundle\Controller\Api\Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SidebarBundle\Entity\AbstractWidget;
@@ -58,7 +57,7 @@ class WidgetController extends FOSRestController
         }
 
         return $this->handleView(
-            $this->view($items, Codes::HTTP_OK)
+            $this->view($items, Response::HTTP_OK)
         );
     }
 
@@ -94,7 +93,7 @@ class WidgetController extends FOSRestController
         $manager->flush();
 
         return $this->handleView(
-            $this->view(['id' => $entity->getId()], Codes::HTTP_CREATED)
+            $this->view(['id' => $entity->getId()], Response::HTTP_CREATED)
         );
     }
 
@@ -115,10 +114,10 @@ class WidgetController extends FOSRestController
         /** @var \Oro\Bundle\SidebarBundle\Entity\Widget $entity */
         $entity = $this->getManager()->find($this->getWidgetClass(), (int)$widgetId);
         if (!$entity) {
-            return $this->handleView($this->view([], Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
         }
         if (!$this->validatePermissions($entity->getUser())) {
-            return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
+            return $this->handleView($this->view(null, Response::HTTP_FORBIDDEN));
         }
 
         $entity->setState($request->get('state', $entity->getState()));
@@ -130,7 +129,7 @@ class WidgetController extends FOSRestController
         $em->persist($entity);
         $em->flush();
 
-        return $this->handleView($this->view([], Codes::HTTP_OK));
+        return $this->handleView($this->view([], Response::HTTP_OK));
     }
 
     /**
@@ -149,17 +148,17 @@ class WidgetController extends FOSRestController
         /** @var \Oro\Bundle\SidebarBundle\Entity\Widget $entity */
         $entity = $this->getManager()->find($this->getWidgetClass(), (int)$widgetId);
         if (!$entity) {
-            return $this->handleView($this->view([], Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
         }
         if (!$this->validatePermissions($entity->getUser())) {
-            return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
+            return $this->handleView($this->view(null, Response::HTTP_FORBIDDEN));
         }
 
         $em = $this->getManager();
         $em->remove($entity);
         $em->flush();
 
-        return $this->handleView($this->view([], Codes::HTTP_NO_CONTENT));
+        return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
     }
 
     /**

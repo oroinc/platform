@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\SegmentBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -54,7 +52,7 @@ class SegmentController extends RestController implements ClassResourceInterface
         $page = $request->query->get('page', 1);
         $term = $request->query->get('term');
         $currentSegment = $request->query->get('currentSegment', null);
-        $statusCode = Codes::HTTP_OK;
+        $statusCode = Response::HTTP_OK;
 
         /** @var SegmentManager $provider */
         $manager = $this->get('oro_segment.segment_manager');
@@ -62,7 +60,7 @@ class SegmentController extends RestController implements ClassResourceInterface
         try {
             $result = $manager->getSegmentByEntityName($entityName, $term, (int)$page, $currentSegment);
         } catch (InvalidEntityException $ex) {
-            $statusCode = Codes::HTTP_NOT_FOUND;
+            $statusCode = Response::HTTP_NOT_FOUND;
             $result = ['message' => $ex->getMessage()];
         }
 
@@ -108,14 +106,14 @@ class SegmentController extends RestController implements ClassResourceInterface
         /** @var Segment $segment */
         $segment = $this->getManager()->find($id);
         if (!$segment) {
-            return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view(null, Response::HTTP_NOT_FOUND));
         }
 
         try {
             $this->get('oro_segment.static_segment_manager')->run($segment);
-            return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
+            return $this->handleView($this->view(null, Response::HTTP_NO_CONTENT));
         } catch (\LogicException $e) {
-            return $this->handleView($this->view(null, Codes::HTTP_BAD_REQUEST));
+            return $this->handleView($this->view(null, Response::HTTP_BAD_REQUEST));
         }
     }
 

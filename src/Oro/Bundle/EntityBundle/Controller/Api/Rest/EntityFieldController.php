@@ -8,7 +8,6 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
@@ -63,7 +62,7 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
         /** @var EntityFieldProvider $provider */
         $provider = $this->get('oro_entity.entity_field_provider');
 
-        $statusCode = Codes::HTTP_OK;
+        $statusCode = Response::HTTP_OK;
         try {
             $result = $provider->getFields(
                 $entityName,
@@ -74,7 +73,7 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
                 $applyExclusions
             );
         } catch (InvalidEntityException $ex) {
-            $statusCode = Codes::HTTP_NOT_FOUND;
+            $statusCode = Response::HTTP_NOT_FOUND;
             $result = ['message' => $ex->getMessage()];
         }
 

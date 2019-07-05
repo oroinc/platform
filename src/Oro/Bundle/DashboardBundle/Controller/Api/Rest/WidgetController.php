@@ -6,7 +6,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -57,11 +56,11 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
         $widget = $this->getDashboardManager()->findWidgetModel($widgetId);
 
         if (!$dashboard || !$widget) {
-            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view(array(), Response::HTTP_NOT_FOUND));
         }
 
         if (!$dashboard->hasWidget($widget)) {
-            return $this->handleView($this->view(array(), Codes::HTTP_BAD_REQUEST));
+            return $this->handleView($this->view(array(), Response::HTTP_BAD_REQUEST));
         }
 
         $widget->setExpanded(
@@ -74,7 +73,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
 
         $this->getEntityManager()->flush();
 
-        return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
+        return $this->handleView($this->view(array(), Response::HTTP_NO_CONTENT));
     }
 
     /**
@@ -94,17 +93,17 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
         $widget = $this->getDashboardManager()->findWidgetModel($widgetId);
 
         if (!$dashboard || !$widget) {
-            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view(array(), Response::HTTP_NOT_FOUND));
         }
 
         if (!$dashboard->hasWidget($widget)) {
-            return $this->handleView($this->view(array(), Codes::HTTP_BAD_REQUEST));
+            return $this->handleView($this->view(array(), Response::HTTP_BAD_REQUEST));
         }
 
         $this->getDashboardManager()->remove($widget);
         $this->getEntityManager()->flush();
 
-        return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
+        return $this->handleView($this->view(array(), Response::HTTP_NO_CONTENT));
     }
 
     /**
@@ -131,7 +130,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
         $dashboard = $this->getDashboardManager()->findDashboardModel($dashboardId);
 
         if (!$dashboard) {
-            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view(array(), Response::HTTP_NOT_FOUND));
         }
 
         $layoutPositions = $request->get('layoutPositions', []);
@@ -144,7 +143,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
 
         $this->getEntityManager()->flush();
 
-        return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
+        return $this->handleView($this->view(array(), Response::HTTP_NO_CONTENT));
     }
 
     /**
@@ -177,14 +176,14 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
         $dashboard = $this->getDashboardManager()->findDashboardModel($dashboardId);
 
         if (!$dashboard || !$widgetName) {
-            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view(array(), Response::HTTP_NOT_FOUND));
         }
 
         $widget = $this->getDashboardManager()->createWidgetModel($widgetName);
         $dashboard->addWidget($widget, $targetColumn);
         $this->getDashboardManager()->save($widget, true);
 
-        return $this->handleView($this->view($widget, Codes::HTTP_OK));
+        return $this->handleView($this->view($widget, Response::HTTP_OK));
     }
 
     /**

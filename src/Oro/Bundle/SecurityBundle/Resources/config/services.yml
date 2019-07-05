@@ -1,8 +1,4 @@
 parameters:
-    twig.exception_listener.class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
-    fos_rest.exception_listener.class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
-    security.exception_listener.class:                         Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener
-
     oro_security.acl.base_manager.class:                       Oro\Bundle\SecurityBundle\Acl\Persistence\BaseAclManager
     oro_security.acl.manager.class:                            Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager
     oro_security.acl.sid_manager.class:                        Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager
@@ -837,3 +833,13 @@ services:
 
     Oro\Bundle\SecurityBundle\Util\UriSecurityHelper:
         alias: oro_security.util.uri_security_helper
+
+    oro_security.rest_exception_listener:
+        class: Oro\Bundle\SecurityBundle\EventListener\RestExceptionListener
+        decorates: fos_rest.exception_listener
+        parent: fos_rest.exception_listener
+
+    oro_security.twig_exception_listener:
+        class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
+        decorates: twig.exception_listener
+        parent: twig.exception_listener

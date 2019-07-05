@@ -5,7 +5,6 @@ namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -19,6 +18,7 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @NamePrefix("oro_api_")
@@ -169,10 +169,10 @@ class UserController extends RestController implements ClassResourceInterface
         $entity = $this->getManager()->find($id);
 
         if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
-        return $this->handleView($this->view($entity->getRoles(), Codes::HTTP_OK));
+        return $this->handleView($this->view($entity->getRoles(), Response::HTTP_OK));
     }
 
     /**
@@ -195,10 +195,10 @@ class UserController extends RestController implements ClassResourceInterface
         $entity = $this->getManager()->find($id);
 
         if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
-        return $this->handleView($this->view($entity->getGroups(), Codes::HTTP_OK));
+        return $this->handleView($this->view($entity->getGroups(), Response::HTTP_OK));
     }
 
     /**
@@ -238,18 +238,18 @@ class UserController extends RestController implements ClassResourceInterface
         );
 
         if (empty($params)) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
         /** @var User $entity */
         $entity = $this->getManager()->getRepository()->findOneBy($params);
         if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
         $result = $this->getPreparedItem($entity);
 
-        return $this->buildResponse($result, self::ACTION_READ, ['result' => $result], Codes::HTTP_OK);
+        return $this->buildResponse($result, self::ACTION_READ, ['result' => $result], Response::HTTP_OK);
     }
 
     /**

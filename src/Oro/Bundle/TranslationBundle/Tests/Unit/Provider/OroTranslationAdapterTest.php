@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
-use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter;
+use Symfony\Component\HttpFoundation\Response;
 
 class OroTranslationAdapterTest extends \PHPUnit\Framework\TestCase
 {
@@ -73,7 +73,7 @@ class OroTranslationAdapterTest extends \PHPUnit\Framework\TestCase
     public function testFetchStatistic(
         $expectedResult,
         $fetchedData,
-        $code = Codes::HTTP_OK,
+        $code = Response::HTTP_OK,
         $exceptionExpected = false
     ) {
         $this->client->expects($this->once())
@@ -123,13 +123,13 @@ class OroTranslationAdapterTest extends \PHPUnit\Framework\TestCase
             'if not json should throw exception'         => [
                 [],
                 'not JSON',
-                Codes::HTTP_OK,
+                Response::HTTP_OK,
                 '\RuntimeException'
             ],
             'not full filled stat should be skipped'     => [
                 [],
                 [['code' => 'en']],
-                Codes::HTTP_OK,
+                Response::HTTP_OK,
                 '\RuntimeException'
             ],
             'correct statistic should be returned as is' => [

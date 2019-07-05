@@ -3,12 +3,63 @@
 namespace Oro\Bundle\UIBundle\Controller;
 
 use FOS\RestBundle\Controller\ExceptionController as BaseController;
+use FOS\RestBundle\Util\ExceptionValueMap;
+use FOS\RestBundle\View\View;
+use FOS\RestBundle\View\ViewHandlerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\ExistsLoaderInterface;
 
-class ExceptionController extends BaseController
+/**
+ * Handles rendering error pages.
+ */
+class ExceptionController extends BaseController implements ServiceSubscriberInterface
 {
+    /** @var ContainerInterface */
+    private $container;
+
+    /** @var ViewHandlerInterface */
+    private $viewHandler;
+
+    /**
+     * @param ContainerInterface $container
+     * @param bool $showException
+     */
+    public function __construct(ContainerInterface $container, $showException)
+    {
+        $this->container = $container;
+        $this->viewHandler = $container->get('fos_rest.view_handler');
+
+        parent::__construct(
+            $this->viewHandler,
+            $this->container->get('fos_rest.exception.codes_map'),
+            $showException
+        );
+    }
+
+    protected function createView(\Exception $exception, $code, array $templateData, Request $request, $showException)
+    {
+        $view = new View(
+            $exception,
+            $code,
+            $exception instanceof HttpExceptionInterface ? $exception->getHeaders() : []
+        );
+
+        $format = $request->getRequestFormat();
+        if ($this->viewHandler->isFormatTemplating($format)) {
+            $view->setTemplate($this->findTemplate($request, $format, $code, $showException));
+        }
+
+        $view->setTemplateVar('raw_exception');
+        $view->setTemplateData($templateData);
+
+        return $view;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -62,5 +113,17 @@ class ExceptionController extends BaseController
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return [
+            'twig' => Environment::class,
+            'fos_rest.view_handler' => ViewHandlerInterface::class,
+            'fos_rest.exception.codes_map' => ExceptionValueMap::class,
+        ];
     }
 }
