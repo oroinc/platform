@@ -7,7 +7,6 @@ use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
@@ -78,7 +77,7 @@ class TranslationController extends FOSRestController
             }
         }
 
-        $view     = $this->view($data, Codes::HTTP_OK);
+        $view     = $this->view($data, Response::HTTP_OK);
         $response = parent::handleView($view);
 
         $responseContext = [
@@ -138,6 +137,6 @@ class TranslationController extends FOSRestController
             'value' => $translated ? $translation->getValue() : '',
         ];
 
-        return parent::handleView($this->view($response, Codes::HTTP_OK));
+        return parent::handleView($this->view($response, Response::HTTP_OK));
     }
 }

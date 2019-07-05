@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
@@ -591,7 +590,7 @@ class EmailController extends Controller
             return $response;
         }
 
-        return new Response('', Codes::HTTP_NOT_FOUND);
+        return new Response('', Response::HTTP_NOT_FOUND);
     }
 
     /**
@@ -687,11 +686,11 @@ class EmailController extends Controller
         } catch (\Exception $e) {
             return new JsonResponse(
                 ['error' => $this->get(TranslatorInterface::class)->trans('oro.email.action.message.error')],
-                Codes::HTTP_OK
+                Response::HTTP_OK
             );
         }
 
-        return new JsonResponse([], Codes::HTTP_OK);
+        return new JsonResponse([], Response::HTTP_OK);
     }
 
     /**

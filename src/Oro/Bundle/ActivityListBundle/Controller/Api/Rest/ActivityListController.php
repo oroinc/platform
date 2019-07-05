@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActivityListBundle\Controller\Api\Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
@@ -81,7 +80,7 @@ class ActivityListController extends RestController
     {
         $activityListEntity = $this->getManager()->getItem($entityId);
         if (!$activityListEntity) {
-            return new JsonResponse([], Codes::HTTP_NOT_FOUND);
+            return new JsonResponse([], Response::HTTP_NOT_FOUND);
         }
 
         return new JsonResponse($activityListEntity);
