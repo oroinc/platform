@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Simple;
 
 use Oro\Bundle\CacheBundle\Simple\PhpTempCache;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class PhpTempCacheTest extends \PHPUnit\Framework\TestCase
 {
@@ -22,6 +23,7 @@ class PhpTempCacheTest extends \PHPUnit\Framework\TestCase
             'int' => 42,
             'float' => 49.5,
             'string' => 'string',
+            'numeric string' => '8',
             'empty array' => [],
             'filled array' => [1, 2, 3],
             'empty object' => new \StdClass(),
@@ -38,9 +40,15 @@ class PhpTempCacheTest extends \PHPUnit\Framework\TestCase
      * @dataProvider setGetDataProvider
      * @param mixed $key
      * @param mixed $value
+     * @param bool $exception
+     * @throws InvalidArgumentException
      */
-    public function testSetGetSingle($key, $value): void
+    public function testSetGetSingle($key, $value, bool $exception): void
     {
+        if ($exception) {
+            $this->expectException(InvalidArgumentException::class);
+        }
+
         $this->assertFalse($this->cache->has($key));
         $this->assertNull($this->cache->get($key));
         $this->assertFalse($this->cache->get($key, false));
@@ -60,7 +68,11 @@ class PhpTempCacheTest extends \PHPUnit\Framework\TestCase
         foreach (self::getDataTypes() as $keyType => $key) {
             if (is_scalar($key)) {
                 foreach (self::getDataTypes() as $valueType => $value) {
-                    yield "{$keyType} key with {$valueType} value" => ['key' => $key, 'value' => $value];
+                    yield "{$keyType} key with {$valueType} value" => [
+                        'key' => $key,
+                        'value' => $value,
+                        'exception' => !is_string($key) || is_numeric($key),
+                    ];
                 }
             }
         }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CacheBundle\Simple;
 
 use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * Non persistent cache provider that working with "php://temp" as storage
@@ -74,29 +75,12 @@ class PhpTempCache implements CacheInterface
     }
 
     /**
-     * @param mixed $data
-     * @return string
-     */
-    private function serialize($data): string
-    {
-        return \serialize($data);
-    }
-
-    /**
-     * @param string $data
-     * @return mixed
-     */
-    private function unserialize(string $data)
-    {
-        return \unserialize($data);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function get($key, $default = null)
     {
         $this->initialize();
+        $this->assertKey($key);
 
         if (!$this->has($key)) {
             return $default;
@@ -112,7 +96,7 @@ class PhpTempCache implements CacheInterface
             throw new \RuntimeException('Temp cache invalid: unable reed data');
         }
 
-        return $this->unserialize($data);
+        return \unserialize($data);
     }
 
     /**
@@ -121,10 +105,11 @@ class PhpTempCache implements CacheInterface
     public function set($key, $value, $ttl = null): bool
     {
         $this->initialize();
+        $this->assertKey($key);
 
         $this->delete($key);
 
-        $data = $this->serialize($value);
+        $data = \serialize($value);
         $dataSize = strlen($data);
         if ($dataSize === 0) {
             throw new \InvalidArgumentException('Try allocate position for empty data');
@@ -173,6 +158,7 @@ class PhpTempCache implements CacheInterface
      */
     public function delete($key): bool
     {
+        $this->assertKey($key);
         if ($this->has($key)) {
             $this->deleted[] = $this->index[$key];
             unset($this->index[$key]);
@@ -201,8 +187,11 @@ class PhpTempCache implements CacheInterface
      */
     public function getMultiple($keys, $default = null)
     {
+        $this->assertIterable($keys);
+
         $response = [];
         foreach ($keys as $key) {
+            $this->assertKey($key);
             $response[$key] = $this->get($key, $default);
         }
 
@@ -214,8 +203,11 @@ class PhpTempCache implements CacheInterface
      */
     public function setMultiple($values, $ttl = null): bool
     {
+        $this->assertIterable($values);
+
         $success = true;
         foreach ($values as $key => $value) {
+            $this->assertKey($key);
             $success = $success && $this->set($key, $value, $ttl);
         }
 
@@ -227,8 +219,11 @@ class PhpTempCache implements CacheInterface
      */
     public function deleteMultiple($keys): bool
     {
+        $this->assertIterable($keys);
+
         $success = true;
         foreach ($keys as $key) {
+            $this->assertKey($key);
             $success = $success && $this->delete($key);
         }
 
@@ -240,6 +235,30 @@ class PhpTempCache implements CacheInterface
      */
     public function has($key): bool
     {
+        $this->assertKey($key);
         return isset($this->index[$key]);
+    }
+
+    /**
+     * @param mixed $key
+     * @throws InvalidArgumentException
+     */
+    private function assertKey($key): void
+    {
+        if (!\is_string($key) || \is_numeric($key)) {
+            throw new InvalidArgumentException(
+                sprintf('Invalid key "%s", not numeric string required', \is_scalar($key) ? $key : \gettype($key))
+            );
+        }
+    }
+
+    private function assertIterable($iterable)
+    {
+        if (!\is_iterable($iterable)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Argument must be an array or a Traversable, got "%s".',
+                \is_object($iterable) ? \get_class($iterable) : \gettype($iterable)
+            ));
+        }
     }
 }
