@@ -17,7 +17,7 @@ $theme-fonts: (
                 'style': normal
             )
         ),
-        'formats': ('woff2')
+        'formats': ('woff', 'woff2')
     ),
     'secondary': (
         'family': 'Roboto',
@@ -27,7 +27,8 @@ $theme-fonts: (
                 'weight': 700,
                 'style': normal
             )
-        )
+        ),
+        'formats': ('woff', 'woff2')
     ),
     'icon': (
         'family': 'custom-icon-font',
@@ -37,7 +38,8 @@ $theme-fonts: (
                 'weight': normal,
                 'style': normal
             )
-        )
+        ),
+        'formats': ('woff')
     ),
     'only-bullets': (
         'family': 'only-bullets',
@@ -48,7 +50,8 @@ $theme-fonts: (
                 'weight': normal,
                 'style': normal
             )
-        )
+        ),
+        'formats': ('woff', 'woff2')
     )
 );
 

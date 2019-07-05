@@ -1,6 +1,6 @@
 /* @theme: blank; */
 
-// Use: @include font-face('Lato', '../fonts/lato/lato-regular-webfont', 400, normal);
+// Use: @include font-face('Lato', '../fonts/lato/lato-regular-webfont', 400, normal, ('woff', 'woff2'));
 @mixin font-face($font-family, $file-path, $font-weight, $font-style, $font-formats) {
     @font-face {
         font-family: $font-family;
@@ -16,6 +16,23 @@
             }
         } @else {
             src: url('#{$file-path}.woff') format('woff');
+
+            @warn "The $font-formats argument doesn't exist. Please add needed formats to your custom font
+            Example:
+            $theme-fonts: (
+                'secondary': (
+                    'family': 'Roboto',
+                    'variants': (
+                        (
+                            'path': '#{$global-url}/orofrontend/default/fonts/roboto/roboto-regular-webfont',
+                            'weight': 700,
+                            'style': normal
+                        )
+                    ),
+                    'formats': ('woff', 'woff2')
+                )
+            );
+            ";
         }
 
         font-weight: $font-weight;
@@ -39,7 +56,7 @@
 //                 'style': normal
 //             )
 //         ),
-//         'formats': ('woff2', ...)
+//         'formats': ('woff2', 'woff', 'ttf', 'eot', 'svg') // Add only needed formats
 //     ),
 //     'secondary': (
 //         'family': 'Test2',
@@ -47,7 +64,8 @@
 //             (
 //                 'path': '...',
 //             )
-//         )
+//         ),
+//         'formats': ('woff2', 'woff', 'ttf', 'eot', 'svg') // Add only needed formats
 //     )
 // );
 // Use: @include use-font-face($fonts);
