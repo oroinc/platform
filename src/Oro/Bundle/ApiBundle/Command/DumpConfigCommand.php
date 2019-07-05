@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
@@ -23,6 +24,18 @@ use Symfony\Component\Yaml\Yaml;
  */
 class DumpConfigCommand extends AbstractDebugCommand
 {
+    /** @var string */
+    protected static $defaultName = 'oro:api:config:dump';
+
+    /** @var ProcessorBagInterface */
+    private $processorBag;
+
+    /** @var ConfigProvider */
+    private $configProvider;
+
+    /** @var RelationConfigProvider */
+    private $relationConfigProvider;
+
     /**
      * @var array
      */
@@ -36,12 +49,32 @@ class DumpConfigCommand extends AbstractDebugCommand
     ];
 
     /**
+     * @param ValueNormalizer $valueNormalizer
+     * @param ResourcesProvider $resourcesProvider
+     * @param ProcessorBagInterface $processorBag
+     * @param ConfigProvider $configProvider
+     * @param RelationConfigProvider $relationConfigProvider
+     */
+    public function __construct(
+        ValueNormalizer $valueNormalizer,
+        ResourcesProvider $resourcesProvider,
+        ProcessorBagInterface $processorBag,
+        ConfigProvider $configProvider,
+        RelationConfigProvider $relationConfigProvider
+    ) {
+        parent::__construct($valueNormalizer, $resourcesProvider);
+
+        $this->processorBag = $processorBag;
+        $this->configProvider = $configProvider;
+        $this->relationConfigProvider = $relationConfigProvider;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('oro:api:config:dump')
             ->setDescription('Dumps entity configuration used in Data API.')
             ->addArgument(
                 'entity',
@@ -94,9 +127,7 @@ class DumpConfigCommand extends AbstractDebugCommand
         $version = Version::normalizeVersion(null);
         $extras = $this->getConfigExtras($input);
 
-        /** @var ProcessorBagInterface $processorBag */
-        $processorBag = $this->getContainer()->get('oro_api.processor_bag');
-        $processorBag->addApplicableChecker(new Util\RequestTypeApplicableChecker());
+        $this->processorBag->addApplicableChecker(new Util\RequestTypeApplicableChecker());
 
         $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $version, $requestType);
         $isDocumentationResourcesRequested = $input->getOption('documentation-resources');
@@ -192,10 +223,7 @@ class DumpConfigCommand extends AbstractDebugCommand
      */
     protected function getConfig($entityClass, $version, RequestType $requestType, array $extras)
     {
-        /** @var ConfigProvider $configProvider */
-        $configProvider = $this->getContainer()->get('oro_api.config_provider');
-
-        $config = $configProvider->getConfig($entityClass, $version, $requestType, $extras);
+        $config = $this->configProvider->getConfig($entityClass, $version, $requestType, $extras);
 
         return [
             $entityClass => $this->convertConfigToArray($config)
@@ -212,10 +240,7 @@ class DumpConfigCommand extends AbstractDebugCommand
      */
     protected function getRelationConfig($entityClass, $version, RequestType $requestType, array $extras)
     {
-        /** @var RelationConfigProvider $configProvider */
-        $configProvider = $this->getContainer()->get('oro_api.relation_config_provider');
-
-        $config = $configProvider->getRelationConfig($entityClass, $version, $requestType, $extras);
+        $config = $this->relationConfigProvider->getRelationConfig($entityClass, $version, $requestType, $extras);
 
         return [
             $entityClass => $this->convertConfigToArray($config)
@@ -230,9 +255,7 @@ class DumpConfigCommand extends AbstractDebugCommand
      */
     protected function getEntityClasses($version, RequestType $requestType)
     {
-        /** @var ResourcesProvider $resourcesProvider */
-        $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
-        $resources = $resourcesProvider->getResources($version, $requestType);
+        $resources = $this->resourcesProvider->getResources($version, $requestType);
         $entityClasses = [];
         foreach ($resources as $resource) {
             $entityClasses[] = $resource->getEntityClass();

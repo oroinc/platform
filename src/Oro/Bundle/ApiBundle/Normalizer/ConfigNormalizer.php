@@ -144,7 +144,10 @@ class ConfigNormalizer
     {
         $dependsOnFieldName = $config->findFieldNameByPropertyPath($dependsOnPropertyPath[0]);
         if (!$dependsOnFieldName) {
-            return;
+            if (\count($dependsOnPropertyPath) > 1) {
+                return;
+            }
+            $dependsOnFieldName = $dependsOnPropertyPath[0];
         }
 
         $dependsOnField = $config->getOrAddField($dependsOnFieldName);

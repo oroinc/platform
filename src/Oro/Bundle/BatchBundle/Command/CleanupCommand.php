@@ -3,12 +3,13 @@
 namespace Oro\Bundle\BatchBundle\Command;
 
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
+use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,9 +17,29 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Command to clean up old batch job records
  */
-class CleanupCommand extends ContainerAwareCommand implements CronCommandInterface
+class CleanupCommand extends Command implements CronCommandInterface
 {
     const FLUSH_BATCH_SIZE = 100;
+
+    /** @var string */
+    protected static $defaultName = 'oro:cron:batch:cleanup';
+
+    /** @var DoctrineJobRepository */
+    private $akeneoJobRepository;
+
+    /** @var string */
+    private $batchCleanupInterval;
+
+    /**
+     * @param DoctrineJobRepository $akeneoJobRepository
+     * @param string $batchCleanupInterval
+     */
+    public function __construct(DoctrineJobRepository $akeneoJobRepository, string $batchCleanupInterval)
+    {
+        $this->akeneoJobRepository = $akeneoJobRepository;
+        $this->batchCleanupInterval = $batchCleanupInterval;
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -34,8 +55,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     public function isActive()
     {
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
-        $intervalString = $this->getContainer()->getParameter('oro_batch.cleanup_interval');
-        $date->sub(\DateInterval::createFromDateString($intervalString));
+        $date->sub(\DateInterval::createFromDateString($this->batchCleanupInterval));
         $qb = $this->getObsoleteJobInstancesQueryBuilder($date);
 
         $count = $qb->select('COUNT(ji.id)')
@@ -51,7 +71,6 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     protected function configure()
     {
         $this
-            ->setName('oro:cron:batch:cleanup')
             ->setDescription('Clean up batch history')
             ->addOption(
                 'interval',
@@ -95,7 +114,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     protected function prepareDateInterval($intervalString = null)
     {
         $date           = new \DateTime('now', new \DateTimeZone('UTC'));
-        $intervalString = $intervalString ?: $this->getContainer()->getParameter('oro_batch.cleanup_interval');
+        $intervalString = $intervalString ?: $this->batchCleanupInterval;
         $date->sub(\DateInterval::createFromDateString($intervalString));
 
         return $date;
@@ -174,6 +193,6 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
      */
     protected function getEntityManager()
     {
-        return $this->getContainer()->get('akeneo_batch.job_repository')->getJobManager();
+        return $this->akeneoJobRepository->getJobManager();
     }
 }

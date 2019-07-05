@@ -32,6 +32,6 @@ define(function(require) {
         _.extend(options, additionalOptions || {});
         var button;
         button = options._sourceElement;
-        button.click($.proxy(onClick, null));
+        button.click(onClick);
     };
 });

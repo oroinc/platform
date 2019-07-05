@@ -96,6 +96,7 @@ class WsseNoncePhpFileCache extends BasePhpFileCache
      */
     protected function purge()
     {
+        $purged              = null;
         $startTime           = time();
         $directory           = $this->getDataDirectory();
         $purgeStatusFileName = 'cache_purge_status' . $this->getExtension();
@@ -119,15 +120,16 @@ class WsseNoncePhpFileCache extends BasePhpFileCache
 
         if (file_exists($purgeStatusFilePath)) {
             $fp = fopen($purgeStatusFilePath, 'r');
-            if (!flock($fp, LOCK_EX | LOCK_NB)) {
-                return;
+            if (flock($fp, LOCK_EX | LOCK_NB)) {
+                if ($this->doPurge($directory, $startTime, $purgeStatusFileName)) {
+                    $purged = $this->writePurgeStatus($purgeStatusFilePath, $lastPurgeTime);
+                }
             }
+            flock($fp, LOCK_UN);
             fclose($fp);
         }
 
-        if ($this->doPurge($directory, $startTime, $purgeStatusFileName)) {
-            return $this->writePurgeStatus($purgeStatusFilePath, $lastPurgeTime);
-        }
+        return $purged;
     }
 
     /**
@@ -144,15 +146,19 @@ class WsseNoncePhpFileCache extends BasePhpFileCache
         $fileIterator = $this->getExpiredFilesIterator($directory, $startTime - $this->nonceLifeTime);
         /** @var \SplFileInfo $file */
         foreach ($fileIterator as $name => $file) {
-            if ($file->getFilename() === $purgeStatusFileName) {
-                continue;
-            }
+            try {
+                if ($file->getFilename() === $purgeStatusFileName) {
+                    continue;
+                }
 
-            @unlink($name);
-            $count++;
-            if ($count % self::PURGE_BATCH_SIZE === 0 && time() - $startTime >= self::PURGE_MAX_TIME_FRAME) {
+                @unlink($name);
+                $count++;
+                if ($count % self::PURGE_BATCH_SIZE === 0 && time() - $startTime >= self::PURGE_MAX_TIME_FRAME) {
+                    $success = false;
+                    break;
+                }
+            } catch (\Exception $e) {
                 $success = false;
-                break;
             }
         }
 
@@ -176,12 +182,16 @@ class WsseNoncePhpFileCache extends BasePhpFileCache
                 \RecursiveIteratorIterator::LEAVES_ONLY
             ),
             function (\SplFileInfo $file) use ($fileExtension, $ignoreFilePrefix, $expirationTime) {
-                $fileName = $file->getFilename();
+                try {
+                    $fileName = $file->getFilename();
 
-                return
-                    substr($fileName, -strlen($fileExtension)) === $fileExtension
-                    && $file->getMTime() <= $expirationTime
-                    && strpos($fileName, $ignoreFilePrefix) !== 0;
+                    return
+                        substr($fileName, -strlen($fileExtension)) === $fileExtension
+                        && $file->getMTime() <= $expirationTime
+                        && strpos($fileName, $ignoreFilePrefix) !== 0;
+                } catch (\Exception $e) {
+                    return false;
+                }
             }
         );
     }

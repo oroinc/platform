@@ -12,7 +12,7 @@ datagrids:
                     - dashboard.createdAt
                     - dashboard.updatedAt
                 from:
-                    - { table: '%oro_dashboard.dashboard_entity.class%', alias: dashboard }
+                    - { table: Oro\Bundle\DashboardBundle\Entity\Dashboard, alias: dashboard }
                 join:
                     left:
                         - { join: dashboard.owner, alias: owner }

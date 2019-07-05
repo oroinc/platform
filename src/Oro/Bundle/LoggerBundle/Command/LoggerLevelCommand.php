@@ -6,8 +6,9 @@ use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Psr\Log\LogLevel;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,11 +17,26 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Updates logger level configuration.
  */
-class LoggerLevelCommand extends ContainerAwareCommand
+class LoggerLevelCommand extends Command
 {
     const LEVEL_PARAM         = 'level';
     const DISABLE_AFTER_PARAM = 'disable-after';
     const USER_PARAM          = 'user';
+
+    /** @var string */
+    protected static $defaultName = 'oro:logger:level';
+
+    /** @var ConfigManager */
+    private $globalConfigManager;
+
+    /** @var ConfigManager */
+    private $userConfigManager;
+
+    /** @var CacheProvider */
+    private $cache;
+
+    /** @var UserManager */
+    private $userManager;
 
     /** @var array */
     protected static $loggingLevels = [
@@ -35,12 +51,31 @@ class LoggerLevelCommand extends ContainerAwareCommand
     ];
 
     /**
+     * @param ConfigManager $globalConfigManager
+     * @param ConfigManager $userConfigManager
+     * @param CacheProvider $cache
+     * @param UserManager $userManager
+     */
+    public function __construct(
+        ConfigManager $globalConfigManager,
+        ConfigManager $userConfigManager,
+        CacheProvider $cache,
+        UserManager $userManager
+    ) {
+        parent::__construct();
+
+        $this->globalConfigManager = $globalConfigManager;
+        $this->userConfigManager = $userConfigManager;
+        $this->cache = $cache;
+        $this->userManager = $userManager;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('oro:logger:level')
             ->addArgument(
                 self::LEVEL_PARAM,
                 InputArgument::REQUIRED,
@@ -76,12 +111,10 @@ class LoggerLevelCommand extends ContainerAwareCommand
         $user = $this->getUser($input->getOption(self::USER_PARAM));
 
         if ($user) {
-            /* @var ConfigManager $configManager */
-            $configManager = $this->getContainer()->get('oro_config.user');
+            $configManager = $this->userConfigManager;
             $configManager->setScopeIdFromEntity($user);
         } else {
-            /* @var ConfigManager $configManager */
-            $configManager = $this->getContainer()->get('oro_config.global');
+            $configManager = $this->globalConfigManager;
         }
 
         $configManager->set(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY), $level);
@@ -92,10 +125,8 @@ class LoggerLevelCommand extends ContainerAwareCommand
 
         $configManager->flush();
 
-        /** @var CacheProvider $cache */
-        $cache = $this->getContainer()->get('oro_logger.cache');
-        if ($cache->contains(Configuration::LOGS_LEVEL_KEY)) {
-            $cache->delete(Configuration::LOGS_LEVEL_KEY);
+        if ($this->cache->contains(Configuration::LOGS_LEVEL_KEY)) {
+            $this->cache->delete(Configuration::LOGS_LEVEL_KEY);
         }
 
         if ($user) {
@@ -183,10 +214,7 @@ class LoggerLevelCommand extends ContainerAwareCommand
 
         if ($email) {
             /** @var User $user */
-            $user = $this
-                ->getContainer()
-                ->get('oro_user.manager')
-                ->findUserByEmail($email);
+            $user = $this->userManager->findUserByEmail($email);
 
             if (is_null($user)) {
                 throw new \InvalidArgumentException(

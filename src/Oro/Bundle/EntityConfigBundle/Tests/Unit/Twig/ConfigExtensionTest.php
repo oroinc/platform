@@ -11,6 +11,9 @@ use Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
@@ -23,22 +26,16 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
         $router = $this->createMock(RouterInterface::class);
-        $entityClassNameHelper = $this->getMockBuilder(EntityClassNameHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_entity_config.config_manager', $this->configManager)
-            ->add('router', $router)
-            ->add('oro_entity.entity_class_name_helper', $entityClassNameHelper)
-            ->add('oro_entity.doctrine_helper', $doctrineHelper)
+            ->add(ConfigManager::class, $this->configManager)
+            ->add(RouterInterface::class, $router)
+            ->add(EntityClassNameHelper::class, $entityClassNameHelper)
+            ->add(DoctrineHelper::class, $doctrineHelper)
             ->getContainer($this);
 
         $this->extension = new ConfigExtension($container);

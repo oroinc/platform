@@ -5,7 +5,6 @@ namespace Oro\Bundle\WindowsBundle\Controller\Api;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +30,7 @@ class WindowsStateController extends FOSRestController
         $items = $this->getWindowsStatesManager()->getWindowsStates();
 
         return $this->handleView(
-            $this->view($items, $items ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND)
+            $this->view($items, $items ? Response::HTTP_OK : Response::HTTP_NOT_FOUND)
         );
     }
 
@@ -49,11 +48,11 @@ class WindowsStateController extends FOSRestController
         try {
             $id = $this->getWindowsStatesManager()->createWindowsState();
         } catch (\InvalidArgumentException $e) {
-            throw new HttpException(Codes::HTTP_BAD_REQUEST, 'Wrong JSON inside POST body');
+            throw new HttpException(Response::HTTP_BAD_REQUEST, 'Wrong JSON inside POST body');
         }
 
         return $this->handleView(
-            $this->view(['id' => $id], Codes::HTTP_CREATED)
+            $this->view(['id' => $id], Response::HTTP_CREATED)
         );
     }
 
@@ -71,13 +70,13 @@ class WindowsStateController extends FOSRestController
     {
         try {
             if (!$this->getWindowsStatesManager()->updateWindowsState($windowId)) {
-                return $this->handleView($this->view([], Codes::HTTP_NOT_FOUND));
+                return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
             }
         } catch (\InvalidArgumentException $e) {
-            throw new HttpException(Codes::HTTP_BAD_REQUEST, 'Wrong JSON inside POST body');
+            throw new HttpException(Response::HTTP_BAD_REQUEST, 'Wrong JSON inside POST body');
         }
 
-        return $this->handleView($this->view([], Codes::HTTP_OK));
+        return $this->handleView($this->view([], Response::HTTP_OK));
     }
 
     /**
@@ -95,13 +94,13 @@ class WindowsStateController extends FOSRestController
     {
         try {
             if (!$this->getWindowsStatesManager()->deleteWindowsState($windowId)) {
-                return $this->handleView($this->view([], Codes::HTTP_NOT_FOUND));
+                return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
             }
         } catch (\InvalidArgumentException $e) {
-            throw new HttpException(Codes::HTTP_BAD_REQUEST, 'Wrong JSON inside POST body');
+            throw new HttpException(Response::HTTP_BAD_REQUEST, 'Wrong JSON inside POST body');
         }
 
-        return $this->handleView($this->view([], Codes::HTTP_NO_CONTENT));
+        return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
     }
 
     /**

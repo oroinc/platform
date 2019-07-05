@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Model\FileContentProvider;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
@@ -19,29 +19,23 @@ class FileApiEntityManager extends ApiEntityManager
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
-    /** @var AttachmentManager */
-    protected $attachmentManager;
-
     /** @var FileManager */
     protected $fileManager;
 
     /**
-     * @param string                        $class
-     * @param ObjectManager                 $om
+     * @param string $class
+     * @param ObjectManager $om
      * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param FileManager                   $fileManager
-     * @param AttachmentManager             $attachmentManager
+     * @param FileManager $fileManager
      */
     public function __construct(
         $class,
         ObjectManager $om,
         AuthorizationCheckerInterface $authorizationChecker,
-        FileManager $fileManager,
-        AttachmentManager $attachmentManager
+        FileManager $fileManager
     ) {
         parent::__construct($class, $om);
         $this->authorizationChecker = $authorizationChecker;
-        $this->attachmentManager = $attachmentManager;
         $this->fileManager = $fileManager;
     }
 
@@ -50,13 +44,11 @@ class FileApiEntityManager extends ApiEntityManager
      */
     public function serializeOne($id)
     {
-        list($fileId, $ownerEntityClass, $ownerEntityId) = $this->attachmentManager->parseFileKey($id);
-
-        if (!$this->authorizationChecker->isGranted('VIEW', new ObjectIdentity($ownerEntityId, $ownerEntityClass))) {
+        if (!$this->authorizationChecker->isGranted('VIEW', new ObjectIdentity($id, File::class))) {
             throw new AccessDeniedException();
         }
 
-        return parent::serializeOne($fileId);
+        return parent::serializeOne($id);
     }
 
     /**

@@ -2,12 +2,8 @@ services:
     _defaults:
         public: true
 
-    oro_platform.controllers.platform:
-        class: Oro\Bundle\PlatformBundle\Controller\PlatformController
+    Oro\Bundle\PlatformBundle\Controller\PlatformController:
         calls:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: container.service_subscriber }
-
-    Oro\Bundle\PlatformBundle\Controller\PlatformController:
-        alias: oro_platform.controllers.platform

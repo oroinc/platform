@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
-use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;

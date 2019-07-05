@@ -31,8 +31,8 @@ class WorkflowExtensionTest extends \PHPUnit\Framework\TestCase
         $workflowVariableFormatter->expects($this->any())->method('formatWorkflowVariableValue')->willReturn('test');
 
         $container = self::getContainerBuilder()
-            ->add('oro_workflow.registry.workflow_manager', $workflowManagerRegistry)
-            ->add('oro_workflow.formatter.workflow_variable', $workflowVariableFormatter)
+            ->add(WorkflowManagerRegistry::class, $workflowManagerRegistry)
+            ->add(WorkflowVariableFormatter::class, $workflowVariableFormatter)
             ->getContainer($this);
 
         $this->extension = new WorkflowExtension($container);

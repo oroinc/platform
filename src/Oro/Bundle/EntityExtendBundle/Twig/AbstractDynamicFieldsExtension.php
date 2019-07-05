@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Twig;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -12,7 +13,7 @@ use Twig\TwigFunction;
  *   - oro_get_dynamic_fields
  *   - oro_get_dynamic_field
  */
-abstract class AbstractDynamicFieldsExtension extends AbstractExtension
+abstract class AbstractDynamicFieldsExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const NAME = 'oro_entity_config_fields';
 

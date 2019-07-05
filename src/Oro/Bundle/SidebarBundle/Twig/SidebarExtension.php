@@ -5,8 +5,9 @@ namespace Oro\Bundle\SidebarBundle\Twig;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\SidebarBundle\Configuration\WidgetDefinitionProvider;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Asset\Packages as AssetHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -15,7 +16,7 @@ use Twig\TwigFunction;
  * Provides a Twig function to retrieve sidebar widgets information:
  *   - oro_sidebar_get_available_widgets
  */
-class SidebarExtension extends AbstractExtension implements FeatureToggleableInterface
+class SidebarExtension extends AbstractExtension implements FeatureToggleableInterface, ServiceSubscriberInterface
 {
     use FeatureCheckerHolderTrait;
 
@@ -103,5 +104,17 @@ class SidebarExtension extends AbstractExtension implements FeatureToggleableInt
     public function getName()
     {
         return self::NAME;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_sidebar.widget_definition_provider' => WidgetDefinitionProvider::class,
+            'translator' => TranslatorInterface::class,
+            'assets.packages' => AssetHelper::class,
+        ];
     }
 }

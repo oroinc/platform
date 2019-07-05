@@ -41,10 +41,28 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
         );
     }
 
+    public function testProcessForSubresourceThatDoesNotAssociatedWithAnyFieldInParentEntityConfig()
+    {
+        $parentConfig = new EntityDefinitionConfig();
+        $parentMetadata = new EntityMetadata();
+
+        $this->doctrineHelper->expects(self::never())
+            ->method('getManageableEntityClass');
+
+        $this->context->setParentClassName('Test\Class');
+        $this->context->setParentId(-1);
+        $this->context->setAssociationName('association');
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->processor->process($this->context);
+    }
+
     public function testProcessForNotManageableEntity()
     {
         $parentClass = 'Test\Class';
+        $associationName = 'association';
         $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->addField($associationName);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -52,6 +70,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
             ->willReturn(null);
 
         $this->context->setParentClassName($parentClass);
+        $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
         $this->processor->process($this->context);
     }
@@ -60,7 +79,9 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
     {
         $parentClass = 'Test\Class';
         $parentId = 123;
+        $associationName = 'association';
         $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->addField($associationName);
         $parentMetadata = new EntityMetadata();
 
         $this->doctrineHelper->expects(self::once())
@@ -94,6 +115,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
 
         $this->context->setParentClassName($parentClass);
         $this->context->setParentId($parentId);
+        $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);
         $this->processor->process($this->context);
@@ -107,7 +129,9 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
     {
         $parentClass = 'Test\Class';
         $parentId = 123;
+        $associationName = 'association';
         $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->addField($associationName);
         $parentMetadata = new EntityMetadata();
 
         $this->doctrineHelper->expects(self::once())
@@ -141,6 +165,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
 
         $this->context->setParentClassName($parentClass);
         $this->context->setParentId($parentId);
+        $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);
         $this->processor->process($this->context);
@@ -151,7 +176,9 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
         $parentClass = 'Test\Class';
         $parentResourceClass = 'Test\ParentResourceClass';
         $parentId = 123;
+        $associationName = 'association';
         $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->addField($associationName);
         $parentMetadata = new EntityMetadata();
 
         $this->doctrineHelper->expects(self::once())
@@ -185,6 +212,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
 
         $this->context->setParentClassName($parentResourceClass);
         $this->context->setParentId($parentId);
+        $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);
         $this->processor->process($this->context);

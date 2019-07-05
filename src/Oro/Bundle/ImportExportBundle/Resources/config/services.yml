@@ -1,4 +1,5 @@
 parameters:
+    oro_importexport.entity.import_export_result.class: Oro\Bundle\ImportExportBundle\Entity\ImportExportResult
     oro_importexport.template_fixture.entity_registry.class:  Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry
     oro_importexport.template_fixture.manager.class:          Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager
     oro_importexport.action.execute_job.class:                Oro\Bundle\ImportExportBundle\Model\Action\ExecuteJobAction
@@ -119,12 +120,15 @@ services:
     oro_importexport.configuration.registry:
         class: 'Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistry'
 
+    Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistry:
+        alias: oro_importexport.configuration.registry
+
     oro_importexport.twig_extension.get_import_export_configuration:
         class: 'Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension'
         arguments:
-            - '@oro_importexport.configuration.registry'
+            - '@oro_platform.twig.service_locator'
         tags:
-            - { name: 'twig.extension' }
+            - { name: twig.extension }
 
     Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension:
         alias: 'oro_importexport.twig_extension.get_import_export_configuration'

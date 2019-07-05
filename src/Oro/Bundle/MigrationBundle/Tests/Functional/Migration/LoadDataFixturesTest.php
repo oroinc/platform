@@ -24,7 +24,7 @@ class LoadDataFixturesTest extends WebTestCase
     public function testLoadDemoDataFixtures()
     {
         // for manual execution needs reset autoincrements, like that ALTER TABLE `<table_name>` AUTO_INCREMENT=2
-        $this->runCommand(LoadDataFixturesCommand::COMMAND_NAME, ['--fixtures-type=demo'], true, true);
+        $this->runCommand(LoadDataFixturesCommand::getDefaultName(), ['--fixtures-type=demo'], true, true);
 
         $messages = [];
         foreach ($this->getMessageCollector()->getSentMessages() as $message) {

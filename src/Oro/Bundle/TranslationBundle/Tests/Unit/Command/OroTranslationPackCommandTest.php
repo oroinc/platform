@@ -3,14 +3,40 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
 
 use Oro\Bundle\TranslationBundle\Command\OroTranslationPackCommand;
+use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationAdaptersCollection;
+use Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter;
+use Oro\Bundle\TranslationBundle\Provider\TranslationPackageProvider;
+use Oro\Bundle\TranslationBundle\Provider\TranslationPackDumper;
+use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\TestKernel;
 use Oro\Component\Testing\TempDirExtension;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class OroTranslationPackCommandTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
+
+    /** @var TranslationPackDumper|\PHPUnit\Framework\MockObject\MockObject */
+    private $translationDumper;
+
+    /** var TranslationServiceProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $translationServiceProvider;
+
+    /** var TranslationPackageProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $translationPackageProvider;
+
+    /** @var TranslationAdaptersCollection */
+    private $translationAdaptersCollection;
+
+    protected function setUp()
+    {
+        $this->translationDumper = $this->createMock(TranslationPackDumper::class);
+        $this->translationServiceProvider = $this->createMock(TranslationServiceProvider::class);
+        $this->translationPackageProvider = $this->createMock(TranslationPackageProvider::class);
+        $this->translationAdaptersCollection = new TranslationAdaptersCollection();
+    }
 
     public function testConfigure()
     {
@@ -137,34 +163,26 @@ class OroTranslationPackCommandTest extends \PHPUnit\Framework\TestCase
         $kernel->boot();
 
         $projectId   = 'someproject';
-        $adapterMock = $this->getNewMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter');
+        $adapterMock = $this->getNewMock(CrowdinAdapter::class);
 
         $adapterMock->expects($this->any())
             ->method('setProjectId')
             ->with($projectId);
 
-        $uploaderMock = $this->getNewMock('Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider');
-
-        $uploaderMock->expects($this->any())
-            ->method('setAdapter')
-            ->with($adapterMock)
-            ->will($this->returnSelf());
-
-        $uploaderMock->expects($this->once())
+        $this->translationServiceProvider->expects($this->once())
             ->method('setLogger')
-            ->with($this->isInstanceOf('Psr\Log\LoggerInterface'))
+            ->with($this->isInstanceOf(LoggerInterface::class))
             ->will($this->returnSelf());
 
         if (isset($args['-m']) && $args['-m'] == 'update') {
-            $uploaderMock->expects($this->once())
+            $this->translationServiceProvider->expects($this->once())
                 ->method('update');
         } else {
-            $uploaderMock->expects($this->once())
+            $this->translationServiceProvider->expects($this->once())
                 ->method($commandName);
         }
 
         $kernel->getContainer()->set('oro_translation.uploader.crowdin_adapter', $adapterMock);
-        $kernel->getContainer()->set('oro_translation.service_provider', $uploaderMock);
 
         $app         = new Application($kernel);
         $commandMock = $this->getCommandMock();
@@ -220,9 +238,18 @@ class OroTranslationPackCommandTest extends \PHPUnit\Framework\TestCase
      *
      * @return \PHPUnit\Framework\MockObject\MockObject|OroTranslationPackCommand
      */
-    protected function getCommandMock($methods = array('asText'))
+    protected function getCommandMock($methods = ['asText'])
     {
-        $commandMock = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Command\OroTranslationPackCommand')
+        $commandMock = $this->getMockBuilder(OroTranslationPackCommand::class)
+            ->setConstructorArgs(
+                [
+                    $this->translationDumper,
+                    $this->translationServiceProvider,
+                    $this->translationPackageProvider,
+                    $this->translationAdaptersCollection,
+                    'kernel_dir'
+                ]
+            )
             ->setMethods($methods);
 
         return $commandMock->getMock();

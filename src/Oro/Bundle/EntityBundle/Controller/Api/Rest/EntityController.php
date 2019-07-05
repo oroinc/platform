@@ -7,7 +7,6 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
@@ -43,7 +42,7 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
         $provider = $this->get('oro_entity.entity_provider');
         $result = $provider->getEntities(false, $applyExclusions);
 
-        return $this->handleView($this->view($result, Codes::HTTP_OK));
+        return $this->handleView($this->view($result, Response::HTTP_OK));
     }
 
     /**
@@ -79,7 +78,7 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
         /** @var EntityWithFieldsProvider $provider */
         $provider = $this->get('oro_entity.entity_field_list_provider');
 
-        $statusCode = Codes::HTTP_OK;
+        $statusCode = Response::HTTP_OK;
         try {
             $result = $provider->getFields(
                 $withVirtualFields,
@@ -88,7 +87,7 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
                 $applyExclusions
             );
         } catch (InvalidEntityException $ex) {
-            $statusCode = Codes::HTTP_NOT_FOUND;
+            $statusCode = Response::HTTP_NOT_FOUND;
             $result     = array('message' => $ex->getMessage());
         }
 

@@ -10,13 +10,15 @@ services:
     oro_form.twig.form_extension:
         class: Oro\Bundle\FormBundle\Twig\FormExtension
         arguments:
-            - '@twig.form.renderer'
+            - '@oro_platform.twig.service_locator'
         public: false
         tags:
             - { name: twig.extension }
 
     oro_form.model.update_handler:
         deprecated: The "%service_id%" service is deprecated since v2.1.0 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade (oro_form.update_handler) instead
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: 'Oro\Bundle\FormBundle\Model\UpdateHandler'
         arguments:
             - '@request_stack'
@@ -59,6 +61,8 @@ services:
 
     oro_form.update_handler:
         class: Oro\Bundle\FormBundle\Model\UpdateHandlerFacade
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@request_stack'
             - '@session'

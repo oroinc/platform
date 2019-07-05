@@ -106,7 +106,6 @@ To add a new access rule, create a new class that implements [AccessRuleInterfac
 
 namespace Acme\DemoBundle\AccessRule;
 
-use Acme\DemoBundle\Entity\Contact;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleInterface;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
@@ -121,7 +120,7 @@ class ContactAccessRule implements AccessRuleInterface
      */
     public function isApplicable(Criteria $criteria): bool
     {
-        return $criteria->getEntityClass() === Contact::class;
+        return true;
     }
 
     /**
@@ -140,10 +139,30 @@ Next, the access rule class should be registered as a service with the `oro_secu
     acme_demo.access_rule.contact:
         class: Acme\DemoBundle\AccessRule\ContactAccessRule
         tags:
-            - { name: oro_security.access_rule }
+            - { name: oro_security.access_rule, type: ORM, entityClass: Acme\DemoBundle\Entity\Contact }
 ```
 
-As a result, this access rule is applied to all ACL protected queries that have the *Contact* entity.
+Here, the `type` and `entityClass` are options for the `oro_security.access_rule` tag that are used to
+define conditions when an access rule should be applicable.
+
+In this example the access rule is applied to all ACL protected ORM queries that have the *Contact* entity.
+
+The `oro_security.access_rule` tag options that can be used for any access rule:
+
+- `type` - the type of a query, e.g. `ORM`.
+- `permission` - the ACL permission, e.g. `VIEW`.
+- `entityClass` - the FQCN of an entity.
+- `loggedUserClass` - the FQCN of a logged in user.
+
+**Note:** also, the `oro_security.access_rule` tag can be used with options specific for a particular access rule.
+
+**Note:** using options for the `oro_security.access_rule` tag is more preferable that implementing logic in
+the `isApplicable()` method because it allows to not initialize a rule service if it is not applicable.
+The `isApplicable()` method is intended for complex logic that cannot be achieved via the tag options.
+
+To add additional options you need to create a class that implements
+[AccessRuleOptionMatcherInterface](../../AccessRule/AccessRuleOptionMatcherInterface.php) and decorate
+the service `oro_security.access_rule_option_matcher`.
 
 ## Access Rules Visitor
 

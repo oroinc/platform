@@ -8,12 +8,6 @@ Retrieve a specific file record.
 
 {@inheritdoc}
 
-### get_list
-
-Retrieve a set of file records.
-
-{@inheritdoc}
-
 ### create
 
 Create a new file record.

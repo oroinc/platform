@@ -7,7 +7,6 @@ use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\NavigationBundle\Entity\AbstractPageState;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,7 +33,7 @@ class PagestateController extends FOSRestController implements ClassResourceInte
                 $this->getPageStateRepository()->findBy(
                     array('user' => $this->getUser())
                 ),
-                Codes::HTTP_OK
+                Response::HTTP_OK
             )
         );
     }
@@ -57,10 +56,10 @@ class PagestateController extends FOSRestController implements ClassResourceInte
     public function getAction($id)
     {
         if (!$entity = $this->getEntity($id)) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
-        return $this->handleView($this->view($entity, Codes::HTTP_OK));
+        return $this->handleView($this->view($entity, Response::HTTP_OK));
     }
 
     /**
@@ -81,8 +80,8 @@ class PagestateController extends FOSRestController implements ClassResourceInte
         $entity = new $pageStateClass();
 
         $view = $this->get('oro_navigation.form.handler.pagestate')->process($entity)
-            ? $this->view($this->getState($entity), Codes::HTTP_CREATED)
-            : $this->view($this->get('oro_navigation.form.pagestate'), Codes::HTTP_BAD_REQUEST);
+            ? $this->view($this->getState($entity), Response::HTTP_CREATED)
+            : $this->view($this->get('oro_navigation.form.pagestate'), Response::HTTP_BAD_REQUEST);
 
         return $this->handleView($view);
     }
@@ -105,12 +104,12 @@ class PagestateController extends FOSRestController implements ClassResourceInte
     public function putAction($id)
     {
         if (!$entity = $this->getEntity($id)) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
         $view = $this->get('oro_navigation.form.handler.pagestate')->process($entity)
-            ? $this->view('', Codes::HTTP_NO_CONTENT)
-            : $this->view($this->get('oro_navigation.form.pagestate'), Codes::HTTP_BAD_REQUEST);
+            ? $this->view('', Response::HTTP_NO_CONTENT)
+            : $this->view($this->get('oro_navigation.form.pagestate'), Response::HTTP_BAD_REQUEST);
 
         return $this->handleView($view);
     }
@@ -133,13 +132,13 @@ class PagestateController extends FOSRestController implements ClassResourceInte
     public function deleteAction($id)
     {
         if (!$entity = $this->getEntity($id)) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
         $this->getManager()->remove($entity);
         $this->getManager()->flush();
 
-        return $this->handleView($this->view('', Codes::HTTP_NO_CONTENT));
+        return $this->handleView($this->view('', Response::HTTP_NO_CONTENT));
     }
 
     /**
@@ -159,7 +158,7 @@ class PagestateController extends FOSRestController implements ClassResourceInte
                 AbstractPageState::generateHash($this->get('request_stack')->getCurrentRequest()->get('pageId'))
             );
 
-        return $this->handleView($this->view($this->getState($entity), Codes::HTTP_OK));
+        return $this->handleView($this->view($this->getState($entity), Response::HTTP_OK));
     }
 
     /**

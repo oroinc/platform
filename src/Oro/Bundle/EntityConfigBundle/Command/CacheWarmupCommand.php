@@ -7,16 +7,32 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Warms up the entity config cache.
+ */
 class CacheWarmupCommand extends ContainerAwareCommand
 {
+    /** @var string */
+    protected static $defaultName = 'oro:entity-config:cache:warmup';
+
+    /** @var ConfigCacheWarmer */
+    private $configCacheWarmer;
+
+    /**
+     * @param ConfigCacheWarmer $configCacheWarmer
+     */
+    public function __construct(ConfigCacheWarmer $configCacheWarmer)
+    {
+        $this->configCacheWarmer = $configCacheWarmer;
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
-        $this
-            ->setName('oro:entity-config:cache:warmup')
-            ->setDescription('Warms up the entity config cache.');
+        $this->setDescription('Warms up the entity config cache.');
     }
 
     /**
@@ -26,8 +42,6 @@ class CacheWarmupCommand extends ContainerAwareCommand
     {
         $output->writeln('Warm up the entity config cache');
 
-        /** @var ConfigCacheWarmer $configCacheWarmer */
-        $configCacheWarmer = $this->getContainer()->get('oro_entity_config.config_cache_warmer');
-        $configCacheWarmer->warmUpCache();
+        $this->configCacheWarmer->warmUpCache();
     }
 }

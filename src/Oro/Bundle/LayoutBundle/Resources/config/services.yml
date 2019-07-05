@@ -29,6 +29,9 @@ services:
             - '@oro_layout.layout_context_holder'
             - '@oro_layout.profiler.layout_data_collector'
 
+    Oro\Bundle\LayoutBundle\Layout\LayoutManager:
+        alias: oro_layout.layout_manager
+
     layout:
         alias: oro_layout.layout_manager
 
@@ -36,9 +39,6 @@ services:
         class: Oro\Component\Layout\Templating\TextHelper
         arguments:
             - '@translator'
-
-    Oro\Component\Layout\Templating\TextHelper:
-        alias: oro_layout.text.helper
 
     oro_layout.layout_context_configurator.application:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ApplicationContextConfigurator
@@ -108,6 +108,9 @@ services:
         class: Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider
         arguments:
             - '@oro_layout.theme_manager'
+
+    Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider:
+        alias: oro_layout.provider.image_type
 
     oro_layout.provider.requirejs_config:
         class: Oro\Bundle\LayoutBundle\Provider\RequireJSConfigProvider

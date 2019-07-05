@@ -32,15 +32,9 @@ class OrganizationExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->entityOwnerAccessor = $this->getMockBuilder(EntityOwnerAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->businessUnitManager = $this->getMockBuilder(BusinessUnitManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityOwnerAccessor = $this->createMock(EntityOwnerAccessor::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->businessUnitManager = $this->createMock(BusinessUnitManager::class);
 
         $this->entityOwnerAccessor->expects($this->any())
             ->method('getOwner')
@@ -51,9 +45,9 @@ class OrganizationExtensionTest extends \PHPUnit\Framework\TestCase
             );
 
         $container = self::getContainerBuilder()
-            ->add('oro_security.owner.entity_owner_accessor', $this->entityOwnerAccessor)
-            ->add('oro_entity_config.config_manager', $this->configManager)
-            ->add('oro_organization.business_unit_manager', $this->businessUnitManager)
+            ->add(EntityOwnerAccessor::class, $this->entityOwnerAccessor)
+            ->add(ConfigManager::class, $this->configManager)
+            ->add(BusinessUnitManager::class, $this->businessUnitManager)
             ->getContainer($this);
 
         $this->extension = new OrganizationExtension($container);

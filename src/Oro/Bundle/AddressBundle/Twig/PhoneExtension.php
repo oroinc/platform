@@ -3,7 +3,8 @@
 namespace Oro\Bundle\AddressBundle\Twig;
 
 use Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -12,7 +13,7 @@ use Twig\TwigFunction;
  *   - phone_number
  *   - phone_numbers
  */
-class PhoneExtension extends AbstractExtension
+class PhoneExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -82,5 +83,15 @@ class PhoneExtension extends AbstractExtension
     public function getName()
     {
         return 'oro_phone_extension';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_address.provider.phone' => PhoneProviderInterface::class,
+        ];
     }
 }

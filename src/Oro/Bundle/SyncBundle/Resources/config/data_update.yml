@@ -18,6 +18,11 @@ services:
 
     oro_sync.content.tag_generator:
         class: Oro\Bundle\SyncBundle\Content\TagGeneratorChain
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
+
+    Oro\Bundle\SyncBundle\Content\TagGeneratorInterface:
+        alias: oro_sync.content.tag_generator
 
     oro_sync.content.tag_generator.doctrine:
         class: Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator
@@ -34,10 +39,15 @@ services:
 
     oro_sync.content.data_update_topic_sender:
         class: 'Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_sync.websocket_client'
             - '@oro_sync.client.connection_checker'
             - '@security.token_storage'
+
+    Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender:
+        alias: oro_sync.content.data_update_topic_sender
 
     oro_sync.topic.data_update:
         class: Oro\Bundle\SyncBundle\Topic\BroadcastTopic

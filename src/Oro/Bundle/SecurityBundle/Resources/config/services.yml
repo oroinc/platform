@@ -1,8 +1,4 @@
 parameters:
-    twig.exception_listener.class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
-    fos_rest.exception_listener.class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
-    security.exception_listener.class:                         Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener
-
     oro_security.acl.base_manager.class:                       Oro\Bundle\SecurityBundle\Acl\Persistence\BaseAclManager
     oro_security.acl.manager.class:                            Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager
     oro_security.acl.sid_manager.class:                        Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager
@@ -34,7 +30,6 @@ parameters:
     oro_security.token.factory.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
     oro_security.token.factory.organization_rememberme.class: Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory
 
-    oro_security.acl_helper.class:                             Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper
     oro_security.search.acl_helper.class:                      Oro\Bundle\SecurityBundle\Search\AclHelper
     oro_security.orm.ownership_sql_walker_builder.class:       Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder
     oro_security.ownership_tree_provider.class:                Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider
@@ -50,6 +45,8 @@ parameters:
 
     oro_security.serializer.filter_chain.class:                Oro\Component\EntitySerializer\Filter\EntityAwareFilterChain
     oro_security.serializer.acl_filter:                        Oro\Bundle\SecurityBundle\Filter\SerializerFieldFilter
+
+    oro_security.allowed_protocols: ['http', 'https']
 
 services:
     oro_security.request_authorization_checker:
@@ -71,6 +68,8 @@ services:
 
     oro_security.token_accessor:
         class: Oro\Bundle\SecurityBundle\Authentication\TokenAccessor
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@security.token_storage'
 
@@ -94,6 +93,8 @@ services:
 
     oro_security.acl.manager:
         class: '%oro_security.acl.manager.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_security.acl.object_identity_factory'
             - '@oro_security.acl.extension_selector'
@@ -372,10 +373,9 @@ services:
         class: Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
         public: false
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber }
 
     oro_security.encoder.default:
         class: Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter
@@ -388,11 +388,15 @@ services:
         arguments: [ '%kernel.secret%']
 
     oro_security.acl_helper:
-        class: '%oro_security.acl_helper.class%'
+        class: Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
-            - '@Psr\Container\ContainerInterface'
-        tags:
-            - { name: container.service_subscriber }
+            - '@security.token_storage'
+            - '@oro_security.access_rule_executor'
+
+    Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper:
+        alias: oro_security.acl_helper
 
     oro_security.search.acl_helper:
         class: '%oro_security.search.acl_helper.class%'
@@ -472,6 +476,8 @@ services:
 
     oro_security.token.factory.username_password_organization:
         class: '%oro_security.token.factory.username_password_organization.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
 
     oro_security.token.factory.organization_rememberme:
         class: '%oro_security.token.factory.organization_rememberme.class%'
@@ -710,6 +716,9 @@ services:
         arguments:
             - '@oro_security.encoder.default'
 
+    Oro\Bundle\SecurityBundle\Generator\RandomTokenGeneratorInterface:
+        alias: oro_security.generator.random_token
+
     oro_security.form.data_transformer.factory.crypted_data:
         class: 'Oro\Bundle\SecurityBundle\Form\DataTransformer\Factory\CryptedDataTransformerFactory'
         arguments:
@@ -764,11 +773,20 @@ services:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -10 }
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse, priority: -10 }
 
-    oro_security.access_rule.chain_access_rule:
-        class: Oro\Bundle\SecurityBundle\AccessRule\ChainAccessRule
+    # this service is initialized by Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AccessRulesPass
+    oro_security.access_rule_executor:
+        class: Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor
+        public: false
+        arguments:
+            - []
+            - ~
+            - '@oro_security.access_rule_option_matcher'
 
-    Oro\Bundle\SecurityBundle\AccessRule\ChainAccessRule:
-        alias: oro_security.access_rule.chain_access_rule
+    oro_security.access_rule_option_matcher:
+        class: Oro\Bundle\SecurityBundle\AccessRule\AccessRuleOptionMatcher
+        public: false
+        arguments:
+            - '@oro_security.token_accessor'
 
     oro_security.access_rule.acl:
         class: Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule
@@ -777,7 +795,7 @@ services:
             - '@oro_security.orm.ownership_sql_walker_builder'
             - '@oro_security.owner.metadata_provider.chain'
         tags:
-            - { name: oro_security.access_rule }
+            - { name: oro_security.access_rule, aclDisable: false }
 
     oro_security.access_rule.available_owner_check:
         class: Oro\Bundle\SecurityBundle\AccessRule\AvailableOwnerAccessRule
@@ -786,9 +804,42 @@ services:
             - '@oro_security.orm.ownership_sql_walker_builder'
             - '@oro_security.owner.metadata_provider.chain'
         tags:
-            - { name: oro_security.access_rule }
+            - { name: oro_security.access_rule, permission: CREATE, availableOwnerEnable: true }
+            - { name: oro_security.access_rule, permission: ASSIGN, availableOwnerEnable: true }
 
     oro_security.form.extension.autocomplete_password_type:
         class: 'Oro\Bundle\SecurityBundle\Form\Extension\AutocompletePasswordTypeExtension'
         tags:
             - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\PasswordType }
+
+    oro_security.menu_builder.strip_dangerous_protocols:
+        class: Oro\Bundle\SecurityBundle\Menu\Builder\StripDangerousProtocolsBuilder
+        arguments:
+            - '@oro_security.util.uri_security_helper'
+        tags:
+            - { name: oro_menu.builder, priority: 300 }
+
+    oro_security.validator.constraints.not_dangerous_protocol:
+        class: Oro\Bundle\SecurityBundle\Validator\Constraints\NotDangerousProtocolValidator
+        arguments:
+            - '@oro_security.util.uri_security_helper'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_security.validator.constraints.not_dangerous_protocol }
+
+    oro_security.util.uri_security_helper:
+        class: Oro\Bundle\SecurityBundle\Util\UriSecurityHelper
+        arguments:
+            - '%oro_security.allowed_protocols%'
+
+    Oro\Bundle\SecurityBundle\Util\UriSecurityHelper:
+        alias: oro_security.util.uri_security_helper
+
+    oro_security.rest_exception_listener:
+        class: Oro\Bundle\SecurityBundle\EventListener\RestExceptionListener
+        decorates: fos_rest.exception_listener
+        parent: fos_rest.exception_listener
+
+    oro_security.twig_exception_listener:
+        class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
+        decorates: twig.exception_listener
+        parent: twig.exception_listener

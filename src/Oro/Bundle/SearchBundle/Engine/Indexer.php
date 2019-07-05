@@ -9,7 +9,6 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Search index accesser class.
@@ -45,24 +44,21 @@ class Indexer
     protected $isAllowedApplyAcl = true;
 
     /**
-     * @param EngineInterface   $engine
-     * @param ObjectMapper        $mapper
-     * @param SecurityProvider    $securityProvider
-     * @param AclHelper           $searchAclHelper
-     * @param EventDispatcherInterface $dispatcher
+     * @param EngineInterface  $engine
+     * @param ObjectMapper     $mapper
+     * @param SecurityProvider $securityProvider
+     * @param AclHelper        $searchAclHelper
      */
     public function __construct(
-        EngineInterface        $engine,
-        ObjectMapper             $mapper,
-        SecurityProvider         $securityProvider,
-        AclHelper                $searchAclHelper,
-        EventDispatcherInterface $dispatcher
+        EngineInterface $engine,
+        ObjectMapper $mapper,
+        SecurityProvider $securityProvider,
+        AclHelper $searchAclHelper
     ) {
-        $this->engine           = $engine;
-        $this->mapper           = $mapper;
+        $this->engine = $engine;
+        $this->mapper = $mapper;
         $this->securityProvider = $securityProvider;
-        $this->searchAclHelper  = $searchAclHelper;
-        $this->dispatcher       = $dispatcher;
+        $this->searchAclHelper = $searchAclHelper;
     }
 
     /**

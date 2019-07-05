@@ -188,7 +188,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isOwningSide'             => true,
                 'mappedBy'                 => null,
                 'inversedBy'               => null,
-                'cascade'                  => ['detach'],
+                'cascade'                  => [],
                 'joinColumns'              => [
                     [
                         'name'                 => $fieldName . '_id',
@@ -213,7 +213,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isCascadePersist'         => false,
                 'isCascadeRefresh'         => false,
                 'isCascadeMerge'           => false,
-                'isCascadeDetach'          => true,
+                'isCascadeDetach'          => false,
                 'orphanRemoval'            => false
             ],
             $result
@@ -280,7 +280,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isOwningSide'             => true,
                 'mappedBy'                 => null,
                 'inversedBy'               => null,
-                'cascade'                  => ['persist', 'detach'],
+                'cascade'                  => ['persist'],
                 'joinColumns'              => [
                     [
                         'name'                 => $fieldName . '_id',
@@ -305,7 +305,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isCascadePersist'         => true,
                 'isCascadeRefresh'         => false,
                 'isCascadeMerge'           => false,
-                'isCascadeDetach'          => true,
+                'isCascadeDetach'          => false,
                 'orphanRemoval'            => false
             ],
             $result
@@ -370,7 +370,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isOwningSide'             => true,
                 'mappedBy'                 => null,
                 'inversedBy'               => $targetFieldName,
-                'cascade'                  => ['detach'],
+                'cascade'                  => [],
                 'joinColumns'              => [
                     [
                         'name'                 => $fieldName . '_id',
@@ -395,7 +395,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isCascadePersist'         => false,
                 'isCascadeRefresh'         => false,
                 'isCascadeMerge'           => false,
-                'isCascadeDetach'          => true,
+                'isCascadeDetach'          => false,
                 'orphanRemoval'            => false
             ],
             $result
@@ -477,7 +477,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isOwningSide'             => true,
                 'mappedBy'                 => null,
                 'inversedBy'               => null,
-                'cascade'                  => ['detach'],
+                'cascade'                  => [],
                 'joinColumns'              => [
                     [
                         'name'                 => $columnName,
@@ -502,7 +502,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isCascadePersist'         => false,
                 'isCascadeRefresh'         => false,
                 'isCascadeMerge'           => false,
-                'isCascadeDetach'          => true,
+                'isCascadeDetach'          => false,
                 'orphanRemoval'            => false
             ],
             $result
@@ -574,13 +574,13 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isOwningSide'     => false,
                 'mappedBy'         => $targetFieldName,
                 'inversedBy'       => null,
-                'cascade'          => ['detach'],
+                'cascade'          => [],
                 'fetch'            => ClassMetadataInfo::FETCH_LAZY,
                 'isCascadeRemove'  => false,
                 'isCascadePersist' => false,
                 'isCascadeRefresh' => false,
                 'isCascadeMerge'   => false,
-                'isCascadeDetach'  => true,
+                'isCascadeDetach'  => false,
                 'orphanRemoval'    => false
             ],
             $result
@@ -635,7 +635,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                         'owner'           => false,
                         'target_entity'   => $targetEntityClass,
                         'target_field_id' => $targetFieldId,
-                        'cascade'         => ['persist'],
+                        'cascade'         => ['persist', 'detach'],
                         'fetch'           => 'extra_lazy',
                     ]
                 ],
@@ -745,13 +745,13 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isOwningSide'     => false,
                 'mappedBy'         => $targetFieldName,
                 'inversedBy'       => null,
-                'cascade'          => ['detach'],
+                'cascade'          => [],
                 'fetch'            => ClassMetadataInfo::FETCH_LAZY,
                 'isCascadeRemove'  => false,
                 'isCascadePersist' => false,
                 'isCascadeRefresh' => false,
                 'isCascadeMerge'   => false,
-                'isCascadeDetach'  => true,
+                'isCascadeDetach'  => false,
                 'orphanRemoval'    => false
             ],
             $result
@@ -861,13 +861,13 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isOwningSide'     => false,
                 'mappedBy'         => $targetFieldName,
                 'inversedBy'       => null,
-                'cascade'          => ['detach'],
+                'cascade'          => [],
                 'fetch'            => ClassMetadataInfo::FETCH_LAZY,
                 'isCascadeRemove'  => false,
                 'isCascadePersist' => false,
                 'isCascadeRefresh' => false,
                 'isCascadeMerge'   => false,
-                'isCascadeDetach'  => true,
+                'isCascadeDetach'  => false,
                 'orphanRemoval'    => false
             ],
             $result

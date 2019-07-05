@@ -9,7 +9,7 @@ services:
     jms_serializer.twig_extension.serializer:
         class: Oro\Bundle\PlatformBundle\Twig\SerializerExtension
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -66,12 +66,14 @@ services:
         class: Oro\Bundle\PlatformBundle\Twig\PlatformExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
     oro_platform.optional_listeners.manager:
         class: Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
            - []
            - '@service_container'
@@ -106,6 +108,8 @@ services:
 
     oro_platform.command_executor:
         class: Oro\Component\PhpUtils\Tools\CommandExecutor\CommandExecutor
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '%kernel.project_dir%/bin/console'
             - '%kernel.environment%'
@@ -114,3 +118,11 @@ services:
         class: Oro\Bundle\PlatformBundle\Collector\PlatformCollector
         tags:
             - { name: data_collector, template: "%oro_platform.collector.template%", id: oro_platform, priority: -260 }
+
+    oro_platform.twig.service_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        public: false
+        arguments:
+            - [] # services. Will be set in Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\TwigServiceLocatorPass
+        tags:
+            - { name: container.service_locator }

@@ -15,3 +15,7 @@ Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
                 min:        6
                 max:        255
             - Email:        ~
+        website:
+            - Url:
+                protocols: ['http', 'https']
+                message: oro.organization.validation.business_unit.website_url.message

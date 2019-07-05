@@ -4,9 +4,10 @@ namespace Oro\Bundle\SecurityBundle\Tests\Functional\Cache;
 
 use Oro\Bundle\SecurityBundle\Cache\WsseNoncePhpFileCache;
 use Oro\Bundle\SecurityBundle\Tests\Util\ReflectionUtil;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\TempDirExtension;
 
-class WsseNoncePhpFileCacheTest extends \PHPUnit\Framework\TestCase
+class WsseNoncePhpFileCacheTest extends WebTestCase
 {
     use TempDirExtension;
 

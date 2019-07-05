@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -14,7 +15,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class ApplyCriteria implements ProcessorInterface
 {
     /** @var CriteriaConnector */
-    protected $criteriaConnector;
+    private $criteriaConnector;
 
     /**
      * @param CriteriaConnector $criteriaConnector
@@ -32,15 +33,12 @@ class ApplyCriteria implements ProcessorInterface
         /** @var Context $context */
 
         $criteria = $context->getCriteria();
-        if (null === $criteria) {
-            // the criteria object does not exist
-            return;
-        }
-
-        $query = $context->getQuery();
-        if ($query instanceof QueryBuilder) {
-            $this->criteriaConnector->applyCriteria($query, $criteria);
-            $context->setCriteria();
+        if ($criteria instanceof Criteria) {
+            $query = $context->getQuery();
+            if ($query instanceof QueryBuilder) {
+                $this->criteriaConnector->applyCriteria($query, $criteria);
+                $context->setCriteria();
+            }
         }
     }
 }

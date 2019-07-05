@@ -4,7 +4,9 @@ namespace Oro\Bundle\ApiBundle\Command;
 
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\Debug\TraceableProcessor;
@@ -15,27 +17,42 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * The CLI command to show different kind of debug information about Data API.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class DebugCommand extends AbstractDebugCommand
+class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     /** @var string */
     protected static $defaultName = 'oro:api:debug';
 
     /** @var ActionProcessorBagInterface */
     private $actionProcessorBag;
 
+    /** @var ProcessorBagInterface */
+    private $processorBag;
+
     /**
+     * @param ValueNormalizer $valueNormalizer
+     * @param ResourcesProvider $resourcesProvider
      * @param ActionProcessorBagInterface $actionProcessorBag
+     * @param ProcessorBagInterface $processorBag
      */
-    public function __construct(ActionProcessorBagInterface $actionProcessorBag)
-    {
-        parent::__construct();
+    public function __construct(
+        ValueNormalizer $valueNormalizer,
+        ResourcesProvider $resourcesProvider,
+        ActionProcessorBagInterface $actionProcessorBag,
+        ProcessorBagInterface $processorBag
+    ) {
+        parent::__construct($valueNormalizer, $resourcesProvider);
 
         $this->actionProcessorBag = $actionProcessorBag;
+        $this->processorBag = $processorBag;
     }
 
     /**
@@ -128,20 +145,18 @@ class DebugCommand extends AbstractDebugCommand
      */
     protected function dumpActions(OutputInterface $output)
     {
-        /** @var ProcessorBagInterface $processorBag */
-        $processorBag = $this->getContainer()->get('oro_api.processor_bag');
         $publicActions = $this->actionProcessorBag->getActions();
 
         $processorsForPublicActions = [];
         $processorsForOtherActions = [];
         $totalNumberOfProcessors = 0;
         $allProcessorsIds = [];
-        foreach ($processorBag->getActions() as $action) {
-            $processorIds = $this->getProcessorIds($processorBag, $action);
+        foreach ($this->processorBag->getActions() as $action) {
+            $processorIds = $this->getProcessorIds($action);
             $allProcessorsIds = array_merge($allProcessorsIds, $processorIds);
             $numberOfProcessors = count($processorIds);
             $totalNumberOfProcessors += $numberOfProcessors;
-            $processorInfo = [$numberOfProcessors, $processorBag->getActionGroups($action)];
+            $processorInfo = [$numberOfProcessors, $this->processorBag->getActionGroups($action)];
             if (in_array($action, $publicActions, true)) {
                 $processorsForPublicActions[$action] = $processorInfo;
             } else {
@@ -216,9 +231,6 @@ class DebugCommand extends AbstractDebugCommand
     {
         $output->writeln('The processors are displayed in alphabetical order.');
 
-        /** @var ProcessorBagInterface $processorBag */
-        $processorBag = $this->getContainer()->get('oro_api.processor_bag');
-
         $table = new Table($output);
         $table->setHeaders(['Processor', 'Actions', 'Is Service?']);
 
@@ -229,11 +241,10 @@ class DebugCommand extends AbstractDebugCommand
         $applicableChecker->addChecker(new Util\RequestTypeApplicableChecker());
 
         $processorsMap = [];
-        $container = $this->getContainer();
-        $actions = $processorBag->getActions();
+        $actions = $this->processorBag->getActions();
         foreach ($actions as $action) {
             $context->setAction($action);
-            $processors = $processorBag->getProcessors($context);
+            $processors = $this->processorBag->getProcessors($context);
             $processors->setApplicableChecker($applicableChecker);
             foreach ($processors as $processor) {
                 if ($processor instanceof TraceableProcessor) {
@@ -246,7 +257,7 @@ class DebugCommand extends AbstractDebugCommand
                 if (!in_array($action, $processorsMap[$className][0], true)) {
                     $processorsMap[$className][0][] = $action;
                 }
-                if ($container->has($processors->getProcessorId())) {
+                if ($this->container->has($processors->getProcessorId())) {
                     $processorsMap[$className][1][] = true;
                 }
             }
@@ -271,9 +282,6 @@ class DebugCommand extends AbstractDebugCommand
     {
         $output->writeln('The list of processors that do not have a description:');
 
-        /** @var ProcessorBagInterface $processorBag */
-        $processorBag = $this->getContainer()->get('oro_api.processor_bag');
-
         $context = new Context();
         $context->set(ApiContext::REQUEST_TYPE, $requestType);
 
@@ -281,10 +289,10 @@ class DebugCommand extends AbstractDebugCommand
         $applicableChecker->addChecker(new Util\RequestTypeApplicableChecker());
 
         $processorClasses = [];
-        $actions = $processorBag->getActions();
+        $actions = $this->processorBag->getActions();
         foreach ($actions as $action) {
             $context->setAction($action);
-            $processors = $processorBag->getProcessors($context);
+            $processors = $this->processorBag->getProcessors($context);
             $processors->setApplicableChecker($applicableChecker);
             foreach ($processors as $processor) {
                 if ($processor instanceof TraceableProcessor) {
@@ -313,9 +321,6 @@ class DebugCommand extends AbstractDebugCommand
     {
         $output->writeln('The processors are displayed in the order they are executed.');
 
-        /** @var ProcessorBagInterface $processorBag */
-        $processorBag = $this->getContainer()->get('oro_api.processor_bag');
-
         $table = new Table($output);
         $table->setHeaders(['Processor', 'Attributes']);
 
@@ -328,7 +333,7 @@ class DebugCommand extends AbstractDebugCommand
             $context->set($name, $this->getTypedValue($value));
             $specifiedAttributes[] = $name;
         }
-        $processors = $processorBag->getProcessors($context);
+        $processors = $this->processorBag->getProcessors($context);
 
         $applicableChecker = new ChainApplicableChecker();
         $applicableChecker->addChecker(new Util\RequestTypeApplicableChecker());
@@ -459,16 +464,15 @@ class DebugCommand extends AbstractDebugCommand
     }
 
     /**
-     * @param ProcessorBagInterface $processorBag
-     * @param string                $action
+     * @param string $action
      *
      * @return string[]
      */
-    protected function getProcessorIds(ProcessorBagInterface $processorBag, $action)
+    protected function getProcessorIds($action)
     {
         $context = new Context();
         $context->setAction($action);
-        $processors = $processorBag->getProcessors($context);
+        $processors = $this->processorBag->getProcessors($context);
         $processors->setApplicableChecker(new ChainApplicableChecker());
 
         $result = [];

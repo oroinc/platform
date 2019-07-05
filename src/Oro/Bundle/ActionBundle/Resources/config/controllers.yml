@@ -2,12 +2,8 @@ services:
     _defaults:
         public: true
 
-    oro_action.controller.ajax:
-        class: 'Oro\Bundle\ActionBundle\Controller\AjaxController'
+    Oro\Bundle\ActionBundle\Controller\AjaxController:
         calls:
             - [setContainer, ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: 'container.service_subscriber' }
-
-    Oro\Bundle\ActionBundle\Controller\AjaxController:
-        alias: 'oro_action.controller.ajax'

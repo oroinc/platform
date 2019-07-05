@@ -7,7 +7,8 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -19,7 +20,7 @@ use Twig\TwigFilter;
  *   - oro_formatting_code_title
  *   - localized_value
  */
-class LocalizationExtension extends AbstractExtension
+class LocalizationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const NAME = 'oro_locale_localization';
 
@@ -131,5 +132,17 @@ class LocalizationExtension extends AbstractExtension
     public function getName()
     {
         return static::NAME;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_locale.formatter.language_code' => LanguageCodeFormatter::class,
+            'oro_locale.formatter.formatting_code' => FormattingCodeFormatter::class,
+            'oro_locale.helper.localization' => LocalizationHelper::class,
+        ];
     }
 }

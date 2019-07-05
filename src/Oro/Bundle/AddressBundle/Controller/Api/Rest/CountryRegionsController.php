@@ -5,7 +5,6 @@ namespace Oro\Bundle\AddressBundle\Controller\Api\Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
@@ -33,7 +32,7 @@ class CountryRegionsController extends FOSRestController
     {
         if (!$country) {
             return $this->handleView(
-                $this->view(null, Codes::HTTP_NOT_FOUND)
+                $this->view(null, Response::HTTP_NOT_FOUND)
             );
         }
 
@@ -42,7 +41,7 @@ class CountryRegionsController extends FOSRestController
         $regions = $regionRepository->getCountryRegions($country);
 
         return $this->handleView(
-            $this->view($regions, Codes::HTTP_OK)
+            $this->view($regions, Response::HTTP_OK)
         );
     }
 }

@@ -301,7 +301,11 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
             return;
         }
 
-        $result = $this->entitySerializer->serialize($query, $config);
+        $result = $this->entitySerializer->serialize(
+            $query,
+            $config,
+            $context->getNormalizationContext()
+        );
         if (empty($result)) {
             $result = null;
         } elseif (count($result) === 1) {
@@ -346,7 +350,7 @@ class ValidateEntityIdExists implements ProcessorInterface
         /** @var SingleItemContext $context */
 
         $entityId = $context->getId();
-        if (empty($entityId)) {
+        if ((null === $entityId || '' === $entityId) && $context->hasIdentifierFields()) {
             $context->addError(
                 Error::createValidationError(
                     Constraint::ENTITY_ID,

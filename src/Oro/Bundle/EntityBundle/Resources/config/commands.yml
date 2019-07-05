@@ -1,6 +1,7 @@
 services:
     Oro\Bundle\EntityBundle\Command\EntityAliasDebugCommand:
         public: false
-        class: Oro\Bundle\EntityBundle\Command\EntityAliasDebugCommand
+        arguments:
+            - '@oro_entity.entity_alias_resolver'
         tags:
             - { name: console.command }

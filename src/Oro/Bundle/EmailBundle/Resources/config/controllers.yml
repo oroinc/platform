@@ -2,12 +2,14 @@ services:
     _defaults:
         public: true
 
-    oro_email.controller.auto_response_rule:
-        class: 'Oro\Bundle\EmailBundle\Controller\AutoResponseRuleController'
+    Oro\Bundle\EmailBundle\Controller\AutoResponseRuleController:
         calls:
             - [setContainer, ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: 'container.service_subscriber' }
 
-    Oro\Bundle\EmailBundle\Controller\AutoResponseRuleController:
-        alias: 'oro_email.controller.auto_response_rule'
+    Oro\Bundle\EmailBundle\Controller\Dashboard\DashboardController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: 'container.service_subscriber' }

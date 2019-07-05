@@ -45,7 +45,7 @@ class SearchReindexationGlobalOptionsProviderTest extends \PHPUnit\Framework\Tes
 
         $this->command->expects($this->once())
             ->method('getName')
-            ->willReturn(PlatformUpdateCommand::NAME);
+            ->willReturn(PlatformUpdateCommand::getDefaultName());
         $this->command->expects($this->once())
             ->method('getApplication')
             ->willReturn($application);
@@ -63,7 +63,7 @@ class SearchReindexationGlobalOptionsProviderTest extends \PHPUnit\Framework\Tes
 
         $this->command->expects($this->once())
             ->method('getName')
-            ->willReturn(PlatformUpdateCommand::NAME);
+            ->willReturn(PlatformUpdateCommand::getDefaultName());
 
         $command = $this->createMock(HelpCommand::class);
         $command->expects($this->once())

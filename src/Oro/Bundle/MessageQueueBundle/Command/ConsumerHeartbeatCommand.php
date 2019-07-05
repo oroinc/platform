@@ -4,6 +4,9 @@ namespace Oro\Bundle\MessageQueueBundle\Command;
 
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\CronBundle\Command\SynchronousCommandInterface;
+use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
+use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,8 +18,35 @@ class ConsumerHeartbeatCommand extends ContainerAwareCommand implements
     CronCommandInterface,
     SynchronousCommandInterface
 {
-    const COMMAND_NAME = 'oro:cron:message-queue:consumer_heartbeat_check';
     const HEARTBEAT_UPDATE_PERIOD_PARAMETER_NAME = 'oro_message_queue.consumer_heartbeat_update_period';
+
+    /** @var string */
+    protected static $defaultName = 'oro:cron:message-queue:consumer_heartbeat_check';
+
+    /** @var ConsumerHeartbeat */
+    private $consumerHeartbeat;
+
+    /** var ConnectionChecker **/
+    private $connectionChecker;
+
+    /** var WebsocketClientInterface **/
+    private $websocketClient;
+
+    /**
+     * @param ConsumerHeartbeat $consumerHeartbeat
+     * @param ConnectionChecker $connectionChecker
+     * @param WebsocketClientInterface $websocketClient
+     */
+    public function __construct(
+        ConsumerHeartbeat $consumerHeartbeat,
+        ConnectionChecker $connectionChecker,
+        WebsocketClientInterface $websocketClient
+    ) {
+        $this->consumerHeartbeat = $consumerHeartbeat;
+        $this->connectionChecker = $connectionChecker;
+        $this->websocketClient = $websocketClient;
+        parent::__construct();
+    }
 
     /** {@inheritdoc} */
     public function getDefaultDefinition()
@@ -36,8 +66,7 @@ class ConsumerHeartbeatCommand extends ContainerAwareCommand implements
     /** {@inheritdoc} */
     public function configure()
     {
-        $this->setName(self::COMMAND_NAME)
-            ->setDescription('Checks if there is alive consumers');
+        $this->setDescription('Checks if there is alive consumers');
     }
 
     /** {@inheritdoc} */
@@ -48,12 +77,9 @@ class ConsumerHeartbeatCommand extends ContainerAwareCommand implements
             return;
         }
 
-        $container = $this->getContainer();
-        if (!$container->get('oro_message_queue.consumption.consumer_heartbeat')->isAlive() &&
-            $container->get('oro_sync.client.connection_checker')->checkConnection()
-        ) {
+        if (!$this->consumerHeartbeat->isAlive() && $this->connectionChecker->checkConnection()) {
             // Notify frontend that there are no alive consumers.
-            $container->get('oro_sync.websocket_client')->publish('oro/message_queue_heartbeat', '');
+            $this->websocketClient->publish('oro/message_queue_heartbeat', '');
         }
     }
 }

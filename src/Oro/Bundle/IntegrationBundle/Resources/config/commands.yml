@@ -1,12 +1,19 @@
 services:
-    Oro\Bundle\IntegrationBundle\Command\CleanupCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\IntegrationBundle\Command\CleanupCommand
+
+    Oro\Bundle\IntegrationBundle\Command\CleanupCommand:
+        arguments:
+            - '@doctrine'
+            - '@oro_entity.orm.native_query_executor_helper'
         tags:
             - { name: console.command }
 
     Oro\Bundle\IntegrationBundle\Command\SyncCommand:
-        public: false
-        class: Oro\Bundle\IntegrationBundle\Command\SyncCommand
+        arguments:
+            - '@oro_message_queue.job.processor'
+            - '@translator'
+            - '@oro_integration.genuine_sync_scheduler'
+            - '@doctrine.orm.entity_manager'
         tags:
             - { name: console.command }

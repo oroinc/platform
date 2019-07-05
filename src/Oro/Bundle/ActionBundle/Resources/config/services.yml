@@ -14,6 +14,8 @@ parameters:
 services:
     oro_action.handler.delete:
         class: '%oro_action.handler.delete.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_soap.handler.delete'
             - '@oro_action.api_manager'
@@ -25,6 +27,9 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@property_accessor'
             - '@request_stack'
+
+    Oro\Bundle\ActionBundle\Helper\ContextHelper:
+        alias: 'oro_action.helper.context'
 
     oro_action.helper.default_operation_request:
         class: 'Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper'
@@ -155,6 +160,8 @@ services:
         class: 'Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider'
 
     oro_action.form.handler.operation_button:
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: Oro\Bundle\ActionBundle\Handler\OperationFormHandler
         arguments:
             - '@form.factory'
@@ -216,11 +223,15 @@ services:
             - { name: layout.data_provider, alias: buttons }
 
     oro_action.provider.button_search_context:
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider'
         arguments:
             - '@oro_action.helper.context'
 
     oro_action.provider.button:
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonProvider'
         lazy: true
         calls:
@@ -243,7 +254,7 @@ services:
         class: 'Oro\Bundle\ActionBundle\Twig\OperationExtension'
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 

@@ -46,6 +46,8 @@ services:
     # Other services
     oro_ui.router:
         class: '%oro_ui.router.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@request_stack'
             - '@router'
@@ -56,6 +58,8 @@ services:
 
     oro_ui.dynamic_asset_version_manager:
         class: Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_ui.dynamic_asset_version.cache'
 
@@ -68,15 +72,18 @@ services:
     oro_ui.view.listener:
         class: Oro\Bundle\UIBundle\EventListener\TemplateListener
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
+            - { name: container.service_subscriber, id: 'templating' }
+            - { name: container.service_subscriber, id: 'templating.name_parser' }
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
 
     oro_ui.view.content_provider.listener:
         class: Oro\Bundle\UIBundle\EventListener\ContentProviderListener
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
+            - { name: container.service_subscriber }
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     oro_ui.config_settings.listener:
@@ -199,7 +206,7 @@ services:
         class: Oro\Bundle\UIBundle\Twig\FormatExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -207,7 +214,7 @@ services:
         class: Oro\Bundle\UIBundle\Twig\TabExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -215,7 +222,7 @@ services:
         class: Oro\Bundle\UIBundle\Twig\HtmlTagExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -223,7 +230,7 @@ services:
         class: Oro\Bundle\UIBundle\Twig\PlaceholderExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -231,10 +238,9 @@ services:
         class: Oro\Bundle\UIBundle\Twig\UiExtension
         public: false
         arguments:
-            -  '@Psr\Container\ContainerInterface'
+            -  '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber }
 
     oro_ui.config.use_default_configurator:
         parent: oro_config.form.configurator.use_default_configurator.abstract

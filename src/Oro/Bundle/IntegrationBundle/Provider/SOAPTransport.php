@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use FOS\RestBundle\Util\Codes;
 use Guzzle\Http\Url;
 use Guzzle\Parser\ParserRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
@@ -11,6 +10,7 @@ use Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Base class for interacting with 3rd party system using SOAP
@@ -195,7 +195,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
      */
     protected function isResultOk(array $headers = [])
     {
-        if (Codes::HTTP_OK === $this->getHttpStatusCode($headers)) {
+        if (Response::HTTP_OK === $this->getHttpStatusCode($headers)) {
             return true;
         }
 
@@ -245,9 +245,9 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     protected function getHttpStatusesForAttempt()
     {
         return [
-            Codes::HTTP_BAD_GATEWAY,
-            Codes::HTTP_SERVICE_UNAVAILABLE,
-            Codes::HTTP_GATEWAY_TIMEOUT,
+            Response::HTTP_BAD_GATEWAY,
+            Response::HTTP_SERVICE_UNAVAILABLE,
+            Response::HTTP_GATEWAY_TIMEOUT,
         ];
     }
 

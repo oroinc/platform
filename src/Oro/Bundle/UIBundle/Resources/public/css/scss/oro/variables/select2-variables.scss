@@ -5,7 +5,9 @@
 $select2-container-offset: 0 !default;
 $select2-container-position: relative !default;
 $select2-container-display: inline-block !default;
-$select2-container-border: 2px solid $primary-750 !default;
+$select2-container-border-width: 2px !default;
+$select2-container-border-color: $primary-750 !default;
+$select2-container-border: $select2-container-border-width solid $select2-container-border-color !default;
 $select2-container-background: $primary-inverse !default;
 $select2-container-border-radius: 2px !default;
 $select2-container-outline: none !default;

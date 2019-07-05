@@ -200,7 +200,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
         $repository = $this->getContainer()->get('oro_entity.doctrine_helper')
             ->getEntityRepositoryForClass(Schedule::class);
 
-        $schedules = $repository->findBy(['command' => HandleProcessTriggerCommand::NAME]);
+        $schedules = $repository->findBy(['command' => HandleProcessTriggerCommand::getDefaultName()]);
 
         /** @var Schedule $schedule */
         foreach ($schedules as $schedule) {

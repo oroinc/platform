@@ -14,7 +14,6 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 /**
  * @group search
- * @dbIsolationPerTest
  */
 class IterableResultFactoryTest extends SearchBundleWebTestCase
 {
@@ -28,13 +27,7 @@ class IterableResultFactoryTest extends SearchBundleWebTestCase
             $this->markTestSkipped('Should be tested only with ORM search engine');
         }
 
-        $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
-        $this->getSearchIndexer()->resetIndex(Item::class);
-        $this->ensureItemsLoaded($alias, 0);
-
-        $this->loadFixtures([LoadSearchItemData::class]);
-        $this->getSearchIndexer()->reindex(Item::class);
-        $this->ensureItemsLoaded($alias, LoadSearchItemData::COUNT);
+        $this->loadFixture(Item::class, LoadSearchItemData::class, LoadSearchItemData::COUNT);
     }
 
     public function testCreateIterableResultWithoutIdentifierField()

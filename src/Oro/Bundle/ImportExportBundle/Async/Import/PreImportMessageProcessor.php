@@ -206,7 +206,8 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
                     'entity' => $this->importHandler->getEntityName(
                         $body['process'],
                         $body['processorAlias']
-                    )
+                    ),
+                    'options' => $body['options']
                 ]);
                 $this->dependentJob->saveDependentJob($context);
 

@@ -68,7 +68,7 @@ class MessageProcessorClassProvider
             $messageProcessor = $messageProcessor->getWrappedValueHolderValue();
         }
 
-        $this->lastProcessorClass = get_class($messageProcessor);
+        $this->lastProcessorClass = $messageProcessor ? get_class($messageProcessor) : null;
 
         return $this->lastProcessorClass;
     }

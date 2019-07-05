@@ -13,10 +13,12 @@ use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Model\EmailHolderNameInterface;
 use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
+use Oro\Bundle\EmailBundle\Provider\UrlProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailHolderHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Twig\Extension\AbstractExtension;
@@ -35,7 +37,7 @@ use Twig\TwigFunction;
  *   - oro_get_unread_emails_count
  *   - oro_get_absolute_url
  */
-class EmailExtension extends AbstractExtension
+class EmailExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const NAME = 'oro_email';
 
@@ -71,7 +73,7 @@ class EmailExtension extends AbstractExtension
      */
     protected function getEmailAttachmentManager()
     {
-        return $this->container->get(EmailAttachmentManager::class);
+        return $this->container->get('oro_email.manager.email_attachment_manager');
     }
 
     /**
@@ -317,5 +319,23 @@ class EmailExtension extends AbstractExtension
     public function getAbsoluteUrl($route, $routeParams = []): string
     {
         return $this->container->get('oro_email.provider.url_provider')->getAbsoluteUrl($route, $routeParams);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_email.email_holder_helper' => EmailHolderHelper::class,
+            'oro_email.email.address.helper' => EmailAddressHelper::class,
+            'oro_email.manager.email_attachment_manager' => EmailAttachmentManager::class,
+            'doctrine' => ManagerRegistry::class,
+            'oro_email.mailbox.process_storage' => MailboxProcessStorage::class,
+            'security.authorization_checker' => AuthorizationCheckerInterface::class,
+            'oro_security.token_accessor' => TokenAccessorInterface::class,
+            'oro_email.related_emails.provider' => RelatedEmailsProvider::class,
+            'oro_email.provider.url_provider' => UrlProvider::class,
+        ];
     }
 }

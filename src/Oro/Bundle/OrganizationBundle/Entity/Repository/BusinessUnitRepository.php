@@ -8,6 +8,9 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Provides methods to retrieve information about business units
+ */
 class BusinessUnitRepository extends EntityRepository
 {
     /**
@@ -205,6 +208,29 @@ class BusinessUnitRepository extends EntityRepository
         }
 
         return $options;
+    }
+
+    /**
+     * @param User $user
+     * @param Organization $organization
+     *
+     * @return BusinessUnit|null
+     */
+    public function getFirstAllowedBusinessUnit(User $user, Organization $organization)
+    {
+        $qb = $this->createQueryBuilder('bu');
+        $qb
+            ->join('bu.users', 'u')
+            ->join('u.organizations', 'uorg')
+            ->andWhere($qb->expr()->eq('u', ':user'))
+            ->andWhere($qb->expr()->eq('uorg', ':organization'))
+            ->andWhere($qb->expr()->eq('bu.organization', ':organization'))
+            ->setParameter('user', $user)
+            ->setParameter('organization', $organization)
+            ->orderBy('bu.id')
+            ->setMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**

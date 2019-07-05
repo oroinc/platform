@@ -2,12 +2,8 @@ services:
     _defaults:
         public: true
 
-    oro_datagrid.controller.grid:
-        class: 'Oro\Bundle\DataGridBundle\Controller\GridController'
+    Oro\Bundle\DataGridBundle\Controller\GridController:
         calls:
             - [setContainer, ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: 'container.service_subscriber' }
-
-    Oro\Bundle\DataGridBundle\Controller\GridController:
-        alias: 'oro_datagrid.controller.grid'

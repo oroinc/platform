@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -38,7 +37,7 @@ class WorkflowDefinitionController extends FOSRestController
      */
     public function getAction(WorkflowDefinition $workflowDefinition)
     {
-        return $this->handleView($this->view($workflowDefinition, Codes::HTTP_OK));
+        return $this->handleView($this->view($workflowDefinition, Response::HTTP_OK));
     }
 
     /**
@@ -80,12 +79,12 @@ class WorkflowDefinitionController extends FOSRestController
             return $this->handleView(
                 $this->view(
                     ['error' => $exception->getMessage()],
-                    Codes::HTTP_BAD_REQUEST
+                    Response::HTTP_BAD_REQUEST
                 )
             );
         }
 
-        return $this->handleView($this->view($workflowDefinition->getName(), Codes::HTTP_OK));
+        return $this->handleView($this->view($workflowDefinition->getName(), Response::HTTP_OK));
     }
 
     /**
@@ -127,12 +126,12 @@ class WorkflowDefinitionController extends FOSRestController
             return $this->handleView(
                 $this->view(
                     ['error' => $exception->getMessage()],
-                    Codes::HTTP_BAD_REQUEST
+                    Response::HTTP_BAD_REQUEST
                 )
             );
         }
 
-        return $this->handleView($this->view($builtDefinition->getName(), Codes::HTTP_OK));
+        return $this->handleView($this->view($builtDefinition->getName(), Response::HTTP_OK));
     }
 
     /**
@@ -160,11 +159,11 @@ class WorkflowDefinitionController extends FOSRestController
     public function deleteAction(WorkflowDefinition $workflowDefinition)
     {
         if ($workflowDefinition->isSystem()) {
-            return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
+            return $this->handleView($this->view(null, Response::HTTP_FORBIDDEN));
         } else {
             $this->getHandler()->deleteWorkflowDefinition($workflowDefinition);
 
-            return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
+            return $this->handleView($this->view(null, Response::HTTP_NO_CONTENT));
         }
     }
 

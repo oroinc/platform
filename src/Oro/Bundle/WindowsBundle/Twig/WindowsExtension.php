@@ -5,7 +5,8 @@ namespace Oro\Bundle\WindowsBundle\Twig;
 use Oro\Bundle\WindowsBundle\Entity\AbstractWindowsState;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -18,7 +19,7 @@ use Twig\TwigFunction;
  *   - oro_windows_restore
  *   - oro_window_render_fragment
  */
-class WindowsExtension extends AbstractExtension
+class WindowsExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const EXTENSION_NAME = 'oro_windows';
 
@@ -148,5 +149,17 @@ class WindowsExtension extends AbstractExtension
     public function getName()
     {
         return self::EXTENSION_NAME;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_windows.manager.windows_state_registry' => WindowsStateManagerRegistry::class,
+            'oro_windows.manager.windows_state_request' => WindowsStateRequestManager::class,
+            'fragment.handler' => FragmentHandler::class,
+        ];
     }
 }

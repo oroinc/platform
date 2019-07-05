@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\DeleteList;
 
-use Oro\Bundle\ApiBundle\Collection\Criteria;
+use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeleteLimit;
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class SetDeleteLimitTest extends DeleteListProcessorTestCase
 {
@@ -39,8 +38,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
     {
         $maxResults = 2;
 
-        $resolver = $this->createMock(EntityClassResolver::class);
-        $criteria = new Criteria($resolver);
+        $criteria = new Criteria();
         $criteria->setMaxResults($maxResults);
 
         $this->context->setCriteria($criteria);
@@ -53,8 +51,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
     {
         $maxResults = -1;
 
-        $resolver = $this->createMock(EntityClassResolver::class);
-        $criteria = new Criteria($resolver);
+        $criteria = new Criteria();
         $criteria->setMaxResults($maxResults);
 
         $this->context->setCriteria($criteria);
@@ -65,8 +62,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
 
     public function testProcessWhenNoLimitInConfig()
     {
-        $resolver = $this->createMock(EntityClassResolver::class);
-        $criteria = new Criteria($resolver);
+        $criteria = new Criteria();
 
         $config = new EntityDefinitionConfig();
 
@@ -81,8 +77,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
     {
         $maxResults = 2;
 
-        $resolver = $this->createMock(EntityClassResolver::class);
-        $criteria = new Criteria($resolver);
+        $criteria = new Criteria();
 
         $config = new EntityDefinitionConfig();
         $config->setMaxResults($maxResults);
@@ -98,8 +93,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
     {
         $maxResults = -1;
 
-        $resolver = $this->createMock(EntityClassResolver::class);
-        $criteria = new Criteria($resolver);
+        $criteria = new Criteria();
 
         $config = new EntityDefinitionConfig();
         $config->setMaxResults($maxResults);

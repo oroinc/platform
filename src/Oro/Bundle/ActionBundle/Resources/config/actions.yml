@@ -1,8 +1,16 @@
 services:
+    oro_action.action_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        public: false
+        arguments:
+            - [] # actions. Will be set in Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ActionLocatorPass
+        tags:
+            - { name: container.service_locator }
+
     oro_action.action_factory:
         class: 'Oro\Component\Action\Action\ActionFactory'
         arguments:
-            - '@service_container'
+            - '@oro_action.action_locator'
             - []
 
     oro_action.action_assembler:

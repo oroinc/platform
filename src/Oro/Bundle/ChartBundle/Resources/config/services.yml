@@ -1,5 +1,4 @@
 parameters:
-    oro_chart.view_builder.class:                  Oro\Bundle\ChartBundle\Model\ChartViewBuilder
     oro_chart.options_builder.class:               Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder
     oro_chart.data_transformer.factory.class:      Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory
     oro_chart.data_transformer.pie_chart.class:    Oro\Bundle\ChartBundle\Model\Data\Transformer\PieChartDataTransformer
@@ -16,13 +15,19 @@ services:
             - '%kernel.cache_dir%/oro/charts.php'
             - '%kernel.debug%'
 
+    Oro\Bundle\ChartBundle\Model\ConfigProvider:
+        alias: oro_chart.config_provider
+
     oro_chart.view_builder:
-        class: '%oro_chart.view_builder.class%'
+        class: Oro\Bundle\ChartBundle\Model\ChartViewBuilder
         shared: false
         arguments:
             - '@oro_chart.config_provider'
             - '@oro_chart.data_transformer.factory'
             - '@twig'
+
+    Oro\Bundle\ChartBundle\Model\ChartViewBuilder:
+        alias: oro_chart.view_builder
 
     oro_chart.form.type.settings:
         class: '%oro_chart.form.type.settings.class%'
@@ -58,3 +63,6 @@ services:
 
     oro_chart.options_builder:
         class: '%oro_chart.options_builder.class%'
+
+    Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder:
+        alias: oro_chart.options_builder

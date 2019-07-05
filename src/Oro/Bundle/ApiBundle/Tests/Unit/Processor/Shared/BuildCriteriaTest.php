@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
@@ -15,7 +15,6 @@ use Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 {
@@ -27,16 +26,6 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         parent::setUp();
 
         $this->processor = new BuildCriteria();
-    }
-
-    /**
-     * @return Criteria
-     */
-    private function getCriteria()
-    {
-        $resolver = $this->createMock(EntityClassResolver::class);
-
-        return new Criteria($resolver);
     }
 
     /**
@@ -88,7 +77,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $filers->add('filter[name]', $this->getComparisonFilter('string', 'association.name'));
 
         $this->context->setFilterValues($filterValues);
-        $this->context->setCriteria($this->getCriteria());
+        $this->context->setCriteria(new Criteria());
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -120,7 +109,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $filers->add('filter[label]', $this->getComparisonFilter('string', 'label'));
 
         $this->context->setFilterValues($filterValues);
-        $this->context->setCriteria($this->getCriteria());
+        $this->context->setCriteria(new Criteria());
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -144,7 +133,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         );
 
         $this->context->setFilterValues($filterValues);
-        $this->context->setCriteria($this->getCriteria());
+        $this->context->setCriteria(new Criteria());
         $this->processor->process($this->context);
 
         self::assertNull(
@@ -171,7 +160,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
             ->willThrowException($exception);
 
         $this->context->setFilterValues($filterValues);
-        $this->context->setCriteria($this->getCriteria());
+        $this->context->setCriteria(new Criteria());
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getCriteria()->getWhereExpression());
@@ -204,7 +193,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
             ->willThrowException($exception);
 
         $this->context->setFilterValues($filterValues);
-        $this->context->setCriteria($this->getCriteria());
+        $this->context->setCriteria(new Criteria());
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getCriteria()->getWhereExpression());
@@ -225,7 +214,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $filers->add('pageSize', $filter);
 
         $this->context->setFilterValues(new TestFilterValueAccessor());
-        $this->context->setCriteria($this->getCriteria());
+        $this->context->setCriteria(new Criteria());
         $this->processor->process($this->context);
 
         self::assertEquals(

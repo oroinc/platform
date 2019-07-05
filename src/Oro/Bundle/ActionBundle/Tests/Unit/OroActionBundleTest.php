@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit;
 
+use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass;
 use Oro\Bundle\ActionBundle\OroActionBundle;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -18,27 +19,43 @@ class OroActionBundleTest extends \PHPUnit\Framework\TestCase
 
         $compilerPasses = [
             [
-                'class' => 'Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConditionPass',
+                'class' => CompilerPass\ConditionPass::class,
                 'type' => PassConfig::TYPE_AFTER_REMOVING
             ],
             [
-                'class' => 'Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ActionPass',
+                'class' => CompilerPass\ActionPass::class,
                 'type' => PassConfig::TYPE_AFTER_REMOVING
             ],
             [
-                'class' => 'Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\MassActionProviderPass',
+                'class' => CompilerPass\MassActionProviderPass::class,
                 'type' => PassConfig::TYPE_AFTER_REMOVING
             ],
             [
-                'class' => 'Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ButtonProviderPass',
+                'class' => CompilerPass\ButtonProviderPass::class,
                 'type' => PassConfig::TYPE_AFTER_REMOVING
             ],
             [
-                'class' => 'Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\DoctrineTypeMappingProviderPass',
+                'class' => CompilerPass\DoctrineTypeMappingProviderPass::class,
                 'type' => PassConfig::TYPE_BEFORE_OPTIMIZATION
             ],
             [
-                'class' => 'Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\OperationRegistryFilterPass',
+                'class' => CompilerPass\OperationRegistryFilterPass::class,
+                'type' => PassConfig::TYPE_BEFORE_OPTIMIZATION
+            ],
+            [
+                'class' => CompilerPass\DuplicatorFilterPass::class,
+                'type' => PassConfig::TYPE_AFTER_REMOVING
+            ],
+            [
+                'class' => CompilerPass\DuplicatorMatcherPass::class,
+                'type' => PassConfig::TYPE_AFTER_REMOVING
+            ],
+            [
+                'class' => CompilerPass\ActionLocatorPass::class,
+                'type' => PassConfig::TYPE_BEFORE_OPTIMIZATION
+            ],
+            [
+                'class' => CompilerPass\ConditionLocatorPass::class,
                 'type' => PassConfig::TYPE_BEFORE_OPTIMIZATION
             ],
         ];

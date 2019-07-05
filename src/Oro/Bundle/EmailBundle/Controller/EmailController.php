@@ -4,10 +4,8 @@ namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
-use Oro\Bundle\AttachmentBundle\Tools\ThumbnailFactory;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
@@ -533,7 +531,7 @@ class EmailController extends Controller
         $fileManager = $this->get(FileManager::class);
         $content = $fileManager->getContent($path, false);
         if (null === $content) {
-            $thumbnail = $this->get(ThumbnailFactory::class)->createThumbnail(
+            $imageBinary = $this->get('oro_attachment.provider.resized_image')->getResizedImage(
                 ContentDecoder::decode(
                     $attachment->getContent()->getContent(),
                     $attachment->getContent()->getContentTransferEncoding()
@@ -541,8 +539,15 @@ class EmailController extends Controller
                 $width,
                 $height
             );
-            $content = $thumbnail->getBinary()->getContent();
-            $fileManager->writeToStorage($content, $path);
+
+            if ($imageBinary) {
+                $content = $imageBinary->getContent();
+                $fileManager->writeToStorage($content, $path);
+            }
+        }
+
+        if (!$content) {
+            throw $this->createNotFoundException();
         }
 
         return new Response($content, Response::HTTP_OK, ['Content-Type' => $attachment->getContentType()]);
@@ -585,7 +590,7 @@ class EmailController extends Controller
             return $response;
         }
 
-        return new Response('', Codes::HTTP_NOT_FOUND);
+        return new Response('', Response::HTTP_NOT_FOUND);
     }
 
     /**
@@ -681,11 +686,11 @@ class EmailController extends Controller
         } catch (\Exception $e) {
             return new JsonResponse(
                 ['error' => $this->get(TranslatorInterface::class)->trans('oro.email.action.message.error')],
-                Codes::HTTP_OK
+                Response::HTTP_OK
             );
         }
 
-        return new JsonResponse([], Codes::HTTP_OK);
+        return new JsonResponse([], Response::HTTP_OK);
     }
 
     /**

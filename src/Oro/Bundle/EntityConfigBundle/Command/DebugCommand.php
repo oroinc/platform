@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
@@ -9,26 +10,49 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
+ * Displays entity configuration.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class DebugCommand extends ContainerAwareCommand
+class DebugCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:entity-config:debug';
+
+    /** @var ManagerRegistry */
+    private $registry;
+
+    /** @var ConfigManager */
+    private $configManager;
+
+    /**
+     * @param ManagerRegistry $registry
+     * @param ConfigManager $configManager
+     */
+    public function __construct(ManagerRegistry $registry, ConfigManager $configManager)
+    {
+        parent::__construct();
+
+        $this->registry = $registry;
+        $this->configManager = $configManager;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
         $this
-            ->setName('oro:entity-config:debug')
             ->addArgument('entity', InputArgument::OPTIONAL, 'The entity class name')
             ->addArgument('field', InputArgument::OPTIONAL, 'The field name')
             ->addOption(
@@ -178,7 +202,7 @@ class DebugCommand extends ContainerAwareCommand
     protected function dumpEntityList(OutputInterface $output)
     {
         /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
 
         $rows = $em->getConnection()->fetchAll(
             'SELECT class_name, mode FROM oro_entity_config ORDER BY class_name'
@@ -194,13 +218,10 @@ class DebugCommand extends ContainerAwareCommand
      */
     protected function dumpEntityListFromCache(OutputInterface $output, $scope)
     {
-        /** @var ConfigManager $cm */
-        $cm = $this->getContainer()->get('oro_entity_config.config_manager');
-
         /** @var EntityConfigId[] $ids */
-        $ids = $cm->getIds($scope, null, true);
+        $ids = $this->configManager->getIds($scope, null, true);
         /** @var EntityConfigId[] $notHiddenIds */
-        $notHiddenIds = $cm->getIds($scope, null);
+        $notHiddenIds = $this->configManager->getIds($scope, null);
 
         foreach ($ids as $id) {
             $hidden = true;
@@ -227,7 +248,7 @@ class DebugCommand extends ContainerAwareCommand
     protected function dumpFieldList(OutputInterface $output, $className)
     {
         /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
 
         $rows = $em->getConnection()->fetchAll(
             'SELECT fc.field_name, fc.type, fc.mode FROM oro_entity_config ec'
@@ -249,13 +270,10 @@ class DebugCommand extends ContainerAwareCommand
      */
     protected function dumpFieldListFromCache(OutputInterface $output, $className, $scope)
     {
-        /** @var ConfigManager $cm */
-        $cm = $this->getContainer()->get('oro_entity_config.config_manager');
-
         /** @var FieldConfigId[] $ids */
-        $ids = $cm->getIds($scope, $className, true);
+        $ids = $this->configManager->getIds($scope, $className, true);
         /** @var FieldConfigId[] $notHiddenIds */
-        $notHiddenIds = $cm->getIds($scope, $className);
+        $notHiddenIds = $this->configManager->getIds($scope, $className);
 
         foreach ($ids as $id) {
             $hidden = true;
@@ -285,7 +303,7 @@ class DebugCommand extends ContainerAwareCommand
     protected function dumpNonConfigRef(OutputInterface $output, $className = null)
     {
         /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
 
         if (empty($className)) {
             $rows       = $em->getConnection()->fetchAll(
@@ -354,8 +372,11 @@ class DebugCommand extends ContainerAwareCommand
      */
     protected function dumpEntityConfig(OutputInterface $output, $className, $scope = null, $attrName = null)
     {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
+
         /** @var Connection $connection */
-        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
+        $connection = $em->getConnection();
 
         $rows = $connection->fetchAll(
             'SELECT * FROM oro_entity_config WHERE class_name = ?',
@@ -379,7 +400,7 @@ class DebugCommand extends ContainerAwareCommand
     protected function dumpEntityConfigFromCache(OutputInterface $output, $className, $scope, $attrName = null)
     {
         /** @var ConfigProvider $cp */
-        $cp = $this->getContainer()->get('oro_entity_config.config_manager')->getProvider($scope);
+        $cp = $this->configManager->getProvider($scope);
 
         if (!$cp->hasConfig($className)) {
             $output->writeln('The configuration was not found.');
@@ -401,8 +422,11 @@ class DebugCommand extends ContainerAwareCommand
      */
     protected function dumpFieldConfig(OutputInterface $output, $className, $fieldName, $scope = null, $attrName = null)
     {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
+
         /** @var Connection $connection */
-        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
+        $connection = $em->getConnection();
 
         $rows = $connection->fetchAll(
             'SELECT ec.class_name, fc.* FROM oro_entity_config ec'
@@ -436,7 +460,7 @@ class DebugCommand extends ContainerAwareCommand
         $attrName = null
     ) {
         /** @var ConfigProvider $cp */
-        $cp = $this->getContainer()->get('oro_entity_config.config_manager')->getProvider($scope);
+        $cp = $this->configManager->getProvider($scope);
 
         if (!$cp->hasConfig($className, $fieldName)) {
             $output->writeln('The configuration was not found.');
@@ -500,8 +524,11 @@ class DebugCommand extends ContainerAwareCommand
         $scope,
         $attrName = null
     ) {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
+
         /** @var Connection $connection */
-        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
+        $connection = $em->getConnection();
 
         $rows = $connection->fetchAll(
             'SELECT * FROM oro_entity_config WHERE class_name = ?',
@@ -544,8 +571,11 @@ class DebugCommand extends ContainerAwareCommand
         $scope,
         $attrName = null
     ) {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
+
         /** @var Connection $connection */
-        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
+        $connection = $em->getConnection();
 
         $rows = $connection->fetchAll(
             'SELECT fc.* FROM oro_entity_config ec'
@@ -590,8 +620,11 @@ class DebugCommand extends ContainerAwareCommand
         $attrName,
         $attrVal
     ) {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
+
         /** @var Connection $connection */
-        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
+        $connection = $em->getConnection();
 
         $rows = $connection->fetchAll(
             'SELECT * FROM oro_entity_config WHERE class_name = ?',
@@ -632,8 +665,11 @@ class DebugCommand extends ContainerAwareCommand
         $attrName,
         $attrVal
     ) {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
+
         /** @var Connection $connection */
-        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
+        $connection = $em->getConnection();
 
         $rows = $connection->fetchAll(
             'SELECT fc.* FROM oro_entity_config ec'
@@ -690,9 +726,7 @@ class DebugCommand extends ContainerAwareCommand
 
     protected function clearConfigCache()
     {
-        /** @var ConfigManager $cm */
-        $cm = $this->getContainer()->get('oro_entity_config.config_manager');
-        $cm->clearCache();
+        $this->configManager->clearCache();
     }
 
     /**

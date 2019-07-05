@@ -2,7 +2,7 @@ css:
     inputs:
         - 'bundles/bowerassets/timepicker/jquery.timepicker.css'
 
-        - 'bundles/components/jstree/dist/themes/default/style.min.css'
+        - 'bundles/bowerassets/jstree/dist/themes/default/style.min.css'
 
         # Bootstrap port
         - 'bundles/oroui/css/scss/bootstrap/bootstrap.scss'

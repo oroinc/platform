@@ -11,8 +11,6 @@ class ParserTest extends \PHPUnit\Framework\TestCase
 {
     public function testParsesSelectKeyword()
     {
-        $query = new Query();
-
         $tokens = $this->generateTokens([
             [Token::KEYWORD_TYPE, 'select'],
             [Token::PUNCTUATION_TYPE, '('],
@@ -23,11 +21,8 @@ class ParserTest extends \PHPUnit\Framework\TestCase
             [Token::EOF_TYPE, '']
         ]);
 
-        $tokenStream = new TokenStream($tokens);
-
-        $parser = new Parser($query);
-
-        $parser->parse($tokenStream);
+        $parser = new Parser();
+        $query = $parser->parse(new TokenStream($tokens));
 
         $this->assertContains('text.test1', $query->getSelect());
         $this->assertContains('text.test2', $query->getSelect());
@@ -50,8 +45,6 @@ class ParserTest extends \PHPUnit\Framework\TestCase
 
     public function testParseAggregateExpression()
     {
-        $query = new Query();
-
         $tokens = $this->generateTokens([
             [Token::KEYWORD_TYPE, Query::KEYWORD_AGGREGATE],
             [Token::STRING_TYPE, 'test_field'],
@@ -61,8 +54,8 @@ class ParserTest extends \PHPUnit\Framework\TestCase
             [Token::EOF_TYPE, '']
         ]);
 
-        $parser = new Parser($query);
-        $parser->parse(new TokenStream($tokens));
+        $parser = new Parser();
+        $query = $parser->parse(new TokenStream($tokens));
 
         $this->assertEquals(
             ['test_name' => ['field' => 'text.test_field', 'function' => Query::AGGREGATE_FUNCTION_COUNT]],
@@ -78,14 +71,12 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     // @codingStandardsIgnoreEnd
     public function testParseAggregateExpressionFieldException()
     {
-        $query = new Query();
-
         $tokens = $this->generateTokens([
             [Token::KEYWORD_TYPE, Query::KEYWORD_AGGREGATE],
             [Token::KEYWORD_TYPE, null],
         ]);
 
-        $parser = new Parser($query);
+        $parser = new Parser();
         $parser->parse(new TokenStream($tokens));
     }
 
@@ -97,15 +88,13 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     // @codingStandardsIgnoreEnd
     public function testParseAggregateExpressionFunctionException()
     {
-        $query = new Query();
-
         $tokens = $this->generateTokens([
             [Token::KEYWORD_TYPE, Query::KEYWORD_AGGREGATE],
             [Token::STRING_TYPE, 'test_field'],
             [Token::STRING_TYPE, 'test'],
         ]);
 
-        $parser = new Parser($query);
+        $parser = new Parser();
         $parser->parse(new TokenStream($tokens));
     }
 
@@ -117,8 +106,6 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     // @codingStandardsIgnoreEnd
     public function testParseAggregateExpressionNameException()
     {
-        $query = new Query();
-
         $tokens = $this->generateTokens([
             [Token::KEYWORD_TYPE, Query::KEYWORD_AGGREGATE],
             [Token::STRING_TYPE, 'test_field'],
@@ -126,7 +113,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
             [Token::KEYWORD_TYPE, Query::KEYWORD_SELECT],
         ]);
 
-        $parser = new Parser($query);
+        $parser = new Parser();
         $parser->parse(new TokenStream($tokens));
     }
 }

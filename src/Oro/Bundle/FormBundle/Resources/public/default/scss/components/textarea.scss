@@ -24,4 +24,10 @@
     @include element-state('error') {
         box-shadow: $textarea-box-shadow-error-state;
     }
+
+    @include element-state('disabled') {
+        background: $textarea-background-color-disabled-state;
+        box-shadow: none;
+        border: $textarea-border;
+    }
 }

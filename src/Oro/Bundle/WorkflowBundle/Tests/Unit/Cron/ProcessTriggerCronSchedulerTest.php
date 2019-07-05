@@ -45,7 +45,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $this->deferredScheduler->expects($this->once())
             ->method('addSchedule')
-            ->with(HandleProcessTriggerCommand::NAME, $arguments, $cronExpression);
+            ->with(HandleProcessTriggerCommand::getDefaultName(), $arguments, $cronExpression);
 
         $this->processCronScheduler->add($trigger);
     }

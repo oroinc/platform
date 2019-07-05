@@ -21,6 +21,9 @@ Oro\Bundle\NavigationBundle\Entity\MenuUpdate:
             - NotBlank:
                 groups: [UserDefined]
 
+            - Oro\Bundle\SecurityBundle\Validator\Constraints\NotDangerousProtocol:
+                  message: oro.navigation.validator.menu_update.not_dangerous_protocol.message
+
 Oro\Bundle\NavigationBundle\Entity\PinbarTab:
     constraints:
         - Oro\Bundle\NavigationBundle\Validator\Constraints\UniquePinbarTabUrl: ~

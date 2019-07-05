@@ -25,7 +25,11 @@ class SchemaDumperExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
 
-        $this->extension = new SchemaDumperExtension($this->doctrine);
+        $container = self::getContainerBuilder()
+            ->add('doctrine', $this->doctrine)
+            ->getContainer($this);
+
+        $this->extension = new SchemaDumperExtension($container);
     }
 
     public function testGetName()

@@ -206,7 +206,8 @@ datagrids:
                 englishTranslation:
                     type: string
                     data_name: englishValue
-                value:
+                value_trans:
+                    label: oro.translation.translation.value.label
                     type: string
                     data_name: value
                 key:

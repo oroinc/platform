@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\ThemeBundle\DependencyInjection\OroThemeExtension;
@@ -12,6 +11,9 @@ class OroThemeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider loadDataProvider
+     * @param array $configs
+     * @param array $expectedThemeSettings
+     * @param $expectedActiveTheme
      */
     public function testLoad(array $configs, array $expectedThemeSettings, $expectedActiveTheme)
     {
@@ -29,7 +31,6 @@ class OroThemeExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load($configs, $container);
 
         $registryDefinition = $container->getDefinition('oro_theme.registry');
-        $this->assertEquals('%oro_theme.registry.class%', $registryDefinition->getClass());
 
         $this->assertEquals($expectedThemeSettings, $container->getParameter('oro_theme.settings'));
 
@@ -48,6 +49,9 @@ class OroThemeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertNotNull($container->getDefinition('oro_theme.twig.extension'));
     }
 
+    /**
+     * @return array
+     */
     public function loadDataProvider()
     {
         return [

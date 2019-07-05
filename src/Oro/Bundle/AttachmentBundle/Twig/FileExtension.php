@@ -6,9 +6,13 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Oro\Component\PhpUtils\Formatter\BytesFormatter;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
@@ -28,15 +32,14 @@ use Twig\TwigFunction;
  *   - oro_file_view
  *   - oro_image_view
  */
-class FileExtension extends AbstractExtension
+class FileExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const DEFAULT_THUMB_SIZE = 16;
-
-    const FILES_TEMPLATE  = 'OroAttachmentBundle:Twig:file.html.twig';
-    const IMAGES_TEMPLATE = 'OroAttachmentBundle:Twig:image.html.twig';
+    private const DEFAULT_THUMB_SIZE = 16;
+    private const FILES_TEMPLATE = 'OroAttachmentBundle:Twig:file.html.twig';
+    private const IMAGES_TEMPLATE = 'OroAttachmentBundle:Twig:image.html.twig';
 
     /** @var ContainerInterface */
-    protected $container;
+    private $container;
 
     /**
      * @param ContainerInterface $container
@@ -51,7 +54,7 @@ class FileExtension extends AbstractExtension
      */
     protected function getAttachmentManager()
     {
-        return $this->container->get('oro_attachment.manager');
+        return $this->container->get(AttachmentManager::class);
     }
 
     /**
@@ -59,7 +62,7 @@ class FileExtension extends AbstractExtension
      */
     protected function getConfigManager()
     {
-        return $this->container->get('oro_entity_config.config_manager');
+        return $this->container->get(ConfigManager::class);
     }
 
     /**
@@ -67,7 +70,7 @@ class FileExtension extends AbstractExtension
      */
     protected function getDoctrine()
     {
-        return $this->container->get('doctrine');
+        return $this->container->get(ManagerRegistry::class);
     }
 
     /**
@@ -99,32 +102,77 @@ class FileExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_attachment_file';
-    }
-
-    /**
      * Get file url
      *
-     * @param object $parentEntity
-     * @param string $fieldName
-     * @param File   $attachment
-     * @param string $type
-     * @param bool   $absolute
+     * @param File $file
+     * @param string $action
+     * @param bool $absolute
      *
      * @return string
      */
     public function getFileUrl(
-        $parentEntity,
-        $fieldName,
-        File $attachment,
-        $type = 'get',
-        $absolute = false
+        File $file,
+        string $action = FileUrlProviderInterface::FILE_ACTION_GET,
+        bool $absolute = false
     ) {
-        return $this->getAttachmentManager()->getFileUrl($parentEntity, $fieldName, $attachment, $type, $absolute);
+        $referenceType = $absolute === false
+            ? UrlGeneratorInterface::ABSOLUTE_URL
+            : UrlGeneratorInterface::ABSOLUTE_PATH;
+
+        return $this->getAttachmentManager()->getFileUrl($file, $action, $referenceType);
+    }
+
+    /**
+     * Get resized attachment image url
+     *
+     * @param File $file
+     * @param int  $width
+     * @param int  $height
+     *
+     * @return string
+     */
+    public function getResizedImageUrl(
+        File $file,
+        $width = self::DEFAULT_THUMB_SIZE,
+        $height = self::DEFAULT_THUMB_SIZE
+    ) {
+        return $this->getAttachmentManager()->getResizedImageUrl($file, $width, $height);
+    }
+
+    /**
+     * @param File $file
+     * @param string $filterName
+     *
+     * @return string
+     */
+    public function getFilteredImageUrl(File $file, $filterName)
+    {
+        return $this->getAttachmentManager()->getFilteredImageUrl($file, $filterName);
+    }
+
+    /**
+     * Get attachment image resized with config values
+     *
+     * @param object $parentEntity
+     * @param string $fieldName
+     * @param File   $file
+     *
+     * @return string
+     */
+    public function getConfiguredImageUrl($parentEntity, $fieldName, File $file = null)
+    {
+        if (!$file) {
+            $file = $this->getPropertyAccessor()->getValue($parentEntity, $fieldName);
+        }
+
+        if ($file && $file->getFilename()) {
+            $entityClass = ClassUtils::getRealClass($parentEntity);
+            $config = $this->getConfigManager()->getProvider('attachment')->getConfig($entityClass, $fieldName);
+
+            return $this->getResizedImageUrl($file, $config->get('width'), $config->get('height'));
+        }
+
+        return '';
     }
 
     /**
@@ -136,24 +184,7 @@ class FileExtension extends AbstractExtension
      */
     public function getFileSize($bytes)
     {
-        return $this->getAttachmentManager()->getFileSize($bytes);
-    }
-
-    /**
-     * Get resized attachment image url
-     *
-     * @param File $attachment
-     * @param int  $width
-     * @param int  $height
-     *
-     * @return string
-     */
-    public function getResizedImageUrl(
-        File $attachment,
-        $width = self::DEFAULT_THUMB_SIZE,
-        $height = self::DEFAULT_THUMB_SIZE
-    ) {
-        return $this->getAttachmentManager()->getResizedImageUrl($attachment, $width, $height);
+        return BytesFormatter::format($bytes);
     }
 
     /**
@@ -171,130 +202,78 @@ class FileExtension extends AbstractExtension
     /**
      * Get file view html block
      *
-     * @param Environment       $environment
-     * @param mixed             $parentEntity
-     * @param string            $fieldName
-     * @param File              $attachment
-     * @param array             $additional
+     * @param Environment $environment
+     * @param File|int|null $file
+     * @param array $additional
      *
      * @return string
      */
-    public function getFileView(
-        Environment $environment,
-        $parentEntity,
-        $fieldName,
-        $attachment = null,
-        $additional = null
-    ) {
-        if (filter_var($attachment, FILTER_VALIDATE_INT)) {
-            $attachment = $this->getFileById($attachment);
-        }
-        if ($attachment && $attachment->getFilename()) {
-            $attachmentManager = $this->getAttachmentManager();
-            $url = null;
-            if (is_object($parentEntity)) {
-                $url = $attachmentManager->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true);
-            }
-
-            return $environment->loadTemplate(self::FILES_TEMPLATE)->render(
-                [
-                    'iconClass'  => $attachmentManager->getAttachmentIconClass($attachment),
-                    'url'        => $url,
-                    'fileName'   => $attachment->getOriginalFilename(),
-                    'additional' => $additional
-                ]
-            );
+    public function getFileView(Environment $environment, $file, ?array $additional = null)
+    {
+        if (filter_var($file, FILTER_VALIDATE_INT)) {
+            $file = $this->getFileById($file);
         }
 
-        return '';
+        if (!$file || !$file->getFilename()) {
+            return '';
+        }
+
+        $url = $this->getAttachmentManager()->getFileUrl(
+            $file,
+            FileUrlProviderInterface::FILE_ACTION_DOWNLOAD,
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        return $environment->loadTemplate(self::FILES_TEMPLATE)->render(
+            [
+                'iconClass' => $this->getAttachmentManager()->getAttachmentIconClass($file),
+                'url' => $url,
+                'fileName' => $file->getOriginalFilename(),
+                'additional' => $additional,
+            ]
+        );
     }
 
     /**
      * Get Image html block
      *
-     * @param Environment       $environment
-     * @param object            $parentEntity
-     * @param mixed             $attachment
-     * @param string|object     $entityClass
-     * @param string            $fieldName
+     * @param Environment $environment
+     * @param File|int|null $file
      *
      * @return string
      */
-    public function getImageView(
-        Environment $environment,
-        $parentEntity,
-        $attachment = null,
-        $entityClass = null,
-        $fieldName = ''
-    ) {
-        if (filter_var($attachment, FILTER_VALIDATE_INT)) {
-            $attachment = $this->getFileById($attachment);
-        }
-
-        if ($attachment && $attachment->getFilename()) {
-            $width  = self::DEFAULT_THUMB_SIZE;
-            $height = self::DEFAULT_THUMB_SIZE;
-
-            if ($entityClass && $fieldName) {
-                if (is_object($entityClass)) {
-                    $entityClass = ClassUtils::getRealClass($entityClass);
-                }
-                $config = $this->getConfigManager()
-                    ->getProvider('attachment')
-                    ->getConfig($entityClass, $fieldName);
-                $width  = $config->get('width');
-                $height = $config->get('height');
-            }
-
-            $attachmentManager = $this->getAttachmentManager();
-
-            return $environment->loadTemplate(self::IMAGES_TEMPLATE)->render(
-                [
-                    'imagePath' => $attachmentManager->getResizedImageUrl($attachment, $width, $height),
-                    'url'       => $attachmentManager
-                        ->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true),
-                    'fileName'  => $attachment->getOriginalFilename()
-                ]
-            );
-        }
-
-        return '';
-    }
-
-    /**
-     * Get attachment image resized with config values
-     *
-     * @param object $parentEntity
-     * @param string $fieldName
-     * @param File   $attachment
-     *
-     * @return string
-     */
-    public function getConfiguredImageUrl($parentEntity, $fieldName, File $attachment = null)
+    public function getImageView(Environment $environment, $file)
     {
-        if (!$attachment) {
-            $attachment = PropertyAccess::createPropertyAccessor()->getValue($parentEntity, $fieldName);
+        if (filter_var($file, FILTER_VALIDATE_INT)) {
+            $file = $this->getFileById($file);
         }
 
-        if ($attachment && $attachment->getFilename()) {
-            $entityClass = ClassUtils::getRealClass($parentEntity);
+        if (!$file || !$file->getFilename()) {
+            return '';
+        }
+
+        $width = self::DEFAULT_THUMB_SIZE;
+        $height = self::DEFAULT_THUMB_SIZE;
+        $entityClass = $file->getParentEntityClass();
+        $fieldName = $file->getParentEntityFieldName();
+
+        if ($entityClass && $fieldName) {
             $config = $this->getConfigManager()->getProvider('attachment')->getConfig($entityClass, $fieldName);
-
-            return $this->getResizedImageUrl($attachment, $config->get('width'), $config->get('height'));
+            $width = $config->get('width');
+            $height = $config->get('height');
         }
 
-        return '';
-    }
-
-    /**
-     * @param File   $attachment
-     * @param string $filterName
-     *
-     * @return string
-     */
-    public function getFilteredImageUrl(File $attachment, $filterName)
-    {
-        return $this->getAttachmentManager()->getFilteredImageUrl($attachment, $filterName);
+        return $environment->loadTemplate(self::IMAGES_TEMPLATE)->render(
+            [
+                'imagePath' => $this->getAttachmentManager()->getResizedImageUrl($file, $width, $height),
+                'url' => $this->getAttachmentManager()->getFileUrl(
+                    $file,
+                    FileUrlProviderInterface::FILE_ACTION_DOWNLOAD,
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
+                'fileName' => $file->getOriginalFilename(),
+            ]
+        );
     }
 
     /**
@@ -337,6 +316,27 @@ class FileExtension extends AbstractExtension
      */
     protected function getFileById($id)
     {
-        return $this->getDoctrine()->getRepository('OroAttachmentBundle:File')->find($id);
+        return $this->getDoctrine()->getRepository(File::class)->find($id);
+    }
+
+    /**
+     * @return PropertyAccessorInterface
+     */
+    private function getPropertyAccessor(): PropertyAccessorInterface
+    {
+        return $this->container->get(PropertyAccessorInterface::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            AttachmentManager::class,
+            ConfigManager::class,
+            ManagerRegistry::class,
+            PropertyAccessorInterface::class,
+        ];
     }
 }

@@ -13,7 +13,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
-use Oro\Component\MessageQueue\Client\MessageProducer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -154,7 +154,7 @@ class GridController extends AbstractController
             $parameters['pageSize'] = (int)$exportOptions[$format][Configuration::OPTION_PAGE_SIZE];
         }
 
-        $this->get(MessageProducer::class)->send(Topics::PRE_EXPORT, [
+        $this->get(MessageProducerInterface::class)->send(Topics::PRE_EXPORT, [
             'format' => $format,
             'parameters' => $parameters,
             'notificationTemplate' => 'datagrid_export_result',
@@ -234,7 +234,7 @@ class GridController extends AbstractController
             parent::getSubscribedServices(),
             [
                 TranslatorInterface::class,
-                MessageProducer::class,
+                MessageProducerInterface::class,
                 MassActionDispatcher::class,
                 RequestParameterBagFactory::class,
                 Manager::class

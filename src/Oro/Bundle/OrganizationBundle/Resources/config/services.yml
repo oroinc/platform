@@ -1,6 +1,5 @@
 parameters:
     oro_organization.business_unit.entity.class:               Oro\Bundle\OrganizationBundle\Entity\BusinessUnit
-    oro_organization.business_unit.manager.class:              Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager
     oro_organization.organization.manager.class:               Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager
     oro_organization.organization.entity.class:                Oro\Bundle\OrganizationBundle\Entity\Organization
 
@@ -38,20 +37,29 @@ services:
     #
     oro_organization.business_unit.manager.api:
         class: '%oro_organization.business_unit.manager.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_organization.business_unit.entity.class%'
             - '@doctrine.orm.entity_manager'
 
     oro_organization.business_unit_manager:
-        class: '%oro_organization.business_unit.manager.class%'
+        class: Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_security.token_accessor'
             - '@oro_security.acl_helper'
 
+    Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager:
+        alias: oro_organization.business_unit_manager
+
     oro_organization.organization_manager:
         class: '%oro_organization.organization.manager.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@doctrine'
 
@@ -68,9 +76,12 @@ services:
     # Ownership
     #
     oro_organization.form.type.ownership_type:
-        class: '%oro_organization.form.type.ownership_type.class%'
+        class: Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType
         tags:
             - { name: form.type, alias: oro_type_choice_ownership_type }
+
+    Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType:
+        alias: oro_organization.form.type.ownership_type
 
     oro_organization.owner_assignment_checker.default:
         class: '%oro_organization.owner_assignment_checker.default.class%'
@@ -78,6 +89,8 @@ services:
 
     oro_organization.owner_deletion_manager:
         class: '%oro_organization.owner_deletion_manager.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_organization.owner_assignment_checker.default'
             - '@oro_entity_config.provider.ownership'
@@ -93,7 +106,7 @@ services:
         class: Oro\Bundle\OrganizationBundle\Twig\OrganizationExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -216,6 +229,8 @@ services:
 
     oro_organization.business_unit.handler.delete:
         class: Oro\Bundle\OrganizationBundle\Handler\BusinessUnitDeleteHandler
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.handler.delete.abstract
 
     oro_organization.organization.handler.delete:

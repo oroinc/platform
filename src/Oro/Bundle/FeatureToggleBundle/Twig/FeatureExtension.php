@@ -3,7 +3,8 @@
 namespace Oro\Bundle\FeatureToggleBundle\Twig;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -12,7 +13,7 @@ use Twig\TwigFunction;
  *   - feature_enabled
  *   - feature_resource_enabled
  */
-class FeatureExtension extends AbstractExtension
+class FeatureExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -30,7 +31,7 @@ class FeatureExtension extends AbstractExtension
      */
     protected function getFeatureChecker()
     {
-        return $this->container->get('oro_featuretoggle.checker.feature_checker');
+        return $this->container->get(FeatureChecker::class);
     }
 
     /**
@@ -71,5 +72,15 @@ class FeatureExtension extends AbstractExtension
     public function isResourceEnabled($resource, $resourceType, $scopeIdentifier = null)
     {
         return $this->getFeatureChecker()->isResourceEnabled($resource, $resourceType, $scopeIdentifier);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            FeatureChecker::class,
+        ];
     }
 }

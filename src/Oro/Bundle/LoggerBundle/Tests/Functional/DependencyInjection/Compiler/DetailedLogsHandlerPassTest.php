@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\LoggerBundle\Tests\Functional\DependencyInjection\Compiler;
 
+use Doctrine\Common\Cache\CacheProvider;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\Command\LoggerLevelCommand;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\DetailedLogsHandlerPass;
 use Oro\Bundle\LoggerBundle\DependencyInjection\OroLoggerExtension;
 use Oro\Bundle\LoggerBundle\Tests\Functional\Stub\CustomLogChannelCommandStub;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\LoggerChannelPass;
@@ -29,7 +32,7 @@ class DetailedLogsHandlerPassTest extends WebTestCase
     public function testLogToCustomChannel()
     {
         $application = new Application(self::$kernel);
-        $application->add(new LoggerLevelCommand());
+        $application->add($this->getLoggerLevelCommand());
         $application->add(new CustomLogChannelCommandStub());
 
         $command = $application->find('oro:logger:level');
@@ -97,5 +100,25 @@ class DetailedLogsHandlerPassTest extends WebTestCase
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../../Fixtures/yml'));
         $loader->load($fixtureFileName.'.yml');
+    }
+
+    /**
+     * @return LoggerLevelCommand
+     */
+    private function getLoggerLevelCommand(): LoggerLevelCommand
+    {
+        /** @var ConfigManager $globalConfigManager */
+        $globalConfigManager = $this->createMock(ConfigManager::class);
+
+        /** @var ConfigManager $userConfigManager */
+        $userConfigManager = $this->createMock(ConfigManager::class);
+
+        /** @var CacheProvider $cache */
+        $cache = $this->createMock(CacheProvider::class);
+
+        /** @var UserManager $userManager */
+        $userManager = $this->createMock(UserManager::class);
+
+        return new LoggerLevelCommand($globalConfigManager, $userConfigManager, $cache, $userManager);
     }
 }

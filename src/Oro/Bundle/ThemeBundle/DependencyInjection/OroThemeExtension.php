@@ -11,6 +11,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+/**
+ * Loads services. Sets active theme to ThemeRegistry
+ */
 class OroThemeExtension extends Extension
 {
     const THEMES_SETTINGS_PARAMETER = 'oro_theme.settings';
@@ -37,7 +40,7 @@ class OroThemeExtension extends Extension
 
         if (isset($config['active_theme'])) {
             $registryDefinition = $container->getDefinition(self::THEME_REGISTRY_SERVICE_ID);
-            $registryDefinition->addMethodCall('setActiveTheme', array($config['active_theme']));
+            $registryDefinition->addMethodCall('setActiveTheme', [$config['active_theme']]);
         }
     }
 

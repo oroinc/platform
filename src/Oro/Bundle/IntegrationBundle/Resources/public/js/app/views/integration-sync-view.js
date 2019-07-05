@@ -44,8 +44,7 @@ define(function(require) {
                 okText: __('oro.integration.force_sync.ok'),
                 cancelText: __('oro.integration.force_sync.cancel'),
                 content: __('oro.integration.force_sync.message', {integration_name: this.integrationName}),
-                className: this.modalClass,
-                handleClose: true
+                className: this.modalClass
             });
 
             confirmation.on('ok', function() {

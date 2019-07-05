@@ -5,7 +5,8 @@ namespace Oro\Bundle\DashboardBundle\Twig;
 use Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -15,7 +16,7 @@ use Twig\TwigFunction;
  *   - oro_query_filter_metadata
  *   - oro_query_filter_entities
  */
-class DashboardExtension extends AbstractExtension
+class DashboardExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -41,7 +42,7 @@ class DashboardExtension extends AbstractExtension
      */
     protected function getQueryDesignerManager()
     {
-        return $this->container->get(QueryDesignerManager::class);
+        return $this->container->get('oro_query_designer.query_designer.manager');
     }
 
     /**
@@ -96,5 +97,17 @@ class DashboardExtension extends AbstractExtension
     public function getQueryFilterEntities()
     {
         return $this->getEntityProvider()->getEntities();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_dashboard.widget_config_value.date_range.converter' => FilterDateRangeConverter::class,
+            'oro_query_designer.query_designer.manager' => QueryDesignerManager::class,
+            'oro_report.entity_provider' => EntityProvider::class,
+        ];
     }
 }

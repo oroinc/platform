@@ -1,3 +1,5 @@
+imports:
+    - { resource: controllers.yml }
 parameters:
     oro_distribution.routing_loader.class:                    Oro\Bundle\DistributionBundle\Routing\OroAutoLoader
     oro_distribution.expose_routing_loader.class:             Oro\Bundle\DistributionBundle\Routing\OroExposeLoader
@@ -63,6 +65,8 @@ services:
 
     oro_distribution.package_manager:
         class: '%oro_distribution.package_manager.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
           - '@oro_distribution.composer'
           - '@oro_distribution.composer.installer'
@@ -112,6 +116,8 @@ services:
 
     oro_distribution.composer.json_file:
         class: '%oro_distribution.composer.json_file.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
           - '%oro_distribution.composer_json%'
     #

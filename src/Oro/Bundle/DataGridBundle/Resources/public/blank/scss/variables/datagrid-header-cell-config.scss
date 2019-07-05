@@ -12,13 +12,13 @@ $datagrid-header-cell-mass-action-offset-inner: $offset-y-s ($offset-x - 2px) $o
 $datagrid-header-cell-action-column-width: 50px !default;
 $datagrid-header-cell-action-column-text-align: right !default;
 
-$datagrid-header-cell-caret-offset: 0 0 0 5px !default;
-$datagrid-header-cell-caret-color: get-color('additional', 'dark') !default;
-$datagrid-header-cell-caret-size: 4px !default;
+$datagrid-header-cell-sortable-icon-offset: 0 0 0 5px !default;
+$datagrid-header-cell-sortable-icon-color: get-color('additional', 'dark') !default;
+$datagrid-header-cell-sortable-icon-size: 4px !default;
 
-$datagrid-header-cell-caret-position: absolute !default;
-$datagrid-header-cell-caret-top: 50% !default;
-$datagrid-header-cell-caret-right: -15px !default;
+$datagrid-header-cell-sortable-icon-position: absolute !default;
+$datagrid-header-cell-sortable-icon-top: 50% !default;
+$datagrid-header-cell-sortable-icon-right: -15px !default;
 
 $datagrid-header-cell-link-font-size: $base-font-size !default;
 $datagrid-header-cell-link-font-weight: 600 !default;

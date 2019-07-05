@@ -8,7 +8,7 @@ use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\PhpUtils\ArrayUtil;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Form\FormView;
@@ -73,7 +73,7 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
      */
     public function initRuntime(Environment $environment)
     {
-        $this->renderer = $this->container->get(TwigRenderer::class);
+        $this->renderer = $this->container->get('oro_layout.twig.renderer');
         $this->renderer->setEnvironment($environment);
     }
 
@@ -167,7 +167,7 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
     public function processText($value, $domain = null)
     {
         if (null === $this->textHelper) {
-            $this->textHelper = $this->container->get(TextHelper::class);
+            $this->textHelper = $this->container->get('oro_layout.text.helper');
         }
 
         return $this->textHelper->processText($value, $domain);
@@ -287,8 +287,8 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
     public static function getSubscribedServices()
     {
         return [
-            TwigRenderer::class,
-            TextHelper::class,
+            'oro_layout.twig.renderer' => TwigRenderer::class,
+            'oro_layout.text.helper' => TextHelper::class,
         ];
     }
 }

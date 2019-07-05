@@ -7,6 +7,9 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
+/**
+ * Provides a set of method to simplify working with attribute configuration data.
+ */
 class AttributeConfigurationProvider
 {
     /** @var ConfigManager */
@@ -39,6 +42,17 @@ class AttributeConfigurationProvider
     {
         return $this->getConfig($attribute, 'extend')
             ->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]);
+    }
+
+    /**
+     * @param FieldConfigModel $attribute
+     *
+     * @return bool
+     */
+    public function isAttributeCustom(FieldConfigModel $attribute)
+    {
+        return $this->getConfig($attribute, 'extend')
+            ->is('owner', ExtendScope::OWNER_CUSTOM);
     }
 
     /**

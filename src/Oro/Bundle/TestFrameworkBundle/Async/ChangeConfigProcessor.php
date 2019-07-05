@@ -8,6 +8,9 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
+/**
+ * Test config processor
+ */
 class ChangeConfigProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     const COMMAND_NOOP = 'noop';
@@ -33,7 +36,7 @@ class ChangeConfigProcessor implements MessageProcessorInterface, TopicSubscribe
     {
         usleep(2000000); // Remove after BAP-16453 is fixed
         if ($message->getBody() !== self::COMMAND_NOOP) {
-            $this->configManager->set('oro_locale.timezone', 'China/Bejin');
+            $this->configManager->set('oro_locale.timezone', 'Europe/London');
             $this->configManager->flush();
         }
 

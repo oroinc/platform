@@ -3,18 +3,19 @@
 namespace Oro\Bundle\ActivityListBundle\Controller;
 
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * Provide functionality to manage activity lists
  *
  * @Route("/activity-list")
  */
-class ActivityListController extends Controller
+class ActivityListController extends AbstractController
 {
     /**
      * @Route("/view/widget/{entityClass}/{entityId}", name="oro_activity_list_widget_activities")
@@ -27,10 +28,10 @@ class ActivityListController extends Controller
      */
     public function widgetAction($entityClass, $entityId)
     {
-        $entity = $this->getEntityRoutingHelper()->getEntity($entityClass, $entityId);
+        $entity = $this->get(EntityRoutingHelper::class)->getEntity($entityClass, $entityId);
 
         /** @var ActivityListChainProvider $activitiesProvider */
-        $activitiesProvider = $this->get('oro_activity_list.provider.chain');
+        $activitiesProvider = $this->get(ActivityListChainProvider::class);
 
         /** @var DateTimeRangeFilter $dateRangeFilter */
         $dateRangeFilter = $this->get(DateTimeRangeFilter::class);
@@ -43,10 +44,15 @@ class ActivityListController extends Controller
     }
 
     /**
-     * @return EntityRoutingHelper
+     * {@inheritdoc}
      */
-    protected function getEntityRoutingHelper()
+    public static function getSubscribedServices()
     {
-        return $this->get('oro_entity.routing_helper');
+        return [
+            'oro_config.user' => ConfigManager::class,
+            ActivityListChainProvider::class,
+            DateTimeRangeFilter::class,
+            EntityRoutingHelper::class,
+        ];
     }
 }

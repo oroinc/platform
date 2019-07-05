@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Expr\Value;
 use Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException;
 use Oro\Bundle\ApiBundle\Model\Range;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * A filter that can be used to filter data by a field value.
@@ -210,7 +211,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
      */
     protected function createExpression(FilterValue $value = null)
     {
-        return null !== $value
+        return null !== $value && ConfigUtil::IGNORE_PROPERTY_PATH !== $this->field
             ? $this->buildExpression($this->field, $value->getPath(), $value->getOperator(), $value->getValue())
             : null;
     }

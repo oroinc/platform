@@ -3,9 +3,15 @@
 namespace Oro\Bundle\MigrationBundle;
 
 use Oro\Bundle\MigrationBundle\DependencyInjection\Compiler\MigrationExtensionPass;
+use Oro\Bundle\MigrationBundle\DependencyInjection\Compiler\ServiceContainerRealRefPass;
+use Oro\Bundle\MigrationBundle\DependencyInjection\Compiler\ServiceContainerWeakRefPass;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * The MigrationBundle bundle class.
+ */
 class OroMigrationBundle extends Bundle
 {
     /**
@@ -16,5 +22,7 @@ class OroMigrationBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new MigrationExtensionPass());
+        $container->addCompilerPass(new ServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
+        $container->addCompilerPass(new ServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);
     }
 }

@@ -2,32 +2,20 @@ services:
     _defaults:
         public: true
 
-    oro_workflow.controllers.widget:
-        class: Oro\Bundle\WorkflowBundle\Controller\WidgetController
-        calls:
-            - ['setContainer', ['@Psr\Container\ContainerInterface']]
-        tags:
-            - { name: container.service_subscriber }
-
     Oro\Bundle\WorkflowBundle\Controller\WidgetController:
-        alias: oro_workflow.controllers.widget
-
-    oro_workflow.controllers.workflow:
-        class: Oro\Bundle\WorkflowBundle\Controller\WorkflowController
         calls:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: container.service_subscriber }
 
     Oro\Bundle\WorkflowBundle\Controller\WorkflowController:
-        alias: 'oro_workflow.controllers.workflow'
-
-    oro_workflow.controllers.workflow_definition:
-        class: Oro\Bundle\WorkflowBundle\Controller\WorkflowDefinitionController
         calls:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: container.service_subscriber }
 
     Oro\Bundle\WorkflowBundle\Controller\WorkflowDefinitionController:
-        alias: 'oro_workflow.controllers.workflow_definition'
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }

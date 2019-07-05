@@ -1,30 +1,43 @@
 services:
-    Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand
+
+    Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand:
         tags:
             - { name: console.command }
 
     Oro\Bundle\TranslationBundle\Command\OroTranslationDumpCommand:
         public: false
         class: Oro\Bundle\TranslationBundle\Command\OroTranslationDumpCommand
+        arguments:
+            - '@oro_translation.js_dumper'
         tags:
             - { name: console.command }
 
     Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand:
-        public: false
-        class: Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand
+        arguments:
+            - '@doctrine'
+            - '@translator'
+            - '@oro_translation.database_translation.persister'
+            - '@oro_translation.provider.language'
         tags:
             - { name: console.command }
 
     Oro\Bundle\TranslationBundle\Command\OroTranslationPackCommand:
-        public: false
-        class: Oro\Bundle\TranslationBundle\Command\OroTranslationPackCommand
+        arguments:
+            - '@Oro\Bundle\TranslationBundle\Provider\TranslationPackDumper'
+            - '@oro_translation.service_provider'
+            - '@oro_translation.packages_provider.translation'
+            - '@Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationAdaptersCollection'
+            - '%kernel.project_dir%'
         tags:
             - { name: console.command }
 
     Oro\Bundle\TranslationBundle\Command\OroTranslationResetCommand:
-        public: false
-        class: Oro\Bundle\TranslationBundle\Command\OroTranslationResetCommand
+        arguments:
+            - '@translator.default'
+            - '@doctrine.orm.entity_manager'
+            - '@oro_translation.database_translation.loader'
+            - '%kernel.default_locale%'
         tags:
             - { name: console.command }
