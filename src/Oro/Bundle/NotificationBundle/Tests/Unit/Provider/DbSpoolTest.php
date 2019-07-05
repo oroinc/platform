@@ -48,7 +48,7 @@ class DbSpoolTest extends \PHPUnit\Framework\TestCase
      */
     public function testQueueMessage()
     {
-        $message = $this->createMock(\Swift_Mime_Message::class);
+        $message = $this->createMock(\Swift_Mime_SimpleMessage::class);
         $this->spool->setLogType('log type');
         $this->entityPool->expects(self::once())
             ->method('addPersistEntity')
@@ -73,7 +73,7 @@ class DbSpoolTest extends \PHPUnit\Framework\TestCase
         $transport->expects(self::once())
             ->method('start');
 
-        $message = $this->createMock(\Swift_Mime_Message::class);
+        $message = $this->createMock(\Swift_Mime_SimpleMessage::class);
 
         $spoolItem = $this->createMock(SpoolItem::class);
         $spoolItem->expects(self::once())

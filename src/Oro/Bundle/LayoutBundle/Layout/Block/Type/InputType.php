@@ -9,6 +9,9 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
 
+/**
+ * Implements Input Block Form Type for Layout
+ */
 class InputType extends AbstractType
 {
     const NAME = 'input';
@@ -28,7 +31,8 @@ class InputType extends AbstractType
                 'id',
                 'name',
                 'value',
-                'placeholder'
+                'placeholder',
+                'required',
             ]
         );
     }
@@ -38,9 +42,12 @@ class InputType extends AbstractType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        BlockUtils::setViewVarsFromOptions($view, $options, ['name', 'type', 'value', 'placeholder']);
+        BlockUtils::setViewVarsFromOptions($view, $options, ['name', 'type', 'value', 'placeholder', 'required']);
         if (isset($options['id'])) {
             $view->vars['attr']['id'] = $options->get('id', false);
+        }
+        if (isset($options['required'])) {
+            $view->vars['attr']['required'] = $options->get('required', false);
         }
     }
 
@@ -58,8 +65,10 @@ class InputType extends AbstractType
         if (!$view->vars['placeholder']) {
             unset($view->vars['placeholder']);
         }
+        if (!$view->vars['required']) {
+            unset($view->vars['required']);
+        }
     }
-
 
     /**
      * {@inheritdoc}

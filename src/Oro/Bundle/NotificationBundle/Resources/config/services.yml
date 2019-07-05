@@ -155,7 +155,7 @@ services:
             - '@oro_notification.mailer.spool_db'
 
     swiftmailer.mailer.db_spool_mailer:
-        class: '%swiftmailer.class%'
+        class: Oro\Bundle\EmailBundle\Util\MailerWrapper
         public: false
         arguments:
             - '@oro_notification.mailer.transport'

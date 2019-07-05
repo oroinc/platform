@@ -5,7 +5,7 @@ namespace Oro\Bundle\NotificationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * SpoolItem
+ * SpoolItem entity represents email message deferred to messages spool
  *
  * @ORM\Table(name="oro_notification_email_spool",
  *      indexes={@ORM\Index(name="notification_spool_status_idx", columns={"status"})})
@@ -30,7 +30,7 @@ class SpoolItem
     private $status;
 
     /**
-     * @var \Swift_Mime_Message
+     * @var \Swift_Mime_SimpleMessage
      *
      * @ORM\Column(name="message", type="object")
      */
@@ -79,10 +79,10 @@ class SpoolItem
     /**
      * Set message
      *
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      * @return SpoolItem
      */
-    public function setMessage(\Swift_Mime_Message $message)
+    public function setMessage(\Swift_Mime_SimpleMessage $message)
     {
         $this->message = $message;
 
@@ -92,7 +92,7 @@ class SpoolItem
     /**
      * Get message
      *
-     * @return \Swift_Mime_Message
+     * @return \Swift_Mime_SimpleMessage
      */
     public function getMessage()
     {

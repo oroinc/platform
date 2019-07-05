@@ -51,7 +51,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
         $pattern = $this->getPattern($text);
         $found = false;
 
-        /** @var \Swift_Mime_Message $message */
+        /** @var \Swift_Mime_SimpleMessage $message */
         foreach ($mailer->getSentMessages() as $message) {
             $data = array_map(
                 function ($field) use ($message) {
@@ -103,7 +103,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
         self::assertNotEmpty($sentMessages, 'There are no sent messages');
 
         $found = false;
-        /** @var \Swift_Mime_Message $message */
+        /** @var \Swift_Mime_SimpleMessage $message */
         foreach ($sentMessages as $message) {
             foreach ($expectedRows as $expectedContent) {
                 $found = (bool) preg_match(
@@ -173,7 +173,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
         self::assertNotEmpty($sentMessages, 'There are no sent messages');
 
         $found = false;
-        /** @var \Swift_Mime_Message $message */
+        /** @var \Swift_Mime_SimpleMessage $message */
         foreach ($sentMessages as $message) {
             foreach ($expectedRows as $expectedContent) {
                 $found = (bool) preg_match(
@@ -241,7 +241,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
 
         $found = false;
 
-        /** @var \Swift_Mime_Message $message */
+        /** @var \Swift_Mime_SimpleMessage $message */
         foreach ($mailer->getSentMessages() as $message) {
             if ($searchText !== $this->getMessageData($message, $searchField)) {
                 continue;
@@ -275,7 +275,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             return;
         }
 
-        /** @var \Swift_Mime_Message $message */
+        /** @var \Swift_Mime_SimpleMessage $message */
         foreach ($mailer->getSentMessages() as $message) {
             if ($searchText === $this->getMessageData($message, $searchField)) {
                 self::fail(sprintf('Email with %s \"%s\" was not expected to be sent', $searchField, $searchText));
@@ -293,11 +293,11 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
     }
 
     /**
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      * @param string $field
      * @return string
      */
-    private function getMessageData(\Swift_Mime_Message $message, $field)
+    private function getMessageData(\Swift_Mime_SimpleMessage $message, $field)
     {
         switch (strtolower(trim($field))) {
             case 'from':
@@ -371,7 +371,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
         $pattern = sprintf('/<a.*href\s*=\s*"(?P<url>[^"]+)".*>\s*%s\s*<\/a>/s', $linkCaption);
         $url = $this->spin(function () use ($mailer, $pattern) {
             $matches = [];
-            /** @var \Swift_Mime_Message $message */
+            /** @var \Swift_Mime_SimpleMessage $message */
             foreach ($mailer->getSentMessages() as $message) {
                 $text = utf8_decode(html_entity_decode($message->getBody()));
                 // replace non-breaking spaces with plain spaces to be able to search
