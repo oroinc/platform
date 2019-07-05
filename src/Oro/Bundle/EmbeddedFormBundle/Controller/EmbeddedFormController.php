@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
-use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
@@ -15,6 +14,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Embedded Form Controller
@@ -65,7 +65,7 @@ class EmbeddedFormController extends Controller
         $em->remove($entity);
         $em->flush();
 
-        return new JsonResponse('', Codes::HTTP_OK);
+        return new JsonResponse('', Response::HTTP_OK);
     }
 
     /**
@@ -84,7 +84,7 @@ class EmbeddedFormController extends Controller
                 'css'            => $css,
                 'successMessage' => $successMessage
             ],
-            Codes::HTTP_OK
+            Response::HTTP_OK
         );
     }
 

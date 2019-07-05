@@ -6,7 +6,6 @@ use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
@@ -67,9 +66,9 @@ class FileController extends RestGetController implements ClassResourceInterface
      *
      * Implement a view handler for FOS Rest Bundle in BAP-8351.
      */
-    protected function buildResponse($data, $action, $contextValues = [], $status = Codes::HTTP_OK)
+    protected function buildResponse($data, $action, $contextValues = [], $status = Response::HTTP_OK)
     {
-        if ($status === Codes::HTTP_OK) {
+        if ($status === Response::HTTP_OK) {
             $format = $this->get('request_stack')->getCurrentRequest()->getRequestFormat();
             if ($format === 'binary') {
                 if ($action !== self::ACTION_READ) {

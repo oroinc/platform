@@ -6,7 +6,6 @@ use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -38,7 +37,7 @@ class ConfigurationController extends FOSRestController
         $data = $manager->getSections();
 
         return $this->handleView(
-            $this->view($data, Codes::HTTP_OK)
+            $this->view($data, Response::HTTP_OK)
         );
     }
 
@@ -70,11 +69,11 @@ class ConfigurationController extends FOSRestController
         try {
             $data = $manager->getData($path, $request->get('scope', 'user'));
         } catch (ItemNotFoundException $e) {
-            return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view(null, Response::HTTP_NOT_FOUND));
         }
 
         return $this->handleView(
-            $this->view($data, Codes::HTTP_OK)
+            $this->view($data, Response::HTTP_OK)
         );
     }
 }

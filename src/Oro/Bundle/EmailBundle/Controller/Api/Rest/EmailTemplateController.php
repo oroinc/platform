@@ -6,7 +6,6 @@ use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
@@ -53,21 +52,21 @@ class EmailTemplateController extends RestController
         /** @var EmailTemplate $entity */
         $entity = $this->getManager()->find($id);
         if (!$entity) {
-            return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view(null, Response::HTTP_NOT_FOUND));
         }
 
         /**
          * Deny to remove system templates
          */
         if ($entity->getIsSystem()) {
-            return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
+            return $this->handleView($this->view(null, Response::HTTP_FORBIDDEN));
         }
 
         $em = $this->getManager()->getObjectManager();
         $em->remove($entity);
         $em->flush();
 
-        return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
+        return $this->handleView($this->view(null, Response::HTTP_NO_CONTENT));
     }
 
     /**
@@ -93,7 +92,7 @@ class EmailTemplateController extends RestController
     {
         if (!$entityName) {
             return $this->handleView(
-                $this->view(null, Codes::HTTP_NOT_FOUND)
+                $this->view(null, Response::HTTP_NOT_FOUND)
             );
         }
 
@@ -112,7 +111,7 @@ class EmailTemplateController extends RestController
             );
 
         return $this->handleView(
-            $this->view($templates, Codes::HTTP_OK)
+            $this->view($templates, Response::HTTP_OK)
         );
     }
 
@@ -139,7 +138,7 @@ class EmailTemplateController extends RestController
         ];
 
         return $this->handleView(
-            $this->view($data, Codes::HTTP_OK)
+            $this->view($data, Response::HTTP_OK)
         );
     }
 
@@ -186,7 +185,7 @@ class EmailTemplateController extends RestController
                             $entityId
                         )
                     ],
-                    Codes::HTTP_NOT_FOUND
+                    Response::HTTP_NOT_FOUND
                 )
             );
         }
@@ -200,14 +199,14 @@ class EmailTemplateController extends RestController
                     'body' => $body,
                     'type' => $emailTemplate->getType(),
                 ],
-                Codes::HTTP_OK
+                Response::HTTP_OK
             );
         } catch (SyntaxError|LoaderError|RuntimeError $e) {
             $view = $this->view(
                 [
                     'reason' => $this->get('translator')->trans('oro.email.emailtemplate.failed_to_compile'),
                 ],
-                Codes::HTTP_UNPROCESSABLE_ENTITY
+                Response::HTTP_UNPROCESSABLE_ENTITY
             );
         }
 

@@ -1,0 +1,12 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\UIBundle\Controller\ExceptionController:
+        arguments:
+            - '@Psr\Container\ContainerInterface'
+            - '%kernel.debug%'
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: 'fos_rest.view_handler' }
+            - { name: container.service_subscriber, id: 'fos_rest.exception.codes_map' }

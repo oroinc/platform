@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SidebarBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\SidebarBundle\Entity\AbstractSidebarState;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class SidebarStateRepository extends EntityRepository
@@ -10,7 +11,7 @@ class SidebarStateRepository extends EntityRepository
     /**
      * @param UserInterface $user
      * @param string $position
-     * @return array
+     * @return AbstractSidebarState|null
      */
     public function getState($user, $position)
     {
