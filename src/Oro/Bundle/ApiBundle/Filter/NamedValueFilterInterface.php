@@ -12,5 +12,5 @@ interface NamedValueFilterInterface
      *
      * @return string
      */
-    public function getFilterValueName();
+    public function getFilterValueName(): string;
 }

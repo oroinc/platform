@@ -14,5 +14,5 @@ interface MetadataAwareFilterInterface
      *
      * @param EntityMetadata $metadata
      */
-    public function setMetadata(EntityMetadata $metadata);
+    public function setMetadata(EntityMetadata $metadata): void;
 }

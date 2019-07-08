@@ -314,7 +314,7 @@ class EntityConfig
      * and value ['has_more' => true] {@see \Oro\Component\EntitySerializer\ConfigUtil::HAS_MORE}
      * should be added to a collection if it has more records than it was requested.
      *
-     * @return string An exclusion strategy, e.g. "none" or "all"
+     * @return bool
      */
     public function getHasMore()
     {

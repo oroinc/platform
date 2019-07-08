@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Authentication\Provider;
 
-use Guzzle\Http\Message\RequestInterface;
-use Guzzle\Http\QueryString;
-use Guzzle\Http\Url;
 use Oro\Bundle\SyncBundle\Authentication\Provider\WebsocketAuthenticationByTicketProvider;
 use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\UriInterface;
 use Ratchet\ConnectionInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -147,28 +146,19 @@ class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit\Framework\Tes
      */
     private function mockWebSocketRequest(?string $ticket)
     {
-        $query = $this->createMock(QueryString::class);
-        $query
-            ->expects(self::once())
-            ->method('get')
-            ->with('ticket')
-            ->willReturn($ticket);
-
-        $url = $this->createMock(Url::class);
-        $url
-            ->expects(self::once())
-            ->method('getQuery')
-            ->willReturn($query);
-
         $request = $this->createMock(RequestInterface::class);
         $request
             ->expects(self::once())
-            ->method('getUrl')
-            ->with(true)
-            ->willReturn($url);
+            ->method('getUri')
+            ->willReturn($uri = $this->createMock(UriInterface::class));
+
+        $uri
+            ->expects(self::once())
+            ->method('getQuery')
+            ->willReturn('ticket='.$ticket);
 
         $connection = $this->createMock(ConnectionInterface::class);
-        $connection->WebSocket = (object) ['request' => $request];
+        $connection->httpRequest = $request;
         $connection->WAMP = (object) ['sessionId' => self::WAMP_SESSION_ID];
 
         return $connection;

@@ -72,7 +72,7 @@ class SearchQueryFilter extends StandaloneFilter
     /**
      * {@inheritdoc}
      */
-    public function apply(Criteria $criteria, FilterValue $value = null)
+    public function apply(Criteria $criteria, FilterValue $value = null): void
     {
         $expr = $this->createExpression($value);
         if (null !== $expr) {

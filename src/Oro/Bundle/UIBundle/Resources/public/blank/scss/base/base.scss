@@ -60,6 +60,10 @@
 
         background-color: $body-bg-color;
         color: $body-color;
+
+        @if ($global-font-smoothing) {
+            @include font-smoothing();
+        }
     }
 }
 

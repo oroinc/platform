@@ -63,7 +63,10 @@ class ConnectionController extends Controller
             $response = ['errors' => $this->handleFormErrors($form)];
         }
 
-        return new JsonResponse($response, !empty($response['errors']) ? Response::HTTP_BAD_REQUEST : Response::HTTP_OK);
+        return new JsonResponse(
+            $response,
+            !empty($response['errors']) ? Response::HTTP_BAD_REQUEST : Response::HTTP_OK
+        );
     }
 
     /**

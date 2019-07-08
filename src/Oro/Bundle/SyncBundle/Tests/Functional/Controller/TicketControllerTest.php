@@ -3,8 +3,8 @@
 namespace Oro\Bundle\SyncBundle\Tests\Functional\Controller;
 
 use Gos\Bundle\WebSocketBundle\Event\ClientEvent;
-use Guzzle\Http\Message\Request;
-use Guzzle\Http\Url;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Uri;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Ratchet\ConnectionInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -24,7 +24,7 @@ class TicketControllerTest extends WebTestCase
         $response = self::getJsonResponseContent($this->client->getResponse(), 200);
         self::assertNotEmpty($response['ticket']);
 
-        $connection = $this->prepareConnection($response);
+        $connection = $this->prepareConnection($response['ticket']);
 
         $event = new ClientEvent($connection, ClientEvent::CONNECTED);
         self::getContainer()
@@ -40,18 +40,19 @@ class TicketControllerTest extends WebTestCase
     }
 
     /**
-     * @param array $response
+     * @param string $ticket
+     *
      * @return ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function prepareConnection(array $response): ConnectionInterface
+    private function prepareConnection(string $ticket): ConnectionInterface
     {
-        $url = new Url('http', 'test.local');
-        $url->setQuery($response);
-        $request = new Request('GET', $url);
+        $uri = (new Uri())
+            ->withQuery('ticket=' . $ticket);
+
+        $request = new Request('GET', $uri);
 
         $connection = $this->createMock(ConnectionInterface::class);
-        $connection->WebSocket = new \stdClass();
-        $connection->WebSocket->request = $request;
+        $connection->httpRequest = $request;
         $connection->WAMP = new \stdClass();
         $connection->WAMP->sessionId = 'test-session-id';
         $connection->resourceId = 'test-resource-id';

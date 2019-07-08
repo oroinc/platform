@@ -16,15 +16,15 @@ abstract class AssociationFilter extends ComparisonFilter implements
     RequestAwareFilterInterface
 {
     /** @var RequestType */
-    protected $requestType;
+    private $requestType;
 
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /**
      * {@inheritdoc}
      */
-    public function setRequestType(RequestType $requestType)
+    public function setRequestType(RequestType $requestType): void
     {
         $this->requestType = $requestType;
     }
@@ -40,9 +40,17 @@ abstract class AssociationFilter extends ComparisonFilter implements
     /**
      * {@inheritdoc}
      */
-    public function getFilterValueName()
+    public function getFilterValueName(): string
     {
         return 'type';
+    }
+
+    /**
+     * @return RequestType
+     */
+    protected function getRequestType(): RequestType
+    {
+        return $this->requestType;
     }
 
     /**
@@ -52,12 +60,13 @@ abstract class AssociationFilter extends ComparisonFilter implements
     {
         $result = [];
 
-        $prefix = $this->field . '.';
+        $field = $this->getField();
+        $prefix = $field . '.';
         /** @var FilterValue $filterValue */
         foreach ($filterValues as $filterKey => $filterValue) {
             $path = $filterValue->getPath();
             if (0 === \strpos($path, $prefix)) {
-                $filterValueName = \substr($path, \strlen($this->field) + 1);
+                $filterValueName = \substr($path, \strlen($field) + 1);
                 if (empty($filterValueName)) {
                     throw new InvalidFilterValueKeyException(
                         'The target type of an association is not specified.',
@@ -74,7 +83,7 @@ abstract class AssociationFilter extends ComparisonFilter implements
                     );
                 }
                 $result[] = $filterKey;
-            } elseif ($path === $this->field) {
+            } elseif ($path === $field) {
                 throw new InvalidFilterValueKeyException(
                     'The target type of an association is not specified.',
                     $filterValue
@@ -90,12 +99,12 @@ abstract class AssociationFilter extends ComparisonFilter implements
      *
      * @return string
      */
-    protected function getEntityClass($entityType)
+    protected function getEntityClass(string $entityType): string
     {
         return $this->valueNormalizer->normalizeValue(
             $entityType,
             DataType::ENTITY_CLASS,
-            $this->requestType
+            $this->getRequestType()
         );
     }
 
@@ -103,12 +112,13 @@ abstract class AssociationFilter extends ComparisonFilter implements
      * @param string $field
      * @param string $path
      */
-    protected function assertFilterValuePath($field, $path)
+    protected function assertFilterValuePath(string $field, string $path): void
     {
         if (0 !== \strpos($path, $field . '.')) {
-            throw new \InvalidArgumentException(
-                \sprintf('The filter value path must starts with "%s".', $field)
-            );
+            throw new \InvalidArgumentException(\sprintf(
+                'The filter value path must starts with "%s".',
+                $field
+            ));
         }
     }
 }

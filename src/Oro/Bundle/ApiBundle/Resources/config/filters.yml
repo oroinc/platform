@@ -48,11 +48,17 @@ services:
     oro_api.filter_factory:
         class: Oro\Bundle\ApiBundle\Filter\ChainFilterFactory
         public: false
+        arguments:
+            - !tagged oro.api.filter_factory
 
+    # this service is configured by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\SimpleFilterFactoryCompilerPass
     oro_api.filter_factory.default:
         class: Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory
         public: false
         arguments:
+            - [] # filters
+            - [] # filter factories
+            - ~ # filter factory container
             - '@property_accessor'
             - '@oro_api.filter_operator_registry'
         tags:
