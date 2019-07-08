@@ -26,7 +26,6 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
-
         $this->cache = new PhpTempCache();
         $this->reader = new XlsxFileReader($this->contextRegistry, $this->cache);
     }
