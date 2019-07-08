@@ -39,7 +39,7 @@ Feature: Workflow in Data Audit
 
   Scenario: Prepare workflow to usage with audit
     When I click "Activate"
-    And I click "Activate"
+    And I click "Activate" in modal window
     Then I should see "Workflow activated" flash message
     When I go to System / Localization / Translations
     And I click "Update Cache"
