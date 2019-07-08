@@ -2,6 +2,15 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## 4.0.0
+
+### Removed
+
+#### ApiBundle
+* All filters and sorters were removed for all "relationships" resources that returns a collection,
+  e.g. "GET /api/countries/{id}/relationships/regions". If you need filtered or sorted data, use sub-resources
+  instead of relationships, e.g. "GET /api/countries/{id}/regions".
+
 ## 4.0.0-rc (2019-05-29)
 [Show detailed list of changes](incompatibilities-4-0-rc.md)
 

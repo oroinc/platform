@@ -14,5 +14,5 @@ interface RequestAwareFilterInterface
      *
      * @param RequestType $requestType
      */
-    public function setRequestType(RequestType $requestType);
+    public function setRequestType(RequestType $requestType): void;
 }

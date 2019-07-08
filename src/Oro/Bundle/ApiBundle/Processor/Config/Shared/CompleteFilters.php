@@ -266,16 +266,13 @@ class CompleteFilters extends CompleteSection
             }
             $this->setFilterArrayAllowed($filter);
             $this->setFilterRangeAllowed($filter);
-            $options = $filter->getOptions();
-            if (null === $options) {
-                $options = [];
-            }
+            $options = $filter->getOptions() ?? [];
             list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
-            $options = \array_replace($options, [
-                'associationOwnerClass' => $metadata->name,
-                'associationType'       => $associationType,
-                'associationKind'       => $associationKind
-            ]);
+            $options['associationOwnerClass'] = $metadata->name;
+            $options['associationType'] = $associationType;
+            if ($associationKind) {
+                $options['associationKind'] = $associationKind;
+            }
             $filter->setOptions($options);
         }
     }

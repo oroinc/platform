@@ -14,7 +14,7 @@ class RequestAwareFilterStub extends ComparisonFilter implements RequestAwareFil
     /**
      * @return RequestType|null
      */
-    public function getRequestType()
+    public function getRequestType(): ?RequestType
     {
         return $this->requestType;
     }
@@ -22,7 +22,7 @@ class RequestAwareFilterStub extends ComparisonFilter implements RequestAwareFil
     /**
      * {@inheritdoc}
      */
-    public function setRequestType(RequestType $requestType)
+    public function setRequestType(RequestType $requestType): void
     {
         $this->requestType = $requestType;
     }

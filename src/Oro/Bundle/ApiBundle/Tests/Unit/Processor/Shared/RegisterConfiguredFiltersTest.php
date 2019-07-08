@@ -160,6 +160,94 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
+    public function testProcessForComparisonFilterWithAttributesInitializedInFactory()
+    {
+        $filtersConfig = new FiltersConfig();
+        $filtersConfig->setExcludeAll();
+
+        $filterConfig = new FilterFieldConfig();
+        $filterConfig->setType('someFilter');
+        $filterConfig->setDataType('string');
+        $filtersConfig->addField('filter', $filterConfig);
+
+        $this->filterFactory->expects(self::once())
+            ->method('createFilter')
+            ->with('someFilter', ['data_type' => 'string'])
+            ->willReturnCallback(
+                function ($filterType, array $options) {
+                    $filter = $this->getComparisonFilter($options['data_type']);
+                    $filter->setDescription('default filter description');
+                    $filter->setArrayAllowed(true);
+                    $filter->setRangeAllowed(true);
+                    $filter->setSupportedOperators(['=']);
+
+                    return $filter;
+                }
+            );
+
+        $this->context->setClassName(Entity\Category::class);
+        $this->context->setConfigOfFilters($filtersConfig);
+        $this->processor->process($this->context);
+
+        $expectedFilter = new ComparisonFilter('string');
+        $expectedFilter->setDescription('default filter description');
+        $expectedFilter->setDataType('string');
+        $expectedFilter->setField('filter');
+        $expectedFilter->setArrayAllowed(true);
+        $expectedFilter->setRangeAllowed(true);
+        $expectedFilter->setSupportedOperators(['=']);
+        $expectedFilters = new FilterCollection();
+        $expectedFilters->add('filter', $expectedFilter);
+
+        self::assertEquals($expectedFilters, $this->context->getFilters());
+    }
+
+    public function testProcessForComparisonFilterWithAttributesInitializedInFactoryAndOverriddenInConfig()
+    {
+        $filtersConfig = new FiltersConfig();
+        $filtersConfig->setExcludeAll();
+
+        $filterConfig = new FilterFieldConfig();
+        $filterConfig->setDescription('filter description');
+        $filterConfig->setType('someFilter');
+        $filterConfig->setDataType('string');
+        $filterConfig->setArrayAllowed(false);
+        $filterConfig->setRangeAllowed(false);
+        $filterConfig->setOperators(['=', '!=', '~']);
+        $filtersConfig->addField('filter', $filterConfig);
+
+        $this->filterFactory->expects(self::once())
+            ->method('createFilter')
+            ->with('someFilter', ['data_type' => 'string'])
+            ->willReturnCallback(
+                function ($filterType, array $options) {
+                    $filter = $this->getComparisonFilter($options['data_type']);
+                    $filter->setDescription('default filter description');
+                    $filter->setArrayAllowed(true);
+                    $filter->setRangeAllowed(true);
+                    $filter->setSupportedOperators(['=']);
+
+                    return $filter;
+                }
+            );
+
+        $this->context->setClassName(Entity\Category::class);
+        $this->context->setConfigOfFilters($filtersConfig);
+        $this->processor->process($this->context);
+
+        $expectedFilter = new ComparisonFilter('string');
+        $expectedFilter->setDescription('filter description');
+        $expectedFilter->setDataType('string');
+        $expectedFilter->setField('filter');
+        $expectedFilter->setArrayAllowed(false);
+        $expectedFilter->setRangeAllowed(false);
+        $expectedFilter->setSupportedOperators(['=', '!=', '~']);
+        $expectedFilters = new FilterCollection();
+        $expectedFilters->add('filter', $expectedFilter);
+
+        self::assertEquals($expectedFilters, $this->context->getFilters());
+    }
+
     public function testProcessForComparisonFilterForToOneAssociation()
     {
         $filtersConfig = new FiltersConfig();

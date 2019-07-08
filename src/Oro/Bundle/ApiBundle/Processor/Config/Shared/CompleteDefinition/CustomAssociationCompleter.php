@@ -134,9 +134,9 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
     }
 
     /**
-     * @param string $entityClass
-     * @param string $associationType
-     * @param string $associationKind
+     * @param string      $entityClass
+     * @param string      $associationType
+     * @param string|null $associationKind
      *
      * @return array [target entity class => field name, ...]
      */
