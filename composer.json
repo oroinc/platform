@@ -31,7 +31,6 @@
         "twig/extensions": "1.5.*",
         "symfony/swiftmailer-bundle": "3.1.0",
         "symfony/monolog-bundle": "3.3.*",
-        "sensio/distribution-bundle": "5.0.*",
         "sensio/framework-extra-bundle": "3.0.29",
         "incenteev/composer-parameter-handler": "2.1.*",
         "jms/serializer": "1.12.*",
@@ -49,7 +48,7 @@
         "leafo/scssphp": "0.6.*",
         "zendframework/zend-mail": "2.10.0",
         "mtdowling/cron-expression": "1.2.*",
-        "gos/web-socket-bundle": "1.8.11",
+        "gos/web-socket-bundle": "1.8.12",
         "guzzle/guzzle": "3.7.*",
         "lexik/maintenance-bundle": "2.1.5",
         "composer/composer": "1.6.*",
@@ -114,7 +113,6 @@
         "phpdocumentor/reflection-docblock": "4.3.*"
     },
     "require-dev": {
-        "sensio/generator-bundle": "3.1.*",
         "behat/behat": "3.4.*",
         "behat/mink": "1.7.x-dev#6d637f7",
         "behat/mink-extension": "2.3.*",
