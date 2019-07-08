@@ -34,6 +34,10 @@
         &:focus {
             color: $tag-item-color;
             outline-style: none;
+
+            &.tags-container__tag-entry--custom-color {
+                filter: brightness(105%);
+            }
         }
 
         .inline-actions-element:hover &,
@@ -41,9 +45,17 @@
             background-color: $tag-item-editable-hover-background;
             color: $tag-item-editable-hover-color;
 
+            &.tags-container__tag-entry--custom-color {
+                filter: brightness(92%);
+            }
+
             &:hover,
             &:focus {
                 background-color: $tag-item-edit-hover-alt-background;
+
+                &.tags-container__tag-entry--custom-color {
+                    filter: brightness(105%);
+                }
             }
         }
     }

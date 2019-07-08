@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
     var BaseView = require('oroui/js/app/views/base/view');
     var _ = require('underscore');
+    var colorUtil = require('oroui/js/tools/color-util');
 
     /**
      * Tags view, able to handle tags array in model.
@@ -50,7 +51,16 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            var tags = this.model.get(this.fieldName);
+            var tags = this.model.get(this.fieldName).map(function(tag) {
+                if (tag.backgroundColor && tag.backgroundColor.length > 0) {
+                    tag = _.extend({
+                        className: 'tags-container__tag-entry--custom-color',
+                        style: 'background-color:' + tag.backgroundColor +
+                            ';color:' + colorUtil.getContrastColor(tag.backgroundColor)
+                    }, tag);
+                }
+                return tag;
+            });
             tags = _.sortBy(tags, 'owner');
             return {
                 tags: tags,
