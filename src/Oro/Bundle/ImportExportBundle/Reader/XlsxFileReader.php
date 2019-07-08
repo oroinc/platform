@@ -2,33 +2,23 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
+use Box\Spout\Common\Type;
+use Box\Spout\Reader\ReaderFactory;
+use Box\Spout\Reader\ReaderInterface;
+use Box\Spout\Reader\XLSX\RowIterator;
+use Box\Spout\Reader\XLSX\Sheet;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
-use PhpOffice\PhpSpreadsheet\Reader as Reader;
-use PhpOffice\PhpSpreadsheet\Settings;
-use PhpOffice\PhpSpreadsheet\Worksheet\RowIterator;
-use Psr\SimpleCache\CacheInterface;
 
 /**
  * Corresponds for reading xlsx file line by line using context passed
  */
 class XlsxFileReader extends AbstractFileReader
 {
-    /** @var CacheInterface */
-    private $cache;
+    /** @var ReaderInterface */
+    private $fileReader;
 
     /** @var RowIterator */
     private $rowIterator;
-
-    /**
-     * @param ContextRegistry $contextRegistry
-     * @param CacheInterface $cache
-     */
-    public function __construct(ContextRegistry $contextRegistry, CacheInterface $cache)
-    {
-        parent::__construct($contextRegistry);
-        $this->cache = $cache;
-    }
 
     /**
      * {@inheritdoc}
@@ -59,21 +49,14 @@ class XlsxFileReader extends AbstractFileReader
      */
     private function readRow(ContextInterface $context): array
     {
-        $data = [];
-
-        if (!$this->isEof()) {
-            $row = $this->rowIterator->current();
-            $cellIterator = $row->getCellIterator('A', $row->getWorksheet()->getHighestDataColumn());
-
-            foreach ($cellIterator as $cell) {
-                $data[] = $cell->getValue();
-            }
-
-            $this->rowIterator->next();
-            $context->incrementReadOffset();
-            $context->incrementReadCount();
+        if ($this->isEof()) {
+            return [];
         }
 
+        $context->incrementReadOffset();
+        $data = $this->rowIterator->current();
+        $this->rowIterator->next();
+        $context->incrementReadCount();
         return $data;
     }
 
@@ -96,13 +79,16 @@ class XlsxFileReader extends AbstractFileReader
     {
         parent::initializeByContext($context);
 
-        Settings::setCache($this->cache);
+        $this->fileReader = ReaderFactory::create(Type::XLSX);
+        $this->fileReader->open($this->fileInfo->getPathname());
 
-        $fileReader = new Reader\Xlsx();
-        $fileReader->setReadDataOnly(true);
+        $sheetIterator = $this->fileReader->getSheetIterator();
+        $sheetIterator->rewind();
 
-        $activeSheet = $fileReader->load($this->fileInfo->getPathname())->getActiveSheet();
-        $this->rowIterator = $activeSheet->getRowIterator(1, $activeSheet->getHighestDataRow());
+        /** @var Sheet $sheet */
+        $sheet = $sheetIterator->current();
+        $this->rowIterator = $sheet->getRowIterator();
+        $this->rowIterator->rewind();
 
         if ($this->firstLineIsHeader && !$this->header) {
             $this->header = $this->readRow($context);
@@ -112,6 +98,9 @@ class XlsxFileReader extends AbstractFileReader
     public function close()
     {
         $this->rowIterator = null;
+        if ($this->fileReader) {
+            $this->fileReader->close();
+        }
         parent::close();
     }
 }

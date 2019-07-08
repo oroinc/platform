@@ -8,7 +8,6 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
-use Psr\SimpleCache\CacheInterface;
 
 /**
  * Write xlsx to file
@@ -23,12 +22,10 @@ class XlsxFileWriter extends XlsxFileStreamWriter implements StepExecutionAwareI
 
     /**
      * @param ContextRegistry $contextRegistry
-     * @param CacheInterface $cache
      */
-    public function __construct(ContextRegistry $contextRegistry, CacheInterface $cache)
+    public function __construct(ContextRegistry $contextRegistry)
     {
         $this->contextRegistry = $contextRegistry;
-        parent::__construct($cache);
     }
 
     /**

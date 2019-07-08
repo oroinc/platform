@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
+use Box\Spout\Common\Type;
+use Box\Spout\Writer\WriterFactory;
+use Box\Spout\Writer\WriterInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use PhpOffice\PhpSpreadsheet\Settings;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer as Writer;
-use Psr\SimpleCache\CacheInterface;
 
 /**
  * Write XLSX to file
@@ -16,35 +15,23 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
     /** @var bool */
     protected $firstLineIsHeader = true;
 
-    /** @var Spreadsheet */
-    private $spreadsheet;
-
     /** @var int */
     private $currentRow = 0;
 
-    /** @var CacheInterface */
-    private $cache;
+    /** @var WriterInterface */
+    private $writer;
 
     /**
-     * XlsxFileStreamWriter constructor.
-     * @param CacheInterface $cache
+     * @return WriterInterface
      */
-    public function __construct(CacheInterface $cache)
+    public function getWriter(): WriterInterface
     {
-        $this->cache = $cache;
-        Settings::setCache($cache);
-    }
-
-    /**
-     * @return Spreadsheet
-     */
-    public function getSpreadsheet(): Spreadsheet
-    {
-        if (!$this->spreadsheet) {
-            $this->spreadsheet = new Spreadsheet();
+        if (!$this->writer) {
+            $this->writer = WriterFactory::create(Type::XLSX);
+            $this->writer->openToFile($this->filePath);
         }
 
-        return $this->spreadsheet;
+        return $this->writer;
     }
 
     /**
@@ -64,9 +51,7 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
             }
         }
 
-        $this->getSpreadsheet()
-            ->getActiveSheet()
-            ->fromArray($writeArray, null, 'A'.++$this->currentRow);
+        $this->getWriter()->addRows($writeArray);
 
         $this->currentRow += count($writeArray) - 1;
     }
@@ -91,14 +76,10 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
      */
     public function close(): void
     {
-        if ($this->spreadsheet) {
-            $writer = new Writer\Xlsx($this->spreadsheet);
-            $writer->save($this->filePath);
-
-            $this->spreadsheet = null;
+        if ($this->writer) {
+            $this->writer->close();
             $this->header = null;
             $this->currentRow = 0;
-            $this->cache->clear();
         }
     }
 }

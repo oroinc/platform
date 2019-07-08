@@ -3,13 +3,14 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Oro\Bundle\CacheBundle\Simple\PhpTempCache;
+use Box\Spout\Common\Type;
+use Box\Spout\Reader\ReaderFactory;
+use Box\Spout\Reader\XLSX\Sheet;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter;
 use Oro\Bundle\ImportExportBundle\Writer\XlsxFileWriter;
 use Oro\Component\Testing\TempDirExtension;
-use PhpOffice\PhpSpreadsheet\Reader;
 
 class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,22 +22,16 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
     /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $contextRegistry;
 
-    /** @var PhpTempCache */
-    private $cache;
-
-
     protected function setUp()
     {
         $this->getTempDir('XlsxFileWriterTest');
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
-        $this->cache = new PhpTempCache();
-        $this->writer = new XlsxFileWriter($this->contextRegistry, $this->cache);
+        $this->writer = new XlsxFileWriter($this->contextRegistry);
     }
 
     protected function tearDown()
     {
         $this->writer->close();
-        $this->cache->clear();
     }
 
     /**
@@ -106,9 +101,9 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
                 ['filePath' => $filePath],
                 [
                     [
-                        'field_one'   => '1',
-                        'field_two'   => '2',
-                        'field_three' => '3',
+                        'field_one'   => 1,
+                        'field_two'   => 2,
+                        'field_three' => 3,
                     ],
                     [
                         'field_one'   => 'test1',
@@ -138,7 +133,7 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
                     'firstLineIsHeader' => false
                 ],
                 [
-                    ['1', '2', '3'],
+                    [1, 2, 3],
                     ['test1', 'test2', 'test3']
                 ],
                 __DIR__ . '/fixtures/no_header.xlsx'
@@ -201,21 +196,26 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
     /**
      * @param string $expectedPath
      * @param string $actualPath
-     * @throws Reader\Exception
      */
     private function assertXlsx(string $expectedPath, string $actualPath): void
     {
-        $reader = new Reader\Xlsx();
+        $exceptedReader = ReaderFactory::create(Type::XLSX);
+        $exceptedReader->open($expectedPath);
+        /** @var Sheet[] $exceptedSheets */
+        $exceptedSheets = iterator_to_array($exceptedReader->getSheetIterator());
 
-        $exceptedSpreadsheet = $reader->load($expectedPath);
-        $actualSpreadsheet = $reader->load($actualPath);
+        $actualReader = ReaderFactory::create(Type::XLSX);
+        $actualReader->open($actualPath);
+        /** @var Sheet[] $actualSheets */
+        $actualSheets = iterator_to_array($actualReader->getSheetIterator());
 
-        $this->assertSame($exceptedSpreadsheet->getSheetCount(), $actualSpreadsheet->getSheetCount());
+        $this->assertCount(count($exceptedSheets), $actualSheets);
 
-        $exceptedSheets = $exceptedSpreadsheet->getAllSheets();
-        $actualSheets = $actualSpreadsheet->getAllSheets();
         foreach ($exceptedSheets as $sheetIndex => $sheet) {
-            $this->assertSame($sheet->toArray(), $actualSheets[$sheetIndex]->toArray());
+            $this->assertSame(
+                iterator_to_array($sheet->getRowIterator()),
+                iterator_to_array($actualSheets[$sheetIndex]->getRowIterator())
+            );
         }
     }
 }

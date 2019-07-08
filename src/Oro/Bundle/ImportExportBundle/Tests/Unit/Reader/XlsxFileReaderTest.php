@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Oro\Bundle\CacheBundle\Simple\PhpTempCache;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -16,9 +15,6 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
     /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $contextRegistry;
 
-    /** @var PhpTempCache */
-    private $cache;
-
     /** @var XlsxFileReader */
     private $reader;
 
@@ -26,14 +22,7 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
-        $this->cache = new PhpTempCache();
-        $this->reader = new XlsxFileReader($this->contextRegistry, $this->cache);
-    }
-
-    /** {@inheritdoc} */
-    public function tearDown()
-    {
-        $this->cache->clear();
+        $this->reader = new XlsxFileReader($this->contextRegistry);
     }
 
     public function testSetStepExecution()
@@ -98,9 +87,8 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
                 'exceptedHeader' => null,
                 'expected' => [
                     ['field_one', 'field_two', 'field_three', 'field_four'],
-                    [1.0, 2.0, 3.0, 4.0],
+                    [1, 2, 3, 4],
                     ['test1', 'test2', 'test3', 'test4'],
-                    [],
                     ['after_new1', 'after_new2', 'after_new3', 'after_new4'],
                 ]
             ],
@@ -113,9 +101,8 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
                 'exceptedHeader' => ['h1', 'h2', 'h3', 'h4'],
                 'expected' => [
                     ['field_one', 'field_two', 'field_three', 'field_four'],
-                    [1.0, 2.0, 3.0, 4.0],
+                    [1, 2, 3, 4],
                     ['test1', 'test2', 'test3', 'test4'],
-                    [],
                     ['after_new1', 'after_new2', 'after_new3', 'after_new4'],
                 ]
             ],
@@ -127,10 +114,10 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
                 'exceptedHeader' => ['field_one', 'field_two', 'field_three', 'field_four'],
                 'expected' => [
                     [
-                        'field_one' => 1.0,
-                        'field_two' => 2.0,
-                        'field_three' => 3.0,
-                        'field_four' => 4.0,
+                        'field_one' => 1,
+                        'field_two' => 2,
+                        'field_three' => 3,
+                        'field_four' => 4,
                     ],
                     [
                         'field_one' => 'test1',
@@ -138,7 +125,6 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
                         'field_three' => 'test3',
                         'field_four' => 'test4',
                     ],
-                    [],
                     [
                         'field_one' => 'after_new1',
                         'field_two' => 'after_new2',

@@ -6,16 +6,10 @@ services:
         tags:
             - { name: oro_importexport.reader, alias: csv }
 
-    oro_importexport.reader.xlsx.cache:
-        parent: oro.cache.simple.php_temp
-        arguments:
-            - 512
-
     oro_importexport.reader.xlsx:
         class: 'Oro\Bundle\ImportExportBundle\Reader\XlsxFileReader'
         arguments:
             - '@oro_importexport.context_registry'
-            - '@oro_importexport.reader.xlsx.cache'
         tags:
             - { name: oro_importexport.reader, alias: xlsx }
 
