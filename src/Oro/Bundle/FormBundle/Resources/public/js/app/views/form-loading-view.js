@@ -46,15 +46,16 @@ define(function(require) {
 
             this.initLayout()
                 .then(function() {
-                    this._disableButton();
-                    this._loadSubviews().then(this._afterLoadSubviews.bind(this));
+                    var $buttons = this._getNavButtons();
+                    $buttons.addClass('disabled');
+                    this._loadSubviews().then(this._afterLoadSubviews.bind(this, $buttons));
                 }.bind(this));
 
             return this;
         },
 
-        _afterLoadSubviews: function() {
-            this._enableButtons();
+        _afterLoadSubviews: function($buttons) {
+            $buttons.removeClass('disabled');
             mediator.trigger('page:afterPagePartChange');
             this.$el.removeClass('lazy-loading');
         },
@@ -67,16 +68,8 @@ define(function(require) {
             return $.when.apply($, promises);
         },
 
-        _enableButtons: function() {
-            this._getNavButtons().removeClass('disabled');
-        },
-
-        _disableButton: function() {
-            this._getNavButtons().addClass('disabled');
-        },
-
         _getNavButtons: function() {
-            return this.$('.title-buttons-container .btn');
+            return this.$('.title-buttons-container').find(':button, [role="button"]');
         }
     });
 
