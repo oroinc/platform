@@ -103,7 +103,7 @@ class DirectMailer extends \Swift_Mailer
             $transport->setPort($port);
             $transport->setEncryption($encryption);
         } else {
-            $transport = \Swift_SmtpTransport::newInstance($host, $port, $encryption);
+            $transport = new \Swift_SmtpTransport($host, $port, $encryption);
         }
 
         $transport
@@ -173,13 +173,13 @@ class DirectMailer extends \Swift_Mailer
      * The return value is the number of recipients who were accepted for
      * delivery.
      *
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      * @param array               $failedRecipients An array of failures by-reference
      *
      * @return int The number of recipients who were accepted for delivery
      * @throws \Exception
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $result = 0;
         // start a transport if needed

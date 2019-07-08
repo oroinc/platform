@@ -117,7 +117,7 @@ class TemplateEmailManager
         $emailTemplateModel =
             $this->emailTemplateContentProvider->getTemplateContent($criteria, $language, $templateParams);
 
-        $message = \Swift_Message::newInstance()
+        $message = (new \Swift_Message())
             ->setSubject($emailTemplateModel->getSubject())
             ->setBody($emailTemplateModel->getContent())
             ->setContentType($emailTemplateModel->getType());

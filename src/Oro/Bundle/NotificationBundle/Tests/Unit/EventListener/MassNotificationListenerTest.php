@@ -34,7 +34,7 @@ class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
     public function testLogMassNotification()
     {
         $date = new \DateTime('now');
-        $message = $this->createMock('Swift_Mime_Message');
+        $message = $this->createMock('Swift_Mime_SimpleMessage');
         $message->expects(self::once())->method('getTo')->willReturn(['to@test.com' => 'test']);
         $message->expects(self::once())->method('getFrom')->willReturn(['from@test.com' => 'test']);
         $message->expects(self::once())->method('getDate')->willReturn($date->getTimestamp());

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Behat\Mock\Mailer;
 
 use Swift_Events_EventListener;
-use Swift_Mime_Message;
+use Swift_Mime_SimpleMessage;
 
 class SmtpTransportMock implements \Swift_Transport
 {
@@ -78,7 +78,7 @@ class SmtpTransportMock implements \Swift_Transport
     /**
      * {@inheritdoc}
      */
-    public function send(Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         return 1;
     }
@@ -87,6 +87,13 @@ class SmtpTransportMock implements \Swift_Transport
      * {@inheritdoc}
      */
     public function registerPlugin(Swift_Events_EventListener $plugin)
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function ping()
     {
     }
 }

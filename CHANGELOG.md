@@ -72,7 +72,9 @@ The current file describes significant changes in the code that may affect the u
   to `getVariableGetters(): array`.
   By performance reasons new method `getVariableProcessors(string $entityClass): array` was added.
   If method `getVariableDefinitions` of your provider returns info about processors, move it to `getVariableProcessors`.
-
+* Due to the updated version of `symfony/swiftmailer-bundle` parameter `mailer_transport: mail` is not supported anymore. Please
+  use `mailer_transport: sendmail` instead or another available swiftmailer transport type.
+  
 #### UIBundle
 * The redundant methods `getFormatterName`, `getSupportedTypes` and `isDefaultFormatter` were removed from `Oro\Bundle\UIBundle\Formatter\FormatterInterface`.
   Use `data_type` attribute of `oro_formatter` tag to specify the default formatter for the data type.
