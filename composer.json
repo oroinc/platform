@@ -73,7 +73,7 @@
         "bower-asset/moment-timezone": "0.5.*",
         "bower-asset/jstree": "3.3.*",
         "symfony/polyfill-php70":"1.*",
-        "liuggio/excelbundle": "2.1.*",
+        "box/spout": "2.7.*",
         "bower-asset/select2": "3.4.1",
         "bower-asset/chaplin": "1.2.0",
         "bower-asset/jquery-cookie": "1.4.1",
