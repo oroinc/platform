@@ -98,6 +98,8 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function templateDataProvider()
     {

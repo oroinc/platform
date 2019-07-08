@@ -10,6 +10,7 @@ use Oro\Bundle\SSOBundle\Security\OAuthProvider;
 use Oro\Bundle\SSOBundle\Security\OAuthToken;
 use Oro\Bundle\SSOBundle\Security\OAuthTokenFactory;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
 class OAuthProviderTest extends \PHPUnit\Framework\TestCase
@@ -35,22 +36,29 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
     private $userChecker;
 
     /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface
+     */
+    private $tokenStorage;
+
+    /**
      * @var OAuthTokenFactory
      */
     private $tokenFactory;
 
     public function setUp()
     {
-        $this->userProvider = $this
-                ->createMock('HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface');
-        $this->resourceOwnerMap = $this->getMockBuilder('HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap')
-                ->disableOriginalConstructor()
-                ->getMock();
-        $this->userChecker = $this->createMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
-
+        $this->userProvider = $this->createMock(OAuthAwareUserProviderInterface::class);
+        $this->resourceOwnerMap = $this->createMock(ResourceOwnerMap::class);
+        $this->userChecker = $this->createMock(UserCheckerInterface::class);
         $this->tokenFactory = new OAuthTokenFactory();
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
-        $this->oauthProvider = new OAuthProvider($this->userProvider, $this->resourceOwnerMap, $this->userChecker);
+        $this->oauthProvider = new OAuthProvider(
+            $this->userProvider,
+            $this->resourceOwnerMap,
+            $this->userChecker,
+            $this->tokenStorage
+        );
     }
 
     public function testSupportsShouldReturnTrueForOAuthToken()

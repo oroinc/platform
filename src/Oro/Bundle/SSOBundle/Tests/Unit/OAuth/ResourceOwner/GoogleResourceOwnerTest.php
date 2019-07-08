@@ -2,27 +2,32 @@
 
 namespace Oro\Bundle\SSOBundle\Tests\OAuth\ResourceOwner;
 
+use Http\Client\Common\HttpMethodsClient;
+use HWI\Bundle\OAuthBundle\OAuth\RequestDataStorageInterface;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SSOBundle\OAuth\ResourceOwner\GoogleResourceOwner;
+use Symfony\Component\Security\Http\HttpUtils;
 
 class GoogleResourceOwnerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ConfigManager */
     private $cm;
+
+    /** @var GoogleResourceOwner */
     private $googleResourceOwner;
 
     public function setUp()
     {
-        $this->cm = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->cm = $this->createMock(ConfigManager::class);
 
-        $httpClient = $this->createMock('Buzz\Client\ClientInterface');
-        $httpUtils = $this->createMock('Symfony\Component\Security\Http\HttpUtils');
+        $httpClient = $this->createMock(HttpMethodsClient::class);
+        $httpUtils = $this->createMock(HttpUtils::class);
         $options = [
             'client_id' => 'changeMe',
             'client_secret' => 'changeMe',
         ];
         $name = 'google';
-        $storage = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\RequestDataStorageInterface');
+        $storage = $this->createMock(RequestDataStorageInterface::class);
 
         $this->googleResourceOwner = new GoogleResourceOwner($httpClient, $httpUtils, $options, $name, $storage);
     }

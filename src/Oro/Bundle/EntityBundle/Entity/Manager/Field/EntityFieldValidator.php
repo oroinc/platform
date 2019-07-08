@@ -10,6 +10,9 @@ use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Validates entity fields.
+ */
 class EntityFieldValidator
 {
     /** @var Registry */
@@ -23,6 +26,7 @@ class EntityFieldValidator
 
     /**
      * @param Registry $registry
+     * @param TranslatorInterface $translator
      */
     public function __construct(Registry $registry, TranslatorInterface $translator)
     {
@@ -127,11 +131,17 @@ class EntityFieldValidator
     protected function validateFieldName($entity, $fieldName)
     {
         if (!$this->hasField($entity, $fieldName)) {
-            throw new EntityHasFieldException('oro.entity.controller.message.field_not_found', Response::HTTP_NOT_FOUND);
+            throw new EntityHasFieldException(
+                'oro.entity.controller.message.field_not_found',
+                Response::HTTP_NOT_FOUND
+            );
         }
 
         if (!$this->hasAccessEditFiled($fieldName)) {
-            throw new FieldUpdateAccessException('oro.entity.controller.message.access_denied', Response::HTTP_FORBIDDEN);
+            throw new FieldUpdateAccessException(
+                'oro.entity.controller.message.access_denied',
+                Response::HTTP_FORBIDDEN
+            );
         }
     }
 

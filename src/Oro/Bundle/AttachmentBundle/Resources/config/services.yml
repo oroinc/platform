@@ -18,16 +18,14 @@ parameters:
 
     oro_attachment.provider.attachment.class:                    Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
 
-    oro_attachment.filesystem_dir.attachment:                    attachment
-    oro_attachment.filesystem_name.attachment:                   attachments
+    oro_attachment.filesystem_dir.attachments:                   attachment
+    oro_attachment.filesystem_name.attachments:                  attachments
 
     oro_attachment.filesystem_name.mediacache:                   mediacache
     oro_attachment.filesystem_dir.mediacache:                    media/cache
 
     oro_attachment.filesystem_name.protected_mediacache:         protected_mediacache
     oro_attachment.filesystem_dir.protected_mediacache:          attachment/cache
-
-    liip_imagine.meta_data.reader.class:                         Imagine\Image\Metadata\DefaultMetadataReader
 
     oro_attachment.liip_imagine.unsupported_mime_types:          ['image/svg+xml']
 
@@ -55,7 +53,7 @@ services:
         class: Oro\Bundle\AttachmentBundle\Manager\FileManager
         parent: oro_gaufrette.file_manager
         arguments:
-            - '%oro_attachment.filesystem_name.attachment%'
+            - '%oro_attachment.filesystem_name.attachments%'
             - '@oro_attachment.protocol_validator'
         lazy: true
 
@@ -381,3 +379,10 @@ services:
             - '@oro_api.security.authorization_checker'
         tags:
             - { name: oro.api.processor, action: get, group: data_security_check, class: '%oro_attachment.file.entity.class%', priority: 10 }
+
+    oro_attachment.liip_imagine.filter.loader.watermark:
+        class: Liip\ImagineBundle\Imagine\Filter\Loader\WatermarkFilterLoader
+        decorates: liip_imagine.filter.loader.watermark
+        arguments:
+            - '@liip_imagine'
+            - 'gaufrette:/' # One slash instead of two used intentionally due to specifics of WatermarkFilterLoader

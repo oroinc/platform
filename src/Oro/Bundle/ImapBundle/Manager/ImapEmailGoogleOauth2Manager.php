@@ -2,20 +2,16 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
-use Buzz\Client\ClientInterface;
-use Buzz\Client\Curl;
-use Buzz\Message\MessageInterface;
-use Buzz\Message\Request;
-use Buzz\Message\RequestInterface;
-use Buzz\Message\Response;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Http\Client\Common\HttpMethodsClient;
 use HWI\Bundle\OAuthBundle\OAuth\Response\PathUserResponse;
 use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Exception\RefreshOAuthAccessTokenFailureException;
+use Psr\Http\Message\MessageInterface;
 
 /**
  * Manager to work with mailings via IMAP.
@@ -27,7 +23,7 @@ class ImapEmailGoogleOauth2Manager
     const RETRY_TIMES = 3;
     const RESOURCE_OWNER_GOOGLE = 'google';
 
-    /** @var Curl */
+    /** @var HttpMethodsClient */
     protected $httpClient;
 
     /** @var ResourceOwnerMap */
@@ -40,13 +36,13 @@ class ImapEmailGoogleOauth2Manager
     private $doctrine;
 
     /**
-     * @param ClientInterface $httpClient
+     * @param HttpMethodsClient $httpClient
      * @param ResourceOwnerMap $resourceOwnerMap
      * @param ConfigManager $configManager
      * @param ManagerRegistry $doctrine
      */
     public function __construct(
-        ClientInterface $httpClient,
+        HttpMethodsClient $httpClient,
         ResourceOwnerMap $resourceOwnerMap,
         ConfigManager $configManager,
         ManagerRegistry $doctrine
@@ -186,9 +182,6 @@ class ImapEmailGoogleOauth2Manager
      */
     protected function doHttpRequest($parameters)
     {
-        $request = new Request(RequestInterface::METHOD_POST, self::OAUTH2_ACCESS_TOKEN_URL);
-        $response = new Response();
-
         $contentParameters = [
             'client_id'     => $this->configManager->get('oro_google_integration.client_id'),
             'client_secret' => $this->configManager->get('oro_google_integration.client_secret'),
@@ -202,10 +195,7 @@ class ImapEmailGoogleOauth2Manager
             'user-agent: oro-oauth'
         ];
 
-        $request->setHeaders($headers);
-        $request->setContent($content);
-
-        $this->httpClient->send($request, $response);
+        $response = $this->httpClient->post(self::OAUTH2_ACCESS_TOKEN_URL, $headers, $content);
 
         return $this->getResponseContent($response);
     }
@@ -219,7 +209,7 @@ class ImapEmailGoogleOauth2Manager
      */
     protected function getResponseContent(MessageInterface $rawResponse)
     {
-        $content = $rawResponse->getContent();
+        $content = $rawResponse->getBody();
         if (!$content) {
             return [];
         }
