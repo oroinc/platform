@@ -36,7 +36,20 @@
     @if ($font) {
         @return $font;
     } @else {
-        @warn 'Front not found:' $key;
+        @warn 'Font not found:' $key;
+    }
+}
+
+// @return the value in a $font-weights map associated with a given key;
+// Use: font-weight: font-weight('bold') => font-weight: 700;
+
+@function font-weight($key) {
+    $fontWeightKey: map-get($font-weights, $key);
+
+    @if ($fontWeightKey) {
+        @return $fontWeightKey
+    } @else {
+        @warn 'Font weight value not found:' $key;
     }
 }
 
