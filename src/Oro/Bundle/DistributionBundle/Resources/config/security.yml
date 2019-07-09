@@ -6,12 +6,6 @@ services:
            - { name: kernel.event_listener, event: kernel.exception, method: onAccessDeniedException }
 
 security:
-    acl:
-        connection: default
-        cache:
-            id: security.acl.cache.doctrine
-            prefix: sf2_acl_
-
     providers:
         oro_user:
             entity: { class: OroDistributionBundle:Security\User, property: username }
@@ -51,3 +45,9 @@ security:
         - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/packages, role: ROLE_ADMINISTRATOR }
         - { path: ^/$, role: ROLE_ADMINISTRATOR }
+
+acl:
+    connection: default
+    cache:
+        id: security.acl.cache.doctrine
+        prefix: sf2_acl_
