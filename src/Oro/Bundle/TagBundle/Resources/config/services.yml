@@ -25,6 +25,8 @@ parameters:
 services:
     oro_tag.tag.manager:
         class: '%oro_tag.tag.manager.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@doctrine.orm.entity_manager'
             - '%oro_tag.tag.entity.class%'
@@ -55,6 +57,8 @@ services:
     # Tag API
     oro_tag.tag.manager.api:
         class: '%oro_tag.tag.manager.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_tag.tag.entity.class%'
@@ -62,6 +66,8 @@ services:
 
     oro_tag.taxonomy.manager.api:
         class: '%oro_tag.taxonomy.manager.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_tag.taxonomy.entity.class%'
@@ -71,7 +77,7 @@ services:
         class: Oro\Bundle\TagBundle\Twig\TagExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -177,6 +183,8 @@ services:
 
     oro_tag.provider.statistic:
         class: Oro\Bundle\TagBundle\Provider\StatisticProvider
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_tag.security_provider'

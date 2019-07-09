@@ -46,9 +46,7 @@ class AvailableOwnerAccessRule implements AccessRuleInterface
     public function isApplicable(Criteria $criteria): bool
     {
         return
-            $criteria->getOption(self::ENABLE_RULE, false)
-            && ($criteria->getPermission() === 'ASSIGN' || $criteria->getPermission() === 'CREATE')
-            && $criteria->isRoot()
+            $criteria->isRoot()
             && $criteria->hasOption(self::TARGET_ENTITY_CLASS);
     }
 

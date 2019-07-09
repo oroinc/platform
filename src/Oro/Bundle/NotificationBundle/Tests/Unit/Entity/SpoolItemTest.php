@@ -37,7 +37,7 @@ class SpoolItemTest extends \PHPUnit\Framework\TestCase
         // empty from construct
         $this->assertNull($this->entity->getMessage());
 
-        $message = $this->createMock('Swift_Mime_Message');
+        $message = $this->createMock('Swift_Mime_SimpleMessage');
 
         $this->entity->setMessage($message);
         $this->assertEquals($message, $this->entity->getMessage());

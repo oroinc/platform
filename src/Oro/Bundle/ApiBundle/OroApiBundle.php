@@ -40,7 +40,7 @@ class OroApiBundle extends Bundle
 
         $container->addCompilerPass(new Compiler\ProcessorBagCompilerPass());
         $container->addCompilerPass(new Compiler\FilterNamesCompilerPass());
-        $container->addCompilerPass(new Compiler\FilterFactoryCompilerPass());
+        $container->addCompilerPass(new Compiler\SimpleFilterFactoryCompilerPass());
         $container->addCompilerPass(new Compiler\FormCompilerPass());
         $container->addCompilerPass(new Compiler\DataTransformerCompilerPass());
         $container->addCompilerPass(new Compiler\EntityIdTransformerCompilerPass());
@@ -110,6 +110,7 @@ class OroApiBundle extends Bundle
         // * oro:entity-extend:update-config
         // * oro:entity-extend:migration:update-config
         // * oro:entity-extend:cache:*
+        // * doctrine:database:create
         // to avoid "Class Extend\Entity\... does not exist" exceptions for case when custom entities are created
         // via migrations and has some configuration in "Resources/config/oro/api.yml"
         if ($this->kernel->isDebug()
@@ -124,6 +125,7 @@ class OroApiBundle extends Bundle
             && !CommandExecutor::isCurrentCommand('oro:entity-extend:update-config')
             && !CommandExecutor::isCurrentCommand('oro:entity-extend:migration:update-config')
             && !CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
+            && !CommandExecutor::isCurrentCommand('doctrine:database:create')
         ) {
             $this->getCacheManager()->warmUpDirtyCaches();
         }

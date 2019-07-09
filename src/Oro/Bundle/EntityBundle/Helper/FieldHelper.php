@@ -426,4 +426,44 @@ class FieldHelper
     {
         $this->fieldProvider->setLocale($locale);
     }
+
+    /**
+     * Exclude fields marked as "excluded" and skipped not identity fields
+     *
+     * @param string           $entityName
+     * @param string           $fieldName
+     * @param array|mixed|null $itemData
+     *
+     * @return bool
+     */
+    public function isFieldExcluded($entityName, $fieldName, $itemData = null)
+    {
+        if ($this->getConfigValue($entityName, $fieldName, 'excluded', false)) {
+            return true;
+        }
+
+        $isIdentity = $this->isIdentityField($entityName, $fieldName, $itemData);
+        $isSkipped  = $itemData !== null && !array_key_exists($fieldName, $itemData);
+
+        return $isSkipped && !$isIdentity;
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $fieldName
+     * @param array|null $itemData
+     *
+     * @return bool
+     */
+    protected function isIdentityField($entityName, $fieldName, $itemData = null)
+    {
+        $isIdentity = $this->getConfigValue($entityName, $fieldName, 'identity', false);
+        if (false === $isIdentity) {
+            return $isIdentity;
+        }
+
+        $isInputDataContainsField = is_array($itemData) && array_key_exists($fieldName, $itemData);
+
+        return $this->isRequiredIdentityField($entityName, $fieldName) || $isInputDataContainsField;
+    }
 }

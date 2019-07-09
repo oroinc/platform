@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Controller;
 
-use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
@@ -17,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 
@@ -63,7 +63,10 @@ class ConnectionController extends Controller
             $response = ['errors' => $this->handleFormErrors($form)];
         }
 
-        return new JsonResponse($response, !empty($response['errors']) ? Codes::HTTP_BAD_REQUEST : Codes::HTTP_OK);
+        return new JsonResponse(
+            $response,
+            !empty($response['errors']) ? Response::HTTP_BAD_REQUEST : Response::HTTP_OK
+        );
     }
 
     /**

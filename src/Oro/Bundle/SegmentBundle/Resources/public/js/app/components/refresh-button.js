@@ -45,7 +45,7 @@ define(function(require) {
 
         var url = $(e.target).data('url');
 
-        confirm.on('ok', $.proxy(run, null, url, reloadRequired));
+        confirm.on('ok', _.partial(run, url, reloadRequired));
         confirm.open();
     }
 
@@ -53,6 +53,6 @@ define(function(require) {
         _.extend(options, additionalOptions || {});
         var reloadRequired = Boolean(options.reloadRequired);
         var button = options._sourceElement;
-        button.click($.proxy(onClick, null, reloadRequired));
+        button.click(_.partial(onClick, reloadRequired));
     };
 });

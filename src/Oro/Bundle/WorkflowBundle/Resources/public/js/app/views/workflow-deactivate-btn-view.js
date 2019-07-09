@@ -41,7 +41,7 @@ define(function(require) {
 
         delegateEvents: function() {
             WorkflowDeactivateBtnView.__super__.delegateEvents.apply(this, arguments);
-            this.$el.on('click' + this.eventNamespace(), this.options.selectors.button, $.proxy(this.onClick, this));
+            this.$el.on('click' + this.eventNamespace(), this.options.selectors.button, this.onClick.bind(this));
             this.$el.on({
                 deactivation_success: this.onDeactivationSuccess
             }, this.options.selectors.button);

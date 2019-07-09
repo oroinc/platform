@@ -6,7 +6,7 @@ services:
         class: Oro\Bundle\CurrencyBundle\Twig\CurrencyExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -31,9 +31,14 @@ services:
     #currencyConfig
     oro_currency.config.currency:
         class: 'Oro\Bundle\CurrencyBundle\Config\DefaultCurrencyConfigProvider'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         lazy: true
         arguments:
             - '@oro_config.manager'
+
+    Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface:
+        alias: 'oro_currency.config.currency'
 
     oro_currency.provider.view_type:
         class: Oro\Bundle\CurrencyBundle\Provider\ViewTypeConfigProvider

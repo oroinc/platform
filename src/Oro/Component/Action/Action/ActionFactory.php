@@ -3,8 +3,11 @@
 namespace Oro\Component\Action\Action;
 
 use Oro\Component\ConfigExpression\ExpressionInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
+/**
+ * Builds action instances.
+ */
 class ActionFactory implements ActionFactoryInterface
 {
     /**
@@ -21,7 +24,7 @@ class ActionFactory implements ActionFactoryInterface
      * @param ContainerInterface $container
      * @param array $types
      */
-    public function __construct(ContainerInterface $container, array $types = array())
+    public function __construct(ContainerInterface $container, array $types = [])
     {
         $this->container = $container;
         $this->types = $types;
@@ -34,7 +37,7 @@ class ActionFactory implements ActionFactoryInterface
      * @throws \RunTimeException
      * @return ActionInterface
      */
-    public function create($type, array $options = array(), ExpressionInterface $condition = null)
+    public function create($type, array $options = [], ExpressionInterface $condition = null)
     {
         if (!$type) {
             throw new \RuntimeException('The action type must be defined');

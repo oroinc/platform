@@ -3,7 +3,8 @@
 namespace Oro\Bundle\UserBundle\Twig;
 
 use Oro\Bundle\UserBundle\Provider\GenderProvider;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -11,7 +12,7 @@ use Twig\TwigFunction;
  * Provides a Twig function to display a translated gender label:
  *   - oro_gender
  */
-class OroUserExtension extends AbstractExtension
+class OroUserExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -64,5 +65,15 @@ class OroUserExtension extends AbstractExtension
     public function getName()
     {
         return 'user_extension';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_user.gender_provider' => GenderProvider::class,
+        ];
     }
 }

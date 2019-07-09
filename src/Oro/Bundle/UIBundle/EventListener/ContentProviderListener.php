@@ -4,11 +4,15 @@ namespace Oro\Bundle\UIBundle\EventListener;
 
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface;
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class ContentProviderListener
+/**
+ * Provide functionality to enable content provider manager
+ */
+class ContentProviderListener implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     private $container;
@@ -54,8 +58,18 @@ class ContentProviderListener
     /**
      * @return ContentProviderManager
      */
-    protected function getContentProviderManager()
+    private function getContentProviderManager(): ContentProviderManager
     {
-        return $this->container->get('oro_ui.content_provider.manager');
+        return $this->container->get(ContentProviderManager::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            ContentProviderManager::class,
+        ];
     }
 }

@@ -77,7 +77,9 @@ define(function(require) {
             this.viewOptions._sourceElement = this.$el;
             this.viewOptions.title = '';
             this.view = new this.View(this.viewOptions);
-            this.view.beforeOpen();
+            if (_.isFunction(this.view.beforeOpen)) {
+                this.view.beforeOpen();
+            }
             this.$el.append(this.actionsTemplate());
 
             DatagridSettingsDialogWidget.__super__.render.call(this);
@@ -87,7 +89,9 @@ define(function(require) {
          * @instance
          */
         onContentUpdated: function() {
-            this.view.updateViews();
+            if (_.isFunction(this.view.updateViews)) {
+                this.view.updateViews();
+            }
             this.$el.focusFirstInput();
         },
 

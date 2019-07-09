@@ -39,6 +39,7 @@ define(function(require) {
             closeText: null,
             okButtonClass: 'btn btn-primary',
             cancelButtonClass: 'btn',
+            secondaryButtonClass: 'btn',
             closeButtonClass: '',
             handleClose: false,
             allowCancel: true,
@@ -73,7 +74,6 @@ define(function(require) {
         events: function() {
             var events = {};
 
-            events[EVENTS.CLICK + ' .close'] = this.handlerClick.bind(this, EVENTS.CANCEL);
             events[EVENTS.CLICK + ' .cancel'] = this.handlerClick.bind(this, EVENTS.CANCEL);
             events[EVENTS.CLICK + ' .ok'] = this.handlerClick.bind(this, EVENTS.OK);
             events[EVENTS.CLICK + ' [data-button-id]'] = this.handlerClick.bind(this, EVENTS.BUTTONCLICK);
@@ -157,7 +157,7 @@ define(function(require) {
          */
         getTemplateData: function() {
             var data = ModalView.__super__.getTemplateData.apply(this, arguments);
-            var fields = ['allowOk', 'allowCancel', 'cancelButtonClass', 'closeButtonClass',
+            var fields = ['allowOk', 'allowCancel', 'cancelButtonClass', 'closeButtonClass', 'secondaryButtonClass',
                 'okButtonClass', 'closeText', 'cancelText', 'okText', 'secondaryText', 'title', 'content'];
 
             return _.extend({
@@ -181,7 +181,7 @@ define(function(require) {
             event.preventDefault();
 
             this.triggerEventOnContent(eventName);
-            this.trigger(eventName, $(event.target).data('button-id') || this);
+            this.trigger(eventName, $(event.target).data('button-id'));
 
             if (this.options && this.options.okCloses &&
                 (eventName === EVENTS.OK || eventName === EVENTS.BUTTONCLICK)
@@ -206,6 +206,7 @@ define(function(require) {
 
             ModalView.count--;
             mediator.trigger('modal:close', this);
+            this.trigger(EVENTS.CLOSE);
             this.trigger(EVENTS.HIDDEN);
             this.triggerEventOnContent(EVENTS.HIDDEN);
             this.undelegateEvents();
@@ -367,7 +368,7 @@ define(function(require) {
                 }
 
                 this.trigger(this.options.handleClose ? EVENTS.CLOSE : EVENTS.CANCEL);
-                this.triggerEventOnContent(EVENTS.SHOWN);
+                this.triggerEventOnContent(EVENTS.HIDDEN);
             }.bind(this));
 
             if (tools.isMobile()) {

@@ -14,22 +14,19 @@ services:
         tags:
             - { name: form.type, alias: oro_report }
 
-    oro_report.form.report:
-        class: Symfony\Component\Form\Form
-        factory: ['@form.factory', createNamed]
-        arguments:
-            - "oro_report_form"
-            - Oro\Bundle\ReportBundle\Form\Type\ReportType
-
     oro_report.form.handler.report:
         class: '%oro_report.form.handler.report.class%'
         arguments:
-            - '@oro_report.form.report'
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
+    Oro\Bundle\ReportBundle\Form\Handler\ReportHandler:
+        alias: oro_report.form.handler.report
+
     oro_report.report.manager.api:
         class: '%oro_report.report.manager.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_report.report.entity.class%'

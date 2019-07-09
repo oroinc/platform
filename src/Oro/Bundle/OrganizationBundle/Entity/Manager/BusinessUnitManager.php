@@ -178,18 +178,7 @@ class BusinessUnitManager
      */
     public function getCurrentBusinessUnit(User $user, Organization $organization)
     {
-        $qb = $this->getBusinessUnitRepo()->createQueryBuilder('bu');
-        $result = $qb
-            ->join('bu.users', 'u')
-            ->andWhere($qb->expr()->eq('u', ':user'))
-            ->andWhere($qb->expr()->eq('u.organization', ':organization'))
-            ->setParameter('user', $user)
-            ->setParameter('organization', $organization)
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getResult();
-
-        return reset($result) ?: null;
+        return $this->getBusinessUnitRepo()->getFirstAllowedBusinessUnit($user, $organization);
     }
 
     /**

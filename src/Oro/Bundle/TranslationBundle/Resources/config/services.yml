@@ -76,6 +76,8 @@ services:
         class: '%oro_translation.crowdin.adapter.class%'
         arguments:
             - '@oro_translation.guzzle_crowdin_client'
+        tags:
+            - { name: translation_adapter, alias: crowdin }
 
     oro_translation.oro_translation_adapter:
         class: '%oro_translation.oro_translation.adapter.class%'
@@ -106,6 +108,8 @@ services:
 
     oro_translation.database_translation.loader:
         class: 'Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@doctrine'
             - '@oro_translation.database_checker'
@@ -163,7 +167,9 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Twig\TranslationExtension'
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
+            - '%oro_translation.debug_translator%'
+            - '%oro_translation.js_translation.debug%'
         tags:
             - { name: twig.extension }
 
@@ -293,6 +299,8 @@ services:
 
     oro_translation.helper.language:
         class: 'Oro\Bundle\TranslationBundle\Helper\LanguageHelper'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_translation.statistic_provider'
             - '@oro_translation.packages_provider'
@@ -302,6 +310,8 @@ services:
 
     oro_translation.manager.translation:
         class: 'Oro\Bundle\TranslationBundle\Manager\TranslationManager'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@doctrine'
             - '@oro_translation.provider.translation_domain'
@@ -316,6 +326,8 @@ services:
 
     oro_translation.provider.translation_domain:
         class: 'Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@doctrine'
             - '@oro_translation.cache.provider.domains'
@@ -359,6 +371,8 @@ services:
 
     oro_translation.provider.external_translations:
         class: 'Oro\Bundle\TranslationBundle\Provider\ExternalTranslationsProvider'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
            - '@oro_translation.service_provider'
            - '@oro_translation.helper.language'
@@ -376,3 +390,14 @@ services:
             - '%installed%'
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad, priority: -100 }
+
+    Oro\Bundle\TranslationBundle\Provider\TranslationPackDumper:
+        arguments:
+            - '@translation.writer'
+            - '@translation.extractor'
+            - '@translation.reader'
+            - '@filesystem'
+            - '@oro_translation.packages_provider.translation'
+            - "@=service('kernel').getBundles()"
+
+    Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationAdaptersCollection: ~

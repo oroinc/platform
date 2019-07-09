@@ -59,6 +59,8 @@ services:
 
     oro_notification.email_notification.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - 'Oro\Bundle\NotificationBundle\Entity\EmailNotification'
@@ -153,7 +155,7 @@ services:
             - '@oro_notification.mailer.spool_db'
 
     swiftmailer.mailer.db_spool_mailer:
-        class: '%swiftmailer.class%'
+        class: Oro\Bundle\EmailBundle\Util\MailerWrapper
         public: false
         arguments:
             - '@oro_notification.mailer.transport'

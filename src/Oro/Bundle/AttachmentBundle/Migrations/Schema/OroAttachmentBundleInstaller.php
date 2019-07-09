@@ -17,7 +17,7 @@ class OroAttachmentBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_6';
     }
 
     /**
@@ -26,8 +26,20 @@ class OroAttachmentBundleInstaller implements Installation
     public function up(Schema $schema, QueryBag $queries)
     {
         OroAttachmentBundle::createFileTable($schema);
+        $this->addParentEntityClassEntityIdColumns($schema);
         OroAttachmentBundle1::createAttachmentTable($schema);
         OroAttachmentOrganization::addOrganizationFields($schema);
         AddOriginalFilenameIndex::addOriginalFilenameIndex($schema);
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    private function addParentEntityClassEntityIdColumns(Schema $schema): void
+    {
+        $table = $schema->getTable('oro_attachment_file');
+        $table->addColumn('parent_entity_class', 'string', ['notnull' => false, 'length' => 512]);
+        $table->addColumn('parent_entity_id', 'integer', ['notnull' => false]);
+        $table->addColumn('parent_entity_field_name', 'string', ['notnull' => false, 'length' => 50]);
     }
 }

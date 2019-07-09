@@ -37,7 +37,7 @@ define([
             // handler fires before the form is actually reset.  delaying it a bit
             // gives the form inputs time to clear.
             $(this.element[0].form).on('reset.' + this._namespaceID, function() {
-                setTimeout($.proxy(self.refresh, self), 10);
+                setTimeout(self.refresh.bind(self), 10);
             });
         },
 
@@ -61,7 +61,7 @@ define([
                 this.menu.css('zIndex', zIndex + 2);
 
                 mask.show(zIndex + 1)
-                    .onhide($.proxy(this.close, this));
+                    .onhide(this.close.bind(this));
             }
         },
 

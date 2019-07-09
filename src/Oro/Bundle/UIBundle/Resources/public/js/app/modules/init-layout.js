@@ -199,24 +199,48 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         });
     });
 
-    /* ============================================================
-     * from form/collection.js'
-     * ============================================================ */
+    /**
+     * Gererates HTML for new rows to oro collection
+     *
+     * @param {jQuery} $listContainer
+     * @param {number} [rowsCount]
+     * @return {string}
+     */
 
-    var getOroCollectionInfo = function($listContainer) {
-        var index = $listContainer.data('last-index') || $listContainer.children().length;
+    var generateOroCollectionRows = function($listContainer, rowsCount) {
+        rowsCount = rowsCount || 1;
+
+        var lastIndex = -1;
+        var $items = $listContainer.children('[data-content]');
+
+        if ($items.length > 0) {
+            var indexes = $items.toArray().map(function(item) {
+                var selector = '[data-content]:not([data-content=""])';
+                var content = $(item).find(selector).addBack(selector).attr('data-content');
+
+                if (_.isEmpty(content)) {
+                    return -1;
+                }
+
+                // Since `data-content` attribute can contain as full field name with index
+                // as plain index it needs to cover both cases
+                var matches = content.match(/\[(\d+)\]$/) || content.match(/^(\d+)$/);
+
+                return matches ? Number(matches[1]) : -1;
+            });
+
+            lastIndex = _.max(indexes);
+        }
+
+        var rowsHTML = '';
         var prototypeName = $listContainer.attr('data-prototype-name') || '__name__';
-        var html = $listContainer.attr('data-prototype');
+        var prototypeHtml = $listContainer.attr('data-prototype');
 
-        return {
-            nextIndex: index,
-            prototypeHtml: html,
-            prototypeName: prototypeName
-        };
-    };
-    var getOroCollectionNextItemHtml = function(collectionInfo) {
-        return collectionInfo.prototypeHtml
-            .replace(new RegExp(collectionInfo.prototypeName, 'g'), collectionInfo.nextIndex);
+        for (var i = 1; i <= rowsCount; i++) {
+            rowsHTML += prototypeHtml.replace(new RegExp(prototypeName, 'g'), lastIndex + i);
+        }
+
+        return rowsHTML;
     };
 
     var validateContainer = function($container) {
@@ -241,14 +265,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             rowCountAdd = $(containerSelector).data('row-count-add') || 1;
         }
 
-        var collectionInfo = getOroCollectionInfo($listContainer);
-        for (var i = 1; i <= rowCountAdd; i++) {
-            var nextItemHtml = getOroCollectionNextItemHtml(collectionInfo);
-            collectionInfo.nextIndex++;
-            $listContainer.append(nextItemHtml)
-                .trigger('content:changed')
-                .data('last-index', collectionInfo.nextIndex);
-        }
+        var rowsHtml = generateOroCollectionRows($listContainer, rowCountAdd);
+
+        $listContainer.append(rowsHtml).trigger('content:changed');
+
         $listContainer.find('input.position-input').each(function(i, el) {
             $(el).val(i);
         });
@@ -264,11 +284,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         }
         var $item = $(this).closest('.row-oro').parent();
         var $listContainer = $item.parent();
-        var collectionInfo = getOroCollectionInfo($listContainer);
-        var nextItemHtml = getOroCollectionNextItemHtml(collectionInfo);
+        var nextItemHtml = generateOroCollectionRows($listContainer, 1);
+
         $item.after(nextItemHtml);
-        $listContainer.trigger('content:changed')
-            .data('last-index', collectionInfo.nextIndex + 1);
+        $listContainer.trigger('content:changed');
 
         $listContainer.find('input.position-input').each(function(i, el) {
             $(el).val(i);

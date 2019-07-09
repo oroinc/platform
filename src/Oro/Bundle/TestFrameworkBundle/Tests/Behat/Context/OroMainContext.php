@@ -73,6 +73,21 @@ class OroMainContext extends MinkContext implements
         $this->getSession()->resizeWindow(1920, 1080, 'current');
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getSession($name = null)
+    {
+        $session = parent::getSession($name);
+
+        // start session if needed
+        if (!$session->isStarted()) {
+            $session->start();
+        }
+
+        return $session;
+    }
+
     /** @return Stopwatch */
     private function getStopwatch()
     {
@@ -2291,5 +2306,22 @@ JS;
         $message = sprintf('The field "%s" value is "%s", but "%s" expected.', $fieldName, $actual, $value);
 
         self::assertTrue((bool) preg_match($regex, $actual), $message);
+    }
+
+    /**
+     * @Then /^(?:|I )click update schema$/
+     */
+    public function iClickUpdateSchema()
+    {
+        try {
+            $page = $this->getPage();
+
+            $page->clickLink('Update schema');
+            $this->waitForAjax();
+            $page->clickLink('Yes, Proceed');
+            $this->waitForAjax();
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 }

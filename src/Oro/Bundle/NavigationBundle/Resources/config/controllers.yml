@@ -1,0 +1,17 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\NavigationBundle\Controller\UserAjaxMenuController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: 'container.service_subscriber' }
+            - { name: 'container.service_subscriber', id: oro_navigation.manager.menu_update, key: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager }
+
+    Oro\Bundle\NavigationBundle\Controller\GlobalAjaxMenuController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: 'container.service_subscriber' }
+            - { name: 'container.service_subscriber', id: oro_navigation.manager.menu_update, key: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager }

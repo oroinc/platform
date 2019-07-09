@@ -32,6 +32,8 @@ parameters:
 services:
     oro_imap.connector.factory:
         class: '%oro_imap.connector.factory.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_imap.services.factory'
             - '%oro_imap.connector.class%'
@@ -172,6 +174,8 @@ services:
 
     oro_imap.manager.controller.connection:
         class: '%oro_imap.manager.connection_controller_manager.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@form.factory'
             - '@oro_security.encoder.default'

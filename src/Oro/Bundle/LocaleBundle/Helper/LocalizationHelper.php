@@ -39,7 +39,7 @@ class LocalizationHelper
     }
 
     /**
-     * @return Localization
+     * @return Localization|null
      */
     public function getCurrentLocalization()
     {

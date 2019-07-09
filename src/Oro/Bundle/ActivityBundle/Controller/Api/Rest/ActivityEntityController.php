@@ -8,7 +8,6 @@ use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityApiEntityManager;
 use Oro\Bundle\ActivityBundle\Exception\InvalidArgumentException;
@@ -121,9 +120,9 @@ class ActivityEntityController extends RestController
         try {
             return $this->handleDeleteRequest($id);
         } catch (InvalidArgumentException $exception) {
-            return $this->handleDeleteError($exception->getMessage(), Codes::HTTP_BAD_REQUEST, $id);
+            return $this->handleDeleteError($exception->getMessage(), Response::HTTP_BAD_REQUEST, $id);
         } catch (\Exception $e) {
-            return $this->handleDeleteError($e->getMessage(), Codes::HTTP_INTERNAL_SERVER_ERROR, $id);
+            return $this->handleDeleteError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR, $id);
         }
     }
 

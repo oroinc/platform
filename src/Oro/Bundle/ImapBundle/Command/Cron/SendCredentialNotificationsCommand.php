@@ -3,19 +3,39 @@
 namespace Oro\Bundle\ImapBundle\Command\Cron;
 
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Cron command that runs processing the invalid email origins that was failed during sync.
  */
-class SendCredentialNotificationsCommand extends ContainerAwareCommand implements CronCommandInterface
+class SendCredentialNotificationsCommand extends Command implements CronCommandInterface
 {
+    /** @var string */
+    protected static $defaultName = 'oro:cron:imap-credential-notifications';
+
+    /** @var FeatureChecker */
+    private $featureChecker;
+
+    /** @var SyncCredentialsIssueManager */
+    private $syncCredentialsIssueManager;
+
     /**
-     * Command name
+     * @param FeatureChecker $featureChecker
+     * @param SyncCredentialsIssueManager $syncCredentialsIssueManager
      */
-    const COMMAND_NAME = 'oro:cron:imap-credential-notifications';
+    public function __construct(
+        FeatureChecker $featureChecker,
+        SyncCredentialsIssueManager $syncCredentialsIssueManager
+    ) {
+        parent::__construct();
+
+        $this->featureChecker = $featureChecker;
+        $this->syncCredentialsIssueManager = $syncCredentialsIssueManager;
+    }
 
     /**
      * {@inheritdoc}
@@ -30,9 +50,7 @@ class SendCredentialNotificationsCommand extends ContainerAwareCommand implement
      */
     public function isActive()
     {
-        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
-
-        return $featureChecker->isResourceEnabled(self::COMMAND_NAME, 'cron_jobs');
+        return $this->featureChecker->isResourceEnabled(self::getDefaultName(), 'cron_jobs');
     }
 
     /**
@@ -41,7 +59,6 @@ class SendCredentialNotificationsCommand extends ContainerAwareCommand implement
     protected function configure()
     {
         $this
-            ->setName(self::COMMAND_NAME)
             ->setDescription('Send wrong email credentials notifications');
     }
 
@@ -51,9 +68,7 @@ class SendCredentialNotificationsCommand extends ContainerAwareCommand implement
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<info>Process the invalid credentials origins</info>');
-        $processedOrigins = $this->getContainer()
-            ->get('oro_imap.origin_credentials.issue_manager')
-            ->processInvalidOrigins();
+        $processedOrigins = $this->syncCredentialsIssueManager->processInvalidOrigins();
         if (count($processedOrigins)) {
             $output->writeln('<info>Processed origins:</info>', OutputInterface::VERBOSITY_DEBUG);
             foreach ($processedOrigins as $processedOrigin) {

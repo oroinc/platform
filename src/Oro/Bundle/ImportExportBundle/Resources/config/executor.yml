@@ -1,9 +1,6 @@
-parameters:
-    oro_importexport.job_executor.class: Oro\Bundle\ImportExportBundle\Job\JobExecutor
-
 services:
     oro_importexport.job_executor:
-        class: '%oro_importexport.job_executor.class%'
+        class: Oro\Bundle\ImportExportBundle\Job\JobExecutor
         arguments:
             - '@akeneo_batch.connectors'
             - '@akeneo_batch.job_repository'
@@ -13,3 +10,6 @@ services:
         lazy: true
         calls:
             - [setEventDispatcher, ['@event_dispatcher']]
+
+    Oro\Bundle\ImportExportBundle\Job\JobExecutor:
+        alias: oro_importexport.job_executor

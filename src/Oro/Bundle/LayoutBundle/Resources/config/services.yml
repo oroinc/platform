@@ -40,9 +40,6 @@ services:
         arguments:
             - '@translator'
 
-    Oro\Component\Layout\Templating\TextHelper:
-        alias: oro_layout.text.helper
-
     oro_layout.layout_context_configurator.application:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ApplicationContextConfigurator
         arguments:
@@ -111,6 +108,9 @@ services:
         class: Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider
         arguments:
             - '@oro_layout.theme_manager'
+
+    Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider:
+        alias: oro_layout.provider.image_type
 
     oro_layout.provider.requirejs_config:
         class: Oro\Bundle\LayoutBundle\Provider\RequireJSConfigProvider

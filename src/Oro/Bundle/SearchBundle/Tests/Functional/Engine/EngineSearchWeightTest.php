@@ -26,10 +26,6 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
         parent::setUp();
 
         $this->initClient([], $this->generateBasicAuthHeader());
-
-        $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
-        $this->getSearchIndexer()->resetIndex(Item::class);
-        $this->ensureItemsLoaded($alias, 0);
     }
 
     protected function tearDown()
@@ -68,10 +64,9 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
             -255
         );
 
+        $this->loadFixture(Item::class, LoadSearchItemData::class, LoadSearchItemData::COUNT);
+
         $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
-        $this->loadFixtures([LoadSearchItemData::class]);
-        $this->getSearchIndexer()->reindex(Item::class);
-        $this->ensureItemsLoaded($alias, LoadSearchItemData::COUNT);
 
         $query = new Query();
         $query->from($alias);

@@ -3,7 +3,9 @@
 namespace Oro\Bundle\UIBundle\Twig;
 
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -19,7 +21,7 @@ use Twig\TwigFunction;
  *   - age
  *   - age_string
  */
-class FormatExtension extends AbstractExtension
+class FormatExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -196,5 +198,17 @@ class FormatExtension extends AbstractExtension
         }
 
         return $date->diff(new \DateTime('now'));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'translator' => TranslatorInterface::class,
+            'oro_ui.formatter' => FormatterManager::class,
+            'router' => RouterInterface::class,
+        ];
     }
 }

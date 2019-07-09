@@ -35,6 +35,8 @@ services:
 
     oro_entity_pagination.message_manager:
         class: '%oro_entity_pagination.message_manager.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@session'
             - '@translator'
@@ -43,6 +45,8 @@ services:
 
     oro_entity_pagination.navigation:
         class: '%oro_entity_pagination.navigation.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@security.authorization_checker'
@@ -61,6 +65,6 @@ services:
         class: Oro\Bundle\EntityPaginationBundle\Twig\EntityPaginationExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }

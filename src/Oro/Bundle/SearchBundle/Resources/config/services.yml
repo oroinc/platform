@@ -34,12 +34,13 @@ parameters:
 services:
     oro_search.index:
         class:                        '%oro_search.index.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_search.search.engine'
             - '@oro_search.mapper'
             - '@oro_search.security_provider'
             - '@oro_security.search.acl_helper'
-            - '@event_dispatcher'
 
     Oro\Bundle\SearchBundle\Engine\Indexer:
         alias: oro_search.index
@@ -284,7 +285,8 @@ services:
 
     oro_search.async.indexer:
         class: 'Oro\Bundle\SearchBundle\Async\Indexer'
-        public: false
+        # This service marked as public (origin private) for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_message_queue.client.message_producer'
             - '@oro_entity.doctrine_helper'

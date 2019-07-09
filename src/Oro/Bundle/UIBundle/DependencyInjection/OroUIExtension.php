@@ -25,6 +25,7 @@ class OroUIExtension extends Extension
         $loader->load('layouts.yml');
         $loader->load('block_types.yml');
         $loader->load('form_types.yml');
+        $loader->load('controllers.yml');
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }

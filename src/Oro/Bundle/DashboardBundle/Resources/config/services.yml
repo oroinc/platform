@@ -2,17 +2,12 @@ parameters:
     oro_datagrid.datagrid.name_strategy.class:   Oro\Bundle\DashboardBundle\Datagrid\NameStrategy
 
     oro_dashboard.config_resolver.class:         Oro\Component\Config\Resolver\SystemAwareResolver
-    oro_dashboard.manager.state.class:           Oro\Bundle\DashboardBundle\Model\StateManager
-    oro_dashboard.manager.class:                 Oro\Bundle\DashboardBundle\Model\Manager
     oro_dashboard.factory.class:                 Oro\Bundle\DashboardBundle\Model\Factory
-    oro_dashboard.dashboard_entity.class:        Oro\Bundle\DashboardBundle\Entity\Dashboard
     oro_dashboard.dashboard_widget_entity.class: Oro\Bundle\DashboardBundle\Entity\Widget
     oro_dashboard.navigation_listener.class:     Oro\Bundle\DashboardBundle\EventListener\NavigationListener
     oro_dashboard.form.type.edit.class:          Oro\Bundle\DashboardBundle\Form\Type\DashboardType
     oro_dashboard.form.type.select.class:        Oro\Bundle\DashboardBundle\Form\Type\DashboardSelectType
-    oro_dashboard.provider.widget_configuration_form_provider.class:  Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider
     oro_dashboard.widget_config_value.provider.class: Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider
-    oro_dashboard.datetime.helper.class: Oro\Bundle\DashboardBundle\Helper\DateHelper
     oro_dashboard.event_listener.widget_configuration_load.class: Oro\Bundle\DashboardBundle\EventListener\WidgetConfigurationLoadListener
     oro_dashboard.event_listener.widget_items_load_data.class: Oro\Bundle\DashboardBundle\EventListener\WidgetItemsLoadDataListener
     oro_dashboard.event_listener.widget_sort_by.class: Oro\Bundle\DashboardBundle\EventListener\WidgetSortByListener
@@ -73,12 +68,17 @@ services:
         alias: 'oro_dashboard.widget_configs'
 
     oro_dashboard.manager:
-        class: '%oro_dashboard.manager.class%'
+        class: Oro\Bundle\DashboardBundle\Model\Manager
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_dashboard.factory'
             - '@doctrine.orm.entity_manager'
             - '@oro_security.acl_helper'
             - '@security.token_storage'
+
+    Oro\Bundle\DashboardBundle\Model\Manager:
+        alias: oro_dashboard.manager
 
     oro_dashboard.factory:
         class: '%oro_dashboard.factory.class%'
@@ -89,10 +89,13 @@ services:
             - '@oro_dashboard.widget_configs'
 
     oro_dashboard.manager.state:
-        class: '%oro_dashboard.manager.state.class%'
+        class: Oro\Bundle\DashboardBundle\Model\StateManager
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_security.token_accessor'
+
+    Oro\Bundle\DashboardBundle\Model\StateManager:
+        alias: oro_dashboard.manager.state
 
     oro_dashboard.config_provider:
         class: Oro\Bundle\DashboardBundle\Model\ConfigProvider
@@ -101,6 +104,9 @@ services:
             - '%kernel.cache_dir%/oro/dashboards.php'
             - '%kernel.debug%'
             - '@event_dispatcher'
+
+    Oro\Bundle\DashboardBundle\Model\ConfigProvider:
+        alias: oro_dashboard.config_provider
 
     oro_dashboard.navigation_listener:
         class: '%oro_dashboard.navigation_listener.class%'
@@ -123,17 +129,25 @@ services:
             - { name: form.type, alias: "oro_dashboard_select" }
 
     oro_dashboard.provider.widget_configuration_form_provider:
-        class: '%oro_dashboard.provider.widget_configuration_form_provider.class%'
+        class: Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider
         arguments:
             - '@oro_dashboard.config_provider'
             - '@form.factory'
 
+    Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider:
+        alias: oro_dashboard.provider.widget_configuration_form_provider
+
     oro_dashboard.datetime.helper:
-        class: '%oro_dashboard.datetime.helper.class%'
+        class: Oro\Bundle\DashboardBundle\Helper\DateHelper
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_locale.settings'
             - '@doctrine'
             - '@oro_security.acl_helper'
+
+    Oro\Bundle\DashboardBundle\Helper\DateHelper:
+        alias: oro_dashboard.datetime.helper
 
     oro_dashboard.event_listener.widget_configuration_load:
         class: '%oro_dashboard.event_listener.widget_configuration_load.class%'
@@ -331,7 +345,7 @@ services:
         class: Oro\Bundle\DashboardBundle\Twig\DashboardExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 

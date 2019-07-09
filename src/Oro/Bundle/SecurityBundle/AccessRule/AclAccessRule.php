@@ -54,10 +54,6 @@ class AclAccessRule implements AccessRuleInterface
      */
     public function isApplicable(Criteria $criteria): bool
     {
-        if ($criteria->getOption(self::DISABLE_RULE, false)) {
-            return false;
-        }
-
         // do not apply this rule for related entities that are owner for the root entity
         if (!$criteria->isRoot()
             && !$criteria->getOption(self::CHECK_OWNER, false)

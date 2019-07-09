@@ -8,7 +8,6 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\UnitOfWork;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
-use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
@@ -99,7 +98,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
             $result ?: '',
             self::ACTION_READ,
             ['result' => $result],
-            $result ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND
+            $result ? Response::HTTP_OK : Response::HTTP_NOT_FOUND
         );
     }
 
@@ -117,7 +116,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         $metadata = $this->get('oro_soap.provider.metadata')->getMetadataFor($this);
 
         return $this->handleView(
-            $this->view($metadata, Codes::HTTP_OK)
+            $this->view($metadata, Response::HTTP_OK)
         );
     }
 
@@ -388,7 +387,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      *
      * @return Response
      */
-    protected function buildResponse($data, $action, $contextValues = [], $status = Codes::HTTP_OK)
+    protected function buildResponse($data, $action, $contextValues = [], $status = Response::HTTP_OK)
     {
         if ($data instanceof View) {
             $response = parent::handleView($data);
@@ -416,6 +415,6 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     protected function buildNotFoundResponse()
     {
-        return $this->buildResponse('', self::ACTION_READ, ['result' => null], Codes::HTTP_NOT_FOUND);
+        return $this->buildResponse('', self::ACTION_READ, ['result' => null], Response::HTTP_NOT_FOUND);
     }
 }

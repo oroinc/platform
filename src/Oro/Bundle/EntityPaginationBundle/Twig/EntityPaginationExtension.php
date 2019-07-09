@@ -5,7 +5,8 @@ namespace Oro\Bundle\EntityPaginationBundle\Twig;
 use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -16,7 +17,7 @@ use Twig\TwigFunction;
  *   - oro_entity_pagination_collect_data
  *   - oro_entity_pagination_show_info_message
  */
-class EntityPaginationExtension extends AbstractExtension
+class EntityPaginationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const NAME = 'oro_entity_pagination';
 
@@ -130,5 +131,18 @@ class EntityPaginationExtension extends AbstractExtension
     public function getName()
     {
         return self::NAME;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_entity_pagination.navigation' => EntityPaginationNavigation::class,
+            'oro_entity_pagination.storage.data_collector' => StorageDataCollector::class,
+            'oro_entity_pagination.message_manager' => MessageManager::class,
+            'request_stack' => RequestStack::class,
+        ];
     }
 }

@@ -55,7 +55,7 @@ class SendEmailTransportListener
                 $transport->setPort($port);
                 $transport->setEncryption($security);
             } else {
-                $transport = \Swift_SmtpTransport::newInstance($host, $port, $security);
+                $transport = new \Swift_SmtpTransport($host, $port, $security);
             }
 
             $transport->setUsername($username);

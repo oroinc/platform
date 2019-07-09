@@ -48,11 +48,17 @@ services:
     oro_api.filter_factory:
         class: Oro\Bundle\ApiBundle\Filter\ChainFilterFactory
         public: false
+        arguments:
+            - !tagged oro.api.filter_factory
 
+    # this service is configured by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\SimpleFilterFactoryCompilerPass
     oro_api.filter_factory.default:
         class: Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory
         public: false
         arguments:
+            - [] # filters
+            - [] # filter factories
+            - ~ # filter factory container
             - '@property_accessor'
             - '@oro_api.filter_operator_registry'
         tags:
@@ -71,6 +77,12 @@ services:
             - '@oro_api.value_normalizer'
             - '@oro_entity_extend.association_manager'
             - '@oro_api.entity_override_provider_registry'
+
+    oro_api.filter_factory.search_query:
+        class: Oro\Bundle\ApiBundle\Filter\SearchQueryFilterFactory
+        public: false
+        arguments:
+            - '@oro_search.provider.search_mapping'
 
     oro_api.query.expression_visitor_factory:
         class: Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory

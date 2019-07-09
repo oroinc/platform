@@ -4,6 +4,8 @@ namespace Oro\Bundle\SegmentBundle\Twig;
 
 use Oro\Bundle\SegmentBundle\Event\ConditionBuilderOptionsLoadEvent;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -13,19 +15,19 @@ use Twig\TwigFunction;
  *   - update_segment_widget_options
  *   - update_segment_condition_builder_options
  */
-class SegmentExtension extends AbstractExtension
+class SegmentExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const NAME = 'oro_segment';
 
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * @param EventDispatcherInterface $dispatcher
+     * @param ContainerInterface $container
      */
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(ContainerInterface $container)
     {
-        $this->dispatcher = $dispatcher;
+        $this->container = $container;
     }
 
     /**
@@ -50,12 +52,14 @@ class SegmentExtension extends AbstractExtension
      */
     public function updateSegmentWidgetOptions(array $widgetOptions, $type = null)
     {
-        if (!$this->dispatcher->hasListeners(WidgetOptionsLoadEvent::EVENT_NAME)) {
+        $eventDispatcher = $this->container->get('event_dispatcher');
+
+        if (!$eventDispatcher->hasListeners(WidgetOptionsLoadEvent::EVENT_NAME)) {
             return $widgetOptions;
         }
 
         $event = new WidgetOptionsLoadEvent($widgetOptions, $type);
-        $this->dispatcher->dispatch(WidgetOptionsLoadEvent::EVENT_NAME, $event);
+        $eventDispatcher->dispatch(WidgetOptionsLoadEvent::EVENT_NAME, $event);
 
         return $event->getWidgetOptions();
     }
@@ -67,12 +71,14 @@ class SegmentExtension extends AbstractExtension
      */
     public function updateSegmentConditionBuilderOptions(array $options)
     {
-        if (!$this->dispatcher->hasListeners(ConditionBuilderOptionsLoadEvent::EVENT_NAME)) {
+        $eventDispatcher = $this->container->get('event_dispatcher');
+
+        if (!$eventDispatcher->hasListeners(ConditionBuilderOptionsLoadEvent::EVENT_NAME)) {
             return $options;
         }
 
         $event = new ConditionBuilderOptionsLoadEvent($options);
-        $this->dispatcher->dispatch(ConditionBuilderOptionsLoadEvent::EVENT_NAME, $event);
+        $eventDispatcher->dispatch(ConditionBuilderOptionsLoadEvent::EVENT_NAME, $event);
 
         return $event->getOptions();
     }
@@ -83,5 +89,15 @@ class SegmentExtension extends AbstractExtension
     public function getName()
     {
         return static::NAME;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'event_dispatcher' => EventDispatcherInterface::class,
+        ];
     }
 }

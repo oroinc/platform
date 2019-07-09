@@ -6,7 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Ownership\OrganizationAwareTrait;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -55,14 +54,6 @@ class ImportExportResult implements CreatedAtAwareInterface
     protected $owner;
 
     /**
-     * @var Organization|null
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
-
-    /**
      * @var string|null
      *
      * @ORM\Column(type="string", length=255, name="filename", unique=true, nullable=true)
@@ -89,6 +80,13 @@ class ImportExportResult implements CreatedAtAwareInterface
      * @ORM\Column(type="string", length=255, name="entity", unique=false, nullable=false)
      */
     protected $entity;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="options", type="array")
+     */
+    protected $options = [];
 
     /**
      * @var boolean
@@ -221,6 +219,26 @@ class ImportExportResult implements CreatedAtAwareInterface
     public function setEntity(string $entity): ImportExportResult
     {
         $this->entity = $entity;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options ?: [];
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return ImportExportResult
+     */
+    public function setOptions($options): ImportExportResult
+    {
+        $this->options = $options;
 
         return $this;
     }

@@ -36,11 +36,11 @@ class MassEmailDirectMailer extends \Swift_Mailer
     }
 
     /**
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      * @param array|null $failedRecipients
      * @return int
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $result = $this->directMailer->send($message, $failedRecipients);
 

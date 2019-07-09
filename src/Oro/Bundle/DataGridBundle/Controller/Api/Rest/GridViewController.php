@@ -6,7 +6,6 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Put;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -135,9 +134,9 @@ class GridViewController extends RestController
         $gridView = $manager->getView($id, $default, $gridName);
         if ($gridView) {
             $manager->setDefaultGridView($this->getUser(), $gridView);
-            $view = $this->view(null, Codes::HTTP_NO_CONTENT);
+            $view = $this->view(null, Response::HTTP_NO_CONTENT);
         } else {
-            $view = $this->view(null, Codes::HTTP_NOT_FOUND);
+            $view = $this->view(null, Response::HTTP_NOT_FOUND);
         }
 
         return $this->buildResponse($view, self::ACTION_UPDATE, ['id' => $id, 'entity' => $gridView]);

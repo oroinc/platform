@@ -27,6 +27,9 @@ services:
         tags:
             - { name: oro_datagrid.configuration.provider }
 
+    Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider:
+        alias: oro_report.datagrid.configuration.provider
+
     oro_report.cache:
           parent: oro.cache.abstract
           public: false
@@ -76,6 +79,7 @@ services:
         class: Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder
         arguments:
             - '%oro_report.calendar_date.entity.class%'
+            - '@oro_datagrid.helper.date'
 
     oro_report.listener.segment_subscriber:
         class: '%oro_report.listener.segment_subscriber.class%'
@@ -103,8 +107,11 @@ services:
 
     oro_report.calendar_date_manager:
         class: '%oro_report.calendar_date_manager.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_entity.doctrine_helper'
+            - '@oro_locale.settings'
 
     oro_report.validator.report_definition_validator:
         class: Oro\Bundle\ReportBundle\Validator\ReportDefinitionValidator
@@ -127,3 +134,10 @@ services:
             - "%oro_report.calendar_date.entity.class%"
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_report.event_listener.timezone_change:
+        class: Oro\Bundle\ReportBundle\EventListener\TimezoneChangeListener
+        arguments:
+            - '@oro_report.calendar_date_manager'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }

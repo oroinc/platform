@@ -4,6 +4,8 @@ namespace Oro\Bundle\IntegrationBundle\Twig;
 
 use Oro\Bundle\IntegrationBundle\Event\LoadIntegrationThemesEvent;
 use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 use Twig\Extension\AbstractExtension;
@@ -15,19 +17,19 @@ use Twig\TwigFunction;
  *   - oro_integration_is_switch_enabled
  *   - oro_integration_is_delete_enabled
  */
-class IntegrationExtension extends AbstractExtension
+class IntegrationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const DEFAULT_THEME = 'OroIntegrationBundle:Form:fields.html.twig';
 
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * @param EventDispatcherInterface $dispatcher
+     * @param ContainerInterface $container
      */
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(ContainerInterface $container)
     {
-        $this->dispatcher = $dispatcher;
+        $this->container = $container;
     }
 
     /**
@@ -49,13 +51,15 @@ class IntegrationExtension extends AbstractExtension
      */
     public function getThemes(FormView $view)
     {
+        $eventDispatcher = $this->container->get('event_dispatcher');
+
         $themes = [static::DEFAULT_THEME];
-        if (!$this->dispatcher->hasListeners(LoadIntegrationThemesEvent::NAME)) {
+        if (!$eventDispatcher->hasListeners(LoadIntegrationThemesEvent::NAME)) {
             return $themes;
         }
 
         $event = new LoadIntegrationThemesEvent($view, $themes);
-        $this->dispatcher->dispatch(LoadIntegrationThemesEvent::NAME, $event);
+        $eventDispatcher->dispatch(LoadIntegrationThemesEvent::NAME, $event);
 
         return $event->getThemes();
     }
@@ -87,5 +91,15 @@ class IntegrationExtension extends AbstractExtension
     public function getName()
     {
         return 'oro_integration';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'event_dispatcher' => EventDispatcherInterface::class,
+        ];
     }
 }

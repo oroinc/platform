@@ -2,14 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Form\Type\DashboardType;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
-use Oro\Bundle\DashboardBundle\Model\StateManager;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
@@ -17,20 +14,38 @@ use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
+ * CRUD controller for the Dashboard entity.
  * @Route("/dashboard")
  */
-class DashboardController extends Controller
+class DashboardController extends AbstractController
 {
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            WidgetConfigs::class,
+            TranslatorInterface::class,
+            Router::class,
+            WidgetConfigurationFormProvider::class,
+            Manager::class,
+            ConfigurationProviderInterface::class
+        ]);
+    }
+
     /**
      * @Route(
      *      ".{_format}",
@@ -50,7 +65,7 @@ class DashboardController extends Controller
     public function indexAction()
     {
         return [
-            'entity_class' => $this->container->getParameter('oro_dashboard.dashboard_entity.class')
+            'entity_class' => Dashboard::class
         ];
     }
 
@@ -92,7 +107,7 @@ class DashboardController extends Controller
             [
                 'dashboards' => $this->getDashboardManager()->findAllowedDashboards(),
                 'dashboard'  => $currentDashboard,
-                'widgets'    => $this->get('oro_dashboard.widget_configs')->getWidgetConfigs()
+                'widgets'    => $this->get(WidgetConfigs::class)->getWidgetConfigs()
             ]
         );
     }
@@ -112,15 +127,15 @@ class DashboardController extends Controller
             throw new AccessDeniedException();
         }
 
-        $form  = $this->getFormProvider()->getForm($widget->getName());
+        $form  = $this->get(WidgetConfigurationFormProvider::class)->getForm($widget->getName());
         $saved = false;
 
-        $form->setData($this->get('oro_dashboard.widget_configs')->getFormValues($widget));
+        $form->setData($this->get(WidgetConfigs::class)->getFormValues($widget));
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $widget->setOptions($form->getData());
-            $this->getEntityManager()->flush();
+            $this->getDoctrine()->getManagerForClass(Widget::class)->flush();
             $saved = true;
         }
 
@@ -192,10 +207,10 @@ class DashboardController extends Controller
                 $this->getDashboardManager()->save($dashboardModel, true);
                 $this->get('session')->getFlashBag()->add(
                     'success',
-                    $this->get('translator')->trans('oro.dashboard.saved_message')
+                    $this->get(TranslatorInterface::class)->trans('oro.dashboard.saved_message')
                 );
 
-                return $this->get('oro_ui.router')->redirect($dashboardModel->getEntity());
+                return $this->get(Router::class)->redirect($dashboardModel->getEntity());
             }
         }
 
@@ -218,7 +233,7 @@ class DashboardController extends Controller
     {
         return $this->render(
             sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
-            $this->get('oro_dashboard.widget_configs')->getWidgetAttributesForTwig($widget)
+            $this->get(WidgetConfigs::class)->getWidgetAttributesForTwig($widget)
         );
     }
 
@@ -237,7 +252,7 @@ class DashboardController extends Controller
     public function itemizedWidgetAction($widget, $bundle, $name)
     {
         /** @var WidgetConfigs $manager */
-        $manager = $this->get('oro_dashboard.widget_configs');
+        $manager = $this->get(WidgetConfigs::class);
 
         $params = array_merge(
             [
@@ -267,7 +282,7 @@ class DashboardController extends Controller
     public function itemizedDataWidgetAction(Request $request, $widget, $bundle, $name)
     {
         /** @var WidgetConfigs $manager */
-        $manager = $this->get('oro_dashboard.widget_configs');
+        $manager = $this->get(WidgetConfigs::class);
 
         $params = array_merge(
             [
@@ -338,7 +353,7 @@ class DashboardController extends Controller
         $params       = $request->get('params', []);
         $renderParams = $request->get('renderParams', []);
 
-        $viewId = $this->getWidgetConfigs()->getWidgetOptions()->get('gridView');
+        $viewId = $this->get(WidgetConfigs::class)->getWidgetOptions()->get('gridView');
         if ($viewId && null !== $view = $this->findView($viewId)) {
             $params = array_merge(
                 $params,
@@ -352,8 +367,8 @@ class DashboardController extends Controller
             );
         }
 
-        $options = $this->getWidgetConfigs()->getWidgetOptions();
-        $gridConfig = $this->getDatagridConfigurationProvider()->getConfiguration($gridName);
+        $options = $this->get(WidgetConfigs::class)->getWidgetOptions();
+        $gridConfig = $this->get(ConfigurationProviderInterface::class)->getConfiguration($gridName);
         if (isset($gridConfig['filters'], $gridConfig['filters']['columns'])) {
             if (!isset($params['_filter'])) {
                 $params['_filter'] = [];
@@ -369,24 +384,8 @@ class DashboardController extends Controller
                 'params'       => $params,
                 'renderParams' => $renderParams,
             ],
-            $this->getWidgetConfigs()->getWidgetAttributesForTwig($widget)
+            $this->get(WidgetConfigs::class)->getWidgetAttributesForTwig($widget)
         );
-    }
-
-    /**
-     * @return ConfigurationProviderInterface
-     */
-    protected function getDatagridConfigurationProvider()
-    {
-        return $this->get('oro_datagrid.configuration.provider.chain');
-    }
-
-    /**
-     * @return WidgetConfigs
-     */
-    protected function getWidgetConfigs()
-    {
-        return $this->get('oro_dashboard.widget_configs');
     }
 
     /**
@@ -400,27 +399,11 @@ class DashboardController extends Controller
     }
 
     /**
-     * @return WidgetConfigurationFormProvider
-     */
-    protected function getFormProvider()
-    {
-        return $this->get('oro_dashboard.provider.widget_configuration_form_provider');
-    }
-
-    /**
-     * @return StateManager
-     */
-    protected function getStateManager()
-    {
-        return $this->get('oro_dashboard.manager.state');
-    }
-
-    /**
      * @return Manager
      */
     protected function getDashboardManager()
     {
-        return $this->get('oro_dashboard.manager');
+        return $this->get(Manager::class);
     }
 
     /**
@@ -429,13 +412,5 @@ class DashboardController extends Controller
     protected function getDashboardRepository()
     {
         return $this->getDoctrine()->getRepository('OroDashboardBundle:Dashboard');
-    }
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->container->get('doctrine.orm.entity_manager');
     }
 }

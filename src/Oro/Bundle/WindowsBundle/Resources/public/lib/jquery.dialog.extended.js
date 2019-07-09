@@ -12,8 +12,15 @@
  *   jQuery UI Dialog 1.10.2
  *
  */
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools', 'jquery-ui'], function ($, _, __, tools) {
+define(function (require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var tools = require('oroui/js/tools');
+    require('jquery-ui');
+
     $.widget( 'ui.dialog', $.ui.dialog, {
         version: '2.0.0',
 
@@ -63,14 +70,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             // inner-wrapper fixes max-height for flex container in IE11 https://jsfiddle.net/d158647x/
             this.uiDialog.wrapInner('<div class="ui-dialog-inner-wrapper"></div>');
 
-            this._onBackspacePress = $.proxy(this._onBackspacePress, this);
-            this._windowResizeHandler = $.proxy(this._windowResizeHandler, this);
+            this._onBackspacePress = this._onBackspacePress.bind(this);
+            this._windowResizeHandler = this._windowResizeHandler.bind(this);
 
             // prevents history navigation over backspace while dialog is opened
-            $(document).bind('keydown.dialog', this._onBackspacePress);
+            $(document).on('keydown.dialog', this._onBackspacePress);
 
             // Handle window resize
-            $(window).bind('resize.dialog', this._windowResizeHandler);
+            $(window).on('resize.dialog', this._windowResizeHandler);
         },
 
         _limitTo: function() {
@@ -96,8 +103,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             this._super();
 
             // remove custom handler
-            $(document).unbind('keydown.dialog', this._onBackspacePress);
-            $(window).unbind('resize.dialog', this._windowResizeHandler);
+            $(document).off('keydown.dialog', this._onBackspacePress);
+            $(window).off('resize.dialog', this._windowResizeHandler);
 
             // @TODO: Remove this fix when Apple fix caret placement bug
             this.iOScaretFixer(false);
@@ -117,7 +124,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         },
 
         close: function() {
-            $(window).unbind('.dialog');
+            $(window).off('.dialog');
             this._removeMinimizedEl();
 
             this._super();
@@ -249,11 +256,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
 
             this._trigger('beforeMaximize');
             this._saveSnapshot();
-            this._calculateNewMaximizedDimensions($.proxy(function() {
+            this._calculateNewMaximizedDimensions(function() {
                 this._setState('maximized');
                 this._toggleButtons();
                 this._trigger('maximize');
-            }, this));
+            }.bind(this));
 
             return this;
         },
@@ -332,13 +339,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                     }
                 });
                 this.widget().css('position', _.isMobile() ? 'relative' : 'fixed'); // remove scroll when maximized
-                if ($.isFunction(onResizeCallback)) {
+                if (typeof onResizeCallback === 'function') {
                     onResizeCallback();
                 }
             } else {
                 this._resizeTries++;
                 if (this._resizeTries < 100) {
-                    setTimeout($.proxy(function() {this._calculateNewMaximizedDimensions(onResizeCallback);}, this), 500);
+                    setTimeout(function() {this._calculateNewMaximizedDimensions(onResizeCallback);}.bind(this), 500);
                 } else {
                     this._resizeTries = 0;
                 }
@@ -386,7 +393,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         _getContainerHeight: function() {
             var heightDelta = 0;
             if (this.options.maximizedHeightDecreaseBy) {
-                if ($.isNumeric(this.options.maximizedHeightDecreaseBy)) {
+                if (tools.isNumeric(this.options.maximizedHeightDecreaseBy)) {
                     heightDelta = this.options.maximizedHeightDecreaseBy;
                 } else if (this.options.maximizedHeightDecreaseBy === 'minimize-bar') {
                     heightDelta = this._getMinimizeTo().height();
@@ -628,7 +635,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         _restoreWithoutTriggerEvent: function () {
             var beforeState = this.state();
             var method = '_restoreFrom' + beforeState.charAt(0).toUpperCase() + beforeState.slice(1);
-            if ($.isFunction(this[method])) {
+            if (typeof this[method] === 'function') {
                 this[method]();
             } else {
                 $.error('jQuery.dialogExtend Error : Cannot restore dialog from unknown state "' + beforeState + '"');

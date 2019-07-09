@@ -7,18 +7,21 @@ use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
+use Oro\Bundle\SecurityBundle\Util\UriSecurityHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 /**
- * Provides Twig functions to display organization information and permissions:
+ * Provides Twig functions and filters:
  *   - get_enabled_organizations
  *   - get_current_organization
  *   - acl_permission
+ *   - strip_dangerous_protocols
  */
 class OroSecurityExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
@@ -58,6 +61,14 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
     }
 
     /**
+     * @return UriSecurityHelper
+     */
+    private function getUriSecurityHelper(): UriSecurityHelper
+    {
+        return $this->container->get(UriSecurityHelper::class);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFunctions()
@@ -66,6 +77,16 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
             new TwigFunction('get_enabled_organizations', [$this, 'getOrganizations']),
             new TwigFunction('get_current_organization', [$this, 'getCurrentOrganization']),
             new TwigFunction('acl_permission', [$this, 'getPermission']),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFilters()
+    {
+        return [
+            new TwigFilter('strip_dangerous_protocols', [$this, 'stripDangerousProtocols']),
         ];
     }
 
@@ -105,6 +126,16 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
     }
 
     /**
+     * @param mixed $uri
+     *
+     * @return string
+     */
+    public function stripDangerousProtocols($uri): string
+    {
+        return $this->getUriSecurityHelper()->stripDangerousProtocols((string) $uri);
+    }
+
+    /**
      * Returns the name of the extension.
      *
      * @return string
@@ -122,7 +153,8 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
         return [
             AuthorizationCheckerInterface::class,
             TokenAccessorInterface::class,
-            PermissionManager::class
+            PermissionManager::class,
+            UriSecurityHelper::class,
         ];
     }
 }

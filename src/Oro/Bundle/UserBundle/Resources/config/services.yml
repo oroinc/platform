@@ -1,3 +1,5 @@
+imports:
+    - { resource: controllers.yml }
 parameters:
     oro_user.manager.api.class:                   Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_user.permission.manager.api.class:        Oro\Bundle\UserBundle\Entity\Manager\UserPermissionApiEntityManager
@@ -40,8 +42,6 @@ parameters:
 
     oro_user.role.datagrid_helper.class:          Oro\Bundle\UserBundle\Datagrid\RoleGridHelper
 
-    oro_user.provider.user_configuration.form_provider.class: Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider
-
     # Validator
     oro_user.validator.user_custom_grid_field_validator.class: Oro\Bundle\UserBundle\Validator\UserGridFieldValidator
 
@@ -50,12 +50,17 @@ parameters:
 services:
     oro_user.manager:
         class: Oro\Bundle\UserBundle\Entity\UserManager
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_user.security.user_loader'
             - '@doctrine'
             - '@security.encoder_factory'
             - '@oro_entity_extend.enum_value_provider'
             - '@oro_user.manager.mailer_processor_link'
+
+    Oro\Bundle\UserBundle\Entity\UserManager:
+        alias: oro_user.manager
 
     oro_user.manager.mailer_processor_link:
         public: false
@@ -64,6 +69,8 @@ services:
 
     oro_user.manager.api:
         class: '%oro_user.manager.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_user.entity.class%'
@@ -71,6 +78,8 @@ services:
 
     oro_user.permission_manager.api:
         class: '%oro_user.permission.manager.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_user.entity.class%'
@@ -131,7 +140,7 @@ services:
         class: Oro\Bundle\UserBundle\Twig\OroUserExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -144,6 +153,8 @@ services:
 
     oro_user.status_manager:
         class:                        '%oro_user.status.manager.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:                    ["@doctrine.orm.entity_manager", "@oro_user.manager"]
 
     oro_user.role_manager:
@@ -152,6 +163,8 @@ services:
 
     oro_user.role_manager.api:
         class: '%oro_user.role.manager.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_user.role.entity.class%'
@@ -163,6 +176,8 @@ services:
 
     oro_user.group_manager.api:
         class: '%oro_user.group.manager.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_user.group.entity.class%'
@@ -326,18 +341,24 @@ services:
 
     oro_user.handler.delete:
         class: '%oro_user.handler.delete.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.handler.delete.abstract
         calls:
             - [ setTokenAccessor,  ['@oro_security.token_accessor'] ]
 
     oro_user.role.handler.delete:
         class: '%oro_user.role.handler.delete.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.handler.delete.abstract
         arguments:
             - '@oro_security.acl.sid_manager'
 
     oro_user.handler.reset_password_handler:
         class: Oro\Bundle\UserBundle\Handler\ResetPasswordHandler
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         lazy: true
         arguments:
             - '@oro_notification.manager.email_notification'
@@ -423,6 +444,8 @@ services:
 
     oro_user.provider.role_privilege_category_provider:
         class: '%oro_user.provider.role_privilege_category_provider.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@translator'
 
@@ -433,6 +456,8 @@ services:
 
     oro_user.provider.role_privilege_capability_provider:
         class: '%oro_user.provider.role_privilege_capability_provider.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@translator'
             - '@oro_user.provider.role_privilege_category_provider'
@@ -505,6 +530,9 @@ services:
           - '@security.token_storage'
           - '@oro_security.ownership_tree_provider'
 
+    Oro\Bundle\UserBundle\Dashboard\OwnerHelper:
+        alias: oro_user.dashboard.owner_helper
+
     oro_user.listener.choice_tree_filter_load_data_listener:
         class: '%oro_user.listener.choice_tree_filter_load_data_listener.class%'
         arguments:
@@ -513,12 +541,17 @@ services:
             - { name: kernel.event_listener, event: oro_filter.choice_tree_filter_load_data, method: fillData }
 
     oro_user.provider.user_config_form_provider:
-        class: '%oro_user.provider.user_configuration.form_provider.class%'
+        class: Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider
         parent: 'oro_config.provider.abstract_provider'
         lazy: true
 
+    Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider:
+        alias: oro_user.provider.user_config_form_provider
+
     oro_user.provider.user_logging_info_provider:
         class: Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@request_stack'
 

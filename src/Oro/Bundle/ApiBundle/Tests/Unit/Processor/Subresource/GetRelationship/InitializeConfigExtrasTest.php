@@ -4,8 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetRelationship;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetRelationship\InitializeConfigExtras;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
@@ -81,9 +79,7 @@ class InitializeConfigExtrasTest extends GetSubresourceProcessorTestCase
                     $this->context->getParentClassName(),
                     $this->context->getAssociationName()
                 ),
-                new FilterIdentifierFieldsConfigExtra(),
-                new FiltersConfigExtra(),
-                new SortersConfigExtra()
+                new FilterIdentifierFieldsConfigExtra()
             ],
             $this->context->getConfigExtras()
         );

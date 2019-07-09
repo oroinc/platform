@@ -3,7 +3,8 @@
 namespace Oro\Bundle\UIBundle\Twig;
 
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -14,7 +15,7 @@ use Twig\TwigFilter;
  *   - oro_html_sanitize
  *   - oro_html_escape
  */
-class HtmlTagExtension extends AbstractExtension
+class HtmlTagExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -98,5 +99,15 @@ class HtmlTagExtension extends AbstractExtension
     public function getName()
     {
         return 'oro_ui.html_tag';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_ui.html_tag_helper' => HtmlTagHelper::class,
+        ];
     }
 }

@@ -2,6 +2,15 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## 4.0.0
+
+### Removed
+
+#### ApiBundle
+* All filters and sorters were removed for all "relationships" resources that returns a collection,
+  e.g. "GET /api/countries/{id}/relationships/regions". If you need filtered or sorted data, use sub-resources
+  instead of relationships, e.g. "GET /api/countries/{id}/regions".
+
 ## 4.0.0-rc (2019-05-29)
 [Show detailed list of changes](incompatibilities-4-0-rc.md)
 
@@ -72,7 +81,9 @@ The current file describes significant changes in the code that may affect the u
   to `getVariableGetters(): array`.
   By performance reasons new method `getVariableProcessors(string $entityClass): array` was added.
   If method `getVariableDefinitions` of your provider returns info about processors, move it to `getVariableProcessors`.
-
+* Due to the updated version of `symfony/swiftmailer-bundle` parameter `mailer_transport: mail` is not supported anymore. Please
+  use `mailer_transport: sendmail` instead or another available swiftmailer transport type.
+  
 #### UIBundle
 * The redundant methods `getFormatterName`, `getSupportedTypes` and `isDefaultFormatter` were removed from `Oro\Bundle\UIBundle\Formatter\FormatterInterface`.
   Use `data_type` attribute of `oro_formatter` tag to specify the default formatter for the data type.

@@ -33,6 +33,7 @@ oro_behat_extension:
             locator: '//input[@name="oro_user_user_form[organizations][businessUnits]"]'
             type: xpath
             element: Select2Share
+          Avatar: 'oro_user_user_form[avatar][file]'
 
     UserMenu:
       selector: {type: 'xpath', locator: '//*[@id="user-menu"]'}
@@ -130,6 +131,7 @@ oro_behat_extension:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
         - OroUserBundle::FeatureContext
+        - OroUserBundle::UserAttachmentContext
         - OroFormBundle::FormContext
         - OroConfigBundle::FeatureContext
         - OroSecurityBundle::ACLContext
@@ -138,5 +140,6 @@ oro_behat_extension:
         - OroActivityListBundle::ActivityContext
         - OroDataGridBundle::GridContext
         - OroEmailBundle::EmailContext
+        - OroSearchBundle::SearchContext
       paths:
         - '@OroUserBundle/Tests/Behat/Features'

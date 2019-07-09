@@ -1,6 +1,7 @@
 services:
     oro_message_queue.mock_lifecycle_message.cache:
-        public: false
+      # This service marked as public (origin private) for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_behat_mesage_queue_mock_lifecycle_message' ] ]

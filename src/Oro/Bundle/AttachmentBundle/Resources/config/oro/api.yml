@@ -27,3 +27,5 @@ api:
                     form_options:
                         property_path: file
                         allow_file_upload: true
+            actions:
+                get_list: false

@@ -123,6 +123,8 @@ services:
     # Calendar
     oro_locale.calendar:
         shared: false
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         class: '%oro_locale.calendar.class%'
 
     oro_locale.calendar_factory:
@@ -194,12 +196,16 @@ services:
 
     oro_locale.formatter.date_time:
         class: '%oro_locale.formatter.date_time.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_locale.settings'
             - '@translator'
 
     oro_locale.formatter.number:
         class: '%oro_locale.formatter.number.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_locale.settings'
 
@@ -215,6 +221,8 @@ services:
 
     oro_locale.formatter.language_code:
         class: 'Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@translator'
             - '@oro_locale.settings'
@@ -230,7 +238,7 @@ services:
         class: Oro\Bundle\LocaleBundle\Twig\DateFormatExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -238,43 +246,39 @@ services:
         class: Oro\Bundle\LocaleBundle\Twig\LocaleExtension
         public: false
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber }
 
     oro_locale.twig.calendar:
         class: Oro\Bundle\LocaleBundle\Twig\CalendarExtension
         public: false
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber }
 
     oro_locale.twig.date_time:
         class: Oro\Bundle\LocaleBundle\Twig\DateTimeExtension
         public: false
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber, id: 'oro_locale.formatter.date_time' }
 
     oro_locale.twig.address:
         class: Oro\Bundle\LocaleBundle\Twig\AddressExtension
         public: false
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber, id: 'oro_locale.formatter.address' }
 
     oro_locale.twig.number:
         class: Oro\Bundle\LocaleBundle\Twig\NumberExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -282,7 +286,7 @@ services:
         class: 'Oro\Bundle\LocaleBundle\Twig\LocalizationExtension'
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -360,6 +364,8 @@ services:
 
     oro_locale.manager.localization:
         class: 'Oro\Bundle\LocaleBundle\Manager\LocalizationManager'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_config.global'
@@ -387,9 +393,6 @@ services:
         deprecated: The "%service_id%" service is deprecated since 1.11, will be removed after 1.13.
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber, id: 'oro_config.global' }
-            - { name: container.service_subscriber, id: 'oro_locale.formatter.date_time' }
-            - { name: container.service_subscriber, id: 'oro_locale.manager.localization' }
 
     oro_locale.layout.data_provider.locale:
         class: Oro\Bundle\LocaleBundle\Layout\LocaleProvider

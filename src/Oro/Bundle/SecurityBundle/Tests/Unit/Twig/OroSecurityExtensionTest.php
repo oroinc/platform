@@ -9,6 +9,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension;
+use Oro\Bundle\SecurityBundle\Util\UriSecurityHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -26,6 +27,9 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $permissionManager;
 
+    /** @var UriSecurityHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $uriSecurityHelper;
+
     /** @var OroSecurityExtension */
     protected $extension;
 
@@ -34,11 +38,13 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->permissionManager = $this->createMock(PermissionManager::class);
+        $this->uriSecurityHelper = $this->createMock(UriSecurityHelper::class);
 
         $container = self::getContainerBuilder()
             ->add(AuthorizationCheckerInterface::class, $this->authorizationChecker)
             ->add(TokenAccessorInterface::class, $this->tokenAccessor)
             ->add(PermissionManager::class, $this->permissionManager)
+            ->add(UriSecurityHelper::class, $this->uriSecurityHelper)
             ->getContainer($this);
 
         $this->extension = new OroSecurityExtension($container);
@@ -110,6 +116,20 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(
             $permission,
             self::callTwigFunction($this->extension, 'acl_permission', [$aclPermission])
+        );
+    }
+
+    public function testStripDangerousProtocols(): void
+    {
+        $this->uriSecurityHelper
+            ->expects($this->once())
+            ->method('stripDangerousProtocols')
+            ->with($uri = 'sample-proto:sample-data')
+            ->willReturn($expectedUri = 'sample-data');
+
+        $this->assertEquals(
+            $expectedUri,
+            self::callTwigFilter($this->extension, 'strip_dangerous_protocols', [$uri])
         );
     }
 }

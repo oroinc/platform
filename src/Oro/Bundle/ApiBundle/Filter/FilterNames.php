@@ -104,7 +104,6 @@ class FilterNames
     /**
      * Gets the name of a group for all data filters.
      * E.g. if the group is "filter" then the full name of data filters will be "filter[fieldName]".
-     * @see \Oro\Bundle\ApiBundle\Filter\ComparisonFilter
      * @see \Oro\Bundle\ApiBundle\Processor\Shared\RegisterDynamicFilters
      * @see \Oro\Bundle\ApiBundle\Processor\Shared\RegisterConfiguredFilters
      *

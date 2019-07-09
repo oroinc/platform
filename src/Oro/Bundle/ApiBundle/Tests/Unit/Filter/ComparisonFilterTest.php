@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
 {
@@ -462,5 +463,16 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
                 new Comparison('fieldName', 'ALL_NOT_MEMBER_OF', new Value('value'))
             ]
         ];
+    }
+
+    public function testFilterForComputedField()
+    {
+        $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
+        $comparisonFilter->setField(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $criteria = new Criteria();
+        $comparisonFilter->apply($criteria, new FilterValue('path', 'value'));
+
+        self::assertNull($criteria->getWhereExpression());
     }
 }

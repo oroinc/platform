@@ -17,9 +17,7 @@
  * limitations under the License.
  * ============================================================ */
 
-
-!function($){
-
+define(['jquery'], function($) {
     "use strict"; // jshint ;_;
 
 
@@ -87,7 +85,7 @@
                 return this.shown ? this.hide() : this
             }
 
-            items = $.isFunction(this.source) ? this.source(this.query, $.proxy(this.process, this)) : this.source
+            items = typeof this.source === 'function' ? this.source(this.query, this.process) : this.source
 
             return items ? this.process(items) : this
         }
@@ -171,20 +169,31 @@
         }
 
         , listen: function () {
+
+            this.focus = this.focus.bind(this);
+            this.blur = this.blur.bind(this);
+            this.keypress = this.keypress.bind(this);
+            this.keyup = this.keyup.bind(this);
+            this.keydown = this.keydown.bind(this);
+            this.click = this.click.bind(this);
+            this.mouseenter = this.mouseenter.bind(this);
+            this.mouseleave = this.mouseleave.bind(this);
+            this.process = this.process.bind(this);
+
             this.$element
-                .on('focus',    $.proxy(this.focus, this))
-                .on('blur',     $.proxy(this.blur, this))
-                .on('keypress', $.proxy(this.keypress, this))
-                .on('keyup',    $.proxy(this.keyup, this))
+                .on('focus',    this.focus)
+                .on('blur',     this.blur)
+                .on('keypress', this.keypress)
+                .on('keyup',    this.keyup)
 
             if (this.eventSupported('keydown')) {
-                this.$element.on('keydown', $.proxy(this.keydown, this))
+                this.$element.on('keydown', this.keydown)
             }
 
             this.$menu
-                .on('click', $.proxy(this.click, this))
-                .on('mouseenter', 'li', $.proxy(this.mouseenter, this))
-                .on('mouseleave', 'li', $.proxy(this.mouseleave, this))
+                .on('click', this.click)
+                .on('mouseenter', 'li', this.mouseenter)
+                .on('mouseleave', 'li', this.mouseleave)
         }
 
         , eventSupported: function(eventName) {
@@ -332,4 +341,4 @@
         $this.typeahead($this.data())
     })
 
-}(window.jQuery);
+});

@@ -91,7 +91,7 @@ class EntityIdAccessor
             );
         }
 
-        if (empty($result)) {
+        if (null === $result || '' === $result) {
             throw new RuntimeException(
                 \sprintf(
                     'The identifier value for "%s" entity must not be empty.',

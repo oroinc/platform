@@ -34,13 +34,8 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
         $request->setDefaultLocale($this->defaultLocale);
 
         $translationListener = new TranslatableListener();
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\Container')
-            ->setMethods(['get'])
-            ->getMock();
-        $container->expects($this->any())
-            ->method('get')
-            ->willReturn($translationListener);
-        $this->listener = new LocaleListener($container);
+
+        $this->listener = new LocaleListener($translationListener);
         $this->listener->onKernelRequest($this->createGetResponseEvent($request));
 
         $this->assertEquals($customLocale, $request->getLocale());
@@ -56,7 +51,7 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
     {
         $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
             ->disableOriginalConstructor()
-            ->setMethods(array('getRequest'))
+            ->setMethods(['getRequest'])
             ->getMock();
 
         $event->expects($this->once())

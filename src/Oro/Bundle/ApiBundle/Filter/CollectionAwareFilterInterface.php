@@ -12,5 +12,5 @@ interface CollectionAwareFilterInterface
      *
      * @param bool $collection
      */
-    public function setCollection($collection);
+    public function setCollection(bool $collection): void;
 }

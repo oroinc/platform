@@ -245,7 +245,7 @@ class Processor
                         list($encoding, $file) = explode(',', $content);
                         $mime            = str_replace('data:', '', $mime);
                         $fileName        = sprintf('%s.%s', uniqid(), $guesser->guess($mime));
-                        $swiftAttachment = \Swift_Image::newInstance(
+                        $swiftAttachment = new \Swift_Image(
                             ContentDecoder::decode($file, $encoding),
                             $fileName,
                             $mime
@@ -343,7 +343,7 @@ class Processor
     }
 
     /**
-     * Converts emails addresses to a form acceptable to \Swift_Mime_Message class
+     * Converts emails addresses to a form acceptable to \Swift_Mime_SimpleMessage class
      *
      * @param string|string[] $addresses Examples of correct email addresses: john@example.com, <john@example.com>,
      *                                   John Smith <john@example.com> or "John Smith" <john@example.com>
@@ -423,7 +423,7 @@ class Processor
         }
         $addresses = $this->getAddresses($model->getFrom());
         $address = $this->emailAddressHelper->extractPureEmailAddress($model->getFrom());
-        $message->setDate($messageDate->getTimestamp());
+        $message->setDate($messageDate);
         $message->setFrom($addresses);
         $message->setReplyTo($addresses);
         $message->setReturnPath($address);

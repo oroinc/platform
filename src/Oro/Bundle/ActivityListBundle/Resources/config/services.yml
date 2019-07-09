@@ -8,7 +8,6 @@ parameters:
     oro_activity_list.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
     oro_activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
-    oro_activity_list.provider.chain.class: Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider
     oro_activity_list.provider.email_recipients.class: Oro\Bundle\ActivityListBundle\Provider\EmailRecipientsProvider
     oro_activity_list.event_listener.segment_condition_builder_options_listener.class: Oro\Bundle\ActivityListBundle\EventListener\SegmentConditionBuilderOptionsListener
 
@@ -90,13 +89,18 @@ services:
             - { name: doctrine.event_listener, event: postFlush }
 
     oro_activity_list.provider.chain:
-        class: '%oro_activity_list.provider.chain.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
+        class: Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider
         arguments:
             - "@oro_entity.doctrine_helper"
             - "@oro_entity_config.config_manager"
             - "@translator"
             - "@oro_entity.routing_helper"
             - "@oro_security.token_accessor"
+
+    Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider:
+        alias: oro_activity_list.provider.chain
 
     oro_activity_list.provider.email_recipients:
         class: '%oro_activity_list.provider.email_recipients.class%'
@@ -232,4 +236,4 @@ services:
             - "@oro_security.orm.ownership_sql_walker_builder"
             - "@oro_activity_list.provider.chain"
         tags:
-            - { name: oro_security.access_rule }
+            - { name: oro_security.access_rule, type: ORM, entityClass: Oro\Bundle\ActivityListBundle\Entity\ActivityList }

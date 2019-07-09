@@ -12,13 +12,13 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 class ExtendedAssociationFilterFactory
 {
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /** @var AssociationManager */
-    protected $associationManager;
+    private $associationManager;
 
     /** @var EntityOverrideProviderRegistry */
-    protected $entityOverrideProviderRegistry;
+    private $entityOverrideProviderRegistry;
 
     /**
      * @param ValueNormalizer                $valueNormalizer
@@ -42,7 +42,7 @@ class ExtendedAssociationFilterFactory
      *
      * @return ExtendedAssociationFilter
      */
-    public function createFilter($dataType)
+    public function createFilter(string $dataType): ExtendedAssociationFilter
     {
         $filter = new ExtendedAssociationFilter($dataType);
         $filter->setValueNormalizer($this->valueNormalizer);

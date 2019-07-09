@@ -1,0 +1,10 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\ActivityListBundle\Controller\ActivityListController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: 'oro_config.user' }

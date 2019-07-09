@@ -3,7 +3,8 @@
 namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -15,7 +16,7 @@ use Twig\TwigFunction;
  *   - oro_time_format
  *   - oro_datetime_format
  */
-class DateFormatExtension extends AbstractExtension
+class DateFormatExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -120,5 +121,15 @@ class DateFormatExtension extends AbstractExtension
         return $this->getDateTimeFormatConverterRegistry()
             ->getFormatConverter($type)
             ->getDateTimeFormat($dateType, $timeType, $locale);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_locale.format_converter.date_time.registry' => DateTimeFormatConverterRegistry::class,
+        ];
     }
 }

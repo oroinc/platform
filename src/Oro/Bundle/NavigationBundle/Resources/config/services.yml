@@ -9,7 +9,6 @@ parameters:
     oro_menu.factory.class:                                    Knp\Menu\MenuFactory
 
     oro_menu.configuration_resolver.class:                     Oro\Component\Config\Resolver\SystemAwareResolver
-    oro_menu.builder_chain.class:                              Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider
     oro_menu.configuration_builder.class:                      Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder
 
     oro_navigation.navigation_item_menu.builder.class:         Oro\Bundle\NavigationBundle\Menu\NavigationItemBuilder
@@ -75,7 +74,9 @@ services:
         public: false
 
     oro_menu.builder_chain:
-        class: '%oro_menu.builder_chain.class%'
+        class: Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_menu.factory'
             - '@oro_menu.array_loader'
@@ -103,16 +104,17 @@ services:
 
     oro_navigation.tree.menu_update_tree_handler:
         class: 'Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@translator'
 
     oro_menu.twig.extension:
         class: Oro\Bundle\NavigationBundle\Twig\MenuExtension
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber }
 
     oro_navigation.item.builder.pinbar:
         class: '%oro_navigation.item.builder.pinbar.class%'
@@ -155,6 +157,8 @@ services:
 
     oro_navigation.item.factory:
         class: '%oro_navigation.item.factory.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
 
     oro_navigation.item.pinbar.post_persist_listener:
         class: '%oro_navigation.item.pinbar.post_persist_listener.class%'
@@ -298,10 +302,9 @@ services:
         class: Oro\Bundle\NavigationBundle\Twig\TitleExtension
         public: false
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber }
 
     oro_navigation.translation.extractor:
         class: Oro\Bundle\NavigationBundle\Title\TranslationExtractor
@@ -313,6 +316,8 @@ services:
 
     oro_navigation.form.pagestate:
         class: Symfony\Component\Form\Form
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         factory: ['@form.factory', createNamed]
         arguments: ["pagestate", Oro\Bundle\NavigationBundle\Form\Type\PageStateType, null]
 
@@ -340,6 +345,8 @@ services:
 
     oro_navigation.form.handler.pagestate:
         class: '%oro_navigation.form.handler.pagestate.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - "@oro_navigation.form.pagestate"
             - "@request_stack"
@@ -390,6 +397,8 @@ services:
 
     oro_navigation.manager.menu_update:
         class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - "@doctrine"
             - "@oro_navigation.menu_helper.menu_update"
@@ -509,6 +518,8 @@ services:
 
     oro_navigation.configuration.provider:
         class: Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/navigation.php'
@@ -530,6 +541,8 @@ services:
 
     oro_navigation.utils.pinbar_tab_url_normalizer:
         class: 'Oro\Bundle\NavigationBundle\Utils\PinbarTabUrlNormalizer'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
 
     oro_navigation.provider.pinbar_tab_title:
         class: 'Oro\Bundle\NavigationBundle\Provider\PinbarTabTitleProvider'
@@ -539,6 +552,8 @@ services:
 
     oro_navigation.provider.navigation_items:
         class: 'Oro\Bundle\NavigationBundle\Provider\NavigationItemsProvider'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_navigation.item.factory'

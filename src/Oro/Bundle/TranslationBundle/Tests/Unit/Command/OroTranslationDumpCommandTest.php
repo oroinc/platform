@@ -7,13 +7,9 @@ use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Component\Log\OutputLogger;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OroTranslationDumpCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
-
     /** @var JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject */
     protected $jsDumper;
 
@@ -31,22 +27,11 @@ class OroTranslationDumpCommandTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        $this->jsDumper = $this->getMockBuilder(JsTranslationDumper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->container = $this->createMock(ContainerInterface::class);
-        $this->container->expects($this->any())
-            ->method('get')
-            ->will($this->returnValueMap([
-                ['oro_translation.js_dumper', 1, $this->jsDumper],
-            ]));
-
+        $this->jsDumper = $this->createMock(JsTranslationDumper::class);
         $this->input = $this->createMock(InputInterface::class);
         $this->output = $this->createMock(OutputInterface::class);
 
-        $this->command = new OroTranslationDumpCommand();
-        $this->command->setContainer($this->container);
+        $this->command = new OroTranslationDumpCommand($this->jsDumper);
     }
 
     /**
@@ -54,7 +39,7 @@ class OroTranslationDumpCommandTest extends \PHPUnit\Framework\TestCase
      */
     protected function tearDown()
     {
-        unset($this->jsDumper, $this->container, $this->input, $this->output, $this->command);
+        unset($this->jsDumper, $this->input, $this->output, $this->command);
     }
 
     public function testConfigure()

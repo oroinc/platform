@@ -13,6 +13,8 @@ use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -21,6 +23,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Helper methods for import strategies.
+ */
 class ImportStrategyHelper
 {
     /** @var ManagerRegistry */
@@ -47,14 +52,18 @@ class ImportStrategyHelper
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
+    /** @var OwnerChecker */
+    protected $ownerChecker;
+
     /**
-     * @param ManagerRegistry                $managerRegistry
-     * @param ValidatorInterface             $validator
-     * @param TranslatorInterface            $translator
-     * @param FieldHelper                    $fieldHelper
+     * @param ManagerRegistry $managerRegistry
+     * @param ValidatorInterface $validator
+     * @param TranslatorInterface $translator
+     * @param FieldHelper $fieldHelper
      * @param ConfigurableTableDataConverter $configurableDataConverter
-     * @param AuthorizationCheckerInterface  $authorizationChecker
-     * @param TokenAccessorInterface         $tokenAccessor
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param OwnerChecker $ownerChecker
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
@@ -63,7 +72,8 @@ class ImportStrategyHelper
         FieldHelper $fieldHelper,
         ConfigurableTableDataConverter $configurableDataConverter,
         AuthorizationCheckerInterface $authorizationChecker,
-        TokenAccessorInterface $tokenAccessor
+        TokenAccessorInterface $tokenAccessor,
+        OwnerChecker $ownerChecker
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->validator = $validator;
@@ -72,6 +82,7 @@ class ImportStrategyHelper
         $this->configurableDataConverter = $configurableDataConverter;
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
+        $this->ownerChecker = $ownerChecker;
     }
 
     /**
@@ -80,6 +91,86 @@ class ImportStrategyHelper
     public function setConfigProvider(ConfigProvider $extendConfigProvider)
     {
         $this->extendConfigProvider = $extendConfigProvider;
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @param string $permission
+     * @param object|string $entity
+     * @param string $entityName
+     * @return null
+     */
+    public function checkPermissionGrantedForEntity(ContextInterface $context, $permission, $entity, $entityName)
+    {
+        if (!$this->isGranted($permission, $entity)) {
+            $error = $this->translator->trans(
+                'oro.importexport.import.errors.access_denied_entity',
+                ['%entity_name%' => $entityName,]
+            );
+            $context->addError($error);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @param object $entity
+     * @return bool
+     */
+    public function checkEntityOwnerPermissions(ContextInterface $context, $entity)
+    {
+        if (!$this->ownerChecker->isOwnerCanBeSet($entity)) {
+            $error = $this->translator->trans(
+                'oro.importexport.import.errors.wrong_owner'
+            );
+            $this->addValidationErrors([$error], $context);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @param object $entity
+     * @param null $existingEntity
+     * @return bool
+     */
+    public function checkEntityFieldsAcl(ContextInterface $context, $entity, $existingEntity = null)
+    {
+        $entityName = ClassUtils::getClass($entity);
+        $fields = $this->fieldHelper->getFields($entityName, true);
+        $action = $existingEntity ? 'EDIT' : 'CREATE';
+        $checkEntity = $existingEntity ?: new ObjectIdentity('entity', $entityName);
+        $isValid = true;
+
+        foreach ($fields as $field) {
+            $fieldName = $field['name'];
+            $importedValue = $this->fieldHelper->getObjectValue($entity, $fieldName);
+            if (!$this->isGranted($action, $checkEntity, $fieldName) && $importedValue) {
+                $error = $this->translator->trans(
+                    'oro.importexport.import.errors.access_denied_property_entity',
+                    [
+                        '%property_name%' => $fieldName,
+                        '%entity_name%' => $entityName,
+                    ]
+                );
+                $isValid = false;
+                $context->addError($error);
+                if ($existingEntity) {
+                    $existingValue = $this->fieldHelper->getObjectValue($existingEntity, $fieldName);
+                    $this->fieldHelper->setObjectValue($entity, $fieldName, $existingValue);
+                } else {
+                    $this->fieldHelper->setObjectValue($entity, $fieldName, null);
+                }
+            }
+        }
+
+        return $isValid;
     }
 
     /**

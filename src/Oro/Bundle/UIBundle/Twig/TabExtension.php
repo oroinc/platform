@@ -4,7 +4,8 @@ namespace Oro\Bundle\UIBundle\Twig;
 
 use Knp\Menu\MenuItem;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -18,7 +19,7 @@ use Twig\TwigFunction;
  *   - menuTabPanel
  *   - tabPanel
  */
-class TabExtension extends AbstractExtension
+class TabExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const TEMPLATE = 'OroUIBundle::tab_panel.html.twig';
     const DEFAULT_WIDGET_TYPE = 'block';
@@ -189,5 +190,18 @@ class TabExtension extends AbstractExtension
     public function getName()
     {
         return 'oro_ui.tab_panel';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_menu.twig.extension' => MenuExtension::class,
+            'router' => RouterInterface::class,
+            'security.authorization_checker' => AuthorizationCheckerInterface::class,
+            'translator' => TranslatorInterface::class,
+        ];
     }
 }

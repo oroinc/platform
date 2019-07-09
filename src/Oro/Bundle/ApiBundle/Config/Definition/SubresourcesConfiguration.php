@@ -53,7 +53,7 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
     {
         /** @var NodeBuilder $subresourceNode */
         $subresourceNode = $node->end()
-            ->useAttributeAsKey('name')
+            ->useAttributeAsKey('')
             ->normalizeKeys(false)
             ->prototype('array')
                 ->treatFalseLike([ConfigUtil::EXCLUDE => true])

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\InstallerBundle\Composer;
 
 use Composer\Script\Event;
-use Sensio\Bundle\DistributionBundle\Composer\ScriptHandler as SensioScriptHandler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
@@ -11,7 +10,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Installs the assets for installer bundle, bower and npm dependencies
  */
-class ScriptHandler extends SensioScriptHandler
+class ScriptHandler
 {
     /**
      * Installs the assets for installer bundle, bower and npm dependencies
@@ -21,7 +20,7 @@ class ScriptHandler extends SensioScriptHandler
     public static function installAssets(Event $event)
     {
         $options = self::getOptions($event);
-        $webDir  = $options['symfony-web-dir'];
+        $webDir = $options['symfony-web-dir'];
         $vendorDir = $event->getComposer()->getConfig()->get('vendor-dir');
 
         $config = [
@@ -54,8 +53,7 @@ class ScriptHandler extends SensioScriptHandler
     {
         $options = self::getOptions($event);
 
-        $webDir = isset($options['symfony-web-dir']) ?
-            $options['symfony-web-dir'] : 'web';
+        $webDir = $options['symfony-web-dir'];
 
         $parametersFile = self::getParametersFile($options);
 
@@ -136,9 +134,7 @@ class ScriptHandler extends SensioScriptHandler
      */
     protected static function getParametersFile($options)
     {
-        return isset($options['incenteev-parameters']['file'])
-            ? $options['incenteev-parameters']['file']
-            : 'config/parameters.yml';
+        return $options['incenteev-parameters']['file'] ?? 'config/parameters.yml';
     }
 
     /**
@@ -148,8 +144,25 @@ class ScriptHandler extends SensioScriptHandler
      */
     protected static function getParametersKey($options)
     {
-        return isset($options['incenteev-parameters']['parameter-key'])
-            ? $options['incenteev-parameters']['parameter-key']
-            : 'parameters';
+        return $options['incenteev-parameters']['parameter-key'] ?? 'parameters';
+    }
+
+    /**
+     * @param Event $event
+     * @return array
+     */
+    protected static function getOptions(Event $event)
+    {
+        $composer = $event->getComposer();
+        $config = $composer->getConfig();
+
+        return array_merge(
+            ['symfony-web-dir' => 'public'],
+            $composer->getPackage()->getExtra(),
+            [
+                'process-timeout' => $config->get('process-timeout'),
+                'vendor-dir' => $config->get('vendor-dir'),
+            ]
+        );
     }
 }

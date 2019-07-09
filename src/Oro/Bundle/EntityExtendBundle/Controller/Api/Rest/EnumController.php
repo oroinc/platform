@@ -8,7 +8,6 @@ use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
 use Symfony\Component\HttpFoundation\Response;
@@ -64,7 +63,7 @@ class EnumController extends FOSRestController
         $data = $query->getArrayResult();
 
         return $this->handleView(
-            $this->view($data, Codes::HTTP_OK)
+            $this->view($data, Response::HTTP_OK)
         );
     }
 }

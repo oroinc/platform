@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Doctrine\Common\Collections\Criteria as CommonCriteria;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -15,10 +16,10 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class InitializeCriteria implements ProcessorInterface
 {
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var EntityClassResolver */
-    protected $entityClassResolver;
+    private $entityClassResolver;
 
     /**
      * @param DoctrineHelper      $doctrineHelper
@@ -51,11 +52,10 @@ class InitializeCriteria implements ProcessorInterface
             $context->getClassName(),
             $context->getConfig()
         );
-        if (!$entityClass) {
-            // only manageable entities or resources based on manageable entities are supported
-            return;
+        if ($entityClass) {
+            $context->setCriteria(new Criteria($this->entityClassResolver));
+        } else {
+            $context->setCriteria(new CommonCriteria());
         }
-
-        $context->setCriteria(new Criteria($this->entityClassResolver));
     }
 }

@@ -96,7 +96,7 @@ config:
     paths:
         'text': 'bundles/bowerassets/text/text.js'
         'base64': 'oroui/js/extend/base64.js'
-        'jquery': 'bundles/components/jquery/jquery.js'
+        'jquery': 'bundles/npmassets/jquery/dist/jquery.js'
         'jquery-ui': 'bundles/oroui/lib/jquery-ui.js'
         'jquery.form': 'bundles/bowerassets/jquery-form/src/jquery.form.js'
         'jquery.mousewheel': 'bundles/bowerassets/jquery-mousewheel/jquery.mousewheel.js'
@@ -110,7 +110,7 @@ config:
         'jquery.cookie': 'bundles/bowerassets/jquery-cookie/jquery.cookie.js'
         'overlayScrollbars': 'bundles/npmassets/overlayscrollbars/js/OverlayScrollbars.js'
         'styled-scroll-bar': 'bundles/oroui/js/app/plugins/styled-scroll-bar.js'
-        'jquery.jstree': 'bundles/components/jstree/dist/jstree.js'
+        'jquery.jstree': 'bundles/bowerassets/jstree/dist/jstree.js'
         'popper': 'bundles/npmassets/popper.js/dist/umd/popper.js'
         'bootstrap-util': 'bundles/npmassets/bootstrap/js/dist/util.js'
         'bootstrap-alert': 'bundles/npmassets/bootstrap/js/dist/alert.js'
@@ -123,8 +123,8 @@ config:
         'bootstrap-tooltip': 'bundles/npmassets/bootstrap/js/dist/tooltip.js'
         'bootstrap-typeahead': 'bundles/oroui/lib/bootstrap/bootstrap-typeahead.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.js'
-        'underscore': 'bundles/bowerassets/underscore/underscore.js'
-        'backbone': 'bundles/bowerassets/backbone/backbone.js'
+        'underscore': 'bundles/npmassets/underscore/underscore.js'
+        'backbone': 'bundles/npmassets/backbone/backbone.js'
         'chaplin': 'bundles/bowerassets/chaplin/chaplin.js'
         'jquery.timepicker': 'bundles/bowerassets/timepicker/jquery.timepicker.js'
         'jquery.datepair': 'bundles/bowerassets/datepair/dist/jquery.datepair.js'
@@ -159,6 +159,7 @@ config:
         'oroui/js/app/modules/resizable-area-module': 'bundles/oroui/js/app/modules/resizable-area-module.js'
         'oroui/js/app/modules/responsive-layout-module': 'bundles/oroui/js/app/modules/responsive-layout-module.js'
         'oroui/js/app/modules/styled-scroll-bar-module': 'bundles/oroui/js/app/modules/styled-scroll-bar-module.js'
+        'oroui/js/app/modules/color-util': 'bundles/oroui/js/app/modules/color-util.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/services/registry': 'bundles/oroui/js/app/services/registry.js'
@@ -278,6 +279,7 @@ config:
         - oroui/js/app/modules/resizable-area-module
         - oroui/js/app/modules/responsive-layout-module
         - oroui/js/app/modules/styled-scroll-bar-module
+        - oroui/js/app/modules/color-util
 
 build:
     paths:

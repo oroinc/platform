@@ -21,18 +21,18 @@
     }
 
     &.sortable {
-        .caret {
+        .sortable-icon {
             display: none;
-            margin: $datagrid-header-cell-caret-offset;
+            margin: $datagrid-header-cell-sortable-icon-offset;
             
-            border-top: $datagrid-header-cell-caret-size solid $datagrid-header-cell-caret-color;
-            border-right: $datagrid-header-cell-caret-size solid transparent;
-            border-left: $datagrid-header-cell-caret-size solid transparent;
+            border-top: $datagrid-header-cell-sortable-icon-size solid $datagrid-header-cell-sortable-icon-color;
+            border-right: $datagrid-header-cell-sortable-icon-size solid transparent;
+            border-left: $datagrid-header-cell-sortable-icon-size solid transparent;
             vertical-align: middle;
 
-            position: $datagrid-header-cell-caret-position;
-            top: $datagrid-header-cell-caret-top;
-            right: $datagrid-header-cell-caret-right;
+            position: $datagrid-header-cell-sortable-icon-position;
+            top: $datagrid-header-cell-sortable-icon-top;
+            right: $datagrid-header-cell-sortable-icon-right;
 
             transform: translateY(-50%);
 
@@ -42,13 +42,13 @@
 
     &.descending,
     &.ascending {
-        .caret {
+        .sortable-icon {
             display: inline-block;
         }
     }
     
     &.descending {
-        .caret {
+        .sortable-icon {
             transform: translateY(-50%) rotate(180deg);
         }
     }

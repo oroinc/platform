@@ -2,35 +2,75 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
-use Oro\Bundle\TranslationBundle\Provider\AbstractAPIAdapter;
+use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationAdaptersCollection;
+use Oro\Bundle\TranslationBundle\Provider\APIAdapterInterface;
+use Oro\Bundle\TranslationBundle\Provider\TranslationPackageProvider;
 use Oro\Bundle\TranslationBundle\Provider\TranslationPackDumper;
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
 use Oro\Component\Log\OutputLogger;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Dumps translation messages and optionally uploads them to third-party service
  */
-class OroTranslationPackCommand extends ContainerAwareCommand
+class OroTranslationPackCommand extends Command
 {
     /** @var string */
+    protected static $defaultName = 'oro:translation:pack';
+
+    /** @var string */
     protected $path;
+
+    /** @var TranslationPackDumper */
+    private $translationPackDumper;
+
+    /** @var TranslationServiceProvider */
+    private $translationServiceProvider;
+
+    /** @var TranslationPackageProvider */
+    private $translationPackageProvider;
+
+    /** @var string */
+    private $kernelProjectDir;
+
+    /** @var TranslationAdaptersCollection */
+    private $translationAdaptersCollection;
+
+    /**
+     * @param TranslationPackDumper $translationPackDumper
+     * @param TranslationServiceProvider $translationServiceProvider
+     * @param TranslationPackageProvider $translationPackageProvider
+     * @param TranslationAdaptersCollection $translationAdaptersCollection
+     * @param string $kernelProjectDir
+     */
+    public function __construct(
+        TranslationPackDumper $translationPackDumper,
+        TranslationServiceProvider $translationServiceProvider,
+        TranslationPackageProvider $translationPackageProvider,
+        TranslationAdaptersCollection $translationAdaptersCollection,
+        string $kernelProjectDir
+    ) {
+        $this->translationPackDumper = $translationPackDumper;
+        $this->translationServiceProvider = $translationServiceProvider;
+        $this->translationPackageProvider = $translationPackageProvider;
+        $this->kernelProjectDir = $kernelProjectDir;
+        $this->translationAdaptersCollection = $translationAdaptersCollection;
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this
-            ->setName('oro:translation:pack')
+        $this->setName(self::$defaultName)
             ->setDescription('Dump translation messages and optionally upload them to third-party service')
             ->setDefinition(
-                array(
+                [
                     new InputArgument('project', InputArgument::REQUIRED, 'The project [e.g Oro, OroCRM etc]'),
                     new InputArgument(
                         'locale',
@@ -100,7 +140,7 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                         InputOption::VALUE_NONE,
                         'Show all enabled project namespaces for dump/load translations packages.'
                     ),
-                )
+                ]
             )
             ->setHelp(
                 <<<EOF
@@ -117,6 +157,7 @@ EOF
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -138,7 +179,7 @@ EOF
             return 1;
         }
 
-        $this->path = $this->getContainer()->getParameter('kernel.project_dir')
+        $this->path = $this->kernelProjectDir
             . str_replace('//', '/', $input->getOption('path') . '/');
 
         $locale           = $input->getArgument('locale');
@@ -146,10 +187,6 @@ EOF
         $projectNamespace = $input->getArgument('project');
 
         $namespaces = [$projectNamespace];
-        // TODO: incomment later
-//        if ('Pro' != substr($projectNamespace, -3)) {
-//            $namespaces[] = $projectNamespace . 'Pro';
-//        }
 
         if ($input->getOption('dump') === true) {
             foreach ($namespaces as $namespace) {
@@ -180,7 +217,7 @@ EOF
      * @param string                     $mode
      * @param array                      $languagePackPath one or few dirs
      *
-     * @return array
+     * @return void
      */
     protected function upload(TranslationServiceProvider $translationService, $mode, $languagePackPath)
     {
@@ -223,13 +260,12 @@ EOF
      */
     protected function getTranslationService(InputInterface $input, OutputInterface $output)
     {
-        $service = $this->getContainer()->get('oro_translation.service_provider');
-        $service->setLogger(new OutputLogger($output));
+        $this->translationServiceProvider->setLogger(new OutputLogger($output));
 
         // set non default adapter if comes from input
         $adapter = $this->getAdapterFromInput($input);
         if ($adapter) {
-            $service->setAdapter($adapter);
+            $this->translationServiceProvider->setAdapter($adapter);
         }
 
         /*
@@ -237,21 +273,21 @@ EOF
          */
         $projectId = $input->getOption('project-id');
         if (null !== $projectId) {
-            $service->getAdapter()->setProjectId($projectId);
+            $this->translationServiceProvider->getAdapter()->setProjectId($projectId);
         }
         $apiKey = $input->getOption('api-key');
         if (null !== $apiKey) {
-            $service->getAdapter()->setApiKey($apiKey);
+            $this->translationServiceProvider->getAdapter()->setApiKey($apiKey);
         }
 
-        return $service;
+        return $this->translationServiceProvider;
     }
 
     /**
      * @param InputInterface $input
      *
      * @throws \RuntimeException
-     * @return AbstractAPIAdapter
+     * @return APIAdapterInterface
      */
     protected function getAdapterFromInput(InputInterface $input)
     {
@@ -260,11 +296,12 @@ EOF
             return false;
         }
 
-        $serviceId = sprintf('oro_translation.uploader.%s_adapter', $adapterOption);
-        if (!$this->getContainer()->has($serviceId)) {
+        $adapterService = $this->translationAdaptersCollection->getAdapter($adapterOption);
+        if (!$adapterService) {
             throw new \RuntimeException('Invalid adapter name given');
         }
-        return $this->getContainer()->get($serviceId);
+
+        return $adapterService;
     }
 
     /**
@@ -281,19 +318,10 @@ EOF
     {
         $output->writeln(sprintf('Dumping language pack for <info>%s</info>', $projectNamespace));
 
-        $container = $this->getContainer();
-        $dumper = new TranslationPackDumper(
-            $container->get('translation.writer'),
-            $container->get('translation.extractor'),
-            $container->get('translation.reader'),
-            new Filesystem(),
-            $container->get('oro_translation.packages_provider.translation'),
-            $container->get('kernel')->getBundles()
-        );
-        $dumper->setLogger(new OutputLogger($output));
+        $this->translationPackDumper->setLogger(new OutputLogger($output));
 
         $languagePackPath = $this->getLangPackDir($projectNamespace);
-        $dumper->dump(
+        $this->translationPackDumper->dump(
             $languagePackPath,
             $projectNamespace,
             $outputFormat,
@@ -327,14 +355,13 @@ EOF
      *
      * @param OutputInterface $output
      *
-     * @return string
+     * @return void
      */
     private function showEnabledProject(OutputInterface $output)
     {
-        $provider = $this->getContainer()->get('oro_translation.packages_provider.translation');
         $output->writeln('Enabled project namespaces for dump/load translations packages:');
 
-        foreach ($provider->getInstalledPackages() as $packageName) {
+        foreach ($this->translationPackageProvider->getInstalledPackages() as $packageName) {
             $output->writeln(sprintf('> <info>%s</info>', $packageName));
         }
     }

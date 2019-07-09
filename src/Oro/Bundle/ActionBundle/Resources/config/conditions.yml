@@ -1,8 +1,16 @@
 services:
+    oro_action.condition_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        public: false
+        arguments:
+            - [] # actions. Will be set in Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConditionLocatorPass
+        tags:
+            - { name: container.service_locator }
+
     oro_action.expression.extension:
         class: 'Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension'
         arguments:
-            - '@service_container'
+            - '@oro_action.condition_locator'
             - {}
 
     oro_action.expression.context_accessor:

@@ -3,7 +3,9 @@
 namespace Oro\Bundle\RequireJSBundle\Twig;
 
 use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -14,7 +16,7 @@ use Twig\TwigFunction;
  *   - requirejs_build_exists
  *   - requirejs_build_logger
  */
-class OroRequireJSExtension extends AbstractExtension
+class OroRequireJSExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const DEFAULT_PROVIDER_ALIAS = 'oro_requirejs_config_provider';
     const BUILD_LOGGER_TEMPLATE = 'OroRequireJSBundle::requirejs_build_logger.html.twig';
@@ -170,5 +172,16 @@ class OroRequireJSExtension extends AbstractExtension
     protected function getDefaultAliasIfEmpty($alias)
     {
         return $alias ?: static::DEFAULT_PROVIDER_ALIAS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_requirejs.config_provider.manager' => ConfigProviderManager::class,
+            'twig' => Environment::class,
+        ];
     }
 }

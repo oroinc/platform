@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
@@ -12,7 +13,7 @@ use Twig\TwigFilter;
  * Provides a Twig filter to generate a back link:
  *   - back_link
  */
-class BackLinkExtension extends AbstractExtension
+class BackLinkExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -78,6 +79,11 @@ class BackLinkExtension extends AbstractExtension
         return str_replace($placeholder, $link, $string);
     }
 
+    /**
+     * @param string $id
+     * @param string $linkText
+     * @return string
+     */
     private function getLink($id, $linkText)
     {
         if (empty($id)) {
@@ -90,5 +96,16 @@ class BackLinkExtension extends AbstractExtension
         $url = $this->getRouter()->generate('oro_embedded_form_submit', ['id' => $id]);
 
         return sprintf('<a href="%s">%s</a>', $url, $linkText);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'router' => RouterInterface::class,
+            'translator' => TranslatorInterface::class,
+        ];
     }
 }

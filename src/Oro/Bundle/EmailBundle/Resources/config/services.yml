@@ -119,12 +119,13 @@ parameters:
     oro_email.listener.prepare_context_title_listener.class: Oro\Bundle\EmailBundle\EventListener\PrepareContextTitleListener
     oro_email.listener.activity_list_pre_query_build_listener.class: Oro\Bundle\EmailBundle\EventListener\ActivityListPreQueryBuildListener
     oro_email.model.email_activity_updates.class: Oro\Bundle\EmailBundle\Model\EmailActivityUpdates
-    oro_email.event_listener.smtp_settings_change.class: Oro\Bundle\EmailBundle\EventListener\SmtpSettingsChangeListener
-
-    #decorate swiftmailer class
-    swiftmailer.class:  Oro\Bundle\EmailBundle\Util\MailerWrapper
 
 services:
+    oro_email.swiftmailer.mailer.abstract:
+        parent: swiftmailer.mailer.abstract
+        decorates: swiftmailer.mailer.abstract
+        class: Oro\Bundle\EmailBundle\Util\MailerWrapper
+
     oro_email.entity.cache.warmer:
         class: '%oro_email.entity.cache.warmer.class%'
         arguments:
@@ -154,6 +155,8 @@ services:
 
     oro_email.email.address.helper:
         class: '%oro_email.email.address.helper.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
 
     oro_email.email_body_loader_selector:
         public: false
@@ -388,6 +391,8 @@ services:
 
     oro_email.manager.autoresponserule.api:
         class: '%oro_email.manager.autoresponserule.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_email.autoresponserule.entity.class%'
@@ -414,6 +419,8 @@ services:
 
     oro_email.manager.email.api:
         class: '%oro_email.manager.email.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_email.email.entity.class%'
@@ -422,6 +429,8 @@ services:
 
     oro_email.manager.email_origin.api:
         class: '%oro_email.manager.email_origin.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_email.email_origin.entity.class%'
@@ -436,6 +445,8 @@ services:
     # Email template API
     oro_email.manager.emailtemplate.api:
         class: '%oro_email.manager.emailtemplate.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_email.emailtemplate.entity.class%'
@@ -455,6 +466,8 @@ services:
 
     oro_email.email_renderer:
         class: Oro\Bundle\EmailBundle\Provider\EmailRenderer
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_email.twig.email_environment'
             - '@oro_email.email_renderer_configuration'
@@ -509,6 +522,8 @@ services:
 
     oro_email.emailtemplate.variable_provider:
         class: Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             # All arguments are set by Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailTemplateVariablesPass
             - ~ # providers
@@ -820,7 +835,7 @@ services:
         class: Oro\Bundle\EmailBundle\Twig\EmailExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -1003,6 +1018,8 @@ services:
 
     oro_email.manager.email_activity.api:
         class: '%oro_email.manager.email_activity.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_email.email.entity.class%'
@@ -1012,6 +1029,8 @@ services:
 
     oro_email.manager.email_activity_entity.api:
         class: '%oro_email.manager.email_activity_entity.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_email.email.entity.class%'
@@ -1021,6 +1040,8 @@ services:
 
     oro_email.manager.email_activity_search.api:
         class: '%oro_email.manager.email_activity_search.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_email.email.entity.class%'
@@ -1031,6 +1052,8 @@ services:
 
     oro_email.manager.email_activity_suggestion.api:
         class: '%oro_email.manager.email_activity_suggestion.api.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_email.email.entity.class%'
@@ -1068,6 +1091,8 @@ services:
 
     oro_email.datagrid.origin_folder.provider:
         class: '%oro_email.datagrid.origin_folder.provider.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@doctrine'
             - '@oro_security.token_accessor'
@@ -1135,6 +1160,8 @@ services:
 
     oro_email.autocomplete.mailbox_user_search_handler:
         class: '%oro_email.autocomplete.mailbox_user_search_handler.class%'
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         parent: oro_user.autocomplete.user.organization_search_handler
 
     oro_email.listener.mailbox.authorization:
@@ -1297,6 +1324,8 @@ services:
 
     oro_email.provider.smtp_settings:
         class: Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@oro_config.manager'
             - '@oro_config.scope.global'
