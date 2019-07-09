@@ -22,7 +22,7 @@ class ElementDependentVisitorTest extends \PHPUnit\Framework\TestCase
 
         $strategy = new DefaultGeneratorStrategy();
         $this->assertSame(
-<<<CONTENT
+            <<<CONTENT
 class LayoutUpdateClass implements \Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface
 {
     public function getElement()

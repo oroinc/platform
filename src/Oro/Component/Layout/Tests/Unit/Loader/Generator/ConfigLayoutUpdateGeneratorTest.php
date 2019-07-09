@@ -110,7 +110,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
     public function testGenerate()
     {
         $this->assertSame(
-<<<CLASS
+            <<<CLASS
 <?php
 
 /**

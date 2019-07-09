@@ -33,7 +33,7 @@ class PhpLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
         $data = new GeneratorData($code, 'testfilename.php');
 
         $this->assertSame(
-<<<CLASS
+            <<<CLASS
 <?php
 
 /**
@@ -68,7 +68,7 @@ CLASS
     public function testShouldCompileConditions()
     {
         $this->assertSame(
-<<<CLASS
+            <<<CLASS
 <?php
 
 class testClassName implements \Oro\Component\Layout\LayoutUpdateInterface

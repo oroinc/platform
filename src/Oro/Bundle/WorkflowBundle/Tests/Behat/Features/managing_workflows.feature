@@ -75,7 +75,7 @@ Feature: Managing workflows
     Given I click "View" on row "Test workflow" in grid
     Then I should see an "Entity Edit Button" element
     And I click "Activate"
-    And I click "Activate"
+    And I click "Activate" in modal window
     Then I should see "Workflow activated" flash message
     And I should not see an "Entity Edit Button" element
 
@@ -93,7 +93,7 @@ Feature: Managing workflows
       | label           | Trans1  |
       | button_label    | Label1  |
       | button_title    | Title1  |
-    And I click "Cancel"
+    And I click "Cancel" in modal window
     When I fill form with:
       | Name            | Glorious workflow  |
       | Related Entity  | Business Unit      |
