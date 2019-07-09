@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
+namespace Oro\Bundle\WsseAuthenticationBundle\Tests\Unit\Security;
 
 use Oro\Bundle\SecurityBundle\Tests\Unit\Authentication\Token\OrganizationContextTrait;
-use Oro\Bundle\UserBundle\Security\WsseToken;
+use Oro\Bundle\WsseAuthenticationBundle\Security\WsseToken;
 
 class WsseTokenTest extends \PHPUnit\Framework\TestCase
 {

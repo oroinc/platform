@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\DependencyInjection;
 
+use Oro\Bundle\WsseAuthenticationBundle\Cache\WsseNoncePhpFileCache;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -11,6 +12,9 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+/**
+ * Container extension for OroEmbeddedFormBundle.
+ */
 class OroEmbeddedFormExtension extends Extension implements PrependExtensionInterface
 {
     const SESSION_ID_FIELD_NAME_PARAM = 'oro_embedded_form.session_id_field_name';
@@ -18,7 +22,7 @@ class OroEmbeddedFormExtension extends Extension implements PrependExtensionInte
 
     const CSRF_TOKEN_STORAGE_SERVICE_ID       = 'oro_embedded_form.csrf_token_storage';
     const DEFAULT_CSRF_TOKEN_CACHE_SERVICE_ID = 'oro_embedded_form.csrf_token_cache';
-    const DEFAULT_CSRF_TOKEN_CACHE_CLASS      = 'Oro\Bundle\SecurityBundle\Cache\WsseNoncePhpFileCache';
+    const DEFAULT_CSRF_TOKEN_CACHE_CLASS      = WsseNoncePhpFileCache::class;
     const DEFAULT_CSRF_TOKEN_CACHE_PATH       = '%kernel.cache_dir%/security/embedded_form';
 
     /**

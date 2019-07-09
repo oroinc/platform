@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\Cache;
+namespace Oro\Bundle\WsseAuthenticationBundle\Cache;
 
 use Oro\Bundle\CacheBundle\Provider\PhpFileCache as BasePhpFileCache;
 
 /**
- * Cleanup for WSSE cache.
+ * WSSE cache on top of PHP file cache.
  */
 class WsseNoncePhpFileCache extends BasePhpFileCache
 {
@@ -96,9 +96,9 @@ class WsseNoncePhpFileCache extends BasePhpFileCache
      */
     protected function purge()
     {
-        $purged              = null;
-        $startTime           = time();
-        $directory           = $this->getDataDirectory();
+        $purged = null;
+        $startTime = time();
+        $directory = $this->getDataDirectory();
         $purgeStatusFileName = 'cache_purge_status' . $this->getExtension();
         $purgeStatusFilePath = $directory . $purgeStatusFileName;
 
@@ -134,15 +134,15 @@ class WsseNoncePhpFileCache extends BasePhpFileCache
 
     /**
      * @param string $directory
-     * @param int    $startTime
+     * @param int $startTime
      * @param string $purgeStatusFileName
      *
      * @return bool TRUE if all expired nonces have been purged; otherwise, FALSE
      */
     protected function doPurge($directory, $startTime, $purgeStatusFileName)
     {
-        $success      = true;
-        $count        = 0;
+        $success = true;
+        $count = 0;
         $fileIterator = $this->getExpiredFilesIterator($directory, $startTime - $this->nonceLifeTime);
         /** @var \SplFileInfo $file */
         foreach ($fileIterator as $name => $file) {
@@ -167,13 +167,13 @@ class WsseNoncePhpFileCache extends BasePhpFileCache
 
     /**
      * @param string $directory
-     * @param int    $expirationTime
+     * @param int $expirationTime
      *
      * @return \Iterator
      */
     protected function getExpiredFilesIterator($directory, $expirationTime)
     {
-        $fileExtension    = $this->getExtension();
+        $fileExtension = $this->getExtension();
         $ignoreFilePrefix = substr(self::DOCTRINE_NAMESPACE_CACHEKEY, 0, -4); // remove ending "[%s]"
 
         return new \CallbackFilterIterator(
@@ -181,7 +181,7 @@ class WsseNoncePhpFileCache extends BasePhpFileCache
                 new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS),
                 \RecursiveIteratorIterator::LEAVES_ONLY
             ),
-            function (\SplFileInfo $file) use ($fileExtension, $ignoreFilePrefix, $expirationTime) {
+            static function (\SplFileInfo $file) use ($fileExtension, $ignoreFilePrefix, $expirationTime) {
                 try {
                     $fileName = $file->getFilename();
 
@@ -198,7 +198,7 @@ class WsseNoncePhpFileCache extends BasePhpFileCache
 
     /**
      * @param string $purgeStatusFilePath
-     * @param int    $lastPurgeTime
+     * @param int $lastPurgeTime
      *
      * @return bool TRUE on success, FALSE if path cannot be created, if path is not writable or an any other error.
      */

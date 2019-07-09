@@ -1,0 +1,16 @@
+services:
+    _defaults:
+        public: false
+
+    Oro\Bundle\WsseAuthenticationBundle\Command\DeleteNoncesCommand:
+        arguments:
+            - '@oro_wsse_authentication.service_locator.nonce_cache' # Created in WsseSecurityListenerFactory
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\WsseAuthenticationBundle\Command\GenerateWsseHeaderCommand:
+        arguments:
+            - '@doctrine'
+            - '@oro_wsse_authentication.service_locator.encoder' # Created in WsseSecurityListenerFactory
+        tags:
+            - { name: console.command }

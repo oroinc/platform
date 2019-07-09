@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Security;
+namespace Oro\Bundle\WsseAuthenticationBundle\Security;
 
 /**
  * Creates WsseToken with needed data
