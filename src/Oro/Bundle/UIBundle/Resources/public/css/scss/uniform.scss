@@ -29,5 +29,9 @@ div.selector {
         cursor: default;
         opacity: 0;
     }
+
+    &.uniform-empty-value span {
+        color: $primary-700;
+    }
 }
 
