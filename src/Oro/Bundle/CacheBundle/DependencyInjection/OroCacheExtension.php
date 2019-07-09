@@ -32,9 +32,10 @@ class OroCacheExtension extends Extension implements PrependExtensionInterface
             'validation' => [
                 'cache' => 'oro_cache.validation_cache.doctrine',
             ],
-            'serializer' => [
-                'cache' => 'oro_cache.serializer',
-            ],
+// Uncomment in BAP-19101
+//            'serializer' => [
+//                'cache' => 'oro_cache.serializer',
+//            ],
             'annotations' => [
                 'cache' => 'oro_cache.annotations',
             ],
