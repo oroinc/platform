@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
@@ -13,11 +14,28 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
     private $filterFactory;
 
     /**
-     * {@inheritdoc}
+     * @param array $filters
+     * @param array $filterFactories
+     * @param array $factories
+     *
+     * @return SimpleFilterFactory
      */
-    protected function setUp()
-    {
-        $this->filterFactory = new SimpleFilterFactory(
+    private function getFilterFactory(
+        array $filters = [],
+        array $filterFactories = [],
+        array $factories = []
+    ): SimpleFilterFactory {
+        $factoryContainer = $this->createMock(ContainerInterface::class);
+        $factoryContainer->expects(self::any())
+            ->method('get')
+            ->willReturnCallback(function ($serviceId) use ($factories) {
+                return $factories[$serviceId];
+            });
+
+        return new SimpleFilterFactory(
+            $filters,
+            $filterFactories,
+            $factoryContainer,
             new PropertyAccessor(),
             new FilterOperatorRegistry([
                 ComparisonFilter::EQ  => '=',
@@ -28,20 +46,23 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testForUnknownFilter()
     {
-        self::assertNull($this->filterFactory->createFilter('unknown'));
+        $filterFactory = $this->getFilterFactory();
+        self::assertNull($filterFactory->createFilter('unknown'));
     }
 
     public function testForFilterWithoutAdditionalParameters()
     {
         $filterType = 'string';
 
-        $this->filterFactory->addFilter($filterType, ComparisonFilter::class);
+        $filterFactory = $this->getFilterFactory(
+            [$filterType => [ComparisonFilter::class, []]]
+        );
 
         $expectedFilter = new ComparisonFilter($filterType);
 
         self::assertEquals(
             $expectedFilter,
-            $this->filterFactory->createFilter($filterType)
+            $filterFactory->createFilter($filterType)
         );
     }
 
@@ -49,10 +70,8 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $filterType = 'string';
 
-        $this->filterFactory->addFilter(
-            $filterType,
-            ComparisonFilter::class,
-            ['supported_operators' => ['=', '!=']]
+        $filterFactory = $this->getFilterFactory(
+            [$filterType => [ComparisonFilter::class, ['supported_operators' => ['=', '!=']]]]
         );
 
         $expectedFilter = new ComparisonFilter($filterType);
@@ -60,7 +79,7 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             $expectedFilter,
-            $this->filterFactory->createFilter($filterType)
+            $filterFactory->createFilter($filterType)
         );
     }
 
@@ -68,10 +87,8 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $filterType = 'string';
 
-        $this->filterFactory->addFilter(
-            $filterType,
-            ComparisonFilter::class,
-            ['supported_operators' => ['=', '!=']]
+        $filterFactory = $this->getFilterFactory(
+            [$filterType => [ComparisonFilter::class, ['supported_operators' => ['=', '!=']]]]
         );
 
         $expectedFilter = new ComparisonFilter($filterType);
@@ -79,7 +96,7 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             $expectedFilter,
-            $this->filterFactory->createFilter($filterType, ['supported_operators' => ['=']])
+            $filterFactory->createFilter($filterType, ['supported_operators' => ['=']])
         );
     }
 
@@ -88,16 +105,15 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
         $filterType = 'someFilter';
         $dataType = 'integer';
 
-        $this->filterFactory->addFilter(
-            $filterType,
-            ComparisonFilter::class
+        $filterFactory = $this->getFilterFactory(
+            [$filterType => [ComparisonFilter::class, []]]
         );
 
         $expectedFilter = new ComparisonFilter($dataType);
 
         self::assertEquals(
             $expectedFilter,
-            $this->filterFactory->createFilter($filterType, ['data_type' => $dataType])
+            $filterFactory->createFilter($filterType, ['data_type' => $dataType])
         );
     }
 
@@ -106,60 +122,15 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
         $filterType = 'test';
         $filter = new ComparisonFilter($filterType);
 
-        $this->filterFactory->addFilterFactory(
-            $filterType,
-            new FilterFactoryStub($filter),
-            'create'
+        $filterFactory = $this->getFilterFactory(
+            [],
+            [$filterType => ['filter1', 'create', []]],
+            ['filter1' => new FilterFactoryStub($filter)]
         );
 
         self::assertSame(
             $filter,
-            $this->filterFactory->createFilter($filterType)
-        );
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "unknownMethod($dataType)" public method must be declared in the "Oro\Bundle\ApiBundle\Tests\Unit\Filter\FilterFactoryStub" class.
-     */
-    // @codingStandardsIgnoreEnd
-    public function testAddFilterFactoryWhenFactoryMethodDoesNotExist()
-    {
-        $this->filterFactory->addFilterFactory(
-            'test',
-            new FilterFactoryStub(),
-            'unknownMethod'
-        );
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "privateCreate($dataType)" public method must be declared in the "Oro\Bundle\ApiBundle\Tests\Unit\Filter\FilterFactoryStub" class.
-     */
-    // @codingStandardsIgnoreEnd
-    public function testAddFilterFactoryWhenFactoryMethodIsNotPublic()
-    {
-        $this->filterFactory->addFilterFactory(
-            'test',
-            new FilterFactoryStub(),
-            'privateCreate'
-        );
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "createWithoutDataType($dataType)" public method must be declared in the "Oro\Bundle\ApiBundle\Tests\Unit\Filter\FilterFactoryStub" class.
-     */
-    // @codingStandardsIgnoreEnd
-    public function testAddFilterFactoryWhenFactoryMethodHasInvalidSignature()
-    {
-        $this->filterFactory->addFilterFactory(
-            'test',
-            new FilterFactoryStub(),
-            'createWithoutDataType'
+            $filterFactory->createFilter($filterType)
         );
     }
 }

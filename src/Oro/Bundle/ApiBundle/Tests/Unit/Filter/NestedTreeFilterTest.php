@@ -18,8 +18,8 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
      */
     public function testForAssociation()
     {
-        $comparisonFilter = new NestedTreeFilter(DataType::INTEGER);
-        $comparisonFilter->apply(
+        $filter = new NestedTreeFilter(DataType::INTEGER);
+        $filter->apply(
             new Criteria(),
             new FilterValue('path.association', 'value', ComparisonFilter::GT)
         );
@@ -31,8 +31,8 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
      */
     public function testUnsupportedOperator()
     {
-        $comparisonFilter = new NestedTreeFilter(DataType::INTEGER);
-        $comparisonFilter->apply(new Criteria(), new FilterValue('path', 'value', ComparisonFilter::NEQ));
+        $filter = new NestedTreeFilter(DataType::INTEGER);
+        $filter->apply(new Criteria(), new FilterValue('path', 'value', ComparisonFilter::NEQ));
     }
 
     /**
@@ -41,8 +41,8 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
      */
     public function testWithoutOperator()
     {
-        $comparisonFilter = new NestedTreeFilter(DataType::INTEGER);
-        $comparisonFilter->apply(new Criteria(), new FilterValue('path', 'value'));
+        $filter = new NestedTreeFilter(DataType::INTEGER);
+        $filter->apply(new Criteria(), new FilterValue('path', 'value'));
     }
 
     /**
@@ -55,18 +55,15 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
             ComparisonFilter::GTE
         ];
 
-        $comparisonFilter = new NestedTreeFilter(DataType::INTEGER);
-        $comparisonFilter->setSupportedOperators($supportedOperators);
+        $filter = new NestedTreeFilter(DataType::INTEGER);
+        $filter->setSupportedOperators($supportedOperators);
 
         $criteria = new Criteria();
-        $comparisonFilter->apply($criteria, $filterValue);
+        $filter->apply($criteria, $filterValue);
 
         self::assertEquals($expectation, $criteria->getWhereExpression());
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
     public function filterDataProvider()
     {
         return [

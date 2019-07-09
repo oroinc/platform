@@ -15,5 +15,5 @@ interface FilterInterface
      * @param Criteria         $criteria
      * @param FilterValue|null $value
      */
-    public function apply(Criteria $criteria, FilterValue $value = null);
+    public function apply(Criteria $criteria, FilterValue $value = null): void;
 }
