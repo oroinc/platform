@@ -84,7 +84,7 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
     {
         $this->doctrineHelper
             ->method('getEntityClass')
-            ->willReturn(get_class($subject));
+            ->willReturn(is_object($subject) ? get_class($subject) : null);
 
         self::assertSame(
             $expectedResult,
