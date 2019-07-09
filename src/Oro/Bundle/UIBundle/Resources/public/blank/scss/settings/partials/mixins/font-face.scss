@@ -1,22 +1,54 @@
 /* @theme: blank; */
 
-// Use: @include font-face('Lato', '../fonts/lato/lato-regular-webfont', 400, normal);
-@mixin font-face($font-family, $file-path, $font-weight, $font-style) {
+// Use: @include font-face('Lato', '../fonts/lato/lato-regular-webfont', 400, normal, ('woff', 'woff2'));
+@mixin font-face($font-family, $file-path, $font-weight, $font-style, $font-formats) {
     @font-face {
         font-family: $font-family;
-        src: url('#{$file-path}.woff') format('woff'),
-            url('#{$file-path}.ttf') format('truetype'),
-            url('#{$file-path}.svg##{$font-family}') format('svg');
+        @if ($font-formats) {
+            $src: null;
+            $url: null;
+            @each $font-format in $font-formats {
+                $i: index($font-formats, $font-format);
+
+                @if ($font-format == 'ttf') {
+                    $url: url('#{$file-path}.#{$font-format}') format('truetype');
+                } @else if ($font-format == 'svg') {
+                    $url: url('#{$file-path}.#{$font-format}##{$font-family}') format('#{$font-format}');
+                } @else {
+                    $url: url('#{$file-path}.#{$font-format}') format('#{$font-format}');
+                }
+
+                @if ($i == 1) {
+                    $src: $url;
+                } @else {
+                    $src: $src#{', '}$url;
+                }
+            }
+
+            src: $src;
+        } @else {
+            src: url('#{$file-path}.woff') format('woff');
+
+            @warn "The $font-formats argument doesn't exist. Please add needed formats to your custom font
+            Example:
+            $theme-fonts: (
+                'secondary': (
+                    'family': 'Roboto',
+                    'variants': (
+                        (
+                            'path': '#{$global-url}/orofrontend/default/fonts/roboto/roboto-regular-webfont',
+                            'weight': 700,
+                            'style': normal
+                        )
+                    ),
+                    'formats': ('woff', 'woff2')
+                )
+            );
+            ";
+        }
+
         font-weight: $font-weight;
         font-style: $font-style;
-    }
-
-    // Chrome for Windows rendering fix: http://www.adtrak.co.uk/blog/font-face-chrome-rendering/
-    @media screen and (-webkit-min-device-pixel-ratio: 0) {
-        @font-face {
-            font-family: $font-family;
-            src: url('#{$file-path}.svg##{$font-family}') format('svg');
-        }
     }
 }
 
@@ -36,6 +68,7 @@
 //                 'style': normal
 //             )
 //         ),
+//         'formats': ('woff2', 'woff', 'ttf', 'eot', 'svg') // Add only needed formats
 //     ),
 //     'secondary': (
 //         'family': 'Test2',
@@ -43,14 +76,15 @@
 //             (
 //                 'path': '...',
 //             )
-//         )
+//         ),
+//         'formats': ('woff2', 'woff', 'ttf', 'eot', 'svg') // Add only needed formats
 //     )
 // );
 // Use: @include use-font-face($fonts);
-@mixin include-font-face($font-family, $file-path, $font-weigh, $font-style) {
+@mixin include-font-face($font-family, $file-path, $font-weigh, $font-style, $font-formats) {
     @if ($font-family and $file-path) {
         // Calling mixin font-face(family, path, $weigh, style);
-        @include font-face($font-family, $file-path, $font-weigh, $font-style);
+        @include font-face($font-family, $file-path, $font-weigh, $font-style, $font-formats);
     } @else {
         @warn 'Absent family or path keys in a list.';
     }
@@ -97,6 +131,8 @@
             // Iterate font variants
             $font-variants: map_get($current-section, 'variants');
 
+            $font-formats: map_get($current-section, 'formats');
+
             @if (type-of($font-variants) == 'map' or type-of($font-variants) == 'list') {
                 // Get Iterate section 'family'
                 $font-family: map_get($current-section, 'family');
@@ -122,7 +158,7 @@
                         $font-style: map_get($font-variants, 'style');
                     }
 
-                    @include include-font-face($font-family, $file-path, $font-weigh, $font-style);
+                    @include include-font-face($font-family, $file-path, $font-weigh, $font-style, $font-formats);
                 }
 
                 @if (type-of($font-variants) == 'list') {
@@ -138,7 +174,7 @@
                             $font-style: map_get($font-variant, 'style');
                         }
 
-                        @include include-font-face($font-family, $file-path, $font-weigh, $font-style);
+                        @include include-font-face($font-family, $file-path, $font-weigh, $font-style, $font-formats);
                     }
                 }
             } @else {

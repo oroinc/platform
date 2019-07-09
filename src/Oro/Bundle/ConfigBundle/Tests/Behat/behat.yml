@@ -77,6 +77,16 @@ oro_behat_extension:
       selector: 'form[name="shopping_list"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
 
+    Add Recent Emails widget:
+      selector:
+        locator: '//h4[text()="Recent Emails"]/../../..//div[4]/button'
+        type: xpath
+
+    Close Organization info popup:
+      selector:
+        locator: '//strong[contains(text(),"Logged in to")]/../..//a[@title="Close"]'
+        type: xpath
+
   suites:
     OroConfigBundle:
       contexts:
