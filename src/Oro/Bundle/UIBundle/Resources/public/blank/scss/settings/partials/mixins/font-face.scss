@@ -5,15 +5,27 @@
     @font-face {
         font-family: $font-family;
         @if ($font-formats) {
+            $src: null;
+            $url: null;
             @each $font-format in $font-formats {
+                $i: index($font-formats, $font-format);
+
                 @if ($font-format == 'ttf') {
-                    src: url('#{$file-path}.#{$font-format}') format('truetype');
+                    $url: url('#{$file-path}.#{$font-format}') format('truetype');
                 } @else if ($font-format == 'svg') {
-                    src: url('#{$file-path}.#{$font-format}##{$font-family}') format('#{$font-format}');
+                    $url: url('#{$file-path}.#{$font-format}##{$font-family}') format('#{$font-format}');
                 } @else {
-                    src: url('#{$file-path}.#{$font-format}') format('#{$font-format}');
+                    $url: url('#{$file-path}.#{$font-format}') format('#{$font-format}');
+                }
+
+                @if ($i == 1) {
+                    $src: $url;
+                } @else {
+                    $src: $src#{', '}$url;
                 }
             }
+
+            src: $src;
         } @else {
             src: url('#{$file-path}.woff') format('woff');
 
