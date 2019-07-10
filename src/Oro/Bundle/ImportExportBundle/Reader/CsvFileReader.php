@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 use Akeneo\Bundle\BatchBundle\Item\ParseException;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -30,6 +29,11 @@ class CsvFileReader extends AbstractFileReader
     protected $escape;
 
     /**
+     * @var \SplFileObject
+     */
+    private $file;
+
+    /**
      * @param ContextRegistry $contextRegistry
      */
     public function __construct(ContextRegistry $contextRegistry)
@@ -50,43 +54,21 @@ class CsvFileReader extends AbstractFileReader
         }
 
         $data = $this->getFile()->fgetcsv();
-        if (false !== $data) {
-            if (! $context instanceof ContextInterface) {
-                $context = $this->getContext();
-            }
-            $context->incrementReadOffset();
-            if (null === $data || [null] === $data) {
-                if ($this->isEof()) {
-                    return null;
-                }
-
-                return [];
-            }
-            $context->incrementReadCount();
-
-            if ($this->firstLineIsHeader) {
-                if (count($this->header) !== count($data)) {
-                    throw new InvalidItemException(
-                        sprintf(
-                            'Expecting to get %d columns, actually got %d.
-                            Header contains: %s 
-                            Row contains: %s',
-                            count($this->header),
-                            count($data),
-                            print_r($this->header, true),
-                            print_r($data, true)
-                        ),
-                        $data
-                    );
-                }
-
-                $data = array_combine($this->header, $data);
-            }
-        } else {
+        if (false === $data) {
             throw new ParseException('An error occurred while reading the csv.');
         }
 
-        return $data;
+        if (!$context instanceof ContextInterface) {
+            $context = $this->getContext();
+        }
+
+        $context->incrementReadOffset();
+        if (null === $data || [null] === $data) {
+            return $this->isEof() ? null : [];
+        }
+        $context->incrementReadCount();
+
+        return $this->normalizeRow($data);
     }
 
     /**
@@ -152,13 +134,14 @@ class CsvFileReader extends AbstractFileReader
         if ($context->hasOption(Context::OPTION_ESCAPE)) {
             $this->escape = $context->getOption(Context::OPTION_ESCAPE);
         }
+    }
 
-        if ($context->hasOption(Context::OPTION_FIRST_LINE_IS_HEADER)) {
-            $this->firstLineIsHeader = (bool)$context->getOption(Context::OPTION_FIRST_LINE_IS_HEADER);
-        }
-
-        if ($context->hasOption(Context::OPTION_HEADER)) {
-            $this->header = $context->getOption(Context::OPTION_HEADER);
-        }
+    /**
+     * {@inheritdoc}
+     */
+    public function close()
+    {
+        $this->file = null;
+        parent::close();
     }
 }
