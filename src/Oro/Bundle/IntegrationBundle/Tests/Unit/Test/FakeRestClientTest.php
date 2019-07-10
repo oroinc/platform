@@ -84,7 +84,7 @@ class FakeRestClientTest extends \PHPUnit\Framework\TestCase
      * @param mixed $restResponse actual response from client
      * @param string $errorMessage message which will be shown in case of failed assertion
      */
-    private function assertCorrectRestResponse($expectedStatusCode, $restResponse, $errorMessage = null)
+    private function assertCorrectRestResponse($expectedStatusCode, $restResponse, $errorMessage = '')
     {
         $this->assertInstanceOf(RestResponseInterface::class, $restResponse, $errorMessage);
         /** @var RestResponseInterface $restResponse */

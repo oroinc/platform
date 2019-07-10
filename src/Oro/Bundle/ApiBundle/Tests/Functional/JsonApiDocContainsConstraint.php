@@ -28,7 +28,7 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
     /**
      * {@inheritdoc}
      */
-    protected function matches($other)
+    protected function matches($other): bool
     {
         if (parent::matches($other)
             && is_array($this->expected)

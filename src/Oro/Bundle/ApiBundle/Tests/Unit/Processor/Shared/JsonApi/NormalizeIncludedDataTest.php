@@ -346,7 +346,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ->willReturn($normalizedType);
         $this->entityLoader->expects(self::once())
             ->method('findEntity')
-            ->with($normalizedType, $normalizedId, self::isInstanceOf($metadata))
+            ->with($normalizedType, $normalizedId, self::isInstanceOf(EntityMetadata::class))
             ->willReturn($includedEntity);
 
         $config = new EntityDefinitionConfig();
@@ -410,7 +410,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ->willReturn($normalizedType);
         $this->entityLoader->expects(self::once())
             ->method('findEntity')
-            ->with($normalizedType, $normalizedId, self::isInstanceOf($metadata))
+            ->with($normalizedType, $normalizedId, self::isInstanceOf(EntityMetadata::class))
             ->willReturn(null);
 
         $config = new EntityDefinitionConfig();

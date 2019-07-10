@@ -72,10 +72,10 @@ class ContainerResetExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->clearer->expects(self::once())
             ->method('clear')
-            ->with(self::isInstanceOf($logger));
+            ->with(self::isInstanceOf(LoggerInterface::class));
         $this->chainExtensionAwareClearer->expects(self::once())
             ->method('clear')
-            ->with(self::isInstanceOf($logger));
+            ->with(self::isInstanceOf(LoggerInterface::class));
 
         $this->extension->onPostReceived($context);
     }

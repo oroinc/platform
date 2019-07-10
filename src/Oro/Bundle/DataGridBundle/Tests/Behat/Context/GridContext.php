@@ -162,7 +162,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $cell = $row->startInlineEditing($field);
         $inlineEditor = $cell->findField('value');
 
-        self::assertEquals($inlineEditor->getValue(), $value);
+        self::assertEquals($value, $inlineEditor->getValue());
     }
 
     /**
