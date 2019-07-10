@@ -33,15 +33,18 @@ class WorkflowItemRepositoryTest extends WebTestCase
         /** @var WorkflowAwareEntity $entity */
         $entity = $this->getReference('workflow_aware_entity.15');
 
-        /** @var WorkflowItem $item */
-        $item = $this->getReference('test_flow_item.15');
+        /** @var WorkflowItem $item1 */
+        $item1 = $this->getReference('test_flow_item.15');
+
+        /** @var WorkflowItem $item2 */
+        $item2 = $this->getReference('test_multistep_flow_item.35');
 
         $actual = $this->repository->findByEntityMetadata(
             'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
             $entity->getId()
         );
 
-        $this->assertNotEmpty([$item], $actual);
+        $this->assertEquals([$item1, $item2], $actual);
     }
 
     public function testFindAllByEntityMetadata()

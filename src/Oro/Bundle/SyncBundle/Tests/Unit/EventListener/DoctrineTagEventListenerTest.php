@@ -135,11 +135,11 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->tagGenerator->expects(self::at(0))
             ->method('generate')
-            ->with(self::isInstanceOf($entity1), true)
+            ->with(self::isInstanceOf(Entity\TestDepartment::class), true)
             ->willReturn(['entity1Tag']);
         $this->tagGenerator->expects(self::at(1))
             ->method('generate')
-            ->with(self::isInstanceOf($entity2), true)
+            ->with(self::isInstanceOf(Entity\TestEmployee::class), true)
             ->willReturn(['entity2Tag']);
 
         $event = new OnFlushEventArgs($this->em);
@@ -183,11 +183,11 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->tagGenerator->expects(self::at(0))
             ->method('generate')
-            ->with(self::isInstanceOf($entity1), true)
+            ->with(self::isInstanceOf(Entity\TestDepartment::class), true)
             ->willReturn(['entity1Tag']);
         $this->tagGenerator->expects(self::at(1))
             ->method('generate')
-            ->with(self::isInstanceOf($entity2), true)
+            ->with(self::isInstanceOf(Entity\TestEmployee::class), true)
             ->willReturn(['entity2Tag']);
 
         $event = new OnFlushEventArgs($this->em);
@@ -231,11 +231,11 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->tagGenerator->expects(self::at(0))
             ->method('generate')
-            ->with(self::isInstanceOf($entity1), false)
+            ->with(self::isInstanceOf(Entity\TestDepartment::class), false)
             ->willReturn(['entity1Tag']);
         $this->tagGenerator->expects(self::at(1))
             ->method('generate')
-            ->with(self::isInstanceOf($entity2), false)
+            ->with(self::isInstanceOf(Entity\TestEmployee::class), false)
             ->willReturn(['entity2Tag']);
 
         $event = new OnFlushEventArgs($this->em);
@@ -282,11 +282,11 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->tagGenerator->expects(self::at(0))
             ->method('generate')
-            ->with(self::isInstanceOf($entity1), false)
+            ->with(self::isInstanceOf(Entity\TestDepartment::class), false)
             ->willReturn(['entity1Tag']);
         $this->tagGenerator->expects(self::at(1))
             ->method('generate')
-            ->with(self::isInstanceOf($entity2), false)
+            ->with(self::isInstanceOf(Entity\TestEmployee::class), false)
             ->willReturn(['entity2Tag']);
 
         $event = new OnFlushEventArgs($this->em);
@@ -333,11 +333,11 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->tagGenerator->expects(self::at(0))
             ->method('generate')
-            ->with(self::isInstanceOf($entity1), false)
+            ->with(self::isInstanceOf(Entity\TestDepartment::class), false)
             ->willReturn(['entity1Tag']);
         $this->tagGenerator->expects(self::at(1))
             ->method('generate')
-            ->with(self::isInstanceOf($entity2), false)
+            ->with(self::isInstanceOf(Entity\TestEmployee::class), false)
             ->willReturn(['entity2Tag']);
 
         $event = new OnFlushEventArgs($this->em);

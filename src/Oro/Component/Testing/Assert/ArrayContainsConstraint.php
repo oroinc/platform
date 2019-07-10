@@ -30,7 +30,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
     /**
      * {@inheritdoc}
      */
-    protected function matches($other)
+    protected function matches($other): bool
     {
         $this->matchArrayContains($this->expected, $other, []);
 
@@ -40,7 +40,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
     /**
      * {@inheritdoc}
      */
-    public function toString()
+    public function toString(): string
     {
         return 'the array contains other array';
     }
@@ -48,7 +48,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
     /**
      * {@inheritdoc}
      */
-    protected function failureDescription($other)
+    protected function failureDescription($other): string
     {
         return $this->toString();
     }
@@ -56,7 +56,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
     /**
      * {@inheritdoc}
      */
-    protected function additionalFailureDescription($other)
+    protected function additionalFailureDescription($other): string
     {
         $result = "Errors:\n";
         $i = 0;
