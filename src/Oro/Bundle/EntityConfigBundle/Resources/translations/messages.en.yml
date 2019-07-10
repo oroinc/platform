@@ -149,3 +149,4 @@ oro:
                     description:          The labels of the attribute family.
                 owner.label:              Owner
                 organization.label:       Organization
+                default.label:            Default
