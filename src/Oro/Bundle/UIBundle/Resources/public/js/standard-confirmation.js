@@ -1,4 +1,4 @@
-gdefine(function(require) {
+define(function(require) {
     'use strict';
 
     var StandardConfirmationView;
