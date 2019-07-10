@@ -9,7 +9,7 @@ define(function(require) {
     var widgetManager = require('oroui/js/widget-manager');
     var Backbone = require('backbone');
     var tools = require('oroui/js/tools');
-    require('oroui/js/standart-confirmation'); // preload default confirmation dialog module
+    require('oroui/js/standard-confirmation'); // preload default confirmation dialog module
 
     var ButtonManager = function(options) {
         this.initialize(options);
@@ -53,7 +53,7 @@ define(function(require) {
         /**
          * @type {String}
          */
-        confirmComponent: 'oroui/js/standart-confirmation',
+        confirmComponent: 'oroui/js/standard-confirmation',
 
         /**
          * @type {Function}

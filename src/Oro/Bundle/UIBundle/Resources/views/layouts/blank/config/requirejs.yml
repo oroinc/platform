@@ -151,7 +151,7 @@ config:
 
         'oroui/js/viewport-manager': 'bundles/oroui/js/viewport-manager.js'
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
-        'oroui/js/standart-confirmation': 'bundles/oroui/js/standart-confirmation.js'
+        'oroui/js/standard-confirmation': 'bundles/oroui/js/standard-confirmation.js'
         'oroui/js/error': 'bundles/oroui/js/error.js'
         'oroui/js/layout': 'bundles/oroui/js/layout.js'
         'oroui/js/mediator': 'bundles/oroui/js/mediator.js'
