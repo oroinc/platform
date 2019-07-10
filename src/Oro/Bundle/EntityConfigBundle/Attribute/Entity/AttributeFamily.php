@@ -18,7 +18,15 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Layout\ContextItemInterface;
 
 /**
- * @ORM\Table(name="oro_attribute_family")
+ * An attribute family is a set of the attributes that are enough to store complete information
+ * about the entities of a similar type
+ *
+ * @ORM\Table(
+ *     name="oro_attribute_family",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(name="oro_attribute_family_code_org_uidx", columns={"code", "organization_id"})
+ *     }
+ * )
  * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository")
  * @Config(
  *      defaultValues={
@@ -91,7 +99,7 @@ class AttributeFamily extends ExtendAttributeFamily implements
 
     /**
      * @var string
-     * @ORM\Column(name="code", type="string", length=255, unique=true)
+     * @ORM\Column(name="code", type="string", length=255)
      * @ConfigField(
      *      defaultValues={
      *          "importexport"={

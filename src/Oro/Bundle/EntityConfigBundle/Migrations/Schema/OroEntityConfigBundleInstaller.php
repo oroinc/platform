@@ -21,7 +21,7 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
      */
     public function getMigrationVersion()
     {
-        return 'v1_15';
+        return 'v1_16';
     }
 
     /**
@@ -235,7 +235,7 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['code']);
+        $table->addUniqueIndex(['code', 'organization_id'], 'oro_attribute_family_code_org_uidx');
         $table->addIndex(['user_owner_id']);
         $table->addIndex(['organization_id']);
     }
