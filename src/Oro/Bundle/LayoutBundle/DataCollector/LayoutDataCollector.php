@@ -62,13 +62,7 @@ class LayoutDataCollector extends DataCollector
         $this->configManager = $configManager;
         $this->isDebug = $isDebug;
 
-        $this->data = [
-            'context' => [
-                'items' => [],
-                'data' => [],
-            ],
-            'views' => [],
-        ];
+        $this->reset();
     }
 
     /**
@@ -280,6 +274,12 @@ class LayoutDataCollector extends DataCollector
 
     public function reset()
     {
-        $this->data = [];
+        $this->data = [
+            'context' => [
+                'items' => [],
+                'data' => [],
+            ],
+            'views' => [],
+        ];
     }
 }
