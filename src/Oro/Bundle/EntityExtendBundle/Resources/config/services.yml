@@ -618,6 +618,7 @@ services:
 
     oro_entity_extend.cache_warmer_aggregate:
         class: Oro\Bundle\EntityExtendBundle\Cache\CacheWarmerAggregate
+        public: true
         arguments:
             - ~ # link to "cache_warmer" service; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\CacheWarmerPass
             - ~ # link to "oro_entity_extend.cache_warmer" service; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\CacheWarmerPass
@@ -625,6 +626,7 @@ services:
 
     oro_entity_extend.cache_warmer:
         class: Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate
+        public: true
         arguments:
             - [] # warmers; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\CacheWarmerPass
 
