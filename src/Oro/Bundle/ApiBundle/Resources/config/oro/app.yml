@@ -23,6 +23,7 @@ security:
             anonymous: false
         api_wsse_secured:
             pattern: '%oro_api.rest.pattern%'
+            provider: oro_user
             stateless: true
             wsse:
                 lifetime: 3600

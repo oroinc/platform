@@ -29,6 +29,7 @@ services:
 
     oro_featuretoggle.configuration:
         class: 'Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration'
+        public: true
 
     oro_featuretoggle.twig.feature_extension:
         class: 'Oro\Bundle\FeatureToggleBundle\Twig\FeatureExtension'

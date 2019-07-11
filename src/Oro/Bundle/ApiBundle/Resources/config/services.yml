@@ -759,6 +759,7 @@ services:
 
     oro_api.api_doc.security_context:
         class: Oro\Bundle\ApiBundle\ApiDoc\SecurityContext
+        public: true
         arguments:
             - '@security.token_storage'
 
