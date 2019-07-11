@@ -8,6 +8,7 @@ parameters:
 services:
     oro_entity_extend.entity_metadata_builder:
         class: '%oro_entity_extend.entity_metadata_builder.class%'
+        public: true
         arguments:
             - '@oro_entity_config.provider.extend'
 
