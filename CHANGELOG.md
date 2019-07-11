@@ -81,7 +81,9 @@ The current file describes significant changes in the code that may affect the u
   to `getVariableGetters(): array`.
   By performance reasons new method `getVariableProcessors(string $entityClass): array` was added.
   If method `getVariableDefinitions` of your provider returns info about processors, move it to `getVariableProcessors`.
-* Due to the updated version of `symfony/swiftmailer-bundle` parameter `mailer_transport: mail` is not supported anymore. Please
+* Due to the updated version of `symfony/swiftmailer-bundle` parameter `mailer_transport: mail` is not supported anymore. Using old transport will cause such an exception -
+ `Unable to replace alias “swiftmailer.mailer.default.transport.real” with actual definition “mail”.
+  You have requested a non-existent service “mail”.` Please
   use `mailer_transport: sendmail` instead or another available swiftmailer transport type.
   
 #### UIBundle
