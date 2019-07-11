@@ -152,6 +152,8 @@ datagrids:
                 type: twig
                 template: OroEntityConfigBundle:Datagrid:Column/attributeFamilies.html.twig
                 order: 99
+            organization_applicable:
+                renderable: false
         actions:
             update:
                 acl_resource: oro_attribute_update
