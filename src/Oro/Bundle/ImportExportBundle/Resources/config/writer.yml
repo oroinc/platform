@@ -23,7 +23,6 @@ services:
         class: '%oro_importexport.writer.xlsx.class%'
         arguments:
             - '@oro_importexport.context_registry'
-            - '@phpexcel'
         calls:
             - [setClearWriter, ['@oro_importexport.writer.doctrine_clear']]
         tags:
@@ -66,8 +65,6 @@ services:
 
     oro_importexport.writer.echo.xlsx:
         class: '%oro_importexport.writer.echo.xlsx.class%'
-        arguments:
-            - '@phpexcel'
         tags:
             - { name: oro_importexport.writer, alias: echo_xlsx }
 

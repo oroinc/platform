@@ -3,7 +3,7 @@
     "description": "Added database statistic formatter and suite divider",
     "require": {
         "php": "7.1.*",
-        "behat/behat": "^3.2",
+        "behat/behat": "3.4.*",
         "doctrine/dbal": "2.5.5",
         "symfony/config": "3.4.*"
     },

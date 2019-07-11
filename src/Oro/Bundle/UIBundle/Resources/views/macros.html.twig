@@ -1500,10 +1500,12 @@
         {% set form = widget %}
         {% set name = widget.vars.full_name %}
     {% endif %}
+    {% spaceless %}
     <tr data-content="{{ name }}" data-validation-optional-group {{ widgetContainerAttributes }}
             class="{{ options.collection_class|default('') }}">
         {{ form_widget(form) }}
     </tr>
+    {% endspaceless %}
 {% endmacro %}
 
 {% macro badge(label, badgeClass = 'info', iconClass = 'fa-circle') %}

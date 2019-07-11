@@ -9,11 +9,15 @@ use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
+/**
+ * Sets organization to the token.
+ */
 class OAuthProvider extends HWIOAuthProvider
 {
     /**
@@ -40,13 +44,15 @@ class OAuthProvider extends HWIOAuthProvider
      * @param OAuthAwareUserProviderInterface $userProvider User provider
      * @param ResourceOwnerMap $resourceOwnerMap Resource owner map
      * @param UserCheckerInterface $userChecker User checker
+     * @param TokenStorageInterface $tokenStorage
      */
     public function __construct(
         OAuthAwareUserProviderInterface $userProvider,
         ResourceOwnerMap $resourceOwnerMap,
-        UserCheckerInterface $userChecker
+        UserCheckerInterface $userChecker,
+        TokenStorageInterface $tokenStorage
     ) {
-        parent::__construct($userProvider, $resourceOwnerMap, $userChecker);
+        parent::__construct($userProvider, $resourceOwnerMap, $userChecker, $tokenStorage);
         $this->userProvider = $userProvider;
         $this->resourceOwnerMap = $resourceOwnerMap;
         $this->userChecker = $userChecker;
