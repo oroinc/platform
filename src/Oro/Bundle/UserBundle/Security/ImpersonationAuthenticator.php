@@ -20,9 +20,9 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
+use Symfony\Component\Security\Guard\AuthenticatorInterface;
 
-class ImpersonationAuthenticator implements GuardAuthenticatorInterface
+class ImpersonationAuthenticator implements AuthenticatorInterface
 {
     const TOKEN_PARAMETER = '_impersonation_token';
 
@@ -54,6 +54,14 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
         $this->tokenFactory = $tokenFactory;
         $this->eventDispatcher = $eventDispatcher;
         $this->router = $router;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(Request $request)
+    {
+        return true;
     }
 
     /**
