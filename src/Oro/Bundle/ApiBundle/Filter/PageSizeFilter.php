@@ -12,7 +12,7 @@ class PageSizeFilter extends StandaloneFilterWithDefaultValue
     /**
      * {@inheritdoc}
      */
-    public function apply(Criteria $criteria, FilterValue $value = null)
+    public function apply(Criteria $criteria, FilterValue $value = null): void
     {
         $val = null !== $value
             ? $value->getValue()

@@ -4,22 +4,20 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\ApiBundle\Filter\ChainFilterFactory;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
-use Oro\Bundle\ApiBundle\Filter\FilterInterface;
+use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 
 class ChainFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testChainFactory()
     {
-        $chainFactory = new ChainFilterFactory();
         $childFactory1 = $this->createMock(FilterFactoryInterface::class);
         $childFactory2 = $this->createMock(FilterFactoryInterface::class);
-        $chainFactory->addFilterFactory($childFactory1);
-        $chainFactory->addFilterFactory($childFactory2);
+        $chainFactory = new ChainFilterFactory([$childFactory1, $childFactory2]);
 
-        $knownFilter1 = $this->createMock(FilterInterface::class);
-        $knownFilter2 = $this->createMock(FilterInterface::class);
-        $knownFilter31 = $this->createMock(FilterInterface::class);
-        $knownFilter32 = $this->createMock(FilterInterface::class);
+        $knownFilter1 = $this->createMock(StandaloneFilter::class);
+        $knownFilter2 = $this->createMock(StandaloneFilter::class);
+        $knownFilter31 = $this->createMock(StandaloneFilter::class);
+        $knownFilter32 = $this->createMock(StandaloneFilter::class);
 
         $childFactory1->expects(self::any())
             ->method('createFilter')

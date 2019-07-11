@@ -1600,8 +1600,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                         'allow_range' => true,
                         'options'     => [
                             'associationOwnerClass' => self::TEST_CLASS_NAME,
-                            'associationType'       => 'manyToOne',
-                            'associationKind'       => null
+                            'associationType'       => 'manyToOne'
                         ]
                     ],
                     'field2' => [
@@ -1621,8 +1620,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                         'options'   => [
                             'option1'               => 'val1',
                             'associationOwnerClass' => self::TEST_CLASS_NAME,
-                            'associationType'       => 'manyToOne',
-                            'associationKind'       => null
+                            'associationType'       => 'manyToOne'
                         ]
                     ]
                 ]

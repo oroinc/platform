@@ -38,7 +38,7 @@ class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constr
     /**
      * {@inheritdoc}
      */
-    public function toString()
+    public function toString(): string
     {
         return sprintf(
             'getter %s for property %s returns the previously set value %s',
@@ -50,7 +50,7 @@ class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constr
     /**
      * {@inheritdoc}
      */
-    protected function failureDescription($other)
+    protected function failureDescription($other): string
     {
         return sprintf(
             'getter %s for property %s of class %s returns the previously set value %s',
@@ -64,7 +64,7 @@ class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constr
     /**
      * {@inheritdoc}
      */
-    protected function matches($other)
+    protected function matches($other): bool
     {
         $setter = 'set' . ucfirst($this->propertyName);
         if (method_exists($other, $setter)) {

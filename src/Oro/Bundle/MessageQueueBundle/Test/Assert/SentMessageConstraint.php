@@ -37,8 +37,10 @@ class SentMessageConstraint extends \PHPUnit\Framework\Constraint\Constraint
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function matches($other)
+    protected function matches($other): bool
     {
         if (!is_array($other)) {
             return false;
@@ -75,7 +77,7 @@ class SentMessageConstraint extends \PHPUnit\Framework\Constraint\Constraint
     /**
      * {@inheritdoc}
      */
-    public function toString()
+    public function toString(): string
     {
         return 'the message ' . $this->exporter->export($this->message) . ' was sent';
     }
@@ -83,7 +85,7 @@ class SentMessageConstraint extends \PHPUnit\Framework\Constraint\Constraint
     /**
      * {@inheritdoc}
      */
-    protected function failureDescription($other)
+    protected function failureDescription($other): string
     {
         return $this->toString();
     }
@@ -91,7 +93,7 @@ class SentMessageConstraint extends \PHPUnit\Framework\Constraint\Constraint
     /**
      * {@inheritdoc}
      */
-    protected function additionalFailureDescription($other)
+    protected function additionalFailureDescription($other): string
     {
         return 'All sent messages: ' . $this->exporter->export($other);
     }

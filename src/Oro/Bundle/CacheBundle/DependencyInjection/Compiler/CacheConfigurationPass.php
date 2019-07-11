@@ -121,6 +121,9 @@ class CacheConfigurationPass implements CompilerPassInterface
     {
         if ($container->hasDefinition($cacheDefinitionId)) {
             $cacheDefinition = $container->getDefinition($cacheDefinitionId);
+            if (null === $cacheDefinition->getClass() && $cacheDefinition->isAbstract()) {
+                return $cacheDefinition;
+            }
             if (!in_array(CacheProvider::class, class_parents($cacheDefinition->getClass()), true)) {
                 throw new \InvalidArgumentException(sprintf(
                     'Cache providers for `%s` should extend doctrine CacheProvider::class. `%s` given',

@@ -88,10 +88,6 @@ class UnderlyingAclCache
      */
     public function isUnderlying(ObjectIdentityInterface $oid)
     {
-        if (!$this->isDigitIdentifier($oid)) {
-            return false;
-        }
-
         $batchNumber = $this->getBatchNumber($oid);
         $batchKey = $this->getBatchCacheKey($oid);
         $type = $oid->getType();
@@ -170,13 +166,11 @@ class UnderlyingAclCache
     protected function getBatchNumber(ObjectIdentityInterface $oid)
     {
         $identifier = $oid->getIdentifier();
-        /**
-         * We can't correctly calculate batch number in case when "id" is not an integer,
-         * so we put this entities to the single batch
-         */
+
         if (!$this->isDigitIdentifier($oid)) {
-            return 1;
+            $identifier = crc32($identifier);
         }
+
         return (int)floor($identifier / $this->batchSize) + 1;
     }
 

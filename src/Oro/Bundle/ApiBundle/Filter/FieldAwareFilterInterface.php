@@ -12,5 +12,5 @@ interface FieldAwareFilterInterface
      *
      * @param string $field The field name or property path
      */
-    public function setField($field);
+    public function setField(string $field): void;
 }

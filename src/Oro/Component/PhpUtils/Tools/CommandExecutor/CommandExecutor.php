@@ -4,23 +4,17 @@ namespace Oro\Component\PhpUtils\Tools\CommandExecutor;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * The class that contains a set of methods to simplify execution of console commands in a separate process.
  */
-class CommandExecutor implements CommandExecutorInterface
+class CommandExecutor extends AbstractCommandExecutor implements CommandExecutorInterface
 {
     public const DEFAULT_TIMEOUT = 300;
 
     /** @var string */
     protected $consoleCmdPath;
-
-    /** @var string */
-    protected $env;
 
     /** @var array */
     protected $defaultOptions = ['process-timeout' => self::DEFAULT_TIMEOUT];
@@ -62,23 +56,25 @@ class CommandExecutor implements CommandExecutorInterface
             unset($params['--ignore-errors']);
         }
 
-        $pb = new ProcessBuilder();
-        $pb
-            ->add($this->getPhp())
-            ->add($this->consoleCmdPath);
+        $processArguments = [self::getPhpExecutable(), $this->consoleCmdPath];
 
+        $processTimeout = null;
         if (array_key_exists('--process-timeout', $params)) {
-            $pb->setTimeout($params['--process-timeout']);
+            $processTimeout = $params['--process-timeout'];
+            //Timeout will be passed via method so is not needed in params anymore
             unset($params['--process-timeout']);
         }
 
         foreach ($params as $name => $val) {
-            $this->processParameter($pb, $name, $val);
+            $this->processParameter($processArguments, $name, $val);
         }
 
-        $process = $pb
-            ->inheritEnvironmentVariables(true)
-            ->getProcess();
+        $process = new Process($processArguments);
+        $process->inheritEnvironmentVariables(true);
+
+        if ($processTimeout) {
+            $process->setTimeout($processTimeout);
+        }
 
         if (!$logger) {
             $logger = new NullLogger();
@@ -132,95 +128,5 @@ class CommandExecutor implements CommandExecutorInterface
                 throw new \RuntimeException(sprintf('The command terminated with an exit code: %u.', $exitCode));
             }
         }
-    }
-
-    /**
-     * @param string $command
-     * @param array $params
-     *
-     * @return array
-     */
-    protected function prepareParameters($command, array $params): array
-    {
-        $params = array_merge(
-            [
-                'command' => $command
-            ],
-            $params
-        );
-
-        if ($this->env && $this->env !== 'dev') {
-            $params['--env'] = $this->env;
-        }
-
-        foreach ($this->defaultOptions as $name => $value) {
-            $paramName = '--' . $name;
-            if (!array_key_exists($paramName, $params)) {
-                $params[$paramName] = $value;
-            }
-        }
-
-        return $params;
-    }
-
-    /**
-     * @param ProcessBuilder $pb
-     * @param string $name
-     * @param array|string|null $value
-     */
-    protected function processParameter(ProcessBuilder $pb, $name, $value): void
-    {
-        if ($name && '-' === $name[0]) {
-            if ($value === true) {
-                $this->addParameter($pb, $name);
-            } elseif ($value !== false) {
-                $this->addParameter($pb, $name, $value);
-            }
-        } else {
-            $this->addParameter($pb, $value);
-        }
-    }
-
-    /**
-     * @param ProcessBuilder $pb
-     * @param string $name
-     * @param array|string|null $value
-     */
-    protected function addParameter(ProcessBuilder $pb, $name, $value = null): void
-    {
-        $parameters = [];
-
-        if (null !== $value) {
-            if (is_array($value)) {
-                foreach ($value as $item) {
-                    $parameters[] = sprintf('%s=%s', $name, $item);
-                }
-            } else {
-                $parameters[] = sprintf('%s=%s', $name, $value);
-            }
-        } else {
-            $parameters[] = $name;
-        }
-
-        foreach ($parameters as $parameter) {
-            $pb->add($parameter);
-        }
-    }
-
-    /**
-     * Finds the PHP executable.
-     *
-     * @return string
-     * @throws FileNotFoundException
-     */
-    protected function getPhp(): string
-    {
-        $phpFinder = new PhpExecutableFinder();
-        $phpPath = $phpFinder->find();
-        if (!$phpPath) {
-            throw new FileNotFoundException('The PHP executable could not be found.');
-        }
-
-        return $phpPath;
     }
 }

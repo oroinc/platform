@@ -440,9 +440,9 @@ abstract class ApiTestCase extends WebTestCase
      *
      * @param Response    $response
      * @param int|int[]   $statusCode
-     * @param string|null $message
+     * @param string $message
      */
-    protected static function assertResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertResponseStatusCodeEquals(Response $response, $statusCode, string $message = '')
     {
         try {
             if (is_array($statusCode)) {

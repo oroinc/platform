@@ -32,7 +32,7 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
     /**
      * {@inheritdoc}
      */
-    public function setRequestType(RequestType $requestType)
+    public function setRequestType(RequestType $requestType): void
     {
         $this->requestType = $requestType;
     }
@@ -40,23 +40,23 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
     /**
      * {@inheritdoc}
      */
-    public function setMetadata(EntityMetadata $metadata)
+    public function setMetadata(EntityMetadata $metadata): void
     {
         $this->metadata = $metadata;
     }
 
     /**
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
+     * @param EntityIdTransformerRegistry $registry
      */
-    public function setEntityIdTransformerRegistry(EntityIdTransformerRegistry $entityIdTransformerRegistry)
+    public function setEntityIdTransformerRegistry(EntityIdTransformerRegistry $registry): void
     {
-        $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
+        $this->entityIdTransformerRegistry = $registry;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function apply(Criteria $criteria, FilterValue $value = null)
+    public function apply(Criteria $criteria, FilterValue $value = null): void
     {
         if (null !== $value) {
             $criteria->andWhere(
@@ -70,10 +70,8 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
      * @param mixed       $value
      *
      * @return Expression
-     *
-     * @throws \InvalidArgumentException
      */
-    protected function buildExpression($operator, $value)
+    private function buildExpression(?string $operator, $value): Expression
     {
         if (null === $value) {
             throw new \InvalidArgumentException('The composite identifier value must not be NULL.');
@@ -82,14 +80,15 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
         if (null === $operator) {
             $operator = self::EQ;
         }
-        if (!in_array($operator, $this->operators, true)) {
-            throw new \InvalidArgumentException(
-                sprintf('The operator "%s" is not supported for composite identifier.', $operator)
-            );
+        if (!\in_array($operator, $this->getSupportedOperators(), true)) {
+            throw new \InvalidArgumentException(\sprintf(
+                'The operator "%s" is not supported for composite identifier.',
+                $operator
+            ));
         }
 
         $entityIdTransformer = $this->getEntityIdTransformer();
-        if (is_array($value) && !ArrayUtil::isAssoc($value)) {
+        if (\is_array($value) && !ArrayUtil::isAssoc($value)) {
             // a list of identifiers
             if (ComparisonFilter::NEQ === $operator) {
                 // expression: (field1 != value1 OR field2 != value2 OR ...) AND (...)
@@ -135,7 +134,7 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
      *
      * @return Expression
      */
-    private function buildEqualExpression(array $value)
+    private function buildEqualExpression(array $value): Expression
     {
         $expressions = [];
         foreach ($value as $fieldName => $fieldValue) {
@@ -153,7 +152,7 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
      *
      * @return Expression
      */
-    private function buildNotEqualExpression(array $value)
+    private function buildNotEqualExpression(array $value): Expression
     {
         $expressions = [];
         foreach ($value as $fieldName => $fieldValue) {

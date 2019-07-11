@@ -72,8 +72,7 @@ Feature: Adding attributes for workflow transition
     And I click "Apply"
     And I save and close form
     And I click "Activate"
-# press Activate button in popup
-    And I click "Activate"
+    And I click "Activate" in modal window
 # Update cache
     When I go to System/Localization/Translations
     And I click "Update Cache"

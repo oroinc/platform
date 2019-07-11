@@ -951,11 +951,11 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param int $statusCode
-     * @param string|int $message
+     * @param string $message
      *
      * @return array
      */
-    public static function getJsonResponseContent(Response $response, $statusCode, $message = null)
+    public static function getJsonResponseContent(Response $response, $statusCode, string $message = '')
     {
         self::assertJsonResponseStatusCodeEquals($response, $statusCode, $message);
         return self::jsonToArray($response->getContent());
@@ -966,9 +966,9 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param int $statusCode
-     * @param string|null $message
+     * @param string $message
      */
-    protected static function assertEmptyResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertEmptyResponseStatusCodeEquals(Response $response, $statusCode, string $message = '')
     {
         self::assertResponseStatusCodeEquals($response, $statusCode, $message);
         self::assertEmpty(
@@ -982,9 +982,9 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param int $statusCode
-     * @param string|null $message
+     * @param string $message
      */
-    protected static function assertJsonResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertJsonResponseStatusCodeEquals(Response $response, $statusCode, string $message = '')
     {
         self::assertResponseStatusCodeEquals($response, $statusCode, $message);
         self::assertResponseContentTypeEquals($response, 'application/json', $message);
@@ -995,9 +995,9 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param int $statusCode
-     * @param string|null $message
+     * @param string $message
      */
-    protected static function assertHtmlResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertHtmlResponseStatusCodeEquals(Response $response, $statusCode, string $message = '')
     {
         self::assertResponseStatusCodeEquals($response, $statusCode, $message);
         self::assertResponseContentTypeEquals($response, 'text/html; charset=UTF-8', $message);
@@ -1008,9 +1008,9 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param int $statusCode
-     * @param string|null $message
+     * @param string $message
      */
-    protected static function assertResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertResponseStatusCodeEquals(Response $response, $statusCode, string $message = '')
     {
         try {
             \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
@@ -1049,9 +1049,9 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param string $contentType
-     * @param string|null $message
+     * @param string $message
      */
-    protected static function assertResponseContentTypeEquals(Response $response, $contentType, $message = null)
+    protected static function assertResponseContentTypeEquals(Response $response, $contentType, string $message = '')
     {
         $message = $message ? $message . PHP_EOL : '';
         $message .= sprintf('Failed asserting response has header "Content-Type: %s":', $contentType);
@@ -1067,7 +1067,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param array $actual
      * @param string $message
      */
-    protected static function assertArrayIntersectEquals(array $expected, array $actual, $message = null)
+    protected static function assertArrayIntersectEquals(array $expected, array $actual, string $message = '')
     {
         $actualIntersect = self::getRecursiveArrayIntersect($actual, $expected);
         \PHPUnit\Framework\TestCase::assertEquals(
