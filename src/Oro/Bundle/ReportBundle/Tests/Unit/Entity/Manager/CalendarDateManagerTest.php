@@ -4,6 +4,7 @@ namespace Oro\Bundle\ReportBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Bundle\ReportBundle\Entity\Manager\CalendarDateManager;
 use Oro\Bundle\ReportBundle\Entity\Repository\CalendarDateRepository;
@@ -13,6 +14,9 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
+    protected $localeSettings;
+
     /** @var CalendarDateManager */
     protected $calendarDateManager;
 
@@ -21,10 +25,14 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->localeSettings->expects($this->once())
+            ->method('getTimeZone')
+            ->willReturn('UTC');
+
         $this->calendarDateManager = new CalendarDateManager($this->doctrineHelper);
+        $this->calendarDateManager->setLocaleSettings($this->localeSettings);
     }
 
     public function testHandleCalendarDatesWithoutAppending()

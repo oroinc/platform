@@ -42,6 +42,7 @@ config:
             'jquery.select2': 'oroui/js/extend/select2'
             'jquery.multiselect': 'oroui/js/extend/jquery.multiselect'
             'jquery.multiselect.filter': 'oroui/js/extend/jquery.multiselect-filter'
+            'jquery.uniform': 'oroui/js/extend/jquery.uniform'
             'chaplin': 'oroui/js/extend/chaplin'
             'underscore': 'oroui/js/extend/underscore'
             'backbone': 'oroui/js/extend/backbone'
@@ -68,6 +69,8 @@ config:
             'jquery.multiselect': 'jquery.multiselect'
         'oroui/js/extend/jquery.multiselect-filter':
             'jquery.multiselect.filter': 'jquery.multiselect.filter'
+        'oroui/js/extend/jquery.uniform':
+            'jquery.uniform': 'jquery.uniform'
         'oroui/js/extend/jquery-ui':
             'jquery-ui': 'jquery-ui'
         'oroui/js/extend/chaplin':
@@ -156,6 +159,7 @@ config:
         'oroui/js/app/modules/init-lightgallery': 'bundles/oroui/js/app/modules/init-lightgallery.js'
         'oroui/js/app/modules/component-shortcuts-module': 'bundles/oroui/js/app/modules/component-shortcuts-module.js'
         'oroui/js/app/modules/resizable-area-module': 'bundles/oroui/js/app/modules/resizable-area-module.js'
+        'oroui/js/app/modules/color-util': 'bundles/oroui/js/app/modules/color-util.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/services/registry': 'bundles/oroui/js/app/services/registry.js'
@@ -195,6 +199,7 @@ config:
 
         'oroui/js/extend/jquery': 'bundles/oroui/js/extend/jquery.js'
         'oroui/js/extend/underscore': 'bundles/oroui/js/extend/underscore.js'
+        'oroui/js/extend/jquery.uniform': 'bundles/oroui/js/extend/jquery.uniform.js'
 
         'oroui/js/app/components/app-loading-mask-component': 'bundles/oroui/js/app/components/app-loading-mask-component.js'
         'oroui/js/app/components/app-loading-bar-component': 'bundles/oroui/js/app/components/app-loading-bar-component.js'
@@ -274,6 +279,7 @@ config:
         - oroui/js/app/modules/component-shortcuts-module
         - oroui/js/app/modules/viewport-module
         - oroui/js/app/modules/resizable-area-module
+        - oroui/js/app/modules/color-util
 
 build:
     paths:

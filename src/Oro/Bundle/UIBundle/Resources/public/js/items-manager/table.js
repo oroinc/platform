@@ -98,8 +98,13 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
             collection.trigger('sort');
         },
 
+        _getItemElementByModel: function(model) {
+            return this.element.find('[data-cid="' + model.cid + '"]');
+        },
+
         _onModelAdded: function(model, collection, options) {
             var newRow = this._renderModel(model);
+
             if (_.isUndefined(options.at)) {
                 this.element.append(newRow);
             } else if (options.at === 0) {
@@ -107,9 +112,12 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
             } else {
                 this.element.children().eq(options.at).insertBefore(newRow);
             }
+
             if (this.options.sorting) {
                 this.element.sortable('refresh');
             }
+
+            this._getItemElementByModel(model).trigger('content:changed');
 
             mediator.trigger(
                 'items-manager:table:add:' + this._getIdentifier(),
@@ -120,7 +128,11 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         },
 
         _onModelChanged: function(model) {
-            this.element.find('[data-cid="' + model.cid + '"]').replaceWith(this._renderModel(model));
+            var $oldItemElement = this._getItemElementByModel(model);
+
+            $oldItemElement.trigger('content:remove');
+            $oldItemElement.replaceWith(this._renderModel(model));
+            this._getItemElementByModel(model).trigger('content:changed');
 
             mediator.trigger(
                 'items-manager:table:change:' + this._getIdentifier(),
@@ -131,7 +143,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         },
 
         _onModelDeleted: function(model) {
-            this.element.find('[data-cid="' + model.cid + '"]').remove();
+            this._getItemElementByModel(model).trigger('content:remove').remove();
 
             mediator.trigger(
                 'items-manager:table:remove:' + this._getIdentifier(),

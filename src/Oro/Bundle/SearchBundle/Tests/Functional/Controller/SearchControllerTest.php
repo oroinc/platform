@@ -10,7 +10,6 @@ use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 
 /**
  * @group search
- * @dbIsolationPerTest
  */
 class SearchControllerTest extends SearchBundleWebTestCase
 {
@@ -21,30 +20,6 @@ class SearchControllerTest extends SearchBundleWebTestCase
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixture(Item::class, LoadSearchItemData::class, LoadSearchItemData::COUNT);
         $this->loadFixture(Product::class, LoadSearchProductData::class, count(LoadSearchProductData::PRODUCTS));
-    }
-
-    protected function tearDown()
-    {
-        $this->getSearchIndexer()->resetIndex(Product::class);
-        $this->clearTestData(Product::class);
-
-        parent::tearDown();
-    }
-
-    /**
-     * @param string $entity
-     * @param string $fixture
-     * @param int $count
-     */
-    private function loadFixture(string $entity, string $fixture, int $count): void
-    {
-        $alias = $this->getSearchObjectMapper()->getEntityAlias($entity);
-        $this->getSearchIndexer()->resetIndex($entity);
-        $this->ensureItemsLoaded($alias, 0);
-
-        $this->loadFixtures([$fixture]);
-        $this->getSearchIndexer()->reindex($entity);
-        $this->ensureItemsLoaded($alias, $count);
     }
 
     /**

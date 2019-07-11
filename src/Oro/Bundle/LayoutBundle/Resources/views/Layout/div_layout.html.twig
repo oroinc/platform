@@ -6,7 +6,10 @@
         {%- if label is empty -%}
             {% set label = id|humanize %}
         {%- endif -%}
-        <label{{ block('block_label_attributes') }}>{{ label|block_text(translation_domain) }}</label>
+        {%- if required -%}
+            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+        {%- endif -%}
+        <label{{ block('block_label_attributes') }}>{{ label|block_text(translation_domain) }}{% if required %}<em>*</em>{% endif %}</label>
     {%- endif %}
 {%- endblock %}
 

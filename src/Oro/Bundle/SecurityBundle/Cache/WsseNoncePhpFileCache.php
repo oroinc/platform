@@ -122,6 +122,7 @@ class WsseNoncePhpFileCache extends BasePhpFileCache
             if (!flock($fp, LOCK_EX | LOCK_NB)) {
                 return;
             }
+            flock($fp, LOCK_UN);
             fclose($fp);
         }
 
@@ -177,6 +178,12 @@ class WsseNoncePhpFileCache extends BasePhpFileCache
             ),
             function (\SplFileInfo $file) use ($fileExtension, $ignoreFilePrefix, $expirationTime) {
                 $fileName = $file->getFilename();
+
+                try {
+                    $file->getMTime();
+                } catch (\Exception $e) {
+                    return;
+                }
 
                 return
                     substr($fileName, -strlen($fileExtension)) === $fileExtension

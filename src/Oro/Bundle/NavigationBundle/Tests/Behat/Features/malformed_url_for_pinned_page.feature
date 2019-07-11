@@ -19,6 +19,7 @@ Feature: Malformed Url for Pinned Page And History
     Given History must looks like:
       | Users - User Management - System |
     When I click "Users - User Management - System"
+    And I click on empty space
     Then I should see "Could not load malformed url" error message
     When I go to System/User Management/Users
     And I should see following grid:

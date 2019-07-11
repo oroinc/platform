@@ -4,6 +4,7 @@ namespace Oro\Bundle\ReportBundle\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\AbstractSorterExtension;
+use Oro\Bundle\DataGridBundle\Tools\DateHelper;
 use Oro\Bundle\FilterBundle\Filter\DateGroupingFilter;
 use Oro\Bundle\FilterBundle\Filter\SkipEmptyPeriodsFilter;
 use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
@@ -13,6 +14,8 @@ use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Exception\InvalidDatagridConfigException;
 
 /**
+ * Modifies datagrid query to allow for grouping by date
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class DatagridDateGroupingBuilder
@@ -25,7 +28,7 @@ class DatagridDateGroupingBuilder
     const FIELDS_ACL_KEY_NAME = 'fields_acl';
     const COLUMNS_KEY_NAME = 'columns';
     const CALENDAR_DATE_COLUMN_ALIAS = 'cDate';
-    const CALENDAR_TABLE_JOIN_CONDITION_TEMPLATE = 'CAST(%s as DATE) = CAST(%s.%s as DATE)';
+    const CALENDAR_TABLE_JOIN_CONDITION_TEMPLATE = 'CAST(%s as DATE) = CAST(%s as DATE)';
     const CALENDAR_DATE_GRID_COLUMN_NAME = 'timePeriod';
     const DATE_PERIOD_FILTER = 'datePeriodFilter';
     const DEFAULT_GROUP_BY_FIELD = 'id';
@@ -40,6 +43,9 @@ class DatagridDateGroupingBuilder
      */
     protected $joinIdHelper;
 
+    /** @var DateHelper */
+    private $dateHelper;
+
     /**
      * @param string $calendarDateEntity
      * @param JoinIdentifierHelper|null $joinIdHelper
@@ -48,6 +54,14 @@ class DatagridDateGroupingBuilder
     {
         $this->calendarDateClass = $calendarDateEntity;
         $this->joinIdHelper = $joinIdHelper;
+    }
+
+    /**
+     * @param DateHelper $dateHelper
+     */
+    public function setDateHelper(DateHelper $dateHelper)
+    {
+        $this->dateHelper = $dateHelper;
     }
 
     /**
@@ -305,8 +319,9 @@ class DatagridDateGroupingBuilder
         return sprintf(
             static::CALENDAR_TABLE_JOIN_CONDITION_TEMPLATE,
             $this->getCalendarDateFieldReferenceString(),
-            $dateFieldTableAlias,
-            $dateFieldName
+            $this->dateHelper->getConvertTimezoneExpression(
+                sprintf('%s.%s', $dateFieldTableAlias, $dateFieldName)
+            )
         );
     }
 

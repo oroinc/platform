@@ -12,7 +12,6 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 /**
  * @group search
- * @dbIsolationPerTest
  */
 class SearchIterableResultTest extends SearchBundleWebTestCase
 {
@@ -36,13 +35,7 @@ class SearchIterableResultTest extends SearchBundleWebTestCase
             $this->markTestSkipped('Should be tested only with ORM search engine');
         }
 
-        $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
-        $this->getSearchIndexer()->resetIndex(Item::class);
-        $this->ensureItemsLoaded($alias, 0);
-
-        $this->loadFixtures([LoadSearchItemData::class]);
-        $this->getSearchIndexer()->reindex(Item::class);
-        $this->ensureItemsLoaded($alias, LoadSearchItemData::COUNT);
+        $this->loadFixture(Item::class, LoadSearchItemData::class, LoadSearchItemData::COUNT);
     }
 
     public function testWithDefaultBufferSize()

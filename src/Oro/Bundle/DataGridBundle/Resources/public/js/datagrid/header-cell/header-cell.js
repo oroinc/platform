@@ -21,7 +21,7 @@ define(function(require) {
             '<% if (sortable) { %>' +
                 '<a class="grid-header-cell__link" href="#" role="button" data-grid-header-cell-label>' +
                     '<span class="grid-header-cell__label" data-grid-header-cell-text><%- label %></span>' +
-                    '<span class="caret" aria-hidden="true"></span>' +
+                    '<span class="sortable-icon" aria-hidden="true"></span>' +
                 '</a>' +
             '<% } else { %>' +
                 '<span class="grid-header-cell__label-container" data-grid-header-cell-label>' +
