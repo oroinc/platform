@@ -4,8 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\EventsCompilerPass;
 use Oro\Bundle\WorkflowBundle\Migrations\Data\ORM\LoadWorkflowNotificationEvents;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class EventsCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
@@ -78,8 +80,12 @@ class EventsCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->definition->expects($this->once())
             ->method('addMethodCall')
             ->with(
-                'addListenerService',
-                [LoadWorkflowNotificationEvents::TRANSIT_EVENT, [EventsCompilerPass::SERVICE_KEY, 'process']]
+                'addListener',
+                [
+                    LoadWorkflowNotificationEvents::TRANSIT_EVENT,
+                    [new ServiceClosureArgument(new Reference(EventsCompilerPass::SERVICE_KEY)), 'process' ],
+                    0
+                ]
             );
 
         $this->compilerPass->process($this->containerBuilder);
