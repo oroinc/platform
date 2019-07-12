@@ -72,14 +72,15 @@ services:
             - [setNamespace, [ 'oro_config' ] ]
 
     oro_embedded_form.csrf_token_cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_csrf_cache' ] ]
+        class: Symfony\Component\Cache\Simple\ArrayCache
+        arguments:
+            - '%oro_embedded_form.csrf_token_lifetime%'
 
-    oro_security.wsse_nonce_cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_nonces_cache' ] ]
+    oro_wsse_authentication.nonce_cache:
+        abstract: true
+        class: Symfony\Component\Cache\Simple\ArrayCache
+        arguments:
+            - '<lifetime>' # set in WsseNonceCachePass
 
     oro_test.transport_provider:
         class: Oro\Bundle\TestFrameworkBundle\Provider\TestTransportProvider
