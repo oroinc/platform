@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\SegmentBundle\Tests\Behat;
+namespace Oro\Bundle\ReportBundle\Tests\Behat;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Oro\Bundle\SegmentBundle\Entity\SegmentType;
+use Oro\Bundle\ReportBundle\Entity\ReportType;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\ReferenceRepositoryInitializerInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 
@@ -14,9 +14,10 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
      */
     public function init(Registry $doctrine, Collection $referenceRepository)
     {
-        $types = $doctrine->getManagerForClass(SegmentType::class)->getRepository(SegmentType::class)->findAll();
-        foreach ($types as $type) {
-            $referenceRepository->set(sprintf('segment_%s_type', strtolower($type->getName())), $type);
+        $reportTypeRepo = $doctrine->getManager()->getRepository(ReportType::class);
+        /** @var ReportType $reportType */
+        foreach ($reportTypeRepo->findAll() as $reportType) {
+            $referenceRepository->set('report_type_' . $reportType->getName(), $reportType);
         }
     }
 }

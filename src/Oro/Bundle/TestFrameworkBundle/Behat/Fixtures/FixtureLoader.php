@@ -6,10 +6,12 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Suite\Suite;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\Exception\FileNotFoundException;
-use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader as AliceLoader;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader as AliceLoader;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
+ * Loads fixtures.
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class FixtureLoader
@@ -43,18 +45,18 @@ class FixtureLoader
      * @param KernelInterface $kernel
      * @param EntityClassResolver $entityClassResolver
      * @param EntitySupplement $entitySupplement
-     * @param OroAliceLoader $aliceLoader
+     * @param AliceLoader $aliceLoader
      */
     public function __construct(
         KernelInterface $kernel,
         EntityClassResolver $entityClassResolver,
         EntitySupplement $entitySupplement,
-        OroAliceLoader $aliceLoader
+        AliceLoader $aliceLoader
     ) {
         $this->kernel = $kernel;
-        $this->aliceLoader = $aliceLoader;
         $this->entityClassResolver = $entityClassResolver;
         $this->entitySupplement = $entitySupplement;
+        $this->aliceLoader = $aliceLoader;
     }
 
     /**
@@ -159,9 +161,18 @@ class FixtureLoader
      */
     public function load($dataOrFilename)
     {
-        $doctrine = $this->kernel->getContainer()->get('doctrine');
-        $this->aliceLoader->setDoctrine($doctrine);
+        if (\is_string($dataOrFilename)) {
+            $dataOrFilename = [$dataOrFilename];
+        }
+
         $result = $this->aliceLoader->load($dataOrFilename);
+
+        $helper = $this->kernel->getContainer()->get('oro_entity.doctrine_helper');
+        foreach ($result as $key => $object) {
+            if (!$helper->isManageableEntity($object)) {
+                unset($result[$key]);
+            }
+        }
 
         return $result;
     }
@@ -269,7 +280,7 @@ class FixtureLoader
 
     /**
      * @param string $name
-     * @param string|null $instance
+     * @param string|null $property
      * @return mixed
      */
     public function getReference($name, $property = null)

@@ -12,7 +12,7 @@ Oro\Bundle\ReportBundle\Entity\Report:
   report:
     name: Common Report
     type: '@reportType'
-    entity: Oro\Bundle\OrganizationBundle\Entity\Organization
+    entity: 'Oro\\Bundle\\OrganizationBundle\\Entity\\Organization'
     definition: abcd
 
 Oro\Bundle\OrganizationBundle\Entity\Organization:
@@ -23,7 +23,7 @@ Oro\Bundle\OrganizationBundle\Entity\Organization:
 Oro\Bundle\UserBundle\Entity\User:
   user{1..15}:
     username: alice<current()>
-    email: 'fake_<current()>@example.com'
+    email: 'fake_<current()>\@example.com'
     firstName: Alice<current()>
     lastName: Williams<current()>
     password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==

@@ -10,14 +10,17 @@ use Oro\Component\Testing\TempDirExtension;
 use Psr\Log\NullLogger;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
+    /** @var string */
     private $tempDir;
 
     /** @var array */
@@ -47,12 +50,16 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 
         $config = $this->processConfig($config);
 
+        /** @var OroTestFrameworkExtension|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this
             ->getMockBuilder('Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension')
             ->setMethods(['hasValidPaths', 'hasDirectory'])
             ->getMock();
         $extension->expects($this->any())->method('hasValidPaths')->willReturn(true);
         $extension->load($containerBuilder, $config);
+
+        $this->updateNelmioServiceDefinitions($containerBuilder);
+
         $extension->process($containerBuilder);
 
         $this->assertEquals($expectedSuiteConfig, $containerBuilder->getParameter('suite.configurations'));
@@ -81,6 +88,9 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('oro_test', $extension->getConfigKey());
     }
 
+    /**
+     * @return array
+     */
     public function processBundleAutoloadProvider()
     {
         return [
@@ -247,6 +257,9 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $containerBuilder->setParameter('suite.configurations', []);
         $extension = new OroTestFrameworkExtension();
         $extension->load($containerBuilder, $this->processConfig($configExtension));
+
+        $this->updateNelmioServiceDefinitions($containerBuilder);
+
         $extension->process($containerBuilder);
 
         $elementFactoryDefinition = $containerBuilder->getDefinition('oro_element_factory');
@@ -296,6 +309,30 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param ContainerBuilder $containerBuilder
+     */
+    private function updateNelmioServiceDefinitions(ContainerBuilder $containerBuilder): void
+    {
+        $nelmioServices = [
+            'nelmio_alice.file_parser.registry',
+            'nelmio_alice.fixture_builder.denormalizer.flag_parser.registry',
+            'nelmio_alice.fixture_builder.denormalizer.fixture.registry_denormalizer',
+            'nelmio_alice.generator.resolver.parameter.registry',
+            'nelmio_alice.generator.resolver.value.registry',
+            'nelmio_alice.generator.instantiator.registry',
+            'nelmio_alice.generator.caller.registry',
+        ];
+
+        foreach ($nelmioServices as $nelmioService) {
+            $containerBuilder->getDefinition($nelmioService)->addArgument([]);
+        }
+
+        $containerBuilder->setDefinition('property_accessor', new Definition(PropertyAccessor::class));
+        $containerBuilder->setDefinition('file_locator', new Definition(FileLocator::class));
+    }
+
+    /**
+     * @param array $config
      * @return array
      */
     private function processConfig(array $config = [])

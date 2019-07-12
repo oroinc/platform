@@ -6,6 +6,19 @@ parameters:
     oro_test.test_activity_activity_list.provider.class: Oro\Bundle\TestFrameworkBundle\Provider\TestActivityActivityListProvider
 
 services:
+    nelmio_alice.fixture_builder.expression_language.lexer.sub_patterns_lexer:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Lexer\SubPatternsLexer
+        arguments:
+            - '@nelmio_alice.fixture_builder.expression_language.lexer.reference_lexer'
+
+    oro_test.fixtures.reflection_property_accessor:
+        class: Nelmio\Alice\PropertyAccess\ReflectionPropertyAccessor
+        public: false
+        decorates: nelmio_alice.property_accessor
+        decoration_priority: -10
+        arguments:
+            - '@oro_test.fixtures.reflection_property_accessor.inner'
+
     oro_test.provider.exclusion_provider:
         class: '%oro_test.provider.exclusion_provider.class%'
 
@@ -47,24 +60,56 @@ services:
         tags:
             - { name: kernel.event_listener, event: console.terminate, method: onConsoleTerminate }
 
-    oro_test.alice_reference_processor:
-        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceReferenceProcessor
+    oro_test.alice_file_parser.yaml:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceYamlParser
+        decorates: nelmio_alice.file_parser.chainable.yaml
+        arguments:
+            - '@oro_test.alice_file_parser.yaml.inner'
+
+    oro_test.reference_resolver:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\AliceReferenceResolver
         public: false
         arguments:
             - '@doctrine'
-        tags: ['oro_test.alice_processor']
 
-    oro_test.alice_to_string_processor:
-        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceToStringProcessor
-        public: false
-        tags: ['oro_test.alice_processor']
+    oro_test.value_resolver:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\AliceToStringResolver
+        public: true
+        arguments:
+            - '@oro_test.reference_resolver'
+
+    oro_test.fixture_loader.alice_combined_loader:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Loader\AliceCombinedLoader
+        lazy: true
+        arguments:
+            - '@nelmio_alice.files_loader.simple'
+            - '@nelmio_alice.data_loader.simple'
+
+    oro_test.fixture_loader.doctrine.persister_loader:
+        class: Fidry\AliceDataFixtures\Loader\PersisterLoader
+        lazy: true
+        arguments:
+            - '@oro_test.fixture_loader.alice_combined_loader'
+            - '@fidry_alice_data_fixtures.persistence.persister.doctrine'
+
+    oro_test.fixture_loader.doctrine.purger_loader:
+        class: Fidry\AliceDataFixtures\Loader\PurgerLoader
+        lazy: true
+        arguments:
+            - '@oro_test.fixture_loader.doctrine.persister_loader'
+            - '@fidry_alice_data_fixtures.persistence.purger_factory.doctrine'
+            - 'no_purge'
 
     oro_test.alice_fixture_loader:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
-        calls:
-            - [setFileLocator, ['@file_locator']]
+        arguments:
+            - '@oro_test.fixture_loader.doctrine.purger_loader'
+            - '@file_locator'
+
+    oro_test.reference_repository:
+        class: Doctrine\Common\Collections\ArrayCollection
+        factory: ['@oro_test.alice_fixture_loader', getReferenceRepository]
 
     oro_config.cache:
         parent: doctrine_cache.abstract.array

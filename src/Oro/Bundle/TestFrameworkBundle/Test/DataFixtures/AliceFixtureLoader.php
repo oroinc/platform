@@ -2,69 +2,91 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 
-use Nelmio\Alice\Fixtures\Loader as AliceLoader;
-use Nelmio\Alice\Instances\Collection as AliceReferenceRepository;
-use Nelmio\Alice\Instances\Processor\Processor;
+use Fidry\AliceDataFixtures\LoaderInterface;
+use Fidry\AliceDataFixtures\Persistence\PurgeMode;
 use Symfony\Component\Config\FileLocator;
 
-class AliceFixtureLoader extends AliceLoader
+/**
+ * Aware about loaded objects.
+ */
+class AliceFixtureLoader implements LoaderInterface
 {
-    /**
-     * @var FileLocator
-     */
+    /** @var LoaderInterface */
+    protected $loader;
+
+    /** @var Collection */
+    protected $referenceRepository;
+
+    /** @var FileLocator */
     protected $fileLocator;
 
     /**
-     * {@inheritdoc}
-     */
-    public function __construct($locale = 'en_US', array $providers = [], $seed = 1, array $parameters = [])
-    {
-        parent::__construct($locale, $providers, $seed, $parameters);
-        $this->addParser(new AliceYamlParser($this));
-    }
-
-    /**
-     * @return AliceReferenceRepository
-     */
-    public function getReferenceRepository()
-    {
-        return $this->objects;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function load($dataOrFilename)
-    {
-        if (is_string($dataOrFilename)) {
-            $dataOrFilename = $this->locateFile($dataOrFilename);
-        }
-
-        return parent::load($dataOrFilename);
-    }
-
-    /**
-     * @param  string $file
-     * @return string Full path to file
-     */
-    public function locateFile($file)
-    {
-        return $this->fileLocator->locate($file);
-    }
-
-    /**
+     * @param LoaderInterface $loader
      * @param FileLocator $fileLocator
      */
-    public function setFileLocator(FileLocator $fileLocator)
+    public function __construct(LoaderInterface $loader, FileLocator $fileLocator)
     {
+        $this->loader = $loader;
         $this->fileLocator = $fileLocator;
+        $this->referenceRepository = new Collection();
     }
 
     /**
-     * @return Processor
+     * @return Collection
      */
-    public function getProcessor()
+    public function getReferenceRepository(): Collection
     {
-        return $this->processor;
+        return $this->referenceRepository;
+    }
+
+    /**
+     * @param array $references
+     */
+    protected function setReferences(array $references): void
+    {
+        $this->referenceRepository->clear();
+        foreach ($references as $key => $object) {
+            $this->referenceRepository->set($key, $object);
+        }
+    }
+
+    /**
+     * @param array $dataOrFiles
+     * @param array $parameters
+     * @param array $objects
+     * @param PurgeMode|null $purgeMode
+     * @return object[]
+     */
+    public function load(
+        array $dataOrFiles,
+        array $parameters = [],
+        array $objects = [],
+        PurgeMode $purgeMode = null
+    ): array {
+        $objects = $this->loader->load(
+            $dataOrFiles,
+            $parameters,
+            \array_merge($this->referenceRepository->toArray(), $objects)
+        );
+
+        $added = \array_filter(
+            $objects,
+            function ($object) {
+                return !$this->referenceRepository->contains($object);
+            }
+        );
+
+        $this->setReferences($objects);
+
+        return $added;
+    }
+
+    /**
+     * @param string $file
+     * @return string Full path to file
+     */
+    public function locateFile(string $file)
+    {
+        return $this->fileLocator->locate($file);
     }
 }
