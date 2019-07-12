@@ -12,6 +12,8 @@ use Behat\Testwork\EventDispatcher\ServiceContainer\EventDispatcherExtension;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Behat\Testwork\ServiceContainer\ServiceProcessor;
+use Nelmio\Alice\Bridge\Symfony\DependencyInjection\NelmioAliceExtension;
+use Nelmio\Alice\Bridge\Symfony\NelmioAliceBundle;
 use Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ArtifactsHandlerInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
@@ -20,6 +22,7 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -124,6 +127,12 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     public function load(ContainerBuilder $container, array $config)
     {
+        $extension = new NelmioAliceExtension();
+        $extension->load([], $container);
+
+        $bundle = new NelmioAliceBundle();
+        $bundle->build($container);
+
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/config'));
         $loader->load('services.yml');
         $loader->load('health_checkers.yml');
@@ -137,6 +146,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         // Remove reboot kernel after scenario because we have isolation in feature layer instead of scenario
         $container->getDefinition('symfony2_extension.context_initializer.kernel_aware')
             ->clearTag(EventDispatcherExtension::SUBSCRIBER_TAG);
+        $container->addCompilerPass(new DecoratorServicePass());
     }
 
     /**

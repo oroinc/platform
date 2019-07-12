@@ -9,6 +9,9 @@ use Oro\Bundle\TestFrameworkBundle\Provider\XssPayloadProvider;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
+/**
+ * Provides additional functions to the faker.
+ */
 class XssProvider extends BaseProvider
 {
     /**
@@ -54,11 +57,11 @@ class XssProvider extends BaseProvider
 
     /**
      * @param string $identifier
+     * @param string|null $elementId
      * @param string|null $payloadType
-     * @param null|string $elementId
      * @return string
      */
-    public function xss($identifier = 'XSS', $payloadType = null, $elementId = null)
+    public function xss($identifier = 'XSS', $elementId = null, $payloadType = null)
     {
         if (!$elementId) {
             $elementId = $this->prefix . ++self::$idx;

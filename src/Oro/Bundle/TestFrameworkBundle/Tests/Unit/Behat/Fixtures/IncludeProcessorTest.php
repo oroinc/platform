@@ -1,12 +1,18 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
+namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Fixtures;
 
+use Nelmio\Alice\FileLocator\DefaultFileLocator;
+use Nelmio\Alice\Parser\Chainable\YamlParser;
+use Nelmio\Alice\Parser\IncludeProcessor\DefaultIncludeProcessor;
+use Nelmio\Alice\Parser\RuntimeCacheParser;
+use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\IncludeProcessor;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Yaml\Parser;
 
-class OroYamlParserTest extends \PHPUnit\Framework\TestCase
+class IncludeProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OroYamlParser */
+    /** @var RuntimeCacheParser */
     protected $parser;
 
     /** @var KernelInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -18,8 +24,14 @@ class OroYamlParserTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->kernel = $this->createMock(KernelInterface::class);
-        $this->parser = new OroYamlParser();
-        $this->parser->setKernel($this->kernel);
+
+        $fileLocator = new DefaultFileLocator();
+
+        $this->parser = new RuntimeCacheParser(
+            new YamlParser(new Parser()),
+            $fileLocator,
+            new IncludeProcessor(new DefaultIncludeProcessor($fileLocator), $this->kernel)
+        );
     }
 
     /**
@@ -42,7 +54,7 @@ class OroYamlParserTest extends \PHPUnit\Framework\TestCase
             $this->kernel->expects($this->once())
                 ->method('locateResource')
                 ->with($expectsKernelCallWith, null, true)
-                ->willReturn(dirname(__FILE__) . '/OroStubBundle/Tests/Behat/Features/Fixtures/test_include.yml');
+                ->willReturn(__DIR__ . '/OroStubBundle/Tests/Behat/Features/Fixtures/test_include.yml');
         } else {
             $this->kernel->expects($this->never())->method('locateResource');
         }
@@ -58,15 +70,15 @@ class OroYamlParserTest extends \PHPUnit\Framework\TestCase
     public function includeFilesDataProvider()
     {
         yield [
-            'path' => dirname(__FILE__) . '/OroStubBundle/Tests/Behat/Features/Fixtures/test_fixture_1.yml',
+            'path' => __DIR__ . '/OroStubBundle/Tests/Behat/Features/Fixtures/test_fixture_1.yml',
             'expectsKernelCallWith' => '@OroStubBundle/Tests/Behat/Features/Fixtures/test_include.yml',
         ];
         yield [
-            'path' => dirname(__FILE__) . '/OroStubBundle/Tests/Behat/Features/Fixtures/test_fixture_2.yml',
+            'path' => __DIR__ . '/OroStubBundle/Tests/Behat/Features/Fixtures/test_fixture_2.yml',
             'expectsKernelCallWith' => '@OroStubBundle/Tests/Behat/Features/Fixtures/test_include.yml',
         ];
         yield [
-            'path' => dirname(__FILE__) . '/OroStubBundle/Tests/Behat/Features/Fixtures/test_fixture_3.yml',
+            'path' => __DIR__ . '/OroStubBundle/Tests/Behat/Features/Fixtures/test_fixture_3.yml',
             'expectsKernelCallWith' => null,
         ];
     }

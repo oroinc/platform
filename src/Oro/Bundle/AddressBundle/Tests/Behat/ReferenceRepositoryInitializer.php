@@ -3,11 +3,11 @@
 namespace Oro\Bundle\AddressBundle\Tests\Behat;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Nelmio\Alice\Instances\Collection as AliceCollection;
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\ReferenceRepositoryInitializerInterface;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 
 class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerInterface
@@ -17,12 +17,17 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
         Country::class => [
             'germany' => ['iso2Code' => 'DE'],
             'austria' => ['iso2Code' => 'AT'],
+            'samoa' => ['iso2Code' => 'AS'],
             'united_states' => ['iso2Code' => 'US'],
+            'monaco' => ['iso2Code' => 'MC'],
         ],
         Region::class => [
             'berlin' => ['combinedCode' => 'DE-BE'],
             'vienna' => ['combinedCode' => 'AT-9'],
             'florida' => ['combinedCode' => 'US-FL'],
+            'new_york' => ['combinedCode' => 'US-NY'],
+            'indiana' => ['combinedCode' => 'US-IN'],
+            'california' => ['combinedCode' => 'US-CA'],
         ],
         AddressType::class => [
             'billingType' => ['name' => 'billing'],
@@ -41,7 +46,7 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
     /**
      * {@inheritdoc}
      */
-    public function init(Registry $doctrine, AliceCollection $referenceRepository)
+    public function init(Registry $doctrine, Collection $referenceRepository)
     {
         foreach ($this->data as $className => $entities) {
             $repository = $doctrine->getManager()->getRepository($className);

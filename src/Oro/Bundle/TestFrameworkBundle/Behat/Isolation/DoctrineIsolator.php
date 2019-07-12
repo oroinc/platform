@@ -5,13 +5,13 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
-use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener\RestrictFlushInitializerListener;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -39,7 +39,7 @@ class DoctrineIsolator implements IsolatorInterface
     protected $initializers = [];
 
     /**
-     * @var OroAliceLoader
+     * @var AliceFixtureLoader
      */
     protected $aliceLoader;
 
@@ -51,12 +51,12 @@ class DoctrineIsolator implements IsolatorInterface
     /**
      * @param KernelInterface $kernel
      * @param FixtureLoader $fixtureLoader
-     * @param OroAliceLoader $aliceLoader
+     * @param AliceFixtureLoader $aliceLoader
      */
     public function __construct(
         KernelInterface $kernel,
         FixtureLoader $fixtureLoader,
-        OroAliceLoader $aliceLoader
+        AliceFixtureLoader $aliceLoader
     ) {
         $this->kernel = $kernel;
         $this->fixtureLoader = $fixtureLoader;
@@ -82,7 +82,6 @@ class DoctrineIsolator implements IsolatorInterface
     public function initReferences()
     {
         $doctrine = $this->kernel->getContainer()->get('doctrine');
-        $this->aliceLoader->setDoctrine($doctrine);
 
         $referenceRepository = $this->aliceLoader->getReferenceRepository();
         $referenceRepository->clear();

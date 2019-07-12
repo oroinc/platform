@@ -1,4 +1,12 @@
 services:
+    oro_test.fixtures.reflection_property_accessor:
+        class: Nelmio\Alice\PropertyAccess\ReflectionPropertyAccessor
+        public: false
+        decorates: nelmio_alice.property_accessor
+        decoration_priority: -10
+        arguments:
+            - '@oro_test.fixtures.reflection_property_accessor.inner'
+
     oro_test.listener.interactive_execution_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\InteractiveExecutionSubscriber'
 
@@ -77,20 +85,8 @@ services:
             - '@oro_security.owner.metadata_provider.chain'
 
     oro_test.reference_repository:
-        class: Nelmio\Alice\Instances\Collection
+        class: Doctrine\Common\Collections\ArrayCollection
         factory: ['@oro_test.alice_loader', getReferenceRepository]
-
-    oro_behat_extension.fixtures.doctrine_entity_populator:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\DoctrineEntityPopulator
-        arguments:
-            - '@symfony2_extension.kernel'
-
-    oro_behat_extension.fixtures.yml_parser:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroYamlParser
-        arguments:
-            - '@oro_test.alice_loader'
-        calls:
-            - [setKernel, ['@symfony2_extension.kernel']]
 
     oro_behat_extension.suite.oro_suite_generator:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Suite\OroSuiteGenerator
@@ -98,9 +94,6 @@ services:
             - '@symfony2_extension.kernel'
         tags:
             - { name: 'suite.generator', priority: 100 }
-
-    oro_test.faker_generator:
-        class: Faker\Generator
 
     oro_test.provider.xss_payload_provider:
         class: Oro\Bundle\TestFrameworkBundle\Provider\XssPayloadProvider
@@ -112,16 +105,32 @@ services:
     oro_test.faker.provider.xss:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Faker\Provider\XssProvider
         arguments:
-            - '@oro_test.faker_generator'
+            - '@nelmio_alice.faker.generator'
             - '@oro_test.provider.xss_payload_provider'
             - '@oro_test.encoder.default'
+        tags:
+            - {name: nelmio_alice.faker.provider}
+
+    oro_test.file_parser.include_processor:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\IncludeProcessor
+        decorates: nelmio_alice.file_parser.default_include_processor
+        arguments:
+            - '@oro_test.file_parser.include_processor.inner'
+            - '@symfony2_extension.kernel'
+
+    oro_test.fixture_loader.alice_combined_loader:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Loader\AliceCombinedLoader
+        lazy: true
+        arguments:
+            - '@nelmio_alice.files_loader.simple'
+            - '@nelmio_alice.data_loader.simple'
 
     oro_test.alice_loader:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader
-        calls:
-            - [addPopulator, ['@oro_behat_extension.fixtures.doctrine_entity_populator']]
-            - [addParser, ['@oro_behat_extension.fixtures.yml_parser']]
-            - [addProvider, ['@oro_test.faker.provider.xss']]
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader
+        public: true
+        arguments:
+            - '@oro_test.fixture_loader.alice_combined_loader'
+            - '@file_locator'
 
     oro_test.environment.handler.feature_environment_handler:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\FeatureEnvironmentHandler

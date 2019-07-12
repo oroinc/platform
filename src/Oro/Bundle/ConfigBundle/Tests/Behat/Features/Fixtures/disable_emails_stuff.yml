@@ -4,8 +4,7 @@ include:
 OroEntityProxy\OroEmailBundle\EmailAddressProxy:
   charlieAddress:
     owner: '@charlie'
-    email: charlie@sheen.com
-    hasOwner: true
+    email: 'charlie@sheen.com'
 
 Oro\Bundle\EmailBundle\Entity\EmailBody:
   emailBody{1..5}:
@@ -24,7 +23,7 @@ Oro\Bundle\EmailBundle\Entity\Email:
     subject: 'Merry Christmas'
     emailBody: '@emailBody1'
     sentAt: '<dateTimeBetween("-1 day", "now")>'
-    fromName: '"Charlie Sheen" <charlie@sheen.com>'
+    fromName: '"Charlie Sheen" \<charlie@sheen.com\>'
     fromEmailAddress: '@charlieAddress'
     internalDate: '<dateTimeBetween("-1 day", "now")>'
     messageId: fsdfasdf
@@ -33,7 +32,7 @@ Oro\Bundle\EmailBundle\Entity\Email:
     subject: '<sentence(6, true)>'
     emailBody: '@emailBody<current()>'
     sentAt: '<dateTimeBetween("-200 days", "now")>'
-    fromName: '"Charlie Sheen" <charlie@sheen.com>'
+    fromName: '"Charlie Sheen" \<charlie@sheen.com\>'
     fromEmailAddress: '@charlieAddress'
     internalDate: '<dateTimeBetween("-200 days", "-1 day")>'
     messageId: fsdfasdf
