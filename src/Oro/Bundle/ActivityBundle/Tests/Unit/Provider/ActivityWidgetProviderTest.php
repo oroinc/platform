@@ -7,7 +7,7 @@ use Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
 {

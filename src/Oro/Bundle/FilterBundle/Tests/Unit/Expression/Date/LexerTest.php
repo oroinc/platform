@@ -12,7 +12,7 @@ class LexerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $translatorMock = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translatorMock = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $providerMock   = $this->createMock('Oro\Bundle\FilterBundle\Provider\DateModifierProvider');
         $this->lexer    = new Lexer($translatorMock, $providerMock);
     }

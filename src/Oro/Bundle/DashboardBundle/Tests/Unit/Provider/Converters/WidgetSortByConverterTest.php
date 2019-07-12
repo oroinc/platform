@@ -28,7 +28,7 @@ class WidgetSortByConverterTest extends \PHPUnit\Framework\TestCase
             ->with('TestClass', 'existing')
             ->will($this->returnValue($config));
 
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $translator->expects($this->any())
             ->method('trans')
             ->will($this->returnCallback(function ($id) {

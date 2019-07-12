@@ -17,7 +17,7 @@ class ProcessDataSerializerTest extends \PHPUnit\Framework\TestCase
         $originalData = array('old' => new \DateTime(), 'new' => new \DateTime());
 
         $normalizedData = $serializer->normalize($originalData);
-        $denormalizedData = $serializer->denormalize($normalizedData, null);
+        $denormalizedData = $serializer->denormalize($normalizedData, \stdClass::class, '');
 
         $this->assertEquals($originalData, $denormalizedData);
     }

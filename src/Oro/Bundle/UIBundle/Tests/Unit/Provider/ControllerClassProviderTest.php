@@ -197,8 +197,8 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->kernel->expects(self::once())
             ->method('getBundle')
-            ->with('Acme', self::isFalse())
-            ->willReturn([$this->getBundle()]);
+            ->with('Acme')
+            ->willReturn($this->getBundle());
         $this->container->expects(self::never())
             ->method('has');
         $this->logger->expects(self::never())
@@ -222,8 +222,8 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->kernel->expects(self::once())
             ->method('getBundle')
-            ->with('Acme', self::isFalse())
-            ->willReturn([$this->getBundle()]);
+            ->with('Acme')
+            ->willReturn($this->getBundle());
         $this->container->expects(self::never())
             ->method('has');
         $this->logger->expects(self::once())

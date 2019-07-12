@@ -16,7 +16,7 @@ use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint;
 use Oro\Bundle\QueryDesignerBundle\Validator\QueryValidator;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class QueryValidatorTest extends \PHPUnit\Framework\TestCase

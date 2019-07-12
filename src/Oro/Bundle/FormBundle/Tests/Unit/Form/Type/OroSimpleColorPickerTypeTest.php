@@ -21,7 +21,7 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $translatorInterface = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+        $translatorInterface = $this->getMockBuilder('Symfony\Contracts\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
             ->getMock();
 

@@ -19,7 +19,7 @@ abstract class ExtendRole extends AbstractRole
      *
      * {@inheritdoc}
      */
-    public function __construct($role)
+    public function __construct(string $role = '')
     {
         parent::__construct($role);
     }

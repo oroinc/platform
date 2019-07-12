@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Exception\LockedException;
-use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -90,7 +90,7 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $advancedUser->addApiKey($userApiKey);
         $advancedUser->setEnabled(true);
         $advancedUser->setAuthStatus(new StubEnumValue(UserManager::STATUS_ACTIVE, UserManager::STATUS_ACTIVE));
-        $role = $this->createMock(RoleInterface::class);
+        $role = $this->createMock(Role::class);
         $advancedUser->setRoles([$role]);
         $userApiKey->setUser($advancedUser);
 

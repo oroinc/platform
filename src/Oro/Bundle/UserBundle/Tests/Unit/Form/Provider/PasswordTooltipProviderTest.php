@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Provider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
 use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PasswordTooltipProviderTest extends \PHPUnit\Framework\TestCase
 {

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DistributionBundle\Entity\Security;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\Role\Role as BaseRole;
 
 /**
  * Role Entity
@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\Role\RoleInterface;
  * @ORM\Entity()
  * @ORM\Table(name="oro_access_role")
  */
-class Role implements RoleInterface
+class Role extends BaseRole
 {
     /**
      * @var int
@@ -34,9 +34,11 @@ class Role implements RoleInterface
      *
      * @param string $role ROLE_FOO etc
      */
-    public function __construct($role = '')
+    public function __construct(string $role = '')
     {
-        $this->role  = $role;
+        parent::__construct($role);
+
+        $this->role = $role;
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Model;
 
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This class represents a translatable string and can be used instead of a string attributes

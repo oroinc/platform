@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SoapBundle\Provider\EntityMetadataProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -23,7 +23,7 @@ class EntityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->cm         = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $this->provider   = new EntityMetadataProvider($this->cm, $this->translator);
     }
 

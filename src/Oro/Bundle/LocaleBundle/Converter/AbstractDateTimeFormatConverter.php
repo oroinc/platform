@@ -3,7 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Converter;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provided functionality to convert date time to different formats

@@ -3,11 +3,11 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Layput\DataProvider;
 
 use Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Translation\Translator;
 
 class TranslatorProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var  Translator|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     /** @var TranslatorProvider */
@@ -15,7 +15,7 @@ class TranslatorProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Component\Translation\Translator');
         $this->translatorProvider = new TranslatorProvider($this->translator);
     }
 

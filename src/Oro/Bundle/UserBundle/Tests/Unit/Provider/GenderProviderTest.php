@@ -22,7 +22,7 @@ class GenderProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+        $translator = $this->getMockBuilder('Symfony\Contracts\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
             ->setMethods(['trans'])
             ->getMockForAbstractClass();

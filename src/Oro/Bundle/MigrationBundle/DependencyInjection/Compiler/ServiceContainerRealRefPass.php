@@ -34,16 +34,18 @@ class ServiceContainerRealRefPass implements CompilerPassInterface
         }
 
         $migrationContainer = $container->getDefinition('oro_migration.service_container');
-        $privateContainer = $container->getDefinition((string) $migrationContainer->getArgument(2));
+        $privateContainer = $migrationContainer->getArgument(2);
         $definitions = $container->getDefinitions();
+        $privateServices = $privateContainer->getArgument(0);
 
         /** @var ServiceClosureArgument $argument */
-        foreach ($privateContainer->getArgument(0) as $id => $argument) {
-            $target = (string) $argument->getValues()[0];
-
-            if (isset($definitions[$target])) {
+        foreach ($privateServices as $id => $argument) {
+            if (isset($definitions[$target = (string) $argument->getValues()[0]])) {
                 $argument->setValues([new Reference($target)]);
+            } else {
+                unset($privateServices[$id]);
             }
         }
+        $privateContainer->replaceArgument(0, $privateServices);
     }
 }

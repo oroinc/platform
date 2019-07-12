@@ -5,7 +5,7 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 use Oro\Bundle\UIBundle\Twig\FormatExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Translation\Translator;
 
 class FormatExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -22,7 +22,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator = $this->createMock(Translator::class);
         $this->formatterManager = $this->getMockBuilder(FormatterManager::class)
             ->disableOriginalConstructor()
             ->getMock();

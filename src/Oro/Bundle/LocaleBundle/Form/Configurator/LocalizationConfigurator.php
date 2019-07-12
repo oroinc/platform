@@ -84,7 +84,7 @@ class LocalizationConfigurator
             ->getConfig()
             ->getOptions();
 
-        unset($options['value']);
+        unset($options['value'], $options['false_values']);
 
         $form->add('use_parent_scope_value', HiddenType::class, $options);
     }
