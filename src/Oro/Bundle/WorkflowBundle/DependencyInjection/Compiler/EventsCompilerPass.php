@@ -3,8 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\WorkflowBundle\Migrations\Data\ORM\LoadWorkflowNotificationEvents;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class EventsCompilerPass implements CompilerPassInterface
 {
@@ -27,9 +29,10 @@ class EventsCompilerPass implements CompilerPassInterface
             return;
         }
 
-        $dispatcher->addMethodCall(
-            'addListenerService',
-            [LoadWorkflowNotificationEvents::TRANSIT_EVENT, [self::SERVICE_KEY, 'process']]
-        );
+        $dispatcher->addMethodCall('addListener',[
+            LoadWorkflowNotificationEvents::TRANSIT_EVENT,
+            [new ServiceClosureArgument(new Reference(self::SERVICE_KEY)), 'process' ],
+            0
+        ]);
     }
 }
