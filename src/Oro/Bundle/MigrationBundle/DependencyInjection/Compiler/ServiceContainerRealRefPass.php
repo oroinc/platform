@@ -46,6 +46,7 @@ class ServiceContainerRealRefPass implements CompilerPassInterface
                 unset($privateServices[$id]);
             }
         }
+
         $privateContainer->replaceArgument(0, $privateServices);
     }
 }

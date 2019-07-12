@@ -4,8 +4,10 @@ namespace Oro\Bundle\NotificationBundle\DependencyInjection\Compiler;
 
 use Doctrine\DBAL\Connection;
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class EventsCompilerPass implements CompilerPassInterface
 {
@@ -38,10 +40,11 @@ class EventsCompilerPass implements CompilerPassInterface
 
             $rows = $connection->fetchAll('SELECT name FROM ' . self::EVENT_TABLE_NAME);
             foreach ($rows as $row) {
-                $dispatcher->addMethodCall(
-                    'addListenerService',
-                    [$row['name'], [self::SERVICE_KEY, 'process']]
-                );
+                $dispatcher->addMethodCall('addListener', [
+                    $row['name'],
+                    [new ServiceClosureArgument(new Reference(self::SERVICE_KEY)), 'process'],
+                    0
+                ]);
             }
         }
     }
