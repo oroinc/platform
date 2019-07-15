@@ -6,7 +6,7 @@ use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Autocomplete Search Handler for Impersonation used in Audit Logs

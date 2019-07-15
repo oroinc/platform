@@ -69,7 +69,7 @@ class FilterTypeTest extends \PHPUnit\Framework\TestCase
 
     protected function getExtensions()
     {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
 
         $filterType = new FilterType($translator);
 

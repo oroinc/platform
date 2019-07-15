@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\Role\Role;
 
 class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -169,7 +169,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             ->willReturnOnConsecutiveCalls($tokenStorage, $registry);
 
         /** @var RoleInterface $role */
-        $role = $this->createMock(RoleInterface::class);
+        $role = $this->createMock(Role::class);
         $user = new User();
         $user->addRole($role);
         $repository = $this->createMock(UserRepository::class);
@@ -213,7 +213,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             ->willReturnOnConsecutiveCalls($tokenStorage, $userManager);
 
         /** @var RoleInterface $role */
-        $role = $this->createMock(RoleInterface::class);
+        $role = $this->createMock(Role::class);
         $user = new User();
         $user->addRole($role);
         $userManager->expects($this->once())
@@ -409,7 +409,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             ->willReturn($organization);
 
         /** @var RoleInterface $role */
-        $role = $this->createMock(RoleInterface::class);
+        $role = $this->createMock(Role::class);
         $user = new User();
         $user->setUsername('testnewusername');
         $user->addRole($role);

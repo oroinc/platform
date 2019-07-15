@@ -23,7 +23,7 @@ class BaseAclManagerTest extends \PHPUnit\Framework\TestCase
             $this->manager->getSid('ROLE_TEST')
         );
 
-        $src = $this->createMock('Symfony\Component\Security\Core\Role\RoleInterface');
+        $src = $this->createMock('Symfony\Component\Security\Core\Role\Role');
         $src->expects($this->once())
             ->method('getRole')
             ->will($this->returnValue('ROLE_TEST'));

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Dashboard\Converters;
 
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetDefaultOwnersConverter extends ConfigValueConverterAbstract
 {

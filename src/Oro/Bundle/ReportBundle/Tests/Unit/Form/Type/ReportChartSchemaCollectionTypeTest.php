@@ -9,7 +9,7 @@ use Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaCollectionType;
 use Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportChartSchemaCollectionTypeTest extends FormIntegrationTestCase
 {

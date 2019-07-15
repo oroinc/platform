@@ -61,7 +61,7 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
     protected function getExtensions()
     {
         $translator = $this
-            ->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+            ->getMockBuilder('Symfony\Contracts\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
             ->getMock();
 

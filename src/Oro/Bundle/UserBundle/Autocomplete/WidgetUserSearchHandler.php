@@ -6,7 +6,7 @@ use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Autocomplete\QueryCriteria\SearchCriteria;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetUserSearchHandler extends UserSearchHandler
 {

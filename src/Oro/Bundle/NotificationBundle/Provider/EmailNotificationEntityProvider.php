@@ -9,7 +9,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides the list of entities for which it is allowed to configure email notifications.

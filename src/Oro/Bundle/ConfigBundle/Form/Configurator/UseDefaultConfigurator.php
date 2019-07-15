@@ -80,7 +80,7 @@ class UseDefaultConfigurator
             ->getConfig()
             ->getOptions();
 
-        unset($options['value']);
+        unset($options['value'], $options['false_values']);
 
         $form->add(self::USE_PARENT_SCOPE_VALUE, HiddenType::class, $options);
     }

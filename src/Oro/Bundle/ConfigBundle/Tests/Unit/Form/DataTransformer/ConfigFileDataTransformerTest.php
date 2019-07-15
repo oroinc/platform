@@ -169,6 +169,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
     protected function prepareHttpFile()
     {
         $httpFile = $this->prophesize(HttpFile::class);
+        $httpFile->willBeConstructedWith(['', false]);
         $httpFile->isFile()->willReturn(true);
 
         return $httpFile;

@@ -3,6 +3,8 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\EventsCompilerPass;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Reference;
 
 class EventsCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
@@ -52,8 +54,12 @@ class EventsCompilerPassTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('addMethodCall')
             ->with(
-                'addListenerService',
-                array(self::EVENT_NAME, array('oro_notification.manager', 'process'))
+                'addListener',
+                [
+                    self::EVENT_NAME,
+                    [new ServiceClosureArgument(new Reference('oro_notification.manager')), 'process' ],
+                    0
+                ]
             );
 
         $compiler = new EventsCompilerPass();

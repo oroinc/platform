@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Layout\DataProvider;
 
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides layer for layouts to use translator as DataProvider

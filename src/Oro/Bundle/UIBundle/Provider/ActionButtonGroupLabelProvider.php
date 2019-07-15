@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UIBundle\Provider;
 
 use Oro\Bundle\UIBundle\Tools\EntityLabelBuilder;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ActionButtonGroupLabelProvider implements LabelProviderInterface
 {

@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Model;
 
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Represents an error happened during the processing of an action.

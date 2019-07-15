@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Extension;
 
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Default context resolver

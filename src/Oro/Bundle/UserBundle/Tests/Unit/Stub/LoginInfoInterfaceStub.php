@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Stub;
 
 use Oro\Bundle\UserBundle\Entity\LoginInfoInterface;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
-use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\Role\Role;
 
 class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
 {
@@ -172,7 +172,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function addRole(RoleInterface $role)
+    public function addRole(Role $role)
     {
         return $this;
     }

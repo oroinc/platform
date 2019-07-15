@@ -11,7 +11,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassD
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimitResult;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DeleteMassActionHandler implements MassActionHandlerInterface
 {

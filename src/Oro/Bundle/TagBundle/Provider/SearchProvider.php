@@ -12,7 +12,7 @@ use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\TagBundle\Entity\Tagging;
 use Oro\Bundle\TagBundle\Security\SecurityProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SearchProvider extends ResultStatisticsProvider
 {

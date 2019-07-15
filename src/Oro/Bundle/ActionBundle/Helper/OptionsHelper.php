@@ -7,7 +7,7 @@ use Oro\Bundle\ActionBundle\Button\OperationButton;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Manages options for "action buttons"

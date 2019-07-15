@@ -5,7 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Formatter;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The formatter that builds <a href="..."> tag for an image.

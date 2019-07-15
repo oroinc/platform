@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Acl\Extension;
 
 use Oro\Bundle\SecurityBundle\Metadata\Label;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Represents a translatable workflow name.

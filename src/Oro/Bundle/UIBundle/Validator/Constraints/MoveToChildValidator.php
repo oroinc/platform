@@ -4,7 +4,7 @@ namespace Oro\Bundle\UIBundle\Validator\Constraints;
 
 use Oro\Bundle\UIBundle\Model\TreeCollection;
 use Oro\Bundle\UIBundle\Model\TreeItem;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 

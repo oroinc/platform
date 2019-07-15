@@ -5,7 +5,7 @@ namespace Oro\Component\Testing\Unit;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase as BaseTestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
@@ -173,12 +173,12 @@ class FormIntegrationTestCase extends BaseTestCase
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|Translator
      */
     protected function getTranslator()
     {
-        /* @var $translator \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        /* @var $translator \PHPUnit\Framework\MockObject\MockObject|Translator */
+        $translator = $this->createMock('Symfony\Component\Translation\Translator');
 
         $translator->expects($this->any())
             ->method('trans')

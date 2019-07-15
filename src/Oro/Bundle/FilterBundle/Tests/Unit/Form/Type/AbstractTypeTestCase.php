@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractTypeTestCase extends FormIntegrationTestCase
 {
@@ -55,7 +55,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
      */
     protected function createMockTranslator()
     {
-        $translator = $this->getMockForAbstractClass('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->getMockForAbstractClass('Symfony\Contracts\Translation\TranslatorInterface');
         $translator->expects($this->any())
             ->method('trans')
             ->with($this->anything(), array())

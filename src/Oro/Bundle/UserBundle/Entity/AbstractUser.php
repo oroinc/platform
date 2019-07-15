@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
-use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * A base class for an organization aware user.
@@ -134,7 +134,7 @@ abstract class AbstractUser implements
     protected $enabled = true;
 
     /**
-     * @var RoleInterface[]|Collection
+     * @var Role[]|Collection
      *
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\Role", inversedBy="users")
      * @ORM\JoinTable(name="oro_user_access_role",
@@ -412,21 +412,21 @@ abstract class AbstractUser implements
     }
 
     /**
-     * Remove the RoleInterface object from collection
+     * Remove the Role object from collection
      *
-     * @param RoleInterface|string $role
+     * @param Role|string $role
      *
      * @throws \InvalidArgumentException
      */
     public function removeRole($role)
     {
-        if ($role instanceof RoleInterface) {
+        if ($role instanceof Role) {
             $roleObject = $role;
         } elseif (is_string($role)) {
             $roleObject = $this->getRole($role);
         } else {
             throw new \InvalidArgumentException(
-                '$role must be an instance of Symfony\Component\Security\Core\Role\RoleInterface or a string'
+                '$role must be an instance of Symfony\Component\Security\Core\Role\Role or a string'
             );
         }
         if ($roleObject) {
@@ -439,7 +439,7 @@ abstract class AbstractUser implements
      *
      * @param string $roleName Role name
      *
-     * @return RoleInterface|null
+     * @return Role|null
      */
     public function getRole($roleName)
     {
@@ -456,7 +456,7 @@ abstract class AbstractUser implements
     /**
      * {@inheritdoc}
      *
-     * @return RoleInterface[]
+     * @return Role[]
      */
     public function getRoles()
     {
@@ -476,7 +476,7 @@ abstract class AbstractUser implements
     {
         if (!$roles instanceof Collection && !is_array($roles)) {
             throw new \InvalidArgumentException(
-                '$roles must be an instance of Symfony\Component\Security\Core\Role\RoleInterface or an array'
+                '$roles must be an instance of Symfony\Component\Security\Core\Role\Role or an array'
             );
         }
 
@@ -492,7 +492,7 @@ abstract class AbstractUser implements
     /**
      * {@inheritdoc}
      */
-    public function addRole(RoleInterface $role)
+    public function addRole(Role $role)
     {
         if (!$this->hasRole($role)) {
             $this->roles->add($role);
@@ -510,20 +510,20 @@ abstract class AbstractUser implements
      *
      * @internal
      *
-     * @param RoleInterface|string $role
+     * @param Role|string $role
      *
      * @return bool
      * @throws \InvalidArgumentException
      */
     public function hasRole($role)
     {
-        if ($role instanceof RoleInterface) {
+        if ($role instanceof Role) {
             $roleName = $role->getRole();
         } elseif (is_string($role)) {
             $roleName = $role;
         } else {
             throw new \InvalidArgumentException(
-                '$role must be an instance of Symfony\Component\Security\Core\Role\RoleInterface or a string'
+                '$role must be an instance of Symfony\Component\Security\Core\Role\Role or a string'
             );
         }
 

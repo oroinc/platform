@@ -4,7 +4,7 @@ namespace Oro\Bundle\NotificationBundle\Provider;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactInformationEmailsProvider
 {

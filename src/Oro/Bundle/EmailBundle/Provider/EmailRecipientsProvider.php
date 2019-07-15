@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Provider;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailRecipientsProvider
 {

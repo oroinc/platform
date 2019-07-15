@@ -12,7 +12,6 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Role\RoleInterface;
 
 class TokenSerializerTest extends \PHPUnit\Framework\TestCase
 {
@@ -86,11 +85,11 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $user->expects(self::once())
             ->method('getId')
             ->willReturn(123);
-        $role1 = $this->createMock(RoleInterface::class);
+        $role1 = $this->createMock(Role::class);
         $role1->expects(self::once())
             ->method('getRole')
             ->willReturn('ROLE_1');
-        $role2 = $this->createMock(RoleInterface::class);
+        $role2 = $this->createMock(Role::class);
         $role2->expects(self::once())
             ->method('getRole')
             ->willReturn('ROLE_2');
