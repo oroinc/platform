@@ -91,11 +91,8 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
             )
         );
 
-        // backup DB loader
-        $translationLoader = $this->getContainer()->get('oro_translation.database_translation.loader');
-
-        // disable DB loader to exclude existing translations from database
-        $this->getContainer()->set('oro_translation.database_translation.loader', new EmptyArrayLoader());
+        $databaseTranslationLoader = $this->getContainer()->get('oro_translation.database_translation.loader');
+        $databaseTranslationLoader->setDisabled();
 
         if ($input->getOption('rebuild-cache')) {
             $this->translator->rebuildCache();
@@ -112,8 +109,7 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
             throw $e;
         }
 
-        // restore DB loader
-        $this->getContainer()->set('oro_translation.database_translation.loader', $translationLoader);
+        $databaseTranslationLoader->setEnabled();
 
         if ($input->getOption('rebuild-cache')) {
             $output->write(sprintf('<info>Rebuilding cache ... </info>'));
