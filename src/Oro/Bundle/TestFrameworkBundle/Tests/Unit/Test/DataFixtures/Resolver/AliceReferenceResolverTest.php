@@ -1,15 +1,16 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Test\DataFixtures\Resolver;
+namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Test\DataFixtures;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Proxy\Proxy;
-use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
-use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\AliceReferenceResolver;
+use Nelmio\Alice\Instances\Collection;
+use Nelmio\Alice\Instances\Processor\Processable;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceReferenceProcessor;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class AliceReferenceResolverTest extends \PHPUnit\Framework\TestCase
+class AliceReferenceProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var RegistryInterface|\PHPUnit\Framework\MockObject\MockObject
@@ -17,18 +18,56 @@ class AliceReferenceResolverTest extends \PHPUnit\Framework\TestCase
     private $registry;
 
     /**
-     * @var AliceReferenceResolver
+     * @var AliceReferenceProcessor
      */
-    private $resolver;
+    private $aliceReferenceProcessor;
 
-    public function testResolveWhenObjectsDoesNotContainReference(): void
+    protected function setUp()
     {
-        $value = '@object';
-        $this->resolver->setReferences(new Collection());
+        $this->markTestSkipped();
+
+        $this->registry = $this->createMock(RegistryInterface::class);
+        $this->aliceReferenceProcessor = new AliceReferenceProcessor($this->registry);
+    }
+
+    /**
+     * @dataProvider getProcessedValues
+     * @param bool   $expectedMatch
+     * @param string $value
+     */
+    public function testCanProcess($expectedMatch, $value)
+    {
+        $processable = new Processable($value);
+
+        self::assertSame($expectedMatch, $this->aliceReferenceProcessor->canProcess($processable));
+    }
+
+    /**
+     * @return array
+     */
+    public function getProcessedValues()
+    {
+        return [
+            [true,  '@ref'],
+            [true,  '@ref->id'],
+            [true,  '@ref->owner->getId()'],
+            [false, 'ref'],
+            [false, '@ref*'],
+            [false, '@ref<current()>'],
+            [false, '<current()>'],
+            [false, '<current()>@example.org'],
+        ];
+    }
+
+    public function testProcessWhenObjectsDoesNotContainReference()
+    {
+        $processable = new Processable('@object');
+        $this->aliceReferenceProcessor->setObjects(new Collection());
+        $this->aliceReferenceProcessor->canProcess($processable);
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Reference "object" not found');
-        $this->resolver->resolve($value);
+        $this->aliceReferenceProcessor->process($processable, []);
     }
 
     /**
@@ -39,12 +78,14 @@ class AliceReferenceResolverTest extends \PHPUnit\Framework\TestCase
      * @param mixed $expectedValue
      * @dataProvider processProvider
      */
-    public function testResolve($referencePath, $object, $isContains, $objectFromDb, $expectedValue): void
+    public function testProcess($referencePath, $object, $isContains, $objectFromDb, $expectedValue)
     {
-        $this->resolver->setReferences(new Collection(['ref' => $object]));
+        $processable = new Processable($referencePath);
+        $this->aliceReferenceProcessor->setObjects(new Collection(['ref' => $object]));
+        $this->aliceReferenceProcessor->canProcess($processable);
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->registry->expects($this->any())
+        $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with(get_class($object))
             ->willReturn($entityManager);
@@ -67,7 +108,7 @@ class AliceReferenceResolverTest extends \PHPUnit\Framework\TestCase
             ->with(get_class($object), $identifier)
             ->willReturn($objectFromDb);
 
-        $value = $this->resolver->resolve($referencePath);
+        $value = $this->aliceReferenceProcessor->process($processable, []);
         $this->assertEquals($expectedValue, $value);
     }
 
@@ -130,47 +171,6 @@ class AliceReferenceResolverTest extends \PHPUnit\Framework\TestCase
                 'objectFromDb' => $refClassMock2,
                 'expectedValue' => $ownerId,
             ],
-            'cannot be resolved 1' => [
-                'referencePath' => 'ref',
-                'object' => $proxyRefClassMock,
-                'isContains' => false,
-                'objectFromDb' => $refClassMock2,
-                'expectedValue' => 'ref',
-            ],
-            'cannot be resolved 2' => [
-                'referencePath' => '@ref*',
-                'object' => $proxyRefClassMock,
-                'isContains' => false,
-                'objectFromDb' => $refClassMock2,
-                'expectedValue' => '@ref*',
-            ],
-            'cannot be resolved 3' => [
-                'referencePath' => '@ref<current()>',
-                'object' => $proxyRefClassMock,
-                'isContains' => false,
-                'objectFromDb' => $refClassMock2,
-                'expectedValue' => '@ref<current()>',
-            ],
-            'cannot be resolved 4' => [
-                'referencePath' => '<current()>',
-                'object' => $proxyRefClassMock,
-                'isContains' => false,
-                'objectFromDb' => $refClassMock2,
-                'expectedValue' => '<current()>',
-            ],
-            'cannot be resolved 5' => [
-                'referencePath' => '<current()>@example.org',
-                'object' => $proxyRefClassMock,
-                'isContains' => false,
-                'objectFromDb' => $refClassMock2,
-                'expectedValue' => '<current()>@example.org',
-            ],
         ];
-    }
-
-    protected function setUp()
-    {
-        $this->registry = $this->createMock(RegistryInterface::class);
-        $this->resolver = new AliceReferenceResolver($this->registry);
     }
 }
