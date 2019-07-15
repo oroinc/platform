@@ -22,6 +22,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 
+/**
+ * Authenticator guard for impersonated authentication.
+ */
 class ImpersonationAuthenticator implements AuthenticatorInterface
 {
     const TOKEN_PARAMETER = '_impersonation_token';
@@ -59,9 +62,9 @@ class ImpersonationAuthenticator implements AuthenticatorInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(Request $request)
+    public function supports(Request $request): bool
     {
-        return true;
+        return $request->query->has(static::TOKEN_PARAMETER);
     }
 
     /**

@@ -1,19 +1,20 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
+namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver;
 
 use Doctrine\ORM\Proxy\Proxy;
-use Nelmio\Alice\Instances\Collection;
-use Nelmio\Alice\Instances\Processor\Methods\MethodInterface;
-use Nelmio\Alice\Instances\Processor\ProcessableInterface;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
- * AliceReferenceProcessor parse reference path to return the appropriate value
+ * AliceReferenceResolver parse reference path to return the appropriate value
  */
-class AliceReferenceProcessor implements MethodInterface
+class AliceReferenceResolver implements ResolverInterface, ReferencesAwareInterface
 {
+    /**
+     * @var string
+     */
     private static $regex = '/^@(?P<ref>[^<*]*)$/';
 
     /**
@@ -24,7 +25,7 @@ class AliceReferenceProcessor implements MethodInterface
     /**
      * @var Collection
      */
-    protected $objects;
+    protected $references;
 
     /**
      * @param RegistryInterface $registry
@@ -35,40 +36,31 @@ class AliceReferenceProcessor implements MethodInterface
     }
 
     /**
-     * Sets the object collection to handle referential calls.
-     *
-     * @param Collection $objects
+     * {@inheritdoc}
      */
-    public function setObjects(Collection $objects)
+    public function setReferences(Collection $references)
     {
-        $this->objects = $objects;
+        $this->references = $references;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function canProcess(ProcessableInterface $processable)
+    public function resolve($value)
     {
-        return
-            is_string($processable->getValue())
-            && $processable->valueMatches(static::$regex)
-        ;
-    }
+        if (!\is_string($value) || !\preg_match(self::$regex, $value, $matches)) {
+            return $value;
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ProcessableInterface $processable, array $variables)
-    {
-        $reference = null !== ($processable->getMatch('ref')) ? $processable->getMatch('ref') : null;
+        $reference = $matches['ref'] ?: null;
         $refParts = explode('->', $reference);
         $reference = array_shift($refParts);
 
-        if (!$this->objects->containsKey($reference)) {
-            throw new \Exception(sprintf('Reference "%s" not found', $reference));
+        if (!$this->references->containsKey($reference)) {
+            throw new \RuntimeException(sprintf('Reference "%s" not found', $reference));
         }
 
-        $object = $this->objects->find($reference);
+        $object = $this->references->get($reference);
         $result = $this->actualizeObject($object);
         $propertyAccessor = new PropertyAccessor();
 

@@ -112,7 +112,7 @@ class CommandExecutor extends AbstractCommandExecutor
             $process = new Process($processArguments);
             $process->inheritEnvironmentVariables(true);
 
-            if ($processTimeout) {
+            if ($processTimeout !== null) {
                 $process->setTimeout($processTimeout);
             }
 

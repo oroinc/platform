@@ -1,0 +1,19 @@
+framework:
+    cache:
+        pools:
+            cache.annotations:
+                adapter: cache.adapter.doctrine
+                provider: oro_cache.annotations
+            cache.serializer:
+                adapter: cache.adapter.doctrine
+                provider: oro_cache.serializer
+            cache.validator:
+                adapter: cache.adapter.doctrine
+                provider: oro_cache.validator
+
+    annotations:
+        cache: php_array
+
+jms_serializer:
+    metadata:
+        cache: oro_cache.jms_serializer_adapter

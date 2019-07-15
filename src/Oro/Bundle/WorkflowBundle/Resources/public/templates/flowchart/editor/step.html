@@ -2,23 +2,23 @@
 <div class="jsplumb-source jsplumb-source-top-right"></div>
 <div class="jsplumb-source jsplumb-source-bottom-right"></div>
 <div class="jsplumb-source jsplumb-source-bottom-left"></div>
-<div class="step-label">
+<div class="step-label" title="<%- label %>">
     <%- label %>
-    <% if (!_is_start) { %>
-    <% var togglerId = _.uniqueId('dropdown-') %>
-    <span role="button" id="<%- togglerId %>" class="dropdown-toggle" data-toggle="dropdown"
-       aria-label="<%- _.__('oro.workflow.flowchart.step.actions_label') %>" aria-haspopup="true" aria-expanded="false">
-    </span>
-    <ul class="dropdown-menu" role="menu" aria-labelledby="<%- togglerId %>">
-        <li class="first">
-            <a class="workflow-step-edit" href="#edit-step"><span class="fa-pencil-square-o" aria-hidden="true"></span><%- _.__('Edit') %></a>
-        </li>
-        <li>
-            <a class="workflow-step-clone" href="#clone-step"><span class="fa-files-o" aria-hidden="true"></span><%- _.__('Clone') %></a>
-        </li>
-        <li>
-            <a class="workflow-step-delete" href="#delete-step"><span class="fa-trash-o" aria-hidden="true"></span><%- _.__('Delete') %></a>
-        </li>
-    </ul>
-    <% } %>
 </div>
+<% if (!_is_start) { %>
+<% var togglerId = _.uniqueId('dropdown-') %>
+<span role="button" id="<%- togglerId %>" class="dropdown-toggle" data-toggle="dropdown" data-placement="bottom-end"
+      aria-label="<%- _.__('oro.workflow.flowchart.step.actions_label') %>" aria-haspopup="true" aria-expanded="false">
+    </span>
+<ul class="dropdown-menu" role="menu" aria-labelledby="<%- togglerId %>">
+    <li class="first">
+        <a class="workflow-step-edit" href="#edit-step"><span class="fa-pencil-square-o" aria-hidden="true"></span><%- _.__('Edit') %></a>
+    </li>
+    <li>
+        <a class="workflow-step-clone" href="#clone-step"><span class="fa-files-o" aria-hidden="true"></span><%- _.__('Clone') %></a>
+    </li>
+    <li>
+        <a class="workflow-step-delete" href="#delete-step"><span class="fa-trash-o" aria-hidden="true"></span><%- _.__('Delete') %></a>
+    </li>
+</ul>
+<% } %>
