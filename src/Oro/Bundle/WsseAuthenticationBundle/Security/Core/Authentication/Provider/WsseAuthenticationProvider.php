@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\WsseAuthenticationBundle\Security\Core\Authentication\Provider;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 use Oro\Bundle\UserBundle\Security\UserApiKeyInterface;
 use Oro\Bundle\WsseAuthenticationBundle\Security\WsseTokenFactoryInterface;
+use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;
@@ -38,7 +39,7 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
     /** @var PasswordEncoderInterface */
     private $encoder;
 
-    /** @var Cache */
+    /** @var CacheInterface */
     private $nonceCache;
 
     /** @var int */
@@ -53,7 +54,7 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
      * @param UserProviderInterface $userProvider An UserProviderInterface instance
      * @param string $providerKey The provider key
      * @param PasswordEncoderInterface $encoder A PasswordEncoderInterface instance
-     * @param Cache $nonceCache The nonce cache
+     * @param CacheInterface $nonceCache The nonce cache
      * @param int $lifetime The lifetime
      * @param string $dateFormat The date format
      */
@@ -63,7 +64,7 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
         UserProviderInterface $userProvider,
         $providerKey,
         PasswordEncoderInterface $encoder,
-        Cache $nonceCache,
+        CacheInterface $nonceCache,
         $lifetime = 300,
         $dateFormat = '/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])'
         . '(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?0'
@@ -113,6 +114,10 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
                         $user->getRoles()
                     );
                     $authenticatedToken->setOrganizationContext($validUserApi->getOrganization());
+
+                    if ($this->nonceCache instanceof PruneableInterface) {
+                        $this->nonceCache->prune();
+                    }
 
                     return $authenticatedToken;
                 }
@@ -220,11 +225,11 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
             throw new CredentialsExpiredException('Token has expired.');
         }
 
-        if ($this->nonceCache->contains($nonce)) {
+        if ($this->nonceCache->has($nonce)) {
             throw new NonceExpiredException('Previously used nonce detected.');
         }
 
-        $this->nonceCache->save($nonce, strtotime($this->getCurrentTime()), $this->lifetime);
+        $this->nonceCache->set($nonce, strtotime($this->getCurrentTime()), $this->lifetime);
 
         $expected = $this->encoder->encodePassword(sprintf('%s%s%s', base64_decode($nonce), $created, $secret), $salt);
 

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WsseAuthenticationBundle\Tests\Unit\Security\Core\Authentication\Provider;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\UserApi;
@@ -11,6 +10,7 @@ use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Oro\Bundle\WsseAuthenticationBundle\Security\Core\Authentication\Provider\WsseAuthenticationProvider;
 use Oro\Bundle\WsseAuthenticationBundle\Security\WsseTokenFactory;
 use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
+use Symfony\Component\Cache\Simple\ArrayCache;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;

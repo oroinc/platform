@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WsseAuthenticationBundle\Command;
 
-use Doctrine\Common\Cache\FlushableCache;
 use Psr\Container\ContainerInterface;
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,6 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class DeleteNoncesCommand extends ContainerAwareCommand
 {
+    /** @var string */
     protected static $defaultName = 'oro:wsse:nonces:delete';
 
     /** @var ContainerInterface */
@@ -54,7 +55,7 @@ class DeleteNoncesCommand extends ContainerAwareCommand
     {
         $firewall = $input->getOption('firewall');
 
-        $this->getNonceCache($firewall)->flushAll();
+        $this->getNonceCache($firewall)->clear();
 
         $output->writeln(
             sprintf(
@@ -67,9 +68,9 @@ class DeleteNoncesCommand extends ContainerAwareCommand
     /**
      * @param string $firewallName
      *
-     * @return FlushableCache
+     * @return CacheInterface
      */
-    private function getNonceCache(string $firewallName): FlushableCache
+    private function getNonceCache(string $firewallName): CacheInterface
     {
         $serviceId = 'oro_wsse_authentication.nonce_cache.' . $firewallName;
         if (!$this->container->has($serviceId)) {

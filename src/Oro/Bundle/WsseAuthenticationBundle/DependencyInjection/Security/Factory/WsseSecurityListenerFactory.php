@@ -23,12 +23,6 @@ class WsseSecurityListenerFactory implements SecurityFactoryInterface
     private const AUTHENTICATION_LISTENER
         = 'oro_wsse_authentication.security.http.firewall.wsse_authentication_listener';
 
-    /** @var string */
-    private $encoderId;
-
-    /** @var string */
-    private $nonceCacheId;
-
     /**
      * {@inheritdoc}
      */
@@ -36,23 +30,23 @@ class WsseSecurityListenerFactory implements SecurityFactoryInterface
     {
         $node
             ->children()
-            ->scalarNode('provider')->end()
-            ->scalarNode('realm')->defaultValue(null)->end()
-            ->scalarNode('profile')->defaultValue('UsernameToken')->end()
-            ->scalarNode('lifetime')->defaultValue(300)->end()
-            ->scalarNode('date_format')->defaultValue(
-                '/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?' .
-                '[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|2' .
-                '4\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/'
-            )->end()
-            ->arrayNode('encoder')
-            ->children()
-            ->scalarNode('algorithm')->end()
-            ->scalarNode('encodeHashAsBase64')->end()
-            ->scalarNode('iterations')->end()
-            ->end()
-            ->end()
-            ->scalarNode('nonce_cache_service_id')->defaultValue(null)->end()
+                ->scalarNode('provider')->end()
+                ->scalarNode('realm')->defaultValue(null)->end()
+                ->scalarNode('profile')->defaultValue('UsernameToken')->end()
+                ->scalarNode('lifetime')->defaultValue(300)->end()
+                ->scalarNode('date_format')->defaultValue(
+                    '/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?' .
+                    '[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|2' .
+                    '4\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/'
+                )->end()
+                ->arrayNode('encoder')
+                    ->children()
+                        ->scalarNode('algorithm')->end()
+                        ->scalarNode('encodeHashAsBase64')->end()
+                        ->scalarNode('iterations')->end()
+                    ->end()
+                ->end()
+                ->scalarNode('nonce_cache_service_id')->defaultValue(null)->end()
             ->end();
     }
 
@@ -62,12 +56,10 @@ class WsseSecurityListenerFactory implements SecurityFactoryInterface
     public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPoint): array
     {
         $providerId = $this->createAuthenticationProvider($container, $id, $config, $userProviderId);
-
         $entryPointId = $this->createEntryPoint($container, $id, $config);
-
         $listenerId = $this->createAuthenticationListener($container, $id, $entryPointId);
 
-        return array($providerId, $listenerId, $entryPointId);
+        return [$providerId, $listenerId, $entryPointId];
     }
 
     /**
@@ -87,22 +79,6 @@ class WsseSecurityListenerFactory implements SecurityFactoryInterface
     }
 
     /**
-     * @return string
-     */
-    public function getEncoderId(): string
-    {
-        return $this->encoderId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getNonceCacheId(): string
-    {
-        return $this->nonceCacheId;
-    }
-
-    /**
      * @param ContainerBuilder $container
      * @param string $id
      * @param array $config
@@ -111,25 +87,25 @@ class WsseSecurityListenerFactory implements SecurityFactoryInterface
      */
     private function createEncoder(ContainerBuilder $container, string $id, array $config): string
     {
-        $this->encoderId = self::ENCODER . '.' . $id;
+        $encoderId = self::ENCODER . '.' . $id;
 
-        $container->setDefinition($this->encoderId, new ChildDefinition(self::ENCODER));
+        $container->setDefinition($encoderId, new ChildDefinition(self::ENCODER));
 
         if (isset($config['encoder']['algorithm'])) {
-            $container->getDefinition($this->encoderId)->replaceArgument(0, $config['encoder']['algorithm']);
+            $container->getDefinition($encoderId)->replaceArgument(0, $config['encoder']['algorithm']);
         }
 
         if (isset($config['encoder']['encodeHashAsBase64'])) {
-            $container->getDefinition($this->encoderId)->replaceArgument(1, $config['encoder']['encodeHashAsBase64']);
+            $container->getDefinition($encoderId)->replaceArgument(1, $config['encoder']['encodeHashAsBase64']);
         }
 
         if (isset($config['encoder']['iterations'])) {
-            $container->getDefinition($this->encoderId)->replaceArgument(2, $config['encoder']['iterations']);
+            $container->getDefinition($encoderId)->replaceArgument(2, $config['encoder']['iterations']);
         }
 
-        $this->addEncoderToServiceLocator($container, $this->encoderId);
+        $this->addEncoderToServiceLocator($container, $encoderId);
 
-        return $this->encoderId;
+        return $encoderId;
     }
 
     /**
@@ -142,25 +118,22 @@ class WsseSecurityListenerFactory implements SecurityFactoryInterface
     private function createNonceCache(ContainerBuilder $container, string $id, array $config): string
     {
         if (isset($config['nonce_cache_service_id'])) {
-            $this->nonceCacheId = $config['nonce_cache_service_id'];
+            $nonceCacheId = $config['nonce_cache_service_id'];
         } else {
-            $this->nonceCacheId = self::NONCE_CACHE . '.' . $id;
-
-            $container->setDefinition($this->nonceCacheId, new ChildDefinition(self::NONCE_CACHE))
-                ->addMethodCall('setNamespace', ['wsse_nonce_' . $id])
-                ->addMethodCall('setNonceLifeTime', [$config['lifetime']]);
+            $nonceCacheId = self::NONCE_CACHE . '.' . $id;
+            $container->setDefinition($nonceCacheId, new ChildDefinition(self::NONCE_CACHE));
         }
 
-        $this->addNonceCacheToServiceLocator($container, $this->nonceCacheId);
+        $this->addNonceCacheToServiceLocator($container, $nonceCacheId);
 
-        return $this->nonceCacheId;
+        return $nonceCacheId;
     }
 
     /**
      * @param ContainerBuilder $container
      * @param string $nonceCacheServiceId
      */
-    private function addNonceCacheToServiceLocator(ContainerBuilder $container, string $nonceCacheServiceId)
+    private function addNonceCacheToServiceLocator(ContainerBuilder $container, string $nonceCacheServiceId): void
     {
         $nonceCacheServiceLocatorId = 'oro_wsse_authentication.service_locator.nonce_cache';
         if (!$container->hasDefinition($nonceCacheServiceLocatorId)) {
@@ -211,7 +184,7 @@ class WsseSecurityListenerFactory implements SecurityFactoryInterface
      * @param ContainerBuilder $container
      * @param string $encoderServiceId
      */
-    private function addEncoderToServiceLocator(ContainerBuilder $container, string $encoderServiceId)
+    private function addEncoderToServiceLocator(ContainerBuilder $container, string $encoderServiceId): void
     {
         $encoderServiceLocatorId = 'oro_wsse_authentication.service_locator.encoder';
         if (!$container->hasDefinition($encoderServiceLocatorId)) {

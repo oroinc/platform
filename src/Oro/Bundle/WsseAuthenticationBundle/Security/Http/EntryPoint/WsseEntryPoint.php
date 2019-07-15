@@ -18,20 +18,23 @@ class WsseEntryPoint implements AuthenticationEntryPointInterface
     private $logger;
 
     /** @var string */
-    private $realm;
+    private $realmName;
 
     /** @var string */
     private $profile;
 
     /**
      * @param LoggerInterface|null $logger
-     * @param string|null $realm
+     * @param string $realmName
      * @param string $profile
      */
-    public function __construct(LoggerInterface $logger = null, string $realm = null, string $profile = 'UsernameToken')
-    {
+    public function __construct(
+        ?LoggerInterface $logger = null,
+        string $realmName = '',
+        string $profile = 'UsernameToken'
+    ) {
         $this->logger = $logger ?? new NullLogger();
-        $this->realm = $realm;
+        $this->realmName = $realmName;
         $this->profile = $profile;
     }
 
@@ -44,18 +47,8 @@ class WsseEntryPoint implements AuthenticationEntryPointInterface
             $this->logger->warning($authException->getMessage());
         }
 
-        $response = new Response();
-        $response->headers->set(
-            'WWW-Authenticate',
-            sprintf(
-                'WSSE realm="%s", profile="%s"',
-                $this->realm,
-                $this->profile
-            )
-        );
+        $headers = ['WWW-Authenticate' => sprintf('WSSE realm="%s", profile="%s"', $this->realmName, $this->profile)];
 
-        $response->setStatusCode(401);
-
-        return $response;
+        return new Response('', 401, $headers);
     }
 }

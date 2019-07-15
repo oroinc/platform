@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\DependencyInjection;
 
-use Oro\Bundle\WsseAuthenticationBundle\Cache\WsseNoncePhpFileCache;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -22,8 +20,6 @@ class OroEmbeddedFormExtension extends Extension implements PrependExtensionInte
 
     const CSRF_TOKEN_STORAGE_SERVICE_ID       = 'oro_embedded_form.csrf_token_storage';
     const DEFAULT_CSRF_TOKEN_CACHE_SERVICE_ID = 'oro_embedded_form.csrf_token_cache';
-    const DEFAULT_CSRF_TOKEN_CACHE_CLASS      = WsseNoncePhpFileCache::class;
-    const DEFAULT_CSRF_TOKEN_CACHE_PATH       = '%kernel.cache_dir%/security/embedded_form';
 
     /**
      * {@inheritDoc}
@@ -40,23 +36,10 @@ class OroEmbeddedFormExtension extends Extension implements PrependExtensionInte
 
         $container->setParameter(self::SESSION_ID_FIELD_NAME_PARAM, $config[Configuration::SESSION_ID_FIELD_NAME]);
         $container->setParameter(self::CSRF_TOKEN_LIFETIME_PARAM, $config[Configuration::CSRF_TOKEN_LIFETIME]);
-        if (!empty($config[Configuration::CSRF_TOKEN_CACHE_SERVICE_ID])) {
-            $csrfTokenCacheServiceId = $config[Configuration::CSRF_TOKEN_CACHE_SERVICE_ID];
-        } else {
-            $csrfTokenCacheServiceId = self::DEFAULT_CSRF_TOKEN_CACHE_SERVICE_ID;
-            if (!$container->hasDefinition($csrfTokenCacheServiceId)) {
-                $csrfTokenCacheServiceDef = new Definition(
-                    self::DEFAULT_CSRF_TOKEN_CACHE_CLASS,
-                    [self::DEFAULT_CSRF_TOKEN_CACHE_PATH]
-                );
-                $csrfTokenCacheServiceDef->setPublic(false);
-                $csrfTokenCacheServiceDef->addMethodCall(
-                    'setNonceLifeTime',
-                    [$container->getParameter(self::CSRF_TOKEN_LIFETIME_PARAM)]
-                );
-                $container->setDefinition($csrfTokenCacheServiceId, $csrfTokenCacheServiceDef);
-            }
-        }
+
+        $csrfTokenCacheServiceId = $config[Configuration::CSRF_TOKEN_CACHE_SERVICE_ID]
+            ?? self::DEFAULT_CSRF_TOKEN_CACHE_SERVICE_ID;
+
         $container
             ->getDefinition(self::CSRF_TOKEN_STORAGE_SERVICE_ID)
             ->replaceArgument(0, new Reference($csrfTokenCacheServiceId));

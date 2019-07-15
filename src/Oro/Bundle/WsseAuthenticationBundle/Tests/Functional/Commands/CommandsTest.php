@@ -134,7 +134,7 @@ class CommandsTest extends WebTestCase
     {
         $nonceCache = $this->getNonceCache(self::FIREWALL_NAME);
 
-        $this->assertTrue($nonceCache->contains($this->getNonce($header[4][1])));
+        $this->assertTrue($nonceCache->has($this->getNonce($header[4][1])));
 
         /** @var Kernel $kernel */
         $kernel = $this->client->getKernel();
@@ -154,7 +154,7 @@ class CommandsTest extends WebTestCase
             '--firewall' => self::FIREWALL_NAME,
         ]);
 
-        $this->assertFalse($nonceCache->contains($this->getNonce($header[4][1])));
+        $this->assertFalse($nonceCache->has($this->getNonce($header[4][1])));
         $this->assertContains('Deleted nonce cache', $commandTester->getDisplay());
 
         return $header;
