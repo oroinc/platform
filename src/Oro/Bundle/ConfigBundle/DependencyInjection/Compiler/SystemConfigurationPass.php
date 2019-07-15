@@ -110,6 +110,7 @@ class SystemConfigurationPass implements CompilerPassInterface
         // a main config manager should be an alias to the most priority scoped config manager
         $container->removeDefinition(self::MAIN_MANAGER_SERVICE);
         $container->setAlias(self::MAIN_MANAGER_SERVICE, 'oro_config.' . $mainScope);
+        $container->getAlias(self::MAIN_MANAGER_SERVICE)->setPublic(true);
     }
 
     /**
