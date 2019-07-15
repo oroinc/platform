@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides detailed information about fields for a specific entity.

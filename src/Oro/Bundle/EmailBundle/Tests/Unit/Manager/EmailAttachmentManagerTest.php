@@ -143,6 +143,7 @@ class EmailAttachmentManagerTest extends \PHPUnit\Framework\TestCase
         $emailAttachment = new EmailAttachment();
         ReflectionUtil::setId($emailAttachment, 1);
         $emailAttachment->setContent($this->getContentMock());
+        $emailAttachment->setFileName('filename.file');
 
         $file = new ComponentFile(__DIR__ . '/../Fixtures/attachment/test.txt');
 

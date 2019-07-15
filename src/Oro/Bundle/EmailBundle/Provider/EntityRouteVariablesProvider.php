@@ -6,7 +6,7 @@ use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariablesProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides definitions of entity route variables.

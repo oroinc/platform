@@ -14,7 +14,7 @@ use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 

@@ -8,7 +8,7 @@ use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityFieldChoiceType extends AbstractType
 {

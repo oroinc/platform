@@ -75,7 +75,7 @@ class OroPlaceholderPasswordType extends AbstractType
 
         // We can show placeholder when form not submitted (view page), submitted without errors
         // When the form is submitted with errors we have to show empty field
-        $canShowPlaceholder = $dataNotChanged || $form->getRoot()->isValid() || !$form->isSubmitted();
+        $canShowPlaceholder = $dataNotChanged || !$form->isSubmitted() || $form->getRoot()->isValid();
 
         if ($password && $canShowPlaceholder) {
             $view->vars['value'] = $this->getPlaceholder((string)$password);

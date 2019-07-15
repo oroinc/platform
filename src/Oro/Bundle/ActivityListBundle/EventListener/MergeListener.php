@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MergeListener
 {

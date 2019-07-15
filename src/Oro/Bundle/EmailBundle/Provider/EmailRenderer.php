@@ -8,7 +8,7 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRenderer;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorRegistry;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 /**

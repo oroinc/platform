@@ -17,6 +17,8 @@ class OroYamlParserTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
+        $this->markTestSkipped();
+
         $this->kernel = $this->createMock(KernelInterface::class);
         $this->parser = new OroYamlParser();
         $this->parser->setKernel($this->kernel);

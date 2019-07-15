@@ -6,7 +6,7 @@ use Oro\Bundle\TranslationBundle\Extension\TranslationContextResolverInterface;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TranslationContextResolver implements TranslationContextResolverInterface
 {

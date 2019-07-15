@@ -8,7 +8,7 @@ use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides detailed information about entities

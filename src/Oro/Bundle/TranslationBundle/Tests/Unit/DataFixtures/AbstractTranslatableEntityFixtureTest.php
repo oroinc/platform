@@ -37,7 +37,7 @@ class AbstractTranslatableEntityFixtureTest extends \PHPUnit\Framework\TestCase
 
     public function testLoad()
     {
-        $translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+        $translator = $this->getMockBuilder('Symfony\Contracts\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 

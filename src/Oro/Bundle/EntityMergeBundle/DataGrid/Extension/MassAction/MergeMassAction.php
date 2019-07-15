@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MergeMassAction extends AbstractMassAction
 {

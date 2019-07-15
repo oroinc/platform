@@ -16,7 +16,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Populates datagrid config with actions and context configs that attached to it

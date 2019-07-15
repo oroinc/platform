@@ -36,7 +36,7 @@ class RolePermissionDatasourceTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $this->permissionManager = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager')
             ->disableOriginalConstructor()
             ->getMock();

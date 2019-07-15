@@ -9,7 +9,7 @@ use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AddLanguageType extends AbstractType
 {

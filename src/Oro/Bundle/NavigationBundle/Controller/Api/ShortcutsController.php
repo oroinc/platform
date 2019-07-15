@@ -10,7 +10,7 @@ use Knp\Menu\Iterator\RecursiveItemIterator;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @RouteResource("shortcuts")

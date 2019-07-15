@@ -22,7 +22,7 @@ use Oro\Component\PhpUtils\ArrayUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides methods to manage auto-response rules.

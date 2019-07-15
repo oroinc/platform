@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\JsTree;
 
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\UIBundle\Model\TreeItem;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MenuUpdateTreeHandler
 {

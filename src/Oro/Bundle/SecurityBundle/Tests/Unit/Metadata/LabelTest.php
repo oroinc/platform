@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\SecurityBundle\Metadata\Label;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LabelTest extends \PHPUnit\Framework\TestCase
 {

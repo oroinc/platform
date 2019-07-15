@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RequestContextAwareInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Translation\Translator;
 
 class LocaleListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -31,7 +31,7 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     /** @var CurrentLocalizationProvider|\PHPUnit\Framework\MockObject\MockObject */
@@ -43,7 +43,7 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);
-        $this->translator =  $this->createMock(TranslatorInterface::class);
+        $this->translator =  $this->createMock(Translator::class);
         $this->transListener = $this->createMock(TranslatableListener::class);
         $this->router = $this->createMock(RequestContextAwareInterface::class);
         $this->currentLocalizationProvider = $this->createMock(CurrentLocalizationProvider::class);

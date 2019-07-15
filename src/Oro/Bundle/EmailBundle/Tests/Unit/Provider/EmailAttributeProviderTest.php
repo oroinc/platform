@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WebsiteBundle\Tests\Unit\Resolver;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Resolver;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -99,7 +99,7 @@ class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
                         'deleted_email' => 'deletedEmail',
                         'has_contact_information' => 'hasContactInformation',
                     ],
-                ]),
+                ], [null]),
                 'expected' => [
                     new EmailAttribute('email'),
                     new EmailAttribute('secondaryEmail'),
@@ -119,7 +119,7 @@ class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
                         'deleted_email' => 'deletedEmail',
                         'has_contact_information' => 'hasContactInformation',
                     ],
-                ]),
+                ], [null]),
                 'expected' => [
                     new EmailAttribute('email'),
                     new EmailAttribute('email'),

@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Translation\Helper;
 
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TransitionTranslationHelper
 {

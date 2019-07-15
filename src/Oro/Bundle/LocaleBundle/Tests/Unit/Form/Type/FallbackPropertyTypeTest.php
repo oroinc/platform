@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FallbackPropertyTypeTest extends FormIntegrationTestCase
 {
@@ -26,7 +26,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
     protected function setUp()
     {
         /** @var TranslatorInterface $translator */
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $this->translator->expects($this->any())
             ->method('trans')
             ->with('oro.locale.fallback.type.parent_localization')

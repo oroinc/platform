@@ -28,7 +28,7 @@ use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
 {

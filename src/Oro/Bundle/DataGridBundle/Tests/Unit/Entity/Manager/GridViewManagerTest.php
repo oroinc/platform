@@ -15,7 +15,7 @@ use Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GridViewManagerTest extends \PHPUnit\Framework\TestCase
 {

@@ -13,7 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 {

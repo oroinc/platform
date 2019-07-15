@@ -9,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Guess\TypeGuess;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 
 class VariableGuesser extends AbstractGuesser

@@ -15,7 +15,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This class contains logic of enum configuration, options and translations synchronization

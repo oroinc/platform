@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Extension;
 
 use Oro\Bundle\WorkflowBundle\Acl\Extension\TransitionLabel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TransitionLabelTest extends \PHPUnit\Framework\TestCase
 {

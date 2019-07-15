@@ -10,7 +10,7 @@ use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AddLanguageTypeTest extends FormIntegrationTestCase
 {

@@ -25,6 +25,8 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
+        $this->markTestSkipped();
+
         $this->tempDir = $this->getTempDir('behat');
         mkdir($this->tempDir . '/bundle1/Tests/Behat', 0777, true);
         mkdir($this->tempDir . '/bundle2/Tests/Behat', 0777, true);

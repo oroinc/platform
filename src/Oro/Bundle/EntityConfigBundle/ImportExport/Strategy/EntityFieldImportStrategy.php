@@ -9,7 +9,7 @@ use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\AbstractImportStrategy;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
