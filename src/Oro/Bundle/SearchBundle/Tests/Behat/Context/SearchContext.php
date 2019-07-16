@@ -76,20 +76,21 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
     public function iShouldNotSeeFollowingSearchEntityTypes(TableNode $table)
     {
         $entityTypes = $this->getPage()->find('css', '.search-entity-types-column');
-        self::assertNotNull($entityTypes, 'Search entity types column not found');
 
-        $crawler = new Crawler($entityTypes->getHtml());
-        $links = [];
+        if ($entityTypes) {
+            $crawler = new Crawler($entityTypes->getHtml());
+            $links = [];
 
-        /** @var \DOMElement $link */
-        foreach ($crawler->filter('ul li') as $link) {
-            preg_match('/([\w\s]+).(\d+)/', $link->textContent, $matches);
-            $links[trim($matches[1])] = $link;
-        }
+            /** @var \DOMElement $link */
+            foreach ($crawler->filter('ul li') as $link) {
+                preg_match('/([\w\s]+).(\d+)/', $link->textContent, $matches);
+                $links[trim($matches[1])] = $link;
+            }
 
-        foreach ($table as $row) {
-            $type = $row['Type'];
-            self::assertTrue(!array_key_exists($type, $links), sprintf('Type "%s" not found', $type));
+            foreach ($table as $row) {
+                $type = $row['Type'];
+                self::assertTrue(!array_key_exists($type, $links), sprintf('Type "%s" not found', $type));
+            }
         }
     }
 

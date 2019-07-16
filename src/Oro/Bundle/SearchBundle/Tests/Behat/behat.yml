@@ -42,6 +42,8 @@ oro_behat_extension:
         - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
         - OroDataGridBundle::GridContext
         - OroFormBundle::FormContext
+        - OroSecurityBundle::ACLContext
+        - OroSecurityBundle::PermissionContext
         - OroSearchBundle::SearchContext
       paths:
         - '@OroSearchBundle/Tests/Behat/Features'
