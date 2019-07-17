@@ -310,7 +310,7 @@ define(function(require) {
          */
         adjustLabelsWidth: function($context) {
             var controlGroups = $context.find('.control-group').filter(function(i, group) {
-                return !$(group).find('> .control-label').length && !$(group).closest('.tab-content').length;
+                return !$(group).find('> .control-label').length && !$(group).closest('.tab-content, .controls').length;
             });
             var labels = $context.find('.control-label').filter(function(i, label) {
                 return !$(label).closest('.widget-title-container').length;
