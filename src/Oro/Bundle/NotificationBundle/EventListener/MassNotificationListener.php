@@ -42,7 +42,7 @@ class MassNotificationListener
 
     /**
      * @param MassNotification    $entity
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      * @param int                 $sentCount
      */
     private function updateFromSwiftMessage(MassNotification $entity, $message, $sentCount)

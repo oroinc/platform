@@ -5,6 +5,9 @@ namespace Oro\Bundle\EmailBundle\Util;
 use Monolog\Logger;
 use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * Sends message using Swift_Mailer::send internally
+ */
 class MailerWrapper extends \Swift_Mailer
 {
     /**
@@ -36,13 +39,13 @@ class MailerWrapper extends \Swift_Mailer
     }
 
     /**
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      * @param array|null $failedRecipients
      * @return int
      *
      * @throws \Swift_TransportException
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         try {
             $result = $this->mailer->send($message, $failedRecipients);

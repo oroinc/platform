@@ -36,7 +36,7 @@ class MassEmailDirectMailerTest extends \PHPUnit\Framework\TestCase
     public function testSend()
     {
         $failedRecipients = ['some data'];
-        $message = \Swift_Message::newInstance();
+        $message = new \Swift_Message();
         $sent = 777;
         $this->directMailer->expects($this->once())
             ->method('send')

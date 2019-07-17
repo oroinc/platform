@@ -10,14 +10,30 @@ services:
 
     oro_security.owner.metadata_provider.chain:
         class: Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@oro_test.kernel_service_factory', get]
         arguments: ['oro_security.owner.metadata_provider.chain']
 
     oro_config.global:
         class: Oro\Bundle\ConfigBundle\Config\GlobalScopeManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@oro_test.kernel_service_factory', get]
         arguments: ['oro_config.global']
+
+    property_accessor:
+        class: Symfony\Component\PropertyAccess\PropertyAccessor
+        public: true
+        factory: ['@oro_test.kernel_service_factory', get]
+        arguments: ['property_accessor']
+
+    doctrine.orm.entity_manager:
+        class: Doctrine\ORM\EntityManager
+        public: true
+        factory: ['@oro_test.kernel_service_factory', get]
+        arguments: ['doctrine.orm.entity_manager']
+
+    file_locator:
+        class: Symfony\Component\HttpKernel\Config\FileLocator
+        public: true
+        factory: ['@oro_test.kernel_service_factory', get]
+        arguments: ['file_locator']

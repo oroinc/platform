@@ -5,7 +5,6 @@ namespace Oro\Bundle\DataAuditBundle\Controller\Api\Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
@@ -137,13 +136,13 @@ class AuditController extends RestGetController implements ClassResourceInterfac
         /* @var $provider EntityWithFieldsProvider */
         $provider = $this->get('oro_query_designer.entity_field_list_provider');
         $withRelations = filter_var($request->get('with-relations', true), FILTER_VALIDATE_BOOLEAN);
-        $statusCode = Codes::HTTP_OK;
+        $statusCode = Response::HTTP_OK;
 
         try {
             $entities = $provider->getFields(true, true, $withRelations, false);
             $result = $this->filterAuditableEntities($entities);
         } catch (InvalidEntityException $ex) {
-            $statusCode = Codes::HTTP_NOT_FOUND;
+            $statusCode = Response::HTTP_NOT_FOUND;
             $result = ['message' => $ex->getMessage()];
         }
 

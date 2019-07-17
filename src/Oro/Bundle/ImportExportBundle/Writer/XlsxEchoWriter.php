@@ -12,7 +12,7 @@ class XlsxEchoWriter extends XlsxFileStreamWriter
     /**
      * {@inheritdoc}
      */
-    public function setImportExportContext(ContextInterface $context)
+    public function setImportExportContext(ContextInterface $context): void
     {
         $this->filePath = 'php://output';
 

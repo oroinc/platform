@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
-use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
@@ -180,7 +179,7 @@ class ConfigEntityGridController extends AbstractController
         $entityConfig = $configManager->getProvider('extend')->getConfig($entity->getClassName());
 
         if ($entityConfig->get('owner') == ExtendScope::OWNER_SYSTEM) {
-            return new Response('', Codes::HTTP_FORBIDDEN);
+            return new Response('', Response::HTTP_FORBIDDEN);
         }
 
         $entityConfig->set('state', ExtendScope::STATE_DELETE);
@@ -188,7 +187,7 @@ class ConfigEntityGridController extends AbstractController
         $configManager->persist($entityConfig);
         $configManager->flush();
 
-        return new JsonResponse(['message' => 'Item deleted', 'successful' => true], Codes::HTTP_OK);
+        return new JsonResponse(['message' => 'Item deleted', 'successful' => true], Response::HTTP_OK);
     }
 
     /**
@@ -216,7 +215,7 @@ class ConfigEntityGridController extends AbstractController
         $entityConfig = $configManager->getProvider('extend')->getConfig($entity->getClassName());
 
         if ($entityConfig->get('owner') == ExtendScope::OWNER_SYSTEM) {
-            return new Response('', Codes::HTTP_FORBIDDEN);
+            return new Response('', Response::HTTP_FORBIDDEN);
         }
 
         $entityConfig->set(
@@ -227,7 +226,7 @@ class ConfigEntityGridController extends AbstractController
         $configManager->persist($entityConfig);
         $configManager->flush();
 
-        return new JsonResponse(['message' => 'Item was restored', 'successful' => true], Codes::HTTP_OK);
+        return new JsonResponse(['message' => 'Item was restored', 'successful' => true], Response::HTTP_OK);
     }
 
     /**

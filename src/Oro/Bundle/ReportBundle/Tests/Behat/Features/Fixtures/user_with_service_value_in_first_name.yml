@@ -1,6 +1,6 @@
 Oro\Bundle\UserBundle\Entity\User:
     testUser:
-        firstName: \@testService->doWork()
+        firstName: '\@testService-\>doWork()'
         lastName: Test
         username: test
         organization: '@organization'

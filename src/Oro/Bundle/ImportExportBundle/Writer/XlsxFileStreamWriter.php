@@ -2,83 +2,64 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Liuggio\ExcelBundle\Factory as ExcelFactory;
+use Box\Spout\Common\Type;
+use Box\Spout\Writer\WriterFactory;
+use Box\Spout\Writer\WriterInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 
+/**
+ * Write XLSX to file
+ */
 abstract class XlsxFileStreamWriter extends FileStreamWriter
 {
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $firstLineIsHeader = true;
 
-    /**
-     * @var ExcelFactory
-     */
-    protected $phpExcel;
+    /** @var int */
+    private $currentRow = 0;
+
+    /** @var WriterInterface */
+    private $writer;
 
     /**
-     * @var \PHPExcel
+     * @return WriterInterface
      */
-    protected $excelObj;
-
-    /**
-     * @var int
-     */
-    protected $currentRow = 0;
-
-    /**
-     * @param ExcelFactory $phpExcel
-     */
-    public function __construct(ExcelFactory $phpExcel)
+    public function getWriter(): WriterInterface
     {
-        $this->phpExcel = $phpExcel;
-    }
-
-    /**
-     * @return \PHPExcel
-     */
-    public function createPHPExcelObject()
-    {
-        if ($this->excelObj) {
-            return $this->excelObj;
+        if (!$this->writer) {
+            $this->writer = WriterFactory::create(Type::XLSX);
+            $this->writer->openToFile($this->filePath);
         }
 
-        \PHPExcel_Settings::setCacheStorageMethod(
-            \PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp,
-            ['memoryCacheSize' => '512M']
-        );
-
-        return $this->excelObj = $this->phpExcel->createPHPExcelObject();
+        return $this->writer;
     }
 
     /**
      * @inheritdoc
      */
-    public function write(array $items)
+    public function write(array $items): void
     {
-        $writeArray = [];
+        $writeArray = $items;
         // write a header if needed
-        if ($this->firstLineIsHeader && ! $this->excelObj) {
+        if ($this->firstLineIsHeader && $this->currentRow === 0) {
             if (!$this->header && count($items) > 0) {
                 $this->header = array_keys($items[0]);
             }
+
             if ($this->header) {
-                $writeArray[] = $this->header;
+                array_unshift($writeArray, $this->header);
             }
         }
 
-        $this->createPHPExcelObject();
-        $writeArray = array_merge($writeArray, $items);
-        $sheet = $this->excelObj->getActiveSheet();
-        $sheet->fromArray($writeArray, null, 'A'.++$this->currentRow);
+        $this->getWriter()->addRows($writeArray);
+
         $this->currentRow += count($writeArray) - 1;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setImportExportContext(ContextInterface $context)
+    public function setImportExportContext(ContextInterface $context): void
     {
         if ($context->hasOption('firstLineIsHeader')) {
             $this->firstLineIsHeader = (bool)$context->getOption('firstLineIsHeader');
@@ -93,11 +74,10 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
      * Write to file on close.
      * A little hacky but direct write is not possible because you cannot append data directly
      */
-    public function close()
+    public function close(): void
     {
-        if ($this->excelObj) {
-            $this->phpExcel->createWriter($this->excelObj, 'Excel2007')->save($this->filePath);
-            $this->excelObj = null;
+        if ($this->writer) {
+            $this->writer->close();
             $this->header = null;
             $this->currentRow = 0;
         }

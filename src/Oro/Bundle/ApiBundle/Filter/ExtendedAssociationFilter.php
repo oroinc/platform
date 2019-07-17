@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 use Doctrine\Common\Collections\Expr\Comparison;
+use Doctrine\Common\Collections\Expr\Expression;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
@@ -14,40 +15,40 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 class ExtendedAssociationFilter extends AssociationFilter
 {
     /** @var AssociationManager */
-    protected $associationManager;
+    private $associationManager;
 
     /** @var EntityOverrideProviderRegistry */
-    protected $entityOverrideProviderRegistry;
+    private $entityOverrideProviderRegistry;
 
     /** @var string */
-    protected $associationOwnerClass;
+    private $associationOwnerClass;
 
     /** @var string */
-    protected $associationType;
+    private $associationType;
 
     /** @var string|null */
-    protected $associationKind;
+    private $associationKind;
 
     /**
      * @param AssociationManager $associationManager
      */
-    public function setAssociationManager(AssociationManager $associationManager)
+    public function setAssociationManager(AssociationManager $associationManager): void
     {
         $this->associationManager = $associationManager;
     }
 
     /**
-     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
+     * @param EntityOverrideProviderRegistry $registry
      */
-    public function setEntityOverrideProviderRegistry(EntityOverrideProviderRegistry $entityOverrideProviderRegistry)
+    public function setEntityOverrideProviderRegistry(EntityOverrideProviderRegistry $registry): void
     {
-        $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
+        $this->entityOverrideProviderRegistry = $registry;
     }
 
     /**
      * @param string $associationOwnerClass
      */
-    public function setAssociationOwnerClass($associationOwnerClass)
+    public function setAssociationOwnerClass(string $associationOwnerClass): void
     {
         $this->associationOwnerClass = $associationOwnerClass;
     }
@@ -55,15 +56,15 @@ class ExtendedAssociationFilter extends AssociationFilter
     /**
      * @param string $associationType
      */
-    public function setAssociationType($associationType)
+    public function setAssociationType(string $associationType): void
     {
         $this->associationType = $associationType;
     }
 
     /**
-     * @param string $associationKind
+     * @param string|null $associationKind
      */
-    public function setAssociationKind($associationKind)
+    public function setAssociationKind(?string $associationKind): void
     {
         $this->associationKind = $associationKind;
     }
@@ -71,7 +72,7 @@ class ExtendedAssociationFilter extends AssociationFilter
     /**
      * {@inheritdoc}
      */
-    protected function doBuildExpression($field, $path, $operator, $value)
+    protected function doBuildExpression(string $field, string $path, string $operator, $value): ?Expression
     {
         $this->assertFilterValuePath($field, $path);
 
@@ -93,7 +94,7 @@ class ExtendedAssociationFilter extends AssociationFilter
      *
      * @return string
      */
-    protected function getFieldName($filterValueName)
+    protected function getFieldName(string $filterValueName): string
     {
         $targetEntityClass = $this->getEntityClass($filterValueName);
         $associationTargets = $this->associationManager->getAssociationTargets(
@@ -104,7 +105,8 @@ class ExtendedAssociationFilter extends AssociationFilter
         );
 
         $fieldName = null;
-        $entityOverrideProvider = $this->entityOverrideProviderRegistry->getEntityOverrideProvider($this->requestType);
+        $entityOverrideProvider = $this->entityOverrideProviderRegistry
+            ->getEntityOverrideProvider($this->getRequestType());
         foreach ($associationTargets as $targetClass => $targetField) {
             $substituteTargetClass = $entityOverrideProvider->getSubstituteEntityClass($targetClass);
             if ($substituteTargetClass) {
@@ -116,9 +118,10 @@ class ExtendedAssociationFilter extends AssociationFilter
             }
         }
         if (!$fieldName) {
-            throw new RuntimeException(
-                \sprintf('An association with "%s" is not supported.', $filterValueName)
-            );
+            throw new RuntimeException(\sprintf(
+                'An association with "%s" is not supported.',
+                $filterValueName
+            ));
         }
 
         return $fieldName;

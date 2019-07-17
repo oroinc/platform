@@ -1,5 +1,18 @@
 /* @theme: admin.oro; */
 
+@import "oroui/css/scss/variables";
+
 .app-page__central-panel {
     z-index: 1; // fix overlapping bug in IE11
+}
+
+.datagrid-settings.show,
+.floatThead.floatThead-fixed .btn-group {
+    position: static; // fix overlapping dropdown bug in IE11
+}
+
+.datagrid-settings .dropdown-menu {
+    #{$start}: auto;
+    #{$end}: 100%;
+    transform: none;
 }

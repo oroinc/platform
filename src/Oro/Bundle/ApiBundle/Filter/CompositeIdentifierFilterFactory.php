@@ -27,7 +27,7 @@ class CompositeIdentifierFilterFactory
      *
      * @return CompositeIdentifierFilter
      */
-    public function createFilter($dataType)
+    public function createFilter(string $dataType): CompositeIdentifierFilter
     {
         $filter = new CompositeIdentifierFilter($dataType);
         $filter->setEntityIdTransformerRegistry($this->entityIdTransformerRegistry);

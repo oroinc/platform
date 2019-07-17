@@ -35,7 +35,7 @@ class SearchQueryFilterFactory
      *
      * @return SearchQueryFilter
      */
-    public function createFilter($dataType)
+    public function createFilter(string $dataType): SearchQueryFilter
     {
         $filter = new SearchQueryFilter($dataType);
         $filter->setSearchMappingProvider($this->searchMappingProvider);

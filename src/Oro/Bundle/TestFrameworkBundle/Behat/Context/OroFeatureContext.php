@@ -19,6 +19,21 @@ class OroFeatureContext extends RawMinkContext
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getSession($name = null)
+    {
+        $session = parent::getSession($name);
+
+        // start session if needed
+        if (!$session->isStarted()) {
+            $session->start();
+        }
+
+        return $session;
+    }
+
+    /**
      * @return OroSelenium2Driver
      */
     protected function getDriver()

@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
 .visible-items-counter {
+    line-height: $visible-items-counter-line-height;
+    
     color: $visible-items-counter-color;
 }

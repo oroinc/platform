@@ -68,6 +68,6 @@ class AliceFileFixture extends AliceFixture implements DependentFixtureInterface
      */
     protected function loadData()
     {
-        return $this->loader->load($this->fileName);
+        return $this->loader->load([$this->fileName]);
     }
 }

@@ -13,7 +13,7 @@ class SelfIdentifiableFilterStub extends ComparisonFilter implements SelfIdentif
     /**
      * @param string[]|\Exception|null $filterKeys
      */
-    public function setFoundFilterKeys($filterKeys)
+    public function setFoundFilterKeys($filterKeys): void
     {
         $this->foundFilterKeys = $filterKeys;
     }

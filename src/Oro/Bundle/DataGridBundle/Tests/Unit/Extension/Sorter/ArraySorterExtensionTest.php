@@ -72,7 +72,7 @@ class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
         $this->config->expects($this->never())->method('offsetGetByPath')
             ->with(Configuration::COLUMNS_PATH)->willReturn([]);
 
-        $this->assertFalse($this->extension->isApplicable($this->config), new ArrayDatasource());
+        $this->assertFalse($this->extension->isApplicable($this->config));
     }
 
     /**

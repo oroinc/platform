@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
-use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -14,6 +13,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -93,7 +93,7 @@ class IntegrationController extends Controller
                     UrlGeneratorInterface::ABSOLUTE_URL
                 );
 
-                $status = Codes::HTTP_OK;
+                $status = Response::HTTP_OK;
                 $response = [
                     'successful' => true,
                     'message'    => $this->get('translator')->trans(
@@ -110,14 +110,14 @@ class IntegrationController extends Controller
                     ['e' => $e]
                 );
 
-                $status = Codes::HTTP_BAD_REQUEST;
+                $status = Response::HTTP_BAD_REQUEST;
                 $response = [
                     'successful' => false,
                     'message'    => $this->get('translator')->trans('oro.integration.sync_error')
                 ];
             }
         } else {
-            $status = Codes::HTTP_OK;
+            $status = Response::HTTP_OK;
             $response = [
                 'successful' => false,
                 'message'    => $this->get('translator')->trans('oro.integration.sync_error_integration_deactivated')

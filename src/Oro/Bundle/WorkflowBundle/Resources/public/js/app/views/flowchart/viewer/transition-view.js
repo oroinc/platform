@@ -22,10 +22,13 @@ define(function(require) {
         defaultConnectionOptions: function() {
             return {
                 paintStyle: {
-                    strokeStyle: '#dcdcdc',
+                    strokeStyle: '#bababb',
                     lineWidth: 2,
-                    outlineColor: '#fafafa',
+                    outlineColor: '#ffffff',
                     outlineWidth: 2
+                },
+                EndpointStyle: {
+                    lineWidth: 10
                 }
             };
         },

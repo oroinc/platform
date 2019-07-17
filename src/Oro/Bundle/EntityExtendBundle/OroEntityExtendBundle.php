@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\Process;
 
 /**
  * Warms up extended entity cache during boot in a case when the cache is empty
@@ -109,8 +109,6 @@ class OroEntityExtendBundle extends Bundle
     {
         // We have to check the extend entity configs in separate process to prevent conflicts
         // with 'class_alias' function is used in 'oro:entity-extend:cache:warmup' command.
-        $pb = $this->createProcessBuilder('oro:entity-extend:cache:check');
-
         $attempts = 0;
         do {
             if (!CommandExecutor::isCommandRunning('oro:entity-extend:cache:check')) {
@@ -119,7 +117,8 @@ class OroEntityExtendBundle extends Bundle
                     return;
                 }
 
-                $process = $pb->getProcess();
+                $process = $this->getProcess('oro:entity-extend:cache:check');
+
                 $exitStatusCode = $process->run();
                 if ($exitStatusCode) {
                     $output = $process->getErrorOutput();
@@ -144,8 +143,6 @@ class OroEntityExtendBundle extends Bundle
         // to allow this process continue executing.
         // The problem is we need initialized DI contained for warming up this cache,
         // but in this moment we are exactly doing this for the current process.
-        $pb = $this->createProcessBuilder('oro:entity-extend:cache:warmup');
-
         $attempts = 0;
         do {
             if (!CommandExecutor::isCommandRunning('oro:entity-extend:cache:warmup')) {
@@ -154,7 +151,8 @@ class OroEntityExtendBundle extends Bundle
                     return;
                 }
 
-                $process = $pb->getProcess();
+                $process = $this->getProcess('oro:entity-extend:cache:warmup');
+
                 $exitStatusCode = $process->run();
                 if ($exitStatusCode) {
                     throw new \RuntimeException($process->getErrorOutput());
@@ -190,18 +188,24 @@ class OroEntityExtendBundle extends Bundle
     }
 
     /**
+     * Creates and returns Process instance with configured parameters and timeout set
      * @param string $commandName
      *
-     * @return ProcessBuilder
+     * @return Process
      */
-    private function createProcessBuilder(string $commandName): ProcessBuilder
+    private function getProcess(string $commandName): Process
     {
-        return ProcessBuilder::create()
-            ->setTimeout(self::CACHE_GENERATION_TIMEOUT)
-            ->add($this->getPhpExecutable())
-            ->add($this->kernel->getProjectDir() . '/bin/console')
-            ->add($commandName)
-            ->add(sprintf('%s=%s', '--env', $this->kernel->getEnvironment()))
-            ->add(sprintf('%s=%s', '--cache-dir', $this->cacheDir));
+        $processArguments = [
+            $this->getPhpExecutable(),
+            $this->kernel->getProjectDir() . '/bin/console',
+            $commandName,
+            sprintf('%s=%s', '--env', $this->kernel->getEnvironment()),
+            sprintf('%s=%s', '--cache-dir', $this->cacheDir)
+        ];
+
+        $process = new Process($processArguments);
+        $process->setTimeout(self::CACHE_GENERATION_TIMEOUT);
+
+        return $process;
     }
 }

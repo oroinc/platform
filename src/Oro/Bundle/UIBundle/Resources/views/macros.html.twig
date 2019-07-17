@@ -275,6 +275,7 @@
             'title' - button title
             'iCss'  - css class for 'i' tag (icon)
             'label' - button label
+            'role'  - link role HTML attribute
         ]
 #}
 {% macro link(parameters) %}
@@ -301,6 +302,7 @@
             {% endfor %}
         {% endif %}
         class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
+        {% if parameters.role is defined %}role="{{ parameters.role }}"{% endif %}
         {% if parameters.title is defined %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}
         {{- parameters.label|trim }}
     </a>
@@ -322,7 +324,7 @@
     {% import _self as UIMacro %}
 
     <div class="pull-left btn-group icons-holder">
-        {{ UIMacro.link(parameters|merge({'class': 'btn back icons-holder-text'})) }}
+        {{ UIMacro.link(parameters|merge({'class': 'btn back icons-holder-text', 'role': 'button'})) }}
     </div>
 {% endmacro %}
 
@@ -1179,7 +1181,7 @@
                         {{ UIMacro.collection_prototype(emailField) }}
                     {% endfor %}
                 </div>
-                <a class="btn add-list-item" href="#">{{ buttonCaption }}</a>
+                <a class="btn add-list-item" href="#" role="button">{{ buttonCaption }}</a>
             </div>
         </div>
     </div>
@@ -1498,10 +1500,12 @@
         {% set form = widget %}
         {% set name = widget.vars.full_name %}
     {% endif %}
+    {% spaceless %}
     <tr data-content="{{ name }}" data-validation-optional-group {{ widgetContainerAttributes }}
             class="{{ options.collection_class|default('') }}">
         {{ form_widget(form) }}
     </tr>
+    {% endspaceless %}
 {% endmacro %}
 
 {% macro badge(label, badgeClass = 'info', iconClass = 'fa-circle') %}

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
-use FOS\RestBundle\Util\Codes;
+use Symfony\Component\HttpFoundation\Response;
 
 class OroTranslationAdapter extends AbstractAPIAdapter
 {
@@ -62,7 +62,7 @@ class OroTranslationAdapter extends AbstractAPIAdapter
             ['packages' => implode(',', $packages)]
         );
 
-        if ($response->getStatusCode() === Codes::HTTP_OK) {
+        if ($response->getStatusCode() === Response::HTTP_OK) {
             $result = $response->json();
             $result = is_array($result) ? $result : [];
 

@@ -4,6 +4,7 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\VoidCache;
 use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass;
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
@@ -77,6 +78,49 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
         $container->setDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE, $fileCacheDef);
         $container->setDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE, $dataCacheDef);
+
+        $compiler = new CacheConfigurationPass();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $compiler->process($container);
+    }
+
+    public function testAbstractDefinitionWithoutClass()
+    {
+        $abstractDataCacheDef = new Definition();
+        $abstractDataCacheDef->setAbstract(true);
+
+        $container = new ContainerBuilder();
+        $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
+        $container->setDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE, $abstractDataCacheDef);
+
+        $compiler = new CacheConfigurationPass();
+
+        $compiler->process($container);
+    }
+
+    public function testAbstractDefinitionWithSupportedClass()
+    {
+        $abstractDataCacheDef = new Definition(VoidCache::class);
+        $abstractDataCacheDef->setAbstract(true);
+
+        $container = new ContainerBuilder();
+        $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
+        $container->setDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE, $abstractDataCacheDef);
+
+        $compiler = new CacheConfigurationPass();
+
+        $compiler->process($container);
+    }
+
+    public function testAbstractDefinitionWithUnsupportedClass()
+    {
+        $abstractDataCacheDef = new Definition(Cache::class);
+        $abstractDataCacheDef->setAbstract(true);
+
+        $container = new ContainerBuilder();
+        $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
+        $container->setDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE, $abstractDataCacheDef);
 
         $compiler = new CacheConfigurationPass();
 

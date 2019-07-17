@@ -35,27 +35,27 @@ define(function(require) {
                     hoverClass: 'workflow-transition-endpoint-hover'
                 }],
                 PaintStyle: {
-                    strokeStyle: '#caa37b',
+                    strokeStyle: '#bababb',
                     lineWidth: 2,
                     outlineColor: 'transparent',
                     outlineWidth: 7
                 },
                 HoverPaintStyle: {
-                    strokeStyle: '#caa37b'
+                    strokeStyle: '#dba91e'
                 },
                 EndpointStyle: {
-                    fillStyle: '#dcdcdc'
+                    fillStyle: '#bababb'
                 },
                 EndpointHoverStyle: {
-                    fillStyle: '#caa37b'
+                    fillStyle: '#dba91e'
                 },
                 ConnectionOverlays: [
                     ['Arrow', {
                         location: 1,
                         id: 'arrow',
                         length: 10,
-                        width: 8,
-                        foldback: 0.7
+                        width: 12,
+                        foldback: 1
                     }]
                 ]
             };

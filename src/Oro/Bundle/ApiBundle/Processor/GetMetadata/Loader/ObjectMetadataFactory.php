@@ -220,9 +220,9 @@ class ObjectMetadataFactory
     }
 
     /**
-     * @param string $entityClass
-     * @param string $associationType
-     * @param string $associationKind
+     * @param string      $entityClass
+     * @param string      $associationType
+     * @param string|null $associationKind
      *
      * @return array [class name => field name, ...]
      */

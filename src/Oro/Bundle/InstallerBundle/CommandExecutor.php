@@ -3,25 +3,18 @@
 namespace Oro\Bundle\InstallerBundle;
 
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
+use Oro\Component\PhpUtils\Tools\CommandExecutor\AbstractCommandExecutor;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * The class that contains a set of methods to simplify execution of console commands.
  */
-class CommandExecutor
+class CommandExecutor extends AbstractCommandExecutor
 {
     const DEFAULT_TIMEOUT = 300;
-
-    /**
-     * @var string|null
-     */
-    protected $env;
 
     /**
      * @var OutputInterface
@@ -47,9 +40,6 @@ class CommandExecutor
      * @var string
      */
     protected $lastCommandLine;
-
-    /** @var array */
-    protected $defaultOptions;
 
     /**
      * Constructor
@@ -94,6 +84,7 @@ class CommandExecutor
         $this->lastCommandLine = null;
         $this->lastCommandExitCode = null;
 
+        // Array of parameters which will be passed to Process instance
         $params = $this->prepareParameters($command, $params);
 
         $ignoreErrors = false;
@@ -104,23 +95,26 @@ class CommandExecutor
 
         if (array_key_exists('--process-isolation', $params)) {
             unset($params['--process-isolation']);
-            $pb = new ProcessBuilder();
-            $pb
-                ->add($this->getPhp())
-                ->add($_SERVER['argv'][0]);
+            $processArguments = [self::getPhpExecutable(), $_SERVER['argv'][0]];
 
+
+            $processTimeout = null;
             if (array_key_exists('--process-timeout', $params)) {
-                $pb->setTimeout($params['--process-timeout']);
+                $processTimeout = $params['--process-timeout'];
+                //Timeout will be passed via method so is not needed in params anymore
                 unset($params['--process-timeout']);
             }
 
             foreach ($params as $name => $val) {
-                $this->processParameter($pb, $name, $val);
+                $this->processParameter($processArguments, $name, $val);
             }
 
-            $process = $pb
-                ->inheritEnvironmentVariables(true)
-                ->getProcess();
+            $process = new Process($processArguments);
+            $process->inheritEnvironmentVariables(true);
+
+            if ($processTimeout !== null) {
+                $process->setTimeout($processTimeout);
+            }
 
             $this->lastCommandLine = $process->getCommandLine();
 
@@ -218,107 +212,6 @@ class CommandExecutor
                 ));
             }
         }
-    }
-
-    /**
-     * @param string $command
-     * @param array  $params
-     *
-     * @return array
-     */
-    protected function prepareParameters($command, array $params)
-    {
-        $params = array_merge(
-            [
-                'command' => $command
-            ],
-            $params
-        );
-
-        if ($this->env && $this->env !== 'dev') {
-            $params['--env'] = $this->env;
-        }
-
-        foreach ($this->defaultOptions as $name => $value) {
-            $paramName = '--' . $name;
-            if (!array_key_exists($paramName, $params)) {
-                $params[$paramName] = $value;
-            }
-        }
-
-        return $params;
-    }
-
-    /**
-     * @param ProcessBuilder    $pb
-     * @param string            $name
-     * @param array|string|null $value
-     */
-    protected function processParameter(ProcessBuilder $pb, $name, $value)
-    {
-        if ($name && '-' === $name[0]) {
-            if ($value === true) {
-                $this->addParameter($pb, $name);
-            } elseif ($value !== false) {
-                $this->addParameter($pb, $name, $value);
-            }
-        } else {
-            $this->addParameter($pb, $value);
-        }
-    }
-
-    /**
-     * @param ProcessBuilder    $pb
-     * @param string            $name
-     * @param array|string|null $value
-     */
-    protected function addParameter(ProcessBuilder $pb, $name, $value = null)
-    {
-        $parameters = [];
-
-        if (null !== $value) {
-            if (is_array($value)) {
-                foreach ($value as $item) {
-                    $parameters[] = sprintf('%s=%s', $name, $item);
-                }
-            } else {
-                $parameters[] = sprintf('%s=%s', $name, $value);
-            }
-        } else {
-            $parameters[] = $name;
-        }
-
-        foreach ($parameters as $parameter) {
-            $pb->add($parameter);
-        }
-    }
-
-    /**
-     * Finds the PHP executable.
-     *
-     * @return string
-     * @throws FileNotFoundException
-     */
-    protected function getPhp()
-    {
-        return self::getPhpExecutable();
-    }
-
-    /**
-     * Finds the PHP executable.
-     *
-     * @return string
-     * @throws FileNotFoundException
-     */
-    public static function getPhpExecutable()
-    {
-        $phpFinder = new PhpExecutableFinder();
-        $phpPath   = $phpFinder->find();
-        if (!$phpPath) {
-            throw new FileNotFoundException('The PHP executable could not be found.');
-        }
-
-        return $phpPath;
     }
 
     /**

@@ -9,7 +9,7 @@ use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureFactory;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResolver;
-use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesExecutor;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
 use Oro\Bundle\TestFrameworkBundle\Test\Event\DisableListenersForDataFixturesEvent;
@@ -361,13 +361,9 @@ abstract class WebTestCase extends BaseWebTestCase
             return $data;
         }
 
-        /** @var AliceFixtureLoader $aliceLoader */
-        $aliceLoader = self::getContainer()->get('oro_test.alice_fixture_loader');
-        $aliceLoader->setReferences(self::$referenceRepository->getReferences());
-
         if (is_string($data)) {
             try {
-                $file = $aliceLoader->locateFile($data);
+                $file = self::getContainer()->get('file_locator')->locate($data);
                 if (is_file($file)) {
                     $data = Yaml::parse(file_get_contents($file));
                 }
@@ -375,12 +371,15 @@ abstract class WebTestCase extends BaseWebTestCase
             }
         }
 
+        $resolver = self::getContainer()->get('oro_test.value_resolver');
+        $resolver->setReferences(new Collection(self::$referenceRepository->getReferences()));
+
         if (is_array($data)) {
-            array_walk_recursive($data, function (&$item) use ($aliceLoader) {
-                $item = $aliceLoader->getProcessor()->process($item, [], null);
+            array_walk_recursive($data, function (&$item) use ($resolver) {
+                $item = $resolver->resolve($item);
             });
         } elseif (is_int($data) || is_string($data)) {
-            $data = $aliceLoader->getProcessor()->process($data, [], null);
+            $data = $resolver->resolve($data);
         } else {
             throw new \InvalidArgumentException(
                 sprintf('Expected argument of type "array or string", "%s" given.', gettype($data))
@@ -951,11 +950,11 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param int $statusCode
-     * @param string|int $message
+     * @param string $message
      *
      * @return array
      */
-    public static function getJsonResponseContent(Response $response, $statusCode, $message = null)
+    public static function getJsonResponseContent(Response $response, $statusCode, string $message = '')
     {
         self::assertJsonResponseStatusCodeEquals($response, $statusCode, $message);
         return self::jsonToArray($response->getContent());
@@ -966,9 +965,9 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param int $statusCode
-     * @param string|null $message
+     * @param string $message
      */
-    protected static function assertEmptyResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertEmptyResponseStatusCodeEquals(Response $response, $statusCode, string $message = '')
     {
         self::assertResponseStatusCodeEquals($response, $statusCode, $message);
         self::assertEmpty(
@@ -982,9 +981,9 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param int $statusCode
-     * @param string|null $message
+     * @param string $message
      */
-    protected static function assertJsonResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertJsonResponseStatusCodeEquals(Response $response, $statusCode, string $message = '')
     {
         self::assertResponseStatusCodeEquals($response, $statusCode, $message);
         self::assertResponseContentTypeEquals($response, 'application/json', $message);
@@ -995,9 +994,9 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param int $statusCode
-     * @param string|null $message
+     * @param string $message
      */
-    protected static function assertHtmlResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertHtmlResponseStatusCodeEquals(Response $response, $statusCode, string $message = '')
     {
         self::assertResponseStatusCodeEquals($response, $statusCode, $message);
         self::assertResponseContentTypeEquals($response, 'text/html; charset=UTF-8', $message);
@@ -1008,9 +1007,9 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param int $statusCode
-     * @param string|null $message
+     * @param string $message
      */
-    protected static function assertResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertResponseStatusCodeEquals(Response $response, $statusCode, string $message = '')
     {
         try {
             \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
@@ -1049,9 +1048,9 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param string $contentType
-     * @param string|null $message
+     * @param string $message
      */
-    protected static function assertResponseContentTypeEquals(Response $response, $contentType, $message = null)
+    protected static function assertResponseContentTypeEquals(Response $response, $contentType, string $message = '')
     {
         $message = $message ? $message . PHP_EOL : '';
         $message .= sprintf('Failed asserting response has header "Content-Type: %s":', $contentType);
@@ -1067,7 +1066,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param array $actual
      * @param string $message
      */
-    protected static function assertArrayIntersectEquals(array $expected, array $actual, $message = null)
+    protected static function assertArrayIntersectEquals(array $expected, array $actual, string $message = '')
     {
         $actualIntersect = self::getRecursiveArrayIntersect($actual, $expected);
         \PHPUnit\Framework\TestCase::assertEquals(

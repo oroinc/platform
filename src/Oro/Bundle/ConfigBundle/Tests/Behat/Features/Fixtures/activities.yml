@@ -5,8 +5,7 @@ include:
 OroEntityProxy\OroEmailBundle\EmailAddressProxy:
   charlieAddress:
     owner: '@charlie'
-    email: charlie@sheen.com
-    hasOwner: true
+    email: 'charlie@sheen.com'
 
 Oro\Bundle\EmailBundle\Entity\EmailBody:
   emailBody{1..26}:
@@ -25,7 +24,7 @@ Oro\Bundle\EmailBundle\Entity\Email:
     subject: "-<current()> days"
     emailBody: '@emailBody<current()>'
     sentAt: '<dateTimeBetween($subject, $subject)>'
-    fromName: '"Charlie Sheen" <charlie@sheen.com>'
+    fromName: '"Charlie Sheen" \<charlie@sheen.com\>'
     fromEmailAddress: '@charlieAddress'
     internalDate: '<dateTimeBetween($subject, $subject)>'
     messageId: fsdfasdf

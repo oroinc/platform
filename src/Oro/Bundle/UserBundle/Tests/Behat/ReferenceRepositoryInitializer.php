@@ -4,8 +4,8 @@ namespace Oro\Bundle\UserBundle\Tests\Behat;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
-use Nelmio\Alice\Instances\Collection as AliceCollection;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\ReferenceRepositoryInitializerInterface;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -16,7 +16,7 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
     /**
      * {@inheritdoc}
      */
-    public function init(Registry $doctrine, AliceCollection $referenceRepository)
+    public function init(Registry $doctrine, Collection $referenceRepository)
     {
         /** @var EntityManager $em */
         $em = $doctrine->getManager();

@@ -181,7 +181,6 @@ services:
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -50 }
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: -50 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, priority: -50 }
-            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, priority: -50 }
 
     oro_api.json_api.normalize_id_filter_key:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIdFilterKey
@@ -191,7 +190,6 @@ services:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -55 }
             - { name: oro.api.processor, action: delete_list, group: initialize, requestType: json_api, priority: -55 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, requestType: json_api, priority: -55 }
-            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, requestType: json_api, priority: -55 }
 
     oro_api.register_dynamic_filters:
         class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterDynamicFilters
@@ -205,7 +203,6 @@ services:
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -60 }
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: -60 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, priority: -60 }
-            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, priority: -60 }
 
     oro_api.json_api.set_default_sorting:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetDefaultSorting
@@ -214,7 +211,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -95 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, requestType: json_api, priority: -95 }
-            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, requestType: json_api, priority: -95 }
 
     oro_api.set_default_sorting:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultSorting
@@ -223,7 +219,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: '!json_api', priority: -100 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, requestType: '!json_api', priority: -100 }
-            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, requestType: '!json_api', priority: -100 }
 
     oro_api.set_default_paging:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultPaging
@@ -386,7 +381,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_input, requestType: json_api, priority: 90 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_input, collection: true, requestType: json_api, priority: 90 }
-            - { name: oro.api.processor, action: get_relationship, group: normalize_input, collection: true, requestType: json_api, priority: 90 }
 
     oro_api.subresource.json_api.validate_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\JsonApi\ValidateRequestData
@@ -466,7 +460,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_input, priority: -100 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_input, collection: true, priority: -100 }
-            - { name: oro.api.processor, action: get_relationship, group: normalize_input, collection: true, priority: -100 }
 
     oro_api.validate_entity_id_exists:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityIdExists
@@ -586,6 +579,16 @@ services:
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: 50 }
             - { name: oro.api.processor, action: get_subresource, group: build_query, collection: true, priority: 50 }
             - { name: oro.api.processor, action: get_relationship, group: build_query, collection: true, priority: 50 }
+
+    oro_api.set_default_ordering:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultOrdering
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: build_query, priority: -10 }
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -10 }
+            - { name: oro.api.processor, action: get_subresource, group: build_query, collection: true, priority: -10 }
+            - { name: oro.api.processor, action: get_relationship, group: build_query, collection: true, priority: -10 }
 
     oro_api.normalize_paging:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizePaging

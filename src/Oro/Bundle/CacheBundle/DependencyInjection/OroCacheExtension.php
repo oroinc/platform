@@ -4,11 +4,13 @@ namespace Oro\Bundle\CacheBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-class OroCacheExtension extends Extension implements PrependExtensionInterface
+/**
+ * Container extension for OroCacheBundle.
+ */
+class OroCacheExtension extends Extension
 {
     /**
      * {@inheritDoc}
@@ -21,29 +23,5 @@ class OroCacheExtension extends Extension implements PrependExtensionInterface
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('commands.yml');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function prepend(ContainerBuilder $container)
-    {
-        $validationConfig = [
-            'validation' => [
-                'cache' => 'oro_cache.validation_cache.doctrine',
-            ],
-            'serializer' => [
-                'cache' => 'oro_cache.serializer',
-            ],
-            'annotations' => [
-                'cache' => 'oro_cache.annotations',
-            ],
-        ];
-
-        $container->prependExtensionConfig('framework', $validationConfig);
-        $container->prependExtensionConfig(
-            'jms_serializer',
-            ['metadata' => ['cache' => 'oro_cache.jms_serializer_adapter']]
-        );
     }
 }

@@ -3,7 +3,6 @@ namespace Oro\Bundle\MessageQueueBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -42,7 +41,7 @@ class JobController extends FOSRestController
                 'successful' => true,
                 'message' => $this->get('translator')->trans('oro.message_queue_job.rest.job_interrupted'),
             ],
-            Codes::HTTP_OK
+            Response::HTTP_OK
         ));
     }
 

@@ -38,8 +38,6 @@ parameters:
     oro_user.provider.role_privilege_capability_provider.class: Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider
     oro_user.provider.privilege_category_provider.class: Oro\Bundle\UserBundle\Provider\PrivilegeCategoryProvider
 
-    oro_user.token.factory.wsse.class:            Oro\Bundle\UserBundle\Security\WsseTokenFactory
-
     oro_user.role.datagrid_helper.class:          Oro\Bundle\UserBundle\Datagrid\RoleGridHelper
 
     # Validator
@@ -420,9 +418,6 @@ services:
             - '@security.token_storage'
             - '@session.flash_bag'
             - '@translator'
-
-    oro_user.token.factory.wsse:
-        class: '%oro_user.token.factory.wsse.class%'
 
     oro_user.role.datagrid_helper:
         class: '%oro_user.role.datagrid_helper.class%'

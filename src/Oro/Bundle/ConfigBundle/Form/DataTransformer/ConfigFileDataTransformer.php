@@ -56,9 +56,7 @@ class ConfigFileDataTransformer implements DataTransformerInterface
             return null;
         }
 
-        $file = $this->doctrineHelper->getEntityRepositoryForClass(File::class)->find($value);
-
-        return $file ? clone $file : null;
+        return $this->doctrineHelper->getEntityRepositoryForClass(File::class)->find($value);
     }
 
     /**

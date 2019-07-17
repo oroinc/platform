@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Expr\Expression;
 
 /**
  * A filter that can be used to filter data by a value of "primary" field.
@@ -26,17 +27,17 @@ use Doctrine\Common\Collections\Criteria;
 class PrimaryFieldFilter extends ComparisonFilter
 {
     /** @var string */
-    protected $dataField;
+    private $dataField;
 
     /** @var string */
-    protected $primaryFlagField;
+    private $primaryFlagField;
 
     /**
      * Gets a field that contains a data value.
      *
      * @return string|null
      */
-    public function getDataField()
+    public function getDataField(): ?string
     {
         return $this->dataField;
     }
@@ -44,9 +45,9 @@ class PrimaryFieldFilter extends ComparisonFilter
     /**
      * Sets a field that contains a data value.
      *
-     * @param string $fieldName
+     * @param string|null $fieldName
      */
-    public function setDataField($fieldName)
+    public function setDataField(?string $fieldName): void
     {
         $this->dataField = $fieldName;
     }
@@ -56,7 +57,7 @@ class PrimaryFieldFilter extends ComparisonFilter
      *
      * @return string|null
      */
-    public function getPrimaryFlagField()
+    public function getPrimaryFlagField(): ?string
     {
         return $this->primaryFlagField;
     }
@@ -64,9 +65,9 @@ class PrimaryFieldFilter extends ComparisonFilter
     /**
      * Sets a field that contains a "primary" flag.
      *
-     * @param string $fieldName
+     * @param string|null $fieldName
      */
-    public function setPrimaryFlagField($fieldName)
+    public function setPrimaryFlagField(?string $fieldName): void
     {
         $this->primaryFlagField = $fieldName;
     }
@@ -74,13 +75,14 @@ class PrimaryFieldFilter extends ComparisonFilter
     /**
      * {@inheritdoc}
      */
-    protected function createExpression(FilterValue $value = null)
+    protected function createExpression(FilterValue $value = null): ?Expression
     {
         if (null === $value) {
             return null;
         }
 
-        if (!$this->field) {
+        $field = $this->getField();
+        if (!$field) {
             throw new \InvalidArgumentException('The Field must not be empty.');
         }
         if (!$this->dataField) {
@@ -88,7 +90,7 @@ class PrimaryFieldFilter extends ComparisonFilter
         }
 
         $expr = $this->buildExpression(
-            $this->field . '.' . $this->dataField,
+            $field . '.' . $this->dataField,
             $value->getPath(),
             $value->getOperator(),
             $value->getValue()
@@ -96,7 +98,7 @@ class PrimaryFieldFilter extends ComparisonFilter
 
         return Criteria::expr()->andX(
             $expr,
-            Criteria::expr()->eq($this->field . '.' . ($this->primaryFlagField  ?: 'primary'), true)
+            Criteria::expr()->eq($field . '.' . ($this->primaryFlagField  ?: 'primary'), true)
         );
     }
 }

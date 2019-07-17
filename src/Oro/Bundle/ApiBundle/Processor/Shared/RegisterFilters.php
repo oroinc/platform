@@ -45,10 +45,7 @@ abstract class RegisterFilters implements ProcessorInterface
      */
     protected function createFilter(FilterFieldConfig $filterConfig, $propertyPath, Context $context)
     {
-        $filterOptions = $filterConfig->getOptions();
-        if (null === $filterOptions) {
-            $filterOptions = [];
-        }
+        $filterOptions = $this->getFilterOptions($filterConfig);
         $filterType = $filterConfig->getType();
         $dataType = $filterConfig->getDataType();
         if (!$filterType) {
@@ -58,29 +55,18 @@ abstract class RegisterFilters implements ProcessorInterface
         }
         $filter = $this->filterFactory->createFilter($filterType, $filterOptions);
         if (null !== $filter) {
-            $filter->setArrayAllowed($filterConfig->isArrayAllowed());
-            $filter->setRangeAllowed($filterConfig->isRangeAllowed());
-            $filter->setDescription($filterConfig->getDescription());
-            $operators = $filterConfig->getOperators();
-            if (!empty($operators)) {
-                $filter->setSupportedOperators($operators);
-            } elseif (!$filterConfig->hasType() && $filterConfig->isCollection()) {
-                $filter->setSupportedOperators(
-                    \array_merge($filter->getSupportedOperators(), self::COLLECTION_ASSOCIATION_ADDITIONAL_OPERATORS)
-                );
-            }
+            $this->initializeFilterOptions($filter, $filterConfig);
             if ($filter instanceof FieldAwareFilterInterface) {
                 $filter->setField($propertyPath);
             }
             if ($filterConfig->isCollection()) {
-                if ($filter instanceof CollectionAwareFilterInterface) {
-                    $filter->setCollection(true);
-                } else {
+                if (!$filter instanceof CollectionAwareFilterInterface) {
                     throw new \LogicException(\sprintf(
                         'The filter by "%s" does not support the "collection" option',
                         $propertyPath
                     ));
                 }
+                $filter->setCollection(true);
             }
             if ($filter instanceof RequestAwareFilterInterface) {
                 $filter->setRequestType($context->getRequestType());
@@ -99,5 +85,45 @@ abstract class RegisterFilters implements ProcessorInterface
         }
 
         return $filter;
+    }
+
+    /**
+     * @param FilterFieldConfig $filterConfig
+     *
+     * @return array
+     */
+    private function getFilterOptions(FilterFieldConfig $filterConfig): array
+    {
+        $filterOptions = $filterConfig->getOptions();
+        if (null === $filterOptions) {
+            $filterOptions = [];
+        }
+
+        return $filterOptions;
+    }
+
+    /**
+     * @param StandaloneFilter  $filter
+     * @param FilterFieldConfig $filterConfig
+     */
+    private function initializeFilterOptions(StandaloneFilter $filter, FilterFieldConfig $filterConfig): void
+    {
+        if ($filterConfig->hasArrayAllowed()) {
+            $filter->setArrayAllowed($filterConfig->isArrayAllowed());
+        }
+        if ($filterConfig->hasRangeAllowed()) {
+            $filter->setRangeAllowed($filterConfig->isRangeAllowed());
+        }
+        if ($filterConfig->hasDescription()) {
+            $filter->setDescription($filterConfig->getDescription());
+        }
+        $operators = $filterConfig->getOperators();
+        if (!empty($operators)) {
+            $filter->setSupportedOperators($operators);
+        } elseif (!$filterConfig->hasType() && $filterConfig->isCollection()) {
+            $filter->setSupportedOperators(
+                \array_merge($filter->getSupportedOperators(), self::COLLECTION_ASSOCIATION_ADDITIONAL_OPERATORS)
+            );
+        }
     }
 }

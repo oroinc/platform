@@ -38,7 +38,7 @@ Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
     workflow_custom_workflow_editable:
         name: workflow_custom_workflow_editable
         label: 'oro.workflow.workflow_custom_workflow_editable.label'
-        relatedEntity: 'Oro\Bundle\UserBundle\Entity\User'
+        relatedEntity: 'Oro\\Bundle\\UserBundle\\Entity\\User'
         entityAttributeName: 'entity'
         stepsDisplayOrdered: false
         system: false
@@ -88,7 +88,7 @@ Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
                         class: ''
                     is_hidden: false
                     acl_message: null
-                    form_type: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType
+                    form_type: 'Oro\\Bundle\\WorkflowBundle\\Form\\Type\\WorkflowTransitionType'
                     page_template: null
                     dialog_template: null
                     init_entities: {  }
@@ -110,7 +110,7 @@ Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
     workflow_custom_workflow_readonly:
         name: workflow_custom_workflow_readonly
         label: 'oro.workflow.workflow_custom_workflow_readonly.label'
-        relatedEntity: 'Oro\Bundle\UserBundle\Entity\User'
+        relatedEntity: 'Oro\\Bundle\\UserBundle\\Entity\\User'
         entityAttributeName: 'entity'
         stepsDisplayOrdered: false
         system: false
@@ -160,7 +160,7 @@ Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
                         class: ''
                     is_hidden: false
                     acl_message: null
-                    form_type: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType
+                    form_type: 'Oro\\Bundle\\WorkflowBundle\\Form\\Type\\WorkflowTransitionType'
                     page_template: null
                     dialog_template: null
                     init_entities: {  }
@@ -181,18 +181,13 @@ Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
                     actions:
                         -
                             '@assign_value':
-                                - $.result.test
+                                - '\$.result.test'
                                 - null
-
-
-
-
-
 
     workflow_system_workflow_editable:
         name: workflow_system_workflow_editable
         label: 'oro.workflow.workflow_system_workflow_editable.label'
-        relatedEntity: 'Oro\Bundle\UserBundle\Entity\User'
+        relatedEntity: 'Oro\\Bundle\\UserBundle\\Entity\\User'
         entityAttributeName: 'entity'
         stepsDisplayOrdered: false
         system: true
@@ -242,7 +237,7 @@ Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
                         class: ''
                     is_hidden: false
                     acl_message: null
-                    form_type: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType
+                    form_type: 'Oro\\Bundle\\WorkflowBundle\\Form\\Type\\WorkflowTransitionType'
                     page_template: null
                     dialog_template: null
                     init_entities: {  }
@@ -264,7 +259,7 @@ Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
     workflow_system_workflow_readonly:
         name: workflow_system_workflow_readonly
         label: 'oro.workflow.workflow_system_workflow_readonly.label'
-        relatedEntity: 'Oro\Bundle\UserBundle\Entity\User'
+        relatedEntity: 'Oro\\Bundle\\UserBundle\\Entity\\User'
         entityAttributeName: 'entity'
         stepsDisplayOrdered: false
         system: true
@@ -314,7 +309,7 @@ Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
                         class: ''
                     is_hidden: false
                     acl_message: null
-                    form_type: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType
+                    form_type: 'Oro\\Bundle\\WorkflowBundle\\Form\\Type\\WorkflowTransitionType'
                     page_template: null
                     dialog_template: null
                     init_entities: {  }
@@ -335,7 +330,7 @@ Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
                     actions:
                         -
                             '@assign_value':
-                                - $.result.test
+                                - '\$.result.test'
                                 - null
 
 Oro\Bundle\WorkflowBundle\Entity\WorkflowStep:

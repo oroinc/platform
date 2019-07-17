@@ -73,6 +73,21 @@ class OroMainContext extends MinkContext implements
         $this->getSession()->resizeWindow(1920, 1080, 'current');
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getSession($name = null)
+    {
+        $session = parent::getSession($name);
+
+        // start session if needed
+        if (!$session->isStarted()) {
+            $session->start();
+        }
+
+        return $session;
+    }
+
     /** @return Stopwatch */
     private function getStopwatch()
     {
