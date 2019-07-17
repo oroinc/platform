@@ -110,7 +110,7 @@ class ActivityListController extends RestController
      */
     public function getManager()
     {
-        return $this->get(ActivityListManager::class);
+        return $this->get('oro_activity_list.manager');
     }
 
     /**

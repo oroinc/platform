@@ -75,6 +75,7 @@ services:
             - '@Psr\Container\ContainerInterface'
         tags:
             - { name: container.service_subscriber, id: 'templating' }
+            - { name: container.service_subscriber, id: 'twig.loader.native_filesystem' }
             - { name: container.service_subscriber, id: 'templating.name_parser' }
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
 

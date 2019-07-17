@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\EventListener;
 
+use Doctrine\Common\Inflector\Inflector;
 use Psr\Container\ContainerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
@@ -11,9 +12,10 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\Templating\TemplateReferenceInterface;
+use Twig\Loader\FilesystemLoader;
 
 /**
- * Adding widget container template into guessed template path
+ * Resolve controller name and inject widget container template into guessed template path
  */
 class TemplateListener implements ServiceSubscriberInterface
 {
@@ -39,23 +41,16 @@ class TemplateListener implements ServiceSubscriberInterface
     public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
         $request = $event->getRequest();
-
-        $widgetContainer = $request->query->get('_widgetContainerTemplate')
-            ?: $request->request->get('_widgetContainerTemplate')
-            ?: $request->query->get('_widgetContainer')
-            ?: $request->request->get('_widgetContainer');
-
-        if ($widgetContainer) {
-            $template = $this->getTemplateReference($request);
-            if ($template) {
-                if (!$this->processContainer($template, $widgetContainer)) {
-                    $this->processContainer($template, self::DEFAULT_CONTAINER);
-                }
-            }
+        $templateReference = $this->getTemplateReference($request);
+        if ($templateReference) {
+            $this->resolveControllerDir($templateReference);
+            $this->injectWidgetContainer($templateReference, $request);
         }
     }
 
     /**
+     * Find template reference in request attributes
+     *
      * @param Request $request
      * @return TemplateReferenceInterface|null
      */
@@ -91,44 +86,137 @@ class TemplateListener implements ServiceSubscriberInterface
     }
 
     /**
+     * Allow to use the controller view directory name in CamelCase
+     *
+     * @param TemplateReferenceInterface $templateReference
+     */
+    private function resolveControllerDir(TemplateReferenceInterface $templateReference): void
+    {
+        if ($templateReference instanceof TemplateReference) {
+            $bundle = $templateReference->get('bundle');
+            $controller = $templateReference->get('controller');
+        } else {
+            $parts = $this->parseTemplateReference($templateReference);
+            if ($parts) {
+                $bundle = $parts['bundle'];
+                $controller = $parts['controller'];
+            }
+        }
+
+        if (!isset($bundle, $controller)) {
+            return;
+        }
+
+        $legacyController = Inflector::classify($controller);
+        if ($legacyController === $controller) {
+            return;
+        }
+
+        $loader = $this->container->get('twig.loader.native_filesystem');
+        foreach ($loader->getPaths($bundle) as $path) {
+            if (file_exists(rtrim($path, '/\\') . DIRECTORY_SEPARATOR . $controller)) {
+                return;
+            }
+
+            if (file_exists($path . DIRECTORY_SEPARATOR . $legacyController)) {
+                if ($templateReference instanceof TemplateReference) {
+                    $templateReference->set('controller', $legacyController);
+                    $templateReference->set('name', $this->resolveActionName($templateReference->get('name')));
+                } else {
+                    $templateReference->set('name', sprintf(
+                        '@%s/%s/%s',
+                        $parts['bundle'],
+                        $legacyController,
+                        $this->resolveActionName($parts['name'])
+                    ));
+                }
+
+                return;
+            }
+        }
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    private function resolveActionName(string $name): string
+    {
+        return preg_match('/^(?<view>[^\/\.]+)(\.[a-z]+.[a-z]+)?$/', $name, $parsed)
+            ? str_replace($parsed['view'], Inflector::camelize($parsed['view']), $name)
+            : $name;
+    }
+
+    /**
+     * @param TemplateReferenceInterface $templateReference
+     * @param Request $request
+     */
+    private function injectWidgetContainer(TemplateReferenceInterface $templateReference, Request $request): void
+    {
+        $widgetContainer = $request->query->get('_widgetContainerTemplate')
+            ?: $request->request->get('_widgetContainerTemplate')
+            ?: $request->query->get('_widgetContainer')
+            ?: $request->request->get('_widgetContainer');
+
+        if ($widgetContainer) {
+            if (!$this->processContainer($templateReference, $widgetContainer)) {
+                $this->processContainer($templateReference, self::DEFAULT_CONTAINER);
+            }
+        }
+    }
+
+    /**
      * Check new template name based on container
      *
-     * @param TemplateReferenceInterface $template
+     * @param TemplateReferenceInterface $templateReference
      * @param string $container
      * @return bool
      */
-    private function processContainer(TemplateReferenceInterface $template, string $container): bool
+    private function processContainer(TemplateReferenceInterface $templateReference, string $container): bool
     {
-        if ($template instanceof TemplateReference) {
+        if ($templateReference instanceof TemplateReference) {
             $templateName = sprintf(
                 '%s:%s:%s.%s.%s',
-                $template->get('bundle'),
-                $template->get('controller'),
-                $container . '/' . $template->get('name'),
-                $template->get('format'),
-                $template->get('engine')
+                $templateReference->get('bundle'),
+                $templateReference->get('controller'),
+                $container . '/' . $templateReference->get('name'),
+                $templateReference->get('format'),
+                $templateReference->get('engine')
             );
 
             if ($this->getTemplating()->exists($templateName)) {
-                $template->set('name', $container . '/' . $template->get('name'));
+                $templateReference->set('name', $container . '/' . $templateReference->get('name'));
                 return true;
             }
         } else {
-            $parameters = $template->all();
-            if (count($parameters) === 2
-                && isset($parameters['name'], $parameters['engine'])
-                && preg_match('/^(?<path>@?[^\/:]+[\/:]{1}[^\/:]+[\/:]{1})(?<name>.+)$/', $parameters['name'], $parts)
-            ) {
+            $parts = $this->parseTemplateReference($templateReference);
+            if ($parts) {
                 $templateName = $parts['path'] . $container . '/' . $parts['name'];
 
                 if ($this->getTemplating()->exists($templateName)) {
-                    $template->set('name', $templateName);
+                    $templateReference->set('name', $templateName);
                     return true;
                 }
             }
         }
 
         return false;
+    }
+
+    /**
+     * @param TemplateReferenceInterface $templateReference
+     * @return array|null
+     */
+    private function parseTemplateReference(TemplateReferenceInterface $templateReference): ?array
+    {
+        $parameters = $templateReference->all();
+        if (\count($parameters) !== 2 || !isset($parameters['name'], $parameters['engine'])) {
+            return null;
+        }
+
+        $pattern = '/^(?<path>@?(?<bundle>[^\/:]+)[\/:]{1}(?<controller>[^\/:]+)[\/:]{1})(?<name>.+)$/';
+
+        return \preg_match($pattern, $parameters['name'], $parts) ? $parts : null;
     }
 
     /**
@@ -150,6 +238,7 @@ class TemplateListener implements ServiceSubscriberInterface
     {
         return [
             'templating' => EngineInterface::class,
+            'twig.loader.native_filesystem' => FilesystemLoader::class,
             'templating.name_parser' => TemplateNameParserInterface::class
         ];
     }
