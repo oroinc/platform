@@ -97,3 +97,10 @@ services:
             - '@service_container'
         tags:
             - { name: layout.context_configurator, priority: -100 }
+
+    oro_embedded_form.csrf_token_cache:
+        class: Symfony\Component\Cache\Simple\PhpFilesCache
+        arguments:
+            - ''
+            - '%oro_embedded_form.csrf_token_lifetime%'
+            - '%kernel.cache_dir%/security/embedded_form'

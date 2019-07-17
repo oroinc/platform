@@ -67,6 +67,3 @@ oro_user:
             fix_values: false
             default_value: 1
             show_default: false
-
-escape_wsse_authentication:
-    authentication_listener_class: Oro\Bundle\UserBundle\Security\Http\Firewall\Listener
