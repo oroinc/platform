@@ -44,11 +44,11 @@ class OroActionBundleTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'class' => CompilerPass\DuplicatorFilterPass::class,
-                'type' => PassConfig::TYPE_AFTER_REMOVING
+                'type' => PassConfig::TYPE_BEFORE_REMOVING
             ],
             [
                 'class' => CompilerPass\DuplicatorMatcherPass::class,
-                'type' => PassConfig::TYPE_AFTER_REMOVING
+                'type' => PassConfig::TYPE_BEFORE_REMOVING
             ],
             [
                 'class' => CompilerPass\ActionLocatorPass::class,

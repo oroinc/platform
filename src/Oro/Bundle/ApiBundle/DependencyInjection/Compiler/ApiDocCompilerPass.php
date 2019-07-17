@@ -82,8 +82,10 @@ class ApiDocCompilerPass implements CompilerPassInterface
         if (!$container->hasDefinition(self::API_DOC_HTML_FORMATTER_SERVICE)) {
             return false;
         }
+
         $htmlFormatterDef = $container->getDefinition(self::API_DOC_HTML_FORMATTER_SERVICE);
-        if (NelmioFormatter\HtmlFormatter::class !== $htmlFormatterDef->getClass()) {
+        $formatterClass = $container->getParameterBag()->resolveValue($htmlFormatterDef->getClass());
+        if (NelmioFormatter\HtmlFormatter::class !== ltrim($formatterClass, '/\\')) {
             return false;
         }
 

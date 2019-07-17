@@ -129,6 +129,7 @@ services:
 
     oro_layout.helper:
         class: Oro\Bundle\LayoutBundle\Request\LayoutHelper
+        public: true
         arguments:
             - '@request_stack'
         tags:

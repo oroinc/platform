@@ -206,6 +206,7 @@ services:
     oro_attachment.datagrid.action.dialog:
         class: '%oro_attachment.datagrid.action.dialog.class%'
         shared: false
+        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: dialog }
 

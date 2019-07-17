@@ -46,9 +46,13 @@ class ServiceContainerWeakRefPass implements CompilerPassInterface
                 && !$definition->isAbstract()
                 && $id !== 'oro_migration.service_container'
             ) {
-                $privateServices[$id] = new ServiceClosureArgument(
-                    new Reference($id, ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE)
-                );
+                if (!$definition->isShared() && strpos($id, 'oro') === 0) {
+                    $definition->setPublic(true);
+                } else {
+                    $privateServices[$id] = new ServiceClosureArgument(
+                        new Reference($id, ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE)
+                    );
+                }
             }
         }
 

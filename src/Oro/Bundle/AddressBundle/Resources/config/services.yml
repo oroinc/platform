@@ -25,6 +25,7 @@ services:
     oro_address.extension.action.type.map:
         class: '%oro_address.extension.action.type.map.class%'
         shared: false
+        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: map }
 

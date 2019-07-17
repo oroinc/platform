@@ -182,6 +182,7 @@ services:
 
     oro_datagrid.grid_view.manager:
         class: Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager
+        public: true
         arguments:
             - '@oro_security.acl_helper'
             - '@doctrine'

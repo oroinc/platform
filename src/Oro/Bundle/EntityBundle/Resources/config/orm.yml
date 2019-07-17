@@ -25,6 +25,7 @@ services:
         class: Doctrine\ORM\EntityRepository
         factory: ['@oro_entity.repository.factory', 'getDefaultRepository']
         abstract: true
+        public: true
 
     oro_entity.abstract_entity_manager:
         class: Doctrine\ORM\EntityManager

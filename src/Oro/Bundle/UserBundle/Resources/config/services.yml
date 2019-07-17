@@ -400,6 +400,7 @@ services:
 
     oro_user.placeholder.filter:
         class: '%oro_user.placeholder.filter.class%'
+        public: true
         arguments:
             - '@oro_security.token_accessor'
 

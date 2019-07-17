@@ -58,42 +58,49 @@ services:
     oro_datagrid.extension.mass_action.type.ajax:
         class: '%oro_datagrid.extension.mass_action.type.ajax.class%'
         shared: false
+        public: true
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: ajax }
 
     oro_datagrid.extension.mass_action.type.delete:
         class: '%oro_datagrid.extension.mass_action.type.delete.class%'
         shared: false
+        public: true
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: delete }
 
     oro_datagrid.extension.mass_action.type.redirect:
         class: '%oro_datagrid.extension.mass_action.type.redirect.class%'
         shared: false
+        public: true
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: redirect }
 
     oro_datagrid.extension.mass_action.type.widget:
         class: '%oro_datagrid.extension.mass_action.type.widget.class%'
         shared: false
+        public: true
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: widget }
 
     oro_datagrid.extension.mass_action.type.window:
         class: '%oro_datagrid.extension.mass_action.type.window.class%'
         shared: false
+        public: true
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: window }
 
     oro_datagrid.extension.mass_action.type.massedit:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\MassEdit\MassEditAction
         shared: false
+        public: true
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: massedit }
 
     oro_datagrid.extension.mass_action.type.frontend:
         class: '%oro_datagrid.extension.mass_action.type.frontend.class%'
         shared: false
+        public: true
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: frontend }
 

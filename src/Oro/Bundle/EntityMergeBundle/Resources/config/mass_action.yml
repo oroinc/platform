@@ -14,6 +14,7 @@ services:
             - '@oro_entity_config.provider.merge'
             - '@translator'
         shared: false
+        public: true
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: merge }
 
