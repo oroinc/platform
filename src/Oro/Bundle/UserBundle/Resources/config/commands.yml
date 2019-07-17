@@ -6,13 +6,6 @@ services:
         tags:
             - { name: console.command }
 
-    Oro\Bundle\UserBundle\Command\GenerateWSSEHeaderCommand:
-        arguments:
-            - '@doctrine'
-            - '@escape_wsse_authentication.encoder.wsse_secured'
-        tags:
-            - { name: console.command }
-
     Oro\Bundle\UserBundle\Command\ImpersonateUserCommand:
         arguments:
             - '@doctrine'

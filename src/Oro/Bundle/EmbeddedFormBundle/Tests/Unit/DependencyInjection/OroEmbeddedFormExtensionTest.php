@@ -23,18 +23,6 @@ class OroEmbeddedFormExtensionTest extends \PHPUnit\Framework\TestCase
             3600,
             $container->getParameter(OroEmbeddedFormExtension::CSRF_TOKEN_LIFETIME_PARAM)
         );
-        $csrfTokenCacheDef = $container->getDefinition(OroEmbeddedFormExtension::DEFAULT_CSRF_TOKEN_CACHE_SERVICE_ID);
-        $this->assertNotNull($csrfTokenCacheDef);
-        $this->assertEquals(
-            OroEmbeddedFormExtension::DEFAULT_CSRF_TOKEN_CACHE_CLASS,
-            $csrfTokenCacheDef->getClass()
-        );
-        $this->assertEquals(
-            [
-                ['setNonceLifeTime', [3600]]
-            ],
-            $csrfTokenCacheDef->getMethodCalls()
-        );
 
         $this->assertEquals(
             new Reference(OroEmbeddedFormExtension::DEFAULT_CSRF_TOKEN_CACHE_SERVICE_ID),
@@ -74,13 +62,6 @@ class OroEmbeddedFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             123,
             $container->getParameter(OroEmbeddedFormExtension::CSRF_TOKEN_LIFETIME_PARAM)
-        );
-        $this->assertEquals(
-            [
-                ['setNonceLifeTime', [123]]
-            ],
-            $container->getDefinition(OroEmbeddedFormExtension::DEFAULT_CSRF_TOKEN_CACHE_SERVICE_ID)
-                ->getMethodCalls()
         );
     }
 

@@ -1,19 +1,21 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Command;
+namespace Oro\Bundle\WsseAuthenticationBundle\Command;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\UserBundle\Entity\UserApi;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 /**
  * Generate X-WSSE HTTP header for a given API key.
  */
-class GenerateWSSEHeaderCommand extends Command
+class GenerateWsseHeaderCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:wsse:generate-header';
@@ -21,19 +23,19 @@ class GenerateWSSEHeaderCommand extends Command
     /** @var ManagerRegistry */
     private $registry;
 
-    /** @var MessageDigestPasswordEncoder */
-    private $messageDigestPasswordEncoder;
+    /** @var ContainerInterface */
+    private $container;
 
     /**
      * @param ManagerRegistry $registry
-     * @param MessageDigestPasswordEncoder $messageDigestPasswordEncoder
+     * @param ContainerInterface $container
      */
-    public function __construct(ManagerRegistry $registry, MessageDigestPasswordEncoder $messageDigestPasswordEncoder)
+    public function __construct(ManagerRegistry $registry, ContainerInterface $container)
     {
         parent::__construct();
 
         $this->registry = $registry;
-        $this->messageDigestPasswordEncoder = $messageDigestPasswordEncoder;
+        $this->container = $container;
     }
 
     /**
@@ -42,19 +44,24 @@ class GenerateWSSEHeaderCommand extends Command
     public function configure()
     {
         $this->setDescription('Generate X-WSSE HTTP header for a given API key');
-        $this->setDefinition(
-            [
-                new InputArgument('apiKey', InputArgument::REQUIRED, 'User API Key'),
-            ]
-        );
+        $this->setDefinition([
+            new InputArgument('apiKey', InputArgument::REQUIRED, 'User API Key'),
+            new InputOption(
+                'firewall',
+                null,
+                InputArgument::OPTIONAL,
+                'Firewall name. Default: wsse_secured',
+                'wsse_secured'
+            ),
+        ]);
     }
 
     /**
-     * @param InputInterface  $input
+     * @param InputInterface $input
      * @param OutputInterface $output
      *
-     * @throws \InvalidArgumentException
      * @return int
+     * @throws \InvalidArgumentException
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
@@ -86,10 +93,10 @@ class GenerateWSSEHeaderCommand extends Command
 
         // http://stackoverflow.com/questions/18117695/how-to-calculate-wsse-nonce
         $prefix = gethostname();
-        $nonce  = base64_encode(substr(md5(uniqid($prefix . '_', true)), 0, 16));
-        $salt   = ''; // do not use real salt here, because API key already encrypted enough
+        $nonce = base64_encode(substr(md5(uniqid($prefix . '_', true)), 0, 16));
+        $salt = ''; // do not use real salt here, because API key already encrypted enough
 
-        $passwordDigest = $this->messageDigestPasswordEncoder->encodePassword(
+        $passwordDigest = $this->getPasswordEncoder($input->getOption('firewall'))->encodePassword(
             sprintf(
                 '%s%s%s',
                 base64_decode($nonce),
@@ -113,5 +120,22 @@ class GenerateWSSEHeaderCommand extends Command
         $output->writeln('');
 
         return 0;
+    }
+
+    /**
+     * @param string $firewallName
+     *
+     * @return PasswordEncoderInterface
+     */
+    private function getPasswordEncoder(string $firewallName): PasswordEncoderInterface
+    {
+        $serviceId = 'oro_wsse_authentication.encoder.' . $firewallName;
+        if (!$this->container->has($serviceId)) {
+            throw new \InvalidArgumentException(
+                sprintf('WSSE password encoder for firewall "%s" is not defined', $firewallName)
+            );
+        }
+
+        return $this->container->get($serviceId);
     }
 }
