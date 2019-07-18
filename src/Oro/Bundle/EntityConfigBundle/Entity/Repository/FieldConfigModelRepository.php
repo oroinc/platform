@@ -7,6 +7,9 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
+/**
+ * Provides methods to retrieve information about FieldConfigModel entity
+ */
 class FieldConfigModelRepository extends EntityRepository
 {
     /**
@@ -155,5 +158,27 @@ class FieldConfigModelRepository extends EntityRepository
         $queryBuilder->andWhere($queryBuilder->expr()->isNull('state.scope'));
 
         return $queryBuilder;
+    }
+
+    /**
+     * @param bool $isSystem
+     * @return FieldConfigModel[]
+     */
+    public function getAttributesByIsSystem($isSystem)
+    {
+        $attributes = $this->getBaseAttributeQueryBuilder()
+            ->innerJoin(
+                'f.indexedValues',
+                's',
+                'WITH',
+                's.scope = :extendScope AND s.code = :ownerCode AND s.value = :ownerValue'
+            )
+            ->setParameter('ownerCode', 'owner')
+            ->setParameter('extendScope', 'extend')
+            ->setParameter('ownerValue', ($isSystem ? ExtendScope::OWNER_SYSTEM : ExtendScope::OWNER_CUSTOM))
+            ->getQuery()
+            ->getResult();
+
+        return $attributes;
     }
 }
