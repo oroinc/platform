@@ -10,6 +10,9 @@ use Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
+/**
+ * Doctrine helper methods for EntityMerge
+ */
 class DoctrineHelper
 {
     /** @var EntityManager */
@@ -45,7 +48,8 @@ class DoctrineHelper
         $queryBuilder = $repository->createQueryBuilder('entity');
         $entityIdentifier = $this->getSingleIdentifierFieldName($className);
         $identifierExpression = sprintf('entity.%s', $entityIdentifier);
-        $queryBuilder->where($queryBuilder->expr()->in($identifierExpression, $entityIds));
+        $queryBuilder->where($queryBuilder->expr()->in($identifierExpression, ':entityIds'));
+        $queryBuilder->setParameter('entityIds', $entityIds);
         $entities = $queryBuilder->getQuery()->execute();
 
         return $entities;

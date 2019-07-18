@@ -2,13 +2,16 @@
 namespace Oro\Bundle\CronBundle\Command;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Loads cron commands definitions from application to database
+ */
 class CronDefinitionsLoadCommand extends ContainerAwareCommand
 {
     /**
@@ -105,7 +108,7 @@ class CronDefinitionsLoadCommand extends ContainerAwareCommand
 
     /**
      * @param string $className
-     * @return ObjectRepository
+     * @return EntityRepository
      */
     private function getRepository($className)
     {

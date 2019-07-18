@@ -202,24 +202,30 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getQueryBuilder')
             ->willReturn($this->queryBuilder);
 
-        $this->queryBuilder->expects($this->at(0))
+        $this->queryBuilder->expects($this->once())
             ->method('addSelect')
             ->with('columnNames.string as columnName')
-            ->willReturn($this->queryBuilder);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(1))
+        $this->queryBuilder->expects($this->once())
             ->method('innerJoin')
             ->with('alias1.properties', 'columnNames', Expr\Join::WITH, 'columnNames.localization IS NULL')
-            ->willReturn($this->queryBuilder);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(2))
+        $this->queryBuilder->expects($this->once())
             ->method('getDQLPart')
             ->with('groupBy')
-            ->willReturn(true);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(3))
+        $this->queryBuilder->expects($this->once())
             ->method('addGroupBy')
-            ->with('columnName');
+            ->with('columnName')
+            ->willReturnSelf();
+
+        $expr = new Expr();
+        $this->queryBuilder->expects($this->any())
+            ->method('expr')
+            ->willReturn($expr);
 
         $this->extension->visitDatasource($config, $this->datasource);
     }
@@ -254,28 +260,34 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getQueryBuilder')
             ->willReturn($this->queryBuilder);
 
-        $this->queryBuilder->expects($this->at(0))
+        $this->queryBuilder->expects($this->once())
             ->method('addSelect')
             ->with('columnNames.string as columnName')
-            ->willReturn($this->queryBuilder);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(1))
+        $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
             ->with('alias1.properties', 'columnNames', Expr\Join::WITH, 'columnNames.localization IS NULL')
-            ->willReturn($this->queryBuilder);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(2))
+        $this->queryBuilder->expects($this->once())
             ->method('andWhere')
-            ->willReturn(true);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(3))
+        $this->queryBuilder->expects($this->once())
             ->method('getDQLPart')
             ->with('groupBy')
-            ->willReturn(true);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(4))
+        $this->queryBuilder->expects($this->once())
             ->method('addGroupBy')
-            ->with('columnName');
+            ->with('columnName')
+            ->willReturnSelf();
+
+        $expr = new Expr();
+        $this->queryBuilder->expects($this->any())
+            ->method('expr')
+            ->willReturn($expr);
 
         $this->extension->visitDatasource($config, $this->datasource);
     }

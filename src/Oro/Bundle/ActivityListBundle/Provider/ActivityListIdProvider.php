@@ -311,7 +311,8 @@ class ActivityListIdProvider
                 $qb->andWhere($qb->expr()->lte($orderByPath, ':dateFilter'));
             }
             $qb->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
-            $qb->andWhere($qb->expr()->notIn('activity.id', implode(',', $pageFilter['ids'])));
+            $qb->andWhere($qb->expr()->notIn('activity.id', ':pageFilterIds'));
+            $qb->setParameter('pageFilterIds', $pageFilter['ids']);
         }
 
         $qb->orderBy($orderByPath, $orderDirection);

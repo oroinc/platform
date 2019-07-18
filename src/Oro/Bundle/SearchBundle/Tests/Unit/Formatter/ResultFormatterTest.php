@@ -148,13 +148,18 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($entities));
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->setMethods(array('where', 'getQuery'))
+            ->setMethods(['where', 'getQuery', 'setParameter'])
             ->setConstructorArgs(array($this->entityManager))
             ->getMock();
 
         $queryBuilder->expects($this->once())
             ->method('where')
-            ->with(new Func('e.id IN', $entityIds));
+            ->with(new Func('e.id IN', ':entityIds'))
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('entityIds', $entityIds)
+            ->willReturnSelf();
         $queryBuilder->expects($this->once())
             ->method('getQuery')
             ->will($this->returnValue($query));
@@ -167,7 +172,7 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
         $repository->expects($this->any())
             ->method('createQueryBuilder')
             ->with('e')
-            ->will($this->returnValue($queryBuilder));
+            ->willReturn($queryBuilder);
 
         return $repository;
     }
@@ -261,7 +266,7 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
         $expectedResult = $this->prepareStubEntities();
 
         /** @var $indexer Indexer */
-        $indexer = $this->createMock('Oro\Bundle\SearchBundle\Engine\Indexer');
+        $indexer = $this->createMock(Indexer::class);
         $indexerRows = $this->getIndexerRows();
 
         $resultFormatter = new ResultFormatter($this->entityManager, $indexer);
@@ -276,7 +281,7 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
         $this->prepareStubEntities();
 
         /** @var $indexer Indexer */
-        $indexer = $this->createMock('Oro\Bundle\SearchBundle\Engine\Indexer');
+        $indexer = $this->createMock(Indexer::class);
         $indexerRows = $this->getIndexerRows();
 
         $resultFormatter = new ResultFormatter($this->entityManager, $indexer);
