@@ -11,6 +11,10 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Autocomplete search handler generic implementation.
+ * Search entities by given string.
+ */
 class SearchHandler implements SearchHandlerInterface
 {
     /**
@@ -211,12 +215,6 @@ class SearchHandler implements SearchHandlerInterface
         $resultEntities = [];
         if ($entityIds) {
             $unsortedEntities = $this->getEntitiesByIds($entityIds);
-
-            /**
-             * We need to sort entities in the same order given by method searchIds.
-             *
-             * @todo Should be not necessary after implementation of BAP-5691.
-             */
             $entityByIdHash = [];
 
             foreach ($unsortedEntities as $entity) {
@@ -248,7 +246,8 @@ class SearchHandler implements SearchHandlerInterface
         if ($entityIds) {
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = $this->entityRepository->createQueryBuilder('e');
-            $queryBuilder->where($queryBuilder->expr()->in('e.' . $this->idFieldName, $entityIds));
+            $queryBuilder->where($queryBuilder->expr()->in('e.' . $this->idFieldName, ':entityIds'));
+            $queryBuilder->setParameter('entityIds', $entityIds);
             return $queryBuilder->getQuery()->getResult();
         }
 
