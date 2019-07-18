@@ -69,7 +69,11 @@ class AclHelper
                     continue;
                 }
 
-                $condition  = $this->ownershipDataBuilder->getAclConditionData($className, $permission);
+                $entityConfig = $this->mappingProvider->getEntityConfig($className);
+                $condition  = $this->ownershipDataBuilder->getAclConditionData(
+                    $className,
+                    $entityConfig['acl_permission'] ?? $permission
+                );
                 $expression = $this->getExpressionByCondition($className, $entityAlias, $condition, $expr);
 
                 if (!$expression) {

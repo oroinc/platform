@@ -1,9 +1,17 @@
 services:
+    oro_layout.layout.service_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        public: false
+        arguments:
+            - [] # services. Will be set in Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigurationPass
+        tags:
+            - { name: container.service_locator }
+
     oro_layout.extension:
         public: false
         class: Oro\Component\Layout\Extension\DependencyInjection\DependencyInjectionExtension
         arguments:
-            - '@service_container'
+            - '@oro_layout.layout.service_locator'
             - {} # types
             - {} # type extensions
             - {} # layout updates

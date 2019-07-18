@@ -5,8 +5,11 @@ namespace Oro\Component\Layout\Extension\DependencyInjection;
 use Oro\Component\Layout\Exception;
 use Oro\Component\Layout\Extension\ExtensionInterface;
 use Oro\Component\Layout\LayoutItemInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
+/**
+ * Handles access to layout block types, extensions, layout updates, context configurators
+ */
 class DependencyInjectionExtension implements ExtensionInterface
 {
     /** @var ContainerInterface */
