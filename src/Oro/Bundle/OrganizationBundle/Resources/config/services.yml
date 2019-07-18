@@ -77,6 +77,7 @@ services:
     #
     oro_organization.form.type.ownership_type:
         class: Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType
+        public: true
         tags:
             - { name: form.type, alias: oro_type_choice_ownership_type }
 
@@ -141,6 +142,7 @@ services:
     #
     oro_organization.provider.business_units_grid:
         class: '%oro_organization.provider.business_units.class%'
+        public: true
         arguments:
             - '@doctrine.orm.entity_manager'
 

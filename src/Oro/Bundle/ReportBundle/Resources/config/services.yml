@@ -58,6 +58,7 @@ services:
 
     oro_report.report_manager:
         class: '%oro_report.report_manager.class%'
+        public: true
         arguments:
             - '@doctrine.orm.entity_manager'
 

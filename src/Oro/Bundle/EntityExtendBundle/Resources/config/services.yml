@@ -556,6 +556,7 @@ services:
 
     oro_entity_extend.enum_value_provider:
         class: '%oro_entity_extend.enum_value_provider.class%'
+        public: true
         arguments:
             - "@oro_entity.doctrine_helper"
             - "@oro_entity_extend.cache.enum_translation_provider"

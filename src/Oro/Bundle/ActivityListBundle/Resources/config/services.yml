@@ -72,6 +72,7 @@ services:
 
     oro_activity_list.placeholder.filter:
         class: '%oro_activity_list.placeholder.filter.class%'
+        public: true
         arguments:
             - "@oro_activity_list.provider.chain"
             - "@doctrine"

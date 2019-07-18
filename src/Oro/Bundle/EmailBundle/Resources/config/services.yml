@@ -634,6 +634,7 @@ services:
 
     oro_email.emailtemplate.datagrid_helper:
         class: '%oro_email.emailtemplate.datagrid_helper.class%'
+        public: true
         arguments:
             - '@oro_entity.entity_provider'
             - '@translator'
@@ -1111,6 +1112,7 @@ services:
 
     oro_email.mailbox_choice_list:
         class: '%oro_email.mailbox_choice_list.class%'
+        public: true
         arguments:
             - '@oro_security.token_accessor'
             - '@oro_email.mailbox.manager'
@@ -1247,6 +1249,7 @@ services:
 
     oro_email.placeholder.send_email.filter:
         class: '%oro_email.placeholder.send_email.filter.class%'
+        public: true
         arguments:
             - '@oro_activity.manager'
 

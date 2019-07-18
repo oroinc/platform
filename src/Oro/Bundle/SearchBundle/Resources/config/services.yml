@@ -371,6 +371,7 @@ services:
 
     oro_search.utils.search_all_text:
        class: Oro\Bundle\SearchBundle\Utils\SearchAllText
+       public: true
        arguments:
             - '@translator'
 

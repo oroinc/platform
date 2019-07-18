@@ -48,6 +48,7 @@ services:
 
     oro_currency.helper.currency_name:
         class: Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper
+        public: true
         arguments:
             - '@oro_locale.settings'
             - '@oro_locale.formatter.number'
@@ -76,6 +77,7 @@ services:
 
     oro_currency.query.currency_transformer:
         class: Oro\Bundle\CurrencyBundle\Query\CurrencyQueryBuilderTransformer
+        public: true
 
     oro_currency.locale_settings:
         class: Oro\Bundle\CurrencyBundle\Model\LocaleSettings

@@ -135,6 +135,7 @@ services:
 
     oro_entity_config.event_listener.entityconfig_grid_listener:
         class: '%oro_entity_config.event_listener.entityconfig_grid_listener.class%'
+        public: true
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_datagrid.provider.resolver'
@@ -503,6 +504,7 @@ services:
 
     oro_entity_config.placeholder.attributes_import_filter:
         class: 'Oro\Bundle\EntityConfigBundle\Placeholder\AttributesImportFilter'
+        public: true
         arguments:
             - '@oro_entity.entity_alias_resolver'
             - '@oro_entity_config.websocket.attributes_import_topic_sender'

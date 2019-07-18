@@ -360,6 +360,7 @@ services:
 
     oro_datagrid.helper.date:
         class: Oro\Bundle\DataGridBundle\Tools\DateHelper
+        public: true
         arguments:
             - '@oro_locale.settings'
 

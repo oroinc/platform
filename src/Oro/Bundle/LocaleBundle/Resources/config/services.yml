@@ -356,6 +356,7 @@ services:
 
     oro_locale.provider.localization_choices:
         class: 'Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider'
+        public: true
         arguments:
             - '@oro_locale.settings'
             - '@oro_locale.formatter.language_code'

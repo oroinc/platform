@@ -315,6 +315,7 @@ services:
 
     oro_user.gender_provider:
         class: '%oro_user.gender_provider.class%'
+        public: true
         arguments:
             - '@translator'
 
@@ -422,6 +423,7 @@ services:
 
     oro_user.role.datagrid_helper:
         class: '%oro_user.role.datagrid_helper.class%'
+        public: true
         arguments:
             - '@security.authorization_checker'
 
@@ -433,6 +435,7 @@ services:
 
     oro_user.provider.filter.user_choice_tree:
         class: '%oro_user.provider.filter.user_choice_tree.class%'
+        public: true
         arguments:
             - '@doctrine'
             - '@oro_security.acl_helper'

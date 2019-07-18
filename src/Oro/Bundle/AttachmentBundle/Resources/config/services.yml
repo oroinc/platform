@@ -184,6 +184,7 @@ services:
 
     oro_attachment.placeholder.filter:
         class: '%oro_attachment.placeholder.filter.class%'
+        public: true
         arguments:
             - '@oro_attachment.association_helper'
             - '@oro_entity.doctrine_helper'

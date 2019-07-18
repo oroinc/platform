@@ -74,6 +74,7 @@ services:
 
     oro_cron.repository.schedule:
         class: Oro\Bundle\CronBundle\Entity\Repository\ScheduleRepository
+        public: true
         factory: ['@doctrine', getRepository]
         arguments:
             - 'Oro\Bundle\CronBundle\Entity\Schedule'
