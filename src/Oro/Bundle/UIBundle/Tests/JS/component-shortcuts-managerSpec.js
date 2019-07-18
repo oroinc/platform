@@ -84,29 +84,38 @@ define(['underscore'], function(_) {
         });
 
         it('Get component object data', function() {
+            componentShortcutsManager.add('test', testWidgetConfiguration);
             var testPageComponentOptions = _.extend({}, testWidgetConfiguration.options, {test: true});
+            var shortcut = componentShortcutsManager.getAll()['test'];
+            var elemData = {};
+            elemData[shortcut.dataKey] = {test: true};
 
-            expect(componentShortcutsManager.getComponentData(testWidgetConfiguration, {test: true})).toEqual({
+            expect(componentShortcutsManager.getComponentData(shortcut, elemData)).toEqual({
                 pageComponentModule: testWidgetConfiguration.moduleName,
                 pageComponentOptions: testPageComponentOptions
             });
         });
 
         it('Get component object data - simple', function() {
-            var shortcut = {};
-            var dataOptions = 'component-name';
-
-            expect(componentShortcutsManager.getComponentData(shortcut, dataOptions)).toEqual({
-                pageComponentModule: dataOptions,
-                pageComponentOptions: shortcut
+            var shortcut = {
+                dataKey: 'pageComponentTest'
+            };
+            var elemData = {};
+            elemData[shortcut.dataKey] = 'component-name';
+            expect(componentShortcutsManager.getComponentData(shortcut, elemData)).toEqual({
+                pageComponentModule: 'component-name',
+                pageComponentOptions: {}
             });
         });
 
         it('Get component object data - scalar', function() {
-            var shortcut = _.extend({}, testWidgetConfiguration, {scalarOption: 'height'});
+            componentShortcutsManager.add('test', _.extend({}, testWidgetConfiguration, {scalarOption: 'height'}));
             var testPageComponentOptions = _.extend({}, testWidgetConfiguration.options, {height: 80});
+            var shortcut = componentShortcutsManager.getAll()['test'];
+            var elemData = {};
+            elemData[shortcut.dataKey] = 80;
 
-            expect(componentShortcutsManager.getComponentData(shortcut, 80)).toEqual({
+            expect(componentShortcutsManager.getComponentData(shortcut, elemData)).toEqual({
                 pageComponentModule: testWidgetConfiguration.moduleName,
                 pageComponentOptions: testPageComponentOptions
             });

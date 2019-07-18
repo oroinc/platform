@@ -4,6 +4,8 @@ define(function(require) {
     var ComponentShortcutsManager;
 
     var _ = require('underscore');
+    var $ = require('jquery');
+
     var config = require('module').config();
     config = _.extend({
         reservedKeys: ['options']
@@ -56,21 +58,28 @@ define(function(require) {
         /**
          * Prepare component data by element attributes and shortcut config
          *
-         * @param {object} shortcut
-         * @param {object|string} dataOptions
-         * @return {object}
+         * @param {Object} shortcut
+         * @param {Object} elemData
+         * @return {Object}
          */
-        getComponentData: function(shortcut, dataOptions) {
+        getComponentData: function(shortcut, elemData) {
+            var dataOptions = elemData[shortcut.dataKey];
             var module = shortcut.moduleName || dataOptions;
 
-            var options = dataOptions;
-            if (!_.isObject(options)) {
-                options = {};
+            if (!_.isObject(dataOptions)) {
+                dataOptions = {};
                 if (shortcut.scalarOption) {
-                    options[shortcut.scalarOption] = dataOptions;
+                    dataOptions[shortcut.scalarOption] = elemData[shortcut.dataKey];
                 }
             }
-            options = _.defaults({}, options, shortcut.options);
+
+            var options = $.extend(
+                true,
+                {},
+                shortcut.options,
+                dataOptions,
+                elemData.pageComponentOptions
+            );
 
             return {
                 pageComponentModule: module,
