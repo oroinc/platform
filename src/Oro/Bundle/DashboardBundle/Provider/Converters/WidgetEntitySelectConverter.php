@@ -8,6 +8,9 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
+/**
+ * Dashboard configuration converter for entity select values.
+ */
 class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
 {
     /** @var AclHelper */
@@ -82,8 +85,9 @@ class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
 
         $qb = $this->entityManager->getRepository($this->entityClass)->createQueryBuilder('e');
         $qb->where(
-            $qb->expr()->in(sprintf('e.%s', $identityField), $value)
+            $qb->expr()->in(sprintf('e.%s', $identityField), ':ids')
         );
+        $qb->setParameter('ids', $value);
 
         return $this->aclHelper->apply($qb)->getResult();
     }

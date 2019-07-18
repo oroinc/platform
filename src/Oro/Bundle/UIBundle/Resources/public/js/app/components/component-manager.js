@@ -104,7 +104,7 @@ define([
             var elements = [];
             var self = this;
 
-            var shortcuts = ComponentShortcutsManager.getAll();
+            var shortcuts = Object.values(ComponentShortcutsManager.getAll());
             var selector = _.map(shortcuts, function(shortcut) {
                 return '[' + shortcut.dataAttr + ']';
             });
@@ -116,25 +116,19 @@ define([
                 }
 
                 var elemData = $elem.data();
-                _.each(shortcuts, function(shortcut) {
-                    var dataKey = shortcut.dataKey;
-                    var dataAttr = shortcut.dataAttr;
-                    if (elemData[dataKey] === undefined) {
-                        return;
-                    }
-
-                    var data = ComponentShortcutsManager.getComponentData(shortcut, elemData[dataKey]);
-                    data.pageComponentOptions = $.extend(
-                        true,
-                        data.pageComponentOptions,
-                        $elem.data('pageComponentOptions')
-                    );
-                    $elem.removeAttr(dataAttr)
-                        .removeData(dataKey)
-                        .data(data);
-
-                    elements.push($elem);
+                var shortcut = _.find(shortcuts, function(shortcut) {
+                    return shortcut.dataKey in elemData;
                 });
+
+                if (shortcut) {
+                    var dataUpdate = ComponentShortcutsManager.getComponentData(shortcut, elemData);
+                    $elem
+                        .removeAttr(shortcut.dataAttr)
+                        .removeData(shortcut.dataKey)
+                        .data(dataUpdate);
+                }
+
+                elements.push($elem);
             });
 
             return elements;

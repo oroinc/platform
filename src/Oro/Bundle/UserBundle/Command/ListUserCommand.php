@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Command;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\Table;
@@ -9,6 +10,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Lists users. By default shows a paginated list of the active (enabled) users.
+ */
 class ListUserCommand extends ContainerAwareCommand
 {
     /**
@@ -40,13 +44,14 @@ class ListUserCommand extends ContainerAwareCommand
         $limit = (int) $input->getOption('limit');
         $offset = ((int) $input->getOption('page') - 1) * $limit;
 
+        /** @var QueryBuilder $builder */
         $builder = $this
             ->getContainer()
             ->get('doctrine')
             ->getManager()
             ->getRepository('OroUserBundle:User')
-            ->createQueryBuilder('u')
-            ->orderBy('u.enabled', 'DESC')
+            ->createQueryBuilder('u');
+        $builder->orderBy('u.enabled', 'DESC')
             ->addOrderBy('u.id', 'ASC');
 
         if ($offset > 0) {

@@ -6,6 +6,9 @@ use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 
+/**
+ * Group result entities by entity name with keeping list of actual entities in the same order
+ */
 class ResultFormatter
 {
     /**
@@ -107,7 +110,8 @@ class ResultFormatter
         $idField = $this->getEntityIdentifier($entityName);
 
         $queryBuilder = $this->entityManager->getRepository($entityName)->createQueryBuilder('e');
-        $queryBuilder->where($queryBuilder->expr()->in('e.' . $idField, $entityIds));
+        $queryBuilder->where($queryBuilder->expr()->in('e.' . $idField, ':entityIds'));
+        $queryBuilder->setParameter('entityIds', $entityIds);
         $currentEntities = $queryBuilder->getQuery()->getResult();
 
         $resultEntities = array();

@@ -138,7 +138,7 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
-            ->setMethods(['expr', 'getQuery', 'where'])
+            ->setMethods(['expr', 'getQuery', 'where', 'setParameter'])
             ->getMock();
 
         $this->query = $this->getMockBuilder(AbstractQuery::class)
@@ -292,11 +292,12 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expectQueryBuilderCalls' => [
                     ['expr', [], 'getMockExpr'],
-                    ['where', ['e.id IN (1, 2, 3, 4)'], 'getMockQueryBuilder'],
+                    ['where', ['e.id IN :entityIds'], 'getMockQueryBuilder'],
+                    ['setParameter', ['entityIds', [1, 2, 3, 4]], 'getMockQueryBuilder'],
                     ['getQuery', [], 'getMockQuery']
                 ],
                 'expectExprCalls' => [
-                    ['in', ['e.' . self::TEST_ID_FIELD, [1, 2, 3, 4]], 'e.id IN (1, 2, 3, 4)'],
+                    ['in', ['e.' . self::TEST_ID_FIELD, ':entityIds'], 'e.id IN :entityIds'],
                 ],
                 'expectQueryCalls' => [
                     [
@@ -353,11 +354,12 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expectQueryBuilderCalls' => [
                     ['expr', [], 'getMockExpr'],
-                    ['where', ['e.id IN (1, 2)'], 'getMockQueryBuilder'],
+                    ['where', ['e.id IN :entityIds'], 'getMockQueryBuilder'],
+                    ['setParameter', ['entityIds', [1, 2]], 'getMockQueryBuilder'],
                     ['getQuery', [], 'getMockQuery']
                 ],
                 'expectExprCalls' => [
-                    ['in', ['e.' . self::TEST_ID_FIELD, [1, 2]], 'e.id IN (1, 2)'],
+                    ['in', ['e.' . self::TEST_ID_FIELD, ':entityIds'], 'e.id IN :entityIds'],
                 ],
                 'expectQueryCalls' => [
                     [
@@ -561,7 +563,12 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($expr);
         $qb->expects($this->once())
             ->method('where')
-            ->with($expr->in('e.id', $searchIds));
+            ->with($expr->in('e.id', ':entityIds'))
+            ->willReturnSelf();
+        $qb->expects($this->once())
+            ->method('setParameter')
+            ->with('entityIds', $searchIds)
+            ->willReturnSelf();
 
         $this->entityRepository->expects($this->once())
             ->method('createQueryBuilder')
@@ -606,7 +613,12 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($expr);
         $qb->expects($this->once())
             ->method('where')
-            ->with($expr->in('e.id', $searchIds));
+            ->with($expr->in('e.id', ':entityIds'))
+            ->willReturnSelf();
+        $qb->expects($this->once())
+            ->method('setParameter')
+            ->with('entityIds', $searchIds)
+            ->willReturnSelf();
 
         $this->entityRepository->expects($this->once())
             ->method('createQueryBuilder')
