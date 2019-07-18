@@ -284,6 +284,49 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
     }
 
     /**
+     * Example: Then email date less than "+3 days"
+     *
+     * @Given /^email date (?P<condition>[\w]+) than "(?P<date>[-+\s\w]+)"$/
+     *
+     * @param string $condition
+     * @param string $expectedDate
+     */
+    public function assertDateInEmail(string $condition, string $expectedDate)
+    {
+        $mailer = $this->getMailer();
+        if (!$mailer instanceof DirectMailerDecorator) {
+            return;
+        }
+
+        $found = null;
+        /** @var \Swift_Mime_Message $message */
+        foreach ($mailer->getSentMessages() as $message) {
+            $found = (bool) preg_match(
+                '/\D{2,3}\s\d{1,2},\s\d{4} at \d{1,2}:\d{2}\s(AM|PM)/',
+                $message->getBody(),
+                $matches
+            );
+            if ($found) {
+                $date = \DateTime::createFromFormat('M d, Y ?? h:i A', $matches[0], new \DateTimeZone('UTC'));
+                $result = null;
+                switch ($condition) {
+                    case 'less':
+                        $result = $date < new \DateTime($expectedDate, new \DateTimeZone('UTC'));
+                        break;
+                    case 'greater':
+                        $result = $date > new \DateTime($expectedDate, new \DateTimeZone('UTC'));
+                        break;
+                }
+                self::assertTrue($result, sprintf('Email date is not %s than %s', $condition, $expectedDate));
+
+                break;
+            }
+        }
+
+        self::assertTrue($found, 'Sent emails bodies don\'t contain dates.');
+    }
+
+    /**
      * @param string $text
      * @return string
      */
