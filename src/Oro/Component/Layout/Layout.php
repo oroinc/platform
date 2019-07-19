@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Layout;
 
+use Symfony\Component\Templating\TemplateNameParser;
+use Symfony\Component\Templating\TemplateReferenceInterface;
+
+/**
+ * Responsible for setting a renderer to be used to render this layout as well as blockThemes
+ */
 class Layout
 {
     /** @var BlockView */
@@ -18,6 +24,9 @@ class Layout
 
     /** @var array */
     protected $formThemes = [];
+
+    /** @var TemplateNameParser */
+    private static $templateNameParser;
 
     /**
      * @param BlockView                       $view
@@ -42,15 +51,57 @@ class Layout
      *
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         $renderer = $this->rendererRegistry->getRenderer($this->rendererName);
         foreach ($this->themes as $theme) {
-            $renderer->setBlockTheme($theme[0], $theme[1]);
+            $renderer->setBlockTheme($theme[0], $this->prepareThemes($theme[1]));
         }
-        $renderer->setFormTheme($this->formThemes);
+        $renderer->setFormTheme($this->prepareThemes($this->formThemes));
 
         return $renderer->renderBlock($this->view);
+    }
+
+    /**
+     * @param string|string[] $themes
+     * @return string|string[]|TemplateReferenceInterface|TemplateReferenceInterface[]
+     */
+    private function prepareThemes($themes)
+    {
+        if (\is_array($themes)) {
+            foreach ($themes as &$theme) {
+                if ($this->isAbsolutePath($theme)) {
+                    $theme = $this->getTemplateNameParser()->parse($theme);
+                }
+            }
+        } else {
+            if ($this->isAbsolutePath($themes)) {
+                $themes = $this->getTemplateNameParser()->parse($themes);
+            }
+        }
+
+        return $themes;
+    }
+
+    /**
+     * @param string $file
+     * @return bool
+     */
+    private function isAbsolutePath(string $file): bool
+    {
+        return (bool) preg_match('#^(?:/|[a-zA-Z]:)#', $file);
+    }
+
+    /**
+     * @return TemplateNameParser
+     */
+    private function getTemplateNameParser(): TemplateNameParser
+    {
+        if (!static::$templateNameParser) {
+            static::$templateNameParser = new TemplateNameParser();
+        }
+
+        return static::$templateNameParser;
     }
 
     /**
