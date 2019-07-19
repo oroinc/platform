@@ -41,10 +41,7 @@ class AddPageNumberToInfoRecord implements ProcessorInterface
             return;
         }
 
-        $infoRecords = $context->getInfoRecords();
-        if (!\is_array($infoRecords)) {
-            $infoRecords = [];
-        }
+        $infoRecords = $context->getInfoRecords() ?? [];
         $infoRecords[''][ConfigUtil::PAGE_NUMBER] = $this->getPageNumber(
             $context->getFilterValues(),
             $pageNumberFilterName

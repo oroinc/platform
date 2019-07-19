@@ -35,13 +35,6 @@ abstract class BaseDriver implements DBALPersisterInterface
     protected $entityName;
 
     /**
-     * @deprecated Please use the entityManager property instead
-     *
-     * @var EntityManagerInterface
-     */
-    protected $em;
-
-    /**
      * @var EntityManagerInterface
      */
     protected $entityManager;
@@ -148,9 +141,8 @@ abstract class BaseDriver implements DBALPersisterInterface
         }
 
         $this->associationMappings = $class->associationMappings;
-        $this->entityName          = $class->name;
-        $this->em                  = $em;
-        $this->entityManager       = $em;
+        $this->entityName = $class->name;
+        $this->entityManager = $em;
     }
 
     /**
@@ -220,7 +212,7 @@ abstract class BaseDriver implements DBALPersisterInterface
         foreach ($query->getAggregations() as $name => $options) {
             $field = $options['field'];
             $function = $options['function'];
-            $fieldName = Criteria::explodeFieldTypeName($field)[1];
+            list($fieldType, $fieldName) = Criteria::explodeFieldTypeName($field);
             QueryBuilderUtil::checkField($fieldName);
 
             // prepare query builder to apply grouping
@@ -244,7 +236,10 @@ abstract class BaseDriver implements DBALPersisterInterface
                         $key = $row[$fieldName];
                         // skip null values to maintain similar behaviour cross all engines
                         if (null !== $key) {
-                            $aggregatedData[$name][(string)$key] = (int)$row['countValue'];
+                            if ($key instanceof \DateTimeInterface) {
+                                $key = $key->getTimestamp();
+                            }
+                            $aggregatedData[$name][$key] = (int)$row['countValue'];
                         }
                     }
                     break;
@@ -255,7 +250,14 @@ abstract class BaseDriver implements DBALPersisterInterface
                 case Query::AGGREGATE_FUNCTION_SUM:
                     $fieldSelect = explode(' as ', $fieldSelect)[0];
                     $queryBuilder->select(sprintf('%s(%s)', $function, $fieldSelect));
-                    $aggregatedData[$name] = (float)$queryBuilder->getQuery()->getSingleScalarResult();
+                    $value = $queryBuilder->getQuery()->getSingleScalarResult();
+                    if (null !== $value) {
+                        if (Query::TYPE_DATETIME === $fieldType) {
+                            $value = (new \DateTime($value, new \DateTimeZone('UTC')))->getTimestamp();
+                        }
+                        $value = (float)$value;
+                    }
+                    $aggregatedData[$name] = $value;
                     break;
 
                 default:

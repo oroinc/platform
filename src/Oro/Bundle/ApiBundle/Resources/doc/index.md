@@ -122,3 +122,4 @@
    - [YAML Templates for a Request Body](./testing.md#yaml-templates-for-a-request-body)
    - [Process Single Reference](./testing.md#process-single-reference)
    - [Dump the Response into a YAML Template](./testing.md#dump-the-response-into-a-yaml-template)
+   - [Base Test Cases for Unit Tests](./testing.md#base-test-cases-for-unit-tests)

@@ -63,7 +63,7 @@ class AccessRuleWalkerContext implements \Serializable
      *
      * @return string
      */
-    public function getPermission(): string
+    public function getPermission(): ?string
     {
         return $this->permission;
     }
@@ -73,7 +73,7 @@ class AccessRuleWalkerContext implements \Serializable
      *
      * @return string
      */
-    public function getUserClass(): string
+    public function getUserClass(): ?string
     {
         return $this->userClass;
     }

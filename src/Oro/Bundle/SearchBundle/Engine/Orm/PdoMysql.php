@@ -411,7 +411,7 @@ class PdoMysql extends BaseDriver
      */
     protected function getTruncateQuery(AbstractPlatform $dbPlatform, $tableName)
     {
-        if ($this->em->getConnection()->isTransactionActive()) {
+        if ($this->entityManager->getConnection()->isTransactionActive()) {
             return sprintf('DELETE FROM %s', $tableName);
         }
 

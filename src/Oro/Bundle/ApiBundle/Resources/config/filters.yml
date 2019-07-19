@@ -83,6 +83,19 @@ services:
         public: false
         arguments:
             - '@oro_search.provider.search_mapping'
+            - '@oro_api.search_field_resolver_factory'
+
+    oro_api.filter_factory.search_aggregation:
+        class: Oro\Bundle\ApiBundle\Filter\SearchAggregationFilterFactory
+        public: false
+        arguments:
+            - '@oro_api.search_field_resolver_factory'
+
+    oro_api.search_field_resolver_factory:
+        class: Oro\Bundle\ApiBundle\Filter\SearchFieldResolverFactory
+        public: false
+        arguments:
+            - '@oro_search.provider.search_mapping'
 
     oro_api.query.expression_visitor_factory:
         class: Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory

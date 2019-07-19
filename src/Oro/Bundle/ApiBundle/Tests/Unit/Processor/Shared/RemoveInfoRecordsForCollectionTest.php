@@ -125,4 +125,28 @@ class RemoveInfoRecordsForCollectionTest extends GetListProcessorTestCase
         self::assertEquals($expectedData, $this->context->getResult());
         self::assertEquals($expectedInfoRecords, $this->context->getInfoRecords());
     }
+
+    public function testProcessWhenInfoRecordsAlreadyContainData()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->addField(new FieldMetadata('id'));
+
+        $data = [
+            ['id' => 1],
+            '_' => ['path' => '']
+        ];
+        $expectedData = $data;
+        unset($expectedData['_']);
+        $expectedInfoRecords = [
+            'someMetaInfo' => 123,
+            ''             => ['path' => '']
+        ];
+
+        $this->context->addInfoRecord('someMetaInfo', 123);
+        $this->context->setResult($data);
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+        self::assertEquals($expectedData, $this->context->getResult());
+        self::assertEquals($expectedInfoRecords, $this->context->getInfoRecords());
+    }
 }

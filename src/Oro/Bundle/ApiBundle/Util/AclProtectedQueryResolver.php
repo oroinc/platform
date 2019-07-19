@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\ORM\Query;
+use Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\EntitySerializer\EntityConfig;
@@ -35,7 +36,7 @@ class AclProtectedQueryResolver extends QueryResolver
      */
     public function resolveQuery(Query $query, EntityConfig $config)
     {
-        $options = [];
+        $options = [AclAccessRule::CHECK_OWNER => true];
         $skipRootEntity = (bool)$config->get(self::SKIP_ACL_FOR_ROOT_ENTITY);
         if ($skipRootEntity) {
             $options[AclHelper::CHECK_ROOT_ENTITY] = false;
