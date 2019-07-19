@@ -1,0 +1,9 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser
+
+Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership:
+    record1:
+        name: 'record 1'
+        owner: '@user'
+        organization: '@organization'
