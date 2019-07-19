@@ -43,8 +43,7 @@ class ActionFactory implements ActionFactoryInterface
             throw new \RuntimeException('The action type must be defined');
         }
 
-        $id = isset($this->types[$type]) ? $this->types[$type] : false;
-
+        $id = $this->types[$type] ?? null;
         if (!$id) {
             throw new \RuntimeException(sprintf('No attached service to action type named `%s`', $type));
         }

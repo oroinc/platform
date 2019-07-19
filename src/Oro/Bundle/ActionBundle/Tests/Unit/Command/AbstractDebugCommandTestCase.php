@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Command;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -20,7 +20,7 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
     /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $input;
 
-    /** @var ContainerAwareCommand */
+    /** @var Command */
     protected $command;
 
     /** @var OutputStub */
@@ -32,8 +32,7 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
         $this->container = $this->createMock(ContainerInterface::class);
         $this->input = $this->createMock(InputInterface::class);
         $this->output = new OutputStub();
-        $this->command = $this->getCommandInstance();
-        $this->command->setContainer($this->container);
+        $this->command = $this->getCommandInstance($this->container, $this->factory);
     }
 
     /**
@@ -44,23 +43,30 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider executeProvider
      */
-    public function testExecute(array $types, array $expected, $argument = null, $exception = null)
+    public function testExecute(array $types, array $expected, $argument = null, $exception = null): void
     {
-        $this->factory->expects($this->once())->method('getTypes')->willReturn($types);
+        $this->input->expects($this->once())
+            ->method('getArgument')
+            ->willReturn($argument);
 
-        $this->input->expects($this->once())->method('getArgument')->willReturn($argument);
+        $this->factory->expects($this->any())
+            ->method('isTypeExists')
+            ->with($argument)
+            ->willReturn(isset($types[$argument]));
+
+        $this->factory->expects($this->any())
+            ->method('getTypes')
+            ->willReturn($types);
 
         $this->container->expects($this->any())
             ->method('get')
             ->willReturnCallback(
-                function ($serviceId) use ($exception) {
-                    if ($serviceId === $this->getFactoryServiceId()) {
-                        return $this->factory;
-                    }
-
+                function ($serviceId) use ($exception, $types) {
                     if ($exception) {
                         throw $exception;
                     }
+
+                    $this->assertContains($serviceId, $types);
 
                     return new TestEntity1();
                 }
@@ -77,7 +83,7 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function executeProvider()
+    public function executeProvider(): array
     {
         return [
             'no types' => [
@@ -145,19 +151,19 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
-
     /**
      * @return string
      */
-    abstract protected function getFactoryServiceId();
+    abstract protected function getArgumentName(): string;
 
     /**
-     * @return string
+     * @param ContainerInterface $container
+     * @param FactoryWithTypesInterface $factory
+     *
+     * @return Command
      */
-    abstract protected function getArgumentName();
-
-    /**
-     * @return ContainerAwareCommand
-     */
-    abstract protected function getCommandInstance();
+    abstract protected function getCommandInstance(
+        ContainerInterface $container,
+        FactoryWithTypesInterface $factory
+    ): Command;
 }

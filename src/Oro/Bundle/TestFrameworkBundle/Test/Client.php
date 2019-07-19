@@ -27,13 +27,13 @@ class Client extends BaseClient
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function request(
-        $method,
-        $uri,
-        array $parameters = array(),
-        array $files = array(),
-        array $server = array(),
-        $content = null,
-        $changeHistory = true
+        string $method,
+        string $uri,
+        array $parameters = [],
+        array $files = [],
+        array $server = [],
+        string $content = null,
+        bool $changeHistory = true
     ) {
         if (strpos($uri, 'http://') === false && strpos($uri, 'https://') === false) {
             $uri = self::LOCAL_URL . $uri;

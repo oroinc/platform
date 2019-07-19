@@ -24,9 +24,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -61,6 +59,11 @@ abstract class WebTestCase extends BaseWebTestCase
     const AUTH_ORGANIZATION = 1;
 
     /**
+     * @var string Default application kernel class
+     */
+    protected static $class = 'AppKernel';
+
+    /**
      * @var bool[]
      */
     private static $dbIsolationPerTest = [];
@@ -80,10 +83,14 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected static $loadedFixtures = [];
 
-    /** @var Client */
+    /**
+     * @var Client
+     */
     protected $client;
 
-    /** @var callable */
+    /**
+     * @var callable
+     */
     private static $resetCallback;
 
     /**
@@ -313,43 +320,6 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected static function getKernelClass()
-    {
-        if (isset($_SERVER['KERNEL_DIR'])) {
-            $dir = $_SERVER['KERNEL_DIR'];
-
-            if (!is_dir($dir)) {
-                $phpUnitDir = static::getPhpUnitXmlDir();
-                if (is_dir("$phpUnitDir/$dir")) {
-                    $dir = "$phpUnitDir/$dir";
-                }
-            }
-        } else {
-            $dir = static::getPhpUnitXmlDir();
-        }
-
-        $finder = new Finder();
-        $finder->name('AppKernel.php')->depth(0)->in($dir);
-        $results = iterator_to_array($finder);
-        if (!count($results)) {
-            throw new \RuntimeException(
-                'Either set KERNEL_DIR in your phpunit.xml according to' .
-                ' https://symfony.com/doc/current/book/testing.html#your-first-functional-test' .
-                ' or override the WebTestCase::createKernel() method.'
-            );
-        }
-
-        $file = current($results);
-        $class = $file->getBasename('.php');
-
-        require_once $file;
-
-        return $class;
-    }
-
-    /**
      * Process and replace all references and functions to values
      *
      * @param  array|string $data Can be path to yml template file or array
@@ -446,12 +416,11 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected static function runCommand($name, array $params = [], $cleanUp = true, $exceptionOnError = false)
     {
-        /** @var KernelInterface $kernel */
-        $kernel = self::getContainer()->get('kernel');
-
-        $application = new Application($kernel);
+        $application = new Application(static::$kernel ?? static::bootKernel());
         $application->setAutoExit(false);
-        $application->setTerminalDimensions(120, 50);
+
+        putenv('COLUMNS=120');
+        putenv('LINES=50');
 
         $params['--no-ansi'] = true;
 
@@ -711,7 +680,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected static function getContainer()
     {
-        return static::getClientInstance()->getContainer();
+        return self::$container;
     }
 
     /**
