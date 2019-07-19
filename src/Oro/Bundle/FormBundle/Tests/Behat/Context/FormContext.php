@@ -9,6 +9,7 @@ use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\Select;
+use Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entities;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
@@ -523,6 +524,17 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
             foreach ($optionLabels as $optionLabel) {
                 static::assertContains($optionLabel, $options);
             }
+        } elseif ($element instanceof Select2Entities) {
+            $element->focus();
+            $options = $element->getSearchResults();
+            $optionsValue = [];
+            /** @var Element $element */
+            foreach ($options as $element) {
+                $optionsValue[] = $element->getText();
+            }
+            foreach ($optionLabels as $optionLabel) {
+                static::assertContains($optionLabel, $optionsValue);
+            }
         } else {
             $this->assertSelectContainsOptions($field, $optionLabels);
         }
@@ -548,6 +560,17 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
             $options = $element->getSuggestedValues();
             foreach ($optionLabels as $optionLabel) {
                 static::assertNotContains($optionLabel, $options);
+            }
+        } elseif ($element instanceof Select2Entities) {
+            $element->focus();
+            $options = $element->getSearchResults();
+            $optionsValue = [];
+            /** @var Element $element */
+            foreach ($options as $element) {
+                $optionsValue[] = $element->getText();
+            }
+            foreach ($optionLabels as $optionLabel) {
+                static::assertNotContains($optionLabel, $optionsValue);
             }
         } else {
             $this->assertSelectNotContainsOptions($field, $optionLabels);

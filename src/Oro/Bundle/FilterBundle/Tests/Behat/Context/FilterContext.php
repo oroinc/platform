@@ -55,21 +55,25 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
             ->setValue($column);
         $this->waitForAjax();
 
-        $searchResult = $this->spin(function (FilterContext $context) use ($column) {
-            $searchResult = $this->getPage()
-                ->find(
-                    'xpath',
-                    "//div[@id='select2-drop']//div[contains(., '{$column}')]"
-                );
-            if ($searchResult && $searchResult->isVisible()) {
-                return $searchResult;
-            }
+        $columnParts = array_map('trim', explode('>', $column));
 
-            return null;
-        }, 5);
+        foreach ($columnParts as $column) {
+            $searchResult = $this->spin(function (FilterContext $context) use ($column) {
+                $searchResult = $this->getPage()
+                    ->find(
+                        'xpath',
+                        "//div[@id='select2-drop']//div[contains(., '{$column}')]"
+                    );
+                if ($searchResult && $searchResult->isVisible()) {
+                    return $searchResult;
+                }
 
-        self::assertNotNull($searchResult, sprintf('No search results for "%s"', $column));
-        $searchResult->click();
+                return null;
+            }, 5);
+
+            self::assertNotNull($searchResult, sprintf('No search results for "%s"', $column));
+            $searchResult->click();
+        }
     }
 
     /**
