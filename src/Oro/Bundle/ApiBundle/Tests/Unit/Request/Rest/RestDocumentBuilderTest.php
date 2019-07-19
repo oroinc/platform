@@ -1095,4 +1095,33 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             $this->documentBuilder->getDocument()
         );
     }
+
+    public function testMetadataForCollectionValuedResult()
+    {
+        $object = [
+            'id'   => 1,
+            'name' => 'test'
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addField($this->createFieldMetadata('name'));
+
+        $this->documentBuilder->setMetadata([
+            ''        => ['has_more' => true],
+            '0.roles' => ['has_more' => true],
+            'meta1'   => 'some value'
+        ]);
+        $this->documentBuilder->setDataCollection([$object], $this->requestType, $metadata);
+
+        self::assertEquals(
+            [
+                [
+                    'id'   => 1,
+                    'name' => 'test'
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
 }

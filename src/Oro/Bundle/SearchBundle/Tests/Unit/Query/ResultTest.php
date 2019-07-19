@@ -2,6 +2,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Query;
 
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
@@ -92,9 +93,11 @@ class ResultTest extends \PHPUnit\Framework\TestCase
         );
 
         $query = new Query();
-        $query
-            ->from(['OroTestBundle:test', 'OroTestBundle:product'])
-            ->andWhere('name', Query::OPERATOR_CONTAINS, 'test string', Query::TYPE_TEXT);
+        $query->from(['OroTestBundle:test', 'OroTestBundle:product']);
+        $query->getCriteria()->where(Criteria::expr()->contains(
+            Criteria::implodeFieldTypeName(Query::TYPE_TEXT, 'name'),
+            'test string'
+        ));
 
         $this->result = new Result($query, $this->items, 3, self::$aggregatedData);
         $this->result1 = new Result($query, [], 0);

@@ -20,6 +20,9 @@ class SearchQueryFilter extends StandaloneFilter
     /** @var AbstractSearchMappingProvider */
     private $searchMappingProvider;
 
+    /** @var SearchFieldResolverFactory */
+    private $searchFieldResolverFactory;
+
     /** @var ExpressionVisitor|null */
     private $searchQueryCriteriaVisitor;
 
@@ -32,15 +35,23 @@ class SearchQueryFilter extends StandaloneFilter
     /**
      * @param AbstractSearchMappingProvider $searchMappingProvider
      */
-    public function setSearchMappingProvider(AbstractSearchMappingProvider $searchMappingProvider)
+    public function setSearchMappingProvider(AbstractSearchMappingProvider $searchMappingProvider): void
     {
         $this->searchMappingProvider = $searchMappingProvider;
     }
 
     /**
+     * @param SearchFieldResolverFactory $searchFieldResolverFactory
+     */
+    public function setSearchFieldResolverFactory(SearchFieldResolverFactory $searchFieldResolverFactory): void
+    {
+        $this->searchFieldResolverFactory = $searchFieldResolverFactory;
+    }
+
+    /**
      * @param ExpressionVisitor $searchQueryCriteriaVisitor
      */
-    public function setSearchQueryCriteriaVisitor(ExpressionVisitor $searchQueryCriteriaVisitor)
+    public function setSearchQueryCriteriaVisitor(ExpressionVisitor $searchQueryCriteriaVisitor): void
     {
         $this->searchQueryCriteriaVisitor = $searchQueryCriteriaVisitor;
     }
@@ -48,23 +59,15 @@ class SearchQueryFilter extends StandaloneFilter
     /**
      * @param string $entityClass
      */
-    public function setEntityClass(string $entityClass)
+    public function setEntityClass(string $entityClass): void
     {
         $this->entityClass = $entityClass;
     }
 
     /**
-     * @return array [field name => field name in search index, ...]
-     */
-    public function getFieldMappings(): array
-    {
-        return $this->fieldMappings;
-    }
-
-    /**
      * @param array $fieldMappings [field name => field name in search index, ...]
      */
-    public function setFieldMappings(array $fieldMappings)
+    public function setFieldMappings(array $fieldMappings): void
     {
         $this->fieldMappings = $fieldMappings;
     }
@@ -115,12 +118,17 @@ class SearchQueryFilter extends StandaloneFilter
         $lexer = new SearchQueryLexer();
         $parser = new SearchQueryParser();
         $mapping = $this->searchMappingProvider->getEntityConfig($this->entityClass);
+        $query = (new SearchQuery())->from($mapping['alias']);
+        $fieldResolver = $this->searchFieldResolverFactory->createFieldResolver(
+            $this->entityClass,
+            $this->fieldMappings
+        );
 
         try {
             return $parser->parse(
                 $lexer->tokenize($whereExpression),
-                (new SearchQuery())->from($mapping['alias']),
-                new SearchQueryFilterFieldResolver($mapping['fields'], $this->fieldMappings),
+                $query,
+                $fieldResolver,
                 SearchQuery::KEYWORD_WHERE
             );
         } catch (ExpressionSyntaxError $e) {

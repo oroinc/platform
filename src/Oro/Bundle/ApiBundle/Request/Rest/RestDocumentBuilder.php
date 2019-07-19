@@ -188,9 +188,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     }
 
     /**
-     * @param array                 $result
-     * @param string                $name
-     * @param LinkMetadataInterface $link
+     * {@inheritdoc}
      */
     protected function addLinkToResult(array &$result, string $name, LinkMetadataInterface $link): void
     {
@@ -201,6 +199,14 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         if ($link instanceof LinkCollectionMetadataInterface) {
             $this->addLinks($result, $link->getLinks($this->resultDataAccessor));
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addMetaToCollectionResult(array &$result, string $name, $value): void
+    {
+        // not supported
     }
 
     /**
@@ -276,7 +282,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     }
 
     /**
-     * @param array $object
+     * {@inheritdoc}
      */
     protected function addRelatedObject(array $object): void
     {

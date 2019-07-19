@@ -38,7 +38,13 @@ abstract class RemoveInfoRecords implements ProcessorInterface
         $infoRecords = $this->processData($data, $metadata);
         $context->setResult($data);
         if (!empty($infoRecords)) {
-            $context->setInfoRecords($infoRecords);
+            if ($context->getInfoRecords()) {
+                foreach ($infoRecords as $key => $val) {
+                    $context->addInfoRecord($key, $val);
+                }
+            } else {
+                $context->setInfoRecords($infoRecords);
+            }
         }
     }
 

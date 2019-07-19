@@ -219,9 +219,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     }
 
     /**
-     * @param array                 $result
-     * @param string                $name
-     * @param LinkMetadataInterface $link
+     * {@inheritdoc}
      */
     protected function addLinkToResult(array &$result, string $name, LinkMetadataInterface $link): void
     {
@@ -232,6 +230,14 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         if ($link instanceof LinkCollectionMetadataInterface) {
             $this->addLinks($result, $link->getLinks($this->resultDataAccessor));
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addMetaToCollectionResult(array &$result, string $name, $value): void
+    {
+        $result[self::META][$name] = $value;
     }
 
     /**
@@ -481,7 +487,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     }
 
     /**
-     * @param array $object
+     * {@inheritdoc}
      */
     protected function addRelatedObject(array $object): void
     {

@@ -77,7 +77,14 @@ class MergeFilterConfigHelperTest extends \PHPUnit\Framework\TestCase
             'filters' => [
                 'fields' => [
                     'filter1' => [
-                        'description' => 'description 1'
+                        'description' => 'description 1',
+                        'options'     => [
+                            'option1' => 'val1',
+                            'option2' => [
+                                'key1' => 'val1',
+                                'key2' => 'val2'
+                            ]
+                        ]
                     ],
                     'filter2' => [
                         'description' => 'description 2'
@@ -88,7 +95,14 @@ class MergeFilterConfigHelperTest extends \PHPUnit\Framework\TestCase
         $filterConfig = [
             'fields' => [
                 'filter1' => [
-                    'description' => 'filter description 1'
+                    'description' => 'filter description 1',
+                    'options'     => [
+                        'option1' => 'filter val1',
+                        'option2' => [
+                            'key2' => 'filter val2',
+                            'key3' => 'filter val3'
+                        ]
+                    ]
                 ],
                 'filter3' => [
                     'description' => 'filter description 3'
@@ -101,7 +115,15 @@ class MergeFilterConfigHelperTest extends \PHPUnit\Framework\TestCase
                 'filters' => [
                     'fields' => [
                         'filter1' => [
-                            'description' => 'filter description 1'
+                            'description' => 'filter description 1',
+                            'options'     => [
+                                'option1' => 'filter val1',
+                                'option2' => [
+                                    'key1' => 'val1',
+                                    'key2' => 'filter val2',
+                                    'key3' => 'filter val3'
+                                ]
+                            ]
                         ],
                         'filter2' => [
                             'description' => 'description 2'
