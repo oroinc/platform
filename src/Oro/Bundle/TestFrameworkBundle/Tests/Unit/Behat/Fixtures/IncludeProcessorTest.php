@@ -23,8 +23,6 @@ class IncludeProcessorTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        $this->markTestSkipped();
-
         $this->kernel = $this->createMock(KernelInterface::class);
 
         $fileLocator = new DefaultFileLocator();

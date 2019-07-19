@@ -93,6 +93,7 @@ class Translator extends BaseTranslator
 
         $this->messageFormatter = $formatter;
         $this->originalOptions = $this->options;
+        $this->resourceFiles = $this->options['resource_files'];
     }
 
     /**

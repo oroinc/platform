@@ -18,11 +18,6 @@ class AvailableReferencesControllerTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    protected function setUp()
-    {
-        $this->markTestSkipped();
-    }
-
     public function testConfigure()
     {
         $aliceLoader = new AliceFixtureLoader(new SimpleLoader(new NativeLoader()), new FileLocator());

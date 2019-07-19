@@ -354,6 +354,7 @@ services:
 
     oro_entity_config.datagrid.attribute_family_actions_configuration:
         class: 'Oro\Bundle\EntityConfigBundle\Datagrid\AttributeFamilyActionsConfiguration'
+        public: true
         arguments:
             - '@security.authorization_checker'
             - '@doctrine.orm.entity_manager'

@@ -23,8 +23,6 @@ services:
     property_accessor:
         class: Symfony\Component\PropertyAccess\PropertyAccessor
         public: true
-        factory: ['@oro_test.kernel_service_factory', get]
-        arguments: ['property_accessor']
 
     doctrine.orm.entity_manager:
         class: Doctrine\ORM\EntityManager
@@ -35,5 +33,7 @@ services:
     file_locator:
         class: Symfony\Component\HttpKernel\Config\FileLocator
         public: true
-        factory: ['@oro_test.kernel_service_factory', get]
-        arguments: ['file_locator']
+        arguments:
+            - '@symfony2_extension.kernel'
+            - '%kernel.root_dir%/Resources'
+            - ['%kernel.root_dir%']

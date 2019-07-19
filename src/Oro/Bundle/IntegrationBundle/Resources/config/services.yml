@@ -334,6 +334,7 @@ services:
 
     oro_integration.datagrid.action_configuration:
         class: Oro\Bundle\IntegrationBundle\Datagrid\ActionConfiguration
+        public: true
         arguments:
             - '@oro_integration.manager.types_registry'
 

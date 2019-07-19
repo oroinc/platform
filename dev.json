@@ -18,7 +18,7 @@
         "ext-zip": "*",
         "ext-openssl": "*",
         "psr/container": "^1.0",
-        "symfony/symfony": "3.4.27",
+        "symfony/symfony": "4.2.*",
         "symfony/security-acl": "~3.0.0",
         "symfony/acl-bundle": "1.0.*",
         "twig/twig": "2.9.*",
@@ -136,10 +136,6 @@
         "monorepo": {
             "type": "path",
             "url": "../*"
-        },
-        "local-batch": {
-            "type": "path",
-            "url": "../../../BatchBundle"
         },
         "oro": {
             "type": "composer",

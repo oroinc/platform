@@ -438,6 +438,7 @@ services:
 
     oro_email.direct_mailer:
         class: '%oro_email.direct_mailer.class%'
+        public: true
         arguments:
             - '@mailer'
             - '@service_container'
@@ -1090,6 +1091,7 @@ services:
 
     Oro\Bundle\EmailBundle\Manager\EmailNotificationManager:
         alias: 'oro_email.manager.notification'
+        public: true
 
     oro_email.datagrid.origin_folder.provider:
         class: '%oro_email.datagrid.origin_folder.provider.class%'

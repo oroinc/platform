@@ -134,7 +134,6 @@ class DoctrineIsolator implements IsolatorInterface
     public function afterTest(AfterIsolatedTestEvent $event)
     {
         $this->kernel->getContainer()->get('doctrine')->getManager()->clear();
-        $this->kernel->getContainer()->get('doctrine')->resetManager();
     }
 
     /** {@inheritdoc} */
