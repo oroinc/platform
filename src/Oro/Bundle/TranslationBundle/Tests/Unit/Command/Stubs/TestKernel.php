@@ -15,8 +15,8 @@ class TestKernel extends Kernel
      */
     public function __construct(string $rootDir)
     {
-        $this->rootDir = $rootDir;
         parent::__construct('test_stub_env', true);
+        $this->rootDir = $rootDir;
     }
 
     public function init()

@@ -6,6 +6,7 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Oro\Bundle\ConfigBundle\Tests\Unit\Fixtures\TestBundle;
 use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -116,6 +117,21 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
                     );
                 }
             );
+
+        $mainServiceAlias = $this->createMock(Alias::class);
+        $mainServiceAlias->expects($this->once())
+            ->method('setPublic')
+            ->with(true);
+
+        $this->container->expects($this->once())
+            ->method('setAlias')
+            ->with('oro_config.manager', 'oro_config.app');
+
+        $this->container->expects($this->once())
+            ->method('getAlias')
+            ->with('oro_config.manager')
+            ->willReturn($mainServiceAlias);
+
         $this->compiler->process($this->container);
     }
 
@@ -206,6 +222,20 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ]);
+
+        $mainServiceAlias = $this->createMock(Alias::class);
+        $mainServiceAlias->expects($this->once())
+            ->method('setPublic')
+            ->with(true);
+
+        $this->container->expects($this->once())
+            ->method('setAlias')
+            ->with('oro_config.manager', 'oro_config.app');
+
+        $this->container->expects($this->once())
+            ->method('getAlias')
+            ->with('oro_config.manager')
+            ->willReturn($mainServiceAlias);
 
         $this->compiler->process($this->container);
     }
