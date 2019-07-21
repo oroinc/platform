@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
-use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
 /**
@@ -206,115 +205,6 @@ class Query
     }
 
     /**
-     * Add "AND WHERE" parameter
-     *
-     * @deprecated Since 1.8 use criteria to add conditions
-     *
-     * @param string $fieldName
-     * @param string $condition
-     * @param string $fieldValue
-     * @param string $fieldType
-     *
-     * @return Query
-     */
-    public function andWhere($fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
-    {
-        return $this->where(self::KEYWORD_AND, $fieldName, $condition, $fieldValue, $fieldType);
-    }
-
-    /**
-     * Add "OR WHERE" parameter
-     *
-     * @deprecated Since 1.8 use criteria to add conditions
-     *
-     * @param string $fieldName
-     * @param string $condition
-     * @param string $fieldValue
-     * @param string $fieldType
-     *
-     * @return Query
-     */
-    public function orWhere($fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
-    {
-        return $this->where(self::KEYWORD_OR, $fieldName, $condition, $fieldValue, $fieldType);
-    }
-
-    /**
-     * Add "WHERE" parameter
-     *
-     * @deprecated Since 1.8 use criteria to add conditions
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     *
-     * @param string $keyWord
-     * @param string $fieldName
-     * @param string $condition
-     * @param string $fieldValue
-     * @param string $fieldType
-     *
-     * @return Query
-     */
-    public function where($keyWord, $fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
-    {
-        $expr      = Criteria::expr();
-        $fieldName = Criteria::implodeFieldTypeName($fieldType, $fieldName);
-
-        switch ($condition) {
-            case self::OPERATOR_LIKE:
-                $expr = $expr->like($fieldName, $fieldValue);
-                break;
-            case self::OPERATOR_NOT_LIKE:
-                $expr = $expr->notLike($fieldName, $fieldValue);
-                break;
-            case self::OPERATOR_CONTAINS:
-                $expr = $expr->contains($fieldName, $fieldValue);
-                break;
-            case self::OPERATOR_NOT_CONTAINS:
-                $expr = $expr->notContains($fieldName, $fieldValue);
-                break;
-            case self::OPERATOR_EQUALS:
-                $expr = $expr->eq($fieldName, $fieldValue);
-                break;
-            case self::OPERATOR_NOT_EQUALS:
-                $expr = $expr->neq($fieldName, $fieldValue);
-                break;
-            case self::OPERATOR_GREATER_THAN:
-                $expr = $expr->gt($fieldName, $fieldValue);
-                break;
-            case self::OPERATOR_GREATER_THAN_EQUALS:
-                $expr = $expr->gte($fieldName, $fieldValue);
-                break;
-            case self::OPERATOR_LESS_THAN:
-                $expr = $expr->lt($fieldName, $fieldValue);
-                break;
-            case self::OPERATOR_LESS_THAN_EQUALS:
-                $expr = $expr->lte($fieldName, $fieldValue);
-                break;
-
-            case self::OPERATOR_IN:
-                $expr = $expr->in($fieldName, $fieldValue);
-                break;
-            case self::OPERATOR_NOT_IN:
-                $expr = $expr->notIn($fieldName, $fieldValue);
-                break;
-            case self::OPERATOR_STARTS_WITH:
-                $expr = $expr->startsWith($fieldName, $fieldValue);
-                break;
-            default:
-                throw new ExpressionSyntaxError(
-                    sprintf('Unsupported operator "%s"', $condition)
-                );
-        }
-
-        if ($keyWord === self::KEYWORD_AND) {
-            $this->criteria->andWhere($expr);
-        } else {
-            $this->criteria->orWhere($expr);
-        }
-
-        return $this;
-    }
-
-    /**
      * Get fields to select
      *
      * @return array
@@ -335,17 +225,6 @@ class Query
     }
 
     /**
-     * Get query options
-     *
-     * @deprecated Since 1.8 use getCriteria method
-     * @throws \Exception
-     */
-    public function getOptions()
-    {
-        throw new \Exception('Method getOptions is deprecated for Query class. Please use getCriteria method');
-    }
-
-    /**
      * Return mapping config array
      *
      * @return array
@@ -363,124 +242,6 @@ class Query
     public function getFields()
     {
         return $this->fields;
-    }
-
-    /**
-     * Set max results
-     *
-     * @deprecated Since 1.8 use criteria's setMaxResults method
-     *
-     * @param int $maxResults
-     *
-     * @return Query
-     */
-    public function setMaxResults($maxResults)
-    {
-        $this->criteria->setMaxResults((int)$maxResults);
-
-        return $this;
-    }
-
-    /**
-     * Get limit parameter
-     *
-     * @deprecated Since 1.8 use criteria's getMaxResults method
-     *
-     * @return int
-     */
-    public function getMaxResults()
-    {
-        return $this->criteria->getMaxResults();
-    }
-
-    /**
-     * Set first result offset
-     *
-     * @deprecated Since 1.8 use criteria's setFirstResult method
-     *
-     * @param int $firstResult
-     *
-     * @return Query
-     */
-    public function setFirstResult($firstResult)
-    {
-        $this->criteria->setFirstResult((int)$firstResult);
-
-        return $this;
-    }
-
-    /**
-     * Get first result offset
-     *
-     * @deprecated Since 1.8 use criteria's getFirstResult method
-     *
-     * @return int
-     */
-    public function getFirstResult()
-    {
-        return $this->criteria->getFirstResult();
-    }
-
-    /**
-     * Set order by
-     *
-     * @deprecated Since 1.8 use criteria's orderBy method
-     *
-     * @param string $fieldName
-     * @param string $direction
-     * @param string $type
-     *
-     * @return Query
-     */
-    public function setOrderBy($fieldName, $direction = self::ORDER_ASC, $type = self::TYPE_TEXT)
-    {
-        $this->criteria->orderBy([$type . '.' . $fieldName => $direction]);
-
-        return $this;
-    }
-
-    /**
-     * Get order by field
-     *
-     * @deprecated Since 1.8 use criteria's getOrderings method
-     *
-     * @return string
-     */
-    public function getOrderBy()
-    {
-        $orders    = array_keys($this->criteria->getOrderings());
-        $fieldName = array_pop($orders);
-
-        return Criteria::explodeFieldTypeName($fieldName)[1];
-    }
-
-    /**
-     * Get "order by" field type
-     *
-     * @deprecated Since 1.8 use criteria's getOrderings method
-     *
-     * @return string
-     */
-    public function getOrderType()
-    {
-        $orders    = array_keys($this->criteria->getOrderings());
-        $fieldName = array_pop($orders);
-
-        return Criteria::explodeFieldTypeName($fieldName)[0];
-    }
-
-    /**
-     * Get order by direction
-     *
-     * @deprecated Since 1.8 use criteria's getOrderings method
-     *
-     * @return string
-     */
-    public function getOrderDirection()
-    {
-        $orders = $this->criteria->getOrderings();
-
-        return array_pop($orders);
     }
 
     /**
@@ -526,47 +287,46 @@ class Query
     public function getStringQuery()
     {
         $fromString = '';
-
-        if ($this->getFrom()) {
-            $fromString .= 'from ' . implode(', ', $this->getFrom());
+        $from = $this->getFrom();
+        if ($from) {
+            $fromString .= 'from ' . implode(', ', $from);
         }
 
         $whereString = $this->getWhereString();
 
         $orderByString = '';
-        if ($this->getOrderBy()) {
-            $orderByString .= ' ' . $this->getOrderBy();
-        }
-        if ($this->getOrderDirection()) {
-            $orderByString .= ' ' . $this->getOrderDirection();
-        }
-        if ($orderByString) {
-            $orderByString = ' order by' . $orderByString;
+        $orderings = $this->criteria->getOrderings();
+        if ($orderings) {
+            $orderByString = ' order by';
+            foreach ($orderings as $field => $direction) {
+                $orderByString .= ' ' . Criteria::explodeFieldTypeName($field)[1] . ' ' . $direction;
+            }
         }
 
         $limitString = '';
-        if ($this->getMaxResults() && $this->getMaxResults() != Query::INFINITY) {
-            $limitString = ' limit ' . $this->getMaxResults();
+        $maxResults = $this->criteria->getMaxResults();
+        if ($maxResults && $maxResults != Query::INFINITY) {
+            $limitString = ' limit ' . $maxResults;
         }
 
         $offsetString = '';
-        if ($this->getFirstResult()) {
-            $offsetString .= ' offset ' . $this->getFirstResult();
+        $firstResult = $this->criteria->getFirstResult();
+        if ($firstResult) {
+            $offsetString .= ' offset ' . $firstResult;
         }
 
-        $selectColumnsString = $this->getStringColumns();
-
         $selectString = '';
+        $selectColumnsString = $this->getStringColumns();
         if (!empty($selectColumnsString)) {
             $selectString = trim('select ' . $selectColumnsString) . ' ';
         }
 
         return $selectString
-               . $fromString
-               . $whereString
-               . $orderByString
-               . $limitString
-               . $offsetString;
+            . $fromString
+            . $whereString
+            . $orderByString
+            . $limitString
+            . $offsetString;
     }
 
     /**
@@ -624,11 +384,23 @@ class Query
     }
 
     /**
-     * @return array ['<name>' => ['field' => <field>, 'function' => '<function>']]
+     * @return array [name => ['field' => field name, 'function' => function], ...]
      */
     public function getAggregations()
     {
         return $this->aggregations;
+    }
+
+    /**
+     * @param array $aggregations [name => ['field' => field name, 'function' => function], ...]
+     *
+     * @return $this
+     */
+    public function setAggregations(array $aggregations)
+    {
+        $this->aggregations = $aggregations;
+
+        return $this;
     }
 
     /**

@@ -396,7 +396,7 @@
     table {
         .action-column,
         .action-cell {
-            width: 86px;
+            min-width: $dashboard-widget-configuration-action-cell-min-width;
         }
 
         &.scrollable {
@@ -433,6 +433,12 @@
     }
 
     .query-filter-row {
+        display: inline-block;
+
+        padding-top: $form-horizontal-control-label-offset;
+
+        line-height: $form-horizontal-control-label-line-height;
+
         .collapse-toggler.collapsed .expanded-text,
         .collapse-toggler:not(.collapsed) .collapsed-text {
             display: none;

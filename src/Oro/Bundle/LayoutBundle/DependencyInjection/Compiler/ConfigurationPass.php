@@ -26,6 +26,9 @@ class ConfigurationPass implements CompilerPassInterface
     private const THEME_CONFIG_SERVICE = 'oro_layout.theme_extension.configuration';
     private const THEME_CONFIG_EXTENSION_TAG_NAME = 'layout.theme_config_extension';
 
+    /** @var array */
+    private $servicesForServiceLocator = [];
+
     /**
      * {@inheritdoc}
      */
@@ -34,6 +37,13 @@ class ConfigurationPass implements CompilerPassInterface
         $this->registerRenderers($container);
         $this->registerThemeConfigExtensions($container);
         $this->configureLayoutExtension($container);
+
+        // Adds services stored in servicesForServiceLocator to serviceLocator
+        // which intend to be used instead of the container
+        $container->getDefinition('oro_layout.layout.service_locator')
+            ->replaceArgument(0, $this->servicesForServiceLocator);
+
+        $this->servicesForServiceLocator = [];
     }
 
     /**
@@ -106,6 +116,8 @@ class ConfigurationPass implements CompilerPassInterface
 
             $alias = $tag[0]['alias'];
             $types[$alias] = $serviceId;
+
+            $this->addServiceToServiceLocator($serviceId);
         }
 
         return $types;
@@ -130,6 +142,8 @@ class ConfigurationPass implements CompilerPassInterface
             $priority = $tag[0]['priority'] ?? 0;
 
             $typeExtensions[$alias][$priority][] = $serviceId;
+
+            $this->addServiceToServiceLocator($serviceId);
         }
         foreach ($typeExtensions as $key => $items) {
             ksort($items);
@@ -158,6 +172,8 @@ class ConfigurationPass implements CompilerPassInterface
             $priority = $tag[0]['priority'] ?? 0;
 
             $layoutUpdates[$id][$priority][] = $serviceId;
+
+            $this->addServiceToServiceLocator($serviceId);
         }
         foreach ($layoutUpdates as $key => $items) {
             ksort($items);
@@ -179,6 +195,8 @@ class ConfigurationPass implements CompilerPassInterface
             $priority = $tag[0]['priority'] ?? 0;
 
             $configurators[$priority][] = $serviceId;
+
+            $this->addServiceToServiceLocator($serviceId);
         }
         if (!empty($configurators)) {
             ksort($configurators);
@@ -205,8 +223,18 @@ class ConfigurationPass implements CompilerPassInterface
 
             $alias = $tag[0]['alias'];
             $dataProviders[$alias] = $serviceId;
+
+            $this->addServiceToServiceLocator($serviceId);
         }
 
         return $dataProviders;
+    }
+
+    /**
+     * @param string $serviceId
+     */
+    private function addServiceToServiceLocator(string $serviceId): void
+    {
+        $this->servicesForServiceLocator[$serviceId] = new Reference($serviceId);
     }
 }

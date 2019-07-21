@@ -101,6 +101,9 @@ A list of filters that should be configured explicitly using
 | Filter Type  | Enabled Operators    | Implemented by |
 |--------------|----------------------|----------------|
 | primaryField | `=`, `!=`, `*`, `!*` | [PrimaryFieldFilter](../../Filter/PrimaryFieldFilter.php) |
+| nestedTree | `>`, `>=` | [NestedTreeFilter](../../Filter/NestedTreeFilter.php) |
+| searchQuery | `=` | [SearchQueryFilter](../../Filter/SearchQueryFilter.php) |
+| searchAggregation | `=` | [SearchAggregationFilter](../../Filter/SearchAggregationFilter.php) |
 
 You can also run the `php var/console debug:config oro_api` command to view all the existing filters
 in the  `filters` section and all the existing operators for filters in the `filter_operators` section.
@@ -163,7 +166,8 @@ Examples of such filters are [ComparisonFilter](#comparisonfilter-filter),
 [ExtendedAssociationFilter](../../Filter/ExtendedAssociationFilter.php),
 [CompositeIdentifierFilter](../../Filter/CompositeIdentifierFilter.php),
 [NestedTreeFilter](../../Filter/NestedTreeFilter.php),
-[SearchQueryFilter](../../Filter/SearchQueryFilter.php)
+[SearchQueryFilter](../../Filter/SearchQueryFilter.php),
+[SearchAggregationFilter](../../Filter/SearchAggregationFilter.php)
 and [PrimaryFieldFilter](../../Filter/PrimaryFieldFilter.php).
 
 ## StandaloneFilterWithDefaultValue Base Class

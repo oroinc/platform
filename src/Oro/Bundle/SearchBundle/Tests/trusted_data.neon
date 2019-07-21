@@ -4,6 +4,11 @@ trusted_data:
         Oro\Bundle\SearchBundle\Engine\AbstractIndexer:
             reindexSingleEntity:
                 orderingsExpr: true
+        Oro\Bundle\SearchBundle\Engine\Indexer:
+            getSimpleSearchQuery:
+                offset: true
+                maxResults: true
+                page: true
         Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter:
             addRestriction:
                 restriction: true
@@ -49,10 +54,6 @@ trusted_data:
             setCriteria: true
             select: true
             addSelect: [0]
-            andWhere: [0]
-            orWhere: [0]
-            where: [1]
-            setOrderBy: [0, 1]
             addAggregate: [1]
             addToSelect: [0]
         Oro\Bundle\SearchBundle\Query\Criteria\Criteria:

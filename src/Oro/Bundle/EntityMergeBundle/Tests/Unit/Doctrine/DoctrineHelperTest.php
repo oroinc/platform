@@ -127,8 +127,12 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->expression->expects($this->once())
             ->method('in')
-            ->with('entity.' . $identifier, $entityIds)
+            ->with('entity.' . $identifier, ':entityIds')
             ->will($this->returnValue($inExpression));
+
+        $this->queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('entityIds', $entityIds);
 
         $this->queryBuilder->expects($this->once())
             ->method('where')

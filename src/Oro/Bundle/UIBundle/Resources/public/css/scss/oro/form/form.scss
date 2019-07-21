@@ -174,8 +174,7 @@ input[type="search"],
 input[type="tel"],
 input[type="color"],
 .uneditable-input,
-.selector,
-select[multiple] {
+.selector {
     @extend .input;
 }
 
@@ -183,35 +182,44 @@ select[multiple] {
     Select multiple
  */
 select[multiple] {
+    border-radius: $input-field-border-radius;
+    background-color: $input-background-color;
+    color: $input-color;
+    border: $input-border-width solid $input-border-color;
+    font-family: $input-font-family;
+    margin-bottom: $input-outer-offset-bottom;
+    box-sizing: $input-box-sizing;
+    outline: $input-outline;
+    width: $field-width;
     height: $select-multiple-height !important;
     padding: $select-multiple-inner-offset;
-
     vertical-align: top;
+    overflow-y: auto;
+
+    &:focus {
+        border-color: $input-focus-border-color;
+        z-index: 1;
+    }
+
+    &:disabled {;
+        color: $input-disabled-color;
+    }
 
     option {
         padding: $select-multiple-option-inner-offset;
         border-radius: $select-multiple-option-border-radius;
-        font-size: $select-multiple-option-font-size;
-        color: $select-multiple-option-color;
 
         &:not(:last-child) {
             margin-bottom: $select-multiple-option-not-last-offset-bottom;
         }
-
-        &:checked {
-            box-shadow: $select-multiple-option-checked-box-shadow;
-            color: $select-multiple-option-checked-color !important;
-        }
     }
 
-    &:focus {
-        option {
-            &:active,
-            &::selection,
-            &:checked {
-                box-shadow: $select-multiple-option-active-box-shadow;
-            }
-        }
+    .control-group & {
+        margin-bottom: $input-control-group-outer-offset-bottom;
+    }
+
+    td & {
+        margin-bottom: 0;
     }
 }
 

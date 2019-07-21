@@ -239,9 +239,9 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
         $sourceQuery = 'from test_product' .
             ' where (name ~ "test string" and integer count > 10 and (decimal price = 10 or integer qty in (2, 5)))' .
-            ' order_by name offset 10 max_results 5';
+            ' order_by decimal price desc offset 10 max_results 5';
         $expectedQuery = 'from test_product where ((integer qty in (2, 5) or decimal price = 10) '
-            .'and integer count > 10 and text name ~ "test string") order by name ASC limit 5 offset 10';
+            .'and integer count > 10 and text name ~ "test string") order by price DESC limit 5 offset 10';
 
         $result = $this->indexService->advancedSearch($sourceQuery);
         $actualQuery = $result->getQuery()->getStringQuery();

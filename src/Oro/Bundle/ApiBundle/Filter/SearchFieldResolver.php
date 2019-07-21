@@ -7,9 +7,9 @@ use Oro\Bundle\SearchBundle\Query\Expression\FieldResolverInterface;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 /**
- * Implements field names mapping for SearchQueryFilter.
+ * Implements field names mapping for search filters.
  */
-class SearchQueryFilterFieldResolver implements FieldResolverInterface
+class SearchFieldResolver implements FieldResolverInterface
 {
     /** @var array [field name in search index => ['type' => field data-type, ...], ...] */
     private $searchFieldMappings;
@@ -44,11 +44,25 @@ class SearchQueryFilterFieldResolver implements FieldResolverInterface
     public function resolveFieldType(string $fieldName): string
     {
         $fieldName = $this->resolveFieldByFieldMappings($fieldName, true);
-        if ($this->searchFieldMappings[$fieldName]['type']) {
+        if (isset($this->searchFieldMappings[$fieldName]['type'])
+            && $this->searchFieldMappings[$fieldName]['type']
+        ) {
             return $this->searchFieldMappings[$fieldName]['type'];
         }
 
         return Query::TYPE_TEXT;
+    }
+
+    /**
+     * Gets a list of possible alternative names for the given field.
+     *
+     * @param string $fieldName
+     *
+     * @return string[]
+     */
+    protected function guessFieldNames(string $fieldName): array
+    {
+        return [];
     }
 
     /**
@@ -57,7 +71,7 @@ class SearchQueryFilterFieldResolver implements FieldResolverInterface
      *
      * @return string
      */
-    public function resolveFieldByFieldMappings(
+    private function resolveFieldByFieldMappings(
         string $fieldName,
         bool $replacePlaceholdersWithVariableNames = false
     ): string {
@@ -73,9 +87,11 @@ class SearchQueryFilterFieldResolver implements FieldResolverInterface
             return $resolvedFieldName;
         }
 
-        $resolvedFieldName = $this->resolveEnumField($fieldName);
-        if ($resolvedFieldName) {
-            return $resolvedFieldName;
+        $guessedFieldNames = $this->guessFieldNames($fieldName);
+        foreach ($guessedFieldNames as $resolvedFieldName) {
+            if (isset($this->searchFieldMappings[$resolvedFieldName])) {
+                return $resolvedFieldName;
+            }
         }
 
         if (!isset($this->searchFieldMappings[$fieldName])) {
@@ -97,19 +113,19 @@ class SearchQueryFilterFieldResolver implements FieldResolverInterface
     ): ?string {
         $this->ensurePlaceholderFieldMappingsInitialized();
         foreach ($this->placeholderFieldMappings as $pattern => $searchPattern) {
-            if (!preg_match($pattern, $fieldName, $matches)) {
+            if (!\preg_match($pattern, $fieldName, $matches)) {
                 continue;
             }
 
             $searchFieldName = $searchPattern;
             $searchMappingFieldName = $searchPattern;
             foreach ($matches as $key => $val) {
-                if (is_numeric($key)) {
+                if (\is_numeric($key)) {
                     continue;
                 }
-                $placeholder = sprintf('{%s}', $key);
-                $searchFieldName = str_replace($placeholder, $val, $searchFieldName);
-                $searchMappingFieldName = str_replace($placeholder, $key, $searchMappingFieldName);
+                $placeholder = \sprintf('{%s}', $key);
+                $searchFieldName = \str_replace($placeholder, $val, $searchFieldName);
+                $searchMappingFieldName = \str_replace($placeholder, $key, $searchMappingFieldName);
             }
 
             if (!isset($this->searchFieldMappings[$searchMappingFieldName])) {
@@ -124,21 +140,6 @@ class SearchQueryFilterFieldResolver implements FieldResolverInterface
         return null;
     }
 
-    /**
-     * @param string $fieldName
-     *
-     * @return string|null
-     */
-    private function resolveEnumField(string $fieldName): ?string
-    {
-        $guessedEnumFieldName = $fieldName . '_ENUM_ID';
-        if (isset($this->searchFieldMappings[$guessedEnumFieldName])) {
-            return $guessedEnumFieldName;
-        }
-
-        return null;
-    }
-
     private function ensurePlaceholderFieldMappingsInitialized(): void
     {
         if (null !== $this->placeholderFieldMappings) {
@@ -147,8 +148,8 @@ class SearchQueryFilterFieldResolver implements FieldResolverInterface
 
         $this->placeholderFieldMappings = [];
         foreach ($this->fieldMappings as $fieldName => $searchFieldName) {
-            if (false !== strpos($fieldName, '(?')) {
-                $this->placeholderFieldMappings[sprintf('#%s#', $fieldName)] = $searchFieldName;
+            if (false !== \strpos($fieldName, '(?')) {
+                $this->placeholderFieldMappings[\sprintf('#%s#', $fieldName)] = $searchFieldName;
             }
         }
     }
@@ -160,6 +161,6 @@ class SearchQueryFilterFieldResolver implements FieldResolverInterface
      */
     private function createFieldNotSupportedException(string $fieldName): InvalidFilterException
     {
-        return new InvalidFilterException(sprintf('Field "%s" is not supported.', $fieldName));
+        return new InvalidFilterException(\sprintf('The field "%s" is not supported.', $fieldName));
     }
 }

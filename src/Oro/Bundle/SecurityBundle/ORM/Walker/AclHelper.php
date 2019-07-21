@@ -25,7 +25,7 @@ class AclHelper
     private $tokenStorage;
 
     /** @var AccessRuleExecutor */
-    private $accessRuleExecutor;
+    protected $accessRuleExecutor;
 
     /**
      * @param TokenStorageInterface $tokenStorage

@@ -9,6 +9,15 @@ oro_behat_extension:
           Entity: oro_segment_form[entity]
           Segment Type: oro_segment_form[type]
 
+    Edit First Segment Column:
+      selector: '#oro_segment-column-list tr:nth-child(1) [data-collection-action="edit"]'
+
+    Edit Second Segment Column:
+      selector: '#oro_segment-column-list tr:nth-child(2) [data-collection-action="edit"]'
+
+    Save Column Button:
+      selector: '.save-button.column-form-button'
+
     Clone Segment Button:
       selector: 'a[title="Clone Segment"]'
 

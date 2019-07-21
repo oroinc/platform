@@ -55,8 +55,8 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     {
         $headers = $this->context->getRequestHeaders();
 
-        $key1   = 'test1';
-        $key2   = 'test2';
+        $key1 = 'test1';
+        $key2 = 'test2';
         $value1 = 'value1';
         $value2 = 'value2';
 
@@ -114,8 +114,8 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     {
         $headers = $this->context->getResponseHeaders();
 
-        $key1   = 'test1';
-        $key2   = 'test2';
+        $key1 = 'test1';
+        $key2 = 'test2';
         $value1 = 'value1';
         $value2 = 'value2';
 
@@ -233,9 +233,9 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadConfigByGetConfig()
     {
-        $version      = '1.1';
-        $requestType  = 'rest';
-        $entityClass  = 'Test\Class';
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
         $configExtras = [
             new TestConfigSection('section1'),
             new TestConfigSection('section2'),
@@ -294,9 +294,9 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadConfigByGetConfigWhenExceptionOccurs()
     {
-        $version      = '1.1';
-        $requestType  = 'rest';
-        $entityClass  = 'Test\Class';
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
         $configExtras = [
             new TestConfigSection('section1'),
             new TestConfigSection('section2'),
@@ -349,9 +349,9 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadConfigByGetConfigOf()
     {
-        $version      = '1.1';
-        $requestType  = 'rest';
-        $entityClass  = 'Test\Class';
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
         $configExtras = [
             new TestConfigSection('section1'),
             new TestConfigSection('section2')
@@ -409,9 +409,9 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadConfigByGetConfigOfWhenExceptionOccurs()
     {
-        $version      = '1.1';
-        $requestType  = 'rest';
-        $entityClass  = 'Test\Class';
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
         $configExtras = [
             new TestConfigSection('section1'),
             new TestConfigSection('section2')
@@ -577,7 +577,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
      */
     public function testLoadKnownSectionConfigByGetConfigOf($configSection)
     {
-        $mainConfig    = new EntityDefinitionConfig();
+        $mainConfig = new EntityDefinitionConfig();
         $sectionConfig = [];
 
         $mainConfig->addField('field1');
@@ -719,9 +719,22 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     {
         self::assertNull($this->context->getInfoRecords());
 
-        $infoRecords = ['' => ['key' => 'value']];
+        $this->context->addInfoRecord('test', 123);
+        self::assertEquals(['test' => 123], $this->context->getInfoRecords());
+
+        $infoRecords = ['' => ['key' => 'value'], '0.association' => ['key1' => 'value1']];
         $this->context->setInfoRecords($infoRecords);
         self::assertEquals($infoRecords, $this->context->getInfoRecords());
+
+        $this->context->addInfoRecord('test', 123);
+        self::assertEquals(
+            [
+                ''              => ['key' => 'value'],
+                '0.association' => ['key1' => 'value1'],
+                'test'          => 123
+            ],
+            $this->context->getInfoRecords()
+        );
 
         $this->context->setInfoRecords(null);
         self::assertNull($this->context->getInfoRecords());
@@ -743,7 +756,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getConfigExtra('another'));
 
         $anotherConfigExtra = new TestConfigExtra('another');
-        $configExtras[]     = $anotherConfigExtra;
+        $configExtras[] = $anotherConfigExtra;
         $this->context->addConfigExtra($anotherConfigExtra);
         self::assertEquals($configExtras, $this->context->getConfigExtras());
 
@@ -783,16 +796,16 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadMetadata()
     {
-        $version      = '1.1';
-        $requestType  = 'rest';
-        $entityClass  = 'Test\Class';
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
         $configExtras = [
             new TestConfigSection('section1'),
             new TestConfigSection('section2')
         ];
 
-        $config         = new EntityDefinitionConfig();
-        $metadata       = new EntityMetadata();
+        $config = new EntityDefinitionConfig();
+        $metadata = new EntityMetadata();
         $metadataExtras = [new TestMetadataExtra('extra1')];
 
         $this->context->setVersion($version);
@@ -901,16 +914,16 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadMetadataWhenExceptionOccurs()
     {
-        $version      = '1.1';
-        $requestType  = 'rest';
-        $entityClass  = 'Test\Class';
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
         $configExtras = [
             new TestConfigSection('section1'),
             new TestConfigSection('section2')
         ];
         $exception = new \RuntimeException('some error');
 
-        $config         = new EntityDefinitionConfig();
+        $config = new EntityDefinitionConfig();
         $metadataExtras = [new TestMetadataExtra('extra1')];
 
         $this->context->setVersion($version);

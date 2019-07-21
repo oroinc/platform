@@ -321,6 +321,14 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
+    public function addInfoRecord(string $key, $value): void
+    {
+        $this->infoRecords[$key] = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function hasQuery()
     {
         return $this->has(self::QUERY);

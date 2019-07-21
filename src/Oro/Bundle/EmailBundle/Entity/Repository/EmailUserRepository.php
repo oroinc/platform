@@ -62,10 +62,12 @@ class EmailUserRepository extends EntityRepository
         $qb
             ->join('eu.folders', 'f')
             ->join('f.origin', 'o')
-            ->andWhere($qb->expr()->eq('eu.owner', $user->getId()))
-            ->andWhere($qb->expr()->eq('eu.organization', $organization->getId()))
+            ->andWhere($qb->expr()->eq('eu.owner', ':owner'))
+            ->andWhere($qb->expr()->eq('eu.organization', ':organization'))
             ->andWhere($qb->expr()->eq('o.isActive', ':active'))
-            ->setParameter('active', true);
+            ->setParameter('active', true)
+            ->setParameter('owner', $user)
+            ->setParameter('organization', $organization);
 
         if ($folderTypes) {
             $qb->andWhere($qb->expr()->in('f.type', ':folderTypes'))->setParameter('folderTypes', $folderTypes);

@@ -116,4 +116,23 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $parser = new Parser();
         $parser->parse(new TokenStream($tokens));
     }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError
+     * @expectedExceptionMessage Unsupported aggregating function "sum" for field type "text" around position 3.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testParseAggregateExpressionUnsupportedFunctionException()
+    {
+        $tokens = $this->generateTokens([
+            [Token::KEYWORD_TYPE, Query::KEYWORD_AGGREGATE],
+            [Token::STRING_TYPE, 'test_field'],
+            [Token::STRING_TYPE, Query::AGGREGATE_FUNCTION_SUM],
+            [Token::KEYWORD_TYPE, Query::KEYWORD_SELECT],
+        ]);
+
+        $parser = new Parser();
+        $parser->parse(new TokenStream($tokens));
+    }
 }

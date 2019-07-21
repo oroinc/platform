@@ -340,7 +340,7 @@
             {% set allow_delete = allow_delete and widget.vars.allow_delete %}
         {% endif %}
     {% endif %}
-    <div
+    <div class="oro-collection-item"
         data-content="{{ name }}"
         {% if widget.parent.vars.skip_optional_validation_group is not defined %}
             data-validation-optional-group
@@ -356,7 +356,6 @@
                     aria-label="{{ 'oro.form.collection.remove'|trans }}"
                     type="button"
                     data-related="{{ name }}">
-                    <span class="fa-trash-o" aria-hidden="true"></span>
                 </button>
             {% endif %}
             {% if allow_add_after %}
@@ -364,7 +363,6 @@
                     aria-label="{{ 'oro.form.collection.add'|trans }}"
                     type="button"
                     data-related="{{ name }}">
-                    <span class="fa-plus" aria-hidden="true"></span>
                 </button>
             {% endif %}
         </div>

@@ -161,6 +161,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
                 $this->resultDataAccessor->clear();
             }
             $this->addLinksWithMetadataToResult($this->result);
+            $this->addCollectionMetadataToResult($this->result);
         } else {
             throw $this->createUnexpectedValueException('array or \Traversable', $collection);
         }
@@ -575,6 +576,13 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     abstract protected function addLinkToResult(array &$result, string $name, LinkMetadataInterface $link): void;
 
     /**
+     * @param array  $result
+     * @param string $name
+     * @param mixed  $value
+     */
+    abstract protected function addMetaToCollectionResult(array &$result, string $name, $value): void;
+
+    /**
      * Checks that the primary data exists.
      */
     protected function assertData(): void
@@ -636,6 +644,23 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
             }
         } finally {
             $this->resultDataAccessor->clear();
+        }
+    }
+
+    /**
+     * @param array $result
+     */
+    private function addCollectionMetadataToResult(array &$result): void
+    {
+        $data = $this->resultDataAccessor->getMetadata();
+        if (empty($data)) {
+            return;
+        }
+
+        foreach ($data as $name => $value) {
+            if ('' !== $name && false === \strpos($name, '.')) {
+                $this->addMetaToCollectionResult($result, $name, $value);
+            }
         }
     }
 }
