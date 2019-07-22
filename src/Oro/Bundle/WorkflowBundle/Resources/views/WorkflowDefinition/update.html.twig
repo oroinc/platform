@@ -330,7 +330,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="control-group">
+                                    <div class="control-group control-group-checkbox">
                                         {{ _self.render_label("oro.workflow.form.final.label"|trans, false, "oro.workflow.workflowdefinition.step.is_final.tooltip") }}
                                         <div class="controls">
                                             <input type="checkbox" name="is_final" <% if (is_final) { %>checked="checked"<% } %>>
@@ -431,7 +431,7 @@
                     </div>
                 </div>
 
-                <div class="control-group">
+                <div class="control-group control-group-checkbox">
                     {{ _self.render_label("oro.workflow.form.required.label"|trans, false, "oro.workflow.workflowdefinition.attribute.required.tooltip") }}
                     <div class="controls">
                         <input type="checkbox" name="required" <% if (required) { %>checked="checked"<% } %>/>

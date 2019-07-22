@@ -42,7 +42,12 @@ class TranslationDomainProviderTest extends WebTestCase
             $domains[] = ['code' => LoadLanguages::LANGUAGE2, 'domain' => $domain];
         }
 
-        $this->assertEquals($domains, $this->provider->getAvailableDomainsForLocales([LoadLanguages::LANGUAGE2]));
+        $actualDomains = $this->provider->getAvailableDomainsForLocales([LoadLanguages::LANGUAGE2]);
+        $this->assertCount(count($domains), $actualDomains);
+
+        foreach ($domains as $domain) {
+            $this->assertContains($domain, $actualDomains);
+        }
     }
 
     public function testGetAvailableDomains()

@@ -303,3 +303,4 @@ api:
             fields:
                 activityTargets:
                     data_type: association:manyToMany:activity
+        Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership: ~

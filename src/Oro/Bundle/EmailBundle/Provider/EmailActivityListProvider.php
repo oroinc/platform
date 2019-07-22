@@ -365,7 +365,8 @@ class EmailActivityListProvider implements
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->doctrineRegistryLink->getService()
             ->getRepository(ActivityList::class)
-            ->createQueryBuilder('a')
+            ->createQueryBuilder('a');
+        $queryBuilder
             ->innerJoin(
                 'OroEmailBundle:Email',
                 'e',

@@ -465,10 +465,33 @@ textarea {
 }
 
 .oro-multiselect-holder .selector {
-    display: inline-block;
-    width: 122px;
-    overflow: hidden;
-    vertical-align: middle;
+        display: inline-block;
+        width: 122px;
+        overflow: hidden;
+        vertical-align: middle;
+}
+
+.oro-collection-item {
+    .removeRow,
+    .addAfterRow {
+        &:before {
+            margin: $btn-icon-fa-offset;
+            text-indent: $btn-icon-fa-text-indent;
+            line-height: $btn-icon-fa-line-height;
+            position: $btn-icon-fa-position;
+            top: $btn-icon-fa-top;
+            left: $btn-icon-fa-left;
+            transform: $btn-icon-fa-transform;
+        }
+    }
+    
+    .removeRow {
+        @include fa-icon($fa-var-trash-o);
+    }
+    
+    .addAfterRow {
+        @include fa-icon($fa-var-plus);
+    }
 }
 
 .validation-tooltip {

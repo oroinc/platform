@@ -125,6 +125,7 @@ Example:
 Acme\DemoBundle\Entity\Product:
     alias: demo_product                                      # Alias for 'from' keyword in advanced search
     search_template: AcmeDemoBundle:result.html.twig         # Template to use in search result page for this entity type
+    acl_permission: 'EDIT'                                  # Acl permissions to use in search results page for this entity type 
     label: Demo products                                     # Label for entity to identify entity in search results
     route:
         name: acme_demo_search_product                       # Route name to generate url link to the entity record

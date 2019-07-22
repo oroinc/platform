@@ -4,6 +4,7 @@ trusted_data:
         Oro\Bundle\DataGridBundle\Extension\Totals\OrmTotalsExtension:
             addPageLimits:
                 field: true
+                idx: true
     safe_methods:
         Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactory:
             getIdentifierField: true

@@ -103,6 +103,8 @@ define(function(require) {
         },
 
         changeFilterType: function(value) {
+            var oldRect = this.el.getBoundingClientRect();
+
             WidgetConfigDateRangeFilter.__super__.changeFilterType.apply(this, arguments);
 
             var type = parseInt(value, 10);
@@ -116,6 +118,12 @@ define(function(require) {
                 // set correct width of uniform widget
                 if (this.domCache.$customPart.data('bound-input-widget') === 'uniform') {
                     this.domCache.$customPart.data('input-widget').refresh();
+                }
+
+                var newRect = this.el.getBoundingClientRect();
+
+                if (oldRect.width !== newRect.width || oldRect.height !== newRect.height) {
+                    this.$el.trigger('content:changed');
                 }
             }
         },

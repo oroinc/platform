@@ -268,7 +268,19 @@ class OrmTotalsExtensionTest extends OrmTestCase
             );
         $qb->expects($this->atLeastOnce())
             ->method('andWhere')
-            ->with(new Func('id IN', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+            ->withConsecutive(
+                [new Func('id IN', ':ids0')],
+                [new Func('id IN', ':ids1')],
+                [new Func('id IN', ':ids2')]
+            )
+            ->willReturnSelf();
+        $qb->expects($this->atLeastOnce())
+            ->method('setParameter')
+            ->withConsecutive(
+                ['ids0', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]],
+                ['ids1', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]],
+                ['ids2', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]
+            )
             ->willReturnSelf();
         $qb->expects($this->atLeastOnce())
             ->method('resetDQLParts')
