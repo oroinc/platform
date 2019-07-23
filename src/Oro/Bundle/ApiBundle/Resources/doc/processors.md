@@ -46,7 +46,7 @@ class DoSomething implements ProcessorInterface
 
 ```yaml
 services:
-    acme.api.processor.do_something:
+    acme.api.do_something:
         class: Acme\Bundle\ProductBundle\Api\Processor\DoSomething
         tags:
             - { name: oro.api.processor, action: get, group: normalize_input, priority: 10 }
@@ -85,13 +85,13 @@ For example, a very simple condition which is used to filter processors by the a
 
 ```yaml
 services:
-    acme.api.processor.do_something:
+    acme.api.do_something:
         class: Acme\Bundle\ProductBundle\Api\Processor\DoSomething
         tags:
             - { name: oro.api.processor, action: get }
 ```
 
-In this case, the `acme.api.processor.do_something` is executed only in scope of the `get` action, for other actions this processor is skipped.
+In this case, the `acme.api.do_something` is executed only in scope of the `get` action, for other actions this processor is skipped.
 
 Conditions provide a simple way to specify which processors are required to accomplish a work. Pay attention that the dependency injection container does not load processors that does not fit the conditions. Use conditions to create the fast data API.
 

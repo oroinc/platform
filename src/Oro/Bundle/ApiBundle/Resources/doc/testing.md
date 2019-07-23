@@ -40,8 +40,10 @@ To simplify creation of the functional test for REST API resources that conform 
 | assertResponseNotEmpty | Asserts that the response data are not empty. |
 | assertResponseNotHasAttributes | Asserts the response content does not contain the given attributes. |
 | assertResponseNotHasRelationships | Asserts the response content does not contain the given relationships. |
-| assertResponseValidationError | Asserts that the response content contains the given validation error. |
-| assertResponseValidationErrors | Asserts that the response content contains the given validation errors. |
+| assertResponseValidationError | Asserts that the response content contains one validation error and it is the given error. |
+| assertResponseContainsValidationError | Asserts that the response content contains the given validation error. |
+| assertResponseValidationErrors | Asserts that the response content contains the given validation errors and only them. |
+| assertResponseContainsValidationErrors | Asserts that the response content contains the given validation errors. |
 | assertAllowResponseHeader | Asserts "Allow" response header equals to the expected value. |
 | assertMethodNotAllowedResponse | Asserts response status code equals to 405 (Method Not Allowed) and "Allow" response header equals to the expected value. |
 | dumpYmlTemplate | Saves a response content to a YAML file. If the first parameter is a file name, the file is saved into the `responses` directory next to the PHP file that contains the test. |
