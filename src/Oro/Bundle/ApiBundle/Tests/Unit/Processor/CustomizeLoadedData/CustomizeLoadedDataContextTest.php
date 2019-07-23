@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
 {
@@ -67,6 +68,33 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getConfig());
     }
 
+    public function testSharedData()
+    {
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+
+        $this->context->setSharedData($sharedData);
+        self::assertSame($sharedData, $this->context->getSharedData());
+    }
+
+    public function testGetNormalizationContext()
+    {
+        $action = 'test_action';
+        $version = '1.2';
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $this->context->setAction($action);
+        $this->context->setVersion($version);
+        $this->context->setSharedData($sharedData);
+        $this->context->getRequestType()->add('test_request_type');
+        $requestType = $this->context->getRequestType();
+
+        $normalizationContext = $this->context->getNormalizationContext();
+        self::assertCount(4, $normalizationContext);
+        self::assertSame($action, $normalizationContext['action']);
+        self::assertSame($version, $normalizationContext['version']);
+        self::assertSame($requestType, $normalizationContext['requestType']);
+        self::assertSame($sharedData, $normalizationContext['sharedData']);
+    }
+
     public function testIdentifierOnly()
     {
         self::assertFalse($this->context->isIdentifierOnly());
@@ -113,7 +141,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
 
     public function testGetResultFieldNameForComputedField()
     {
-        $fieldName = 'renamedTest';
+        $fieldName = 'test';
         $config = new EntityDefinitionConfig();
         $config->addField($fieldName)->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
         $this->context->setConfig($config);

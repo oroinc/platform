@@ -14,11 +14,15 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Oro\Component\ChainProcessor\ParameterBag;
 
 class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
     private $processorBag;
+
+    /** @var ParameterBag */
+    private $sharedData;
 
     /** @var LoadNormalizedIncludedEntities */
     private $processor;
@@ -26,6 +30,10 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
     protected function setUp()
     {
         parent::setUp();
+
+        $this->sharedData = new ParameterBag();
+        $this->sharedData->set('someKey', 'someSharedValue');
+        $this->context->setSharedData($this->sharedData);
 
         $this->processorBag = $this->createMock(ActionProcessorBagInterface::class);
 
@@ -81,6 +89,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext->setCorsRequest(false);
         $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedGetContext->setSharedData($this->sharedData);
         $expectedGetContext->setClassName($includedEntityClass);
         $expectedGetContext->setId($includedRealEntityId);
         $expectedGetContext->setResult($includedEntity);
@@ -161,6 +170,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext->setCorsRequest(false);
         $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedGetContext->setSharedData($this->sharedData);
         $expectedGetContext->setClassName($includedEntityClass);
         $expectedGetContext->setId($includedRealEntityId);
         $expectedGetContext->skipGroup('security_check');

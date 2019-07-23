@@ -63,14 +63,15 @@ class EntityHandler
     /**
      * Handles the given data.
      *
-     * @param mixed $data
+     * @param array $data
+     * @param array $context
      *
      * @return mixed
      */
-    public function __invoke($data)
+    public function __invoke(array $data, array $context)
     {
         if (null !== $this->previousHandler) {
-            $data = \call_user_func($this->previousHandler, $data);
+            $data = \call_user_func($this->previousHandler, $data, $context);
         }
 
         $customizationContext = $this->createCustomizationContext();
@@ -78,6 +79,7 @@ class EntityHandler
         $customizationContext->setIdentifierOnly(
             $this->isIdentifierOnly($customizationContext->getConfig())
         );
+        $customizationContext->setSharedData($context['sharedData']);
 
         /** @see \Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ProcessorBagCompilerPass */
         $group = $this->collection ? 'collection' : 'item';
