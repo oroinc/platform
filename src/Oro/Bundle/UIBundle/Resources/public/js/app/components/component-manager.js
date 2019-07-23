@@ -86,10 +86,12 @@ define([
                 }
                 e.preventDefault();
                 $(e.target).find('[data-bound-component]').each(function() {
-                    var component = self.findComponent(this);
-                    if (component) {
-                        component.dispose();
-                    }
+                    var el = this;
+                    _.each(self.components, function(item) {
+                        if (item.el === el) {
+                            item.component.dispose();
+                        }
+                    });
                 });
             });
         },
@@ -470,9 +472,9 @@ define([
                 component: component,
                 el: el
             };
-            component.once('dispose', _.bind(function() {
+            component.once('dispose', function() {
                 delete this.components[name];
-            }, this));
+            }.bind(this));
             return component;
         },
 
@@ -507,21 +509,6 @@ define([
             delete this.$el;
             this.disposed = true;
             return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
-        },
-
-        /**
-         * Find component related to the element
-         *
-         * @param {HTMLElement} el
-         * @returns {BaseComponent}
-         */
-        findComponent: function(el) {
-            var item = _.find(this.components, function(item) {
-                return item.el === el;
-            });
-            if (item) {
-                return item.component;
-            }
         },
 
         /**
