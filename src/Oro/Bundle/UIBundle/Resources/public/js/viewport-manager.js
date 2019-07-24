@@ -51,6 +51,8 @@ define([
                 isApplicable: _.bind(this.isApplicable, this)
             };
 
+            this._collectCSSBreakpoints();
+
             mediator.on('layout:reposition', _.debounce(this._onResize, 50), viewportManager);
         },
 
@@ -74,6 +76,64 @@ define([
             }, this);
 
             return isApplicable;
+        },
+
+        _collectCSSBreakpoints: function() {
+            this.computedStyle = getComputedStyle(document.documentElement);
+            var index = 0;
+            var property = this._getProperty(index);
+            var breakpointCollection = [];
+
+            while (property.length) {
+                property = this._getProperty(index);
+                if (property) {
+                    breakpointCollection.push(this._parseCSSBreakpoint(property));
+                }
+                index++;
+            }
+
+            console.log(breakpointCollection);
+        },
+
+        _parseCSSBreakpoint: function(value) {
+            var _result;
+            var regexpMax = /(max-width:\s)([(\d+)]*)/g;
+            var regexpMin = /(min-width:\s)([(\d+)]*)/g;
+
+            var splitValue = value.split('|');
+            var matchMax = regexpMax.exec(splitValue[1]);
+            var matchMin = regexpMin.exec(splitValue[1]);
+
+            _result = {
+                name: splitValue[0].trim()
+            };
+
+            console.log(matchMax)
+            if (matchMax && matchMax[2]) {
+                _result['max'] = parseInt(matchMax[2]);
+            }
+
+            if (matchMin && matchMin[2]) {
+                _result['min'] = parseInt(matchMin[2]);
+            }
+
+            return _result;
+        },
+
+        /**
+         * Get CSS property from concat name
+         *
+         * @param props
+         * @returns {string}
+         * @private
+         */
+        _getProperty: function(props) {
+            if (!_.isArray(props)) {
+                props = [props];
+            }
+
+            props.unshift('--breakpoints-');
+            return this.computedStyle.getPropertyValue(props.join(''));
         },
 
         _prepareScreenMaps: function() {
