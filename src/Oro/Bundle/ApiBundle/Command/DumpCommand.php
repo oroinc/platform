@@ -195,7 +195,9 @@ class DumpCommand extends AbstractDebugCommand
                 $result .= sprintf("\n  <comment>%s</comment>", $associationName);
                 $result .= "\n   Type: " . ConfigUtil::getAssociationTargetType($subresource->isCollection());
                 $result .= "\n   Target: " . $targetEntityType;
-                $result .= "\n   Acceptable Targets: " . implode(', ', $acceptableTargetEntityTypes);
+                if ($acceptableTargetEntityTypes) {
+                    $result .= "\n   Acceptable Targets: " . implode(', ', $acceptableTargetEntityTypes);
+                }
                 $subresourceExcludedActions = $subresource->getExcludedActions();
                 if (!empty($subresourceExcludedActions)) {
                     $result .= "\n   Excluded Actions: " . implode(', ', $subresourceExcludedActions);

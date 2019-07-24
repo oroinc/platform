@@ -8,7 +8,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 
 /**
- * CumulativeResource represents a resource which can be located in any bundle
+ * Represents a resource which can be located in any bundle
  * and does not required any special registration in a bundle.
  */
 class CumulativeResource implements ResourceInterface, \Serializable, SelfCheckingResourceInterface
@@ -61,12 +61,11 @@ class CumulativeResource implements ResourceInterface, \Serializable, SelfChecki
             $this->isFreshTimestamp = $timestamp;
             $this->isFresh = true;
 
-            $bundles = CumulativeResourceManager::getInstance()->getBundles();
-            $appRootDir = CumulativeResourceManager::getInstance()->getAppRootDir();
+            $manager = CumulativeResourceManager::getInstance();
+            $bundles = $manager->getBundles();
             foreach ($bundles as $bundleName => $bundleClass) {
-                $bundleDir = $this->getBundleDir($bundleClass);
-                $bundleAppDir = $this->getBundleAppDir($bundleName, $appRootDir);
-
+                $bundleDir = $manager->getBundleDir($bundleClass);
+                $bundleAppDir = $manager->getBundleAppDir($bundleName);
                 /** @var CumulativeResourceLoader $loader */
                 foreach ($this->resourceLoaders as $loader) {
                     if (!$loader->isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, $this, $timestamp)) {
@@ -143,30 +142,5 @@ class CumulativeResource implements ResourceInterface, \Serializable, SelfChecki
     public function unserialize($serialized)
     {
         list($this->resource, $this->found, $this->resourceLoaders) = unserialize($serialized);
-    }
-
-    /**
-     * @param string $bundleClass
-     *
-     * @return string
-     */
-    private function getBundleDir(string $bundleClass): string
-    {
-        $reflection = new \ReflectionClass($bundleClass);
-
-        return dirname($reflection->getFileName());
-    }
-
-    /**
-     * @param string      $bundleName
-     * @param string|null $appRootDir
-     *
-     * @return string
-     */
-    private function getBundleAppDir(string $bundleName, ?string $appRootDir): string
-    {
-        return $appRootDir && is_dir($appRootDir)
-            ? $appRootDir . '/Resources/' . $bundleName
-            : '';
     }
 }

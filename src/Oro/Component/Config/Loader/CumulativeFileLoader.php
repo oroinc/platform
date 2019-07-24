@@ -4,6 +4,7 @@ namespace Oro\Component\Config\Loader;
 
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
+use Oro\Component\Config\CumulativeResourceManager;
 
 /**
  * The base class for classes responsible to load resources from different kind of files, e.g. from YAML files.
@@ -142,7 +143,7 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
      */
     protected function getBundleAppResourcePath($bundleAppDir)
     {
-        if (is_dir($bundleAppDir)) {
+        if (CumulativeResourceManager::getInstance()->isDir($bundleAppDir)) {
             $path = $this->normalizeBundleAppDir($bundleAppDir);
             if (is_file($path)) {
                 return realpath($path);
@@ -190,7 +191,7 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
      */
     public function isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource, $timestamp)
     {
-        if (is_dir($bundleAppDir)) {
+        if (CumulativeResourceManager::getInstance()->isDir($bundleAppDir)) {
             $path = $this->normalizeBundleAppDir($bundleAppDir);
             if ($resource->isFound($bundleClass, $path)) {
                 // check exists and removed resource
