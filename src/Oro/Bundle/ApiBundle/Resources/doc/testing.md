@@ -8,10 +8,11 @@
    - [YAML Templates for a Request Body](#yaml-templates-for-a-request-body)
    - [Process Single Reference](#process-single-reference)
    - [Dump the Response into a YAML Template](#dump-the-response-into-a-yaml-template)
+   - [Base Test Cases for Unit Tests](#base-test-cases-for-unit-tests)
 
 ## Overview
 
-To ensure that your REST API resources work properly, cover them by [functional tests](https://oroinc.com/doc/orocrm/current/book/functional-tests). 
+To ensure that your REST API resources work properly, cover them with [functional tests](https://oroinc.com/orocrm/doc/current/dev-guide/functional-tests). 
 
 To simplify creation of the functional test for REST API resources that conform [JSON.API specification](http://jsonapi.org/format/), the [RestJsonApiTestCase](../../Tests/Functional/RestJsonApiTestCase.php) test case was created. The following table contains the list of the most useful methods of this class:
 
@@ -39,8 +40,10 @@ To simplify creation of the functional test for REST API resources that conform 
 | assertResponseNotEmpty | Asserts that the response data are not empty. |
 | assertResponseNotHasAttributes | Asserts the response content does not contain the given attributes. |
 | assertResponseNotHasRelationships | Asserts the response content does not contain the given relationships. |
-| assertResponseValidationError | Asserts that the response content contains the given validation error. |
-| assertResponseValidationErrors | Asserts that the response content contains the given validation errors. |
+| assertResponseValidationError | Asserts that the response content contains one validation error and it is the given error. |
+| assertResponseContainsValidationError | Asserts that the response content contains the given validation error. |
+| assertResponseValidationErrors | Asserts that the response content contains the given validation errors and only them. |
+| assertResponseContainsValidationErrors | Asserts that the response content contains the given validation errors. |
 | assertAllowResponseHeader | Asserts "Allow" response header equals to the expected value. |
 | assertMethodNotAllowedResponse | Asserts response status code equals to 405 (Method Not Allowed) and "Allow" response header equals to the expected value. |
 | dumpYmlTemplate | Saves a response content to a YAML file. If the first parameter is a file name, the file is saved into the `responses` directory next to the PHP file that contains the test. |
@@ -220,3 +223,28 @@ public function testGetList()
 
 **Important:** Do not forget to check references after you dump a response for the first time: there can be collisions
 if references have the same IDs.
+
+
+## Base Test Cases for Unit Tests
+
+To simplify [unit testing](http://softwaretestingfundamentals.com/unit-testing/) of [API processors](./processors.md),
+one of the following base classes can be used:
+
+| Class | Action |
+| --- | --- |
+| [GetProcessorTestCase](../../Tests/Unit/Processor/Get/GetProcessorTestCase.php) | [get](./actions.md#get-action) |
+| [GetProcessorOrmRelatedTestCase](../../Tests/Unit/Processor/Get/GetProcessorOrmRelatedTestCase.php) | [get](./actions.md#get-action) |
+| [GetListProcessorTestCase](../../Tests/Unit/Processor/GetList/GetListProcessorTestCase.php) | [get_list](./actions.md#get_list-action) |
+| [GetListProcessorOrmRelatedTestCase](../../Tests/Unit/Processor/GetList/GetListProcessorOrmRelatedTestCase.php) | [get_list](./actions.md#get_list-action) |
+| [CreateProcessorTestCase](../../Tests/Unit/Processor/Create/CreateProcessorTestCase.php) | [create](./actions.md#create-action) |
+| [UpdateProcessorTestCase](../../Tests/Unit/Processor/Update/UpdateProcessorTestCase.php) | [update](./actions.md#update-action) |
+| [FormProcessorTestCase](../../Tests/Unit/Processor/FormProcessorTestCase.php) | [create](./actions.md#create-action), [update](./actions.md#update-action) |
+| [DeleteProcessorTestCase](../../Tests/Unit/Processor/Delete/DeleteProcessorTestCase.php) | [delete](./actions.md#delete-action) |
+| [DeleteListProcessorTestCase](../../Tests/Unit/Processor/DeleteList/DeleteListProcessorTestCase.php) | [delete_list](./actions.md#delete_list-action) |
+| [GetSubresourceProcessorTestCase](../../Tests/Unit/Processor/Subresource/GetSubresourceProcessorTestCase.php) | [get_subresource](./actions.md#get_subresource-action), [get_relationship](./actions.md#get_relationship-action) |
+| [GetSubresourceProcessorOrmRelatedTestCase](../../Tests/Unit/Processor/Subresource/GetSubresourceProcessorOrmRelatedTestCase.php) | [get_subresource](./actions.md#get_subresource-action), [get_relationship](./actions.md#get_relationship-action) |
+| [ChangeSubresourceProcessorTestCase](../../Tests/Unit/Processor/Subresource/ChangeSubresourceProcessorTestCase.php) | [update_subresource](./actions.md#update_subresource-action), [add_subresource](./actions.md#add_subresource-action), [delete_subresource](./actions.md#delete_subresource-action) |
+| [ChangeRelationshipProcessorTestCase](../../Tests/Unit/Processor/Subresource/ChangeRelationshipProcessorTestCase.php) | [update_relationship](./actions.md#update_relationship-action), [add_relationship](./actions.md#add_relationship-action), [delete_relationship](./actions.md#delete_relationship-action) |
+| [OptionsProcessorTestCase](../../Tests/Unit/Processor/Options/OptionsProcessorTestCase.php) | [options](./actions.md#options-action) |
+| [ConfigProcessorTestCase](../../Tests/Unit/Processor/Config/ConfigProcessorTestCase.php) | [get_config](./actions.md#get_config-action), [get_relation_config](./actions.md#get_relation_config-action) |
+| [MetadataProcessorTestCase](../../Tests/Unit/Processor/GetMetadata/MetadataProcessorTestCase.php) | [get_metadata](./actions.md#get_metadata-action) |

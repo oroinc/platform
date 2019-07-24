@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Expression\Lexer;
 use Oro\Bundle\SearchBundle\Query\Expression\Parser as ExpressionParser;
 use Oro\Bundle\SearchBundle\Query\Mode;
@@ -11,7 +12,7 @@ use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
 
 /**
- * Search index accesser class.
+ * Search index accessor class.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -110,54 +111,61 @@ class Indexer
     }
 
     /**
-     * @param  string  $searchString
-     * @param  integer $offset
-     * @param  integer $maxResults
-     * @param  string  $from
-     * @param  integer $page
+     * @param string|null          $searchString
+     * @param int|null             $offset
+     * @param int|null             $maxResults
+     * @param string|string[]|null $from
+     * @param int|null             $page
      *
      * @return Query
      */
-    public function getSimpleSearchQuery($searchString, $offset = 0, $maxResults = 0, $from = null, $page = 0)
-    {
+    public function getSimpleSearchQuery(
+        ?string $searchString,
+        ?int $offset = 0,
+        ?int $maxResults = 0,
+        $from = null,
+        ?int $page = 0
+    ): Query {
+        $query = $this->select();
+        $criteria = $query->getCriteria();
+
+        $query->from($from ?: '*');
+
         $searchString = trim($searchString);
-        $query        = $this->select();
-
-        if ($from) {
-            $query->from($from);
-        } else {
-            $query->from('*');
-        }
-
         if ($searchString) {
-            $query->andWhere(self::TEXT_ALL_DATA_FIELD, Query::OPERATOR_CONTAINS, $searchString, Query::TYPE_TEXT);
+            $criteria->where(Criteria::expr()->contains(
+                Criteria::implodeFieldTypeName(Query::TYPE_TEXT, self::TEXT_ALL_DATA_FIELD),
+                $searchString
+            ));
         }
 
-        if ($maxResults > 0) {
-            $query->setMaxResults($maxResults);
-        } else {
-            $query->setMaxResults(Query::INFINITY);
-        }
-
+        $criteria->setMaxResults($maxResults > 0 ? $maxResults : Query::INFINITY);
         if ($page > 0) {
-            $query->setFirstResult($maxResults * ($page - 1));
-        } elseif ($offset > 0) {
-            $query->setFirstResult($offset);
+            $offset = $maxResults * ($page - 1);
+        }
+        if ($offset > 0) {
+            $criteria->setFirstResult($offset);
         }
 
         return $query;
     }
 
     /**
-     * @param  string  $searchString
-     * @param  integer $offset
-     * @param  integer $maxResults
-     * @param  string  $from
-     * @param  integer $page
+     * @param string|null          $searchString
+     * @param int|null             $offset
+     * @param int|null             $maxResults
+     * @param string|string[]|null $from
+     * @param int|null             $page
+     *
      * @return Result
      */
-    public function simpleSearch($searchString, $offset = 0, $maxResults = 0, $from = null, $page = 0)
-    {
+    public function simpleSearch(
+        ?string $searchString,
+        ?int $offset = 0,
+        ?int $maxResults = 0,
+        $from = null,
+        ?int $page = 0
+    ): Result {
         $query = $this->getSimpleSearchQuery($searchString, $offset, $maxResults, $from, $page);
 
         return $this->query($query);

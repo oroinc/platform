@@ -51,7 +51,8 @@ class EnabledLocalizationsSearchHandler extends SearchHandler
         }
 
         $queryBuilder = $this->entityRepository->createQueryBuilder('l');
-        $queryBuilder->where($queryBuilder->expr()->in('l.' . $this->idFieldName, $entityIds));
+        $queryBuilder->where($queryBuilder->expr()->in('l.' . $this->idFieldName, ':entityIds'));
+        $queryBuilder->setParameter('entityIds', $entityIds);
         $query = $this->aclHelper->apply($queryBuilder, 'VIEW');
 
         return $query->getResult();

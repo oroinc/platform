@@ -115,26 +115,27 @@ class FormUtil
      */
     public static function findFormFieldByPropertyPath(FormInterface $form, string $propertyPath): ?FormInterface
     {
-        $foundField = null;
-        $fieldsWithoutPropertyPath = [];
-        /** @var FormInterface $field */
-        foreach ($form as $field) {
-            $fieldPropertyPath = $field->getPropertyPath();
-            if (null !== $fieldPropertyPath && (string)$fieldPropertyPath === $propertyPath) {
-                $foundField = $field;
-                break;
-            }
-        }
-        if (null === $foundField) {
-            foreach ($fieldsWithoutPropertyPath as $field) {
-                if ($field->getName() === $propertyPath) {
-                    $foundField = $field;
-                    break;
-                }
+        if ($form->has($propertyPath)) {
+            $child = $form->get($propertyPath);
+            $childPropertyPath = $child->getPropertyPath();
+            if (null === $childPropertyPath || (string)$childPropertyPath === $propertyPath) {
+                return $child;
             }
         }
 
-        return $foundField;
+        /** @var FormInterface $child */
+        foreach ($form as $child) {
+            $childPropertyPath = $child->getPropertyPath();
+            if (null === $childPropertyPath) {
+                if ($child->getName() === $propertyPath) {
+                    return $child;
+                }
+            } elseif ((string)$childPropertyPath === $propertyPath) {
+                return $child;
+            }
+        }
+
+        return null;
     }
 
     /**

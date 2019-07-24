@@ -99,6 +99,9 @@ class Context extends NormalizeResultContext implements ContextInterface
     /** @var array|null */
     private $infoRecords;
 
+    /** @var ParameterBagInterface|null */
+    private $sharedData;
+
     /**
      * @param ConfigProvider   $configProvider
      * @param MetadataProvider $metadataProvider
@@ -305,6 +308,41 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getSharedData(): ParameterBagInterface
+    {
+        if (null === $this->sharedData) {
+            $this->sharedData = new ParameterBag();
+        }
+
+        return $this->sharedData;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setSharedData(ParameterBagInterface $sharedData): void
+    {
+        $this->sharedData = $sharedData;
+    }
+
+    /**
+     * Gets a context for response data normalization.
+     *
+     * @return array
+     */
+    public function getNormalizationContext(): array
+    {
+        return [
+            self::ACTION       => $this->getAction(),
+            self::VERSION      => $this->getVersion(),
+            self::REQUEST_TYPE => $this->getRequestType(),
+            'sharedData'       => $this->getSharedData()
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getInfoRecords(): ?array
     {
         return $this->infoRecords;
@@ -316,6 +354,14 @@ class Context extends NormalizeResultContext implements ContextInterface
     public function setInfoRecords(?array $infoRecords): void
     {
         $this->infoRecords = $infoRecords;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addInfoRecord(string $key, $value): void
+    {
+        $this->infoRecords[$key] = $value;
     }
 
     /**

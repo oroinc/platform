@@ -8,6 +8,9 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Provides workflow related reusable query helper methods.
+ */
 trait WorkflowQueryTrait
 {
     /**
@@ -15,7 +18,7 @@ trait WorkflowQueryTrait
      * @param string $workflowItemAlias
      * @return QueryBuilder
      */
-    public function joinWorkflowItem(QueryBuilder $queryBuilder, $workflowItemAlias = 'workflowItem')
+    public function joinWorkflowItem(QueryBuilder $queryBuilder, $workflowItemAlias = 'workflowItem'): QueryBuilder
     {
         QueryBuilderUtil::checkIdentifier($workflowItemAlias);
         $queryBuilder->leftJoin(

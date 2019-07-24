@@ -86,10 +86,12 @@ define([
                 }
                 e.preventDefault();
                 $(e.target).find('[data-bound-component]').each(function() {
-                    var component = self.findComponent(this);
-                    if (component) {
-                        component.dispose();
-                    }
+                    var el = this;
+                    _.each(self.components, function(item) {
+                        if (item.el === el) {
+                            item.component.dispose();
+                        }
+                    });
                 });
             });
         },
@@ -104,7 +106,7 @@ define([
             var elements = [];
             var self = this;
 
-            var shortcuts = ComponentShortcutsManager.getAll();
+            var shortcuts = Object.values(ComponentShortcutsManager.getAll());
             var selector = _.map(shortcuts, function(shortcut) {
                 return '[' + shortcut.dataAttr + ']';
             });
@@ -116,25 +118,19 @@ define([
                 }
 
                 var elemData = $elem.data();
-                _.each(shortcuts, function(shortcut) {
-                    var dataKey = shortcut.dataKey;
-                    var dataAttr = shortcut.dataAttr;
-                    if (elemData[dataKey] === undefined) {
-                        return;
-                    }
-
-                    var data = ComponentShortcutsManager.getComponentData(shortcut, elemData[dataKey]);
-                    data.pageComponentOptions = $.extend(
-                        true,
-                        data.pageComponentOptions,
-                        $elem.data('pageComponentOptions')
-                    );
-                    $elem.removeAttr(dataAttr)
-                        .removeData(dataKey)
-                        .data(data);
-
-                    elements.push($elem);
+                var shortcut = _.find(shortcuts, function(shortcut) {
+                    return shortcut.dataKey in elemData;
                 });
+
+                if (shortcut) {
+                    var dataUpdate = ComponentShortcutsManager.getComponentData(shortcut, elemData);
+                    $elem
+                        .removeAttr(shortcut.dataAttr)
+                        .removeData(shortcut.dataKey)
+                        .data(dataUpdate);
+                }
+
+                elements.push($elem);
             });
 
             return elements;
@@ -476,9 +472,9 @@ define([
                 component: component,
                 el: el
             };
-            component.once('dispose', _.bind(function() {
+            component.once('dispose', function() {
                 delete this.components[name];
-            }, this));
+            }.bind(this));
             return component;
         },
 
@@ -513,21 +509,6 @@ define([
             delete this.$el;
             this.disposed = true;
             return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
-        },
-
-        /**
-         * Find component related to the element
-         *
-         * @param {HTMLElement} el
-         * @returns {BaseComponent}
-         */
-        findComponent: function(el) {
-            var item = _.find(this.components, function(item) {
-                return item.el === el;
-            });
-            if (item) {
-                return item.component;
-            }
         },
 
         /**

@@ -339,7 +339,7 @@ class OrmTotalsExtension extends AbstractExtension
         } else {
             $data = $pageData->getData();
         }
-        foreach ($rootIdentifiers as $identifier) {
+        foreach ($rootIdentifiers as $idx => $identifier) {
             $ids = \array_column($data, $identifier['alias']);
 
             $field = isset($identifier['entityAlias'])
@@ -351,7 +351,8 @@ class OrmTotalsExtension extends AbstractExtension
                 continue;
             }
 
-            $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, $ids));
+            $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, ':ids' . $idx));
+            $dataQueryBuilder->setParameter('ids' . $idx, $ids);
         }
     }
 

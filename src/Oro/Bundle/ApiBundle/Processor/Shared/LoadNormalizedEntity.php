@@ -79,6 +79,7 @@ class LoadNormalizedEntity implements ProcessorInterface
         $getContext->setVersion($context->getVersion());
         $getContext->getRequestType()->set($context->getRequestType());
         $getContext->setRequestHeaders($context->getRequestHeaders());
+        $getContext->setSharedData($context->getSharedData());
         $getContext->setHateoas($context->isHateoasEnabled());
         $getContext->setClassName($context->getClassName());
         $getContext->setId($context->getId());

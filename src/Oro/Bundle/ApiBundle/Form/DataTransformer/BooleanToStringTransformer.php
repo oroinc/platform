@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * Transforms a value between a boolean and a string.
+ */
 class BooleanToStringTransformer implements DataTransformerInterface
 {
     /**

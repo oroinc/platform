@@ -145,6 +145,9 @@ oro_api:
         searchQuery:
             factory: ['@oro_api.filter_factory.search_query', 'createFilter']
             supported_operators: ['=']
+        searchAggregation:
+            factory: ['@oro_api.filter_factory.search_aggregation', 'createFilter']
+            supported_operators: ['=']
 
     form_types:
         - Symfony\Component\Form\Extension\Core\Type\FormType

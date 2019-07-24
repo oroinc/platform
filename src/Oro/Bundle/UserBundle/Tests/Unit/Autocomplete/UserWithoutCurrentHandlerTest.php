@@ -104,7 +104,7 @@ class UserWithoutCurrentHandlerTest extends \PHPUnit\Framework\TestCase
         $expr = $this->createMock('Doctrine\ORM\Query\Expr');
         $expr->expects($this->once())
             ->method('in')
-            ->with($this->isType('string'), $expectedUsers);
+            ->with($this->isType('string'), ':entityIds');
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -112,6 +112,9 @@ class UserWithoutCurrentHandlerTest extends \PHPUnit\Framework\TestCase
         $queryBuilder->expects($this->once())
             ->method('expr')
             ->will($this->returnValue($expr));
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('entityIds', $expectedUsers);
 
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()

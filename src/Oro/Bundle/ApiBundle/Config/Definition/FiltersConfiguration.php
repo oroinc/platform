@@ -82,11 +82,6 @@ class FiltersConfiguration extends AbstractConfigurationSection
             ->scalarNode(ConfigUtil::DESCRIPTION)->cannotBeEmpty()->end()
             ->scalarNode(ConfigUtil::PROPERTY_PATH)->cannotBeEmpty()->end()
             ->scalarNode(ConfigUtil::FILTER_TYPE)->cannotBeEmpty()->end()
-            ->arrayNode(ConfigUtil::FILTER_OPTIONS)
-                ->useAttributeAsKey('')
-                ->performNoDeepMerging()
-                ->prototype('variable')->end()
-            ->end()
             ->arrayNode(ConfigUtil::FILTER_OPERATORS)
                 ->validate()
                     ->always(function ($value) {
@@ -101,12 +96,19 @@ class FiltersConfiguration extends AbstractConfigurationSection
                         return $value;
                     })
                 ->end()
+                ->performNoDeepMerging()
                 ->prototype('scalar')->end()
             ->end()
             ->scalarNode(ConfigUtil::DATA_TYPE)->cannotBeEmpty()->end()
             ->booleanNode(ConfigUtil::COLLECTION)->end()
             ->booleanNode(ConfigUtil::ALLOW_ARRAY)->end()
             ->booleanNode(ConfigUtil::ALLOW_RANGE)->end();
+
+        $filterOptionsNode = $node
+            ->arrayNode(ConfigUtil::FILTER_OPTIONS)
+                ->useAttributeAsKey('');
+        $filterOptionsNode->setBuilder(new VariableOrArrayTreeBuilder());
+        $filterOptionsNode->prototype('variable_or_array');
     }
 
     /**

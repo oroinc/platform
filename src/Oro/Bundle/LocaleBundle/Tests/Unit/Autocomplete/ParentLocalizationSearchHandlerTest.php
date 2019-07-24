@@ -214,11 +214,15 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
         $query->expects($this->once())->method('getResult')->will($this->returnValue($resultData));
 
         $expr = $this->createMock(Expr::class);
-        $expr->expects($this->once())->method('in')->with('e.id', $expectedIds)->willReturnSelf();
+        $expr->expects($this->once())->method('in')->with('e.id', ':entityIds')->willReturnSelf();
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->expects($this->once())->method('expr')->willReturn($expr);
         $queryBuilder->expects($this->once())->method('where')->with($expr)->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('entityIds', $expectedIds)
+            ->willReturnSelf();
         $queryBuilder->expects($this->once())->method('getQuery')->willReturn($query);
 
         $this->entityRepository->expects($this->any())->method('createQueryBuilder')->willReturn($queryBuilder);

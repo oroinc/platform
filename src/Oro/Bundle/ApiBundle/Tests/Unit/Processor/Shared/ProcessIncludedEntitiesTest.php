@@ -15,6 +15,7 @@ use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Oro\Component\ChainProcessor\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProcessIncludedEntitiesTest extends FormProcessorTestCase
@@ -25,12 +26,19 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ErrorCompleterInterface */
     private $errorCompleter;
 
+    /** @var ParameterBag */
+    private $sharedData;
+
     /** @var ProcessIncludedEntities */
     private $processor;
 
     protected function setUp()
     {
         parent::setUp();
+
+        $this->sharedData = new ParameterBag();
+        $this->sharedData->set('someKey', 'someSharedValue');
+        $this->context->setSharedData($this->sharedData);
 
         $this->processorBag = $this->createMock(ActionProcessorBagInterface::class);
         $this->errorCompleter = $this->createMock(ErrorCompleterInterface::class);
@@ -81,6 +89,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setMasterRequest(false);
         $expectedContext->setCorsRequest(false);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedContext->setSharedData($this->sharedData);
         $expectedContext->setIncludedEntities($includedEntities);
         $expectedContext->setClassName('Test\Class');
         $expectedContext->setId('id');
@@ -140,6 +149,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedContext->setSharedData($this->sharedData);
         $expectedContext->setIncludedEntities($includedEntities);
         $expectedContext->setClassName('Test\Class');
         $expectedContext->setId('id');
@@ -206,6 +216,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedContext->setSharedData($this->sharedData);
         $expectedContext->setIncludedEntities($includedEntities);
         $expectedContext->setClassName('Test\Class');
         $expectedContext->setId('id');
@@ -269,6 +280,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setMasterRequest(false);
         $expectedContext->setCorsRequest(false);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedContext->setSharedData($this->sharedData);
         $expectedContext->setIncludedEntities($includedEntities);
         $expectedContext->setClassName('Test\Class');
         $expectedContext->setId('id');
@@ -328,6 +340,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedContext->setSharedData($this->sharedData);
         $expectedContext->setIncludedEntities($includedEntities);
         $expectedContext->setClassName('Test\Class');
         $expectedContext->setId('id');

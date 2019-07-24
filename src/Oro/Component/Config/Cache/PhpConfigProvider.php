@@ -38,6 +38,9 @@ abstract class PhpConfigProvider implements
      */
     private $cacheTimestamp = false;
 
+    /** @var bool|null */
+    private $cacheFresh;
+
     /** @var mixed|null */
     private $config;
 
@@ -61,11 +64,15 @@ abstract class PhpConfigProvider implements
         }
 
         $cacheTimestamp = $this->getCacheTimestamp();
+        if (null === $cacheTimestamp || $cacheTimestamp > $timestamp) {
+            return false;
+        }
 
-        return
-            null !== $cacheTimestamp
-            && $cacheTimestamp <= $timestamp
-            && $this->getConfigCache()->isFresh();
+        if (null === $this->cacheFresh) {
+            $this->cacheFresh = $this->getConfigCache()->isFresh();
+        }
+
+        return $this->cacheFresh;
     }
 
     /**
@@ -85,6 +92,7 @@ abstract class PhpConfigProvider implements
                 }
             }
             $this->cacheTimestamp = $cacheTimestamp;
+            $this->cacheFresh = null;
         }
 
         return $this->cacheTimestamp;
@@ -97,6 +105,7 @@ abstract class PhpConfigProvider implements
     {
         $this->config = null;
         $this->cacheTimestamp = false;
+        $this->cacheFresh = null;
         if (\is_file($this->cacheFile)) {
             $fs = new Filesystem();
             $fs->remove($this->cacheFile);
@@ -126,6 +135,7 @@ abstract class PhpConfigProvider implements
                 $config = $this->doLoadConfig($resourcesContainer);
                 $this->getCacheAccessor()->save($cache, $config, $resourcesContainer->getResources());
                 $this->cacheTimestamp = false;
+                $this->cacheFresh = null;
 
                 if ($overrideExistingCacheFile) {
                     \clearstatcache(false, $cache->getPath());

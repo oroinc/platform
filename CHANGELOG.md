@@ -11,6 +11,23 @@ The current file describes significant changes in the code that may affect the u
   e.g. "GET /api/countries/{id}/relationships/regions". If you need filtered or sorted data, use sub-resources
   instead of relationships, e.g. "GET /api/countries/{id}/regions".
 
+#### SearchBundle
+* The following deprecated methods were removed from `Oro\Bundle\SearchBundle\Query\Query`:
+    - andWhere
+    - orWhere
+    - where
+    - getOptions
+    - setMaxResults
+    - getMaxResults
+    - setFirstResult
+    - getFirstResult
+    - setOrderBy
+    - getOrderBy
+    - getOrderType
+    - getOrderDirection
+* The deprecated trait `Oro\Bundle\SearchBundle\EventListener\IndexationListenerTrait` was removed.
+* The deprecated trait `Oro\Bundle\SearchBundle\Engine\Orm\DBALPersisterDriverTrait` was removed.
+
 ## 4.0.0-rc (2019-05-29)
 [Show detailed list of changes](incompatibilities-4-0-rc.md)
 

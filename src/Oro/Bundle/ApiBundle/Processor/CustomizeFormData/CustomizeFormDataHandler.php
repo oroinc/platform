@@ -71,6 +71,7 @@ class CustomizeFormDataHandler
         $formContext = $rootFormConfig->getAttribute(self::API_CONTEXT);
         $context->setVersion($formContext->getVersion());
         $context->getRequestType()->set($formContext->getRequestType());
+        $context->setSharedData($formContext->getSharedData());
         $context->setClassName($form->getConfig()->getDataClass());
         $context->setParentAction($formContext->getAction());
         $context->setForm($form);

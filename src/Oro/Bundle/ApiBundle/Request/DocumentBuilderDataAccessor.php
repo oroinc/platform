@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface;
 
 /**
  * The accessor to a data of a building document.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class DocumentBuilderDataAccessor implements DataAccessorInterface
 {
@@ -43,6 +45,16 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
     public function setMetadata(array $metadata): void
     {
         $this->metadata = $metadata;
+    }
+
+    /**
+     * Gets metadata that are linked to data.
+     *
+     * @return array $metadata [data item path => [key => value, ...], ...]
+     */
+    public function getMetadata(): array
+    {
+        return $this->metadata;
     }
 
     /**

@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler\EntityHandler;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
+use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 {
@@ -586,7 +587,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
             $rootHandler = $configObject->{$getter}();
             self::assertEquals(
                 $processedDataItem,
-                $rootHandler($sourceDataItem)
+                $rootHandler($sourceDataItem, ['sharedData' => $this->createMock(ParameterBagInterface::class)])
             );
         };
     }
@@ -638,7 +639,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
             $childHandler = $childConfigObject->{$getter}();
             self::assertEquals(
                 $processedDataItem,
-                $childHandler($sourceDataItem)
+                $childHandler($sourceDataItem, ['sharedData' => $this->createMock(ParameterBagInterface::class)])
             );
         };
     }

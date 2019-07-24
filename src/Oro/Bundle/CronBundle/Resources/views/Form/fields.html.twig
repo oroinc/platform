@@ -15,7 +15,7 @@
         <td>{{ form_widget(form.activeAt) }}</td>
         <td>{{ form_widget(form.deactivateAt) }}</td>
         <td>
-            <button type="button" class="removeRow btn btn-icon btn-square-lighter"><span class="fa-close"></span></button>
+            <button type="button" class="removeRow btn btn-icon btn-square-lighter" aria-label="{{ 'Remove row'|trans }}"><span class="fa-trash-o" aria-hidden="true"></span></button>
         </td>
     </tr>
     <tr {% if not hasErrors %}style="display: none"{% endif %} class="schedule-interval__error-row" data-role="schedule-interval-row-error">

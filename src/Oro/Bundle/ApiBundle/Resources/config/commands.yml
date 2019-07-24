@@ -29,8 +29,8 @@ services:
         arguments:
             - '@oro_api.value_normalizer'
             - '@oro_api.resources_provider'
-            - '@doctrine'
             - '@oro_api.subresources_provider'
+            - '@doctrine'
         tags:
             - { name: console.command }
 

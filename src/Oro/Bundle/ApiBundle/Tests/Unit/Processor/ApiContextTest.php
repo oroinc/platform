@@ -55,23 +55,4 @@ class ApiContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->isProcessed('test'));
         self::assertTrue($this->context->isProcessed('another'));
     }
-
-    public function testGetNormalizationContext()
-    {
-        $action = 'test_action';
-        $version = '1.2';
-        $this->context->setAction($action);
-        $this->context->setVersion($version);
-        $this->context->getRequestType()->add('test_request_type');
-        $requestType = $this->context->getRequestType();
-
-        self::assertSame(
-            [
-                ApiContext::ACTION       => $action,
-                ApiContext::VERSION      => $version,
-                ApiContext::REQUEST_TYPE => $requestType
-            ],
-            $this->context->getNormalizationContext()
-        );
-    }
 }

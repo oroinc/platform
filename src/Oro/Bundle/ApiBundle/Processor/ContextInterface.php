@@ -196,7 +196,25 @@ interface ContextInterface extends ComponentContextInterface
     public function setHateoas(bool $flag);
 
     /**
-     * Gets a list of records contains an additional information about collections
+     * Gets an object that is used to share data between a primary action
+     * and actions that are executed as part of this action.
+     * Also, this object can be used to share data between different kind of child actions.
+     *
+     * @return ParameterBagInterface
+     */
+    public function getSharedData(): ParameterBagInterface;
+
+    /**
+     * Sets an object that is used to share data between a primary action
+     * and actions that are executed as part of this action.
+     * Also, this object can be used to share data between different kind of child actions.
+     *
+     * @param ParameterBagInterface $sharedData
+     */
+    public function setSharedData(ParameterBagInterface $sharedData): void;
+
+    /**
+     * Gets a list of records contains an additional information about collections,
      * e.g. "has_more" flag in such record indicates whether a collection has more records than it was requested.
      *
      * @return array|null [property path => info record, ...]
@@ -204,12 +222,25 @@ interface ContextInterface extends ComponentContextInterface
     public function getInfoRecords(): ?array;
 
     /**
-     * Sets a list of records contains an additional information about collections
+     * Sets a list of records contains an additional information about collections,
      * e.g. "has_more" flag in such record indicates whether a collection has more records than it was requested.
+     *
+     * Important: do not use array_merge() function to merge existing records with new ones
+     * because the array of records can contain an element with empty string as the key
+     * and it will be lost by array_merge() function.
+     * Use addInfoRecord() method to add new records instead.
      *
      * @param array|null $infoRecords [property path => info record, ...]
      */
     public function setInfoRecords(?array $infoRecords): void;
+
+    /**
+     * Adds a record that contains an additional information about collections.
+     *
+     * @param string $key
+     * @param mixed  $value
+     */
+    public function addInfoRecord(string $key, $value): void;
 
     /**
      * Checks whether a query is used to get result data exists.
