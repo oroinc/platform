@@ -27,3 +27,9 @@ services:
             - '@oro_api.metadata_provider'
         tags:
             - { name: oro.api.processor, action: collect_subresources, priority: -10 }
+
+    oro_api.collect_subresources.remove_not_available_subresources:
+        class: Oro\Bundle\ApiBundle\Processor\CollectSubresources\RemoveNotAvailableSubresources
+        tags:
+            - { name: oro.api.processor, action: collect_subresources, priority: -50 }
+
