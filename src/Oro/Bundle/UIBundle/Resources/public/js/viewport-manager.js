@@ -1,18 +1,22 @@
-define([
-    'module',
-    'oroui/js/mediator',
-    'jquery',
-    'underscore',
-    'oroui/js/error'
-], function(module, mediator, $, _, error) {
+define(function(require) {
     'use strict';
+
+    var module = require('module');
+    var mediator = require('oroui/js/mediator');
+    var _ = require('underscore');
+    var error = require('oroui/js/error');
 
     var viewportManager;
 
+    /**
+     * @default
+     * Default values with breakpoints
+     * @type {*[]}
+     */
     var screenMap = [
         {
             name: 'desktop',
-            max: Infinity
+            min: 1100
         },
         {
             name: 'tablet',
@@ -37,12 +41,28 @@ define([
             screenMap: screenMap
         },
 
+        /**
+         * @property {Object}
+         */
         screenByTypes: {},
 
+        /**
+         * @property {Object}
+         */
         viewport: null,
 
-        initialize: function() {
-            this.screenByTypes = this._prepareScreenMaps();
+        /**
+         * CSS variable prefix
+         * @property {String}
+         */
+        breakpointCSSVarPrefix: '--breakpoints-',
+
+        /**
+         * @inheritDoc
+         * @param options
+         */
+        initialize: function(options) {
+            this.screenByTypes = this._prepareScreenMaps(options.cssVariables || {});
 
             this.viewport = {
                 width: 0,
@@ -51,11 +71,13 @@ define([
                 isApplicable: _.bind(this.isApplicable, this)
             };
 
-            this._collectCSSBreakpoints();
-
             mediator.on('layout:reposition', _.debounce(this._onResize, 50), viewportManager);
         },
 
+        /**
+         * Get current viewport
+         * @returns {null}
+         */
         getViewport: function() {
             if (!this.viewport.type) {
                 this._calcViewport();
@@ -63,6 +85,24 @@ define([
             return this.viewport;
         },
 
+        /**
+         * Get breakpoints object or specific property by name
+         * @param name
+         * @returns {*}
+         */
+        getScreenType: function(name) {
+            if (_.isUndefined(name)) {
+                return this.screenByTypes;
+            }
+
+            return this._getScreenByTypes(name);
+        },
+
+        /**
+         * Check viewport obility
+         * @param testViewport
+         * @returns {boolean}
+         */
         isApplicable: function(testViewport) {
             this.getViewport();
             var checker;
@@ -78,95 +118,76 @@ define([
             return isApplicable;
         },
 
-        _collectCSSBreakpoints: function() {
-            this.computedStyle = getComputedStyle(document.documentElement);
-            var index = 0;
-            var property = this._getProperty(index);
-            var breakpointCollection = [];
-
-            while (property.length) {
-                property = this._getProperty(index);
-                if (property) {
-                    breakpointCollection.push(this._parseCSSBreakpoint(property));
-                }
-                index++;
-            }
-
-            console.log(breakpointCollection);
-        },
-
-        _parseCSSBreakpoint: function(value) {
-            var _result;
+        /**
+         * Collect and resolve CSS variables by breakpoint prefix
+         * @param cssVariables
+         * @returns {*}
+         * @private
+         */
+        _collectCSSBreakpoints: function(cssVariables) {
             var regexpMax = /(max-width:\s)([(\d+)]*)/g;
             var regexpMin = /(min-width:\s)([(\d+)]*)/g;
 
-            var splitValue = value.split('|');
-            var matchMax = regexpMax.exec(splitValue[1]);
-            var matchMin = regexpMin.exec(splitValue[1]);
+            return _.reduce(cssVariables, function(collection, cssVar, varName) {
+                if (new RegExp(this.breakpointCSSVarPrefix).test(varName)) {
+                    var _result;
 
-            _result = {
-                name: splitValue[0].trim()
-            };
+                    var matchMax = cssVar.match(regexpMax);
+                    var matchMin = cssVar.match(regexpMin);
 
-            console.log(matchMax)
-            if (matchMax && matchMax[2]) {
-                _result['max'] = parseInt(matchMax[2]);
-            }
+                    if (matchMax || matchMin) {
+                        _result = {
+                            name: varName.replace(this.breakpointCSSVarPrefix, '')
+                        };
 
-            if (matchMin && matchMin[2]) {
-                _result['min'] = parseInt(matchMin[2]);
-            }
+                        matchMax ? _result['max'] = parseInt(matchMax[0].replace('max-width:', '')) : null;
+                        matchMin ? _result['min'] = parseInt(matchMin[0].replace('min-width:', '')) : null;
 
-            return _result;
+                        collection.push(_result);
+                    }
+                }
+
+                return collection;
+            }, [], this);
         },
 
         /**
-         * Get CSS property from concat name
-         *
-         * @param props
-         * @returns {string}
+         * Prepare breakpoint config object
+         * @param cssVariables
+         * @returns {*}
          * @private
          */
-        _getProperty: function(props) {
-            if (!_.isArray(props)) {
-                props = [props];
-            }
-
-            props.unshift('--breakpoints-');
-            return this.computedStyle.getPropertyValue(props.join(''));
-        },
-
-        _prepareScreenMaps: function() {
+        _prepareScreenMaps: function(cssVariables) {
             var moduleScreenMap = this._getModuleScreenMaps();
-            var screenMap = this.options.screenMap;
+            var cssVariablesScreenMap = this._collectCSSBreakpoints(cssVariables);
 
-            if (this._isValidScreenMap(moduleScreenMap)) {
-                screenMap = _.filter(
-                    _.extend(
-                        {},
-                        _.indexBy(this.options.screenMap, 'name'),
-                        _.indexBy(moduleScreenMap, 'name')
-                    ), function(value) {
-                        return !value.skip;
-                    }
-                );
-            }
+            var screenMap = _.filter(
+                _.extend(
+                    {},
+                    _.indexBy(this.options.screenMap, 'name'),
+                    this._isValidScreenMap(cssVariablesScreenMap)
+                        ? _.indexBy(cssVariablesScreenMap, 'name')
+                        : {},
+                    this._isValidScreenMap(moduleScreenMap)
+                        ? _.indexBy(moduleScreenMap, 'name')
+                        : {}
+                ), function(value) {
+                    return !value.skip;
+                }
+            );
 
-            screenMap = _.chain(screenMap)
-                .sortBy('max')
-                .map(function(value, index, screenMap) {
-                    var smallerScreen = screenMap[index - 1] || null;
-                    value.min = smallerScreen ? smallerScreen.max + 1 : 0;
-                    return value;
-                })
-                .indexBy('name')
-                .value();
+            this.options.screenMap = screenMap;
+            screenMap = _.indexBy(this.options.screenMap, 'name');
 
-            this.options.screenMap = _.values(screenMap);
-
+            mediator.trigger('viewport:ready', screenMap);
             return screenMap;
         },
 
+        /**
+         * Get from screen map from require config
+         * @returns {Array}
+         * @private
+         */
         _getModuleScreenMaps: function() {
             var arr = [];
 
@@ -177,6 +198,12 @@ define([
             return arr;
         },
 
+        /**
+         * Get need screen type
+         * @param screenType
+         * @returns {*}
+         * @private
+         */
         _getScreenByTypes: function(screenType) {
             var defaultVal = null;
 
@@ -192,10 +219,20 @@ define([
             }
         },
 
+        /**
+         * Check is not empty array
+         * @param array
+         * @returns {boolean}
+         * @private
+         */
         _isValidScreenMap: function(array) {
-            return _.isArray(array) && array.length;
+            return !!(_.isArray(array) && array.length);
         },
 
+        /**
+         * On change viewport size handler
+         * @private
+         */
         _onResize: function() {
             var oldViewportType = this.viewport.type;
             this._calcViewport();
@@ -205,6 +242,10 @@ define([
             }
         },
 
+        /**
+         * Calculate properties
+         * @private
+         */
         _calcViewport: function() {
             var viewportWidth = window.innerWidth;
             this.viewport.width = viewportWidth;
@@ -228,6 +269,12 @@ define([
             }
         },
 
+        /**
+         *
+         * @param o
+         * @returns {*|boolean}
+         * @private
+         */
         _isInRange: function(o) {
             o.max = o.max || Infinity;
             o.min = o.min || 0;
@@ -236,10 +283,22 @@ define([
             return o.size && o.min <= o.size && o.size <= o.max;
         },
 
+        /**
+         * Screen type criteria
+         * @param screenType
+         * @returns {boolean}
+         * @private
+         */
         _screenTypeChecker: function(screenType) {
             return screenType === 'any' || this.viewport.type === screenType;
         },
 
+        /**
+         * Min screen type criteria
+         * @param minScreenType
+         * @returns {boolean}
+         * @private
+         */
         _minScreenTypeChecker: function(minScreenType) {
             if (minScreenType === 'any') {
                 return true;
@@ -253,6 +312,12 @@ define([
                 : false;
         },
 
+        /**
+         * Max screen type criteria
+         * @param maxScreenType
+         * @returns {boolean}
+         * @private
+         */
         _maxScreenTypeChecker: function(maxScreenType) {
             if (maxScreenType === 'any') {
                 return true;
@@ -266,18 +331,42 @@ define([
                 : false;
         },
 
+        /**
+         * Width criteria
+         * @param width
+         * @returns {boolean}
+         * @private
+         */
         _widthChecker: function(width) {
             return this.viewport.width === width;
         },
 
+        /**
+         * Min width criteria
+         * @param minWidth
+         * @returns {boolean}
+         * @private
+         */
         _minWidthChecker: function(minWidth) {
             return this.viewport.width >= minWidth;
         },
 
+        /**
+         * Max width criteria
+         * @param maxWidth
+         * @returns {boolean}
+         * @private
+         */
         _maxWidthChecker: function(maxWidth) {
             return this.viewport.width <= maxWidth;
         },
 
+        /**
+         * Is mobile criteria
+         * @param isMobile
+         * @returns {boolean}
+         * @private
+         */
         _isMobileChecker: function(isMobile) {
             return this.viewport.isMobile === isMobile;
         }

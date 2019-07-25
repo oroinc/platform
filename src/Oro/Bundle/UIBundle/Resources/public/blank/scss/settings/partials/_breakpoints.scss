@@ -22,13 +22,3 @@ $oro_breakpoints: (
 $custom-breakpoints: () !default;
 
 $breakpoints: merge-breakpoints($oro_breakpoints, $custom-breakpoints) !default;
-
-:root {
-    $keyIndex: 0;
-
-    @each $breakpoint, $value in $breakpoints {
-        --breakpoints-#{$keyIndex}: #{$breakpoint} #{'|'} #{$value};
-
-        $keyIndex: $keyIndex + 1;
-    }
-}

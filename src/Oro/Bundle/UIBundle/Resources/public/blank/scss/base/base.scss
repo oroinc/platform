@@ -36,6 +36,16 @@
             }
         }
     }
+
+    :root {
+        $keyIndex: 0;
+
+        @each $breakpoint, $value in $breakpoints {
+            --breakpoints-#{$breakpoint}: #{$value};
+
+            $keyIndex: $keyIndex + 1;
+        }
+    }
 }
 
 @if ($use-basic-styles) {

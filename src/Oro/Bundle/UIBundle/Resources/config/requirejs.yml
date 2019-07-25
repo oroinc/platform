@@ -269,7 +269,11 @@ config:
         'oroui/js/app/views/jstree/move-action-view': 'bundles/oroui/js/app/views/jstree/move-action-view.js'
         'oroui/js/app/views/loading-bar-view': 'bundles/oroui/js/app/views/loading-bar-view.js'
 
+        'oroui/js/css-variables-manager': 'bundles/oroui/js/css-variables-manager.js'
+        'oroui/js/app/modules/css-variable-module': 'bundles/oroui/js/app/modules/css-variable-module.js'
+
     appmodules:
+        - oroui/js/app/modules/css-variable-module
         - oroui/js/app/modules/init-layout
         - oroui/js/app/modules/init-lightgallery
         - oroui/js/app/modules/layout-module
