@@ -31,14 +31,14 @@ class DummyEncoderTest extends \PHPUnit\Framework\TestCase
     public function testSupportsEncoding()
     {
         $this->assertFalse($this->encoder->supportsEncoding('json'));
-        $this->assertFalse($this->encoder->supportsEncoding(''));
+        $this->assertTrue($this->encoder->supportsEncoding(''));
         $this->assertTrue($this->encoder->supportsEncoding(null));
     }
 
     public function testSupportsDecoding()
     {
         $this->assertFalse($this->encoder->supportsDecoding('json'));
-        $this->assertFalse($this->encoder->supportsDecoding(''));
+        $this->assertTrue($this->encoder->supportsDecoding(''));
         $this->assertTrue($this->encoder->supportsDecoding(null));
     }
 }

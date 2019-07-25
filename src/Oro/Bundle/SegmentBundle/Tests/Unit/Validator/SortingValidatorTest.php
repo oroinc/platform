@@ -5,8 +5,8 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Util;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Validator\Constraints\Sorting as SortingConstraint;
 use Oro\Bundle\SegmentBundle\Validator\SortingValidator;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SortingValidatorTest extends ConstraintValidatorTestCase
 {

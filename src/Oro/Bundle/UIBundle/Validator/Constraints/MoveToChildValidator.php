@@ -4,9 +4,9 @@ namespace Oro\Bundle\UIBundle\Validator\Constraints;
 
 use Oro\Bundle\UIBundle\Model\TreeCollection;
 use Oro\Bundle\UIBundle\Model\TreeItem;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MoveToChildValidator extends ConstraintValidator
 {

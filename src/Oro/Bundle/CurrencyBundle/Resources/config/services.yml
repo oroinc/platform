@@ -92,9 +92,11 @@ services:
 
     oro_currency.converter.currency_to_string:
         class: Oro\Bundle\CurrencyBundle\Converter\CurrencyToString
+        public: true
 
     oro_currency.importexport.formatter.multi_currency_type:
         class: Oro\Bundle\CurrencyBundle\Formatter\MultiCurrencyTypeFormatter
+        public: true
         arguments:
             - '@oro_locale.formatter.number'
         tags:

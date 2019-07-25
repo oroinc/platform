@@ -102,6 +102,7 @@ class SystemConfigurationPass implements CompilerPassInterface
         }
         foreach ($managerDefs as $scope => $managerDef) {
             $managerDef->replaceArgument(0, $scope);
+            $managerDef->setLazy(true);
             $managerId = 'oro_config.' . $scope;
             $container->setDefinition($managerId, $managerDef);
             $apiManagerDef->addMethodCall('addConfigManager', [$scope, new Reference($managerId)]);

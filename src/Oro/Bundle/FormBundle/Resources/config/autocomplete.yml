@@ -14,6 +14,7 @@ services:
 
     oro_form.autocomplete.search_registry:
         class: '%oro_form.autocomplete.search_registry.class%'
+        public: true
 
     oro_form.autocomplete.search_handler:
         class: '%oro_form.autocomplete.search_handler.class%'

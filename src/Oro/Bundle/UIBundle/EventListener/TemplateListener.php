@@ -114,7 +114,9 @@ class TemplateListener implements ServiceSubscriberInterface
 
         $loader = $this->container->get('twig.loader.native_filesystem');
         foreach ($loader->getPaths($bundle) as $path) {
-            if (file_exists(rtrim($path, '/\\') . DIRECTORY_SEPARATOR . $controller)) {
+            if (file_exists(rtrim($path, '/\\') . DIRECTORY_SEPARATOR . $controller) &&
+                in_array($controller, scandir($path), true)
+            ) {
                 return;
             }
 

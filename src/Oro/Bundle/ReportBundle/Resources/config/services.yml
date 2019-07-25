@@ -16,6 +16,7 @@ parameters:
 services:
     oro_report.entity_provider:
         alias: oro_entity.entity_provider
+        public: true
 
     oro_report.datagrid.configuration.provider:
         class: '%oro_report.datagrid.configuration.provider.class%'

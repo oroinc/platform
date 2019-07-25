@@ -17,6 +17,7 @@ class TranslatorDependencyPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $translatorDef = $container->getDefinition('translator.default');
+        $translatorDef->setPublic(true);
 
         $translatorDef->setClass('Oro\Bundle\TranslationBundle\Translation\Translator');
         $translatorDef->addMethodCall(

@@ -140,6 +140,7 @@ services:
 
     oro_email.email.cache.manager:
         class: '%oro_email.email.cache.manager.class%'
+        public: true
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@event_dispatcher'
@@ -225,6 +226,7 @@ services:
 
     oro_email.email.model.builder:
         class: '%oro_email.email.model.builder.class%'
+        public: true
         arguments:
             - '@oro_email.email.model.builder.helper'
             - '@doctrine.orm.entity_manager'
@@ -618,17 +620,20 @@ services:
 
     oro_email.emailtemplate.datagrid_view_list:
         class: '%oro_email.emailtemplate.datagrid_view_list.class%'
+        public: true
         arguments:
             - '@translator'
 
     oro_email.emailfolder.datagrid_view_list:
         class: '%oro_email.emailfolder.datagrid_view_list.class%'
+        public: true
         arguments:
             - '@translator'
             - '@oro_email.mailbox_choice_list'
 
     oro_email.emailseen.datagrid_view_list:
         class: '%oro_email.emailseen.datagrid_view_list.class%'
+        public: true
         arguments:
             - '@translator'
             - '@oro_email.mailbox_choice_list'
@@ -783,6 +788,7 @@ services:
 
     oro_email.email_synchronization_manager:
         class: '%oro_email.email_synchronization_manager.class%'
+        public: true
         arguments:
             - '@service_container'
 
@@ -812,6 +818,7 @@ services:
 
     oro_email.email.thread.provider:
         class: '%oro_email.email.thread.provider.class%'
+        public: true
 
     Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider:
         alias: 'oro_email.email.thread.provider'
@@ -824,6 +831,7 @@ services:
 
     oro_email.email.manager:
         class: '%oro_email.email.manager.class%'
+        public: true
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_email.email.thread.manager'
@@ -897,6 +905,7 @@ services:
 
     oro_email.email_recipients.provider:
         class: '%oro_email.email_recipients.provider.class%'
+        public: true
         arguments:
             - '@translator'
             - '@oro_email.provider.email_recipients.helper'
@@ -932,6 +941,7 @@ services:
 
     oro_email.provider.email_recipients.helper:
         class: '%oro_email.provider.email_recipients.helper.class%'
+        public: true
         arguments:
             - '@oro_security.acl_helper'
             - '@oro_locale.dql.formatter.name'
@@ -952,6 +962,7 @@ services:
 
     oro_email.manager.email_attachment_manager:
         class: '%oro_email.manager.email_attachment_manager.class%'
+        public: true
         arguments:
             - '@oro_attachment.file_manager'
             - '@doctrine.orm.entity_manager'
@@ -1083,6 +1094,7 @@ services:
 
     oro_email.manager.notification:
         class: '%oro_email.manager.notification.class%'
+        public: true
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_ui.html_tag_helper'
@@ -1190,6 +1202,7 @@ services:
 
     oro_email.mailbox.manager:
         class: '%oro_email.mailbox.manager.class%'
+        public: true
         arguments:
             - '@doctrine'
 
@@ -1342,6 +1355,7 @@ services:
 
     oro_email.mailer.checker.smtp_settings:
         class: Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker
+        public: true
         arguments:
             - '@oro_email.direct_mailer'
 
@@ -1440,6 +1454,7 @@ services:
             - '@router'
     oro_email.form.handler.user_email_config:
          class: 'Oro\Bundle\EmailBundle\Form\Handler\UserEmailConfigHandler'
+         public: true
          arguments:
              - '@doctrine.orm.entity_manager'
 

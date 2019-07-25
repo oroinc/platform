@@ -25,6 +25,7 @@ services:
 
     oro_datagrid.extension.mass_action.handler.delete:
         class: '%oro_datagrid.extension.mass_action.handler.delete.class%'
+        public: true
         arguments:
             - '@doctrine'
             - '@translator'
@@ -46,6 +47,7 @@ services:
 
     oro_datagrid.mass_action.dispatcher:
         class: '%oro_datagrid.mass_action.dispatcher.class%'
+        public: true
         arguments:
             - '@oro_datagrid.datagrid.manager'
             - '@oro_datagrid.mass_action.helper'

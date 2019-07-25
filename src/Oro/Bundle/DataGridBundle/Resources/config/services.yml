@@ -79,14 +79,23 @@ services:
     Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory:
         alias: 'oro_datagrid.datagrid.request_parameters_factory'
 
+    oro_datagrid.datagrid.guesser_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        public: false
+        arguments:
+            - [] # services are inserted here by Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\GuessPass
+        tags:
+            - { name: container.service_locator }
+
     oro_datagrid.datagrid.guesser:
         class: '%oro_datagrid.datagrid.guesser.class%'
         arguments:
-            - '@service_container'
+            - '@oro_datagrid.datagrid.guesser_locator'
             - [] # a list of service ids of column options guessers
 
     oro_datagrid.datagrid.column_options_guesser:
         class: '%oro_datagrid.datagrid.column_options_guesser.class%'
+        public: true
         tags:
             - { name: oro_datagrid.column_options_guesser }
 
@@ -312,6 +321,7 @@ services:
 
     oro_datagrid.helper.route:
         class: 'Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper'
+        public: true
         arguments:
             - '@router.default'
 

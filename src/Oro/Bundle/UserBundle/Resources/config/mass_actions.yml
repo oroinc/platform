@@ -30,6 +30,7 @@ services:
 
     oro_datagrid.mass_action.users_enable_switch.handler.disable:
         class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\UsersEnableSwitchActionHandler
+        public: true
         shared: false
         arguments:
             - '@oro_security.acl_helper'
@@ -41,6 +42,7 @@ services:
 
     oro_datagrid.mass_action.users_enable_switch.handler.enable:
         class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\UsersEnableSwitchActionHandler
+        public: true
         shared: false
         arguments:
             - '@oro_security.acl_helper'

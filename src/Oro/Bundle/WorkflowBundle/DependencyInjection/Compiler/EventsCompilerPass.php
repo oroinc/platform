@@ -8,6 +8,9 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Adds the transition event event listener to notification manager.
+ */
 class EventsCompilerPass implements CompilerPassInterface
 {
     const SERVICE_KEY    = 'oro_notification.manager';
@@ -29,9 +32,9 @@ class EventsCompilerPass implements CompilerPassInterface
             return;
         }
 
-        $dispatcher->addMethodCall('addListener',[
+        $dispatcher->addMethodCall('addListener', [
             LoadWorkflowNotificationEvents::TRANSIT_EVENT,
-            [new ServiceClosureArgument(new Reference(self::SERVICE_KEY)), 'process' ],
+            [new ServiceClosureArgument(new Reference(self::SERVICE_KEY)), 'process'],
             0
         ]);
     }

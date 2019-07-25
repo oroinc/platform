@@ -36,6 +36,7 @@ services:
 
     oro_importexport.formatter.excel_datetime:
         class: 'Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter'
+        public: true
         arguments:
             - '@oro_locale.settings'
             - '@translator'
@@ -46,6 +47,7 @@ services:
 
     oro_importexport.formatter.locale_number:
         class: 'Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter'
+        public: true
         arguments:
             - '@oro_locale.formatter.number'
         tags:
@@ -73,6 +75,7 @@ services:
 
     oro_importexport.file.file_manager:
         class: 'Oro\Bundle\ImportExportBundle\File\FileManager'
+        public: true
         arguments:
           - '@knp_gaufrette.filesystem_map'
 

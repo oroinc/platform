@@ -10,6 +10,7 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Oro\Bundle\ApiBundle\Request\RequestQueryStringNormalizer;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
@@ -297,9 +298,12 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     protected function filterQueryParameters(array $supportedParameters)
     {
+        $queryString = $this->get('request_stack')->getCurrentRequest()->server->get('QUERY_STRING');
+        $queryString = RequestQueryStringNormalizer::normalizeQueryString($queryString);
+
         if (false === preg_match_all(
             '#(?P<name>[\w\d_-]+)(?P<operator>(<|>|%3C|%3E)?=|<>|%3C%3E|(<|>|%3C|%3E))(?P<value>[^&]+)#',
-            $this->get('request_stack')->getCurrentRequest()->getQueryString(),
+            $queryString,
             $matches,
             PREG_SET_ORDER
         )) {

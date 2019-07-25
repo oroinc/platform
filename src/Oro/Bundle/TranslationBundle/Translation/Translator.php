@@ -11,6 +11,7 @@ use Oro\Component\DependencyInjection\ServiceLink;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -325,17 +326,19 @@ class Translator extends BaseTranslator
             $translator->warmUp($tmpDir);
         }
 
+        $filesystem = new Filesystem();
+
         // replace current cache with new cache
         $iterator = new \IteratorIterator(new \DirectoryIterator($tmpDir));
         foreach ($iterator as $path) {
             if (!$path->isFile()) {
                 continue;
             }
-            copy($path->getPathName(), $cacheDir . DIRECTORY_SEPARATOR . $path->getFileName());
-            unlink($path->getPathName());
+            $filesystem->copy($path->getPathName(), $cacheDir . DIRECTORY_SEPARATOR . $path->getFileName(), true);
+            $filesystem->remove($path->getPathName());
         }
 
-        rmdir($tmpDir);
+        $filesystem->remove($tmpDir);
 
         // restore translation strategy and apply it to make use of new cache
         $provider->setStrategy($currentStrategy);

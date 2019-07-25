@@ -34,6 +34,7 @@ services:
 
     oro_entity_merge.mass_action.data_handler:
         class: '%oro_entity_merge.mass_action.data_handler.class%'
+        public: true
         arguments:
             - '@oro_entity_merge.doctrine_helper'
 

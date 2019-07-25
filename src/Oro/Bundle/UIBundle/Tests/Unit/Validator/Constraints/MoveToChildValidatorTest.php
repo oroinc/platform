@@ -6,8 +6,8 @@ use Oro\Bundle\UIBundle\Model\TreeCollection;
 use Oro\Bundle\UIBundle\Model\TreeItem;
 use Oro\Bundle\UIBundle\Validator\Constraints\MoveToChild;
 use Oro\Bundle\UIBundle\Validator\Constraints\MoveToChildValidator;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MoveToChildValidatorTest extends \PHPUnit\Framework\TestCase
 {

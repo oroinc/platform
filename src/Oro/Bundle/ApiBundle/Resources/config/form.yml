@@ -13,7 +13,7 @@ services:
         class: Symfony\Component\DependencyInjection\ServiceLocator
         public: false
         arguments:
-            - [] # service sare inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
+            - [] # services are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
         tags:
             - { name: container.service_locator }
 

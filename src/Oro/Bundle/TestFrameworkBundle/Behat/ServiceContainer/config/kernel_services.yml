@@ -5,6 +5,7 @@ services:
 
     oro_entity.entity_alias_resolver:
         class: Oro\Bundle\EntityBundle\ORM\EntityAliasResolver
+        public: true
         factory: ['@oro_test.kernel_service_factory', get]
         arguments: ['oro_entity.entity_alias_resolver']
 

@@ -64,6 +64,7 @@ services:
 
     oro_cron.async.command_runner:
         class: Oro\Bundle\CronBundle\Async\CommandRunner
+        public: true
         arguments:
             - '@oro_message_queue.client.message_producer'
 

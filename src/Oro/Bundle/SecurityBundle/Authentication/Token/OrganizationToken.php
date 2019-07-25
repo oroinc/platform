@@ -14,7 +14,7 @@ class OrganizationToken extends AbstractToken implements OrganizationContextToke
     use OrganizationContextTokenSerializerTrait;
     /**
      * @param Organization             $organization The organization
-     * @param RoleInterface[]|string[] $roles        An array of roles
+     * @param Role[]|string[] $roles                 An array of roles
      */
     public function __construct(Organization $organization, array $roles = [])
     {
