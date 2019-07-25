@@ -121,6 +121,7 @@ config:
         'datepair': 'bundles/bowerassets/datepair/dist/datepair.js'
         'cryptojs/core': 'bundles/bowerassets/crypto-js/core.js'
         'cryptojs/sha256': 'bundles/bowerassets/crypto-js/sha256.js'
+        'css-vars-ponyfill': 'bundles/npmassets/css-vars-ponyfill/dist/css-vars-ponyfill.js'
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'

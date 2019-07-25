@@ -4,7 +4,7 @@ define(function(require) {
     var _ = require('underscore');
     var $ = require('jquery');
     var mediator = require('oroui/js/mediator');
-    var cssVars = require('https://cdn.jsdelivr.net/npm/css-vars-ponyfill@2');
+    var cssVars = require('css-vars-ponyfill');
 
     var cssVariablesManager = {
         cssVariables: null,

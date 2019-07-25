@@ -110,7 +110,8 @@
         "brick/math": "0.8.*",
         "bower-asset/fuse": "3.2.*",
         "phpdocumentor/reflection-docblock": "4.3.*",
-        "php-http/httplug-bundle": "^1.16"
+        "php-http/httplug-bundle": "^1.16",
+        "npm-asset/css-vars-ponyfill": "^2.0"
     },
     "require-dev": {
         "behat/behat": "3.4.*",
