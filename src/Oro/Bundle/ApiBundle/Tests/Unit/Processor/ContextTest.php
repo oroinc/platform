@@ -21,6 +21,7 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -713,6 +714,34 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setHateoas(true);
         self::assertTrue($this->context->isHateoasEnabled());
         self::assertTrue($this->context->get('hateoas'));
+    }
+
+    public function testSharedData()
+    {
+        self::assertInstanceOf(ParameterBagInterface::class, $this->context->getSharedData());
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $this->context->setSharedData($sharedData);
+        self::assertSame($sharedData, $this->context->getSharedData());
+    }
+
+    public function testGetNormalizationContext()
+    {
+        $action = 'test_action';
+        $version = '1.2';
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $this->context->setAction($action);
+        $this->context->setVersion($version);
+        $this->context->setSharedData($sharedData);
+        $this->context->getRequestType()->add('test_request_type');
+        $requestType = $this->context->getRequestType();
+
+        $normalizationContext = $this->context->getNormalizationContext();
+        self::assertCount(4, $normalizationContext);
+        self::assertSame($action, $normalizationContext['action']);
+        self::assertSame($version, $normalizationContext['version']);
+        self::assertSame($requestType, $normalizationContext['requestType']);
+        self::assertSame($sharedData, $normalizationContext['sharedData']);
     }
 
     public function testInfoRecords()

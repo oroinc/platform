@@ -196,6 +196,24 @@ interface ContextInterface extends ComponentContextInterface
     public function setHateoas(bool $flag);
 
     /**
+     * Gets an object that is used to share data between a primary action
+     * and actions that are executed as part of this action.
+     * Also, this object can be used to share data between different kind of child actions.
+     *
+     * @return ParameterBagInterface
+     */
+    public function getSharedData(): ParameterBagInterface;
+
+    /**
+     * Sets an object that is used to share data between a primary action
+     * and actions that are executed as part of this action.
+     * Also, this object can be used to share data between different kind of child actions.
+     *
+     * @param ParameterBagInterface $sharedData
+     */
+    public function setSharedData(ParameterBagInterface $sharedData): void;
+
+    /**
      * Gets a list of records contains an additional information about collections,
      * e.g. "has_more" flag in such record indicates whether a collection has more records than it was requested.
      *

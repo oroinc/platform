@@ -4,6 +4,7 @@ namespace Oro\Component\Config\Loader;
 
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
+use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -132,7 +133,7 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
     public function load($bundleClass, $bundleDir, $bundleAppDir = '')
     {
         $bundleAppData = [];
-        if (is_dir($bundleAppDir)) {
+        if (CumulativeResourceManager::getInstance()->isDir($bundleAppDir)) {
             $bundleAppData = $this->getData($this->getResourcesDirectoryAbsolutePath($bundleAppDir));
         }
 
@@ -288,7 +289,7 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
         $registeredFiles = array_fill_keys($resource->getFound($bundleClass), false);
 
         $registeredAppFiles = [];
-        if (is_dir($bundleAppDir)) {
+        if (CumulativeResourceManager::getInstance()->isDir($bundleAppDir)) {
             $realPath = realpath($this->getResourcesDirectoryAbsolutePath($bundleAppDir));
             if (is_dir($realPath)) {
                 $files = $this->getDirectoryContentsArray($realPath);

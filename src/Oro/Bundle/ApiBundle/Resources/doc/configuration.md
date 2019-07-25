@@ -607,6 +607,15 @@ The `subresources` configuration section enables you to provide options for sub-
 * **filters** - The filters supported by the sub-resource. This section has the same options as the [entity **filters** section](#filters-configuration-section). If an option exists in both [entity **filters** section](#filters-configuration-section) and sub-resource **filters** section, the sub-resource option wins.
 * **sorters** - The sorters supported by the sub-resource. This section has the same options as the [entity **sorters** section](#sorters-configuration-section). If an option exists in both [entity **sorters** section](#sorters-configuration-section) and sub-resource **sorters** section, the sub-resource option wins.
 
+**Note:** A subresource is accessible via API only if its target entity is also accessible via API.
+However, there are several exceptions from this rule:
+
+* if a [target entity does not have an identifier](./how_to.md#enable-api-for-an-entity-without-identifier)
+* if a target entity is [EntityIdentifier](../../Model/EntityIdentifier.php) and at least one entity from
+  a list of acceptable target classes is accessible via API
+* if a target entity is [a base class for Doctrine's inheritance mapping](https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/inheritance-mapping.html)
+  and at least one concrete entity for this mapping is accessible via API
+
 **Example:**
 
 ```yaml

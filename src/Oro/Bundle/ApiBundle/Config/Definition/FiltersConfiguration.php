@@ -96,6 +96,7 @@ class FiltersConfiguration extends AbstractConfigurationSection
                         return $value;
                     })
                 ->end()
+                ->performNoDeepMerging()
                 ->prototype('scalar')->end()
             ->end()
             ->scalarNode(ConfigUtil::DATA_TYPE)->cannotBeEmpty()->end()

@@ -6,7 +6,12 @@ use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
+use Oro\Component\ChainProcessor\ParameterBagInterface;
+use Symfony\Component\Form\DataMapperInterface;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\Test\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
 {
@@ -16,6 +21,35 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->context = new CustomizeFormDataContext();
+    }
+
+    /**
+     * @param string      $name
+     * @param bool        $compound
+     * @param string|null $propertyPath
+     *
+     * @return \PHPUnit\Framework\MockObject\MockObject|FormConfigInterface
+     */
+    private function getFormConfig($name, $compound = false, $propertyPath = null)
+    {
+        $config = $this->createMock(FormConfigInterface::class);
+        $config->expects(self::any())
+            ->method('getName')
+            ->willReturn($name);
+        $config->expects(self::any())
+            ->method('getCompound')
+            ->willReturn($compound);
+        $config->expects(self::any())
+            ->method('getDataMapper')
+            ->willReturn($compound ? $this->createMock(DataMapperInterface::class) : null);
+        $config->expects(self::any())
+            ->method('getInheritData')
+            ->willReturn(false);
+        $config->expects(self::any())
+            ->method('getPropertyPath')
+            ->willReturn(new PropertyPath($propertyPath ?? $name));
+
+        return $config;
     }
 
     public function testIsInitialized()
@@ -77,6 +111,33 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getConfig());
     }
 
+    public function testSharedData()
+    {
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+
+        $this->context->setSharedData($sharedData);
+        self::assertSame($sharedData, $this->context->getSharedData());
+    }
+
+    public function testGetNormalizationContext()
+    {
+        $action = 'test_action';
+        $version = '1.2';
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $this->context->setAction($action);
+        $this->context->setVersion($version);
+        $this->context->setSharedData($sharedData);
+        $this->context->getRequestType()->add('test_request_type');
+        $requestType = $this->context->getRequestType();
+
+        $normalizationContext = $this->context->getNormalizationContext();
+        self::assertCount(4, $normalizationContext);
+        self::assertSame($action, $normalizationContext['action']);
+        self::assertSame($version, $normalizationContext['version']);
+        self::assertSame($requestType, $normalizationContext['requestType']);
+        self::assertSame($sharedData, $normalizationContext['sharedData']);
+    }
+
     public function testIncludedEntities()
     {
         self::assertNull($this->context->getIncludedEntities());
@@ -112,6 +173,53 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(FormInterface::class);
         $this->context->setForm($form);
         self::assertSame($form, $this->context->getForm());
+    }
+
+    public function testFindFormFieldWhenFieldDoesNotExist()
+    {
+        $propertyPath = 'test';
+        $form = new Form($this->getFormConfig('root', true));
+        $form->add(new Form($this->getFormConfig('field1')));
+
+        $this->context->setForm($form);
+        self::assertNull($this->context->findFormField($propertyPath));
+    }
+
+    public function testFindFormFieldWhenFieldDoesNotExistAndExistFormFieldWithSameNameButMappedToAnotherProperty()
+    {
+        $propertyPath = 'test';
+        $form = new Form($this->getFormConfig('root', true));
+        $form->add(new Form($this->getFormConfig('field1')));
+        $form->add(new Form($this->getFormConfig($propertyPath, false, 'another')));
+
+        $this->context->setForm($form);
+        self::assertNull($this->context->findFormField($propertyPath));
+    }
+
+    public function testFindFormFieldForNotRenamedField()
+    {
+        $propertyPath = 'test';
+        $form = new Form($this->getFormConfig('root', true));
+        $formField = new Form($this->getFormConfig($propertyPath));
+        $form->add(new Form($this->getFormConfig('field1')));
+        $form->add($formField);
+
+        $this->context->setForm($form);
+        self::assertSame($formField, $this->context->findFormField($propertyPath));
+    }
+
+    public function testFindFormFieldForRenamedField()
+    {
+        $fieldName = 'renamedTest';
+        $propertyPath = 'test';
+        $form = new Form($this->getFormConfig('root', true));
+        $formField = new Form($this->getFormConfig($fieldName, false, $propertyPath));
+        $form->add(new Form($this->getFormConfig('field1')));
+        $form->add(new Form($this->getFormConfig($propertyPath, false, 'another')));
+        $form->add($formField);
+
+        $this->context->setForm($form);
+        self::assertSame($formField, $this->context->findFormField($propertyPath));
     }
 
     public function testDataAndResult()

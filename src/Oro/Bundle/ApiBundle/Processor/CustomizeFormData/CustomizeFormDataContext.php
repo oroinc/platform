@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Processor\CustomizeDataContext;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormInterface;
@@ -43,6 +44,8 @@ class CustomizeFormDataContext extends CustomizeDataContext
      * This event is dispatched at the end of the form submitting process, just after data validation.
      * It can be used to finalize the form after all listeners, including data validation listener,
      * are executed. E.g. it can be used to correct form validation result.
+     * Note that this event is dispatched even if submitted data are not valid.
+     * Use isValid() method of the form if your logic should be executed only if submitted data are valid.
      * @see \Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
      * @see \Oro\Bundle\ApiBundle\Form\FormValidationHandler
      */
@@ -128,6 +131,19 @@ class CustomizeFormDataContext extends CustomizeDataContext
     public function getForm(): FormInterface
     {
         return $this->form;
+    }
+
+    /**
+     * Finds a form field by its property path.
+     *
+     * @param string             $propertyPath The name of an entity field
+     * @param FormInterface|null $form         The parent form of the searching child form
+     *
+     * @return FormInterface|null
+     */
+    public function findFormField(string $propertyPath, FormInterface $form = null): ?FormInterface
+    {
+        return FormUtil::findFormFieldByPropertyPath($form ?? $this->getForm(), $propertyPath);
     }
 
     /**

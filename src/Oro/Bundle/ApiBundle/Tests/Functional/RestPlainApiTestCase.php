@@ -80,34 +80,85 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
     }
 
     /**
-     * Asserts the response content contains the given validation error.
+     * Asserts that the response content contains one validation error and it is the given error.
      *
      * @param array    $expectedError
      * @param Response $response
+     * @param int      $statusCode
      */
-    protected function assertResponseValidationError($expectedError, Response $response)
-    {
-        $this->assertResponseValidationErrors([$expectedError], $response);
+    protected function assertResponseValidationError(
+        $expectedError,
+        Response $response,
+        $statusCode = Response::HTTP_BAD_REQUEST
+    ) {
+        $this->assertValidationErrors([$expectedError], $response, $statusCode, true);
     }
 
     /**
-     * Asserts the response content contains the given validation errors.
+     * Asserts that the response content contains the given validation error.
+     *
+     * @param array    $expectedError
+     * @param Response $response
+     * @param int      $statusCode
+     */
+    protected function assertResponseContainsValidationError(
+        $expectedError,
+        Response $response,
+        $statusCode = Response::HTTP_BAD_REQUEST
+    ) {
+        $this->assertValidationErrors([$expectedError], $response, $statusCode, false);
+    }
+
+    /**
+     * Asserts that the response content contains the given validation errors and only them.
      *
      * @param array    $expectedErrors
      * @param Response $response
+     * @param int      $statusCode
      */
-    protected function assertResponseValidationErrors($expectedErrors, Response $response)
+    protected function assertResponseValidationErrors(
+        $expectedErrors,
+        Response $response,
+        $statusCode = Response::HTTP_BAD_REQUEST
+    ) {
+        $this->assertValidationErrors($expectedErrors, $response, $statusCode, true);
+    }
+
+    /**
+     * Asserts that the response content contains the given validation errors.
+     *
+     * @param array    $expectedErrors
+     * @param Response $response
+     * @param int      $statusCode
+     */
+    protected function assertResponseContainsValidationErrors(
+        $expectedErrors,
+        Response $response,
+        $statusCode = Response::HTTP_BAD_REQUEST
+    ) {
+        $this->assertValidationErrors($expectedErrors, $response, $statusCode, false);
+    }
+
+    /**
+     * @param array    $expectedErrors
+     * @param Response $response
+     * @param int      $statusCode
+     * @param bool     $strict
+     */
+    private function assertValidationErrors($expectedErrors, Response $response, $statusCode, $strict)
     {
-        static::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
+        static::assertResponseStatusCodeEquals($response, $statusCode);
 
         $content = self::jsonToArray($response->getContent());
         try {
             $this->assertResponseContains($expectedErrors, $response);
-            self::assertCount(
-                count($expectedErrors),
-                $content,
-                'Unexpected number of validation errors'
-            );
+            if ($strict) {
+                self::assertCount(
+                    count($expectedErrors),
+                    $content,
+                    'Unexpected number of validation errors'
+                );
+            }
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             throw new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(

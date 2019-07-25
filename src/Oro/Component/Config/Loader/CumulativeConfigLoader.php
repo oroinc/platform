@@ -63,13 +63,11 @@ class CumulativeConfigLoader
     {
         $result = [];
 
-        $bundles = CumulativeResourceManager::getInstance()->getBundles();
-        $appRootDir = CumulativeResourceManager::getInstance()->getAppRootDir();
-
+        $manager = CumulativeResourceManager::getInstance();
+        $bundles = $manager->getBundles();
         foreach ($bundles as $bundleName => $bundleClass) {
-            $bundleDir = $this->getBundleDir($bundleClass);
-            $bundleAppDir = $this->getBundleAppDir($bundleName, $appRootDir);
-
+            $bundleDir = $manager->getBundleDir($bundleClass);
+            $bundleAppDir = $manager->getBundleAppDir($bundleName);
             /** @var CumulativeResourceLoader $resourceLoader */
             foreach ($this->resourceLoaders as $resourceLoader) {
                 $resource = $resourceLoader->load($bundleClass, $bundleDir, $bundleAppDir);
@@ -110,45 +108,18 @@ class CumulativeConfigLoader
      */
     public function getResources(): CumulativeResource
     {
-        $bundles = CumulativeResourceManager::getInstance()->getBundles();
-        $appRootDir = CumulativeResourceManager::getInstance()->getAppRootDir();
-
+        $manager = CumulativeResourceManager::getInstance();
+        $bundles = $manager->getBundles();
         $resource = new CumulativeResource($this->name, $this->resourceLoaders);
-        /** @var CumulativeResourceLoader $resourceLoader */
-        foreach ($this->resourceLoaders as $resourceLoader) {
-            foreach ($bundles as $bundleName => $bundleClass) {
-                $bundleDir = $this->getBundleDir($bundleClass);
-                $bundleAppDir = $this->getBundleAppDir($bundleName, $appRootDir);
-
+        foreach ($bundles as $bundleName => $bundleClass) {
+            $bundleDir = $manager->getBundleDir($bundleClass);
+            $bundleAppDir = $manager->getBundleAppDir($bundleName);
+            /** @var CumulativeResourceLoader $resourceLoader */
+            foreach ($this->resourceLoaders as $resourceLoader) {
                 $resourceLoader->registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, $resource);
             }
         }
 
         return $resource;
-    }
-
-    /**
-     * @param string $bundleClass
-     *
-     * @return string
-     */
-    private function getBundleDir(string $bundleClass): string
-    {
-        $reflection = new \ReflectionClass($bundleClass);
-
-        return dirname($reflection->getFileName());
-    }
-
-    /**
-     * @param string      $bundleName
-     * @param string|null $appRootDir
-     *
-     * @return string
-     */
-    private function getBundleAppDir(string $bundleName, ?string $appRootDir): string
-    {
-        return $appRootDir && is_dir($appRootDir)
-            ? $appRootDir . '/Resources/' . $bundleName
-            : '';
     }
 }

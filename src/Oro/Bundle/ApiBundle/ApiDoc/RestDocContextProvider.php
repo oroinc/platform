@@ -59,6 +59,7 @@ class RestDocContextProvider
         $context->getRequestType()->set($this->docViewDetector->getRequestType());
         $context->setVersion($this->docViewDetector->getVersion());
         $context->setLastGroup('initialize');
+        $context->setMasterRequest(true);
         if ($associationName && $context instanceof SubresourceContext) {
             $context->setParentClassName($entityClass);
             $context->setAssociationName($associationName);

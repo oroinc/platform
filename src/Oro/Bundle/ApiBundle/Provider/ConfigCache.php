@@ -37,6 +37,9 @@ class ConfigCache implements ConfigCacheStateInterface
      */
     private $cacheTimestamp;
 
+    /** @var bool|null */
+    private $cacheFresh;
+
     /**
      * @param string             $configKey
      * @param bool               $debug
@@ -120,11 +123,15 @@ class ConfigCache implements ConfigCacheStateInterface
         }
 
         $cacheTimestamp = $this->getCacheTimestamp();
+        if (null === $cacheTimestamp || $cacheTimestamp > $timestamp) {
+            return false;
+        }
 
-        return
-            null !== $cacheTimestamp
-            && $cacheTimestamp <= $timestamp
-            && $this->getCache()->isFresh();
+        if (null === $this->cacheFresh) {
+            $this->cacheFresh = $this->getCache()->isFresh();
+        }
+
+        return $this->cacheFresh;
     }
 
     /**
@@ -143,8 +150,9 @@ class ConfigCache implements ConfigCacheStateInterface
                         $cacheFile
                     ));
                 }
-                $this->cacheTimestamp = $cacheTimestamp;
             }
+            $this->cacheTimestamp = $cacheTimestamp;
+            $this->cacheFresh = null;
         }
 
         return $this->cacheTimestamp;
@@ -175,6 +183,7 @@ class ConfigCache implements ConfigCacheStateInterface
 
                 $this->configCacheWarmer->warmUp($this->configKey);
                 $this->cacheTimestamp = false;
+                $this->cacheFresh = null;
 
                 if ($overrideExistingCacheFile) {
                     \clearstatcache(false, $cacheFile);
