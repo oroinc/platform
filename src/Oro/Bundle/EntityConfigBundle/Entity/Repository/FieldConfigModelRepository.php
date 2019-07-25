@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
@@ -63,7 +64,20 @@ class FieldConfigModelRepository extends EntityRepository
      */
     public function getActiveAttributesByClass($className)
     {
-        $attributes = $this->getBaseAttributeQueryBuilderByClass($className)
+        $attributes = $this->getActiveAttributesByClassQueryBuilder($className)
+            ->getQuery()
+            ->getResult();
+
+        return $attributes;
+    }
+
+    /**
+     * @param string $className
+     * @return QueryBuilder
+     */
+    public function getActiveAttributesByClassQueryBuilder(string $className): QueryBuilder
+    {
+        $queryBuilder = $this->getBaseAttributeQueryBuilderByClass($className)
             ->innerJoin(
                 'f.indexedValues',
                 's',
@@ -72,11 +86,9 @@ class FieldConfigModelRepository extends EntityRepository
             )
             ->setParameter('stateCode', 'state')
             ->setParameter('extendScope', 'extend')
-            ->setParameter('stateValue', ExtendScope::STATE_ACTIVE)
-            ->getQuery()
-            ->getResult();
+            ->setParameter('stateValue', ExtendScope::STATE_ACTIVE);
 
-        return $attributes;
+        return $queryBuilder;
     }
 
     /**
@@ -104,7 +116,7 @@ class FieldConfigModelRepository extends EntityRepository
 
     /**
      * @param array $ids
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     private function getBaseAttributeQueryBuilderByIds(array $ids)
     {
@@ -117,7 +129,7 @@ class FieldConfigModelRepository extends EntityRepository
 
     /**
      * @param string $className
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     private function getBaseAttributeQueryBuilderByClass($className)
     {
@@ -130,7 +142,7 @@ class FieldConfigModelRepository extends EntityRepository
     }
 
     /**
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     private function getBaseAttributeQueryBuilder()
     {

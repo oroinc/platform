@@ -142,11 +142,20 @@ class AttributeManager
         if (!isset($this->activeAttributesByClass[$className])) {
             $this->checkDatabase();
 
-            $this->activeAttributesByClass[$className] = $this->getRepository()
-                ->getActiveAttributesByClass($className);
+            $this->activeAttributesByClass[$className] = $this->getActiveAttributesByClassName($className);
         }
 
         return $this->activeAttributesByClass[$className];
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return FieldConfigModel[]
+     */
+    protected function getActiveAttributesByClassName(string $className): array
+    {
+        return $this->getRepository()->getActiveAttributesByClass($className);
     }
 
     /**
@@ -326,7 +335,7 @@ class AttributeManager
     /**
      * @return FieldConfigModelRepository
      */
-    private function getRepository()
+    protected function getRepository()
     {
         return $this->doctrineHelper->getEntityRepositoryForClass(FieldConfigModel::class);
     }
