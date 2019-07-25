@@ -18,6 +18,7 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
         parent::configureEntityNode($node);
         $node
             ->arrayNode(ConfigUtil::IDENTIFIER_FIELD_NAMES)
+                ->performNoDeepMerging()
                 ->prototype('scalar')->cannotBeEmpty()->end()
             ->end()
             ->booleanNode(ConfigUtil::DISABLE_INCLUSION)->end()

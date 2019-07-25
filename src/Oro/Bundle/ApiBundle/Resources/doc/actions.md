@@ -930,6 +930,8 @@ General methods:
 - **setProcessed(operationName)** - Marks a work as already done. In the most cases this method is useless because it is easy to determine when a work is already done by checking a state of a context. However, a processor performs a complex work, it might be required to mark a work as already done directly.
 - **clearProcessed(operationName)** - Marks a work as not yet done.
 - **isProcessed(operationName)** - Checks whether a work is already done.
+- **getSharedData()** - Gets an object that is used to share data between a primary action and actions that are executed as part of this action. Also, this object can be used to share data between different kind of child actions.
+- **setSharedData(parameterBag)** - Sets an object that is used to share data.
 
 Entity configuration related methods:
 

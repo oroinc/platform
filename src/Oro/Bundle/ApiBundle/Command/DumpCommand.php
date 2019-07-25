@@ -25,28 +25,27 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class DumpCommand extends AbstractDebugCommand
 {
-    /** @var ManagerRegistry */
-    private $registry;
-
     /** @var SubresourcesProvider */
     private $subresourcesProvider;
 
+    /** @var ManagerRegistry */
+    private $doctrine;
+
     /**
-     * @param ValueNormalizer $valueNormalizer
-     * @param ResourcesProvider $resourcesProvider
-     * @param ManagerRegistry $registry
+     * @param ValueNormalizer      $valueNormalizer
+     * @param ResourcesProvider    $resourcesProvider
      * @param SubresourcesProvider $subresourcesProvider
+     * @param ManagerRegistry      $doctrine
      */
     public function __construct(
         ValueNormalizer $valueNormalizer,
         ResourcesProvider $resourcesProvider,
-        ManagerRegistry $registry,
-        SubresourcesProvider $subresourcesProvider
+        SubresourcesProvider $subresourcesProvider,
+        ManagerRegistry $doctrine
     ) {
         parent::__construct($valueNormalizer, $resourcesProvider);
-
-        $this->registry = $registry;
-        $this->resourcesProvider = $resourcesProvider;
+        $this->subresourcesProvider = $subresourcesProvider;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -107,8 +106,7 @@ class DumpCommand extends AbstractDebugCommand
         }
 
         $notAccessibleEntities = [];
-        /** @var ManagerRegistry $doctrine */
-        $managers = $this->registry->getManagers();
+        $managers = $this->doctrine->getManagers();
         foreach ($managers as $manager) {
             if (!$manager instanceof EntityManager) {
                 continue;
@@ -197,7 +195,9 @@ class DumpCommand extends AbstractDebugCommand
                 $result .= sprintf("\n  <comment>%s</comment>", $associationName);
                 $result .= "\n   Type: " . ConfigUtil::getAssociationTargetType($subresource->isCollection());
                 $result .= "\n   Target: " . $targetEntityType;
-                $result .= "\n   Acceptable Targets: " . implode(', ', $acceptableTargetEntityTypes);
+                if ($acceptableTargetEntityTypes) {
+                    $result .= "\n   Acceptable Targets: " . implode(', ', $acceptableTargetEntityTypes);
+                }
                 $subresourceExcludedActions = $subresource->getExcludedActions();
                 if (!empty($subresourceExcludedActions)) {
                     $result .= "\n   Excluded Actions: " . implode(', ', $subresourceExcludedActions);

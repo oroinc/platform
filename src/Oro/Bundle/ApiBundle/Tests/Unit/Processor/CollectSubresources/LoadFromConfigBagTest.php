@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SubresourcesConfigLoader;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\CollectSubresourcesContext;
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\LoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
@@ -250,7 +251,6 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresources = new ApiResourceSubresources($entityClass);
         $expectedSubresource = new ApiSubresource();
         $expectedSubresource->setTargetClassName($targetEntityClass);
-        $expectedSubresource->setAcceptableTargetClassNames([$targetEntityClass]);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
             ApiActions::ADD_SUBRESOURCE,
@@ -351,7 +351,6 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresources = new ApiResourceSubresources($entityClass);
         $expectedSubresource = new ApiSubresource();
         $expectedSubresource->setTargetClassName($targetEntityClass);
-        $expectedSubresource->setAcceptableTargetClassNames([$targetEntityClass]);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
             ApiActions::ADD_SUBRESOURCE,
@@ -367,7 +366,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessSubresourceCreatedBasedOnRenanedAssociation()
+    public function testProcessSubresourceCreatedBasedOnRenamedAssociation()
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';
@@ -407,7 +406,6 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresources = new ApiResourceSubresources($entityClass);
         $expectedSubresource = new ApiSubresource();
         $expectedSubresource->setTargetClassName($targetEntityClass);
-        $expectedSubresource->setAcceptableTargetClassNames([$targetEntityClass]);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
             ApiActions::ADD_SUBRESOURCE,
@@ -460,7 +458,6 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresources = new ApiResourceSubresources($entityClass);
         $expectedSubresource = new ApiSubresource();
         $expectedSubresource->setTargetClassName($targetEntityClass);
-        $expectedSubresource->setAcceptableTargetClassNames([$targetEntityClass]);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
             ApiActions::ADD_SUBRESOURCE,
@@ -513,6 +510,20 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($this->context);
 
         $expectedSubresources = new ApiResourceSubresources($entityClass);
+        $expectedSubresource = new ApiSubresource();
+        $expectedSubresource->setTargetClassName($targetEntityClass);
+        $expectedSubresource->setIsCollection(false);
+        $expectedSubresource->setExcludedActions([
+            ApiActions::GET_SUBRESOURCE,
+            ApiActions::UPDATE_SUBRESOURCE,
+            ApiActions::ADD_SUBRESOURCE,
+            ApiActions::DELETE_SUBRESOURCE,
+            ApiActions::GET_RELATIONSHIP,
+            ApiActions::UPDATE_RELATIONSHIP,
+            ApiActions::ADD_RELATIONSHIP,
+            ApiActions::DELETE_RELATIONSHIP
+        ]);
+        $expectedSubresources->addSubresource('subresource1', $expectedSubresource);
 
         self::assertEquals(
             [$entityClass => $expectedSubresources],
@@ -523,7 +534,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage The target class for "subresource1" subresource of "Test\Class" entity should be specified in config.
+     * @expectedExceptionMessage Invalid configuration for "subresource1" subresource of "Test\Class" entity. The target class should be specified in config.
      */
     // @codingStandardsIgnoreEnd
     public function testProcessCustomSubresourceWithoutTargetClass()
@@ -556,6 +567,61 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->context->setAccessibleResources([]);
         $this->context->setResult($subresources);
         $this->processor->process($this->context);
+    }
+
+    public function testProcessCustomSubresourceWithEntityIdentifierAndNoAcceptableTargetClassNames()
+    {
+        $entityClass = 'Test\Class';
+        $targetEntityClass = EntityIdentifier::class;
+        $resource = new ApiResource($entityClass);
+        $subresources = $this->getApiResourceSubresources($resource);
+
+        $configFile = 'api.yml';
+        $configCache = $this->createMock(ConfigCache::class);
+        $configCache->expects(self::once())
+            ->method('getConfig')
+            ->with($configFile)
+            ->willReturn([
+                'entities' => [
+                    $entityClass => [
+                        'subresources' => [
+                            'subresource1' => [
+                                'target_class' => $targetEntityClass,
+                                'target_type'  => 'to-one'
+                            ]
+                        ]
+                    ]
+                ]
+            ]);
+
+        $this->expectGetConfigBag(new ConfigBag($configCache, $configFile));
+        $this->expectGetConfig($entityClass);
+
+        $this->context->setResources([$resource]);
+        $this->context->setAccessibleResources([]);
+        $this->context->setResult($subresources);
+        $this->processor->process($this->context);
+
+        $expectedSubresources = new ApiResourceSubresources($entityClass);
+        $expectedSubresource = new ApiSubresource();
+        $expectedSubresource->setTargetClassName($targetEntityClass);
+        $expectedSubresource->setAcceptableTargetClassNames([]);
+        $expectedSubresource->setIsCollection(false);
+        $expectedSubresource->setExcludedActions([
+            ApiActions::UPDATE_SUBRESOURCE,
+            ApiActions::ADD_SUBRESOURCE,
+            ApiActions::DELETE_SUBRESOURCE,
+            ApiActions::GET_RELATIONSHIP,
+            ApiActions::UPDATE_RELATIONSHIP,
+            ApiActions::ADD_RELATIONSHIP,
+            ApiActions::DELETE_RELATIONSHIP
+        ]);
+        $expectedSubresources->addSubresource('subresource1', $expectedSubresource);
+
+        self::assertEquals(
+            [$entityClass => $expectedSubresources],
+            $this->context->getResult()->toArray()
+        );
     }
 
     public function testProcessCustomSubresourceWhenItIsExcluded()
@@ -595,7 +661,6 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresources = new ApiResourceSubresources($entityClass);
         $expectedSubresource = new ApiSubresource();
         $expectedSubresource->setTargetClassName($targetEntityClass);
-        $expectedSubresource->setAcceptableTargetClassNames([$targetEntityClass]);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
             ApiActions::UPDATE_SUBRESOURCE,
@@ -654,7 +719,6 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresources = new ApiResourceSubresources($entityClass);
         $expectedSubresource = new ApiSubresource();
         $expectedSubresource->setTargetClassName($targetEntityClass);
-        $expectedSubresource->setAcceptableTargetClassNames([$targetEntityClass]);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
             ApiActions::UPDATE_SUBRESOURCE,
@@ -713,7 +777,6 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresources = new ApiResourceSubresources($entityClass);
         $expectedSubresource = new ApiSubresource();
         $expectedSubresource->setTargetClassName($targetEntityClass);
-        $expectedSubresource->setAcceptableTargetClassNames([$targetEntityClass]);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
             ApiActions::ADD_SUBRESOURCE,

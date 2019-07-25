@@ -163,10 +163,7 @@ class FormHelper
      */
     private function getFormFieldOptions(PropertyMetadata $property, EntityDefinitionFieldConfig $config)
     {
-        $options = $config->getFormOptions();
-        if (null === $options) {
-            $options = [];
-        }
+        $options = $config->getFormOptions() ?? [];
         if (!\array_key_exists('property_path', $options)) {
             $propertyPath = $property->getPropertyPath();
             if (!$propertyPath) {

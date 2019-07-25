@@ -14,11 +14,15 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Oro\Component\ChainProcessor\ParameterBag;
 
 class LoadNormalizedEntityTest extends FormProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
     private $processorBag;
+
+    /** @var ParameterBag */
+    private $sharedData;
 
     /** @var LoadNormalizedEntity */
     private $processor;
@@ -26,6 +30,10 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
     protected function setUp()
     {
         parent::setUp();
+
+        $this->sharedData = new ParameterBag();
+        $this->sharedData->set('someKey', 'someSharedValue');
+        $this->context->setSharedData($this->sharedData);
 
         $this->processorBag = $this->createMock(ActionProcessorBagInterface::class);
 
@@ -136,6 +144,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $expectedGetContext->setCorsRequest(false);
         $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedGetContext->setSharedData($this->sharedData);
         $expectedGetContext->setClassName($this->context->getClassName());
         $expectedGetContext->setId($this->context->getId());
         $expectedGetContext->skipGroup('security_check');
@@ -182,6 +191,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $expectedContext->setCorsRequest(true);
         $expectedContext->setHateoas(true);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedContext->setSharedData($this->sharedData);
         $expectedContext->setId($this->context->getId());
         $expectedContext->setClassName($this->context->getClassName());
         $expectedContext->setConfigExtras($getConfigExtras);

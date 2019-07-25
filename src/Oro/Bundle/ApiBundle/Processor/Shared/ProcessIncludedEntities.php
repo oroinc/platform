@@ -102,6 +102,7 @@ class ProcessIncludedEntities implements ProcessorInterface
         $actionContext->setVersion($context->getVersion());
         $actionContext->getRequestType()->set($context->getRequestType());
         $actionContext->setRequestHeaders($context->getRequestHeaders());
+        $actionContext->setSharedData($context->getSharedData());
         $actionContext->setEntityMapper($context->getEntityMapper());
         $actionContext->setIncludedEntities($context->getIncludedEntities());
 

@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\Shared\LoadEntitiesByEntitySerializer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
+use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\EntitySerializer\EntitySerializer;
 
 class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestCase
@@ -68,6 +69,10 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
     {
         $entityClass = Group::class;
 
+        $sharedData = new ParameterBag();
+        $sharedData->set('someKey', 'someSharedValue');
+        $this->context->setSharedData($sharedData);
+
         $query = $this->doctrineHelper->createQueryBuilder($entityClass, 'e');
 
         $data = [new Group()];
@@ -87,7 +92,8 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
                 [
                     'action'      => $this->context->getAction(),
                     'version'     => $this->context->getVersion(),
-                    'requestType' => $this->context->getRequestType()
+                    'requestType' => $this->context->getRequestType(),
+                    'sharedData'  => $sharedData
                 ]
             )
             ->willReturn($data);
