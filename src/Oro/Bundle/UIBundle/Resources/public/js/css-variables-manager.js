@@ -17,7 +17,7 @@ define(function(require) {
                 onComplete: _.bind(function(cssText, styleNodes, cssVariables) {
                     this.cssVariables = cssVariables;
 
-                    mediator.trigger('viewport:css:variables:fetched', cssVariables);
+                    mediator.trigger('css:variables:fetched', cssVariables);
 
                     this.deferred.resolve(this.cssVariables);
                 }, this)

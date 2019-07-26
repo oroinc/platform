@@ -47,7 +47,7 @@ $oro_breakpoints: (
     'mobile': '(max-width: ' + $breakpoint-mobile + ')'
 );
 ```
-After processing the variables, pour such a configuration array
+After processing the variables will created configuration array
 
 ```javascript
 screenMap: [

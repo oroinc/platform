@@ -176,11 +176,24 @@ define(function(require) {
                 }
             );
 
-            this.options.screenMap = screenMap;
-            screenMap = _.indexBy(this.options.screenMap, 'name');
+            screenMap = this._sortScreenTypes(screenMap);
 
+            this.options.screenMap = screenMap;
+
+            screenMap = _.indexBy(screenMap, 'name');
             mediator.trigger('viewport:ready', screenMap);
+
             return screenMap;
+        },
+
+        _sortScreenTypes: function(screenMap) {
+            return screenMap.sort(function(a, b) {
+                var aMax = a.max || Infinity;
+                var aMin = a.min || 0;
+                var bMax = b.max || Infinity;
+                var bMin = b.min || 0;
+                return aMax - bMax || aMin - bMin;
+            });
         },
 
         /**

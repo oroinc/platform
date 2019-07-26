@@ -4,7 +4,7 @@ The CSS variable  parser reads the current style file and collects the variables
 
 The module returns a promise to which you can connect using the `onReady` method call passing the callback function to the arguments.
 
-You can also listen to the event of a mediator `viewport:css:variables:fetched`
+You can also listen to the event of a mediator `css:variables:fetched`
 
 Example of use
 
@@ -43,7 +43,7 @@ var Foo = function(cssVariables) {
     console.log(someVar); // variable value "#000000"
 }
 
-mediator.on('viewport:css:variables:fetched', Foo)
+mediator.on('css:variables:fetched', Foo)
 
 ```
 

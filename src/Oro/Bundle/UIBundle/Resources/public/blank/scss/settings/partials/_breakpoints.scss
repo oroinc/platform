@@ -9,11 +9,13 @@ $oro_breakpoints: (
     'tablet': '(max-width: ' +  $breakpoint-tablet + ')',
     'strict-tablet': '(max-width: ' +  $breakpoint-tablet + ') and (min-width: ' + ($breakpoint-tablet-small + 1) + ')',
     'tablet-small': '(max-width: ' +  $breakpoint-tablet-small + ')',
+    'tablet-small1': '(min-width: ' +  $breakpoint-tablet-small + ')',
     'strict-tablet-small': '(max-width: ' +  $breakpoint-tablet-small + ') and (min-width: ' + ($breakpoint-mobile-landscape + 1) + ')',
     'mobile-landscape': 'screen and (max-width: ' +  $breakpoint-mobile-landscape + ')',
     'strict-mobile-landscape': '(max-width: ' +  $breakpoint-mobile-landscape + ') and (min-width: ' + ($breakpoint-mobile + 1) + ')',
     'mobile': '(max-width: ' + $breakpoint-mobile + ')',
     'mobile-big': '(max-width: ' +  $breakpoint-mobile-big + ')',
+    'mobile-big1': '(min-width: ' +  $breakpoint-mobile-big + ')',
     'strict-mobile': '(max-width: ' + $breakpoint-mobile + ')',
     'print': 'print',
     // Custom breakpoints

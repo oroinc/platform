@@ -4,6 +4,18 @@ The current file describes significant changes in the code that may affect the u
 
 ## 4.0.0
 
+### Added
+
+#### UIBundle
+
+* CSSVariable parser `oroui/js/css-variables-manager` has been add. Source module [css-variables-manager](./src/Oro/Bundle/UIBundle/Resources/public/js/css-variables-manager.js)
+
+### Changed
+
+#### UIBundle
+
+* viewportManager has been updated. Add sync with CSS breakpoint variables
+
 ### Removed
 
 #### ApiBundle
