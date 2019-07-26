@@ -1,6 +1,8 @@
 /* @theme: blank; */
 
 // Native breakpoints;
+// @Notice! The values of this array will be converted to global changes and which will be processed by javascript, the SCSS breakpoint and `screenType` configuration will be synchronized to the `viewportManager`
+
 $oro_breakpoints: (
     'desktop': '(min-width: ' + $breakpoint-desktop + ')',
     'strict-desktop': '(min-width: ' + $breakpoint-desktop + ')',

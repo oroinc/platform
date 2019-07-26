@@ -31,7 +31,47 @@ screenMap: [
     }
 ]
 ```
+
+Added functionality to synchronize breakpoints from SCSS `$breakpoints` variable.
+
+```scss
+$breakpoint-desktop: 1100px;
+$breakpoint-tablet: $breakpoint-desktop - 1px;
+$breakpoint-tablet-small: 992px;
+$breakpoint-mobile: 414px;
+
+$oro_breakpoints: (
+    'desktop': '(min-width: ' + $breakpoint-desktop + ')',
+    'tablet': '(max-width: ' +  $breakpoint-tablet + ')',
+    'tablet-small': '(max-width: ' +  $breakpoint-tablet-small + ')',
+    'mobile': '(max-width: ' + $breakpoint-mobile + ')'
+);
+```
+After processing the variables, pour such a configuration array
+
+```javascript
+screenMap: [
+    {
+        name: 'desktop',
+        min: 1100
+    },
+    {
+        name: 'tablet',
+        max: 1099
+    },
+    {
+        name: 'tablet-small',
+        max: 992
+    },
+    {
+        name: 'mobile',
+        max: 414
+    }
+]
+```
 Also can be overridden by require config on specific theme.
+
+**Has the highest priority**
 ```javascript
 require({
     config: {
