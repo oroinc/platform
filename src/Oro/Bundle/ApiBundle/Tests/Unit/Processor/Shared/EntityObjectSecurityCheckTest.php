@@ -51,6 +51,7 @@ class EntityObjectSecurityCheckTest extends GetProcessorTestCase
 
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @expectedExceptionMessage No access by "VIEW" permission to the entity.
      */
     public function testProcessWhenAccessDenied()
     {

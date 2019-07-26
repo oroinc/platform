@@ -15,7 +15,7 @@ use Oro\Component\EntitySerializer\EntitySerializer;
 class LoadEntitiesByEntitySerializer implements ProcessorInterface
 {
     /** @var EntitySerializer */
-    protected $entitySerializer;
+    private $entitySerializer;
 
     /**
      * @param EntitySerializer $entitySerializer

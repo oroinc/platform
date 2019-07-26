@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Validates whether an feature is enabled for the type of entities specified
@@ -37,7 +37,7 @@ class EntityTypeFeatureCheck implements ProcessorInterface
             $context->getClassName(),
             FeatureConfigurationExtension::API_RESOURCE_KEY
         )) {
-            throw new AccessDeniedException();
+            throw new NotFoundHttpException();
         }
     }
 }

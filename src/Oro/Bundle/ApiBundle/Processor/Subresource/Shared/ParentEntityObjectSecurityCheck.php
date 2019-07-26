@@ -15,10 +15,10 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class ParentEntityObjectSecurityCheck implements ProcessorInterface
 {
     /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var string */
-    protected $permission;
+    private $permission;
 
     /**
      * @param AuthorizationCheckerInterface $authorizationChecker
@@ -46,7 +46,10 @@ class ParentEntityObjectSecurityCheck implements ProcessorInterface
         }
 
         if (!$isGranted) {
-            throw new AccessDeniedException();
+            throw new AccessDeniedException(sprintf(
+                'No access by "%s" permission to the parent entity.',
+                $this->permission
+            ));
         }
     }
 }

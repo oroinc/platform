@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -101,6 +102,10 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         $exceptionClass = \get_class($exception);
         if ($exception instanceof AuthenticationException) {
             $exceptionClass = AuthenticationException::class;
+        } elseif ($exception instanceof AccessDeniedException
+            || $exception instanceof AccessDeniedHttpException
+        ) {
+            $exceptionClass = AccessDeniedException::class;
         }
 
         return ValueNormalizerUtil::humanizeClassName($exceptionClass, 'Exception');
