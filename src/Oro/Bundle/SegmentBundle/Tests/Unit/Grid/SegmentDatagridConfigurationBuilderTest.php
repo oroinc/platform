@@ -3,7 +3,8 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Grid;
 
 use Doctrine\ORM\Query;
-use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
+use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\ColumnOptionsGuesserMock;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker;
 use Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder;
@@ -46,7 +47,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
             $doctrine,
-            new DatagridGuesserMock(),
+            new DatagridGuesser([new ColumnOptionsGuesserMock()]),
             $this->entityNameResolver
         );
 
@@ -78,7 +79,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
             $doctrine,
-            new DatagridGuesserMock(),
+            new DatagridGuesser([new ColumnOptionsGuesserMock()]),
             $this->entityNameResolver
         );
 

@@ -6,7 +6,7 @@ use Oro\Bundle\EntityConfigBundle\EventListener\AttributeFamilyFormViewListener;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase

@@ -34,6 +34,7 @@ services:
 
     oro_ui.placeholder.filter:
         class: Oro\Bundle\UIBundle\Placeholder\PlaceholderFilter
+        public: true
 
     oro_ui.placeholder.configuration.provider:
         class: Oro\Bundle\UIBundle\Placeholder\PlaceholderConfigurationProvider
@@ -75,6 +76,7 @@ services:
             - '@Psr\Container\ContainerInterface'
         tags:
             - { name: container.service_subscriber, id: 'templating' }
+            - { name: container.service_subscriber, id: 'twig.loader.native_filesystem' }
             - { name: container.service_subscriber, id: 'templating.name_parser' }
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
 
@@ -118,6 +120,7 @@ services:
 
     oro_ui.widget_provider.view_actions:
         class: '%oro_ui.widget_provider.view_actions.class%'
+        public: true
         arguments:
             - '@oro_ui.label_provider.action_button_group'
             - '@event_dispatcher'
@@ -125,6 +128,7 @@ services:
 
     oro_ui.widget_provider.update_actions:
         class: '%oro_ui.widget_provider.update_actions.class%'
+        public: true
         arguments:
             - '@oro_ui.label_provider.action_button_group'
             - '@event_dispatcher'

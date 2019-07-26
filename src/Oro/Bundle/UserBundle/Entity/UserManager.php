@@ -10,7 +10,7 @@ use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * Provides a set of methods to simplify manage of the User entity.
@@ -109,13 +109,13 @@ class UserManager extends BaseUserManager
 
             $roleClassName = $em->getClassMetadata(ClassUtils::getClass($user))
                 ->getAssociationTargetClass('roles');
-            if (!is_a($roleClassName, RoleInterface::class, true)) {
+            if (!is_a($roleClassName, Role::class, true)) {
                 throw new \RuntimeException(
-                    sprintf('Expected %s, %s given', RoleInterface::class, $roleClassName)
+                    sprintf('Expected %s, %s given', Role::class, $roleClassName)
                 );
             }
 
-            /** @var RoleInterface|null $role */
+            /** @var Role|null $role */
             $role = $em->getRepository($roleClassName)
                 ->findOneBy(['role' => User::ROLE_DEFAULT]);
             if (!$role) {

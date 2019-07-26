@@ -103,6 +103,21 @@ class FormCompilerPass implements CompilerPassInterface
             $apiFormExtensionDef->replaceArgument(1, $this->getApiFormTypes($container, $formTypeClassNames));
             $apiFormExtensionDef->replaceArgument(2, $this->getApiFormTypeExtensions($container));
             $apiFormExtensionDef->replaceArgument(3, $this->getApiFormTypeGuessers($container));
+
+            $serviceList = array_merge(
+                $apiFormExtensionDef->getArgument(1),
+                $apiFormExtensionDef->getArgument(3),
+                ...array_values($apiFormExtensionDef->getArgument(2))
+            );
+
+            foreach ($serviceList as $serviceId) {
+                if ($serviceId) {
+                    $serviceLocatorServices[$serviceId] = new Reference($serviceId);
+                }
+            }
+
+            $serviceLocator = $container->getDefinition('oro_api.form.extension_locator');
+            $serviceLocator->replaceArgument(0, $serviceLocatorServices ?? []);
         }
         if ($container->hasDefinition(self::API_FORM_METADATA_GUESSER_SERVICE_ID)) {
             $dataTypeMappings = [];

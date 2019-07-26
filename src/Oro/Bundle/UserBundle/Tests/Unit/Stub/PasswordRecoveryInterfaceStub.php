@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Stub;
 
 use Oro\Bundle\UserBundle\Entity\PasswordRecoveryInterface;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
-use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\Role\Role;
 
 class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryInterface
 {
@@ -139,7 +139,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     /**
      * {@inheritdoc}
      */
-    public function addRole(RoleInterface $role)
+    public function addRole(Role $role)
     {
         return $this;
     }

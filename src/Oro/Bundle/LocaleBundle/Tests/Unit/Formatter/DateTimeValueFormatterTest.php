@@ -21,7 +21,7 @@ class DateTimeValueFormatterTest extends \PHPUnit\Framework\TestCase
             ->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+        $this->translator = $this->getMockBuilder('Symfony\Contracts\Translation\TranslatorInterface')
             ->getMock();
 
         $this->formatter = new DateTimeValueFormatter(

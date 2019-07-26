@@ -6,7 +6,7 @@ use Oro\Bundle\UIBundle\Tools\FlashMessageHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FlashMessageHelperTest extends \PHPUnit\Framework\TestCase
 {

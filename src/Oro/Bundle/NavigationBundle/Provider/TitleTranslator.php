@@ -3,7 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TitleTranslator
 {

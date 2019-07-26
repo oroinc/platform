@@ -19,6 +19,11 @@ class OroIntegrationExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('actions.yml');
         $loader->load('services.yml');
+
+        if ($container->getParameter('kernel.environment') === 'test') {
+            $loader->load('services_test.yml');
+        }
+
         $loader->load('rest_transport.yml');
         $loader->load('repositories.yml');
         $loader->load('factories.yml');

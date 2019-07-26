@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Combine author name and impersonation for audit data grid

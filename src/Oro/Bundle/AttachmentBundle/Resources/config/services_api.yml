@@ -1,5 +1,5 @@
 services:
-    oro_attachment.api.customize_loaded_data.compute_file_content:
+    oro_attachment.api.compute_file_content:
         class: Oro\Bundle\AttachmentBundle\Api\Processor\ComputeFileContent
         arguments:
             - '@oro_attachment.file_manager'

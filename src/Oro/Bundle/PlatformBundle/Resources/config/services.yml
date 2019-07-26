@@ -13,6 +13,13 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_platform.service_link.service_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        arguments:
+            - []
+        tags:
+            - { name: container.service_locator }
+
     oro_platform.maintenance:
         class: Oro\Bundle\PlatformBundle\Maintenance\Mode
         arguments:
@@ -50,6 +57,7 @@ services:
 
     oro_platform.form.url_generator:
         class: 'Oro\Bundle\PlatformBundle\Form\UrlGenerator'
+        public: true
         arguments:
             - '@oro_platform.provider.package'
             - '@oro_platform.url.cache'

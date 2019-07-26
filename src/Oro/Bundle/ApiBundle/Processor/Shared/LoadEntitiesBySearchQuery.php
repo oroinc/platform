@@ -14,7 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class LoadEntitiesBySearchQuery implements ProcessorInterface
 {
     /** @var SearchIndex */
-    protected $searchIndex;
+    private $searchIndex;
 
     /**
      * @param SearchIndex $searchIndex

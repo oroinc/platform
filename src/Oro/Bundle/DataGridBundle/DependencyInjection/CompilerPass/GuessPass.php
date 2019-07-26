@@ -4,7 +4,11 @@ namespace Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Collect datagrid column options guessers and set them to the main guesser.
+ */
 class GuessPass implements CompilerPassInterface
 {
     const COLUMN_OPTIONS_GUESSER_ID       = 'oro_datagrid.datagrid.guesser';
@@ -17,8 +21,14 @@ class GuessPass implements CompilerPassInterface
     {
         if ($container->hasDefinition(self::COLUMN_OPTIONS_GUESSER_ID)) {
             $serviceDef = $container->getDefinition(self::COLUMN_OPTIONS_GUESSER_ID);
-            $guessers = array_keys($container->findTaggedServiceIds(self::COLUMN_OPTIONS_GUESSER_TAG_NAME));
-            $serviceDef->replaceArgument(1, $guessers);
+            $guessers = $container->findTaggedServiceIds(self::COLUMN_OPTIONS_GUESSER_TAG_NAME);
+
+            $guesserServices = [];
+
+            foreach ($guessers as $gusserServiceId => $definition) {
+                $guesserServices[$gusserServiceId] = new Reference($gusserServiceId);
+            }
+            $serviceDef->replaceArgument(0, $guesserServices);
         }
     }
 }

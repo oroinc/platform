@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Action;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ActionMetadataFactory
 {

@@ -29,7 +29,7 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
             ->with('SomeEntityClass')
             ->willReturn($entityConfig);
 
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
 
         $this->target = new MergeMassAction($entityConfigProvider, $translator);
     }

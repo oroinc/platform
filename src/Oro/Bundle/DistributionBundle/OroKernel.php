@@ -250,8 +250,7 @@ abstract class OroKernel extends Kernel
             'file' => $cache->getPath(),
             'as_files' => true,
             'debug' => $this->debug,
-            'inline_class_loader_parameter' => \PHP_VERSION_ID >= 70000 && !$this->loadClassCache
-                && !class_exists(ClassCollectionLoader::class, false)
+            'inline_class_loader_parameter' => !class_exists(ClassCollectionLoader::class, false)
                 ? 'container.dumper.inline_class_loader'
                 : null,
             'build_time' => $container->hasParameter('kernel.container_build_time')
@@ -290,24 +289,6 @@ abstract class OroKernel extends Kernel
         }
 
         parent::initializeContainer();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBundle($name, $first = true)
-    {
-        // if need to get this precise bundle
-        if (strpos($name, '!') === 0) {
-            $name = substr($name, 1);
-            if (isset($this->bundleMap[$name])) {
-                // current bundle is always the last
-                $bundle = end($this->bundleMap[$name]);
-                return $first ? $bundle : array($bundle);
-            }
-        }
-
-        return parent::getBundle($name, $first);
     }
 
     /**

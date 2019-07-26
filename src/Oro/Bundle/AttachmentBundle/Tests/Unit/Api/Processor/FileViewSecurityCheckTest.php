@@ -2,40 +2,33 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Api\Processor;
 
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\AttachmentBundle\Api\Processor\FileViewSecurityCheck;
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Component\ChainProcessor\ContextInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class FileViewSecurityCheckTest extends \PHPUnit\Framework\TestCase
+class FileViewSecurityCheckTest extends GetProcessorTestCase
 {
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
-
-    /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $context;
 
     /** @var FileViewSecurityCheck */
     private $processor;
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
-        $this->context = $this->createMock(ContextInterface::class);
         $this->processor = new FileViewSecurityCheck($this->authorizationChecker);
     }
 
-    public function testProcessWhenGranted(): void
+    public function testProcessWhenAccessGranted()
     {
-        $this->context
-            ->method('get')
-            ->willReturnMap([
-                ['class', $fileClass = File::class],
-                ['id', $fileId = 1],
-            ]);
+        $fileClass = File::class;
+        $fileId = 123;
 
         $this->authorizationChecker
             ->expects($this->once())
@@ -43,17 +36,19 @@ class FileViewSecurityCheckTest extends \PHPUnit\Framework\TestCase
             ->with('VIEW', new ObjectIdentity($fileId, $fileClass))
             ->willReturn(true);
 
+        $this->context->setClassName($fileClass);
+        $this->context->setId($fileId);
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNotGranted(): void
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @expectedExceptionMessage No access to the entity.
+     */
+    public function testProcessWhenAccessDenied()
     {
-        $this->context
-            ->method('get')
-            ->willReturnMap([
-                ['class', $fileClass = File::class],
-                ['id', $fileId = 1],
-            ]);
+        $fileClass = File::class;
+        $fileId = 123;
 
         $this->authorizationChecker
             ->expects($this->once())
@@ -61,8 +56,8 @@ class FileViewSecurityCheckTest extends \PHPUnit\Framework\TestCase
             ->with('VIEW', new ObjectIdentity($fileId, $fileClass))
             ->willReturn(false);
 
-        $this->expectException(AccessDeniedException::class);
-
+        $this->context->setClassName($fileClass);
+        $this->context->setId($fileId);
         $this->processor->process($this->context);
     }
 }

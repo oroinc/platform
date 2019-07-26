@@ -12,7 +12,7 @@ services:
 
     oro_migration.service_container:
         class: Oro\Bundle\MigrationBundle\Container\MigrationContainer
-        public: false
+        public: true
         arguments:
             - '@?parameter_bag'
             - '@service_container'

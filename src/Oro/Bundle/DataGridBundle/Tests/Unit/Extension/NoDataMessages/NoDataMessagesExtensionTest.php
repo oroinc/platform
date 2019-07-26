@@ -9,7 +9,7 @@ use Oro\Bundle\DataGridBundle\Extension\NoDataMessages\NoDataMessagesExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NoDataMessagesExtensionTest extends \PHPUnit\Framework\TestCase
 {

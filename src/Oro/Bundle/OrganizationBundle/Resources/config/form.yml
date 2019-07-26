@@ -4,7 +4,7 @@ parameters:
     oro_organization.form.type.business_unit_tree_type.class:        Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeType
     oro_organization.form.type.business_unit_tree_select_type.class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeSelectType
     oro_organization.form.type.business_unit.api.class:              Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitApiType
-    oro_organization.form.type.businesS_unit_select.class:           Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectType
+    oro_organization.form.type.business_unit_select.class:           Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectType
 
     oro_organization.form.type.organization.class:                   Oro\Bundle\OrganizationBundle\Form\Type\OrganizationType
     oro_organization.form.handler.organization.class:                Oro\Bundle\OrganizationBundle\Form\Handler\OrganizationHandler

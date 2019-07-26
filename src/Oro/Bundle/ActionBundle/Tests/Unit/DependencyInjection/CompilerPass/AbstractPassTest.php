@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection\CompilerPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\AbstractPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 abstract class AbstractPassTest extends \PHPUnit\Framework\TestCase
 {
@@ -66,6 +67,9 @@ abstract class AbstractPassTest extends \PHPUnit\Framework\TestCase
                     'service.definition.second' => [[]],
                 ]
             );
+        $this->container->expects($this->any())
+            ->method('getParameterBag')
+            ->willReturn(new ParameterBag());
 
         $this->compilerPass->process($this->container);
     }

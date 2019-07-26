@@ -47,6 +47,8 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
 
         $this->doctrineHelper->expects(self::never())
             ->method('getManageableEntityClass');
+        $this->doctrineHelper->expects(self::never())
+            ->method('createQueryBuilder');
 
         $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
@@ -63,6 +65,8 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
             ->method('getManageableEntityClass')
             ->with($parentClass, $parentConfig)
             ->willReturn(null);
+        $this->doctrineHelper->expects(self::never())
+            ->method('createQueryBuilder');
 
         $this->context->setParentClassName($parentClass);
         $this->context->setParentConfig($parentConfig);
@@ -123,14 +127,18 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
             ->method('getManageableEntityClass')
             ->with($parentClass, $parentConfig)
             ->willReturn($parentClass);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityIdentifierFieldNamesForClass')
+            ->with($parentClass)
+            ->willReturn(['id']);
 
         $qb = $this->createMock(QueryBuilder::class);
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('createQueryBuilder')
             ->with($parentClass, 'e')
             ->willReturn($qb);
 
-        $this->entityIdHelper->expects(self::once())
+        $this->entityIdHelper->expects(self::exactly(2))
             ->method('applyEntityIdentifierRestriction')
             ->with(self::identicalTo($qb), $parentId, self::identicalTo($parentMetadata));
 
@@ -142,6 +150,72 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
         $query->expects(self::once())
             ->method('getOneOrNullResult')
             ->willReturn(null);
+
+        $notAclProtectedQuery = $this->createMock(AbstractQuery::class);
+        $qb->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($notAclProtectedQuery);
+        $notAclProtectedQuery->expects(self::once())
+            ->method('getOneOrNullResult')
+            ->with(AbstractQuery::HYDRATE_ARRAY)
+            ->willReturn(null);
+
+        $this->context->setParentClassName($parentClass);
+        $this->context->setParentId($parentId);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasParentEntity());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @expectedExceptionMessage No access to the parent entity.
+     */
+    public function testProcessForManageableEntityWhenNoAccessToEntity()
+    {
+        $parentClass = 'Test\Class';
+        $parentId = 123;
+        $parentConfig = new EntityDefinitionConfig();
+        $parentMetadata = new EntityMetadata();
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getManageableEntityClass')
+            ->with($parentClass, $parentConfig)
+            ->willReturn($parentClass);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityIdentifierFieldNamesForClass')
+            ->with($parentClass)
+            ->willReturn(['id']);
+
+        $qb = $this->createMock(QueryBuilder::class);
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('createQueryBuilder')
+            ->with($parentClass, 'e')
+            ->willReturn($qb);
+
+        $this->entityIdHelper->expects(self::exactly(2))
+            ->method('applyEntityIdentifierRestriction')
+            ->with(self::identicalTo($qb), $parentId, self::identicalTo($parentMetadata));
+
+        $query = $this->createMock(AbstractQuery::class);
+        $this->queryFactory->expects(self::once())
+            ->method('getQuery')
+            ->with(self::identicalTo($qb), self::identicalTo($parentConfig))
+            ->willReturn($query);
+        $query->expects(self::once())
+            ->method('getOneOrNullResult')
+            ->willReturn(null);
+
+        $notAclProtectedQuery = $this->createMock(AbstractQuery::class);
+        $qb->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($notAclProtectedQuery);
+        $notAclProtectedQuery->expects(self::once())
+            ->method('getOneOrNullResult')
+            ->with(AbstractQuery::HYDRATE_ARRAY)
+            ->willReturn(['id' => $parentId]);
 
         $this->context->setParentClassName($parentClass);
         $this->context->setParentId($parentId);

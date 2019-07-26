@@ -48,6 +48,7 @@ class ParentEntityObjectSecurityCheckTest extends ChangeRelationshipProcessorTes
 
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @expectedExceptionMessage No access by "VIEW" permission to the parent entity.
      */
     public function testProcessWhenAccessDenied()
     {

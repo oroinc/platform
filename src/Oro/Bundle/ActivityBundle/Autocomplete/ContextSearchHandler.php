@@ -18,7 +18,7 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This is specified handler that search targets entities for specified activity class.

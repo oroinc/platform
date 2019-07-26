@@ -11,12 +11,13 @@ use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Exception\LockedException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
 {
@@ -119,6 +120,8 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
             [$this->createExecutionFailedException(new BadRequestHttpException()), 'bad request http exception'],
             [new RuntimeException('Some error.'), 'runtime exception'],
             [new ActionNotAllowedException(), 'action not allowed exception'],
+            [new AccessDeniedException('Reason.'), 'access denied exception'],
+            [new AccessDeniedHttpException('Reason.'), 'access denied exception'],
             [new ForbiddenException('Reason.'), 'forbidden exception'],
             [new LockedException('Reason.'), 'authentication exception'],
             [new DisabledException('Reason.'), 'authentication exception'],

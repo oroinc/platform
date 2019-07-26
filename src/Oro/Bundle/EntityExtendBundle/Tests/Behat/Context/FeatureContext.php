@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Behat\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 
@@ -46,5 +47,34 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext
             'oro_entity_config_entity_field.export_template',
             ['entity_id' => $entityModel->getId()]
         );
+    }
+
+    /**
+     * @Given /^(?:|I )check if field "(?P<field>.*)" "(?P<cond>.*)" in db table by entity class "(?P<class>.*)"$/
+     *
+     * @param string $field
+     * @param string $cond
+     * @param string $class
+     */
+    public function checkIfFieldNotOrIsInDbTableByEntityClass(string $field, string $cond, string $class)
+    {
+        self::assertContains($cond, ['is', 'not']);
+        /** @var DoctrineHelper $dh */
+        $dh = $this->getContainer()->get('oro_entity.doctrine_helper');
+
+        $em = $dh->getEntityManager($class);
+        $sm = $em->getConnection()->getSchemaManager();
+
+        $tableName = $em->getClassMetadata($class)->getTableName();
+
+        $columns = $columns = $sm->listTableColumns($tableName);
+
+        $columnsArray = [];
+        foreach ($columns as $column) {
+            $columnsArray[] = $column->getName();
+        }
+        $cond === 'is' ?
+            self::assertContains($field, $columnsArray) :
+                self::assertNotContains($field, $columnsArray);
     }
 }

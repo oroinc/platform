@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AttributeFamilyFormViewListener
 {

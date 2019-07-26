@@ -110,7 +110,7 @@ services:
 
     oro_distribution.composer.installation_manager:
         class: '%oro_distribution.composer.installation_manager.class%'
-        public: false
+        public: true
         factory: ['@oro_distribution.composer', getInstallationManager]
         lazy: true
 

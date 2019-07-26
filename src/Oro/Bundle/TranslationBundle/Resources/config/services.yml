@@ -24,6 +24,7 @@ parameters:
 services:
     oro_translation.controller:
         class: '%oro_translation.controller.class%'
+        public: true
         arguments:
             - '@translator.default'
             - '@templating'
@@ -162,6 +163,7 @@ services:
             - '%kernel.project_dir%'
             - '@oro_translation.provider.language'
         lazy: true
+        public: true
 
     oro_translation.twig.translation.extension:
         class: 'Oro\Bundle\TranslationBundle\Twig\TranslationExtension'
@@ -282,6 +284,7 @@ services:
 
     oro_translation.provider.translation_context:
         class: 'Oro\Bundle\TranslationBundle\Provider\TranslationContextProvider'
+        public: true
 
     oro_translation.extension.translation_context_resolver:
         class: 'Oro\Bundle\TranslationBundle\Extension\TranslationContextResolver'
@@ -359,11 +362,13 @@ services:
     oro_translation.mass_action.reset_translation:
         class: 'Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassAction'
         shared: false
+        public: true
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: reset_translations }
 
     oro_translation.mass_action.reset_translation_handler:
         class: 'Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassActionHandler'
+        public: true
         arguments:
            - '@oro_translation.manager.translation'
            - '@translator'

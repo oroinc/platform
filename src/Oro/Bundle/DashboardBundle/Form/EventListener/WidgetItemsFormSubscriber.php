@@ -6,7 +6,7 @@ use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetItemsFormSubscriber implements EventSubscriberInterface
 {

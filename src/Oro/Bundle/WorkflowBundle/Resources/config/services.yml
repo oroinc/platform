@@ -11,12 +11,14 @@ services:
     oro_workflow.datagrid.action.workflow_activate:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowActivateAction'
         shared: false
+        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: workflow-activate }
 
     oro_workflow.datagrid.action.workflow_deactivate:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowDeactivateAction'
         shared: false
+        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: workflow-deactivate }
 
@@ -138,6 +140,7 @@ services:
 
     oro_workflow.registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
+        public: true
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.workflow_assembler'
@@ -394,6 +397,7 @@ services:
 
     oro_workflow.helper.translation:
         class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper'
+        public: true
         arguments:
             - '@translator.default'
             - '@oro_translation.manager.translation'
@@ -625,6 +629,7 @@ services:
 
     oro_workflow.helper.workflow_deactivation:
         class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowDeactivationHelper'
+        public: true
         arguments:
             - '@oro_workflow.registry.system'
             - '@oro_workflow.helper.translation'

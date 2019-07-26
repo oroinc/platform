@@ -85,6 +85,10 @@ define(function(require) {
             });
             this.subview('contentView', contentView);
 
+            if (contentView.listenToUpdatePosition) {
+                this.listenTo(this, 'updatePosition', contentView.onUpdatePosition.bind(contentView));
+            }
+
             var widgetIconView = new IconView({
                 autoRender: true,
                 model: this.model,
@@ -105,7 +109,7 @@ define(function(require) {
             var changedAttrs = _.keys(model.changedAttributes());
             if (_.difference(changedAttrs, ignoreAttrs).length) {
                 this.render();
-                this.updatePosition();
+                this.trigger('updatePosition');
             }
         },
 
@@ -114,6 +118,7 @@ define(function(require) {
             var isExpanded = isPoppedUp || this.model.get('state') === constants.WIDGET_MAXIMIZED;
             this.$el.toggleClass('poppedup', isPoppedUp);
             this.$el.toggleClass('expanded', isExpanded);
+            this.trigger('updatePosition');
         },
 
         updateHighlight: function() {
@@ -140,7 +145,7 @@ define(function(require) {
                 if (this.model.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
                     rect = $content[0].getBoundingClientRect();
                     contentMargin = $content.outerHeight(true) - rect.height;
-                    $content.css('max-height', windowHeight - rect.top - contentMargin + 'px');
+                    $content.css('max-height', windowHeight - rect.top - contentMargin);
                 } else {
                     $content.css('max-height', 'none');
                 }
@@ -182,7 +187,7 @@ define(function(require) {
                 return;
             }
             this.model.toggleHoverState();
-            this.updatePosition();
+            this.trigger('updatePosition');
         },
 
         onWidgetDialogOpen: function() {

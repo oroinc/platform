@@ -5,7 +5,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Provider;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Provider\GroupSearchProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GroupSearchProviderTest extends \PHPUnit\Framework\TestCase
 {

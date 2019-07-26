@@ -3,9 +3,9 @@
 namespace Oro\Bundle\SegmentBundle\Validator;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SortingValidator extends ConstraintValidator
 {

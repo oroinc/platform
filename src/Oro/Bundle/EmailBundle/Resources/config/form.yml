@@ -130,6 +130,7 @@ services:
 
     oro_email.form.handler.email:
         class: '%oro_email.form.handler.email.class%'
+        public: true
         arguments:
             - '@oro_email.form.email'
             - '@request_stack'
@@ -141,6 +142,7 @@ services:
 
     oro_email.form.email:
         class: Symfony\Component\Form\Form
+        public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_email_email", Oro\Bundle\EmailBundle\Form\Type\EmailType, null]
 
@@ -246,11 +248,13 @@ services:
 
     oro_email.form.handler.email_configuration:
         class: 'Oro\Bundle\EmailBundle\Form\Handler\EmailConfigurationHandler'
+        public: true
         arguments:
             - '@event_dispatcher'
 
     oro_email.form.configurator.email_configuration:
         class: 'Oro\Bundle\EmailBundle\Form\Configurator\EmailConfigurationConfigurator'
+        public: true
         arguments:
             - '@oro_security.encoder.default'
             - '@validator'

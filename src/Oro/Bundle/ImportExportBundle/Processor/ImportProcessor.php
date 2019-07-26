@@ -92,7 +92,7 @@ class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface
         $object = $this->serializer->deserialize(
             $item,
             $this->getEntityName(),
-            null,
+            '',
             $this->context->getConfiguration()
         );
 

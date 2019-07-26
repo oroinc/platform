@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Datagrid\Action;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\AbstractAction;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ButtonWidgetAction extends AbstractAction
 {

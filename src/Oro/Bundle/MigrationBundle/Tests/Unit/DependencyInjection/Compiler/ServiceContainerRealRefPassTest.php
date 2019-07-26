@@ -45,7 +45,6 @@ class ServiceContainerRealRefPassTest extends \PHPUnit\Framework\TestCase
             ->with('oro_migration.service_container')
             ->willReturn(true);
 
-        $container = new Definition(MigrationContainer::class, [null, null, new Reference('test.service_locator')]);
         $serviceLocator = new Definition(
             ServiceLocator::class,
             [
@@ -56,14 +55,12 @@ class ServiceContainerRealRefPassTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->containerBuilder->expects($this->exactly(2))
+        $container = new Definition(MigrationContainer::class, [null, null, $serviceLocator]);
+
+        $this->containerBuilder->expects($this->once())
             ->method('getDefinition')
-            ->willReturnMap(
-                [
-                    ['oro_migration.service_container', $container],
-                    ['test.service_locator', $serviceLocator],
-                ]
-            );
+            ->with('oro_migration.service_container')
+            ->willReturn($container);
 
         $this->containerBuilder->expects($this->once())
             ->method('getDefinitions')
@@ -74,7 +71,6 @@ class ServiceContainerRealRefPassTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             [
                 'service1' => new ServiceClosureArgument(new Reference('service1')),
-                'service2' => new ServiceClosureArgument(new Reference('service2')),
             ],
             $serviceLocator->getArgument(0)
         );

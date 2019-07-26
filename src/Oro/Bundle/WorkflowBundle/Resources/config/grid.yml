@@ -1,6 +1,7 @@
 services:
     oro_workflow.datagrid.action_permission_provider:
         class: Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider
+        public: true
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
             - '@oro_workflow.configuration.checker'
@@ -15,11 +16,13 @@ services:
 
     oro_workflow.datagrid.process_definition_entity_name_provider:
         parent: oro_workflow.datagrid.abstract_entity_name_provider
+        public: true
         calls:
             - [setEntityName, ["OroWorkflowBundle:ProcessDefinition"]]
 
     oro_workflow.datagrid.workflow_definition_entity_name_provider:
         parent: oro_workflow.datagrid.abstract_entity_name_provider
+        public: true
         calls:
             - [setEntityName, ["OroWorkflowBundle:WorkflowDefinition"]]
 

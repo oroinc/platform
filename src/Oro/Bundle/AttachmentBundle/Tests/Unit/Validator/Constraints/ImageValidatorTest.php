@@ -81,6 +81,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ file }}', '"' . __FILE__ . '"')
             ->setParameter('{{ types }}', '"image/png", "image/jpg", "image/gif"')
             ->setParameter('{{ type }}', '"image/svg"')
+            ->setParameter('{{ name }}', '"ImageValidatorTest.php"')
             ->assertRaised();
     }
 }

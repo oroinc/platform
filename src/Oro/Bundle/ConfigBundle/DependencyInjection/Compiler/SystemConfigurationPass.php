@@ -102,6 +102,7 @@ class SystemConfigurationPass implements CompilerPassInterface
         }
         foreach ($managerDefs as $scope => $managerDef) {
             $managerDef->replaceArgument(0, $scope);
+            $managerDef->setLazy(true);
             $managerId = 'oro_config.' . $scope;
             $container->setDefinition($managerId, $managerDef);
             $apiManagerDef->addMethodCall('addConfigManager', [$scope, new Reference($managerId)]);
@@ -110,6 +111,7 @@ class SystemConfigurationPass implements CompilerPassInterface
         // a main config manager should be an alias to the most priority scoped config manager
         $container->removeDefinition(self::MAIN_MANAGER_SERVICE);
         $container->setAlias(self::MAIN_MANAGER_SERVICE, 'oro_config.' . $mainScope);
+        $container->getAlias(self::MAIN_MANAGER_SERVICE)->setPublic(true);
     }
 
     /**

@@ -1,18 +1,20 @@
 services:
     oro_email.direct_mailer:
         class: Oro\Bundle\EmailBundle\Tests\Behat\Mock\Mailer\DirectMailerMock
+        public: true
         arguments:
             - '@mailer'
             - '@service_container'
 
     oro_email.direct_mailer.cache:
-        public: false
+        public: true
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_behat_email_messages' ] ]
 
     oro_email.direct_mailer.decorator:
         class: Oro\Bundle\EmailBundle\Tests\Behat\Mock\Mailer\DirectMailerDecorator
+        public: true
         decorates: oro_email.direct_mailer
         arguments:
             - '@oro_email.direct_mailer.decorator.inner'

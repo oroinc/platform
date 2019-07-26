@@ -24,7 +24,7 @@ use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -365,7 +365,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
             'reflFields' => [
                 'id' => new ReflectionProperty(CustomerStub::class, 'id', [spl_object_hash($object) => 1])
             ],
-        ]);
+        ], [null]);
 
         $this->registry->expects(self::once())
             ->method('getManagerForClass')

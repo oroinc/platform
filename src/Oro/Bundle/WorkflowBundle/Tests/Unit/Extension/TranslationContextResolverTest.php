@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Extension;
 use Oro\Bundle\WorkflowBundle\Extension\TranslationContextResolver;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TranslationContextResolverTest extends \PHPUnit\Framework\TestCase
 {

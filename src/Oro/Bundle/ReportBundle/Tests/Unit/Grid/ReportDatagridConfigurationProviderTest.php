@@ -8,7 +8,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -76,7 +76,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
             $this->functionProvider,
             $this->virtualFieldProvider,
             $this->doctrine,
-            new DatagridGuesserMock(),
+            new DatagridGuesser([]),
             $entityNameResolver
         );
 

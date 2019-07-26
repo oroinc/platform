@@ -6,18 +6,17 @@ define(function(require) {
     var mediator = require('../mediator');
     var persistentStorage = require('oroui/js/persistent-storage');
     var SideMenuOverlay = require('oroui/js/desktop/side-menu-overlay');
+    var ScrollingOverlay = require('oroui/js/app/views/scrolling-overlay-view');
 
     var STATE_STORAGE_KEY = 'main-menu-state';
     var MAXIMIZED_STATE = 'maximized';
     var MINIMIZED_STATE = 'minimized';
-    var ENTER_KEY_CODE = 13;
 
     $.widget('oroui.desktopSideMenu', $.oroui.sideMenu, {
         options: {
             menuSelector: '#main-menu',
             innerMenuSelector: '.menu:eq(0)',
-            innerMenuItemClassName: 'menu-item',
-            invisibleClassName: 'invisible'
+            innerMenuItemClassName: 'menu-item'
         },
 
         overlay: null,
@@ -25,8 +24,6 @@ define(function(require) {
         dropdownIndex: null,
 
         timeout: 50,
-
-        timer: null,
 
         /**
          * Do initial changes
@@ -41,28 +38,20 @@ define(function(require) {
         _create: function() {
             this._super();
 
-            this.listener
-                .listenTo(mediator, 'layout:reposition', _.debounce(this.onChangeReposition, this.timeout).bind(this));
-
             this.$menu = this.element.find(this.options.menuSelector);
-            this.$menuScrollContent = this.element.find('.nav-multilevel');
-            this.$scrollHandles = this.element.find('[data-role="scroll-trigger"]');
-            this.scrollStep = this.getScrollStep();
 
             this._on(this.element, {
                 'click .dropdown-level-1': this.onMenuOpen,
-                'keydown [data-role="scroll-trigger"]': this.onMenuScroll,
-                'mousedown [data-role="scroll-trigger"]': this.onMenuHoldScroll,
-                'mouseup [data-role="scroll-trigger"]': this.undoMenuHoldScroll,
-                'mouseout [data-role="scroll-trigger"]': this.undoMenuHoldScroll,
                 'transitionend .accordion': function() {
                     mediator.trigger('layout:reposition');
                 }
             });
-            this._on(this.$menuScrollContent, {
-                scroll: _.debounce(this.toggleScrollTriggers, this.timeout)
-            });
 
+            this.scrollingOverlay = new ScrollingOverlay({
+                autoRender: true,
+                scrollStep: this.getHeightOfFirstMenuItem(),
+                $scrollingContent: this.element.find('.nav-multilevel')
+            });
             this.overlay = new SideMenuOverlay();
             this.overlay
                 .on('open', this._attachHandlersFormDocument.bind(this))
@@ -98,7 +87,11 @@ define(function(require) {
             );
             this._update();
             mediator.trigger('layout:adjustHeight');
-            this.scrollStep = this.getScrollStep();
+            this.scrollingOverlay.setScrollStep(this.getHeightOfFirstMenuItem());
+        },
+
+        getHeightOfFirstMenuItem: function() {
+            return Math.ceil(this.element.find('.nav-multilevel').children().first().outerHeight());
         },
 
         /**
@@ -113,6 +106,8 @@ define(function(require) {
             this.overlay.dispose();
             delete this.overlay;
             delete this.dropdownIndex;
+            this.scrollingOverlay.dispose();
+            delete this.scrollingOverlay;
 
             this._removeHandlersFormDocument();
         },
@@ -143,51 +138,6 @@ define(function(require) {
          */
         _removeHandlersFormDocument: function() {
             $(document).off(this.eventNamespace);
-        },
-
-        /**
-         * Change sidebar width for minimized state
-         */
-        onChangeReposition: function() {
-            this.toggleScrollTriggers();
-        },
-
-        /**
-         * Show / hide scroll handles
-         */
-        toggleScrollTriggers: function() {
-            var bottomPosition = _.reduce(this.$menuScrollContent.children(), function(result, item) {
-                return result + $(item).outerHeight();
-            }, 0);
-            var scrollContentHeight = this.$menuScrollContent.outerHeight();
-            var scrollTop = this.$menuScrollContent.scrollTop();
-
-            this.$scrollHandles.removeClass(this.options.invisibleClassName);
-
-            if (scrollContentHeight >= bottomPosition) {
-                this.$scrollHandles.addClass(this.options.invisibleClassName);
-                return;
-            }
-
-            this.$scrollHandles
-                .filter('[data-direction="up"]')
-                .toggleClass(this.options.invisibleClassName,
-                    scrollTop === 0
-                );
-
-            this.$scrollHandles
-                .filter('[data-direction="down"]')
-                .toggleClass(
-                    this.options.invisibleClassName,
-                    scrollTop >= bottomPosition - scrollContentHeight
-                );
-        },
-
-        /**
-         * @returns {number}
-         */
-        getScrollStep: function() {
-            return Math.ceil(this.$menuScrollContent.children().first().outerHeight());
         },
 
         /**
@@ -226,48 +176,6 @@ define(function(require) {
             }
 
             this.dropdownIndex = index;
-        },
-
-        /**
-         * Handle menu scroll action
-         *
-         * @param {Event} event
-         */
-        onMenuScroll: function(event) {
-            if (typeof event.keyCode === 'number' && event.keyCode !== ENTER_KEY_CODE) {
-                return;
-            }
-
-            this.toggleScrollTriggers();
-
-            switch ($(event.currentTarget).data('direction')) {
-                case 'up':
-                    this.$menuScrollContent.scrollTop(this.$menuScrollContent.scrollTop() - this.scrollStep);
-                    break;
-                case 'down':
-                    this.$menuScrollContent.scrollTop(this.$menuScrollContent.scrollTop() + this.scrollStep);
-                    break;
-            }
-        },
-
-        /**
-         * Undo scroll
-         */
-        undoMenuHoldScroll: function() {
-            clearInterval(this.timer);
-        },
-
-        /**
-         * Handle menu hold scroll action
-         *
-         * @param {Event} event
-         */
-        onMenuHoldScroll: function(event) {
-            this.onMenuScroll(event);
-
-            this.timer = setInterval(function() {
-                this.onMenuScroll(event);
-            }.bind(this), 150);
         },
 
         /**

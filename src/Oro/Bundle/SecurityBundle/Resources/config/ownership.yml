@@ -19,6 +19,7 @@ services:
 
     oro_security.owner.metadata_provider.chain:
         class: Oro\Bundle\SecurityBundle\Owner\Metadata\ChainOwnershipMetadataProvider
+        public: true
         calls:
             - [setDefaultProvider, ['@oro_security.owner.ownership_metadata_provider']]
 

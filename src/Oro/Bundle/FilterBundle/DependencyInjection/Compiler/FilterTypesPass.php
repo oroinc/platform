@@ -44,7 +44,6 @@ class FilterTypesPass implements CompilerPassInterface
                     ));
                 }
 
-                $container->getDefinition($serviceId)->setPublic(false);
                 $filters[$attributes['type']] = new Reference($serviceId);
             }
         }
