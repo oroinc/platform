@@ -10,7 +10,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\LockHandler;
+use Symfony\Component\Lock\Factory;
+use Symfony\Component\Lock\Store\SemaphoreStore;
 
 /**
  * The CLI command to synchronize email body.
@@ -98,8 +99,11 @@ class EmailBodySyncCommand extends Command implements CronCommandInterface
             return 0;
         }
 
-        $lock = new LockHandler('oro:cron:email-body-sync');
-        if (!$lock->lock()) {
+        $store = new SemaphoreStore();
+        $lockFactory = new Factory($store);
+
+        $lock = $lockFactory->createLock('oro:cron:email-body-sync');
+        if (!$lock->acquire()) {
             $output->writeln('The command is already running in another process.');
 
             return 0;

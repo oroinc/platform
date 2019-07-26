@@ -131,7 +131,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     protected function getSupportedQueryParameters($methodName)
     {
         /** @var ParamFetcherInterface $paramFetcher */
-        $paramFetcher = $this->container->get('fos_rest.request.param_fetcher');
+        $paramFetcher = $this->container->get('oro_soap.request.param_fetcher');
         $paramFetcher->setController([$this, $methodName]);
 
         $skipParameters = ['limit', 'page'];

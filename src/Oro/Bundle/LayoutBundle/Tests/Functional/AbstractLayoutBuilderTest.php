@@ -37,7 +37,7 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
         // prepare test environment
         $container = $this->getContainer();
         $this->initialBundles = CumulativeResourceManager::getInstance()->getBundles();
-        $this->initialThemeManager = $container->get('oro_layout.theme_manager');
+
         $this->resourcesProvider = $container->get('oro_layout.tests.theme_extension.resource_provider.theme');
     }
 
@@ -48,8 +48,7 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
     {
         $container = $this->getContainer();
         CumulativeResourceManager::getInstance()->setBundles($this->initialBundles);
-        // revert overridden service
-        $container->set('oro_layout.theme_manager', $this->initialThemeManager);
+
         // clear caches that are changed in getLayout()
         $container->get('oro_layout.cache.block_view_cache')->reset();
         $this->resourcesProvider->warmUpCache();
@@ -105,7 +104,7 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
             new ThemeFactory(PropertyAccess::createPropertyAccessor()),
             $themeDefinitionBag
         );
-        $this->getContainer()->set('oro_layout.theme_manager', $themeManager);
+        $this->getContainer()->set('oro_layout.theme_manager.test', $themeManager);
 
         $this->resourcesProvider->warmUpCache();
 

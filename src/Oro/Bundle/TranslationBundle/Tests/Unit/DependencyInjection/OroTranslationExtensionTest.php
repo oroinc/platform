@@ -49,7 +49,7 @@ class OroTranslationExtensionTest extends \PHPUnit\Framework\TestCase
         $actualParameters  = array();
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->setMethods(array('setDefinition', 'setParameter', 'getDefinition'))
+            ->setMethods(array('setDefinition', 'setParameter', 'getDefinition', 'getParameter'))
             ->getMock();
         $container->expects($this->any())
             ->method('setDefinition')
@@ -78,6 +78,11 @@ class OroTranslationExtensionTest extends \PHPUnit\Framework\TestCase
                     }
                 )
             );
+
+        $container->expects($this->any())
+            ->method('getParameter')
+            ->with('kernel.environment')
+            ->willReturn('prod');
 
         $extension = new OroTranslationExtension();
         $extension->load($this->config, $container);

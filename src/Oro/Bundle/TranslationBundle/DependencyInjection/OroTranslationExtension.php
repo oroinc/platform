@@ -23,6 +23,10 @@ class OroTranslationExtension extends Extension
         $loader->load('importexport.yml');
         $loader->load('commands.yml');
 
+        if ($container->getParameter('kernel.environment') === 'test') {
+            $loader->load('services_test.yml');
+        }
+
         $container
             ->getDefinition('oro_translation.controller')
             ->replaceArgument(3, $config['js_translation']);

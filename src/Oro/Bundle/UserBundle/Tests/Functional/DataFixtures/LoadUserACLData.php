@@ -12,7 +12,6 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\Role\Role;
 
 class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
@@ -129,7 +128,7 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
         $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
 
         foreach (static::getUsers() as $item) {
-            /** @var RoleInterface $role */
+            /** @var Role $role */
             $role = $this->getReference($item['role']);
             /** @var User $user */
             $user = $userManager->createUser();

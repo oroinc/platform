@@ -46,5 +46,6 @@ class TranslatorDependencyPass implements CompilerPassInterface
 
         $isInstalled = $container->hasParameter('installed') && $container->getParameter('installed');
         $translatorDef->addMethodCall('setInstalled', [$isInstalled]);
+        $translatorDef->setPublic(true);
     }
 }

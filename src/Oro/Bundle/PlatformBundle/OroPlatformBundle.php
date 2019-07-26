@@ -9,6 +9,7 @@ use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineOrmListen
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyServicesCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\OptionalListenersCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\TwigServiceLocatorPass;
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UndoLazyEntityManagerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineConfigurationPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineEventHandlersPass;
 use Oro\Component\DependencyInjection\Compiler\ServiceLinkCompilerPass;
@@ -61,6 +62,7 @@ class OroPlatformBundle extends Bundle
                 RegisterEventListenersAndSubscribersPass::class
             );
         }
+        $container->addCompilerPass(new UndoLazyEntityManagerPass());
         $container->addCompilerPass(new ConsoleGlobalOptionsCompilerPass());
         $container->addCompilerPass(new TwigServiceLocatorPass());
     }

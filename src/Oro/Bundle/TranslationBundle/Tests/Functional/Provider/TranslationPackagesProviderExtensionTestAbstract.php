@@ -76,8 +76,8 @@ abstract class TranslationPackagesProviderExtensionTestAbstract extends WebTestC
         $composer = new Composer();
         $composer->setInstallationManager($installationManager);
 
-        $container->set('oro_distribution.composer.installation_manager', $installationManager);
-        $container->set('oro_distribution.composer', $composer);
+        $container->set('oro_distribution.composer.installation_manager.stub', $installationManager);
+        $container->set('oro_distribution.composer.stub', $composer);
     }
 
     /**

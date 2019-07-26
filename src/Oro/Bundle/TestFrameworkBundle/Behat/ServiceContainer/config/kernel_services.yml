@@ -1,6 +1,7 @@
 services:
     oro_test.kernel_service_factory:
         class: Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\KernelServiceFactory
+        public: true
         arguments: ['@symfony2_extension.kernel']
 
     oro_entity.entity_alias_resolver:

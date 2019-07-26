@@ -5,7 +5,6 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class DatagridGuesserTest extends \PHPUnit\Framework\TestCase
 {
@@ -30,10 +29,6 @@ class DatagridGuesserTest extends \PHPUnit\Framework\TestCase
             ['filter_prop1' => 'prop1', 'filter_prop2' => 'prop2'],
             ColumnGuess::LOW_CONFIDENCE
         );
-
-        $container = new ContainerBuilder();
-        $container->set('guesser1', $guesser1);
-        $container->set('guesser2', $guesser2);
 
         $guesser1->expects($this->once())
             ->method('guessFormatter')
@@ -62,7 +57,7 @@ class DatagridGuesserTest extends \PHPUnit\Framework\TestCase
             ->with($class, $property, $type)
             ->will($this->returnValue($filterGuess));
 
-        $datagridGuesser = new DatagridGuesser($container, ['guesser1', 'guesser2']);
+        $datagridGuesser = new DatagridGuesser([$guesser1, $guesser2]);
         $columnOptions   = [
             DatagridGuesser::FORMATTER => [
                 'formatter_prop1' => 'prop1_initial',
@@ -103,8 +98,7 @@ class DatagridGuesserTest extends \PHPUnit\Framework\TestCase
 
     public function testSetColumnOptions()
     {
-        $container       = new ContainerBuilder();
-        $datagridGuesser = new DatagridGuesser($container, []);
+        $datagridGuesser = new DatagridGuesser([]);
 
         $config = DatagridConfiguration::create([]);
 

@@ -19,24 +19,16 @@ class GuessPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::COLUMN_OPTIONS_GUESSER_ID)) {
-            return;
+        if ($container->hasDefinition(self::COLUMN_OPTIONS_GUESSER_ID)) {
+            $serviceDef = $container->getDefinition(self::COLUMN_OPTIONS_GUESSER_ID);
+            $guessers = $container->findTaggedServiceIds(self::COLUMN_OPTIONS_GUESSER_TAG_NAME);
+
+            $guesserServices = [];
+
+            foreach ($guessers as $gusserServiceId => $definition) {
+                $guesserServices[$gusserServiceId] = new Reference($gusserServiceId);
+            }
+            $serviceDef->replaceArgument(0, $guesserServices);
         }
-
-        $ids = array_keys($container->findTaggedServiceIds(self::COLUMN_OPTIONS_GUESSER_TAG_NAME, true));
-        if (!$ids) {
-            return;
-        }
-
-        $serviceDef = $container->getDefinition(self::COLUMN_OPTIONS_GUESSER_ID);
-        $serviceDef->replaceArgument(1, $ids);
-
-        $guessers = [];
-        foreach ($ids as $id) {
-            $guessers[$id] = new Reference($id);
-        }
-
-        $serviceLocator = $container->getDefinition('oro_datagrid.datagrid.guesser_locator');
-        $serviceLocator->replaceArgument(0, $guessers);
     }
 }

@@ -4,6 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Functional\Operation;
 
 use Oro\Bundle\ActionBundle\Tests\Functional\ActionTestCase;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
+use Oro\Bundle\TranslationBundle\Tests\Functional\Stub\TranslatorStub;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslationOperationsTest extends ActionTestCase
@@ -21,11 +22,14 @@ class TranslationOperationsTest extends ActionTestCase
 
     public function testUpdateCacheOperation()
     {
-        $translator = $this->getTranslatorMock();
-        $translator->expects($this->once())->method('rebuildCache');
-        $translator->expects($this->any())->method('getTranslations')->willReturn([]);
+        $translatorMock = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
+        $translatorMock->expects($this->once())->method('rebuildCache');
+        $translatorMock->expects($this->any())->method('getTranslations')->willReturn([]);
 
-        $this->setTranslator($translator);
+        /** @var TranslatorStub $translator */
+        $translator = $this->getContainer()->get('translator.default');
+        $translator->setRebuildCache([$translatorMock, 'rebuildCache']);
+        $translator->setGetTranslations([$translatorMock, 'getTranslations']);
 
         $this->assertExecuteOperation(
             'oro_translation_rebuild_cache',
@@ -73,21 +77,5 @@ class TranslationOperationsTest extends ActionTestCase
             'scope INSTALLED' => [LoadTranslations::TRANSLATION_KEY_4],
             'scope UI' => [LoadTranslations::TRANSLATION_KEY_5]
         ];
-    }
-
-    /**
-     * @param Translator $translator
-     */
-    private function setTranslator(Translator $translator)
-    {
-        self::$kernel->getContainer()->set('translator.default', $translator);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Translator
-     */
-    private function getTranslatorMock()
-    {
-        return $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
     }
 }

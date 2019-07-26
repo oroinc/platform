@@ -142,6 +142,7 @@ services:
 
     oro_integration.reader.entity.by_id:
         class: '%oro_integration.reader.entity.by_id.class%'
+        public: true
         parent: oro_importexport.reader.entity
 
     oro_integration.helper.default_owner_helper:
@@ -198,6 +199,7 @@ services:
 
     oro_integration.delete_manager:
         class: '%oro_integration.delete_manager.class%'
+        public: true
         arguments: [ '@doctrine.orm.entity_manager' ]
 
     oro_integration.sync_scheduler:

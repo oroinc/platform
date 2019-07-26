@@ -1,0 +1,5 @@
+services:
+    oro_integration.transport.rest.client_factory.stub:
+        decorates: oro_integration.transport.rest.client_factory
+        class: 'Oro\Bundle\IntegrationBundle\Test\FakeRestClientFactory'
+        public: true

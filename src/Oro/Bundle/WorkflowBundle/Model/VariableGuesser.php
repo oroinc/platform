@@ -12,6 +12,10 @@ use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Guesses class name and a list of options for creating an instance
+ * of that class for certain variable
+ */
 class VariableGuesser extends AbstractGuesser
 {
     const DEFAULT_CONSTRAINT_NAMESPACE = 'Symfony\\Component\\Validator\\Constraints\\';
@@ -49,7 +53,7 @@ class VariableGuesser extends AbstractGuesser
         if ('entity' === $type) {
             list($formType, $formOptions) = $this->getEntityForm($variable);
 
-            return new TypeGuess($formType, $formOptions, TypeGuess::VERY_HIGH_CONFIDENCE);
+            return new TypeGuess($formType ?? '', $formOptions, TypeGuess::VERY_HIGH_CONFIDENCE);
         }
 
         if (!isset($this->formTypeMapping[$type])) {

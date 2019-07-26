@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Grid;
 
-use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
@@ -43,7 +43,7 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
             $this->doctrine,
-            new DatagridGuesserMock(),
+            new DatagridGuesser([]),
             $entityNameResolver
         );
 

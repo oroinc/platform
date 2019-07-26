@@ -2,3 +2,8 @@ services:
     oro_layout.tests.theme_extension.resource_provider.theme:
         alias: oro_layout.theme_extension.resource_provider.theme
         public: true
+
+    oro_layout.theme_manager.test:
+        decorates: 'oro_layout.theme_manager'
+        parent: 'oro_layout.theme_manager'
+        public: true

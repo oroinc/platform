@@ -12,11 +12,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 class CleanupStorageCommandTest extends WebTestCase
 {
     /**
-     * @var FileManager
-     */
-    private $previousFileManager;
-
-    /**
      * @var FileManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fileManager;
@@ -27,15 +22,8 @@ class CleanupStorageCommandTest extends WebTestCase
         $this->initClient();
 
         $this->fileManager = $this->createMock(FileManager::class);
-        $this->previousFileManager = self::getContainer()->get('oro_importexport.file.file_manager');
 
-        self::getContainer()->set('oro_importexport.file.file_manager', $this->fileManager);
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-        self::getContainer()->set('oro_importexport.file.file_manager', $this->previousFileManager);
+        self::getContainer()->set('oro_importexport.file.file_manager.stub', $this->fileManager);
     }
 
     public function testExecuteWhenNoFilesReturned(): void

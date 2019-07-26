@@ -272,6 +272,7 @@ services:
 
     oro_user.autocomplete.search_user_criteria:
         class: Oro\Bundle\UserBundle\Autocomplete\QueryCriteria\SearchUserCriteria
+        public: true
 
     oro_user.autocomplete.user.search_without_current_handler:
         class: '%oro_user.autocomplete.user.search_without_current_handler.class%'
@@ -572,6 +573,7 @@ services:
     # Datagrid
     oro_user.user.datagrid_view_list:
         class: Oro\Bundle\UserBundle\Datagrid\UserViewList
+        public: true
         arguments:
             - '@translator'
 

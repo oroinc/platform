@@ -261,7 +261,7 @@ services:
 
     oro_locale.twig.date_time:
         class: Oro\Bundle\LocaleBundle\Twig\DateTimeExtension
-        public: false
+        public: true
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:

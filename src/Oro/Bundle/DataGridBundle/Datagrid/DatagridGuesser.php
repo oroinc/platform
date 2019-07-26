@@ -3,8 +3,11 @@
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Psr\Container\ContainerInterface;
 
+/**
+ * Registry of ColumnOptionsGuesserInterface guesser services
+ * Handles methods for applying column guesses
+ */
 class DatagridGuesser
 {
     /** column formatting options key */
@@ -16,9 +19,6 @@ class DatagridGuesser
     /** column filtering options key */
     const FILTER = 'filter';
 
-    /** @var ContainerInterface */
-    protected $container;
-
     /** @var string[] */
     protected $columnOptionsGuesserServiceIds;
 
@@ -26,12 +26,10 @@ class DatagridGuesser
     protected $columnOptionsGuesser;
 
     /**
-     * @param ContainerInterface $container
-     * @param string[]           $columnOptionsGuesserServiceIds
+     * @param ColumnOptionsGuesserInterface[] $columnOptionsGuesserServiceIds
      */
-    public function __construct(ContainerInterface $container, array $columnOptionsGuesserServiceIds)
+    public function __construct(array $columnOptionsGuesserServiceIds)
     {
-        $this->container                      = $container;
         $this->columnOptionsGuesserServiceIds = $columnOptionsGuesserServiceIds;
     }
 
@@ -145,12 +143,12 @@ class DatagridGuesser
     /**
      * @return ColumnOptionsGuesserInterface
      */
-    protected function getColumnOptionsGuesser()
+    protected function getColumnOptionsGuesser(): ColumnOptionsGuesserInterface
     {
         if ($this->columnOptionsGuesser === null) {
-            $guessers = array();
-            foreach ($this->columnOptionsGuesserServiceIds as $serviceId) {
-                $guessers[] = $this->container->get($serviceId);
+            $guessers = [];
+            foreach ($this->columnOptionsGuesserServiceIds as $guesserService) {
+                $guessers[] = $guesserService;
             }
             $this->columnOptionsGuesser = new ColumnOptionsGuesserChain($guessers);
         }
