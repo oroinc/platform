@@ -42,11 +42,7 @@ class WsseNonceCachePass implements CompilerPassInterface
             }
 
             $nonceCacheDef = $container->getDefinition(self::NONCE_CACHE . '.' . $firewallName);
-            if (!$nonceCacheDef->getArguments()) {
-                $nonceCacheDef->setArguments($defaultNonceCacheArguments);
-            }
-
-            foreach ($nonceCacheDef->getArguments() as $index => $argument) {
+            foreach ($defaultNonceCacheArguments as $index => $argument) {
                 if ($argument === '<lifetime>') {
                     $nonceCacheDef
                         ->replaceArgument($index, $config[$this->wsseKey]['lifetime'] ?? self::DEFAULT_LIFETIME);

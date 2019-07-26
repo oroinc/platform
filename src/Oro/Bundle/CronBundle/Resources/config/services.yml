@@ -64,6 +64,7 @@ services:
 
     oro_cron.async.command_runner:
         class: Oro\Bundle\CronBundle\Async\CommandRunner
+        public: true
         arguments:
             - '@oro_message_queue.client.message_producer'
 
@@ -74,6 +75,7 @@ services:
 
     oro_cron.repository.schedule:
         class: Oro\Bundle\CronBundle\Entity\Repository\ScheduleRepository
+        public: true
         factory: ['@doctrine', getRepository]
         arguments:
             - 'Oro\Bundle\CronBundle\Entity\Schedule'

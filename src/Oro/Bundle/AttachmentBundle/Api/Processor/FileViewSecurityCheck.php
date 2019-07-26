@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Api\Processor;
 
-use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
@@ -30,8 +30,13 @@ class FileViewSecurityCheck implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        if (!$this->authorizationChecker->isGranted('VIEW', new ObjectIdentity($context->get('id'), File::class))) {
-            throw new AccessDeniedException();
+        /** @var SingleItemContext $context */
+
+        if (!$this->authorizationChecker->isGranted(
+            'VIEW',
+            new ObjectIdentity($context->getId(), $context->getClassName())
+        )) {
+            throw new AccessDeniedException('No access to the entity.');
         }
     }
 }

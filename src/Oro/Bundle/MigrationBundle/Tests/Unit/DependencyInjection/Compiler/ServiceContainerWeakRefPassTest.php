@@ -66,9 +66,9 @@ class ServiceContainerWeakRefPassTest extends \PHPUnit\Framework\TestCase
                     'service8' => $this->createDefinition(true, true, true),
                     'oro_migration.service_container' => new Definition(
                         MigrationContainer::class,
-                        [null, null, new Reference('test.service_locator')]
+                        [null, null, new Reference('.test.service_locator')]
                     ),
-                    'test.service_locator' => $serviceLocator,
+                    '.test.service_locator' => $serviceLocator,
                 ]
             );
 

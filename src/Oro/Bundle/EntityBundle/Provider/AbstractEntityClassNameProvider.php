@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractEntityClassNameProvider
 {

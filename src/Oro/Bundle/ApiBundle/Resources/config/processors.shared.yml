@@ -683,6 +683,8 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByEntitySerializer
         arguments:
             - '@oro_api.entity_serializer'
+            - '@oro_api.doctrine_helper'
+            - '@oro_entity.orm.entity_class_resolver'
         tags:
             - { name: oro.api.processor, action: get, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: load_data, collection: false, priority: -10 }
@@ -701,7 +703,8 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntity
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.entity_loader'
+            - '@oro_api.entity_id_helper'
+            - '@oro_api.entity_serializer.query_factory'
         tags:
             - { name: oro.api.processor, action: delete, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: update, group: load_data, priority: -10 }

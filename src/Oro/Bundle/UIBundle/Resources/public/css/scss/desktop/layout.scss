@@ -92,6 +92,7 @@ body:not(.login-page) {
 
     &__left-panel,
     &__right-panel {
+        position: relative;
         overflow: visible;
     }
 

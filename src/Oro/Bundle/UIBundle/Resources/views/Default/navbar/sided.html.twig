@@ -21,19 +21,7 @@
 
         <nav class="scroller" id="main-menu"
                 {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/main-menu-view'}) }}>
-            <button class="main-menu-sided__scroll invisible"
-                    data-role="scroll-trigger"
-                    data-direction="up"
-                    aria-label="{{ 'oro.ui.navbar.scroll_up_label'|trans }}"
-            >
-            </button>
             {{ block('application_menu') }}
-            <button class="main-menu-sided__scroll invisible"
-                    data-role="scroll-trigger"
-                    data-direction="down"
-                    aria-label="{{ 'oro.ui.navbar.scroll_down_label'|trans }}"
-            >
-            </button>
         </nav>
 
         <button id="main-menu-toggler" class="main-menu-toggler" aria-label="{{ 'oro.ui.navbar.toggler_label'|trans }}"></button>

@@ -305,7 +305,11 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
 
     private function parseQueryString(): void
     {
-        $queryString = $this->request->getQueryString();
+        $queryString = $this->request->server->get('QUERY_STRING');
+        $queryString = RequestQueryStringNormalizer::normalizeQueryString($queryString);
+
+        $queryString = '' === $queryString ? null : $queryString;
+
         if (empty($queryString)) {
             return;
         }

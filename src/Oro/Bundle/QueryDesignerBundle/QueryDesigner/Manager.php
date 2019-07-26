@@ -6,7 +6,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterBagInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides a set of methods to build a query based on the query designer configuration.

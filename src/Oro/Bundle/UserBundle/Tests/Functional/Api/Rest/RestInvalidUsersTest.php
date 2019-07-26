@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional\Api\Rest;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData;
 
 class RestInvalidUsersTest extends WebTestCase
 {
@@ -12,53 +11,44 @@ class RestInvalidUsersTest extends WebTestCase
         $this->initClient();
     }
 
-    public function testInvalidKey()
+    /**
+     * @dataProvider usernameKeyDataProvider
+     *
+     * @param string $username
+     * @param string $key
+     */
+    public function testInvalidCredentials(string $username, string $key): void
     {
-        $request = array(
-            "user" => array(
-                "username" => 'user_' . mt_rand(),
-                "email" => 'test_'  . mt_rand() . '@test.com',
-                "enabled" => 'true',
-                "plainPassword" => '1231231q',
-                "firstName" => "firstName",
-                "lastName" => "lastName",
-                "roles" => array("1")
-            )
-        );
+        $request = [
+            'user' => [
+                'username' => 'user_' . mt_rand(),
+                'email' => 'test_' . mt_rand() . '@test.com',
+                'enabled' => 'true',
+                'plainPassword' => '1231231q',
+                'firstName' => 'firstName',
+                'lastName' => 'lastName',
+                'roles' => ['1'],
+            ],
+        ];
         $this->client->request(
             'POST',
             $this->getUrl('oro_api_post_user'),
             $request,
-            array(),
-            array(),
-            $this->generateWsseAuthHeader()
+            [],
+            $this->generateWsseAuthHeader($username, $key)
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 401);
     }
 
-    public function testInvalidUser()
+    /**
+     * @return array
+     */
+    public function usernameKeyDataProvider(): array
     {
-        $request = array(
-            "user" => array(
-                "username" => 'user_' . mt_rand(),
-                "email" => 'test_'  . mt_rand() . '@test.com',
-                "enabled" => 'true',
-                "plainPassword" => '1231231q',
-                "firstName" => "firstName",
-                "lastName" => "lastName",
-                "roles" => array("1")
-            )
-        );
-        $this->client->request(
-            'POST',
-            $this->getUrl('oro_api_post_user'),
-            $request,
-            array(),
-            array(),
-            $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
-        );
-        $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 401);
+        return [
+            'invalid key' => [WebTestCase::USER_NAME, 'invalid_key'],
+            'invalid user' => ['invalid_user', WebTestCase::USER_PASSWORD],
+        ];
     }
 }

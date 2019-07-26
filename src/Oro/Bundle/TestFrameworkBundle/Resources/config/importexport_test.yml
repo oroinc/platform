@@ -6,9 +6,11 @@
 services:
     oro_user.importexport.strategy.user.add_or_replace:
         parent: oro_importexport.strategy.configurable_add_or_replace
+        public: true
 
     oro_user.importexport.processor.import.add_or_replace:
         parent: oro_importexport.processor.import_abstract
+        public: true
         calls:
             - [setDataConverter, ['@oro_user.importexport.template_fixture.data_converter']]
             - [setStrategy, ['@oro_user.importexport.strategy.user.add_or_replace']]

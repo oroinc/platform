@@ -26,7 +26,7 @@ class ProcessTraversableNormalizer extends AbstractProcessNormalizer
         $denormalizedData = array();
 
         foreach ($data as $key => $value) {
-            $denormalizedData[$key] = $this->serializer->denormalize($value, null, $format, $context);
+            $denormalizedData[$key] = $this->serializer->denormalize($value, $class, $format, $context);
         }
 
         return $denormalizedData;

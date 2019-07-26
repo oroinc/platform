@@ -44,12 +44,14 @@ services:
 
     oro_dataaudit.datagrid.entity_type_provider:
         class: 'Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider'
+        public: true
         arguments:
             - '@oro_entity.entity_class_name_provider'
             - '@oro_dataaudit.audit_config_provider'
 
     oro_dataaudit.datagrid.author_provider:
         class: 'Oro\Bundle\DataAuditBundle\Datagrid\AuthorProvider'
+        public: true
         arguments:
             - '@translator'
 
@@ -107,6 +109,7 @@ services:
     # Placeholder filter
     oro_dataaudit.placeholder.filter:
         class: 'Oro\Bundle\DataAuditBundle\Placeholder\AuditableFilter'
+        public: true
         arguments:
             - '@oro_entity_config.provider.dataaudit'
 
@@ -126,6 +129,7 @@ services:
 
     oro_dataaudit.segment_widget.context_checker:
         class: 'Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker'
+        public: true
 
     oro_dataaudit.set_new_audit_version:
         class: 'Oro\Bundle\DataAuditBundle\Service\SetNewAuditVersionService'

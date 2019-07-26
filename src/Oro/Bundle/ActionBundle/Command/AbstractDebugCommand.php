@@ -4,19 +4,33 @@ namespace Oro\Bundle\ActionBundle\Command;
 
 use Oro\Bundle\ActionBundle\Helper\DocCommentParser;
 use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-abstract class AbstractDebugCommand extends ContainerAwareCommand
+/**
+ * Abstract class for get debug info from factories
+ */
+abstract class AbstractDebugCommand extends Command
 {
+    /** @var ContainerInterface */
+    private $container;
+
+    /** @var FactoryWithTypesInterface */
+    private $factory;
+
     /**
-     * {@inheritdoc}
+     * @param ContainerInterface|null $container
+     * @param FactoryWithTypesInterface|null $factory
      */
-    public function isEnabled()
+    public function __construct(ContainerInterface $container, FactoryWithTypesInterface $factory)
     {
-        return $this->getContainer()->has($this->getFactoryServiceId()) && parent::isEnabled();
+        parent::__construct();
+
+        $this->container = $container;
+        $this->factory = $factory;
     }
 
     /**
@@ -26,11 +40,7 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
     {
         $name = $input->getArgument($this->getArgumentName());
 
-        if ($name) {
-            return $this->outputItem($name, $output);
-        } else {
-            return $this->outputAllItems($output);
-        }
+        return $name ? $this->outputItem($name, $output) : $this->outputAllItems($output);
     }
 
     /**
@@ -41,19 +51,16 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
      */
     protected function outputItem($name, OutputInterface $output)
     {
-        $types = $this->getFactory()->getTypes();
-        if (!isset($types[$name])) {
+        if (!$this->factory->isTypeExists($name)) {
             $output->writeln(sprintf('<error>Type "%s" is not found</error>', $name));
 
             return 1;
         }
 
+        $types = $this->factory->getTypes();
         try {
-            $service = $this->getContainer()->get($types[$name]);
-        } catch (\TypeError $e) {
-            $this->printErrorServiceLoadException($output, $e, $types[$name]);
-            return 1;
-        } catch (\ErrorException $e) { //php 5.6 compatibility
+            $service = $this->container->get($types[$name]);
+        } catch (\TypeError|\ErrorException $e) {
             $this->printErrorServiceLoadException($output, $e, $types[$name]);
             return 1;
         }
@@ -81,7 +88,7 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
      */
     protected function outputAllItems(OutputInterface $output)
     {
-        $types = $this->getFactory()->getTypes();
+        $types = $this->factory->getTypes();
 
         $table = new Table($output);
         $table->setHeaders(['Name', 'Short Description']);
@@ -90,12 +97,10 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
 
         foreach ($types as $key => $type) {
             try {
-                $service = $this->getContainer()->get($type);
+                $service = $this->container->get($type);
                 $description = $docCommentParser->getShortComment(get_class($service));
                 $table->addRow([$key, $description]);
-            } catch (\TypeError $e) {
-                $this->printErrorServiceLoadException($output, $e, $type);
-            } catch (\ErrorException $e) { //php 5.6 compatibility
+            } catch (\TypeError|\ErrorException $e) {
                 $this->printErrorServiceLoadException($output, $e, $type);
             }
         }
@@ -115,22 +120,9 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
     }
 
     /**
-     * @return FactoryWithTypesInterface
-     */
-    protected function getFactory()
-    {
-        return $this->getContainer()->get($this->getFactoryServiceId());
-    }
-
-    /**
-     * @return string
-     */
-    abstract protected function getFactoryServiceId();
-
-    /**
      * Get name of input argument
      *
      * @return string
      */
-    abstract protected function getArgumentName();
+    abstract protected function getArgumentName(): string;
 }

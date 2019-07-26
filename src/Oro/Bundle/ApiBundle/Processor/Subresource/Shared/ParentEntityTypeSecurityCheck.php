@@ -69,7 +69,7 @@ class ParentEntityTypeSecurityCheck implements ProcessorInterface
         }
 
         if (!$isGranted) {
-            throw new AccessDeniedException();
+            throw new AccessDeniedException('No access to this type of parent entities.');
         }
     }
 }

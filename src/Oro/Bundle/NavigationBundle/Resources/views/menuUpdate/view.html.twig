@@ -105,7 +105,9 @@
                     {% block content %}
                         <div class="category-data">
                             <div class="tree-empty-content scrollable-container">
-                                {{ 'oro.navigation.menuupdate.select_existing_or_create_new'|trans }}
+                                <div class="no-data">
+                                    {{ 'oro.navigation.menuupdate.select_existing_or_create_new'|trans }}
+                                </div>
                             </div>
                         </div>
                     {% endblock content %}

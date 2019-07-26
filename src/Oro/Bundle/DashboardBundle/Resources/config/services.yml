@@ -313,6 +313,7 @@ services:
     # BigNumber
     oro_dashboard.provider.big_number.processor:
         class: '%oro_dashboard.provider.big_number.processor.class%'
+        public: true
         arguments:
             - '@oro_dashboard.provider.big_number.formatter'
             - '@oro_dashboard.provider.big_number.date_helper'

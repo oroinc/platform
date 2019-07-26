@@ -61,6 +61,6 @@ class EmbeddedFormTypePropertyTest extends \PHPUnit\Framework\TestCase
      */
     protected function createTranslatorMock()
     {
-        return $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        return $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
     }
 }

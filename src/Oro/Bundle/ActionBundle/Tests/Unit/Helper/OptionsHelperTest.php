@@ -7,7 +7,7 @@ use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OptionsHelperTest extends \PHPUnit\Framework\TestCase
 {

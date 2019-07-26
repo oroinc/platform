@@ -3,7 +3,7 @@
 namespace Oro\Component\Layout\Extension\Theme\Manager;
 
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Responsibility of this class is to get page template config data for required themes.

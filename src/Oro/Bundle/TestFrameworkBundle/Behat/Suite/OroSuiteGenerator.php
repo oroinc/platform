@@ -7,6 +7,9 @@ use Behat\Testwork\Suite\Generator\SuiteGenerator;
 use Behat\Testwork\Suite\GenericSuite;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Generates a suite using provided name, settings and parameters.
+ */
 class OroSuiteGenerator implements SuiteGenerator
 {
     const SUITE_TYPE_SYMFONY = 'symfony_bundle';
@@ -17,6 +20,9 @@ class OroSuiteGenerator implements SuiteGenerator
      */
     protected $kernel;
 
+    /**
+     * @param KernelInterface $kernel
+     */
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
@@ -37,7 +43,7 @@ class OroSuiteGenerator implements SuiteGenerator
     {
         try {
             $bundleName = isset($settings['bundle']) ? $settings['bundle'] : $suiteName;
-            $bundle = $this->kernel->getBundle('!' . $bundleName);
+            $bundle = $this->kernel->getBundle($bundleName);
             $settings['type'] = self::SUITE_TYPE_SYMFONY;
             $settings['bundle'] = $bundleName;
 

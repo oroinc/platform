@@ -28,15 +28,15 @@ class OroActionBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new ConditionPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new ActionPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new ConditionLocatorPass());
+        $container->addCompilerPass(new ConditionPass());
+        $container->addCompilerPass(new ActionLocatorPass());
+        $container->addCompilerPass(new ActionPass());
         $container->addCompilerPass(new MassActionProviderPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new ButtonProviderPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new ButtonProviderPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new DoctrineTypeMappingProviderPass());
         $container->addCompilerPass(new OperationRegistryFilterPass());
-        $container->addCompilerPass(new DuplicatorFilterPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new DuplicatorMatcherPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new ActionLocatorPass());
-        $container->addCompilerPass(new ConditionLocatorPass());
+        $container->addCompilerPass(new DuplicatorFilterPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new DuplicatorMatcherPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 }

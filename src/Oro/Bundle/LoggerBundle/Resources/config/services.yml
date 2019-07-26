@@ -3,6 +3,8 @@ parameters:
 services:
     oro_logger.cache:
         parent: doctrine_cache.abstract.array
+        public: true
+        lazy: true
         calls:
             - [ setNamespace, [ 'oro_logger' ] ]
 

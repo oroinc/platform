@@ -40,23 +40,32 @@ class ServiceContainerWeakRefPass implements CompilerPassInterface
         $definitions = $container->getDefinitions();
 
         foreach ($definitions as $id => $definition) {
-            if (!$definition->isPublic() && !$definition->getErrors() && !$definition->isAbstract()) {
-                $privateServices[$id] = new ServiceClosureArgument(
-                    new Reference($id, ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE)
-                );
+            if ($id && '.' !== $id[0]
+                && (!$definition->isPublic() || $definition->isPrivate())
+                && !$definition->getErrors()
+                && !$definition->isAbstract()
+                && $id !== 'oro_migration.service_container'
+            ) {
+                if (!$definition->isShared() && strpos($id, 'oro') === 0) {
+                    $definition->setPublic(true);
+                } else {
+                    $privateServices[$id] = new ServiceClosureArgument(
+                        new Reference($id, ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE)
+                    );
+                }
             }
         }
 
         $aliases = $container->getAliases();
 
         foreach ($aliases as $id => $alias) {
-            if (!$alias->isPublic()) {
+            if ($id && '.' !== $id[0] && (!$alias->isPublic() || $alias->isPrivate())) {
                 while (isset($aliases[$target = (string) $alias])) {
                     $alias = $aliases[$target];
                 }
-                if (isset($definitions[$target]) &&
-                    !$definitions[$target]->getErrors() &&
-                    !$definitions[$target]->isAbstract()
+                if (isset($definitions[$target])
+                    && !$definitions[$target]->getErrors()
+                    && !$definitions[$target]->isAbstract()
                 ) {
                     $privateServices[$id] = new ServiceClosureArgument(
                         new Reference($target, ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE)

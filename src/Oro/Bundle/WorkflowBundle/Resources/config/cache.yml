@@ -41,6 +41,7 @@ services:
 
     oro_workflow.cache.entity_aware:
         class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache
+        public: true
         arguments:
             - '@oro_workflow.cache'
             - '@oro_entity.doctrine_helper'

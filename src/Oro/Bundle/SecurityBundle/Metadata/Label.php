@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Metadata;
 
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Represents a translatable string.

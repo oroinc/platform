@@ -12,6 +12,7 @@ parameters:
 services:
     oro_segment.entity_provider:
         alias: oro_entity.entity_provider
+        public: true
 
     oro_segment.static_segment_manager:
         class: Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager

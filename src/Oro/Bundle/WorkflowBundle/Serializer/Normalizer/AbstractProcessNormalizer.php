@@ -7,12 +7,16 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerAwareTrait;
 
-abstract class AbstractProcessNormalizer extends SerializerAwareNormalizer implements
+abstract class AbstractProcessNormalizer implements
+    SerializerAwareInterface,
     NormalizerInterface,
     DenormalizerInterface
 {
+    use SerializerAwareTrait;
+
     /**
      * @var ProcessDataSerializer
      */

@@ -173,6 +173,7 @@ services:
     oro_config.form.configurator.use_default_configurator.abstract:
         class: Oro\Bundle\ConfigBundle\Form\Configurator\UseDefaultConfigurator
         abstract: true
+        public: true
         arguments:
             - '@oro_config.form.handler.config'
 

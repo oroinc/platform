@@ -16,10 +16,20 @@ class AddNormalizerCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        $definition = $container->getDefinition(self::SERIALIZER_SERVICE);
+
         $normalizers = $this->findAndSortTaggedServices(self::ATTRIBUTE_NORMALIZER_TAG, $container);
-        $container->getDefinition(self::SERIALIZER_SERVICE)->replaceArgument(0, $normalizers);
+        $definition->replaceArgument(0, $normalizers);
+
+        $encoders = $this->findAndSortTaggedServices('serializer.encoder', $container);
+        $definition->replaceArgument(1, array_merge($definition->getArgument(1), $encoders));
     }
 
+    /**
+     * @param string $tagName
+     * @param ContainerBuilder $container
+     * @return array
+     */
     private function findAndSortTaggedServices($tagName, ContainerBuilder $container)
     {
         $services = $container->findTaggedServiceIds($tagName);

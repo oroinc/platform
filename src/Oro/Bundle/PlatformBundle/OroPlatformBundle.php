@@ -4,6 +4,7 @@ namespace Oro\Bundle\PlatformBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\EntityListenerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ConsoleGlobalOptionsCompilerPass;
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\DataCollectorCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineListenersPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineOrmListenersPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyServicesCompilerPass;
@@ -35,7 +36,7 @@ class OroPlatformBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         $container->addCompilerPass(new LazyServicesCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new OptionalListenersCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new OptionalListenersCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
         $container->addCompilerPass(
             new ServiceLinkCompilerPass(
                 'oro_service_link',
@@ -65,5 +66,6 @@ class OroPlatformBundle extends Bundle
         $container->addCompilerPass(new UndoLazyEntityManagerPass());
         $container->addCompilerPass(new ConsoleGlobalOptionsCompilerPass());
         $container->addCompilerPass(new TwigServiceLocatorPass());
+        $container->addCompilerPass(new DataCollectorCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
     }
 }

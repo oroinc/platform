@@ -3,6 +3,8 @@
 namespace Oro\Bundle\LoggerBundle\Bundle\Tests\Unit\Async\Extension;
 
 use Oro\Bundle\LoggerBundle\Async\Extension\InterruptionDetailConsumptionExtension;
+use Oro\Bundle\LoggerBundle\Tests\Unit\Stub\ConfigManagerStub;
+use Oro\Bundle\LoggerBundle\Tests\Unit\Stub\LoggerStub;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Log\MessageProcessorClassProvider;
@@ -92,7 +94,7 @@ class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\Test
         $messageProcessor = $this->createMock(MessageProcessorInterface::class);
         $message = $this->createMock(MessageInterface::class);
         $messageProcessorClass = get_class($messageProcessor);
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = new LoggerStub();
 
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessageProcessor($messageProcessor);
@@ -104,23 +106,28 @@ class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\Test
             ->with(self::identicalTo($messageProcessor), self::identicalTo($message))
             ->willReturn($messageProcessorClass);
 
-        $this->container->expects(self::at(0))
-            ->method('set')
-            ->with('oro_logger.cache', null);
-        $this->container->expects(self::at(1))
-            ->method('set')
-            ->with('oro_config.user', null);
-
-        $logger->expects(self::once())
-            ->method('info')
-            ->with(sprintf(
-                'The last processor executed before interrupt of consuming was "%s"',
-                $messageProcessorClass
-            ));
+        $this->container->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['oro_logger.cache', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $logger],
+                    [
+                        'oro_config.user',
+                        ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                        $this->createMock(ConfigManagerStub::class)
+                    ],
+                ]
+            );
 
         $this->extension->onPostReceived($context);
         $this->extension->onInterrupted($context);
 
-        self::assertAttributeSame(null, 'lastProcessorClassName', $this->extension);
+        $this->assertAttributeSame(null, 'lastProcessorClassName', $this->extension);
+        $this->assertEquals(
+            [
+                sprintf('The last processor executed before interrupt of consuming was "%s"', $messageProcessorClass)
+            ],
+            $logger->getLogs('info')
+        );
     }
 }

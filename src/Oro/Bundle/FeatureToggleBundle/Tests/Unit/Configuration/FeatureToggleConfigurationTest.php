@@ -39,7 +39,16 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                 'configuration' => [],
                 'entities' => [],
                 'field_configs' => [],
-                'commands' => []
+                'commands' => [],
+                'sidebar_widgets' => [],
+                'dashboard_widgets' => [],
+                'cron_jobs' => [],
+                'api_resources' => [],
+                'navigation_items' => [],
+                'operations' => [],
+                'workflows' => [],
+                'processes' => [],
+                'placeholder_items' => [],
             ]
         ];
 
@@ -59,7 +68,16 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                 'field_configs' => [],
                 'strategy' => 'affirmative',
                 'allow_if_all_abstain' => true,
-                'allow_if_equal_granted_denied' => true
+                'allow_if_equal_granted_denied' => true,
+                'sidebar_widgets' => ['sidebar_widget1', 'sidebar_widget2'],
+                'dashboard_widgets' => ['dashboard_widget1', 'dashboard_widget2'],
+                'cron_jobs' => ['cron_job1', 'cron_job2'],
+                'api_resources' => ['api_resource1', 'api_resource2'],
+                'navigation_items' => ['navigation_item1', 'navigation_item2'],
+                'operations' => ['operation1', 'operation2'],
+                'workflows' => ['workflow1', 'workflow2'],
+                'processes' => ['processe1', 'processe2'],
+                'placeholder_items' => ['placeholder_item1', 'placeholder_item2'],
             ],
         ];
 
@@ -75,7 +93,16 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                 'strategy' => 'affirmative',
                 'allow_if_all_abstain' => true,
                 'allow_if_equal_granted_denied' => true,
-                'commands' => []
+                'commands' => [],
+                'sidebar_widgets' => ['sidebar_widget1', 'sidebar_widget2'],
+                'dashboard_widgets' => ['dashboard_widget1', 'dashboard_widget2'],
+                'cron_jobs' => ['cron_job1', 'cron_job2'],
+                'api_resources' => ['api_resource1', 'api_resource2'],
+                'navigation_items' => ['navigation_item1', 'navigation_item2'],
+                'operations' => ['operation1', 'operation2'],
+                'workflows' => ['workflow1', 'workflow2'],
+                'processes' => ['processe1', 'processe2'],
+                'placeholder_items' => ['placeholder_item1', 'placeholder_item2'],
             ]
         ];
 

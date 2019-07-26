@@ -7,6 +7,7 @@ use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Oro\Component\PhpUtils\ClassLoader;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -51,6 +52,7 @@ class OroEmailBundle extends Bundle
         $container->addCompilerPass(new Compiler\MailboxProcessPass());
         $container->addCompilerPass(new Compiler\OverrideServiceSwiftMailer());
         $container->addCompilerPass(new Compiler\VariableProcessorPass());
+        $container->addCompilerPass(new Compiler\SwiftMailerTransportPass(), PassConfig::TYPE_OPTIMIZE);
 
         $addTopicPass = AddTopicMetaPass::create()
             ->add(Topics::SEND_AUTO_RESPONSE, 'Send auto response for single email')

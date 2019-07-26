@@ -12,7 +12,7 @@ use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Reader\ReaderChain;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 {
@@ -96,7 +96,7 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn('text/csv');
         $response = $this->exportHandler->handleDownloadExportResult('test1.csv');
         $this->assertEquals($fileContent, $response->getContent());
-        $this->assertEquals('attachment; filename="test1.csv"', $response->headers->get('Content-Disposition'));
+        $this->assertEquals('attachment; filename=test1.csv', $response->headers->get('Content-Disposition'));
         $this->assertEquals('text/csv', $response->headers->get('Content-Type'));
     }
 

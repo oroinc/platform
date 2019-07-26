@@ -19,26 +19,26 @@ class DummyEncoderTest extends \PHPUnit\Framework\TestCase
     public function testEncode()
     {
         $data = array('any_data' => new \stdClass());
-        $this->assertSame($data, $this->encoder->encode($data, null));
+        $this->assertSame($data, $this->encoder->encode($data, ''));
     }
 
     public function testDecode()
     {
         $data = array('any_data' => new \stdClass());
-        $this->assertSame($data, $this->encoder->decode($data, null));
+        $this->assertSame($data, $this->encoder->decode($data, ''));
     }
 
     public function testSupportsEncoding()
     {
         $this->assertFalse($this->encoder->supportsEncoding('json'));
-        $this->assertFalse($this->encoder->supportsEncoding(''));
         $this->assertTrue($this->encoder->supportsEncoding(null));
+        $this->assertTrue($this->encoder->supportsEncoding(''));
     }
 
     public function testSupportsDecoding()
     {
         $this->assertFalse($this->encoder->supportsDecoding('json'));
-        $this->assertFalse($this->encoder->supportsDecoding(''));
         $this->assertTrue($this->encoder->supportsDecoding(null));
+        $this->assertTrue($this->encoder->supportsDecoding(''));
     }
 }

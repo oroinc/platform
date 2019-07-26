@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout\Templating;
 
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TextHelper
 {

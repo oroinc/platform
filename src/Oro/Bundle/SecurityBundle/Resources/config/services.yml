@@ -585,6 +585,7 @@ services:
 
     oro_security.configuration.provider.configurable_permission_configuration:
         class: Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider
+        public: true
         parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/configurable_permissions.php'

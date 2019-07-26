@@ -2,6 +2,9 @@ define(function(require) {
     'use strict';
 
     var RecentEmailsContentView;
+    var Backbone = require('backbone');
+    var _ = require('underscore');
+    var constants = require('orosidebar/js/sidebar-constants');
     var BaseView = require('oroui/js/app/views/base/view');
     var EmailNotificationComponent = require('oroemail/js/app/components/email-notification-component');
 
@@ -11,6 +14,8 @@ define(function(require) {
         listen: {
             refresh: 'onRefresh'
         },
+
+        listenToUpdatePosition: true,
 
         /**
          * @inheritDoc
@@ -41,6 +46,18 @@ define(function(require) {
 
         onRefresh: function() {
             this.model.emailNotificationCollection.fetch();
+        },
+
+        onUpdatePosition: function() {
+            var emailNotificationView = this.model.notificationComponentInstance.view;
+
+            if (this.model.collection.findWhere({state: constants.WIDGET_MAXIMIZED_HOVER}) !== void 0 &&
+                emailNotificationView instanceof Backbone.View &&
+                !emailNotificationView.disposed &&
+                _.isFunction(emailNotificationView.adjustMaxHeight)
+            ) {
+                emailNotificationView.adjustMaxHeight();
+            }
         }
     });
 

@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Action;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionMetadataFactory;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 {

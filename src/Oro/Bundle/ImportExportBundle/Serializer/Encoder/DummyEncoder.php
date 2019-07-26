@@ -31,7 +31,7 @@ class DummyEncoder implements EncoderInterface, DecoderInterface
      */
     public function supportsEncoding($format)
     {
-        return $format === null;
+        return empty($format);
     }
 
     /**
@@ -39,6 +39,6 @@ class DummyEncoder implements EncoderInterface, DecoderInterface
      */
     public function supportsDecoding($format)
     {
-        return $format === null;
+        return empty($format);
     }
 }

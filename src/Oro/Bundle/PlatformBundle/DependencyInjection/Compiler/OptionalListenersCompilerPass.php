@@ -5,6 +5,9 @@ namespace Oro\Bundle\PlatformBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * Collects all optional listeners in order to transfer them to the listener manager.
+ */
 class OptionalListenersCompilerPass implements CompilerPassInterface
 {
     const KERNEL_LISTENER_TAG   = 'kernel.event_listener';
@@ -33,11 +36,14 @@ class OptionalListenersCompilerPass implements CompilerPassInterface
         );
 
         $optionalListeners = [];
+        $parameterBag = $container->getParameterBag();
         foreach ($listeners as $listener) {
-            $className = $container->getDefinition($listener)->getClass();
-            $refClass = new \ReflectionClass($className);
-            if ($refClass->implementsInterface(self::OPTIONAL_LISTENER_INTERFACE)) {
+            $listenerDefinition = $container->getDefinition($listener);
+            $className = $parameterBag->resolveValue($listenerDefinition->getClass());
+
+            if (\is_subclass_of($className, self::OPTIONAL_LISTENER_INTERFACE)) {
                 $optionalListeners[] = $listener;
+                $listenerDefinition->setPublic(true);
             }
         }
 

@@ -13,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LocalizedPropertyTypeTest extends AbstractLocalizedType
 {
@@ -33,7 +33,7 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
         $localizationCollection->setDataClass(self::LOCALIZATION_CLASS);
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface $translator */
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
 
         return [
             new PreloadedExtension(

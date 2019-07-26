@@ -47,7 +47,7 @@ class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
         }
         $data = $this->serializer->serialize(
             $object,
-            null,
+            '',
             $this->context->getConfiguration()
         );
         if ($this->dataConverter) {

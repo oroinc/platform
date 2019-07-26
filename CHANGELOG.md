@@ -23,6 +23,13 @@ The current file describes significant changes in the code that may affect the u
   e.g. "GET /api/countries/{id}/relationships/regions". If you need filtered or sorted data, use sub-resources
   instead of relationships, e.g. "GET /api/countries/{id}/regions".
 
+### Changed
+
+#### ApiBundle
+* The handling of HTTP response status code `403 Forbidden` was fixed. Now this status code is returned if there are
+  no permissions to use an API resource. Before the fix `404 Not Found` status code was returned in both cases,
+  when an entity did not exist and when there were no permissions to operate with it.
+
 #### SearchBundle
 * The following deprecated methods were removed from `Oro\Bundle\SearchBundle\Query\Query`:
     - andWhere

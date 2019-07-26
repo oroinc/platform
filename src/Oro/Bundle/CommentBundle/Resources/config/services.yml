@@ -60,6 +60,7 @@ services:
     
     oro_comment.placeholder.filter:
         class: '%oro_comment.placeholder.filter.class%'
+        public: true
         arguments:
             - '@oro_comment.association_helper'
             - '@oro_entity.doctrine_helper'

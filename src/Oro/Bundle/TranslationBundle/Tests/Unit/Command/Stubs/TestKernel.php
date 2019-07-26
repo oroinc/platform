@@ -10,13 +10,24 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class TestKernel extends Kernel
 {
+    /** @var string */
+    private $projectDir;
+
     /**
-     * @param string $rootDir
+     * @param string $projectDir
      */
-    public function __construct(string $rootDir)
+    public function __construct(string $projectDir)
     {
-        $this->rootDir = $rootDir;
+        $this->projectDir = $projectDir;
         parent::__construct('test_stub_env', true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getProjectDir(): string
+    {
+        return $this->projectDir;
     }
 
     public function init()

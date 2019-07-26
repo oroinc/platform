@@ -82,7 +82,7 @@ class Role extends ExtendRole implements \Serializable
      *
      * @param string $role ROLE_FOO etc
      */
-    public function __construct($role = '')
+    public function __construct(string $role = '')
     {
         parent::__construct($role);
 

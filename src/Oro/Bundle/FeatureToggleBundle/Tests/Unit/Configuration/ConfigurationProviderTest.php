@@ -27,7 +27,16 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'configuration' => ['config_section1', 'config_leaf1', 'config_leaf2'],
                 'entities'      => [],
                 'field_configs' => [],
-                'commands'      => []
+                'commands'      => [],
+                'sidebar_widgets' => [],
+                'dashboard_widgets' => [],
+                'cron_jobs' => [],
+                'api_resources' => [],
+                'navigation_items' => [],
+                'operations' => [],
+                'workflows' => [],
+                'processes' => [],
+                'placeholder_items' => [],
             ],
             'feature2' => [
                 'label'         => 'Feature 2',
@@ -37,7 +46,16 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'configuration' => ['config_leaf2'],
                 'entities'      => [],
                 'field_configs' => [],
-                'commands'      => []
+                'commands'      => [],
+                'sidebar_widgets' => [],
+                'dashboard_widgets' => [],
+                'cron_jobs' => [],
+                'api_resources' => [],
+                'navigation_items' => [],
+                'operations' => [],
+                'workflows' => [],
+                'processes' => [],
+                'placeholder_items' => [],
             ],
             'feature3' => [
                 'label'         => 'Feature 3',
@@ -47,7 +65,16 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'configuration' => [],
                 'entities'      => [],
                 'field_configs' => [],
-                'commands'      => []
+                'commands'      => [],
+                'sidebar_widgets' => [],
+                'dashboard_widgets' => [],
+                'cron_jobs' => [],
+                'api_resources' => [],
+                'navigation_items' => [],
+                'operations' => [],
+                'workflows' => [],
+                'processes' => [],
+                'placeholder_items' => [],
             ]
         ],
         '__internal__' => [

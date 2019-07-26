@@ -243,7 +243,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Expected Symfony\Component\Security\Core\Role\RoleInterface, stdClass given
+     * @expectedExceptionMessage Expected Symfony\Component\Security\Core\Role\Role, stdClass given
      */
     public function testNotSupportedRole()
     {

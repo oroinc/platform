@@ -4,7 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Autocomplete;
 
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetBusinessUnitSearchHandler extends SearchHandler
 {

@@ -8,7 +8,7 @@ class ActionButtonGroupLabelProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetLabelWithDefaultGroupAndWithoutEntityClass()
     {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $provider   = new ActionButtonGroupLabelProvider($translator);
 
         $translator->expects($this->once())
@@ -24,7 +24,7 @@ class ActionButtonGroupLabelProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLabelWithoutEntityClass()
     {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $provider   = new ActionButtonGroupLabelProvider($translator);
 
         $translator->expects($this->once())
@@ -40,7 +40,7 @@ class ActionButtonGroupLabelProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLabelWithoutEntityPlaceholder()
     {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $provider   = new ActionButtonGroupLabelProvider($translator);
 
         $translator->expects($this->once())
@@ -61,7 +61,7 @@ class ActionButtonGroupLabelProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLabel()
     {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $provider   = new ActionButtonGroupLabelProvider($translator);
 
         $translator->expects($this->at(0))

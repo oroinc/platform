@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Formatter;
 
 use Oro\Bundle\WorkflowBundle\Model\Variable;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowVariableFormatter
 {

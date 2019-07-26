@@ -169,6 +169,7 @@ services:
     # services used only for ORM search engine
     oro_search.fulltext_index_manager:
         class: '%oro_search.fulltext_index_manager.class%'
+        public: true
         arguments:
             - '@doctrine.dbal.default_connection'
             - '%oro_search.drivers%'
@@ -370,6 +371,7 @@ services:
 
     oro_search.utils.search_all_text:
        class: Oro\Bundle\SearchBundle\Utils\SearchAllText
+       public: true
        arguments:
             - '@translator'
 

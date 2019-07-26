@@ -83,7 +83,7 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
             }
 
             if (array_key_exists('fallback', $item)) {
-                $object->setFallback((string)$item['fallback']);
+                $object->setFallback($item['fallback'] ? (string)$item['fallback'] : null);
             }
             if (array_key_exists('text', $item)) {
                 $object->setText((string)$item['text']);

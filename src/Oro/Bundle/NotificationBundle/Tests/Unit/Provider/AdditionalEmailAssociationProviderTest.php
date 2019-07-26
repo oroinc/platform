@@ -11,7 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NotificationBundle\Provider\AdditionalEmailAssociationProvider;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Fixtures\Entity\EmailHolderTestEntity;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\TestCase
 {

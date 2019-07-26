@@ -16,7 +16,7 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
         $this->factory = $this->getContainer()->get($this->getFactoryServiceId());
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $typeNames = array_keys($this->factory->getTypes());
         $result = $this->runCommand($this->getCommandName());
@@ -26,7 +26,7 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
         }
     }
 
-    public function testExecuteWithArgument()
+    public function testExecuteWithArgument(): void
     {
         $types = $this->factory->getTypes();
         $typeNames = array_keys($types);
@@ -37,7 +37,7 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
         $this->assertContains(array_shift($types), $result);
     }
 
-    public function testExecuteWithNotExistsArgument()
+    public function testExecuteWithNotExistsArgument(): void
     {
         $name = 'some_not_exists_name';
         $result = $this->runCommand($this->getCommandName(), [$name]);
@@ -48,10 +48,10 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
     /**
      * @return string
      */
-    abstract protected function getFactoryServiceId();
+    abstract protected function getFactoryServiceId(): string;
 
     /**
      * @return string
      */
-    abstract protected function getCommandName();
+    abstract protected function getCommandName(): string;
 }

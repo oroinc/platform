@@ -32,6 +32,7 @@ parameters:
 services:
     oro_activity_list.manager:
         class: '%oro_activity_list.manager.class%'
+        public: true
         arguments:
             - "@security.authorization_checker"
             - "@oro_entity.entity_name_resolver"
@@ -71,6 +72,7 @@ services:
 
     oro_activity_list.placeholder.filter:
         class: '%oro_activity_list.placeholder.filter.class%'
+        public: true
         arguments:
             - "@oro_activity_list.provider.chain"
             - "@doctrine"

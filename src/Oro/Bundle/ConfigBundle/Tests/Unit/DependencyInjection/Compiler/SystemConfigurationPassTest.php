@@ -6,6 +6,7 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Oro\Bundle\ConfigBundle\Tests\Unit\Fixtures\TestBundle;
 use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -116,6 +117,21 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
                     );
                 }
             );
+
+        $mainServiceAlias = $this->createMock(Alias::class);
+        $mainServiceAlias->expects($this->once())
+            ->method('setPublic')
+            ->with(true);
+
+        $this->container->expects($this->once())
+            ->method('setAlias')
+            ->with('oro_config.manager', 'oro_config.app');
+
+        $this->container->expects($this->once())
+            ->method('getAlias')
+            ->with('oro_config.manager')
+            ->willReturn($mainServiceAlias);
+
         $this->compiler->process($this->container);
     }
 
@@ -160,33 +176,27 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $configBagServiceDef = $this->createDefinitionMock();
         $this->container->expects(static::once())
             ->method('findTaggedServiceIds')
-            ->will(
-                $this->returnValue(
-                    [
-                        'first_scope_service' => [
-                            ['scope' => 'app', 'priority' => 100],
-                        ],
-                        'second_scope_service' => [
-                            ['scope' => 'user', 'priority' => -100],
-                        ],
-                    ]
-                )
-            );
+            ->willReturn([
+                'first_scope_service' => [
+                    ['scope' => 'app', 'priority' => 100],
+                ],
+                'second_scope_service' => [
+                    ['scope' => 'user', 'priority' => -100],
+                ],
+            ]);
 
         $apiManagerServiceDef = $this->createDefinitionMock();
         $configManagerServiceDef = $this->createDefinitionMock();
         $this->container->expects(static::exactly(5))
             ->method('getDefinition')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['oro_config.config_definition_bag', $bagServiceDef],
-                        ['oro_config.config_bag', $configBagServiceDef],
-                        ['oro_config.manager.api', $apiManagerServiceDef],
-                        ['oro_config.manager', $configManagerServiceDef],
-                        ['oro_config.default_provider', $defaultProviderMock],
-                    ]
-                )
+            ->willReturnMap(
+                [
+                    ['oro_config.config_definition_bag', $bagServiceDef],
+                    ['oro_config.config_bag', $configBagServiceDef],
+                    ['oro_config.manager.api', $apiManagerServiceDef],
+                    ['oro_config.manager', $configManagerServiceDef],
+                    ['oro_config.default_provider', $defaultProviderMock],
+                ]
             );
 
         $bagServiceDef->expects($this->once())
@@ -206,6 +216,20 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ]);
+
+        $mainServiceAlias = $this->createMock(Alias::class);
+        $mainServiceAlias->expects($this->once())
+            ->method('setPublic')
+            ->with(true);
+
+        $this->container->expects($this->once())
+            ->method('setAlias')
+            ->with('oro_config.manager', 'oro_config.app');
+
+        $this->container->expects($this->once())
+            ->method('getAlias')
+            ->with('oro_config.manager')
+            ->willReturn($mainServiceAlias);
 
         $this->compiler->process($this->container);
     }

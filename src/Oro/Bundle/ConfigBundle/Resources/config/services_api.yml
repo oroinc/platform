@@ -25,6 +25,7 @@ services:
 
     oro_config.api.get_list.load_configuration_sections:
         class: Oro\Bundle\ConfigBundle\Api\Processor\GetList\LoadConfigurationSections
+        public: true
         arguments:
             - '@oro_config.api.repository'
             - '@security.authorization_checker'

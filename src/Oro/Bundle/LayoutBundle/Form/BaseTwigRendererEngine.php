@@ -36,6 +36,14 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
     /**
      * {@inheritdoc}
      */
+    public function setEnvironment(Environment $environment)
+    {
+        $this->environment = $environment;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function renderBlock(FormView $view, $resource, $blockName, array $variables = [])
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];

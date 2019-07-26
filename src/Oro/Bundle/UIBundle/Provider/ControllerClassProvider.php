@@ -125,6 +125,34 @@ class ControllerClassProvider extends PhpArrayConfigProvider
             return null;
         }
 
+        [$className, $methodName] = $this->resolveController($controller);
+        if (!\class_exists($className)) {
+            $className = $this->resolveControllerClass($className);
+        }
+
+        if (!$className) {
+            return null;
+        }
+        if (!$methodName) {
+            if (!\method_exists($className, '__invoke')) {
+                throw new \InvalidArgumentException(\sprintf(
+                    'Controller class "%s" should have "__invoke" method.',
+                    $className
+                ));
+            }
+            $methodName = '__invoke';
+        }
+
+        return [$className, $methodName];
+    }
+
+    /**
+     * @param string $controller
+     *
+     * @return array
+     */
+    private function resolveController(string $controller): array
+    {
         // check for "class::method"
         if (false !== \strpos($controller, '::')) {
             return \explode('::', $controller);
@@ -140,22 +168,9 @@ class ControllerClassProvider extends PhpArrayConfigProvider
         $className = null;
         $methodName = null;
         if (1 === $separatorCount) {
-            list($className, $methodName) = \explode(':', $controller);
-            $className = $this->resolveControllerClass($className);
+            [$className, $methodName] = \explode(':', $controller);
         } elseif (0 === $separatorCount) {
-            $className = $this->resolveControllerClass($controller);
-        }
-        if (!$className) {
-            return null;
-        }
-        if (!$methodName) {
-            if (!\method_exists($className, '__invoke')) {
-                throw new \InvalidArgumentException(\sprintf(
-                    'Controller class "%s" should have "__invoke" method.',
-                    $className
-                ));
-            }
-            $methodName = '__invoke';
+            $className = $controller;
         }
 
         return [$className, $methodName];

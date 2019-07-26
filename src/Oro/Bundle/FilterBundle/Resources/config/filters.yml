@@ -121,7 +121,7 @@ services:
 
     oro_filter.datetime_range_filter:
         class: Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter
-        public: false
+        public: true
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
@@ -184,7 +184,7 @@ services:
 
     oro_filter.date_grouping_filter:
         class: Oro\Bundle\FilterBundle\Filter\DateGroupingFilter
-        public: false
+        public: true
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
