@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Formatter;
 
 use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The formatter for "simple_array" data type.

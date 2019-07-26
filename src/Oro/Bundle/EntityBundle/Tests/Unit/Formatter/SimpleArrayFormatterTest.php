@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\EntityBundle\Formatter\SimpleArrayFormatter;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SimpleArrayFormatterTest extends \PHPUnit\Framework\TestCase
 {

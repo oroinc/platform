@@ -23,7 +23,7 @@ class AbstractChoiceTypeTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+        $this->translator = $this->getMockBuilder('Symfony\Contracts\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
             ->setMethods(array('trans'))
             ->getMockForAbstractClass();

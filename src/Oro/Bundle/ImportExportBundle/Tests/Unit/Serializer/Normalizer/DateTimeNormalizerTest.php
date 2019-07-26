@@ -20,7 +20,7 @@ class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
 
         $formatter        = new ExcelDateTimeTypeFormatter($this->localeSettings, $translator);
         $this->normalizer = new DateTimeNormalizer();

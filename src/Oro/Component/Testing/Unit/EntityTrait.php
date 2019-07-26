@@ -33,7 +33,7 @@ trait EntityTrait
 
         if ($reflectionMethod && $reflectionMethod->isPublic()) {
             if (empty($constructorArgs)) {
-                $entity = $reflectionClass->newInstance($constructorArgs);
+                $entity = $reflectionClass->newInstance();
             } else {
                 $entity = $reflectionClass->newInstanceArgs($constructorArgs);
             }

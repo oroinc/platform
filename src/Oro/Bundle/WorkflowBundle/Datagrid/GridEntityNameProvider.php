@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Datagrid;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GridEntityNameProvider
 {

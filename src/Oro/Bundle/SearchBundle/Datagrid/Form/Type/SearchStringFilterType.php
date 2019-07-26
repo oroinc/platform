@@ -5,7 +5,7 @@ namespace Oro\Bundle\SearchBundle\Datagrid\Form\Type;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SearchStringFilterType extends AbstractType
 {

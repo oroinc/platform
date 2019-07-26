@@ -3,7 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Format dates based on locale settings

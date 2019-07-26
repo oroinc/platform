@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UIBundle\Tools;
 
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class that helps to add the flash message, sanitizing it in advance

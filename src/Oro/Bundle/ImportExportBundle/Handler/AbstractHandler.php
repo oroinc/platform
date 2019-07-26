@@ -14,7 +14,7 @@ use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\ReaderChain;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Abstract class for export/import handlers.

@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\Shared\NormalizeErrors;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NormalizeErrorsTest extends GetProcessorTestCase
 {

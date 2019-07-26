@@ -10,10 +10,13 @@ use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
-use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerAwareTrait;
 
-class WorkflowDataNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
+class WorkflowDataNormalizer implements SerializerAwareInterface, NormalizerInterface, DenormalizerInterface
 {
+    use SerializerAwareTrait;
+
     /**
      * @var AttributeNormalizer[]
      */

@@ -9,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\AttributeAssembler;
 use Oro\Component\Action\Exception\AssemblerException;
 use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
 {

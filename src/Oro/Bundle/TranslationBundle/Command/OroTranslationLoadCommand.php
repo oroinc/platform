@@ -8,18 +8,19 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
-use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This command loads translations to database
  * It performs many queries to DB. To optimize it - was used native SQL queries and batch inserts
  */
-final class OroTranslationLoadCommand extends ContainerAwareCommand
+final class OroTranslationLoadCommand extends Command
 {
     const BATCH_INSERT_ROWS_COUNT = 50;
 
@@ -29,7 +30,7 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
     /** @var ManagerRegistry */
     private $registry;
 
-    /** @var TranslatorInterface */
+    /** @var TranslatorInterface|Translator */
     private $translator;
 
     /** @var DatabasePersister */
@@ -38,22 +39,28 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
     /** @var LanguageProvider */
     private $languageProvider;
 
+    /** @var OrmTranslationLoader */
+    private $databaseTranslationLoader;
+
     /**
      * @param ManagerRegistry $registry
-     * @param TranslatorInterface $translator
+     * @param TranslatorInterface|Translator $translator
      * @param DatabasePersister $databasePersister
      * @param LanguageProvider $languageProvider
+     * @param OrmTranslationLoader $databaseTranslationLoader
      */
     public function __construct(
         ManagerRegistry $registry,
         TranslatorInterface $translator,
         DatabasePersister $databasePersister,
-        LanguageProvider $languageProvider
+        LanguageProvider $languageProvider,
+        OrmTranslationLoader $databaseTranslationLoader
     ) {
         $this->registry = $registry;
         $this->translator = $translator;
         $this->databasePersister = $databasePersister;
         $this->languageProvider = $languageProvider;
+        $this->databaseTranslationLoader = $databaseTranslationLoader;
 
         parent::__construct();
     }
@@ -76,6 +83,8 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -91,11 +100,7 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
             )
         );
 
-        // backup DB loader
-        $translationLoader = $this->getContainer()->get('oro_translation.database_translation.loader');
-
-        // disable DB loader to exclude existing translations from database
-        $this->getContainer()->set('oro_translation.database_translation.loader', new EmptyArrayLoader());
+        $this->databaseTranslationLoader->setDisabled();
 
         if ($input->getOption('rebuild-cache')) {
             $this->translator->rebuildCache();
@@ -112,8 +117,7 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
             throw $e;
         }
 
-        // restore DB loader
-        $this->getContainer()->set('oro_translation.database_translation.loader', $translationLoader);
+        $this->databaseTranslationLoader->setEnabled();
 
         if ($input->getOption('rebuild-cache')) {
             $output->write(sprintf('<info>Rebuilding cache ... </info>'));
@@ -126,7 +130,6 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
     /**
      * @param array $locales
      * @param OutputInterface $output
-     * @return array
      */
     private function processLocales(array $locales, OutputInterface $output)
     {

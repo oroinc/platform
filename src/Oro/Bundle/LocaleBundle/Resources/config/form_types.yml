@@ -134,6 +134,7 @@ services:
 
     oro_locale.configurator.localization_configurator:
         class: Oro\Bundle\LocaleBundle\Form\Configurator\LocalizationConfigurator
+        public: true
         arguments:
             - '@oro_config.form.handler.config'
 

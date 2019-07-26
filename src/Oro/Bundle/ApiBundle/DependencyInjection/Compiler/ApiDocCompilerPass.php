@@ -26,6 +26,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const API_DOC_ANNOTATION_HANDLER_TAG_NAME       = 'oro.api.api_doc_annotation_handler';
     private const REST_DOC_VIEW_DETECTOR_SERVICE            = 'oro_api.rest.doc_view_detector';
     private const REQUEST_TYPE_PROVIDER_TAG                 = 'oro.api.request_type_provider';
+    private const API_DOC_SIMPLE_FORMATTER_SERVICE          = 'nelmio_api_doc.formatter.simple_formatter';
     private const API_DOC_HTML_FORMATTER_SERVICE            = 'nelmio_api_doc.formatter.html_formatter';
     private const RENAMED_API_DOC_HTML_FORMATTER_SERVICE    = 'oro_api.api_doc.formatter.html_formatter.nelmio';
     private const COMPOSITE_API_DOC_HTML_FORMATTER_SERVICE  = 'oro_api.api_doc.formatter.html_formatter.composite';
@@ -44,6 +45,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
 
         $this->configureApiDocAnnotationHandler($container);
         $this->configureApiDocExtractor($container);
+        $this->configureSimpleFormatter($container);
         $this->configureHtmlFormatter($container);
         $this->registerRoutingOptionsResolvers($container);
         $this->registerRequestTypeProviders($container);
@@ -82,8 +84,10 @@ class ApiDocCompilerPass implements CompilerPassInterface
         if (!$container->hasDefinition(self::API_DOC_HTML_FORMATTER_SERVICE)) {
             return false;
         }
+
         $htmlFormatterDef = $container->getDefinition(self::API_DOC_HTML_FORMATTER_SERVICE);
-        if (NelmioFormatter\HtmlFormatter::class !== $htmlFormatterDef->getClass()) {
+        $formatterClass = $container->getParameterBag()->resolveValue($htmlFormatterDef->getClass());
+        if (NelmioFormatter\HtmlFormatter::class !== ltrim($formatterClass, '/\\')) {
             return false;
         }
 
@@ -113,6 +117,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private function configureApiDocExtractor(ContainerBuilder $container)
     {
         $apiDocExtractorDef = $container->getDefinition(self::API_DOC_EXTRACTOR_SERVICE);
+        $apiDocExtractorDef->setPublic(true);
         $apiDocExtractorDef->setClass(
             $this->getNewApiDocExtractorClass($apiDocExtractorDef->getClass())
         );
@@ -142,6 +147,15 @@ class ApiDocCompilerPass implements CompilerPassInterface
                 $requestTypeProviderDef->addMethodCall('mapViewToRequestType', [$name, $view['request_type']]);
             }
         }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function configureSimpleFormatter(ContainerBuilder $container)
+    {
+        $formatterDef = $container->getDefinition(self::API_DOC_SIMPLE_FORMATTER_SERVICE);
+        $formatterDef->setPublic(true);
     }
 
     /**

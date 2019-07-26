@@ -4,19 +4,22 @@ namespace Oro\Bundle\ActionBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 
+/**
+ * Displays current "conditions" for an application
+ */
 class DebugConditionCommand extends AbstractDebugCommand
 {
-    const COMMAND_NAME = 'oro:debug:condition';
-    const ARGUMENT_NAME = 'condition-name';
-    const FACTORY_SERVICE_ID = 'oro_action.expression.factory';
+    public const ARGUMENT_NAME = 'condition-name';
+
+    /** @var string */
+    protected static $defaultName = 'oro:debug:condition';
 
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName(self::COMMAND_NAME)
-            ->setDescription('Displays current "conditions" for an application')
+        $this->setDescription('Displays current "conditions" for an application')
             ->addArgument(self::ARGUMENT_NAME, InputArgument::OPTIONAL, 'A condition name')
             ->setHelp(
                 <<<EOF
@@ -30,15 +33,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function getFactoryServiceId()
-    {
-        return self::FACTORY_SERVICE_ID;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getArgumentName()
+    protected function getArgumentName(): string
     {
         return self::ARGUMENT_NAME;
     }

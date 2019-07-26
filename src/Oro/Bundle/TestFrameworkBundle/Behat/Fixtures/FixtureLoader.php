@@ -214,7 +214,7 @@ class FixtureLoader
         }
 
         list($bundleName, $filename) = explode(':', $filename);
-        $bundlePath = $this->kernel->getBundle('!'.$bundleName)->getPath();
+        $bundlePath = $this->kernel->getBundle($bundleName)->getPath();
         $suitePaths = [sprintf('%s%sTests%2$sBehat%2$sFeatures', $bundlePath, DIRECTORY_SEPARATOR)];
 
         if (!$file = $this->findFileInPath($filename, $suitePaths)) {

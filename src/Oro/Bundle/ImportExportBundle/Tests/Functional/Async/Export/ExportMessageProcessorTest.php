@@ -81,7 +81,7 @@ class ExportMessageProcessorTest extends WebTestCase
             )
             ->willReturn($exportResult);
 
-        $this->getContainer()->set('oro_importexport.handler.export', $exportHandler);
+        $this->getContainer()->set('oro_importexport.handler.export.stub', $exportHandler);
 
         $processor = $this->getContainer()->get('oro_importexport.async.export');
 

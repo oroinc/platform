@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityBundle\Event;
 
 use Doctrine\Common\EventArgs;
+use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OroEventManager extends ContainerAwareEventManager
 {

@@ -67,7 +67,7 @@ class ActionsPass implements CompilerPassInterface
         $actions = $container->findTaggedServiceIds($actionTagName);
         foreach ($actions as $serviceId => $tags) {
             $actionDef = $container->getDefinition($serviceId);
-            if (!$actionDef->isPublic()) {
+            if (!$actionDef->isPublic() || $actionDef->isPrivate()) {
                 throw new RuntimeException(sprintf('The service "%s" should be public.', $serviceId));
             }
             if ($actionDef->isShared()) {

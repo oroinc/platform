@@ -9,6 +9,7 @@ services:
     # Processor registry
     oro_importexport.processor.registry:
         class: '%oro_importexport.processor.registry.class%'
+        public: true
 
     # Import delegate processor, abstract import processor
     oro_importexport.processor.import_delegate:

@@ -6,7 +6,7 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;
 use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\UIBundle\Model\TreeItem;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MenuUpdateTreeHandlerTest extends \PHPUnit\Framework\TestCase
 {

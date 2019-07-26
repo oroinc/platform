@@ -15,7 +15,7 @@ use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration;
 use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\FilterBagStub;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCase
 {

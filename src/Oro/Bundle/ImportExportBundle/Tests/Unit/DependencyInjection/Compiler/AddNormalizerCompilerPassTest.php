@@ -30,55 +30,97 @@ class AddNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processDataProvider
+     *
+     * @param array $normalizers
+     * @param array $encoders
+     * @param array $expectedNormalizers
+     * @param array $expectedEncoders
      */
-    public function testProcess($taggedServices, $expectedNormalizers)
-    {
+    public function testProcess(
+        array $normalizers,
+        array $encoders,
+        array $expectedNormalizers,
+        array $expectedEncoders
+    ) {
         $this->containerBuilder->expects($this->once())
             ->method('getDefinition')
             ->with(AddNormalizerCompilerPass::SERIALIZER_SERVICE)
-            ->will($this->returnValue($this->serializerDefinition));
+            ->willReturn($this->serializerDefinition);
 
-        $this->containerBuilder->expects($this->once())
+        $this->containerBuilder->expects($this->exactly(2))
             ->method('findTaggedServiceIds')
-            ->with(AddNormalizerCompilerPass::ATTRIBUTE_NORMALIZER_TAG)
-            ->will($this->returnValue($taggedServices));
+            ->willReturnMap(
+                [
+                    [AddNormalizerCompilerPass::ATTRIBUTE_NORMALIZER_TAG, false, $normalizers],
+                    ['serializer.encoder', false, $encoders],
+                ]
+            );
 
         $this->serializerDefinition->expects($this->once())
+            ->method('getArgument')
+            ->with(1)
+            ->willReturn([new Reference('bazz')]);
+
+        $this->serializerDefinition->expects($this->exactly(2))
             ->method('replaceArgument')
-            ->with(0, $expectedNormalizers);
+            ->withConsecutive(
+                [0, $expectedNormalizers],
+                [1, $expectedEncoders]
+            );
 
         $pass = new AddNormalizerCompilerPass();
         $pass->process($this->containerBuilder);
     }
 
+    /**
+     * @return array
+     */
     public function processDataProvider()
     {
-        return array(
-            'sort_by_priority' => array(
-                'taggedServices' => array(
-                    'foo_1' => array(array('priority' => 1)),
-                    'bar_0' => array(array()),
-                    'baz_2' => array(array('priority' => 2)),
-                ),
-                'expectedNormalizers' => array(
+        return [
+            'sort_by_priority' => [
+                'normalizers' => [
+                    'foo_1' => [['priority' => 1]],
+                    'bar_0' => [[]],
+                    'baz_2' => [['priority' => 2]],
+                ],
+                'encoders' => [
+                    'foo' => [[]],
+                    'bar' => [[]],
+                ],
+                'expectedNormalizers' => [
                     new Reference('baz_2'),
                     new Reference('foo_1'),
                     new Reference('bar_0'),
-                )
-            ),
-            'default_order' => array(
-                'taggedServices' => array(
-                    'foo' => array(array()),
-                    'bar' => array(array()),
-                    'baz' => array(array()),
-                ),
-                'expectedNormalizers' => array(
+                ],
+                'expectedEncoders' => [
+                    new Reference('bazz'),
+                    new Reference('foo'),
+                    new Reference('bar'),
+                ]
+            ],
+            'default_order' => [
+                'normalizers' => [
+                    'foo' => [[]],
+                    'bar' => [[]],
+                    'baz' => [[]],
+                ],
+                'encoders' => [
+                    'foo' => [[]],
+                    'bar' => [[]],
+                ],
+                'expectedNormalizers' => [
                     new Reference('foo'),
                     new Reference('bar'),
                     new Reference('baz'),
-                )
-            ),
-        );
+                ],
+                'expectedEncoders' => [
+                    new Reference('bazz'),
+                    new Reference('foo'),
+                    new Reference('bar'),
+                ]
+            ],
+        ];
     }
 
     //@codingStandardsIgnoreStart

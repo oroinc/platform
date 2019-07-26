@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
 use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Validates entity fields.

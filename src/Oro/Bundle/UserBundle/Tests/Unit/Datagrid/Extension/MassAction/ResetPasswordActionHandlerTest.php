@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordActionHandler;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ResetPasswordActionHandlerTest extends \PHPUnit\Framework\TestCase
 {

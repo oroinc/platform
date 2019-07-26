@@ -19,12 +19,20 @@ class OroActionBundleTest extends \PHPUnit\Framework\TestCase
 
         $compilerPasses = [
             [
+                'class' => CompilerPass\ConditionLocatorPass::class,
+                'type' => PassConfig::TYPE_BEFORE_OPTIMIZATION
+            ],
+            [
                 'class' => CompilerPass\ConditionPass::class,
-                'type' => PassConfig::TYPE_AFTER_REMOVING
+                'type' => PassConfig::TYPE_BEFORE_OPTIMIZATION
+            ],
+            [
+                'class' => CompilerPass\ActionLocatorPass::class,
+                'type' => PassConfig::TYPE_BEFORE_OPTIMIZATION
             ],
             [
                 'class' => CompilerPass\ActionPass::class,
-                'type' => PassConfig::TYPE_AFTER_REMOVING
+                'type' => PassConfig::TYPE_BEFORE_OPTIMIZATION
             ],
             [
                 'class' => CompilerPass\MassActionProviderPass::class,
@@ -32,7 +40,7 @@ class OroActionBundleTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'class' => CompilerPass\ButtonProviderPass::class,
-                'type' => PassConfig::TYPE_AFTER_REMOVING
+                'type' => PassConfig::TYPE_BEFORE_REMOVING
             ],
             [
                 'class' => CompilerPass\DoctrineTypeMappingProviderPass::class,
@@ -44,19 +52,11 @@ class OroActionBundleTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'class' => CompilerPass\DuplicatorFilterPass::class,
-                'type' => PassConfig::TYPE_AFTER_REMOVING
+                'type' => PassConfig::TYPE_BEFORE_REMOVING
             ],
             [
                 'class' => CompilerPass\DuplicatorMatcherPass::class,
-                'type' => PassConfig::TYPE_AFTER_REMOVING
-            ],
-            [
-                'class' => CompilerPass\ActionLocatorPass::class,
-                'type' => PassConfig::TYPE_BEFORE_OPTIMIZATION
-            ],
-            [
-                'class' => CompilerPass\ConditionLocatorPass::class,
-                'type' => PassConfig::TYPE_BEFORE_OPTIMIZATION
+                'type' => PassConfig::TYPE_BEFORE_REMOVING
             ],
         ];
 

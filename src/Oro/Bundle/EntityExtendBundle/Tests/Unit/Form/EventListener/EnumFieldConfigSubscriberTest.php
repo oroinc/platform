@@ -32,7 +32,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->configManager    = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translator       = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator       = $this->createMock('Symfony\Component\Translation\Translator');
         $this->enumSynchronizer = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer')
             ->disableOriginalConstructor()
             ->getMock();

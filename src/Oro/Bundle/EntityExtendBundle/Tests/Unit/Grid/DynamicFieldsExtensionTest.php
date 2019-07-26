@@ -3,9 +3,10 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Provider\SelectedFields\SelectedFieldsProviderInterface;
-use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
+use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\ColumnOptionsGuesserMock;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
@@ -57,7 +58,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         $extension = new DynamicFieldsExtension(
             $this->configManager,
             $this->entityClassResolver,
-            new DatagridGuesserMock(),
+            new DatagridGuesser([new ColumnOptionsGuesserMock()]),
             $this->fieldsHelper,
             $this->doctrineHelper,
             $this->selectedFieldsProvider
@@ -441,7 +442,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         $extension = new DynamicFieldsExtension(
             $this->configManager,
             $this->entityClassResolver,
-            new DatagridGuesserMock(),
+            new DatagridGuesser([]),
             $this->fieldsHelper,
             $this->doctrineHelper,
             $selectedFieldsProvider

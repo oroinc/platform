@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractViewsList
 {

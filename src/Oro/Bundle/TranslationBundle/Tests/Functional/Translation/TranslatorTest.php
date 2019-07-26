@@ -44,7 +44,7 @@ class TranslatorTest extends WebTestCase
         $this->createStrategies();
 
         $this->provider = new TranslationStrategyProvider();
-        self::getContainer()->set('oro_translation.strategy.provider', $this->provider);
+        self::getContainer()->set('oro_translation.strategy.provider.test', $this->provider);
         // Update translation strategy provider's service link for translator
         // to ensure that old strategy provider is not in local cache
         $this->translator->setStrategyProviderLink(new ServiceLink(

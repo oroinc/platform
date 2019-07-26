@@ -20,6 +20,7 @@ services:
             - '@translator'
             - '@oro_translation.database_translation.persister'
             - '@oro_translation.provider.language'
+            - '@oro_translation.database_translation.loader'
         tags:
             - { name: console.command }
 

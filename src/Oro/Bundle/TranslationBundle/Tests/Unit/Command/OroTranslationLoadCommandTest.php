@@ -7,10 +7,9 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand;
 use Oro\Bundle\TranslationBundle\Entity\Language;
-use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
-use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
+use Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,10 +27,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
     /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $languageProvider;
 
-    /** @var TranslationManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translationManager;
-
-    /** @var EmptyArrayLoader */
+    /** @var OrmTranslationLoader */
     protected $translationLoader;
 
     /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -50,31 +46,25 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
     {
         $this->translator = $this->createMock(Translator::class);
         $this->languageProvider = $this->createMock(LanguageProvider::class);
-        $this->translationManager = $this->createMock(TranslationManager::class);
 
         $this->translator->expects($this->any())
             ->method('getCatalogue')
             ->willReturnMap($this->getCatalogueMap());
 
-        $this->translationLoader = new EmptyArrayLoader();
+        $this->translationLoader = $this->createMock(OrmTranslationLoader::class);
         $language = new Language();
 
         $entityRepository = $this->createMock(EntityRepository::class);
         $entityRepository->expects($this->any())->method('findOneBy')->willReturn($language);
+
+        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $managerRegistry */
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $entityManager = $this->createMock(EntityManager::class);
         $managerRegistry->expects($this->any())->method('getManagerForClass')->willReturn($entityManager);
         $entityManager->expects($this->any())->method('getRepository')->willReturn($entityRepository);
 
+        /** @var DatabasePersister|\PHPUnit\Framework\MockObject\MockObject $databasePersister */
         $databasePersister = $this->createMock(DatabasePersister::class);
-
-        $this->container = $this->createMock(ContainerInterface::class);
-        $this->container->expects($this->any())
-            ->method('get')
-            ->willReturnMap([
-                ['oro_translation.manager.translation', 1, $this->translationManager],
-                ['oro_translation.database_translation.loader', 1, $this->translationLoader],
-            ]);
 
         $this->input = $this->createMock(InputInterface::class);
         $this->output = new OutputStub();
@@ -83,10 +73,9 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
             $managerRegistry,
             $this->translator,
             $databasePersister,
-            $this->languageProvider
+            $this->languageProvider,
+            $this->translationLoader
         );
-
-        $this->command->setContainer($this->container);
     }
 
     /**
@@ -126,10 +115,6 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
         $this->languageProvider->expects($this->once())
             ->method('getAvailableLanguages')
             ->willReturn(['locale1' => 'locale1', 'currentLocale' => 'currentLocale']);
-
-        $this->container->expects($this->at(2))->method('set')
-            ->with('oro_translation.database_translation.loader', new EmptyArrayLoader())
-            ->willReturn($this->translationManager);
 
         $this->command->run($this->input, $this->output);
 

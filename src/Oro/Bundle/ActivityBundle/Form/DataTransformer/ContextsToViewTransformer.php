@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContextsToViewTransformer implements DataTransformerInterface
 {

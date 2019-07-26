@@ -74,6 +74,7 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
      */
     private function getBundle(): BundleInterface
     {
+        /** @var BundleInterface|\PHPUnit\Framework\MockObject\MockObject $bundle */
         $bundle = $this->createMock(BundleInterface::class);
         $bundle->expects(self::any())
             ->method('getNamespace')
@@ -99,15 +100,26 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
             'route3',
             new Route('route3', ['_controller' => SomeController::class . '::someAction'])
         );
+        $this->routeCollection->add(
+            'route4',
+            new Route('route4', ['_controller' => 'some_controller.service_definition::anotherAction'])
+        );
 
         $expectedControllers = [
             'route1' => [TestController::class, 'someAction'],
             'route2' => [TestController::class, 'anotherAction'],
-            'route3' => [SomeController::class, 'someAction']
+            'route3' => [SomeController::class, 'someAction'],
+            'route4' => [SomeController::class, 'anotherAction'],
         ];
 
-        $this->container->expects(self::never())
-            ->method('has');
+        $this->container->expects(self::once())
+            ->method('has')
+            ->with('some_controller.service_definition')
+            ->willReturn(true);
+        $this->container->expects(self::once())
+            ->method('get')
+            ->with('some_controller.service_definition')
+            ->willReturn(new SomeController());
         $this->logger->expects(self::never())
             ->method('error');
 
@@ -197,8 +209,8 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->kernel->expects(self::once())
             ->method('getBundle')
-            ->with('Acme', self::isFalse())
-            ->willReturn([$this->getBundle()]);
+            ->with('Acme')
+            ->willReturn($this->getBundle());
         $this->container->expects(self::never())
             ->method('has');
         $this->logger->expects(self::never())
@@ -222,8 +234,8 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->kernel->expects(self::once())
             ->method('getBundle')
-            ->with('Acme', self::isFalse())
-            ->willReturn([$this->getBundle()]);
+            ->with('Acme')
+            ->willReturn($this->getBundle());
         $this->container->expects(self::never())
             ->method('has');
         $this->logger->expects(self::once())

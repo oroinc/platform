@@ -2,6 +2,7 @@ security:
     firewalls:
         wsse_secured:
             pattern: ^/api/rest.*
+            provider: oro_user
             stateless:  true
             wsse:
                 lifetime: 3600

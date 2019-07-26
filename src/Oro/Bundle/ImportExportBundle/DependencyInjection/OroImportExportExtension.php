@@ -28,6 +28,11 @@ class OroImportExportExtension extends Extension
         $loader->load('handler.yml');
         $loader->load('field.yml');
         $loader->load('services.yml');
+
+        if ($container->getParameter('kernel.environment') === 'test') {
+            $loader->load('services_test.yml');
+        }
+
         $loader->load('mq_processor.yml');
         $loader->load('commands.yml');
         $loader->load('controllers.yml');

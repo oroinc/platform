@@ -11,7 +11,7 @@ use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailNotificationDatagridListener
 {

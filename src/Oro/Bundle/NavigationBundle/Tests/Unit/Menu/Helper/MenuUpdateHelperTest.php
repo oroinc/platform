@@ -11,7 +11,7 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
 {

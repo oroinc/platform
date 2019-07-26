@@ -4,7 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Formatter;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Used to format the formatting code and the system language to the human readable locale name.

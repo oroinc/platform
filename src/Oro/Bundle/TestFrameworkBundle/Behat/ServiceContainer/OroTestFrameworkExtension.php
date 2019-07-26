@@ -168,6 +168,8 @@ class OroTestFrameworkExtension implements TestworkExtension
     private function processIsolationSubscribers(ContainerBuilder $container)
     {
         $isolators = [];
+
+        /** @var \Symfony\Component\DependencyInjection\Container $applicationContainer */
         $applicationContainer = $container->get(Symfony2Extension::KERNEL_ID)->getContainer();
 
         foreach ($container->findTaggedServiceIds(self::ISOLATOR_TAG) as $id => $attributes) {
@@ -408,9 +410,7 @@ class OroTestFrameworkExtension implements TestworkExtension
                 continue;
             }
 
-            // Add ! to the start of bundle name, because we need to get the real bundle not the inheritance
-            // See OroKernel->getBundle
-            $bundleSuite = $suiteGenerator->generateSuite('!'.$bundle->getName(), []);
+            $bundleSuite = $suiteGenerator->generateSuite($bundle->getName(), []);
 
             if (!$this->hasValidPaths($bundleSuite)) {
                 continue;

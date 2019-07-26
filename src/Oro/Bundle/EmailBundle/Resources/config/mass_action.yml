@@ -9,6 +9,7 @@ services:
             - '@oro_entity_merge.metadata.registry'
             - '@translator'
         shared: false
+        public: true
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: emailmarkread }
 
@@ -18,11 +19,13 @@ services:
             - '@oro_entity_merge.metadata.registry'
             - '@translator'
         shared: false
+        public: true
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: emailmarkunread }
 
     oro_email.mass_action.mark_handler:
         class: '%oro_email.mass_action.mark_handler.class%'
+        public: true
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@translator'

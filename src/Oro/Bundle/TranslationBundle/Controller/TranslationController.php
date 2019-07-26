@@ -45,7 +45,7 @@ class TranslationController extends BaseController
     public function resetMassAction($gridName, $actionName, Request $request)
     {
         /** @var MassActionDispatcher $massActionDispatcher */
-        $massActionDispatcher = $this->get(MassActionDispatcher::class);
+        $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');
 
         try {
             $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);

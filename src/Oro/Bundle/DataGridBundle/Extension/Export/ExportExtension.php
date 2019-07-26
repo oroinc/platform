@@ -9,7 +9,7 @@ use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This extension is responsible for export-related configurations management in datagrid

@@ -4,14 +4,14 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Cache;
 
 use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Translation\Translator;
 
 class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = 'FooBar';
     const LOCALE = 'en';
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
@@ -22,7 +22,7 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator = $this->createMock(Translator::class);
         $this->translator->expects($this->once())
             ->method('getLocale')
             ->willReturn(self::LOCALE);

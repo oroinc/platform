@@ -26,6 +26,7 @@ parameters:
 services:
     oro_locale.settings:
         class: 'Oro\Bundle\LocaleBundle\Model\LocaleSettings'
+        public: true
         arguments:
             - '@oro_config.manager'
             - '@oro_locale.calendar_factory'
@@ -260,7 +261,7 @@ services:
 
     oro_locale.twig.date_time:
         class: Oro\Bundle\LocaleBundle\Twig\DateTimeExtension
-        public: false
+        public: true
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -356,6 +357,7 @@ services:
 
     oro_locale.provider.localization_choices:
         class: 'Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider'
+        public: true
         arguments:
             - '@oro_locale.settings'
             - '@oro_locale.formatter.language_code'

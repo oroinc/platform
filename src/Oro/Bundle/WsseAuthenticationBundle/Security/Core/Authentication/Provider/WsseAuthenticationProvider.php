@@ -5,6 +5,7 @@ namespace Oro\Bundle\WsseAuthenticationBundle\Security\Core\Authentication\Provi
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 use Oro\Bundle\UserBundle\Security\UserApiKeyInterface;
+use Oro\Bundle\WsseAuthenticationBundle\Exception\NonceExpiredException;
 use Oro\Bundle\WsseAuthenticationBundle\Security\WsseTokenFactoryInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\PruneableInterface;
@@ -15,7 +16,6 @@ use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
-use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 

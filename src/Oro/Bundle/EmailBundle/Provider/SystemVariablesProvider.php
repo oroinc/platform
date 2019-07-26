@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Provider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\SystemVariablesProviderInterface;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides the following system variables for email templates:

@@ -12,7 +12,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowSelectTypeTest extends FormIntegrationTestCase
 {
@@ -33,7 +33,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     {
         $this->registry = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
 
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
 
         $this->type = new WorkflowSelectType($this->registry, $this->translator);
         parent::setUp();

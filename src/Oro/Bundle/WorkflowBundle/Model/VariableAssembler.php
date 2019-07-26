@@ -9,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowVariableNormalizer;
 use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class VariableAssembler extends BaseAbstractAssembler
 {

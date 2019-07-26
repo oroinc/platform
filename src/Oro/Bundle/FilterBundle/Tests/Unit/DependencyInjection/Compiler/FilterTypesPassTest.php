@@ -52,7 +52,7 @@ class FilterTypesPassTest extends \PHPUnit\Framework\TestCase
         );
 
         self::assertFalse($filter1Def->isPublic());
-        self::assertFalse($filter2Def->isPublic());
+        self::assertTrue($filter2Def->isPublic());
     }
 
     /**

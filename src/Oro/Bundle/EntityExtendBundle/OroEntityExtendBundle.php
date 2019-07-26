@@ -195,15 +195,16 @@ class OroEntityExtendBundle extends Bundle
      */
     private function getProcess(string $commandName): Process
     {
+        $projectDir = $this->kernel->getProjectDir();
         $processArguments = [
             $this->getPhpExecutable(),
-            $this->kernel->getProjectDir() . '/bin/console',
+            $projectDir . '/bin/console',
             $commandName,
             sprintf('%s=%s', '--env', $this->kernel->getEnvironment()),
             sprintf('%s=%s', '--cache-dir', $this->cacheDir)
         ];
 
-        $process = new Process($processArguments);
+        $process = new Process($processArguments, $projectDir);
         $process->setTimeout(self::CACHE_GENERATION_TIMEOUT);
 
         return $process;

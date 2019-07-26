@@ -8,7 +8,7 @@ use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserCheckerTest extends \PHPUnit\Framework\TestCase
 {

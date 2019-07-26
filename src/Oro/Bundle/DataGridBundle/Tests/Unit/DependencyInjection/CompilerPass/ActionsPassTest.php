@@ -55,6 +55,7 @@ class ActionsPassTest extends \PHPUnit\Framework\TestCase
     {
         $action = new Definition();
         $action->setShared(false);
+        $action->setPublic(true);
         $action->addTag($actionTagName, ['type' => $actionType]);
 
         return $action;

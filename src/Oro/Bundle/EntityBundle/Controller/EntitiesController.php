@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Entities controller.
- * @Route("/entity")
+ * @Route("/entities")
  */
 class EntitiesController extends Controller
 {

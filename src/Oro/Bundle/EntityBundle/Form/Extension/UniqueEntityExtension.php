@@ -8,8 +8,8 @@ use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UniqueEntityExtension extends AbstractTypeExtension
 {

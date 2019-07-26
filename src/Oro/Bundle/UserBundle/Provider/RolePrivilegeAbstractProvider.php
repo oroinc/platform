@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class RolePrivilegeAbstractProvider
 {

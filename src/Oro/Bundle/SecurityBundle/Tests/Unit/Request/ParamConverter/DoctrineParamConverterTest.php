@@ -8,17 +8,18 @@ use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 
 class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
     /** @var DoctrineParamConverter */
     protected $converter;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var RequestAuthorizationChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $requestAuthorizationChecker;
 
     protected function setUp()
@@ -26,8 +27,12 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
         $this->registry = $this->createMock(ManagerRegistry::class);
         $this->requestAuthorizationChecker = $this->createMock(RequestAuthorizationChecker::class);
 
+        /** @var ExpressionLanguage|\PHPUnit\Framework\MockObject\MockObject $expressionLanguage */
+        $expressionLanguage = $this->createMock(ExpressionLanguage::class);
+
         $this->converter = new DoctrineParamConverter(
             $this->registry,
+            $expressionLanguage,
             $this->requestAuthorizationChecker
         );
     }

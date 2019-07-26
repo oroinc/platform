@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\WorkflowBundle\Datagrid\EmailNotificationDatagridListener;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailNotificationDatagridListenerTest extends \PHPUnit\Framework\TestCase
 {

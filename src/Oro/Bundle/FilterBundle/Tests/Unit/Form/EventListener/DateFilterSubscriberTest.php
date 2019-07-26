@@ -13,7 +13,7 @@ use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
 {

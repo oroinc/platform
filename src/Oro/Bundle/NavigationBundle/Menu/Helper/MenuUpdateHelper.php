@@ -10,7 +10,7 @@ use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Translates and apply all translations for given values

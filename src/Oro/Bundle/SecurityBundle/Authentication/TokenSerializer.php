@@ -9,7 +9,7 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInter
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\Role\Role;
 
 class TokenSerializer implements TokenSerializerInterface
 {
@@ -74,7 +74,7 @@ class TokenSerializer implements TokenSerializerInterface
         return implode(
             ',',
             array_map(
-                function (RoleInterface $role) {
+                function (Role $role) {
                     return $role->getRole();
                 },
                 $token->getRoles()

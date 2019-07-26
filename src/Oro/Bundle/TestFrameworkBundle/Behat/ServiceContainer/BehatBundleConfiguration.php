@@ -23,6 +23,9 @@ class BehatBundleConfiguration implements ConfigurationInterface
      */
     private $kernel;
 
+    /**
+     * @param ContainerBuilder $container
+     */
     public function __construct(ContainerBuilder $container)
     {
         $this->container = $container;
@@ -58,7 +61,7 @@ class BehatBundleConfiguration implements ConfigurationInterface
                                         $val = array_map(function ($v) {
                                             if ('@' === substr($v, 0, 1)) {
                                                 $bundleName = explode('/', substr($v, 1))[0];
-                                                $bundlePath = $this->kernel->getBundle('!' . $bundleName)->getPath();
+                                                $bundlePath = $this->kernel->getBundle($bundleName)->getPath();
 
                                                 return str_replace('@'.$bundleName, $bundlePath, $v);
                                             }
