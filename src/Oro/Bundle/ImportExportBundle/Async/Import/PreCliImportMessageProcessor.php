@@ -86,6 +86,19 @@ class PreCliImportMessageProcessor extends PreImportMessageProcessorAbstract
                             'process' => $body['process'],
                         ]
                     );
+                    $context->addDependentJob(
+                        Topics::SAVE_IMPORT_EXPORT_RESULT,
+                        [
+                            'jobId' => $job->getRootJob()->getId(),
+                            'notifyEmail' => $body['notifyEmail'],
+                            'type' => $body['process'],
+                            'entity' => $this->importHandler->getEntityName(
+                                $body['process'],
+                                $body['processorAlias']
+                            ),
+                            'options' => $body['options']
+                        ]
+                    );
                     $this->dependentJob->saveDependentJob($context);
                 }
 
