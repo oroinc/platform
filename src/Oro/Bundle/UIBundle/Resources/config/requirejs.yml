@@ -185,6 +185,7 @@ config:
         'oroui/js/app/views/content-sidebar-view': 'bundles/oroui/js/app/views/content-sidebar-view.js'
         'oroui/js/app/views/highlight-text-view': 'bundles/oroui/js/app/views/highlight-text-view.js'
         'oroui/js/app/views/swipeable-view': 'bundles/oroui/js/app/views/swipeable-view.js'
+        'oroui/js/app/views/scrolling-overlay-view': 'bundles/oroui/js/app/views/scrolling-overlay-view.js'
 
         'oroui/js/app/plugins/plugin-resizable-area': 'bundles/oroui/js/app/plugins/plugin-resizable-area.js'
 

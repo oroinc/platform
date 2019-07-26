@@ -4,6 +4,7 @@ define(function(require) {
     var WidgetPickerModalView;
     var $ = require('jquery');
     var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
     var widgetPickerModalTemplate = require('text!oroui/templates/widget-picker/widget-picker-modal-template.html');
     var WidgetContainerModel = require('orosidebar/js/app/models/sidebar-widget-container-model');
     var BaseCollection = require('oroui/js/app/models/base/collection');
@@ -94,6 +95,7 @@ define(function(require) {
                     widgetCollection.push(widget);
                     afterLoadFunc();
                     widgetPickerModel.increaseAddedCounter();
+                    mediator.trigger('layout:reposition');
                 });
         }
     });
