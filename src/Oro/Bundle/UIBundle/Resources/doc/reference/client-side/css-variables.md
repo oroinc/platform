@@ -1,21 +1,21 @@
-# CSS Variable parser
+# CSS Variable Parser
 
-The CSS variable  parser reads the current style file and collects the variables in `:root`
+The CSS variable parser reads the current style file and collects the variables in `:root`.
 
 The module returns a promise to which you can connect using the `onReady` method call passing the callback function to the arguments.
 
 You can also listen to the event of a mediator `css:variables:fetched`
 
-Example of use
+Usage examples:
 
-Set some variables in SCSS
+Set some variables in SCSS:
 ```scss
 :root {
     --some-var: #000000;
 }
 ```
 
-How to use onReady callback function
+How to use onReady callback function:
 ```javascript
 
 var cssVariablesManager = require('oroui/js/css-variables-manager');
@@ -31,7 +31,7 @@ cssVariablesManager.onReady(Foo);
 
 ```
 
-How to use mediator way
+How to use the mediator:
 ```javascript
 
 var mediator = require('oroui/js/mediator');
@@ -47,7 +47,7 @@ mediator.on('css:variables:fetched', Foo)
 
 ```
 
-Use getter method
+How to use the getter method:
 ```javascript
 
 var cssVariablesManager = require('oroui/js/css-variables-manager');
