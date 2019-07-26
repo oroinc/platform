@@ -12,7 +12,7 @@ define(function(require) {
     var validateTopmostLabelMixin = config.useTopmostLabelMixin
         ? require('oroform/js/validate-topmost-label-mixin') : null;
 
-    var original = _.pick($.validator.prototype, 'init', 'showLabel', 'defaultShowErrors');
+    var original = _.pick($.validator.prototype, 'init', 'showLabel', 'defaultShowErrors', 'resetElements');
 
     /**
      * Collects all ancestor elements that have validation rules
@@ -374,6 +374,14 @@ define(function(require) {
             this.prepareForm();
             this.hideErrors();
             this.elements().removeClass(this.settings.errorClass);
+        },
+
+        resetElements: function(elements) {
+            original.resetElements.call(this, elements);
+
+            if (validateTopmostLabelMixin) {
+                _.forEach(elements, validateTopmostLabelMixin.validationResetHandler.bind(this));
+            }
         },
 
         /**

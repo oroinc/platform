@@ -117,12 +117,8 @@
     }
 
     .control-group-checkbox {
-        position: $control-group-checkbox-position;
-        display: $control-group-checkbox-display;
-        padding-right: $control-group-checkbox-inner-offset-right;
-
         .control-label {
-            width: $control-group-checkbox-label-width;
+            display: inline-block;
             margin-right: $control-group-checkbox-label-offset-right;
         }
 
@@ -131,10 +127,7 @@
         }
 
         .controls {
-            padding-top: $control-group-checkbox-controls-padding-top;
-            position: $control-group-checkbox-controls-position;
-            top: $control-group-checkbox-controls-top;
-            right: $control-group-checkbox-controls-right;
+            display: inline-block;
         }
     }
 

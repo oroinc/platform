@@ -134,7 +134,7 @@ define([
                     });
                     this.validated = true;
                 }
-                this.errors = validator.toShow;
+                this.errors = validator.errors();
                 this.element.attr('data-validation-ignore', '');
             }
             return result;
@@ -142,10 +142,9 @@ define([
 
         _hideErrors: function() {
             var validator = this._getValidator();
+
             if (validator) {
-                this._elements().each(function() {
-                    validator.settings.unhighlight(this);
-                });
+                validator.resetElements(this._elements());
                 this.errors.hide();
             }
         },
