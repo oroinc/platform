@@ -7,7 +7,6 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Oro\Component\EntitySerializer\Filter\EntityAwareFilterInterface;
 
 /**
  * The serializer that loads data for primary and associated entities from the database
@@ -145,7 +144,7 @@ class EntitySerializer
     /** @var DataNormalizer */
     protected $dataNormalizer;
 
-    /** @var EntityAwareFilterInterface */
+    /** @var FieldFilterInterface */
     protected $fieldFilter;
 
     /**
@@ -179,9 +178,9 @@ class EntitySerializer
     }
 
     /**
-     * @param EntityAwareFilterInterface $filter
+     * @param FieldFilterInterface $filter
      */
-    public function setFieldsFilter(EntityAwareFilterInterface $filter)
+    public function setFieldFilter(FieldFilterInterface $filter)
     {
         $this->fieldFilter = $filter;
     }
@@ -354,9 +353,9 @@ class EntitySerializer
             $isReference = count($path) > 1;
 
             if (null !== $this->fieldFilter && !$isReference) {
-                $isFieldAllowed = $this->fieldFilter->checkField($entity, $entityClass, $propertyPath);
-                if (EntityAwareFilterInterface::FILTER_NOTHING !== $isFieldAllowed) {
-                    if (EntityAwareFilterInterface::FILTER_VALUE === $isFieldAllowed) {
+                $fieldCheckResult = $this->fieldFilter->checkField($entity, $entityClass, $propertyPath);
+                if (null !== $fieldCheckResult) {
+                    if (false === $fieldCheckResult) {
                         // return field but without value
                         $result[$field] = null;
                     }
@@ -1078,17 +1077,16 @@ class EntitySerializer
         }
 
         $accessibleIds = [];
+        $em = $this->doctrineHelper->getEntityManager($entityClass);
         foreach ($entityIds as $entityId) {
-            $isFieldAllowed = $this->fieldFilter->checkField(
-                ['entityId' => $entityId],
+            $fieldCheckResult = $this->fieldFilter->checkField(
+                $em->getReference($entityClass, $entityId),
                 $entityClass,
                 $field
             );
-            if (EntityAwareFilterInterface::FILTER_NOTHING !== $isFieldAllowed) {
-                continue;
+            if (null === $fieldCheckResult) {
+                $accessibleIds[] = $entityId;
             }
-
-            $accessibleIds[] = $entityId;
         }
 
         return $accessibleIds;

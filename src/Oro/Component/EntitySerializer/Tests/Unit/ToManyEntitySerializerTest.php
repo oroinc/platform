@@ -2,8 +2,6 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
-use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Filter\TestFilter;
-
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
@@ -835,14 +833,10 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => \PDO::PARAM_INT]
         );
 
-        $filter = new TestFilter();
-        $filter->setCheckRules(
-            [
-                'name' => TestFilter::FILTER_VALUE,
-                'owner' => TestFilter::FILTER_ALL,
-            ]
-        );
-        $this->serializer->setFieldsFilter($filter);
+        $this->serializer->setFieldFilter($this->getFieldFilter([
+            'name'  => false,
+            'owner' => true
+        ]));
 
         $result = $this->serializer->serialize(
             $qb,
@@ -911,15 +905,11 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => \PDO::PARAM_INT]
         );
 
-        $filter = new TestFilter();
-        $filter->setCheckRules(
-            [
-                'name' => TestFilter::FILTER_VALUE,
-                'groups' => TestFilter::FILTER_VALUE,
-                'owner' => TestFilter::FILTER_ALL,
-            ]
-        );
-        $this->serializer->setFieldsFilter($filter);
+        $this->serializer->setFieldFilter($this->getFieldFilter([
+            'name'   => false,
+            'groups' => false,
+            'owner'  => true
+        ]));
 
         $result = $this->serializer->serialize(
             $qb,

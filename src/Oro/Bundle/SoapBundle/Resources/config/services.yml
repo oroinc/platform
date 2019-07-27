@@ -74,7 +74,7 @@ services:
             - '@oro_soap.entity_serializer.config_converter'
             - '@oro_soap.entity_serializer.data_normalizer'
         calls:
-            - [setFieldsFilter, ['@oro_security.serializer.filter_chain']]
+            - [setFieldFilter, ['@oro_security.entity_serializer.field_filter']]
 
     oro_soap.entity_serializer.doctrine_helper:
         class: Oro\Component\EntitySerializer\DoctrineHelper
