@@ -337,10 +337,13 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
      */
     protected function isResourceFileFresh(CumulativeResource $resource, $bundleClass, $filename, $timestamp)
     {
-        return
-            $resource->isFound($bundleClass, $filename)
-            && is_file($filename)
-            && filemtime($filename) < $timestamp;
+        if (!$resource->isFound($bundleClass, $filename)) {
+            return false;
+        }
+
+        $filemtime = @filemtime($filename);
+
+        return false !== $filemtime && $filemtime < $timestamp;
     }
 
     /**
