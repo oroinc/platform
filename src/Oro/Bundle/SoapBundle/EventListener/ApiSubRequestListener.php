@@ -27,14 +27,23 @@ class ApiSubRequestListener
      */
     public function onKernelRequest(GetResponseEvent $event): void
     {
+        if ($event->isMasterRequest()) {
+            return;
+        }
+
         $request = $event->getRequest();
-        if ($event->isMasterRequest() || !$request->getRequestFormat(null)) {
+        if (!$request->getRequestFormat(null)) {
+            return;
+        }
+
+        if ($request->attributes->get('exception')) {
+            // keep the request format unchanged for exception handling sub-request
             return;
         }
 
         /** @var RequestMatcherInterface $requestMatcher */
         foreach ($this->rules as list($requestMatcher, $options)) {
-            if ((!isset($options['stop']) || !$options['stop']) && $requestMatcher->matches($request)) {
+            if (!($options['stop'] ?? false) && $requestMatcher->matches($request)) {
                 $request->setRequestFormat(null);
                 break;
             }
