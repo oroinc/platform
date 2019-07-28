@@ -96,19 +96,28 @@ class ProcessorBag implements ProcessorBagInterface
      */
     protected function createProcessorIterator(ContextInterface $context)
     {
-        $action = $context->getAction();
+        return $this->processorIteratorFactory->createProcessorIterator(
+            $this->getActionProcessors($context->getAction()),
+            $context,
+            $this->processorApplicableChecker,
+            $this->processorRegistry
+        );
+    }
+
+    /**
+     * @param string $action
+     *
+     * @return array [[processor id, [attribute name => attribute value, ...]]
+     */
+    protected function getActionProcessors($action)
+    {
         $actionProcessors = [];
         $processors = $this->configProvider->getProcessors();
         if (!empty($processors[$action])) {
             $actionProcessors = $processors[$action];
         }
 
-        return $this->processorIteratorFactory->createProcessorIterator(
-            $actionProcessors,
-            $context,
-            $this->processorApplicableChecker,
-            $this->processorRegistry
-        );
+        return $actionProcessors;
     }
 
     /**

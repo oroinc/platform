@@ -22,17 +22,11 @@ class OptimizedProcessorBagTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorIteratorFactoryInterface */
     private $processorIteratorFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorApplicableCheckerFactoryInterface */
-    private $ungroupedApplicableCheckerFactory;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorIteratorFactoryInterface */
     private $ungroupedProcessorIteratorFactory;
 
     /** @var ChainApplicableChecker */
     private $applicableChecker;
-
-    /** @var ChainApplicableChecker */
-    private $ungroupedApplicableChecker;
 
     /** @var OptimizedProcessorBag */
     private $processorBag;
@@ -42,17 +36,12 @@ class OptimizedProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $this->applicableCheckerFactory = $this->createMock(ProcessorApplicableCheckerFactoryInterface::class);
         $this->processorIteratorFactory = $this->createMock(ProcessorIteratorFactoryInterface::class);
-        $this->ungroupedApplicableCheckerFactory = $this->createMock(ProcessorApplicableCheckerFactoryInterface::class);
         $this->ungroupedProcessorIteratorFactory = $this->createMock(ProcessorIteratorFactoryInterface::class);
         $this->applicableChecker = new ChainApplicableChecker();
-        $this->ungroupedApplicableChecker = new ChainApplicableChecker();
 
         $this->applicableCheckerFactory->expects(self::any())
             ->method('createApplicableChecker')
             ->willReturn($this->applicableChecker);
-        $this->ungroupedApplicableCheckerFactory->expects(self::any())
-            ->method('createApplicableChecker')
-            ->willReturn($this->ungroupedApplicableChecker);
 
         $processorBagConfigBuilder = new ProcessorBagConfigBuilder();
         $this->processorBag = new OptimizedProcessorBag(
@@ -61,7 +50,6 @@ class OptimizedProcessorBagTest extends \PHPUnit\Framework\TestCase
             false,
             $this->applicableCheckerFactory,
             $this->processorIteratorFactory,
-            $this->ungroupedApplicableCheckerFactory,
             $this->ungroupedProcessorIteratorFactory
         );
 
@@ -105,7 +93,7 @@ class OptimizedProcessorBagTest extends \PHPUnit\Framework\TestCase
             ->with(
                 [['processor2', []]],
                 self::identicalTo($context),
-                self::identicalTo($this->ungroupedApplicableChecker),
+                self::identicalTo($this->applicableChecker),
                 self::identicalTo($this->processorRegistry)
             )
             ->willReturn($iterator);

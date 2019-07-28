@@ -32,15 +32,6 @@ services:
             - '@oro_api.profiler.processor_applicable_checker_factory.inner'
             - '@oro_api.profiler.logger'
 
-    oro_api.profiler.processor_applicable_checker_factory.ungrouped:
-        class: Oro\Component\ChainProcessor\Debug\TraceableProcessorApplicableCheckerFactory
-        public: false
-        decorates: oro_api.processor_applicable_checker_factory.ungrouped
-        decoration_priority: -255 # should be at the top of the decoration chain
-        arguments:
-            - '@oro_api.profiler.processor_applicable_checker_factory.ungrouped.inner'
-            - '@oro_api.profiler.logger'
-
     oro_api.profiler.collect_resources.processor:
         class: Oro\Component\ChainProcessor\Debug\TraceableActionProcessor
         public: false

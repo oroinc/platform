@@ -22,7 +22,6 @@ services:
             - '%kernel.debug%'
             - '@oro_api.processor_applicable_checker_factory'
             - '@oro_api.processor_iterator_factory'
-            - '@oro_api.processor_applicable_checker_factory.ungrouped'
             - '@oro_api.processor_iterator_factory.ungrouped'
 
     oro_api.processor_bag_config_provider:
@@ -42,10 +41,6 @@ services:
 
     oro_api.processor_applicable_checker_factory:
         class: Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerFactory
-        public: false
-
-    oro_api.processor_applicable_checker_factory.ungrouped:
-        class: Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerWithoutGroupsFactory
         public: false
 
     oro_api.processor_registry:
