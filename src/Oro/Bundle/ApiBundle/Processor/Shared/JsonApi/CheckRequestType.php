@@ -16,10 +16,8 @@ use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
  */
 class CheckRequestType implements ProcessorInterface
 {
-    /**
-     * Content-Type of REST API request conforms JSON API specification
-     */
-    const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
+    /** Content-Type of REST API request conforms JSON API specification */
+    private const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
 
     /**
      * {@inheritdoc}
@@ -41,18 +39,16 @@ class CheckRequestType implements ProcessorInterface
      *
      * @return bool
      */
-    protected function isJsonApiRequest(ParameterBagInterface $requestHeaders)
+    private function isJsonApiRequest(ParameterBagInterface $requestHeaders): bool
     {
         $result = false;
 
-        $contentTypeHeader     = $requestHeaders->get('Content-Type');
-        $mediaTypeDelimiterPos = strpos($contentTypeHeader, ';');
-        if (false === $mediaTypeDelimiterPos) {
-            $contentType = $contentTypeHeader;
-            $mediaType   = null;
-        } else {
-            $contentType = substr($contentTypeHeader, 0, $mediaTypeDelimiterPos);
-            $mediaType   = substr($contentTypeHeader, $mediaTypeDelimiterPos + 1);
+        $contentType = $requestHeaders->get('Content-Type');
+        $mediaType = null;
+        $mediaTypeDelimiterPos = strpos($contentType, ';');
+        if (false !== $mediaTypeDelimiterPos) {
+            $mediaType = substr($contentType, $mediaTypeDelimiterPos + 1);
+            $contentType = substr($contentType, 0, $mediaTypeDelimiterPos);
         }
 
         if ($contentType === self::JSON_API_CONTENT_TYPE) {
