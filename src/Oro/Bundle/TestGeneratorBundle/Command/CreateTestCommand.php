@@ -3,21 +3,39 @@
 namespace Oro\Bundle\TestGeneratorBundle\Command;
 
 use Oro\Bundle\TestGeneratorBundle\Generator\AbstractTestGenerator;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CreateTestCommand extends ContainerAwareCommand
+/**
+ * Creates test stub
+ */
+class CreateTestCommand extends Command
 {
-    const NAME = 'oro:generate:test';
+    protected static $defaultName = 'oro:generate:test';
 
-    const DEFAUT_PHP_VERSION = 5.5;
+    private const DEFAUT_PHP_VERSION = 5.5;
 
-    const SUCCESS_MESSAGE = '<info>Test was generated successful</info>';
+    private const SUCCESS_MESSAGE = '<info>Test was generated successful</info>';
 
-    const CLASS_AUTOLOAD_ERROR_MESSAGE = '<error>Class not found. Please, make sure that class name is correct and '.
-    'package in which the class is declared is in the composer "require" section of current application</error>';
+    private const CLASS_AUTOLOAD_ERROR_MESSAGE = '<error>Class not found. Please, make sure that class name is'
+    . ' correct and package in which the class is declared is in the composer "require" section of current'
+    . ' application</error>';
+
+    /** @var ContainerInterface */
+    private $container;
+
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -25,7 +43,6 @@ class CreateTestCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName(self::NAME)
             ->setDescription('Create Test')
             ->addArgument(
                 'class',
@@ -53,7 +70,7 @@ class CreateTestCommand extends ContainerAwareCommand
         }
         $phpVersion = (float)$input->getArgument('php_version') ?: self::DEFAUT_PHP_VERSION;
         /** @var AbstractTestGenerator $generator */
-        $generator = $this->getContainer()->get('oro_test_generator.generator.test.'.$type);
+        $generator = $this->container->get('oro_test_generator.generator.test.'.$type);
         $generator->setPhpVersion($phpVersion);
         $class = $input->getArgument('class');
         if (strpos($class, '\\') === false) {

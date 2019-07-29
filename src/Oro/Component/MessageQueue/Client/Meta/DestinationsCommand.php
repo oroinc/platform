@@ -7,21 +7,34 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class DestinationsCommand extends Command implements ContainerAwareInterface
+/**
+ * A command shows all available destinations and some information about them.
+ */
+class DestinationsCommand extends Command
 {
-    use ContainerAwareTrait;
+    /** @var string */
+    protected static $defaultName = 'oro:message-queue:destinations';
+
+    /** @var DestinationMetaRegistry */
+    private $destinationMetaRegistry;
+
+    /**
+     * @param DestinationMetaRegistry $destinationMetaRegistry
+     */
+    public function __construct(DestinationMetaRegistry $destinationMetaRegistry)
+    {
+        $this->destinationMetaRegistry = $destinationMetaRegistry;
+
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this
-            ->setName('oro:message-queue:destinations')
-            ->setDescription('A command shows all available destinations and some information about them.');
+        $this->setDescription('A command shows all available destinations and some information about them.');
     }
 
     /**
@@ -34,9 +47,7 @@ class DestinationsCommand extends Command implements ContainerAwareInterface
 
         $count = 0;
         $firstRow = true;
-        /** @var DestinationMetaRegistry $destinationMetaRegistry */
-        $destinationMetaRegistry = $this->container->get('oro_message_queue.client.meta.destination_meta_registry');
-        foreach ($destinationMetaRegistry->getDestinationsMeta() as $destination) {
+        foreach ($this->destinationMetaRegistry->getDestinationsMeta() as $destination) {
             if (!$firstRow) {
                 $table->addRow(new TableSeparator());
             }

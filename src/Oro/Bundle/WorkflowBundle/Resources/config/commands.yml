@@ -3,6 +3,9 @@ services:
         public: false
 
     Oro\Bundle\WorkflowBundle\Command\DebugWorkflowDefinitionsCommand:
+        arguments:
+            - '@doctrine'
+            - '@translator'
         tags:
             - { name: console.command }
 

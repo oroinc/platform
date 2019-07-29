@@ -14,3 +14,9 @@ services:
             - '@oro_email.email_body_synchronizer'
         tags:
             - { name: console.command }
+
+    Oro\Bundle\EmailBundle\Command\GenerateMd5ForEmailsCommand:
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: console.command }

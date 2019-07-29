@@ -4,17 +4,49 @@ namespace Oro\Bundle\LoggerBundle\Command;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class LoggerEmailNotificationCommand extends ContainerAwareCommand
+/**
+ * Update logger email notification configuration
+ */
+class LoggerEmailNotificationCommand extends Command
 {
-    const RECIPIENTS = 'recipients';
-    const DISABLE = 'disable';
+    protected static $defaultName = 'oro:logger:email-notification';
+
+    private const RECIPIENTS = 'recipients';
+    private const DISABLE = 'disable';
+
+    /** @var ValidatorInterface */
+    private $validator;
+
+    /** @var ConfigManager|null */
+    private $configManager;
+
+    /**
+     * @param ValidatorInterface $validator
+     * @param ConfigManager $configManager
+     */
+    public function __construct(ValidatorInterface $validator, ?ConfigManager $configManager)
+    {
+        $this->validator = $validator;
+        $this->configManager = $configManager;
+        
+        parent::__construct();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEnabled(): bool
+    {
+        return (bool) $this->configManager;
+    }
 
     /**
      * {@inheritdoc}
@@ -22,7 +54,6 @@ class LoggerEmailNotificationCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('oro:logger:email-notification')
             ->addOption(
                 self::DISABLE,
                 null,
@@ -50,18 +81,16 @@ class LoggerEmailNotificationCommand extends ContainerAwareCommand
 
         $disable = $input->getOption(self::DISABLE);
 
-        /* @var ConfigManager $configManager */
-        $configManager = $this->getContainer()->get('oro_config.global');
         $recipientsConfigKey = Configuration::getFullConfigKey(Configuration::EMAIL_NOTIFICATION_RECIPIENTS);
         if ($disable) {
-            if (!$configManager->get($recipientsConfigKey)) {
+            if (!$this->configManager->get($recipientsConfigKey)) {
                 $io->text("Error logs notification already disabled.");
 
                 return;
             }
-            $configManager->reset($recipientsConfigKey);
+            $this->configManager->reset($recipientsConfigKey);
             $io->text("Error logs notification successfully disabled.");
-            $configManager->flush();
+            $this->configManager->flush();
 
             return;
         }
@@ -72,10 +101,10 @@ class LoggerEmailNotificationCommand extends ContainerAwareCommand
 
                 return;
             }
-            $configManager->set($recipientsConfigKey, $recipients);
+            $this->configManager->set($recipientsConfigKey, $recipients);
             $io->text(["Error logs notification will be sent to listed email addresses:", $recipients]);
 
-            $configManager->flush();
+            $this->configManager->flush();
 
             return;
         }
@@ -89,11 +118,10 @@ class LoggerEmailNotificationCommand extends ContainerAwareCommand
      */
     protected function validateRecipients($recipients)
     {
-        $validator = $this->getContainer()->get('validator');
         $emails = explode(';', $recipients);
         $errors = [];
         foreach ($emails as $email) {
-            $violations = $validator->validate($email, new Email);
+            $violations = $this->validator->validate($email, new Email);
             if (0 !== count($violations)) {
                 foreach ($violations as $violation) {
                     $errors[] = sprintf('%s - %s', $email, $violation->getMessage());

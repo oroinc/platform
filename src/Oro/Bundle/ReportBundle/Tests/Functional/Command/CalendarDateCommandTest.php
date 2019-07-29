@@ -32,9 +32,9 @@ class CalendarDateCommandTest extends WebTestCase
         }
         $manager->flush();
 
-        $this->runCommand(CalendarDateCommand::COMMAND_NAME);
+        $this->runCommand(CalendarDateCommand::getDefaultName());
         // Check that another command execution does not add duplicate dates
-        $this->runCommand(CalendarDateCommand::COMMAND_NAME);
+        $this->runCommand(CalendarDateCommand::getDefaultName());
 
         $results = $repository->findAll();
         $this->assertNotEmpty($results);

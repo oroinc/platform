@@ -2,20 +2,40 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CacheCheckCommand extends ContainerAwareCommand
+/**
+ * Makes sure that extended entity configs are ready to be processed by other commands.
+ */
+class CacheCheckCommand extends Command
 {
+    protected static $defaultName = 'oro:entity-extend:cache:check';
+
+    /**
+     * @var ExtendConfigDumper
+     */
+    private $extendConfigDumper;
+
+    /**
+     * @param ExtendConfigDumper $extendConfigDumper
+     */
+    public function __construct(ExtendConfigDumper $extendConfigDumper)
+    {
+        $this->extendConfigDumper = $extendConfigDumper;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
         $this
-            ->setName('oro:entity-extend:cache:check')
             ->setDescription(
                 'Makes sure that extended entity configs are ready to be processed by other commands.'
                 . ' This is an internal command. Please do not run it manually.'
@@ -36,17 +56,16 @@ class CacheCheckCommand extends ContainerAwareCommand
         $output->writeln('Check extended entity configs');
 
         $cacheDir = $input->getOption('cache-dir');
-        $dumper   = $this->getContainer()->get('oro_entity_extend.tools.dumper');
+        $originalCacheDir = $this->extendConfigDumper->getCacheDir();
 
-        $originalCacheDir = $dumper->getCacheDir();
         if (empty($cacheDir) || $cacheDir === $originalCacheDir) {
-            $dumper->checkConfig();
+            $this->extendConfigDumper->checkConfig();
         } else {
-            $dumper->setCacheDir($cacheDir);
+            $this->extendConfigDumper->setCacheDir($cacheDir);
             try {
-                $dumper->checkConfig();
+                $this->extendConfigDumper->checkConfig();
             } catch (\Exception $e) {
-                $dumper->setCacheDir($originalCacheDir);
+                $this->extendConfigDumper->setCacheDir($originalCacheDir);
                 throw $e;
             }
         }

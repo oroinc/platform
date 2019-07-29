@@ -4,7 +4,8 @@ namespace Oro\Bundle\EntityExtendBundle\Command;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ConfigFilter\ByInitialStateFilter;
 use Oro\Bundle\EntityExtendBundle\Tools\ConfigFilter\ByOriginFilter;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,15 +13,31 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * The CLI command to update extend entity config
  */
-class UpdateConfigCommand extends ContainerAwareCommand
+class UpdateConfigCommand extends Command
 {
+    protected static $defaultName = 'oro:entity-extend:update-config';
+
+    /**
+     * @var ExtendConfigDumper
+     */
+    private $extendConfigDumper;
+
+    /**
+     * @param ExtendConfigDumper $extendConfigDumper
+     */
+    public function __construct(ExtendConfigDumper $extendConfigDumper)
+    {
+        $this->extendConfigDumper = $extendConfigDumper;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
         $this
-            ->setName('oro:entity-extend:update-config')
             ->setDescription('Prepare entity config')
             ->addOption(
                 'update-custom',
@@ -49,8 +66,7 @@ class UpdateConfigCommand extends ContainerAwareCommand
     {
         $output->writeln($this->getDescription());
 
-        $dumper = $this->getContainer()->get('oro_entity_extend.tools.dumper');
-        $dumper->updateConfig($this->getFilter($input), $input->getOption('update-custom'));
+        $this->extendConfigDumper->updateConfig($this->getFilter($input), $input->getOption('update-custom'));
     }
 
     /**

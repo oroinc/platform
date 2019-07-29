@@ -6,7 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
 use Oro\Component\Log\OutputLogger;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Updates extended entities configuration during a database structure migration process.
  */
-class MigrationUpdateConfigCommand extends ContainerAwareCommand
+class MigrationUpdateConfigCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:entity-extend:migration:update-config';
@@ -25,14 +25,23 @@ class MigrationUpdateConfigCommand extends ContainerAwareCommand
     /** var ExtendConfigProcessor **/
     private $extendConfigProcessor;
 
+    /** @var string */
+    private $optionsPath;
+
     /**
      * @param ExtendOptionsParser $extendOptionsParser
      * @param ExtendConfigProcessor $extendConfigProcessor
+     * @param string $optionsPath
      */
-    public function __construct(ExtendOptionsParser $extendOptionsParser, ExtendConfigProcessor $extendConfigProcessor)
-    {
+    public function __construct(
+        ExtendOptionsParser $extendOptionsParser,
+        ExtendConfigProcessor $extendConfigProcessor,
+        string $optionsPath
+    ) {
         $this->extendOptionsParser = $extendOptionsParser;
         $this->extendConfigProcessor = $extendConfigProcessor;
+        $this->optionsPath = $optionsPath;
+
         parent::__construct();
     }
 
@@ -61,16 +70,11 @@ class MigrationUpdateConfigCommand extends ContainerAwareCommand
     {
         $output->writeln('Update extended entities configuration');
 
-        /** @var string $optionsPath */
-        $optionsPath = $this->getContainer()->getParameter('oro_entity_extend.migration.config_processor.options.path');
-        if (is_file($optionsPath)) {
-            $options = unserialize(file_get_contents($optionsPath));
+        if (is_file($this->optionsPath)) {
+            $options = unserialize(file_get_contents($this->optionsPath));
 
             $dryRun = $input->getOption('dry-run');
-
-            /** @var ExtendOptionsParser $parser */
-            $parser  = $this->getContainer()->get('oro_entity_extend.migration.options_parser');
-            $parser->setDryRunMode($dryRun);
+            $this->extendOptionsParser->setDryRunMode($dryRun);
 
             $options = $this->extendOptionsParser->parseOptions($options);
 
@@ -83,7 +87,7 @@ class MigrationUpdateConfigCommand extends ContainerAwareCommand
             );
         } else {
             $output->writeln(
-                sprintf('<error>The options file "%s" was not found.</error>', $optionsPath)
+                sprintf('<error>The options file "%s" was not found.</error>', $this->optionsPath)
             );
         }
     }

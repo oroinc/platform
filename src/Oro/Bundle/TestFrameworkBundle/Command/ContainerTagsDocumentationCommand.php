@@ -3,19 +3,38 @@
 namespace Oro\Bundle\TestFrameworkBundle\Command;
 
 use Oro\Bundle\TestFrameworkBundle\Provider\ContainerTagsDocumentationInformationProvider;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class ContainerTagsDocumentationCommand extends ContainerAwareCommand
+/**
+ * Displays documented information for dependency injection tags
+ */
+class ContainerTagsDocumentationCommand extends Command
 {
-    const OPTION_WITHOUT_DOCUMENTATION = 'without-documentation';
-    const OPTION_WITH_DOCUMENTATION = 'with-documentation';
-    const OPTION_SKIP_CODE_EXAMPLES = 'skip-code-examples';
-    const OPTION_EXCLUDE = 'exclude';
-    const OPTION_INCLUDED = 'included';
+    protected static $defaultName = 'oro:debug:container:tag-documentation';
+
+    private const OPTION_WITHOUT_DOCUMENTATION = 'without-documentation';
+    private const OPTION_WITH_DOCUMENTATION = 'with-documentation';
+    private const OPTION_SKIP_CODE_EXAMPLES = 'skip-code-examples';
+    private const OPTION_EXCLUDE = 'exclude';
+    private const OPTION_INCLUDED = 'included';
+
+    /** @var ContainerTagsDocumentationInformationProvider */
+    private $containerTagsDocumentationInformationProvider;
+
+    /**
+     * @param ContainerTagsDocumentationInformationProvider $containerTagsDocumentationInformationProvider
+     */
+    public function __construct(
+        ContainerTagsDocumentationInformationProvider $containerTagsDocumentationInformationProvider
+    ) {
+        $this->containerTagsDocumentationInformationProvider = $containerTagsDocumentationInformationProvider;
+
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -23,7 +42,6 @@ class ContainerTagsDocumentationCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('oro:debug:container:tag-documentation')
             ->setDescription('Displays documented information for dependency injection tags')
             ->addOption(
                 self::OPTION_WITHOUT_DOCUMENTATION,
@@ -68,11 +86,11 @@ class ContainerTagsDocumentationCommand extends ContainerAwareCommand
         $withDocs = (bool)$input->getOption(self::OPTION_WITH_DOCUMENTATION);
         $withoutDocs = (bool)$input->getOption(self::OPTION_WITHOUT_DOCUMENTATION);
 
-        $tagsInformationProvider = $this->getTagsInformationProvider();
-        $oroTags = $tagsInformationProvider->getOroTags($includedTags, $excludedTags);
+        $oroTags = $this->containerTagsDocumentationInformationProvider->getOroTags($includedTags, $excludedTags);
         $io = new SymfonyStyle($input, $output);
 
-        $documentationInfo = $tagsInformationProvider->getTagsDocumentationInformation($oroTags, $skipCodeExamples);
+        $documentationInfo = $this->containerTagsDocumentationInformationProvider
+            ->getTagsDocumentationInformation($oroTags, $skipCodeExamples);
         ksort($documentationInfo);
         $rows = $this->getAsTableRows($documentationInfo, $withDocs, $withoutDocs);
 
@@ -96,10 +114,11 @@ class ContainerTagsDocumentationCommand extends ContainerAwareCommand
         $noSkip = !$withDocs && !$withoutDocs;
         $includeWithDoc = $noSkip || $withDocs;
         $includeWithoutDoc = $noSkip || $withoutDocs;
-        $tagsInformationProvider = $this->getTagsInformationProvider();
         foreach ($documentationInfo as $tag => $docs) {
             foreach ($docs as &$doc) {
-                $doc = '<info>' . str_replace($tagsInformationProvider->getInstallDir() . '/', '', $doc) . '</info>';
+                $doc = '<info>'
+                    . str_replace($this->containerTagsDocumentationInformationProvider->getInstallDir() . '/', '', $doc)
+                    . '</info>';
             }
             unset($doc);
 
@@ -119,13 +138,5 @@ class ContainerTagsDocumentationCommand extends ContainerAwareCommand
         }
 
         return $rows;
-    }
-
-    /**
-     * @return ContainerTagsDocumentationInformationProvider
-     */
-    protected function getTagsInformationProvider()
-    {
-        return $this->getContainer()->get('oro_test.provider.container_tags_documentation_information');
     }
 }

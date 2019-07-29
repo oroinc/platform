@@ -1,6 +1,6 @@
 services:
     Oro\Bundle\OrganizationBundle\Command\UpdateOrganizationCommand:
-        public: false
-        class: Oro\Bundle\OrganizationBundle\Command\UpdateOrganizationCommand
+        arguments:
+            - '@oro_organization.organization_manager'
         tags:
             - { name: console.command }
