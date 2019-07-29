@@ -53,6 +53,7 @@ class OroMessageQueueExtension extends Extension
 
         if (isset($config['client'])) {
             $loader->load('client.yml');
+            $loader->load('client_commands.yml');
 
             $driverFactory = $container->getDefinition('oro_message_queue.client.driver_factory');
             $driverFactory->replaceArgument(0, [

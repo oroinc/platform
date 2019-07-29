@@ -8,6 +8,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
+/**
+ * Adds command global option to disable optional listeners.
+ */
 class OptionalListenersGlobalOptionsProvider extends AbstractGlobalOptionsProvider
 {
     const ALL_OPTIONAL_LISTENERS_VALUE = 'all';
@@ -40,7 +43,7 @@ class OptionalListenersGlobalOptionsProvider extends AbstractGlobalOptionsProvid
                     'Disable optional listeners, "%s" to disable all listeners, '
                     .'command "%s" shows all listeners',
                     self::ALL_OPTIONAL_LISTENERS_VALUE,
-                    OptionalListenersCommand::NAME
+                    OptionalListenersCommand::getDefaultName()
                 )
             ),
         ];

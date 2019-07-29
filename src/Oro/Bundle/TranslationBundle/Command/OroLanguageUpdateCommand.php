@@ -2,26 +2,48 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Exception\TranslationProviderException;
 use Oro\Bundle\TranslationBundle\Provider\ExternalTranslationsProvider;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Intl\Intl;
 
-class OroLanguageUpdateCommand extends ContainerAwareCommand
+/**
+ * Installs/Updates language's external translations
+ */
+class OroLanguageUpdateCommand extends Command
 {
-    const NAME = 'oro:language:update';
+    /** @var string */
+    protected static $defaultName = 'oro:language:update';
 
     /** @var ExternalTranslationsProvider */
-    protected $externalTranslationsProvider;
+    private $externalTranslationsProvider;
+
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var LanguageRepository */
-    protected $languageRepository;
+    private $languageRepository;
+
+    /**
+     * @param ExternalTranslationsProvider $externalTranslationsProvider
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function __construct(
+        ExternalTranslationsProvider $externalTranslationsProvider,
+        DoctrineHelper $doctrineHelper
+    ) {
+        $this->externalTranslationsProvider = $externalTranslationsProvider;
+        $this->doctrineHelper = $doctrineHelper;
+
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -29,7 +51,6 @@ class OroLanguageUpdateCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName(self::NAME)
             ->setDescription('Installs/Updates language\'s external translations')
             ->addOption(
                 'language',
@@ -81,7 +102,7 @@ class OroLanguageUpdateCommand extends ContainerAwareCommand
         try {
             $output->writeln(sprintf('Processing language "%s" ...', $this->getLanguageName($language)));
             $langName = $this->getLanguageName($language);
-            if ($this->getExternalTranslationsProvider()->updateTranslations($language)) {
+            if ($this->externalTranslationsProvider->updateTranslations($language)) {
                 $output->writeln(sprintf('Installation completed for "%s" language.', $langName));
             } else {
                 $output->writeln(sprintf('No available translations found for "%s".', $langName));
@@ -116,24 +137,12 @@ class OroLanguageUpdateCommand extends ContainerAwareCommand
                 $this->getLanguageName($language),
                 $language->isEnabled() ? 'Yes' : 'No',
                 $language->getInstalledBuildDate() ? $language->getInstalledBuildDate()->format('Y-m-d H:i:sA') : 'N/A',
-                $this->getExternalTranslationsProvider()->hasTranslations($language) ? 'Avail. Translations' : 'N/A',
+                $this->externalTranslationsProvider->hasTranslations($language) ? 'Avail. Translations' : 'N/A',
             ]);
         }
         $table->render();
     }
 
-    /**
-     * @return ExternalTranslationsProvider
-     */
-    private function getExternalTranslationsProvider()
-    {
-        if (!$this->externalTranslationsProvider) {
-            $this->externalTranslationsProvider = $this->getContainer()
-                ->get('oro_translation.provider.external_translations');
-        }
-
-        return $this->externalTranslationsProvider;
-    }
 
     /**
      * @return LanguageRepository
@@ -141,9 +150,7 @@ class OroLanguageUpdateCommand extends ContainerAwareCommand
     private function getRepository()
     {
         if (!$this->languageRepository) {
-            $this->languageRepository = $this->getContainer()
-                ->get('oro_entity.doctrine_helper')
-                ->getEntityRepositoryForClass(Language::class);
+            $this->languageRepository = $this->doctrineHelper->getEntityRepositoryForClass(Language::class);
         }
 
         return $this->languageRepository;

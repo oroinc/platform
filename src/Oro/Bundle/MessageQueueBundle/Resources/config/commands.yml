@@ -3,6 +3,8 @@ services:
         public: false
 
     Oro\Bundle\MessageQueueBundle\Command\CleanupCommand:
+        arguments:
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: console.command }
 
@@ -21,6 +23,7 @@ services:
             - '@oro_message_queue.consumption.consumer_heartbeat'
             - '@oro_sync.client.connection_checker'
             - '@oro_sync.websocket_client'
+            - '%oro_message_queue.consumer_heartbeat_update_period%'
         tags:
             - { name: console.command }
 

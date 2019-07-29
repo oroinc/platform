@@ -2,28 +2,65 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Renew Symfony routing cache.
  */
-class RouterCacheClearCommand extends ContainerAwareCommand
+class RouterCacheClearCommand extends Command
 {
+    protected static $defaultName = 'router:cache:clear';
+
+    /** @var KernelInterface */
+    private $kernel;
+
+    /** @var RouterInterface|null */
+    private $router;
+
+    /** @var Filesystem */
+    private $filesystem;
+
+    /** @var string */
+    private $cacheDir;
+
+    /**
+     * @param KernelInterface $kernel
+     * @param RouterInterface|null $router
+     * @param Filesystem $filesystem
+     * @param string $cacheDir
+     */
+    public function __construct(
+        KernelInterface $kernel,
+        ?RouterInterface $router,
+        Filesystem $filesystem,
+        string $cacheDir
+    ) {
+        $this->kernel = $kernel;
+        $this->router = $router;
+        $this->filesystem = $filesystem;
+        $this->cacheDir = $cacheDir;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
     public function isEnabled()
     {
-        if (!$this->getContainer()->has('router')) {
+        if (!$this->router) {
             return false;
         }
-        $router = $this->getContainer()->get('router');
-        if (!$router instanceof WarmableInterface) {
+
+        if (!$this->router instanceof WarmableInterface) {
             return false;
         }
 
@@ -36,7 +73,6 @@ class RouterCacheClearCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('router:cache:clear')
             ->setDescription('Clears the routing cache for an application')
             ->setHelp(
                 <<<EOF
@@ -54,36 +90,33 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
-        $tmpCacheDir  = $realCacheDir . '_tmp';
-        $filesystem   = $this->getContainer()->get('filesystem');
+        $tmpCacheDir  = $this->cacheDir . '_tmp';
 
-        if (!is_writable($realCacheDir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
+        if (!is_writable($this->cacheDir)) {
+            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $this->cacheDir));
         }
 
-        if ($filesystem->exists($tmpCacheDir)) {
-            $filesystem->remove($tmpCacheDir);
+        if ($this->filesystem->exists($tmpCacheDir)) {
+            $this->filesystem->remove($tmpCacheDir);
         }
 
-        $kernel = $this->getContainer()->get('kernel');
         $output->writeln(
             sprintf(
                 'Clearing the routing cache for the <info>%s</info> environment',
-                $kernel->getEnvironment()
+                $this->kernel->getEnvironment()
             )
         );
 
-        $this->getContainer()->get('router')->warmUp($tmpCacheDir);
+        $this->router->warmUp($tmpCacheDir);
 
         /** @var SplFileInfo $file */
         foreach (Finder::create()->files()->in($tmpCacheDir) as $file) {
-            $filesystem->copy(
+            $this->filesystem->copy(
                 $file->getPathname(),
-                $realCacheDir . DIRECTORY_SEPARATOR . $file->getFilename()
+                $this->cacheDir . DIRECTORY_SEPARATOR . $file->getFilename()
             );
         }
 
-        $filesystem->remove($tmpCacheDir);
+        $this->filesystem->remove($tmpCacheDir);
     }
 }

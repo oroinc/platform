@@ -5,18 +5,36 @@ namespace Oro\Bundle\MessageQueueBundle\Command;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Job\Job as JobComponent;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CleanupCommand extends ContainerAwareCommand implements CronCommandInterface
+/**
+ * Clears successes and failed jobs from message_queue_job table
+ */
+class CleanupCommand extends Command implements CronCommandInterface
 {
-    const COMMAND_NAME = 'oro:cron:message-queue:cleanup';
     const INTERVAL_FOR_SUCCESSES = '-2 weeks';
     const INTERVAL_FOR_FAILED = '-1 month';
+
+    /** @var string */
+    protected static $defaultName = 'oro:cron:message-queue:cleanup';
+
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function __construct(DoctrineHelper $doctrineHelper)
+    {
+        $this->doctrineHelper = $doctrineHelper;
+        parent::__construct();
+    }
 
     /**
      * {@inheritDoc}
@@ -40,7 +58,6 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     public function configure()
     {
         $this
-            ->setName(static::COMMAND_NAME)
             ->addOption(
                 'dry-run',
                 'd',
@@ -107,12 +124,11 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
      */
     private function getEntityManager()
     {
-        return $this->getContainer()->get('oro_entity.doctrine_helper')->getEntityManagerForClass(Job::class);
+        return $this->doctrineHelper->getEntityManagerForClass(Job::class);
     }
 
     /**
      * @param QueryBuilder $qb
-     * @return mixed
      */
     private function addOutdatedJobsCriteria(QueryBuilder $qb)
     {

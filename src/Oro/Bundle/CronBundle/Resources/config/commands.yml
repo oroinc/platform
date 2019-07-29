@@ -14,5 +14,7 @@ services:
             - { name: console.command }
 
     Oro\Bundle\CronBundle\Command\CronDefinitionsLoadCommand:
+        arguments:
+            - '@doctrine'
         tags:
             - { name: console.command }

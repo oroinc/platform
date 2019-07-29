@@ -13,10 +13,23 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### EntitySerializer component
+* The interface `Oro\Component\EntitySerializer\Filter\EntityAwareFilterInterface` was renamed to
+  `Oro\Component\EntitySerializer\FieldFilterInterface` and the following changes was made in it:
+    - the constants `FILTER_ALL`, `FILTER_VALUE` and `FILTER_NOTHING` were removed
+    - the method `checkField` was changed from `checkField(object|array $entity, string $entityClass, string $field): int`
+      to `checkField(object $entity, string $entityClass, string $field): ?bool`
+* The class `Oro\Component\EntitySerializer\Filter\EntityAwareFilterChain` and the service
+  `oro_security.serializer.filter_chain` were removed.
+  Use decoration of `oro_security.entity_serializer.field_filter` and/or `oro_api.entity_serializer.field_filter`
+  services instead.
+* The method `setFieldsFilter` of `Oro\Component\EntitySerializer\EntitySerializer` was renamed to `setFieldFilter`.
+
 #### ApiBundle
 * The handling of HTTP response status code `403 Forbidden` was fixed. Now this status code is returned if there are
   no permissions to use an API resource. Before the fix `404 Not Found` status code was returned in both cases,
   when an entity did not exist and when there were no permissions to operate with it.
+* The service `oro_api.entity_serializer.acl_filter` was renamed to `oro_api.entity_serializer.field_filter`.
 
 #### SearchBundle
 * The following deprecated methods were removed from `Oro\Bundle\SearchBundle\Query\Query`:
@@ -34,6 +47,11 @@ The current file describes significant changes in the code that may affect the u
     - getOrderDirection
 * The deprecated trait `Oro\Bundle\SearchBundle\EventListener\IndexationListenerTrait` was removed.
 * The deprecated trait `Oro\Bundle\SearchBundle\Engine\Orm\DBALPersisterDriverTrait` was removed.
+
+#### SecurityBundle
+* The class `Oro\Bundle\SecurityBundle\Filter\SerializerFieldFilter` was renamed to
+  `Oro\Bundle\SecurityBundle\Filter\EntitySerializerFieldFilter`.
+* The service `oro_security.serializer.acl_filter` was renamed to `oro_security.entity_serializer.field_filter`.
 
 ## 4.0.0-rc (2019-05-29)
 [Show detailed list of changes](incompatibilities-4-0-rc.md)

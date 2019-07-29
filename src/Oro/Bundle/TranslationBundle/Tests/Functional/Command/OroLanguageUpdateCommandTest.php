@@ -30,7 +30,7 @@ class OroLanguageUpdateCommandTest extends WebTestCase
         $this->externalTranslationsProvider->expects($this->any())->method('hasTranslations')
             ->willReturn(true);
 
-        $result = $this->runCommand(OroLanguageUpdateCommand::NAME);
+        $result = $this->runCommand(OroLanguageUpdateCommand::getDefaultName());
 
         $this->assertNotEmpty($result);
         $this->assertContains('Avail. Translations', $result);
@@ -45,7 +45,7 @@ class OroLanguageUpdateCommandTest extends WebTestCase
     {
         $this->externalTranslationsProvider->expects($this->never())->method('updateTranslations');
 
-        $result = $this->runCommand(OroLanguageUpdateCommand::NAME, ['--language' => 'WRONG_CODE']);
+        $result = $this->runCommand(OroLanguageUpdateCommand::getDefaultName(), ['--language' => 'WRONG_CODE']);
         $this->assertNotEmpty($result);
 
         $expectedMessages = [
@@ -74,7 +74,7 @@ class OroLanguageUpdateCommandTest extends WebTestCase
             ->with($language)
             ->willReturn($hasTranslations);
 
-        $result = $this->runCommand(OroLanguageUpdateCommand::NAME, ['--language' => $language->getCode()]);
+        $result = $this->runCommand(OroLanguageUpdateCommand::getDefaultName(), ['--language' => $language->getCode()]);
         $this->assertNotEmpty($result);
 
         foreach ($expectedMessages as $message) {
@@ -92,7 +92,7 @@ class OroLanguageUpdateCommandTest extends WebTestCase
             ->with($language)
             ->willThrowException(new TranslationProviderException('EXCEPTION_TEXT'));
 
-        $result = $this->runCommand(OroLanguageUpdateCommand::NAME, ['--language' => $language->getCode()]);
+        $result = $this->runCommand(OroLanguageUpdateCommand::getDefaultName(), ['--language' => $language->getCode()]);
         $this->assertNotEmpty($result);
 
         $this->assertContains('EXCEPTION_TEXT', $result);
@@ -111,7 +111,7 @@ class OroLanguageUpdateCommandTest extends WebTestCase
             ->method('updateTranslations')
             ->willReturn(true);
 
-        $result = $this->runCommand(OroLanguageUpdateCommand::NAME, ['--all' => true]);
+        $result = $this->runCommand(OroLanguageUpdateCommand::getDefaultName(), ['--all' => true]);
 
         foreach ($languages as $language) {
             $this->assertContains(

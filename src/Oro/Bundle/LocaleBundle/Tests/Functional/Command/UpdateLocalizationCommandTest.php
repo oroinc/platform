@@ -43,7 +43,7 @@ class UpdateLocalizationCommandTest extends WebTestCase
         $this->assertEnglishLanguageExists(); // And English language is not present
 
         $this->runCommand(
-            UpdateLocalizationCommand::NAME,
+            UpdateLocalizationCommand::getDefaultName(),
             [
                 '--' . UpdateLocalizationCommand::OPTION_FORMATTING_CODE => 'de_DE',
                 '--' . UpdateLocalizationCommand::OPTION_LANGUAGE => 'de'
@@ -57,7 +57,7 @@ class UpdateLocalizationCommandTest extends WebTestCase
 
         // Run command again for in order to make sure that it does not affect non default localization
         $this->runCommand(
-            UpdateLocalizationCommand::NAME,
+            UpdateLocalizationCommand::getDefaultName(),
             [
                 '--' . UpdateLocalizationCommand::OPTION_FORMATTING_CODE => 'it_IT',
                 '--' . UpdateLocalizationCommand::OPTION_LANGUAGE => 'it'

@@ -57,7 +57,7 @@ class InvalidateCacheTimeProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->scheduleManager->expects(static::once())
             ->method('getSchedulesByCommandAndArguments')
-            ->with(InvalidateCacheScheduleCommand::NAME, $args)
+            ->with(InvalidateCacheScheduleCommand::getDefaultName(), $args)
             ->willReturn([$schedule]);
 
         $this->cronFormatTransformer->expects(static::once())
@@ -80,7 +80,7 @@ class InvalidateCacheTimeProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->scheduleManager->expects(static::once())
             ->method('getSchedulesByCommandAndArguments')
-            ->with(InvalidateCacheScheduleCommand::NAME, $args)
+            ->with(InvalidateCacheScheduleCommand::getDefaultName(), $args)
             ->willReturn([]);
 
         $this->cronFormatTransformer->expects(static::never())

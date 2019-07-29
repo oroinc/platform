@@ -3,6 +3,9 @@ services:
         public: false
 
     Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand:
+        arguments:
+            - '@oro_translation.provider.external_translations'
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: console.command }
 

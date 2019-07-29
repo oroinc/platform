@@ -235,4 +235,23 @@ class WindowsStateControllerTest extends WebTestCase
             $this->client->restart();
         }
     }
+
+    public function testInvalidJsonInRequestData()
+    {
+        $this->client->request(
+            'POST',
+            $this->getUrl('oro_api_post_windows'),
+            [],
+            [],
+            $this->generateWsseAuthHeader(),
+            '{"data": {"type": test"}}'
+        );
+        $response = $this->client->getResponse();
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
+        self::assertResponseContentTypeEquals($response, 'application/json');
+        self::assertEquals(
+            ['code' => 400, 'message' => 'Bad Request'],
+            self::jsonToArray($response->getContent())
+        );
+    }
 }

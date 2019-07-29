@@ -7,7 +7,8 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,12 +21,25 @@ use Symfony\Component\Intl\Intl;
  *  `oro:install --language=de --formatting-code=de_DE`
  *  will change "Language" value to "de" and "Formatting code" value to "de_DE" for the default localization.
  */
-class UpdateLocalizationCommand extends ContainerAwareCommand
+class UpdateLocalizationCommand extends Command
 {
-    public const NAME = 'oro:localization:update';
-
     public const OPTION_FORMATTING_CODE = 'formatting-code';
     public const OPTION_LANGUAGE = 'language';
+
+    /** @var string */
+    protected static $defaultName = 'oro:localization:update';
+
+    /** @var RegistryInterface */
+    private $doctrine;
+
+    /**
+     * @param RegistryInterface $doctrine
+     */
+    public function __construct(RegistryInterface $doctrine)
+    {
+        $this->doctrine = $doctrine;
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -43,7 +57,7 @@ It will also create a new language entity for the "language" option value,
 if such language does not exist yet.
 EOD;
 
-        $this->setName(self::NAME)
+        $this
             ->setHidden(true)
             ->setDescription($description)
             ->addOption(
@@ -137,6 +151,6 @@ EOD;
      */
     private function getManager(string $className): EntityManager
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($className);
+        return $this->doctrine->getManagerForClass($className);
     }
 }

@@ -101,8 +101,10 @@ class Context extends ParameterBag implements ContextInterface
      */
     public function undoGroupSkipping($group)
     {
-        if (\in_array($group, $this->skippedGroups, true)) {
-            $this->skippedGroups = array_values(array_diff($this->skippedGroups, [$group]));
+        $key = \array_search($group, $this->skippedGroups, true);
+        if (false !== $key) {
+            unset($this->skippedGroups[$key]);
+            $this->skippedGroups = \array_values($this->skippedGroups);
         }
     }
 

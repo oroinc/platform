@@ -1,22 +1,40 @@
 <?php
+
 namespace Oro\Bundle\DistributionBundle\Command;
 
 use Composer\Package\PackageInterface;
 use Oro\Bundle\DistributionBundle\Console\Grid;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\DistributionBundle\Manager\PackageManager;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ListAvailablePackagesCommand extends ContainerAwareCommand
+/**
+ * List of available packages
+ */
+class ListAvailablePackagesCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:package:available';
+
+    /** @var PackageManager */
+    private $packageManager;
+
+    /**
+     * @param PackageManager $packageManager
+     */
+    public function __construct(PackageManager $packageManager)
+    {
+        $this->packageManager = $packageManager;
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this
-            ->setName('oro:package:available')
-            ->setDescription('List of available packages');
+        $this->setDescription('List of available packages');
     }
 
     /**
@@ -25,7 +43,7 @@ class ListAvailablePackagesCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var PackageInterface[] $availablePackages */
-        $availablePackages = $this->getContainer()->get('oro_distribution.package_manager')->getAvailable();
+        $availablePackages = $this->packageManager->getAvailable();
 
         $grid = new Grid(2, [':']);
         foreach ($availablePackages as $package) {

@@ -3,6 +3,9 @@ services:
         public: false
 
     Oro\Bundle\LoggerBundle\Command\LoggerEmailNotificationCommand:
+        arguments:
+            - '@validator'
+            - '@?oro_config.global'
         tags:
             - { name: console.command }
 

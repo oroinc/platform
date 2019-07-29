@@ -1,10 +1,11 @@
 <?php
+
 namespace Oro\Bundle\CronBundle\Command;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\CronBundle\Entity\Schedule;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,17 +13,29 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Loads cron commands definitions from application to database
  */
-class CronDefinitionsLoadCommand extends ContainerAwareCommand
+class CronDefinitionsLoadCommand extends Command
 {
+    protected static $defaultName = 'oro:cron:definitions:load';
+
+    /** @var RegistryInterface */
+    private $doctrine;
+
+    /**
+     * @param RegistryInterface $doctrine
+     */
+    public function __construct(RegistryInterface $doctrine)
+    {
+        $this->doctrine = $doctrine;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this
-            ->setName('oro:cron:definitions:load')
-            ->setDescription('Loads cron commands definitions from application to database.')
-        ;
+        $this->setDescription('Loads cron commands definitions from application to database.');
     }
 
     /**
@@ -103,7 +116,7 @@ class CronDefinitionsLoadCommand extends ContainerAwareCommand
      */
     private function getEntityManager($className)
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($className);
+        return $this->doctrine->getManagerForClass($className);
     }
 
     /**

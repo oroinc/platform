@@ -6,7 +6,8 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,10 +15,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
+/**
+ * List workflow definitions registered within application
+ */
+class DebugWorkflowDefinitionsCommand extends Command
 {
-    const NAME = 'oro:debug:workflow:definitions';
-    const INLINE_DEPTH = 20;
+    protected static $defaultName = 'oro:debug:workflow:definitions';
+
+    private const INLINE_DEPTH = 20;
 
     /** @var array */
     protected static $tableHeader = [
@@ -31,12 +36,26 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
         'Exclusive Record Groups'
     ];
 
+    /** @var RegistryInterface */
+    private $doctrine;
+
+    /** @var TranslatorInterface */
+    private $translator;
+
+    public function __construct(RegistryInterface $doctrine, TranslatorInterface $translator)
+    {
+        $this->doctrine = $doctrine;
+        $this->translator = $translator;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName(static::NAME)
+        $this
             ->setDescription('List workflow definitions registered within application')
             ->addArgument(
                 'workflow-name',
@@ -52,9 +71,9 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
     {
         if ($input->hasArgument('workflow-name') && $input->getArgument('workflow-name')) {
             return $this->dumpWorkflowDefinition($input->getArgument('workflow-name'), $output);
-        } else {
-            return $this->listWorkflowDefinitions($output);
         }
+
+        return $this->listWorkflowDefinitions($output);
     }
 
     /**
@@ -64,9 +83,6 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
      */
     protected function listWorkflowDefinitions(OutputInterface $output)
     {
-        /** @var TranslatorInterface $translator */
-        $translator = $this->getContainer()->get('translator');
-
         /** @var WorkflowDefinition[] $workflows */
         $workflows = $this->getWorkflowDefinitionRepository()->findAll();
         if (count($workflows)) {
@@ -88,7 +104,7 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
 
                 $row = [
                     $workflow->getName(),
-                    $translator->trans($workflow->getLabel(), [], WorkflowTranslationHelper::TRANSLATION_DOMAIN),
+                    $this->translator->trans($workflow->getLabel(), [], WorkflowTranslationHelper::TRANSLATION_DOMAIN),
                     $workflow->getRelatedEntity(),
                     $workflow->isSystem() ? 'System' : 'Custom',
                     (int)$workflow->getPriority(),
@@ -101,11 +117,11 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
             $table->render();
 
             return 0;
-        } else {
-            $output->writeln('No workflow definitions found.');
-
-            return 1;
         }
+
+        $output->writeln('No workflow definitions found.');
+
+        return 1;
     }
 
     /**
@@ -190,6 +206,6 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
      */
     protected function getWorkflowDefinitionRepository()
     {
-        return $this->getContainer()->get('doctrine')->getRepository(WorkflowDefinition::class);
+        return $this->doctrine->getRepository(WorkflowDefinition::class);
     }
 }

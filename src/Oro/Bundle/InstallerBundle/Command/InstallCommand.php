@@ -661,7 +661,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         if (!$input->getOption('skip-translations')) {
             if (!$input->getOption('skip-download-translations')) {
                 $commandExecutor
-                    ->runCommand(OroLanguageUpdateCommand::NAME, ['--process-isolation' => true, '--all' => true]);
+                    ->runCommand(
+                        OroLanguageUpdateCommand::getDefaultName(),
+                        ['--process-isolation' => true, '--all' => true]
+                    );
             }
             $commandExecutor
                 ->runCommand('oro:translation:load', ['--process-isolation' => true, '--rebuild-cache' => true]);
@@ -710,7 +713,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         ];
 
         $commandExecutor->runCommand(
-            UpdateLocalizationCommand::NAME,
+            UpdateLocalizationCommand::getDefaultName(),
             array_merge(
                 [
                     '--process-isolation' => true
