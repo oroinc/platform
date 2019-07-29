@@ -51,6 +51,8 @@ define(function(require) {
          */
         viewport: null,
 
+        allowTypes: null,
+
         /**
          * CSS variable prefix
          * @property {String}
@@ -116,6 +118,14 @@ define(function(require) {
             }, this);
 
             return isApplicable;
+        },
+
+        getAllowScreenTypes: function(screenType) {
+            if (!_.isArray(screenType)) {
+                screenType = [screenType];
+            }
+
+            return _.intersection(this.viewport.allowTypes, screenType);
         },
 
         /**
@@ -263,9 +273,10 @@ define(function(require) {
             var viewportWidth = window.innerWidth;
             this.viewport.width = viewportWidth;
             var screenMap = this.options.screenMap;
-
             var inRange;
             var screen;
+            var _result = [];
+
             for (var i = 0, stop = screenMap.length; i < stop; i++) {
                 screen = screenMap[i];
 
@@ -277,9 +288,11 @@ define(function(require) {
 
                 if (inRange) {
                     this.viewport.type = screen.name;
-                    break;
+                    _result.push(screen.name);
                 }
             }
+
+            this.viewport.allowTypes = _result;
         },
 
         /**
@@ -303,7 +316,7 @@ define(function(require) {
          * @private
          */
         _screenTypeChecker: function(screenType) {
-            return screenType === 'any' || this.viewport.type === screenType;
+            return screenType === 'any' || this.getAllowScreenTypes(screenType).length;
         },
 
         /**
@@ -317,12 +330,18 @@ define(function(require) {
                 return true;
             }
 
-            var viewport = this._getScreenByTypes(this.viewport.type);
+            var allowScreens = this.getAllowScreenTypes(minScreenType);
             var minViewport = this._getScreenByTypes(minScreenType);
 
-            return (_.isObject(viewport) && _.isObject(minViewport))
-                ? viewport.max >= minViewport.max
-                : false;
+            var _results = _.map(allowScreens, function(screen) {
+                var viewport = this._getScreenByTypes(screen);
+
+                return (_.isObject(viewport) && _.isObject(minViewport))
+                    ? viewport.max >= minViewport.max
+                    : false
+            }, this);
+
+            return _.some(_results);
         },
 
         /**
@@ -336,12 +355,18 @@ define(function(require) {
                 return true;
             }
 
-            var viewport = this._getScreenByTypes(this.viewport.type);
+            var allowScreens = this.getAllowScreenTypes(maxScreenType);
             var maxViewport = this._getScreenByTypes(maxScreenType);
 
-            return (_.isObject(viewport) && _.isObject(maxViewport))
-                ? viewport.max <= maxViewport.max
-                : false;
+            var _results = _.map(allowScreens, function(screen) {
+                var viewport = this._getScreenByTypes(screen);
+
+                return (_.isObject(viewport) && _.isObject(maxViewport))
+                    ? viewport.max <= maxViewport.max
+                    : false
+            }, this);
+
+            return _.some(_results);
         },
 
         /**
