@@ -15,6 +15,7 @@ use Oro\Component\EntitySerializer\EntityDataAccessor;
 use Oro\Component\EntitySerializer\EntityFieldFilterInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Component\EntitySerializer\FieldAccessor;
+use Oro\Component\EntitySerializer\FieldFilterInterface;
 use Oro\Component\EntitySerializer\QueryFactory;
 use Oro\Component\EntitySerializer\QueryResolver;
 use Oro\Component\EntitySerializer\SerializationHelper;
@@ -118,5 +119,22 @@ abstract class EntitySerializerTestCase extends OrmTestCase
                 $this->sortByKeyRecursive($val);
             }
         }
+    }
+
+    /**
+     * @param array $checkRules
+     *
+     * @return FieldFilterInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected function getFieldFilter(array $checkRules)
+    {
+        $filter = $this->createMock(FieldFilterInterface::class);
+        $filter->expects(self::any())
+            ->method('checkField')
+            ->willReturnCallback(function ($entity, $entityClass, $field) use ($checkRules) {
+                return $checkRules[$field] ?? null;
+            });
+
+        return $filter;
     }
 }

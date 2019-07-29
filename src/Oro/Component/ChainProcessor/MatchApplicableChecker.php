@@ -41,9 +41,10 @@ class MatchApplicableChecker extends AbstractMatcher implements ApplicableChecke
             if (isset($this->ignoredAttributes[$name])) {
                 continue;
             }
-            if (!$context->has($name)) {
+            $contextValue = $context->get($name);
+            if (null === $contextValue && !$context->has($name)) {
                 $result = self::ABSTAIN;
-            } elseif (!$this->isMatch($value, $context->get($name), $name)) {
+            } elseif (!$this->isMatch($value, $contextValue, $name)) {
                 $result = self::NOT_APPLICABLE;
                 break;
             }

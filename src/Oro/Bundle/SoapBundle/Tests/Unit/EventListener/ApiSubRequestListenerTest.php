@@ -21,15 +21,6 @@ class ApiSubRequestListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->addRule(new RequestMatcher('^/'), ['stop' => true]);
     }
 
-    public function testOnKernelRequestForSubRequest()
-    {
-        $request = $this->createRequest();
-        $this->assertEquals('xml', $request->getRequestFormat(null));
-
-        $this->listener->onKernelRequest($this->createEvent($request));
-        $this->assertNull($request->getFormat(null));
-    }
-
     public function testOnKernelRequestForMasterRequest()
     {
         $request = $this->createRequest();
@@ -39,13 +30,22 @@ class ApiSubRequestListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('xml', $request->getRequestFormat(null));
     }
 
+    public function testOnKernelRequestForSubRequest()
+    {
+        $request = $this->createRequest();
+        $this->assertEquals('xml', $request->getRequestFormat(null));
+
+        $this->listener->onKernelRequest($this->createEvent($request));
+        $this->assertNull($request->getRequestFormat(null));
+    }
+
     public function testOnKernelRequestForSubRequestWithoutFormat()
     {
         $request = $this->createRequest(null);
         $this->assertNull($request->getRequestFormat(null));
 
         $this->listener->onKernelRequest($this->createEvent($request));
-        $this->assertNull($request->getFormat(null));
+        $this->assertNull($request->getRequestFormat(null));
     }
 
     public function testOnKernelRequestForNonRestApiSubRequest()
@@ -57,19 +57,36 @@ class ApiSubRequestListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('xml', $request->getRequestFormat(null));
     }
 
+    public function testOnKernelRequestForExceptionHandlingSubRequest()
+    {
+        $request = $this->createRequest();
+        $request->attributes->set('exception', new \Exception());
+        $this->assertEquals('xml', $request->getRequestFormat(null));
+
+        $this->listener->onKernelRequest($this->createEvent($request));
+        $this->assertEquals('xml', $request->getRequestFormat(null));
+    }
+
     /**
      * @param string|null $format
-     * @param string $uri
+     * @param string      $uri
+     *
      * @return Request
      */
     private function createRequest(?string $format = 'xml', string $uri = '/api/rest/query'): Request
     {
-        return new Request([], [], ['_format' => $format], [], [], ['REQUEST_URI' => $uri]);
+        $request = Request::create($uri);
+        if ($format) {
+            $request->setRequestFormat($format);
+        }
+
+        return $request;
     }
 
     /**
      * @param Request $request
-     * @param int $type
+     * @param int     $type
+     *
      * @return GetResponseEvent
      */
     private function createEvent(Request $request, int $type = HttpKernelInterface::SUB_REQUEST): GetResponseEvent

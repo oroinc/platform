@@ -10,11 +10,12 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class ActionsConfigLoader extends AbstractConfigLoader
 {
     private const METHOD_MAP = [
-        ConfigUtil::EXCLUDE               => 'setExcluded',
-        ConfigUtil::DISABLE_SORTING       => ['disableSorting', 'enableSorting'],
-        ConfigUtil::DISABLE_INCLUSION     => ['disableInclusion', 'enableInclusion'],
-        ConfigUtil::DISABLE_FIELDSET      => ['disableFieldset', 'enableFieldset'],
-        ConfigUtil::FORM_EVENT_SUBSCRIBER => 'setFormEventSubscribers'
+        ConfigUtil::EXCLUDE                 => 'setExcluded',
+        ConfigUtil::DISABLE_SORTING         => ['disableSorting', 'enableSorting'],
+        ConfigUtil::DISABLE_INCLUSION       => ['disableInclusion', 'enableInclusion'],
+        ConfigUtil::DISABLE_FIELDSET        => ['disableFieldset', 'enableFieldset'],
+        ConfigUtil::DISABLE_META_PROPERTIES => ['disableMetaProperties', 'enableMetaProperties'],
+        ConfigUtil::FORM_EVENT_SUBSCRIBER   => 'setFormEventSubscribers'
     ];
 
     private const FIELD_METHOD_MAP = [
