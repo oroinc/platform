@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\ImportExport\Strategy;
 
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Strategy\AttributeImportStrategy;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Strategy\EntityFieldImportStrategy;
@@ -74,19 +75,27 @@ class AttributeImportStrategyTest extends \PHPUnit\Framework\TestCase
         $this->strategy->setConfigHelper($this->configHelper);
     }
 
-    public function testProcessValidationErrorsWithAttributesGroup()
+    /**
+     * @dataProvider validationGroupsDataProvider
+     * @param bool $isNew
+     * @param array $validationGroups
+     */
+    public function testProcessValidationErrorsWithAttributesGroup($isNew, array $validationGroups)
     {
-        $this->fieldTypeProvider->expects(static::any())
+        $this->fieldTypeProvider->expects($this->any())
             ->method('getFieldProperties')
             ->willReturn([]);
-        $this->translator->expects(static::any())
+        $this->translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(
-                function ($value) {
-                    return $value;
-                }
-            );
+            ->willReturnArgument(0);
+        $entityModel = new EntityConfigModel(\stdClass::class);
         $entity = new FieldConfigModel('testFieldName', 'integer');
+        $entity->setEntity($entityModel);
+
+        $this->validationHelper->expects($this->once())
+            ->method('findExtendFieldConfig')
+            ->with($entityModel->getClassName(), $entity->getFieldName())
+            ->willReturn($isNew ? null: []);
 
         $this->fieldTypeProvider->expects($this->once())
             ->method('getSupportedFieldTypes')
@@ -95,10 +104,9 @@ class AttributeImportStrategyTest extends \PHPUnit\Framework\TestCase
             ->method('addToFieldConfigModel')
             ->with($entity, ['attribute' => ['is_attribute' => true]]);
 
-        $groups = ['FieldConfigModel', 'Sql', 'ChangeTypeField', 'AttributeField'];
         $this->strategyHelper->expects($this->once())
             ->method('validateEntity')
-            ->with($entity, null, new GroupSequence($groups))
+            ->with($entity, null, new GroupSequence($validationGroups))
             ->willReturn(['first error message', 'second error message']);
 
         $this->context->expects($this->once())
@@ -108,5 +116,22 @@ class AttributeImportStrategyTest extends \PHPUnit\Framework\TestCase
             ->with(['first error message', 'second error message'], $this->context);
 
         self::assertNull($this->strategy->process($entity));
+    }
+
+    /**
+     * @return array
+     */
+    public function validationGroupsDataProvider(): array
+    {
+        return [
+            'is new' => [
+                true,
+                ['FieldConfigModel', 'Sql', 'ChangeTypeField', 'AttributeField', 'UniqueField', 'UniqueMethod']
+            ],
+            'existing' => [
+                false,
+                ['FieldConfigModel', 'Sql', 'ChangeTypeField', 'AttributeField']
+            ]
+        ];
     }
 }
