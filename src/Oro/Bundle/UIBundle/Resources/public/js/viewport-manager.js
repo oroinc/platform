@@ -338,7 +338,7 @@ define(function(require) {
 
                 return (_.isObject(viewport) && _.isObject(minViewport))
                     ? viewport.max >= minViewport.max
-                    : false
+                    : false;
             }, this);
 
             return _.some(_results);
@@ -363,7 +363,7 @@ define(function(require) {
 
                 return (_.isObject(viewport) && _.isObject(maxViewport))
                     ? viewport.max <= maxViewport.max
-                    : false
+                    : false;
             }, this);
 
             return _.some(_results);
