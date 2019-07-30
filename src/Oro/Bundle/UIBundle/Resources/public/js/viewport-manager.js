@@ -316,7 +316,7 @@ define(function(require) {
          * @private
          */
         _screenTypeChecker: function(screenType) {
-            return screenType === 'any' || this.getAllowScreenTypes(screenType).length;
+            return screenType === 'any' || !!this.getAllowScreenTypes(screenType).length;
         },
 
         /**
