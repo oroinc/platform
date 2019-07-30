@@ -123,6 +123,7 @@ class ExtendConfigDumper
      * @param bool $updateCustom
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @throws \ReflectionException
      */
     public function updateConfig($filter = null, $updateCustom = false)
     {
@@ -330,6 +331,7 @@ class ExtendConfigDumper
      * @param array           $defaultProperties
      * @param array           $properties
      * @param array           $doctrine
+     * @throws \ReflectionException
      */
     protected function checkFieldSchema(
         $entityName,
@@ -340,8 +342,16 @@ class ExtendConfigDumper
         array &$doctrine
     ) {
         if ($fieldConfig->is('is_extend')) {
+            $reflectionEntityClass = class_exists($entityName)
+                ? new \ReflectionClass($entityName)
+                : null;
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $fieldConfig->getId();
+            if ($fieldConfig->get('state') === ExtendScope::STATE_DELETE &&
+                $reflectionEntityClass &&
+                !$reflectionEntityClass->hasProperty($fieldConfigId->getFieldName())) {
+                return;
+            }
             $fieldName     = $fieldConfigId->getFieldName();
             $fieldType     = $fieldConfigId->getFieldType();
             $isDeleted     = $fieldConfig->is('is_deleted');
@@ -389,6 +399,7 @@ class ExtendConfigDumper
      * @param ConfigProvider  $configProvider
      * @param array|null      $aliases
      * @param callable|null   $filter function (ConfigInterface $config) : bool
+     * @throws \ReflectionException
      */
     protected function checkSchema(
         ConfigInterface $extendConfig,
@@ -434,6 +445,9 @@ class ExtendConfigDumper
         $fieldConfigs = null === $filter
             ? $configProvider->getConfigs($className, true)
             : $configProvider->filter($filter, $className, true);
+        $reflectionEntityClass = class_exists($entityName)
+            ? new \ReflectionClass($entityName)
+            : null;
         foreach ($fieldConfigs as $fieldConfig) {
             $this->updateFieldState($fieldConfig);
             $this->checkFieldSchema(
@@ -455,11 +469,17 @@ class ExtendConfigDumper
             }
 
             $fieldName = $fieldId->getFieldName();
-            $isDeleted = $configProvider->hasConfig($fieldId->getClassName(), $fieldName)
-                ? $configProvider->getConfig($fieldId->getClassName(), $fieldName)->is('is_deleted')
-                : false;
+            $fieldConfig = $configProvider->hasConfig($fieldId->getClassName(), $fieldName)
+                ? $configProvider->getConfig($fieldId->getClassName(), $fieldName)
+                : null;
+            $isDeleted = $fieldConfig ? $fieldConfig->is('is_deleted') : false;
             if (!isset($relationProperties[$fieldName])) {
                 $relationProperties[$fieldName] = [];
+                if ($fieldConfig && $fieldConfig->get('state') === ExtendScope::STATE_DELETE
+                    && $reflectionEntityClass
+                    && !$reflectionEntityClass->hasProperty($fieldId->getFieldName())) {
+                    continue;
+                }
                 if ($isDeleted) {
                     $relationProperties[$fieldName]['private'] = true;
                 }

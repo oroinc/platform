@@ -10,7 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 class UserMenuControllerTest extends WebTestCase
 {
     const MENU_NAME = 'application_menu';
-    
+
     /**
      * {@inheritdoc}
      */
@@ -38,7 +38,7 @@ class UserMenuControllerTest extends WebTestCase
 
         $this->assertContains(
             'Select existing menu item or create new.',
-            $crawler->filter('[data-role="content"] .tree-empty-content')->html()
+            $crawler->filter('[data-role="content"] .tree-empty-content .no-data')->html()
         );
     }
 
@@ -175,7 +175,6 @@ class UserMenuControllerTest extends WebTestCase
 
         $this->client->followRedirects(true);
 
-        /** TODO Change after BAP-1813 */
         $form->getFormNode()->setAttribute(
             'action',
             $form->getFormNode()->getAttribute('action') . '?_widgetContainer=dialog'

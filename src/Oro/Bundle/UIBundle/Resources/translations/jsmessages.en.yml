@@ -54,6 +54,8 @@ close: close
 Save: Save
 Discard: Discard
 "Copy to Clipboard": "Copy to Clipboard"
+"Remove row": "Remove row"
+"Add row": "Add row"
 oro:
     ui:
         delete_confirm_cascade: Are you sure you want to delete this {{ entity_label }} with other entities related to it?

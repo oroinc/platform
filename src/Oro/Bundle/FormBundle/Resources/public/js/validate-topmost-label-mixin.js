@@ -47,6 +47,14 @@ define(function(require) {
         },
 
         validationSuccessHandler: function(element) {
+            validateTopmostLabelMixin.removeHandlerByElement.call(this, element);
+        },
+
+        validationResetHandler: function(element) {
+            validateTopmostLabelMixin.removeHandlerByElement.call(this, element);
+        },
+
+        removeHandlerByElement: function(element) {
             var name = element.getAttribute('name');
 
             if (this.validationMessageHandlerViews && name in this.validationMessageHandlerViews) {

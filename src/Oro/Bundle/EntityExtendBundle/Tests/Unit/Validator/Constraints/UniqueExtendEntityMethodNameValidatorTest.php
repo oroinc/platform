@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityFieldValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodName;
@@ -21,17 +22,19 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
     const TEST_CLASS_NAME = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Tools\TestEntity';
     const TEST_FIELD_NAME = 'testField';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ClassMethodNameChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $classMethodNameChecker;
+
+    /** @var FieldTypeHelper|\PHPUnit\Framework\MockObject\MockObject */
+    protected $fieldTypeHelper;
 
     /** @var UniqueExtendEntityFieldValidator */
     protected $validator;
 
     protected function setUp()
     {
-        $this->classMethodNameChecker = $this->getMockBuilder(ClassMethodNameChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->classMethodNameChecker = $this->createMock(ClassMethodNameChecker::class);
+        $this->fieldTypeHelper = $this->createMock(FieldTypeHelper::class);
 
         parent::setUp();
 
@@ -40,14 +43,13 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
 
     protected function createValidator()
     {
-        $configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
+        $configManager = $this->createMock(ConfigManager::class);
 
         /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        return new UniqueExtendEntityMethodNameValidator(
+        $validator = new UniqueExtendEntityMethodNameValidator(
             new FieldNameValidationHelper(
                 new ConfigProviderMock($configManager, 'extend'),
                 $eventDispatcher,
@@ -55,6 +57,9 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
             ),
             $this->classMethodNameChecker
         );
+        $validator->setFieldTypeHelper($this->fieldTypeHelper);
+
+        return $validator;
     }
 
     /**
@@ -150,22 +155,33 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
             ->assertRaised();
     }
 
+    /**
+     * @return array
+     */
     public function relationTypeProvider()
     {
         return [
-            ['oneToOne'],
-            ['oneToMany'],
-            ['manyToOne'],
-            ['manyToMany'],
+            ['oneToOne', 'oneToOne'],
+            ['oneToMany', 'oneToMany'],
+            ['manyToOne', 'manyToOne'],
+            ['manyToMany', 'manyToMany'],
+            ['enum', 'manyToOne'],
+            ['multiEnum', 'manyToMany']
         ];
     }
 
     /**
      * @dataProvider relationTypeProvider
+     * @param string $fieldType
+     * @param string $relationType
      */
-    public function testRelationMethodsDoNotExist($relationType)
+    public function testRelationMethodsDoNotExist($fieldType, $relationType)
     {
-        $field = $this->getFieldConfigModel($relationType);
+        $this->fieldTypeHelper->expects($this->any())
+            ->method('getUnderlyingType')
+            ->with($fieldType)
+            ->willReturn($relationType);
+        $field = $this->getFieldConfigModel($fieldType);
         $constraint = new UniqueExtendEntityMethodName();
 
         $this->classMethodNameChecker->expects(self::exactly(3))
@@ -183,10 +199,16 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
 
     /**
      * @dataProvider relationTypeProvider
+     * @param string $fieldType
+     * @param string $relationType
      */
-    public function testRelationMethodsExist($relationType)
+    public function testRelationMethodsExist($fieldType, $relationType)
     {
-        $field = $this->getFieldConfigModel($relationType);
+        $this->fieldTypeHelper->expects($this->any())
+            ->method('getUnderlyingType')
+            ->with($fieldType)
+            ->willReturn($relationType);
+        $field = $this->getFieldConfigModel($fieldType);
         $constraint = new UniqueExtendEntityMethodName();
 
         $this->classMethodNameChecker->expects(self::exactly(3))

@@ -105,11 +105,15 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
      */
     protected function validateAndUpdateContext(FieldConfigModel $entity)
     {
+        $validationGroups = $this->getValidationGroups();
+        if ($this->isNewField($entity)) {
+            $validationGroups = array_merge($validationGroups, $this->getValidationGroupsForNewField());
+        }
         $errors = array_merge(
             (array)$this->strategyHelper->validateEntity(
                 $entity,
                 null,
-                new GroupSequence($this->getValidationGroups())
+                new GroupSequence($validationGroups)
             ),
             $this->validateEntityFields($entity)
         );
@@ -209,5 +213,29 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
     protected function getValidationGroups(): array
     {
         return ['FieldConfigModel', 'Sql', 'ChangeTypeField'];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getValidationGroupsForNewField(): array
+    {
+        return ['UniqueField', 'UniqueMethod'];
+    }
+
+    /**
+     * @param FieldConfigModel $entity
+     * @return bool
+     */
+    protected function isNewField(FieldConfigModel $entity): bool
+    {
+        if (!$entity->getFieldName() || !$entity->getEntity() || !$entity->getEntity()->getClassName()) {
+            return false;
+        }
+
+        return null === $this->fieldValidationHelper->findExtendFieldConfig(
+            $entity->getEntity()->getClassName(),
+            $entity->getFieldName()
+        );
     }
 }
