@@ -214,15 +214,24 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                     ['association4', 'Test\Association4Target']
                 ]
             );
+        $association1Metadata = new ClassMetadata('Test\Association1Target');
+        $association2Metadata = new ClassMetadata('Test\Association2Target');
+        $association3Metadata = new ClassMetadata('Test\Association3Target');
+        $association4Metadata = new ClassMetadata('Test\Association4Target');
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(5))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $association1Metadata],
+                ['Test\Association2Target', true, $association2Metadata],
+                ['Test\Association3Target', true, $association3Metadata],
+                ['Test\Association4Target', true, $association4Metadata]
+            ]);
 
         $this->configProvider->expects(self::exactly(4))
             ->method('getConfig')
@@ -339,10 +348,12 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($metadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $metadata],
+                ['Account', true, $customerAssociationMetadata]
+            ]);
         $this->doctrineHelper->expects(self::once())
             ->method('findEntityMetadataByPath')
             ->with(self::TEST_CLASS_NAME, 'customerAssociation')
@@ -386,15 +397,18 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             ->method('getAssociationTargetClass')
             ->with('association1')
             ->willReturn('Test\Association1Target');
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $this->configProvider->expects(self::once())
             ->method('getConfig')
@@ -566,15 +580,18 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             ->method('getAssociationTargetClass')
             ->with('association1')
             ->willReturn('Test\Association1Target');
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $this->entityOverrideProvider->expects(self::once())
             ->method('getSubstituteEntityClass')
@@ -699,14 +716,17 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                 'targetEntity' => 'Test\AssociationTarget'
             ]
         ];
+        $associationMetadata = new ClassMetadata('Test\AssociationTarget');
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($metadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $metadata],
+                ['Test\AssociationTarget', true, $associationMetadata]
+            ]);
 
         $this->processor->process($this->context);
 

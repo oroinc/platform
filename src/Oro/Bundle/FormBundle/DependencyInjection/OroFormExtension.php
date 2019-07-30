@@ -28,6 +28,24 @@ class OroFormExtension extends Extension
             $definition->replaceArgument(0, $config['wysiwyg']['html_allowed_elements']);
         }
 
+        if (isset($config['wysiwyg']['html_purifier_mode'])) {
+            $container->setParameter('oro_form.html_purifier_mode', $config['wysiwyg']['html_purifier_mode']);
+        }
+
+        if (isset($config['wysiwyg']['html_purifier_iframe_domains'])) {
+            $container->setParameter(
+                'oro_form.html_purifier_iframe_domains',
+                $config['wysiwyg']['html_purifier_iframe_domains']
+            );
+        }
+
+        if (isset($config['wysiwyg']['html_purifier_uri_schemes'])) {
+            $container->setParameter(
+                'oro_form.html_purifier_uri_schemes',
+                $config['wysiwyg']['html_purifier_uri_schemes']
+            );
+        }
+
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 }

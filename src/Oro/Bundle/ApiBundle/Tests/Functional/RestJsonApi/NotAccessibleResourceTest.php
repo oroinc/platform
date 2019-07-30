@@ -3,7 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestBuyer;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,8 +27,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         parent::setUp();
 
         $this->loadFixtures([
-            '@OroApiBundle/Tests/Functional/DataFixtures/test_department.yml',
-            '@OroApiBundle/Tests/Functional/DataFixtures/test_product.yml'
+            '@OroApiBundle/Tests/Functional/DataFixtures/not_accessible_resource.yml'
         ]);
     }
 
@@ -136,6 +137,75 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         ];
     }
 
+    public function testGetWithRelationshipThatContainsNotAccessibleTarget()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $accessibleEntityType = $this->getEntityType(TestEmployee::class);
+        $notAccessibleEntityType = $this->getEntityType(TestBuyer::class);
+        $response = $this->get(
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>'],
+            ['fields' => [$entityType => 'staff']]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type'          => $entityType,
+                    'id'            => '<toString(@test_department->id)>',
+                    'relationships' => [
+                        'staff' => [
+                            'data' => [
+                                ['type' => $accessibleEntityType, 'id' => '<toString(@test_employee1->id)>'],
+                                ['type' => $notAccessibleEntityType, 'id' => '<toString(@test_buyer1->id)>']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetWithRelationshipThatContainsNotAccessibleTargetAndWithIncludeFilter()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $accessibleEntityType = $this->getEntityType(TestEmployee::class);
+        $notAccessibleEntityType = $this->getEntityType(TestBuyer::class);
+        $response = $this->get(
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>'],
+            [
+                'fields'  => [
+                    $entityType              => 'staff',
+                    $accessibleEntityType    => 'name',
+                    $notAccessibleEntityType => 'name'
+                ],
+                'include' => 'staff'
+            ]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type'          => $entityType,
+                    'id'            => '<toString(@test_department->id)>',
+                    'relationships' => [
+                        'staff' => [
+                            'data' => [
+                                ['type' => $accessibleEntityType, 'id' => '<toString(@test_employee1->id)>'],
+                                ['type' => $notAccessibleEntityType, 'id' => '<toString(@test_buyer1->id)>']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+        // "included" section will be added in CRM-8250
+        // also check that not accessible entities are not returned in "included" section
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertArrayNotHasKey('included', $responseContent);
+    }
+
     public function testDisabledGet()
     {
         $this->appendEntityConfig(
@@ -146,7 +216,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->get(
-            ['entity' => $entityType, 'id' => '@test_department->id'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>'],
             [],
             [],
             false
@@ -262,7 +332,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->patch(
-            ['entity' => $entityType, 'id' => '@test_department->id'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>'],
             [],
             [],
             false
@@ -281,7 +351,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->patch(
-            ['entity' => $entityType, 'id' => '@test_department->id'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>'],
             [],
             [],
             false
@@ -307,7 +377,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->delete(
-            ['entity' => $entityType, 'id' => '@test_department->id'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>'],
             [],
             [],
             false
@@ -326,7 +396,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->delete(
-            ['entity' => $entityType, 'id' => '@test_department->id'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>'],
             [],
             [],
             false
@@ -397,7 +467,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->getSubresource(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'owner'],
             [],
             [],
             false
@@ -417,7 +487,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->getSubresource(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'owner'],
             [],
             [],
             false
@@ -443,7 +513,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->getSubresource(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'owner'],
             [],
             [],
             false
@@ -469,7 +539,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->getRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'owner'],
             [],
             [],
             false
@@ -488,7 +558,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->getRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'owner'],
             [],
             [],
             false
@@ -507,7 +577,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->getRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'owner'],
             [],
             [],
             false
@@ -533,7 +603,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->getRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'owner'],
             [],
             [],
             false
@@ -559,7 +629,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->patchRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'owner'],
             [],
             [],
             false
@@ -578,7 +648,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->patchRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'owner'],
             [],
             [],
             false
@@ -597,7 +667,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->patchRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'owner'],
             [],
             [],
             false
@@ -623,7 +693,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->patchRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'owner'],
             [],
             [],
             false
@@ -649,7 +719,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->postRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'staff'],
             [],
             [],
             false
@@ -668,7 +738,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->postRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'staff'],
             [],
             [],
             false
@@ -687,7 +757,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->postRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'staff'],
             [],
             [],
             false
@@ -713,7 +783,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->postRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'staff'],
             [],
             [],
             false
@@ -739,7 +809,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->deleteRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'staff'],
             [],
             [],
             false
@@ -758,7 +828,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->deleteRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'staff'],
             [],
             [],
             false
@@ -777,7 +847,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->deleteRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'staff'],
             [],
             [],
             false
@@ -803,7 +873,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->deleteRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'staff'],
             [],
             [],
             false
@@ -836,7 +906,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->patchRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'staff'],
             [],
             [],
             false
@@ -860,7 +930,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->patchRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'owner'],
             [],
             [],
             false
@@ -873,7 +943,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->postRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'owner'],
             [],
             [],
             false
@@ -886,7 +956,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->deleteRelationship(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'owner'],
             [],
             [],
             false
@@ -902,7 +972,10 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             'POST',
             $this->getUrl(
                 $this->getItemRouteName(),
-                self::processTemplateData(['entity' => $entityType, 'id' => '@test_department->id'])
+                self::processTemplateData([
+                    'entity' => $entityType,
+                    'id'     => '<toString(@test_department->id)>'
+                ])
             )
         );
         self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, DELETE');
@@ -914,7 +987,10 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->options(
             $this->getItemRouteName(),
-            ['entity' => $entityType, 'id' => '@test_department->id']
+            self::processTemplateData([
+                'entity' => $entityType,
+                'id'     => '<toString(@test_department->id)>'
+            ])
         );
         self::assertAllowResponseHeader($response, 'OPTIONS, GET, PATCH, DELETE');
     }
@@ -926,7 +1002,10 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             'HEAD',
             $this->getUrl(
                 $this->getItemRouteName(),
-                self::processTemplateData(['entity' => $entityType, 'id' => '@test_department->id'])
+                self::processTemplateData([
+                    'entity' => $entityType,
+                    'id'     => '<toString(@test_department->id)>'
+                ])
             )
         );
         self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, DELETE');
@@ -967,7 +1046,11 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->options(
             $this->getRelationshipRouteName(),
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff']
+            self::processTemplateData([
+                'entity'      => $entityType,
+                'id'          => '<toString(@test_department->id)>',
+                'association' => 'staff'
+            ])
         );
         self::assertAllowResponseHeader($response, 'OPTIONS, GET, PATCH, POST, DELETE');
     }
@@ -981,7 +1064,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
                 $this->getRelationshipRouteName(),
                 self::processTemplateData([
                     'entity'      => $entityType,
-                    'id'          => '@test_department->id',
+                    'id'          => '<toString(@test_department->id)>',
                     'association' => 'staff'
                 ])
             )
@@ -994,7 +1077,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->postSubresource(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'staff'],
             [],
             [],
             false
@@ -1007,7 +1090,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->patchSubresource(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'staff'],
             [],
             [],
             false
@@ -1020,7 +1103,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->deleteSubresource(
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'staff'],
             [],
             [],
             false
@@ -1034,7 +1117,11 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->options(
             $this->getSubresourceRouteName(),
-            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff']
+            self::processTemplateData([
+                'entity'      => $entityType,
+                'id'          => '<toString(@test_department->id)>',
+                'association' => 'staff'
+            ])
         );
         self::assertAllowResponseHeader($response, 'OPTIONS, GET');
     }
@@ -1048,7 +1135,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
                 $this->getSubresourceRouteName(),
                 self::processTemplateData([
                     'entity'      => $entityType,
-                    'id'          => '@test_department->id',
+                    'id'          => '<toString(@test_department->id)>',
                     'association' => 'staff'
                 ])
             )

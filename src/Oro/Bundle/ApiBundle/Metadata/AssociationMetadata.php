@@ -15,6 +15,9 @@ class AssociationMetadata extends PropertyMetadata
     /** @var string */
     private $targetClass;
 
+    /** @var string|null */
+    private $baseTargetClass;
+
     /** @var string[] */
     private $acceptableTargetClasses = [];
 
@@ -64,6 +67,7 @@ class AssociationMetadata extends PropertyMetadata
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function toArray()
     {
@@ -78,6 +82,9 @@ class AssociationMetadata extends PropertyMetadata
         );
         if ($this->targetClass) {
             $result['target_class'] = $this->targetClass;
+        }
+        if ($this->baseTargetClass) {
+            $result['base_target_class'] = $this->baseTargetClass;
         }
         if ($this->acceptableTargetClasses) {
             $result['acceptable_target_classes'] = $this->acceptableTargetClasses;
@@ -145,6 +152,30 @@ class AssociationMetadata extends PropertyMetadata
     public function setTargetClassName($className)
     {
         $this->targetClass = $className;
+    }
+
+    /**
+     * Gets FQCN of the association target base class.
+     * E.g. if an association is bases on Doctrine's inheritance mapping,
+     * the target class will be Oro\Bundle\ApiBundle\Model\EntityIdentifier
+     * and the base target class will be a mapped superclass
+     * or a parent class for table inheritance association.
+     *
+     * @return string|null
+     */
+    public function getBaseTargetClassName()
+    {
+        return $this->baseTargetClass;
+    }
+
+    /**
+     * Sets FQCN of the association target.
+     *
+     * @param string $className
+     */
+    public function setBaseTargetClassName($className)
+    {
+        $this->baseTargetClass = $className;
     }
 
     /**

@@ -66,10 +66,7 @@ class RegisterConfiguredFilters extends RegisterFilters
         }
 
         $metadata = null;
-        $entityClass = $this->doctrineHelper->getManageableEntityClass(
-            $context->getClassName(),
-            $context->getConfig()
-        );
+        $entityClass = $context->getManageableEntityClass($this->doctrineHelper);
         if ($entityClass) {
             // only manageable entities or resources based on manageable entities can have the metadata
             $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);

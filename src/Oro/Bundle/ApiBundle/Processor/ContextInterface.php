@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
@@ -57,6 +58,18 @@ interface ContextInterface extends ComponentContextInterface
      * @param string $className
      */
     public function setClassName($className);
+
+    /**
+     * Returns the API resource class if it is a manageable entity;
+     * otherwise, checks if the API resource is based on a manageable entity, and if so,
+     * returns the class name of this entity.
+     * If both the API resource class and its parent are not manageable entities, returns NULL.
+     *
+     * @param DoctrineHelper $doctrineHelper
+     *
+     * @return string|null
+     */
+    public function getManageableEntityClass(DoctrineHelper $doctrineHelper);
 
     /**
      * Checks whether metadata of an entity has at least one identifier field.

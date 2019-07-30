@@ -82,9 +82,6 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
     }
 
     /**
-     * TODO: custom entity instance as manyToOne relation find the way to show it on view
-     * we should mark some field as title
-     *
      * @param array    $schema
      * @param PhpClass $class
      */
@@ -177,8 +174,9 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
         if (!isset($schema['addremove'][$fieldName])) {
             return '$this->' . $fieldName . ' = $value; return $this;';
         } else {
-            $addMethodName = $this->generateAddMethodName($fieldName);
-            $removeMethodName = $this->generateRemoveMethodName($fieldName);
+            $relationFieldName = $schema['addremove'][$fieldName]['self'];
+            $addMethodName = $this->generateAddMethodName($relationFieldName);
+            $removeMethodName = $this->generateRemoveMethodName($relationFieldName);
             $body = <<<METHOD_BODY
 if ((!\$value instanceof \Traversable && !is_array(\$value) && !\$value instanceof \ArrayAccess) ||
     !\$this->$fieldName instanceof \Doctrine\Common\Collections\Collection) {

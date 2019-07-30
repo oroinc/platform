@@ -15,12 +15,16 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\HateoasMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraCollection;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * The base execution context for processors for subresources and relationships related actions,
  * such as "get_subresource", "update_subresource", "add_subresource", "delete_subresource",
  * "get_relationship", "update_relationship", "add_relationship" and "delete_relationship".
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class SubresourceContext extends Context
 {
@@ -135,6 +139,65 @@ class SubresourceContext extends Context
     public function setIsCollection($value)
     {
         $this->set(self::COLLECTION, $value);
+    }
+
+    /**
+     * Gets the target base class for the association the sub-resource represents.
+     * E.g. if an association is bases on Doctrine's inheritance mapping,
+     * the target class will be Oro\Bundle\ApiBundle\Model\EntityIdentifier
+     * and the base target class will be a mapped superclass
+     * or a parent class for table inheritance association.
+     *
+     * @return string|null
+     */
+    public function getAssociationBaseTargetClassName()
+    {
+        $parentMetadata = $this->getParentMetadata();
+        if (null === $parentMetadata) {
+            return null;
+        }
+        $associationMetadata = $parentMetadata->getAssociation($this->getAssociationName());
+        if (null === $associationMetadata) {
+            return null;
+        }
+
+        return $associationMetadata->getBaseTargetClassName();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getManageableEntityClass(DoctrineHelper $doctrineHelper)
+    {
+        $entityClass = $this->getClassName();
+        if (\is_a($entityClass, EntityIdentifier::class, true)) {
+            $entityClass = $this->getAssociationBaseTargetClassName();
+        }
+        if ($entityClass) {
+            $entityClass = $doctrineHelper->getManageableEntityClass(
+                $entityClass,
+                $this->getConfig()
+            );
+        }
+
+        return $entityClass;
+    }
+
+    /**
+     * Returns the parent class of API resource if it is a manageable entity;
+     * otherwise, checks if the parent API resource is based on a manageable entity, and if so,
+     * returns the class name of this entity.
+     *
+     * @param DoctrineHelper $doctrineHelper
+     *
+     * @return string|null
+     */
+    public function getManageableParentEntityClass(DoctrineHelper $doctrineHelper)
+    {
+        return $doctrineHelper->getManageableEntityClass(
+            $this->getParentClassName(),
+            $this->getParentConfig()
+        );
     }
 
     /**

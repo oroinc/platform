@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -124,7 +125,6 @@ class EntityMetadataFactory
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
-        $associationMetadata->setTargetClassName($targetClass);
         $associationMetadata->setAssociationType($this->getAssociationType($mapping));
         if (!($mapping[self::TYPE] & ClassMetadata::TO_ONE)) {
             $associationMetadata->setIsCollection(true);
@@ -148,8 +148,11 @@ class EntityMetadataFactory
             }
         }
         if ($targetMetadata->isInheritanceTypeNone()) {
+            $associationMetadata->setTargetClassName($targetClass);
             $associationMetadata->addAcceptableTargetClassName($targetClass);
         } else {
+            $associationMetadata->setTargetClassName(EntityIdentifier::class);
+            $associationMetadata->setBaseTargetClassName($targetClass);
             $associationMetadata->setAcceptableTargetClassNames($targetMetadata->subClasses);
         }
 
