@@ -35,10 +35,7 @@ class BuildQuery implements ProcessorInterface
             return;
         }
 
-        $entityClass = $this->doctrineHelper->getManageableEntityClass(
-            $context->getClassName(),
-            $context->getConfig()
-        );
+        $entityClass = $context->getManageableEntityClass($this->doctrineHelper);
         if (!$entityClass) {
             // only manageable entities or resources based on manageable entities are supported
             return;

@@ -61,10 +61,7 @@ class LoadEntity implements ProcessorInterface
             return;
         }
 
-        $entityClass = $this->doctrineHelper->getManageableEntityClass(
-            $context->getClassName(),
-            $config
-        );
+        $entityClass = $context->getManageableEntityClass($this->doctrineHelper);
         if (!$entityClass) {
             // only manageable entities or resources based on manageable entities are supported
             return;

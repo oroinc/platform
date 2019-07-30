@@ -27,6 +27,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         $associationMetadata->setPropertyPath('testPropertyPath');
         $associationMetadata->setDataType('testDataType');
         $associationMetadata->setTargetClassName('targetClassName');
+        $associationMetadata->setBaseTargetClassName('baseTargetClassName');
         $associationMetadata->setAcceptableTargetClassNames(['targetClassName1']);
         $associationMetadata->setIsCollection(true);
         $associationMetadata->setIsNullable(true);
@@ -63,6 +64,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         $associationMetadata->setPropertyPath('testPropertyPath');
         $associationMetadata->setDataType('testDataType');
         $associationMetadata->setTargetClassName('targetClassName');
+        $associationMetadata->setBaseTargetClassName('baseTargetClassName');
         $associationMetadata->setAcceptableTargetClassNames(['targetClassName1', 'targetClassName2']);
         $associationMetadata->setAssociationType('manyToMany');
         $associationMetadata->setIsCollection(true);
@@ -84,6 +86,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
                 'association_type'             => 'manyToMany',
                 'collection'                   => true,
                 'target_class'                 => 'targetClassName',
+                'base_target_class'            => 'baseTargetClassName',
                 'acceptable_target_classes'    => ['targetClassName1', 'targetClassName2'],
                 'target_metadata'              => [
                     'class'     => 'entityClassName',
@@ -296,6 +299,15 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($associationMetadata->getTargetClassName());
         $associationMetadata->setTargetClassName('targetClassName');
         self::assertEquals('targetClassName', $associationMetadata->getTargetClassName());
+    }
+
+    public function testBaseTargetClassName()
+    {
+        $associationMetadata = new AssociationMetadata();
+
+        self::assertNull($associationMetadata->getBaseTargetClassName());
+        $associationMetadata->setBaseTargetClassName('targetClassName');
+        self::assertEquals('targetClassName', $associationMetadata->getBaseTargetClassName());
     }
 
     public function testAcceptableTargetClassName()

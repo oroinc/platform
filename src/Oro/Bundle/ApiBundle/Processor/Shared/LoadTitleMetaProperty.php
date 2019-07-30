@@ -25,10 +25,10 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
     private const COMPOSITE_KEYS = 'composite_keys';
 
     /** @var EntityTitleProvider */
-    protected $entityTitleProvider;
+    private $entityTitleProvider;
 
     /** @var ExpandedAssociationExtractor */
-    protected $expandedAssociationExtractor;
+    private $expandedAssociationExtractor;
 
     /**
      * @param EntityTitleProvider          $entityTitleProvider
@@ -72,8 +72,14 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
             return;
         }
 
+        $entityClass = $context->getClassName();
+        $parentResourceClass = $config->getParentResourceClass();
+        if ($parentResourceClass) {
+            $entityClass = $parentResourceClass;
+        }
+
         $context->setResult(
-            $this->updateData($data, $context->getClassName(), $config, $titlePropertyPath)
+            $this->updateData($data, $entityClass, $config, $titlePropertyPath)
         );
     }
 
@@ -108,10 +114,6 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
     ) {
         $idFieldName = $this->getEntityIdentifierFieldName($config);
         if ($idFieldName) {
-            $parentResourceClass = $config->getParentResourceClass();
-            if ($parentResourceClass) {
-                $entityClass = $parentResourceClass;
-            }
             $titles = $this->getTitles($data, $entityClass, $idFieldName, $config);
             $this->setTitles($data, $entityClass, $idFieldName, $config, $titles, $titleFieldName);
         }
@@ -127,7 +129,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      * @param array                  $titles
      * @param string                 $titleFieldName
      */
-    protected function setTitles(
+    private function setTitles(
         array &$data,
         $entityClass,
         $idFieldName,
@@ -148,7 +150,10 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
                         $entityId[$propertyPath] = $item[$fieldName];
                     }
                 }
-                $entityKey = $this->buildEntityKey($entityClass, $entityId);
+                $entityKey = $this->buildEntityKey(
+                    $item[ConfigUtil::CLASS_NAME] ?? $entityClass,
+                    $entityId
+                );
                 if (array_key_exists($entityKey, $titles)) {
                     $item[$titleFieldName] = $titles[$entityKey];
                 }
@@ -164,7 +169,10 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
         } else {
             foreach ($data as &$item) {
                 if (isset($item[$idFieldName])) {
-                    $entityKey = $this->buildEntityKey($entityClass, $item[$idFieldName]);
+                    $entityKey = $this->buildEntityKey(
+                        $item[ConfigUtil::CLASS_NAME] ?? $entityClass,
+                        $item[$idFieldName]
+                    );
                     if (array_key_exists($entityKey, $titles)) {
                         $item[$titleFieldName] = $titles[$entityKey];
                     }
@@ -187,7 +195,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      * @param array                         $titles
      * @param string                        $titleFieldName
      */
-    protected function setTitlesForAssociations(
+    private function setTitlesForAssociations(
         array &$data,
         array $expandedAssociations,
         array $titles,
@@ -225,7 +233,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      *
      * @return array [entity key => entity title, ...]
      */
-    protected function getTitles(array $data, $entityClass, $idFieldName, EntityDefinitionConfig $config)
+    private function getTitles(array $data, $entityClass, $idFieldName, EntityDefinitionConfig $config)
     {
         $result = [];
         $identifierMap = $this->getIdentifierMap($data, $entityClass, $idFieldName, $config);
@@ -248,7 +256,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      *
      * @return array [entity class => [entity id field name, [entity id, ...]], ...]
      */
-    protected function getIdentifierMap(array $data, $entityClass, $idFieldName, EntityDefinitionConfig $config)
+    private function getIdentifierMap(array $data, $entityClass, $idFieldName, EntityDefinitionConfig $config)
     {
         // the COMPOSITE_KEYS element is internal and used as a temporary storage for
         // a string representations of composite keys
@@ -272,7 +280,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      * @param string                 $idFieldName
      * @param EntityDefinitionConfig $config
      */
-    protected function collectIdentifiers(
+    private function collectIdentifiers(
         array &$map,
         array $data,
         $entityClass,
@@ -283,12 +291,13 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
         $idPropertyPath = $this->getFieldPropertyPath($config, $idFieldName);
         foreach ($data as $item) {
             if (isset($item[$idFieldName])) {
-                if (!isset($map[$entityClass])) {
-                    $map[$entityClass] = [$idPropertyPath, []];
+                $itemEntityClass = $item[ConfigUtil::CLASS_NAME] ?? $entityClass;
+                if (!isset($map[$itemEntityClass])) {
+                    $map[$itemEntityClass] = [$idPropertyPath, []];
                 }
                 $id = $item[$idFieldName];
-                if (!in_array($id, $map[$entityClass][1], true)) {
-                    $map[$entityClass][1][] = $id;
+                if (!in_array($id, $map[$itemEntityClass][1], true)) {
+                    $map[$itemEntityClass][1][] = $id;
                 }
             }
             if (!empty($expandedAssociations)) {
@@ -305,7 +314,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      * @param EntityDefinitionConfig $config
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    protected function collectIdentifiersForCompositeId(
+    private function collectIdentifiersForCompositeId(
         array &$map,
         array $data,
         $entityClass,
@@ -326,11 +335,12 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
                 }
             }
             if ($hasId) {
-                if (!isset($map[$entityClass])) {
-                    $map[$entityClass] = [$idPropertyPath, []];
+                $itemEntityClass = $item[ConfigUtil::CLASS_NAME] ?? $entityClass;
+                if (!isset($map[$itemEntityClass])) {
+                    $map[$itemEntityClass] = [$idPropertyPath, []];
                 }
-                if (!isset($map[self::COMPOSITE_KEYS][$entityClass])) {
-                    $map[self::COMPOSITE_KEYS][$entityClass] = [];
+                if (!isset($map[self::COMPOSITE_KEYS][$itemEntityClass])) {
+                    $map[self::COMPOSITE_KEYS][$itemEntityClass] = [];
                 }
                 $id = [];
                 $key = [];
@@ -340,9 +350,9 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
                     $key[] = sprintf('%s=%s', $fieldName, $val);
                 }
                 $key = implode(',', $key);
-                if (!in_array($key, $map[self::COMPOSITE_KEYS][$entityClass], true)) {
-                    $map[$entityClass][1][] = $id;
-                    $map[self::COMPOSITE_KEYS][$entityClass][] = $key;
+                if (!in_array($key, $map[self::COMPOSITE_KEYS][$itemEntityClass], true)) {
+                    $map[$itemEntityClass][1][] = $id;
+                    $map[self::COMPOSITE_KEYS][$itemEntityClass][] = $key;
                 }
             }
             if (!empty($expandedAssociations)) {
@@ -356,7 +366,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      * @param array                         $item
      * @param EntityDefinitionFieldConfig[] $expandedAssociations
      */
-    protected function collectIdentifiersForAssociations(array &$map, array $item, array $expandedAssociations)
+    private function collectIdentifiersForAssociations(array &$map, array $item, array $expandedAssociations)
     {
         foreach ($expandedAssociations as $associationName => $association) {
             if (!array_key_exists($associationName, $item)) {
@@ -388,7 +398,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      *
      * @return string|string[]|null
      */
-    protected function getEntityIdentifierFieldName(EntityDefinitionConfig $config)
+    private function getEntityIdentifierFieldName(EntityDefinitionConfig $config)
     {
         $fieldNames = $config->getIdentifierFieldNames();
         $numberOfFields = count($fieldNames);
@@ -408,7 +418,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      *
      * @return string
      */
-    protected function getFieldPropertyPath(EntityDefinitionConfig $config, $fieldName)
+    private function getFieldPropertyPath(EntityDefinitionConfig $config, $fieldName)
     {
         $field = $config->findField($fieldName);
         if (null === $field) {
@@ -424,7 +434,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      *
      * @return string
      */
-    protected function buildEntityKey($entityClass, $entityId)
+    private function buildEntityKey($entityClass, $entityId)
     {
         if (is_array($entityId)) {
             $id = [];

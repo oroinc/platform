@@ -48,10 +48,7 @@ class InitializeCriteria implements ProcessorInterface
             return;
         }
 
-        $entityClass = $this->doctrineHelper->getManageableEntityClass(
-            $context->getClassName(),
-            $context->getConfig()
-        );
+        $entityClass = $context->getManageableEntityClass($this->doctrineHelper);
         if ($entityClass) {
             $context->setCriteria(new Criteria($this->entityClassResolver));
         } else {

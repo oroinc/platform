@@ -35,7 +35,52 @@ class NestedAssociationTest extends RestJsonApiTestCase
                     'type'          => $entityType,
                     'id'            => '<toString(@test_entity->id)>',
                     'attributes'    => [
-                        'name' => null
+                        'name' => [
+                            'firstName' => null,
+                            'lastName'  => 'test'
+                        ]
+                    ],
+                    'relationships' => [
+                        'relatedEntity' => [
+                            'data' => [
+                                'type' => $this->getEntityType(TestRelatedEntity::class),
+                                'id'   => '<toString(@test_related_entity1->id)>'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+        $result = self::jsonToArray($response->getContent());
+        $attributes = $result['data']['attributes'];
+        self::assertArrayNotHasKey('relatedClass', $attributes);
+        self::assertArrayNotHasKey('relatedId', $attributes);
+    }
+
+    public function testGetWithTitleMetaProperty()
+    {
+        /** @var TestEntity $entity */
+        $entity = $this->getReference('test_entity');
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $response = $this->get(
+            ['entity' => $entityType, 'id' => (string)$entity->getId()],
+            ['meta' => 'title']
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type'          => $entityType,
+                    'id'            => '<toString(@test_entity->id)>',
+                    'meta'          => [
+                        'title' => 'test ' . TestRelatedEntity::class
+                    ],
+                    'attributes'    => [
+                        'name' => [
+                            'firstName' => null,
+                            'lastName'  => 'test'
+                        ]
                     ],
                     'relationships' => [
                         'relatedEntity' => [

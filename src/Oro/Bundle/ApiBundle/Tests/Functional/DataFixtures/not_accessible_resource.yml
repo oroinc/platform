@@ -1,0 +1,24 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee:
+    test_employee{1..2}:
+        name: 'Test Employee <current()>'
+        owner: '@business_unit'
+        organization: '@organization'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestBuyer:
+    test_buyer{1..2}:
+        name: 'Test Buyer <current()>'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
+    test_department:
+        name: Test Department
+        staff: ['@test_employee1', '@test_buyer1']
+        owner: '@business_unit'
+        organization: '@organization'
+
+Oro\Bundle\TestFrameworkBundle\Entity\TestProduct:
+    test_product:
+        name: Test Product
