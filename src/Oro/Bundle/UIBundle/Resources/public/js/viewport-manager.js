@@ -19,18 +19,8 @@ define(function(require) {
             min: 1100
         },
         {
-            name: 'strict-tablet',
-            max: 1099,
-            min: 992
-        },
-        {
             name: 'tablet',
             max: 1099
-        },
-        {
-            name: 'strict-tablet-small',
-            max: 992,
-            min: 640
         },
         {
             name: 'tablet-small',
