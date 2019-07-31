@@ -100,26 +100,6 @@ services:
     oro_message_queue.client.created_queues:
         class: 'Oro\Component\MessageQueue\Transport\QueueCollection'
 
-    oro_message_queue.client.meta.topics_command:
-        class: 'Oro\Component\MessageQueue\Client\Meta\TopicsCommand'
-        arguments:
-            - '@oro_message_queue.client.meta.topic_meta_registry'
-        tags:
-            - { name: console.command }
-
-    oro_message_queue.client.meta.destinations_command:
-        class: 'Oro\Component\MessageQueue\Client\Meta\DestinationsCommand'
-        tags:
-            - { name: console.command }
-
-    oro_message_queue.client.create_queues_command:
-        class: 'Oro\Component\MessageQueue\Client\CreateQueuesCommand'
-        arguments:
-            - '@oro_message_queue.client.driver'
-            - '@oro_message_queue.client.meta.destination_meta_registry'
-        tags:
-            - { name: console.command }
-
     oro_message_queue.profiler.message_queue_collector:
         class: 'Oro\Bundle\MessageQueueBundle\Profiler\MessageQueueCollector'
         public: false

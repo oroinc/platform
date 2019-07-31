@@ -61,7 +61,7 @@ class InvalidateCacheActionScheduledHandlerTest extends \PHPUnit\Framework\TestC
 
         $this->deferredScheduler->expects(static::once())
             ->method('removeScheduleForCommand')
-            ->with(InvalidateCacheScheduleCommand::NAME, $arguments);
+            ->with(InvalidateCacheScheduleCommand::getDefaultName(), $arguments);
 
         $this->deferredScheduler->expects(static::never())
             ->method('addSchedule');
@@ -98,11 +98,11 @@ class InvalidateCacheActionScheduledHandlerTest extends \PHPUnit\Framework\TestC
 
         $this->deferredScheduler->expects(static::once())
             ->method('removeScheduleForCommand')
-            ->with(InvalidateCacheScheduleCommand::NAME, $arguments);
+            ->with(InvalidateCacheScheduleCommand::getDefaultName(), $arguments);
 
         $this->deferredScheduler->expects(static::once())
             ->method('addSchedule')
-            ->with(InvalidateCacheScheduleCommand::NAME, $arguments, $cronDefinition);
+            ->with(InvalidateCacheScheduleCommand::getDefaultName(), $arguments, $cronDefinition);
 
         $this->deferredScheduler->expects(static::once())
             ->method('flush');

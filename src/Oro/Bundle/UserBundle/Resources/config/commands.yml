@@ -3,6 +3,9 @@ services:
         public: false
 
     Oro\Bundle\UserBundle\Command\CreateUserCommand:
+        arguments:
+            - '@oro_user.manager'
+            - '@doctrine.orm.entity_manager'
         tags:
             - { name: console.command }
 
@@ -17,9 +20,13 @@ services:
             - { name: console.command }
 
     Oro\Bundle\UserBundle\Command\ListUserCommand:
+        arguments:
+            - '@doctrine'
         tags:
             - { name: console.command }
 
     Oro\Bundle\UserBundle\Command\UpdateUserCommand:
+        parent: Oro\Bundle\UserBundle\Command\CreateUserCommand
+        public: false
         tags:
             - { name: console.command }

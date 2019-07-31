@@ -43,6 +43,7 @@ class HtmlTagHelper
     public function sanitize($string)
     {
         $transformer = new SanitizeHTMLTransformer(
+            $this->htmlTagProvider,
             implode(',', $this->htmlTagProvider->getAllowedElements()),
             $this->cacheDir
         );
@@ -59,7 +60,11 @@ class HtmlTagHelper
     public function purify($string)
     {
         if (!$this->purifyTransformer) {
-            $this->purifyTransformer = new SanitizeHTMLTransformer(null, $this->cacheDir);
+            $this->purifyTransformer = new SanitizeHTMLTransformer(
+                $this->htmlTagProvider,
+                null,
+                $this->cacheDir
+            );
         }
 
         return trim($this->purifyTransformer->transform($string));
@@ -114,7 +119,7 @@ class HtmlTagHelper
      */
     public function escape($string)
     {
-        $config = \HTMLPurifier_Config::createDefault();
+        $config = \HTMLPurifier_HTML5Config::createDefault();
         $config->set('Cache.SerializerPath', $this->cacheDir);
         $config->set('Cache.SerializerPermissions', 0775);
         $config->set('Attr.EnableID', true);

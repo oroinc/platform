@@ -247,22 +247,17 @@ class RouteOverridePathTest extends RestJsonApiTestCase
 
         self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        // "attributes" and "relationships" sections will be added in CRM-8250
         $this->assertResponseContains(
             [
                 'data' => [
                     [
-                        'type'       => $employeeEntityType,
-                        'id'         => '<toString(@employee1->id)>',
-                        'attributes' => [
-                            'name' => 'Employee 1'
-                        ]
+                        'type' => $employeeEntityType,
+                        'id'   => '<toString(@employee1->id)>'
                     ],
                     [
-                        'type'       => $employeeEntityType,
-                        'id'         => '<toString(@employee2->id)>',
-                        'attributes' => [
-                            'name' => 'Employee 2'
-                        ]
+                        'type' => $employeeEntityType,
+                        'id'   => '<toString(@employee2->id)>'
                     ]
                 ]
             ],
@@ -284,27 +279,22 @@ class RouteOverridePathTest extends RestJsonApiTestCase
 
         self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        // "attributes" and "relationships" sections will be added in CRM-8250
         $this->assertResponseContains(
             [
                 'data' => [
                     [
-                        'type'       => $employeeEntityType,
-                        'id'         => '<toString(@employee1->id)>',
-                        'meta'       => [
+                        'type' => $employeeEntityType,
+                        'id'   => '<toString(@employee1->id)>',
+                        'meta' => [
                             'title' => 'Employee 1'
-                        ],
-                        'attributes' => [
-                            'name' => 'Employee 1'
                         ]
                     ],
                     [
-                        'type'       => $employeeEntityType,
-                        'id'         => '<toString(@employee2->id)>',
-                        'meta'       => [
+                        'type' => $employeeEntityType,
+                        'id'   => '<toString(@employee2->id)>',
+                        'meta' => [
                             'title' => 'Employee 2'
-                        ],
-                        'attributes' => [
-                            'name' => 'Employee 2'
                         ]
                     ]
                 ]

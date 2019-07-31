@@ -10,9 +10,10 @@ data:
           -
             type: 'testapiemployees'
             id: 'auto'
-included:
-  -
-    type: 'testapiemployees'
-    id: 'auto'
-    attributes:
-      name: 'TestEmployee'
+# "included" section will be added in CRM-8250
+#included:
+#  -
+#    type: 'testapiemployees'
+#    id: 'auto'
+#    attributes:
+#      name: 'TestEmployee'

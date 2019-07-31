@@ -165,9 +165,29 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->strategy->process($entity));
     }
 
+    public function testProcessEmptyFieldName()
+    {
+        $entity = new FieldConfigModel('', 'manyToOne');
+
+        $this->fieldTypeProvider->expects($this->once())
+            ->method('getSupportedFieldTypes')
+            ->willReturn(['string', 'integer', 'date']);
+
+        $this->strategyHelper->expects($this->atLeastOnce())
+            ->method('addValidationErrors')
+            ->with(['oro.entity_config.import.message.invalid_field_type']);
+
+        $this->validationHelper->expects($this->never())
+            ->method('registerField');
+
+        self::assertNull($this->strategy->process($entity));
+    }
+
     public function testProcessValidationErrors()
     {
+        $entityModel = new EntityConfigModel(\stdClass::class);
         $entity = new FieldConfigModel('testFieldName', 'integer');
+        $entity->setEntity($entityModel);
 
         $this->fieldTypeProvider->expects($this->once())
             ->method('getSupportedFieldTypes')
@@ -184,6 +204,10 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         $this->strategyHelper->expects($this->once())
             ->method('addValidationErrors')
             ->with(['first error message', 'second error message'], $this->context);
+
+        $this->validationHelper->expects($this->once())
+            ->method('findExtendFieldConfig')
+            ->willReturn(null);
 
         self::assertNull($this->strategy->process($entity));
     }

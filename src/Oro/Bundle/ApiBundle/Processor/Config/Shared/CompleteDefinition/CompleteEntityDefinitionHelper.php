@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
@@ -438,7 +439,7 @@ class CompleteEntityDefinitionHelper
     ) {
         $this->associationHelper->completeAssociation(
             $field,
-            $this->resolveEntityClass($associationMapping['targetEntity'], $entityOverrideProvider),
+            $this->resolveAssociationEntityClass($associationMapping['targetEntity'], $entityOverrideProvider),
             $version,
             $requestType,
             $extras
@@ -670,6 +671,25 @@ class CompleteEntityDefinitionHelper
         }
 
         return $definition;
+    }
+
+    /**
+     * @param string                          $entityClass
+     * @param EntityOverrideProviderInterface $entityOverrideProvider
+     *
+     * @return string
+     */
+    private function resolveAssociationEntityClass(
+        string $entityClass,
+        EntityOverrideProviderInterface $entityOverrideProvider
+    ): string {
+        // use EntityIdentifier as a target class for associations based on Doctrine's inheritance mapping
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
+        if (!$metadata->isInheritanceTypeNone()) {
+            return EntityIdentifier::class;
+        }
+
+        return $this->resolveEntityClass($entityClass, $entityOverrideProvider);
     }
 
     /**

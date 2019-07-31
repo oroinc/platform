@@ -5,19 +5,39 @@ use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Oro\Component\PhpUtils\PhpIniUtil;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InstallPackageCommand extends ContainerAwareCommand
+/**
+ * Forces installing of dependencies. No confirmation will be ask
+ */
+class InstallPackageCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:package:install';
+
+    /** @var PackageManager */
+    private $packageManager;
+
+    /**
+     * @param PackageManager $packageManager
+     */
+    public function __construct(PackageManager $packageManager)
+    {
+        $this->packageManager = $packageManager;
+        parent::__construct();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
-            ->setName('oro:package:install')
             ->addArgument('package', InputArgument::REQUIRED, 'Package name to be installed')
             ->addArgument('version', InputArgument::OPTIONAL, 'Package version to be installed')
             ->addOption(
@@ -29,6 +49,10 @@ class InstallPackageCommand extends ContainerAwareCommand
             ->setDescription('Installs package from repository');
     }
 
+    /**
+     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var DialogHelper $dialog */
@@ -51,10 +75,7 @@ class InstallPackageCommand extends ContainerAwareCommand
         $forceDependenciesInstalling = $input->getOption('force');
         $verbose = $input->getOption('verbose');
 
-        /** @var PackageManager $manager */
-        $manager = $this->getContainer()->get('oro_distribution.package_manager');
-
-        if ($manager->isPackageInstalled($packageName)) {
+        if ($this->packageManager->isPackageInstalled($packageName)) {
             return $output->writeln(
                 sprintf('<error>%s has been already installed. Try to update it</error>', $packageName)
             );
@@ -66,7 +87,9 @@ class InstallPackageCommand extends ContainerAwareCommand
             false
         );
 
-        if (!$forceDependenciesInstalling && $requirements = $manager->getRequirements($packageName, $packageVersion)) {
+        $requirements = $this->packageManager->getRequirements($packageName, $packageVersion);
+
+        if (!$forceDependenciesInstalling && $requirements) {
             $requirementsString = array_reduce(
                 $requirements,
                 function ($result, PackageRequirement $requirement) {
@@ -87,7 +110,7 @@ class InstallPackageCommand extends ContainerAwareCommand
         }
 
         try {
-            $manager->install($packageName, $packageVersion, $loadDemoData);
+            $this->packageManager->install($packageName, $packageVersion, $loadDemoData);
         } catch (\Exception $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
             if ($verbose && $e instanceof VerboseException) {

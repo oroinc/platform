@@ -5,7 +5,8 @@ namespace Oro\Bundle\NavigationBundle\Command;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,10 +14,25 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Clears `oro_navigation_history` depending on datetime interval.
  */
-class ClearNavigationHistoryCommand extends ContainerAwareCommand implements CronCommandInterface
+class ClearNavigationHistoryCommand extends Command implements CronCommandInterface
 {
-    const CLEAN_BEFORE_PARAM = 'interval';
-    const DEFAULT_INTERVAL = '1 day';
+    protected static $defaultName = 'oro:navigation:history:clear';
+
+    private const CLEAN_BEFORE_PARAM = 'interval';
+    private const DEFAULT_INTERVAL = '1 day';
+
+    /** @var RegistryInterface */
+    private $doctrine;
+
+    /**
+     * @param RegistryInterface $doctrine
+     */
+    public function __construct(RegistryInterface $doctrine)
+    {
+        $this->doctrine = $doctrine;
+
+        parent::__construct();
+    }
 
     /**
      * Run command at 00:05 every day.
@@ -42,7 +58,6 @@ class ClearNavigationHistoryCommand extends ContainerAwareCommand implements Cro
     public function configure()
     {
         $this
-            ->setName('oro:navigation:history:clear')
             ->addOption(
                 self::CLEAN_BEFORE_PARAM,
                 'i',
@@ -84,7 +99,7 @@ class ClearNavigationHistoryCommand extends ContainerAwareCommand implements Cro
             }
 
             /** @var HistoryItemRepository $historyItemRepository */
-            $historyItemRepository = $this->getContainer()->get('doctrine.orm.entity_manager')
+            $historyItemRepository = $this->doctrine->getEntityManagerForClass(NavigationHistoryItem::class)
                 ->getRepository(NavigationHistoryItem::class);
 
             $deletedCnt = $historyItemRepository->clearHistoryItems($cleanBefore);

@@ -9,15 +9,20 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Updates user
+ */
 class UpdateUserCommand extends CreateUserCommand
 {
+    /** @var string */
+    protected static $defaultName = 'oro:user:update';
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('oro:user:update')
             ->setDescription('Update user.')
             ->addArgument(
                 'user-name',
@@ -45,7 +50,7 @@ class UpdateUserCommand extends CreateUserCommand
     {
         $username = $input->getArgument('user-name');
         /** @var User $user */
-        $user     = $this->getUserManager()->findUserByUsername($username);
+        $user     = $this->userManager->findUserByUsername($username);
         $options  = $input->getOptions();
 
         if (!$user) {

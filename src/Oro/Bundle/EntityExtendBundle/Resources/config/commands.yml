@@ -12,7 +12,8 @@ services:
             - '@kernel'
 
     Oro\Bundle\EntityExtendBundle\Command\CacheCheckCommand:
-        class: Oro\Bundle\EntityExtendBundle\Command\CacheCheckCommand
+        arguments:
+            - '@oro_entity_extend.tools.dumper'
         tags:
             - { name: console.command }
 
@@ -32,20 +33,25 @@ services:
             - { name: console.command }
 
     Oro\Bundle\EntityExtendBundle\Command\MigrationUpdateConfigCommand:
-        class: Oro\Bundle\EntityExtendBundle\Command\MigrationUpdateConfigCommand
         arguments:
             - '@oro_entity_extend.migration.options_parser'
             - '@oro_entity_extend.migration.config_processor'
+            - '%oro_entity_extend.migration.config_processor.options.path%'
         tags:
             - { name: console.command }
 
     Oro\Bundle\EntityExtendBundle\Command\RouterCacheClearCommand:
-        class: Oro\Bundle\EntityExtendBundle\Command\RouterCacheClearCommand
+        arguments:
+            - '@kernel'
+            - '@?router'
+            - '@filesystem'
+            - '%kernel.cache_dir%'
         tags:
             - { name: console.command }
 
     Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand:
-        class: Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand
+        arguments:
+            - '@oro_entity_extend.tools.dumper'
         tags:
             - { name: console.command }
 

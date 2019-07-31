@@ -22,6 +22,7 @@ class LoadNestedAssociationData extends AbstractFixture
         $manager->flush();
 
         $entity = new TestEntity();
+        $entity->setLastName('test');
         $entity->setRelatedClass(TestRelatedEntity::class);
         $entity->setRelatedId($this->getReference('test_related_entity1')->id);
         $this->addReference('test_entity', $entity);

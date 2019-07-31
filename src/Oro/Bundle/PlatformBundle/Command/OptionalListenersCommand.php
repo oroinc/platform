@@ -2,20 +2,37 @@
 
 namespace Oro\Bundle\PlatformBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class OptionalListenersCommand extends ContainerAwareCommand
+/**
+ * Get list of Doctrine listeners which can be disabled during process console command
+ */
+class OptionalListenersCommand extends Command
 {
-    const NAME = 'oro:platform:optional-listeners';
+    protected static $defaultName = 'oro:platform:optional-listeners';
+
+    /** @var OptionalListenerManager */
+    private $optionalListenerManager;
+
+    /**
+     * @param OptionalListenerManager $optionalListenerManager
+     */
+    public function __construct(OptionalListenerManager $optionalListenerManager)
+    {
+        $this->optionalListenerManager = $optionalListenerManager;
+
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName(self::NAME)
+        $this
             ->setDescription('Get list of Doctrine listeners which can be disabled during process console command');
     }
 
@@ -24,9 +41,8 @@ class OptionalListenersCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $listeners = $this->getContainer()->get('oro_platform.optional_listeners.manager')->getListeners();
         $output->writeln('List of optional listeners:');
-        foreach ($listeners as $listener) {
+        foreach ($this->optionalListenerManager->getListeners() as $listener) {
             $output->writeln(sprintf('  <comment>> %s</comment>', $listener));
         }
     }

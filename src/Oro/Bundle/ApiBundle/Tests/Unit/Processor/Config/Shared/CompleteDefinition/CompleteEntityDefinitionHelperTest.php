@@ -296,11 +296,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->exclusionProviderRegistry->expects(self::exactly(2))
@@ -376,11 +379,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->exclusionProviderRegistry->expects(self::exactly(2))
@@ -440,11 +446,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->exclusionProviderRegistry->expects(self::exactly(2))
@@ -522,11 +531,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->exclusionProviderRegistry->expects(self::exactly(2))
@@ -610,11 +622,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->exclusionProviderRegistry->expects(self::exactly(2))
@@ -699,11 +714,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->exclusionProviderRegistry->expects(self::exactly(2))
@@ -786,11 +804,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->exclusionProviderRegistry->expects(self::exactly(2))
@@ -870,11 +891,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->exclusionProviderRegistry->expects(self::exactly(2))
@@ -1024,11 +1048,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->exclusionProviderRegistry->expects(self::exactly(2))
@@ -1111,11 +1138,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->exclusionProviderRegistry->expects(self::exactly(2))
@@ -1334,11 +1364,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->exclusionProviderRegistry->expects(self::exactly(2))
@@ -1884,11 +1917,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
 
         $this->configProvider->expects(self::once())
@@ -2539,11 +2575,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->exclusionProviderRegistry->expects(self::exactly(2))
@@ -2643,11 +2682,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->exclusionProviderRegistry->expects(self::exactly(2))
@@ -2753,11 +2795,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->exclusionProviderRegistry->expects(self::exactly(2))
@@ -2872,11 +2917,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($rootEntityMetadata);
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->exclusionProviderRegistry->expects(self::exactly(2))

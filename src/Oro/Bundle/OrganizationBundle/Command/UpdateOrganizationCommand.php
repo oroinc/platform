@@ -2,22 +2,32 @@
 
 namespace Oro\Bundle\OrganizationBundle\Command;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpdateOrganizationCommand extends ContainerAwareCommand
+/**
+ * Update organization by name
+ */
+class UpdateOrganizationCommand extends Command
 {
-    /** @var OrganizationManager */
-    protected $organizationManager;
+    protected static $defaultName = 'oro:organization:update';
 
-    /** @var EntityManagerInterface */
-    protected $entityManager;
+    /** @var OrganizationManager */
+    private $organizationManager;
+
+    /**
+     * @param OrganizationManager $organizationManager
+     */
+    public function __construct(OrganizationManager $organizationManager)
+    {
+        $this->organizationManager = $organizationManager;
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -25,7 +35,6 @@ class UpdateOrganizationCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('oro:organization:update')
             ->setDescription('Update organization by name.')
             ->addArgument('organization-name', InputArgument::REQUIRED, 'Organization name to update')
             ->addOption('organization-name', null, InputOption::VALUE_OPTIONAL, 'Organization name')
@@ -39,7 +48,7 @@ class UpdateOrganizationCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $organizationName = $input->getArgument('organization-name');
-        $organization     = $this->getOrganizationManager()->getOrganizationByName($organizationName);
+        $organization     = $this->organizationManager->getOrganizationByName($organizationName);
         $options          = $input->getOptions();
 
         if (!$organization) {
@@ -66,30 +75,6 @@ class UpdateOrganizationCommand extends ContainerAwareCommand
             }
         }
 
-        $this->getOrganizationManager()->updateOrganization($organization);
-    }
-
-    /**
-     * @return OrganizationManager
-     */
-    protected function getOrganizationManager()
-    {
-        if (!$this->organizationManager) {
-            $this->organizationManager = $this->getContainer()->get('oro_organization.organization_manager');
-        }
-
-        return $this->organizationManager;
-    }
-
-    /**
-     * @return EntityManagerInterface
-     */
-    protected function getEntityManager()
-    {
-        if (!$this->entityManager) {
-            $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
-        }
-
-        return $this->entityManager;
+        $this->organizationManager->updateOrganization($organization);
     }
 }

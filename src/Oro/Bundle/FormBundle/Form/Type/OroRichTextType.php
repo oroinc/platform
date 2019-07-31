@@ -94,6 +94,7 @@ class OroRichTextType extends AbstractType
     {
         if (null !== $options['wysiwyg_options']['valid_elements']) {
             $builder->addModelTransformer(new SanitizeHTMLTransformer(
+                $this->htmlTagProvider,
                 $options['wysiwyg_options']['valid_elements'],
                 $this->cacheDir
             ));
@@ -133,6 +134,14 @@ class OroRichTextType extends AbstractType
             'paste_data_images'  => false,
             'assets_base_url'    => $assetsBaseUrl
         ];
+
+        if ($this->htmlTagProvider->isExtendedPurification()) {
+            $this->addExtendedModeParameters($defaultWysiwygOptions);
+        }
+
+        if (!$this->htmlTagProvider->isPurificationNeeded()) {
+            $this->addDisabledModeParameters($defaultWysiwygOptions);
+        }
 
         $defaults = [
             'wysiwyg_enabled' => (bool) $this->configManager->get('oro_form.wysiwyg_enabled'),
@@ -188,6 +197,36 @@ class OroRichTextType extends AbstractType
                 return $attr;
             }
         );
+    }
+
+    /**
+     * @param array $options
+     */
+    private function addExtendedModeParameters(array &$options)
+    {
+        $options = array_merge($options, [
+            'valid_children' => '+body[style]',
+            'inline_styles' => true,
+        ]);
+    }
+
+    /**
+     * @param array $options
+     */
+    private function addDisabledModeParameters(array &$options)
+    {
+        $options = array_merge($options, [
+            'verify_html' => false,
+            'cleanup_on_startup' => false,
+            'trim_span_elements' => false,
+            'cleanup' => false,
+            'convert_urls' => false,
+            'force_br_newlines' => false,
+            'force_p_newlines' => false,
+            'forced_root_block' => '',
+            'valid_children' => '+body[style]',
+            'inline_styles' => true,
+        ]);
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,15 +10,29 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * The command that checks whether the application meets system requirements.
  */
-class CheckRequirementsCommand extends ContainerAwareCommand
+class CheckRequirementsCommand extends Command
 {
+    protected static $defaultName = 'oro:check-requirements';
+
+    /** @var string */
+    private $projectDir;
+
+    /**
+     * @param string $projectDir
+     */
+    public function __construct(string $projectDir)
+    {
+        $this->projectDir = $projectDir;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('oro:check-requirements')
             ->setDescription('Checks that the application meets the system requirements.')
             ->setHelp(
                 <<<EOT
@@ -76,11 +90,7 @@ EOT
     protected function getRequirements(InputInterface $input)
     {
         if (!class_exists('OroRequirements')) {
-            require_once $this->getContainer()->getParameter('kernel.project_dir')
-                . DIRECTORY_SEPARATOR
-                .'var'
-                . DIRECTORY_SEPARATOR
-                . 'OroRequirements.php';
+            require_once $this->projectDir . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'OroRequirements.php';
         }
 
         return new \OroRequirements($input->getOption('env'));

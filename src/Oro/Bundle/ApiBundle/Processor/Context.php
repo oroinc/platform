@@ -25,6 +25,7 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
@@ -131,6 +132,17 @@ class Context extends NormalizeResultContext implements ContextInterface
     public function setClassName($className)
     {
         $this->set(self::CLASS_NAME, $className);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getManageableEntityClass(DoctrineHelper $doctrineHelper)
+    {
+        return $doctrineHelper->getManageableEntityClass(
+            $this->getClassName(),
+            $this->getConfig()
+        );
     }
 
     /**

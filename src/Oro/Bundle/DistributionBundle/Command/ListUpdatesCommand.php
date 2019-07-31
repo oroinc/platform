@@ -1,26 +1,47 @@
 <?php
+
 namespace Oro\Bundle\DistributionBundle\Command;
 
 use Oro\Bundle\DistributionBundle\Console\Grid;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ListUpdatesCommand extends ContainerAwareCommand
+/**
+ * Lists available updates for installed packages
+ */
+class ListUpdatesCommand extends Command
 {
-    protected function configure()
+    /** @var string */
+    protected static $defaultName = 'oro:package:updates';
+
+    /** @var PackageManager */
+    private $packageManager;
+
+    /**
+     * @param PackageManager $packageManager
+     */
+    public function __construct(PackageManager $packageManager)
     {
-        $this
-            ->setName('oro:package:updates')
-            ->setDescription('Lists available updates for installed packages');
+        $this->packageManager = $packageManager;
+        parent::__construct();
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function configure()
+    {
+        $this->setDescription('Lists available updates for installed packages');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var PackageManager $manager */
-        $manager = $this->getContainer()->get('oro_distribution.package_manager');
-        $updates = $manager->getAvailableUpdates();
+        $updates = $this->packageManager->getAvailableUpdates();
         if ($updates) {
             $output->writeln('<info>Following updates are available:</info>');
 

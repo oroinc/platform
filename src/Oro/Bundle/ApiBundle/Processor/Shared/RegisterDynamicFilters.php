@@ -229,10 +229,7 @@ class RegisterDynamicFilters extends RegisterFilters
      */
     private function getFilter(string $propertyPath, Context $context): ?StandaloneFilter
     {
-        $entityClass = $this->doctrineHelper->getManageableEntityClass(
-            $context->getClassName(),
-            $context->getConfig()
-        );
+        $entityClass = $context->getManageableEntityClass($this->doctrineHelper);
         if (!$entityClass) {
             // only manageable entities or resources based on manageable entities are supported
             return null;

@@ -12,7 +12,7 @@ parameters:
         dataType: 'integer'
         required: false
         actualType: 'collection'
-        subType: 'testapipeople'
+        subType: 'entityidentifiers'
 response:
     id:
         dataType: 'integer'
@@ -27,4 +27,4 @@ response:
         dataType: 'integer'
         required: false
         actualType: 'collection'
-        subType: 'testapipeople'
+        subType: 'entityidentifiers'
