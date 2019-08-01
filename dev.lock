@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "44544ba88cd7e23959d8aa2f2f1193ea",
+    "content-hash": "277ed8a3e577dbf64131024590429a38",
     "packages": [
         {
             "name": "akeneo/batch-bundle",
@@ -5022,6 +5022,20 @@
             "dist": {
                 "type": "tar",
                 "url": "https://registry.npmjs.org/bootstrap/-/bootstrap-4.3.1.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/css-vars-ponyfill",
+            "version": "2.0.2",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/css-vars-ponyfill/-/css-vars-ponyfill-2.0.2.tgz",
                 "reference": null,
                 "shasum": null
             },
