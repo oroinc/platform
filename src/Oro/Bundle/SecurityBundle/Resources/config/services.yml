@@ -1,48 +1,4 @@
 parameters:
-    oro_security.acl.base_manager.class:                       Oro\Bundle\SecurityBundle\Acl\Persistence\BaseAclManager
-    oro_security.acl.manager.class:                            Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager
-    oro_security.acl.sid_manager.class:                        Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager
-    oro_security.acl.ace_provider.class:                       Oro\Bundle\SecurityBundle\Acl\Persistence\AceManipulationHelper
-    oro_security.acl.privilege_repository.class:               Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository
-    oro_security.acl.extension_selector.class:                 Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector
-    oro_security.acl.extension.entity.class:                   Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension
-    oro_security.acl.extension.action.class:                   Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension
-    oro_security.acl.provider.class:                           Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclProvider
-    oro_security.acl.permission_granting_strategy.class:       Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy
-    oro_security.acl.permission_map.class:                     Oro\Bundle\SecurityBundle\Acl\Permission\PermissionMap
-    oro_security.acl.permission_manager.class:                 Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager
-    oro_security.acl.object_identity_factory.class:            Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory
-    oro_security.acl.object_identity_retrieval_strategy.class: Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityRetrievalStrategy
-    oro_security.acl.object_id_accessor.class:                 Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor
-
-    oro_security.acl.group_provider.chain.class:               Oro\Bundle\SecurityBundle\Acl\Group\ChainAclGroupProvider
-
-    oro_security.owner.decision_maker.class:                   Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker
-
-    oro_security.type.oro_acl_access_level_selector.class:     Oro\Bundle\SecurityBundle\Form\Type\AclAccessLevelSelectorType
-    oro_security.type.oro_acl_label.class:                     Oro\Bundle\SecurityBundle\Form\Type\ObjectLabelType
-    oro_security.type.oro_acl_collection.class:                Oro\Bundle\SecurityBundle\Form\Type\PrivilegeCollectionType
-    oro_security.type.oro_acl_permission_collection.class:     Oro\Bundle\SecurityBundle\Form\Type\PermissionCollectionType
-    oro_security.type.oro_acl_privilege.class:                 Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeType
-
-    oro_security.listener.controller.class:                    Oro\Bundle\SecurityBundle\EventListener\ControllerListener
-
-    oro_security.token.factory.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
-    oro_security.token.factory.organization_rememberme.class: Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory
-
-    oro_security.search.acl_helper.class:                      Oro\Bundle\SecurityBundle\Search\AclHelper
-    oro_security.orm.ownership_sql_walker_builder.class:       Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder
-    oro_security.ownership_tree_provider.class:                Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider
-    oro-security.authentication.listener.basic.class:          Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationBasicAuthenticationListener
-    oro_security.authentication.provider.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
-    oro_security.authentication.provider.organization_rememberme.class: Oro\Bundle\SecurityBundle\Authentication\Provider\OrganizationRememberMeAuthenticationProvider
-
-    oro_security.listener.refresh_context_listener.class:      Oro\Bundle\SecurityBundle\EventListener\RefreshContextListener
-    oro_security.listener.api_listener.class:                  Oro\Bundle\SecurityBundle\EventListener\ApiEventListener
-    oro_security.listener.search_listener.class:               Oro\Bundle\SecurityBundle\EventListener\SearchListener
-
-    oro_security.form.extension.aclprotected_type.class:       Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
-
     oro_security.allowed_protocols: ['http', 'https']
 
 services:
@@ -86,30 +42,30 @@ services:
             - { name: oro_service_link, service: oro_entity.orm.entity_class_resolver }
 
     oro_security.acl.base_manager:
-        class: '%oro_security.acl.base_manager.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Persistence\BaseAclManager
 
     oro_security.acl.manager:
-        class: '%oro_security.acl.manager.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_security.acl.object_identity_factory'
             - '@oro_security.acl.extension_selector'
-            - "@?security.acl.dbal.provider"
+            - '@?security.acl.dbal.provider'
             - '@oro_security.acl.ace_provider'
         calls:
             - [ setBaseAclManager, [ '@oro_security.acl.base_manager' ] ]
 
     oro_security.acl.privilege_repository:
-        class: '%oro_security.acl.privilege_repository.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository
         arguments:
             - '@oro_security.acl.manager'
             - '@translator'
 
     oro_security.acl.sid_manager:
-        class: '%oro_security.acl.sid_manager.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager
         arguments:
-            - "@?security.acl.dbal.provider"
+            - '@?security.acl.dbal.provider'
         calls:
             - [ setBaseAclManager, [ '@oro_security.acl.base_manager' ] ]
 
@@ -125,17 +81,17 @@ services:
 
     oro_security.acl.ace_provider:
         public: false
-        class: '%oro_security.acl.ace_provider.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Persistence\AceManipulationHelper
 
     oro_security.acl.extension_selector:
         public: false
-        class: '%oro_security.acl.extension_selector.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector
         arguments:
             - '@oro_security.acl.object_id_accessor'
 
     oro_security.acl.extension.entity:
         public: false
-        class: '%oro_security.acl.extension.entity.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension
         arguments:
             - '@oro_security.acl.object_id_accessor'
             - '@oro_entity.orm.entity_class_resolver'
@@ -151,7 +107,7 @@ services:
 
     oro_security.acl.extension.action:
         public: false
-        class: '%oro_security.acl.extension.action.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension
         arguments:
             - '@oro_security.action_metadata_provider'
         tags:
@@ -159,17 +115,17 @@ services:
 
     oro_security.acl.provider:
         public: false
-        class: '%oro_security.acl.provider.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclProvider
         arguments:
             - '@oro_security.acl.object_identity_factory'
         calls:
-            - [setUnderlyingCache, ["@security.acl.underlying.cache"]]
+            - [setUnderlyingCache, ['@security.acl.underlying.cache']]
 
     security.acl.underlying.cache:
         public: false
         class: Oro\Bundle\SecurityBundle\Acl\Cache\UnderlyingAclCache
         arguments:
-            - "@security.acl.underlying.cache.doctrine.cache_impl"
+            - '@security.acl.underlying.cache.doctrine.cache_impl'
 
     security.acl.underlying.cache.doctrine.cache_impl:
         public: false
@@ -187,15 +143,15 @@ services:
 
     oro_security.acl.permission_granting_strategy:
         public: false
-        class: '%oro_security.acl.permission_granting_strategy.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy
         calls:
-             - [setAuditLogger, ["@?security.acl.audit_logger"]]
-             - [setSecurityMetadataProvider, ["@oro_security.entity_security_metadata_provider_link"]]
-             - [setContext, ["@oro_security.acl.voter_link"]]
+             - [setAuditLogger, ['@?security.acl.audit_logger']]
+             - [setSecurityMetadataProvider, ['@oro_security.entity_security_metadata_provider_link']]
+             - [setContext, ['@oro_security.acl.voter_link']]
 
     oro_security.acl.permission_map:
         public: false
-        class: '%oro_security.acl.permission_map.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Permission\PermissionMap
         arguments:
             - '@oro_security.acl.extension_selector'
 
@@ -205,7 +161,7 @@ services:
             - [ setNamespace, [ 'oro_security_permission' ] ]
 
     oro_security.acl.permission_manager:
-        class: '%oro_security.acl.permission_manager.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_security.configuration.provider.permission_configuration'
@@ -221,45 +177,45 @@ services:
             - '@oro_security.configuration.provider.configurable_permission_configuration'
 
     oro_security.filter.privilege_capability_filter:
-        class: 'Oro\Bundle\SecurityBundle\Filter\AclPrivilegeCapabilityFilter'
+        class: Oro\Bundle\SecurityBundle\Filter\AclPrivilegeCapabilityFilter
         public: false
         tags:
             - { name: oro.security.filter.acl_privilege }
 
     oro_security.filter.privilege_entity_filter:
-        class: 'Oro\Bundle\SecurityBundle\Filter\AclPrivilegeEntityFilter'
+        class: Oro\Bundle\SecurityBundle\Filter\AclPrivilegeEntityFilter
         public: false
         tags:
             - { name: oro.security.filter.acl_privilege }
 
     oro_security.filter.configurable_permission_filter:
-        class: 'Oro\Bundle\SecurityBundle\Filter\AclPrivilegeConfigurableFilter'
+        class: Oro\Bundle\SecurityBundle\Filter\AclPrivilegeConfigurableFilter
         arguments:
             - '@oro_security.acl.configurable_permission_provider'
 
     oro_security.acl.object_identity_factory:
-        class: '%oro_security.acl.object_identity_factory.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory
         arguments:
             - '@oro_security.acl.extension_selector'
 
     oro_security.acl.object_identity_retrieval_strategy:
         public: false
-        class: '%oro_security.acl.object_identity_retrieval_strategy.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityRetrievalStrategy
         arguments:
             - '@oro_security.acl.object_identity_factory'
 
     oro_security.acl.object_id_accessor:
         public: false
-        class: '%oro_security.acl.object_id_accessor.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor
         arguments:
             - '@oro_entity.doctrine_helper'
 
     oro_security.acl.group_provider.chain:
-        class: '%oro_security.acl.group_provider.chain.class%'
+        class: Oro\Bundle\SecurityBundle\Acl\Group\ChainAclGroupProvider
 
     oro_security.owner.decision_maker:
         public: false
-        class: '%oro_security.owner.decision_maker.class%'
+        class: Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker
         arguments:
             - '@oro_security.ownership_tree_provider.chain'
             - '@oro_security.acl.object_id_accessor'
@@ -270,29 +226,29 @@ services:
            - { name: oro_security.owner.ownership_decision_maker }
 
     oro_security.form.type.oro_acl_access_level_selector:
-        class: '%oro_security.type.oro_acl_access_level_selector.class%'
+        class: Oro\Bundle\SecurityBundle\Form\Type\AclAccessLevelSelectorType
         tags:
             - { name: form.type, alias: oro_acl_access_level_selector }
 
     oro_security.form.type.object_label_type:
-        class: '%oro_security.type.oro_acl_label.class%'
+        class: Oro\Bundle\SecurityBundle\Form\Type\ObjectLabelType
         arguments:
             - '@oro_entity.entity_class_name_helper'
         tags:
             - { name: form.type, alias: oro_acl_label }
 
     oro_security.form.type.oro_acl_collection:
-        class: '%oro_security.type.oro_acl_collection.class%'
+        class: Oro\Bundle\SecurityBundle\Form\Type\PrivilegeCollectionType
         tags:
             - { name: form.type, alias: oro_acl_collection }
 
     oro_security.form.type.oro_acl_privilege:
-        class: '%oro_security.type.oro_acl_privilege.class%'
+        class: Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeType
         tags:
             - { name: form.type, alias: oro_acl_privilege }
 
     oro_security.form.type.oro_acl_permission_collection:
-        class: '%oro_security.type.oro_acl_permission_collection.class%'
+        class: Oro\Bundle\SecurityBundle\Form\Type\PermissionCollectionType
         tags:
             - { name: form.type, alias: oro_acl_permission_collection }
 
@@ -358,7 +314,7 @@ services:
             - { name: kernel.cache_warmer }
 
     oro_security.listener.controller:
-        class: '%oro_security.listener.controller.class%'
+        class: Oro\Bundle\SecurityBundle\EventListener\ControllerListener
         arguments:
             - '@oro_security.class_authorization_checker'
             - '@logger'
@@ -396,7 +352,7 @@ services:
         alias: oro_security.acl_helper
 
     oro_security.search.acl_helper:
-        class: '%oro_security.search.acl_helper.class%'
+        class: Oro\Bundle\SecurityBundle\Search\AclHelper
         arguments:
             - '@oro_search.provider.search_mapping'
             - '@oro_security.token_accessor'
@@ -405,7 +361,7 @@ services:
 
     oro_security.orm.ownership_sql_walker_builder:
         public: false
-        class: '%oro_security.orm.ownership_sql_walker_builder.class%'
+        class: Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder
         arguments:
             - '@security.authorization_checker'
             - '@security.token_storage'
@@ -424,7 +380,7 @@ services:
 
     oro_security.ownership_tree_provider:
         public: false
-        class: '%oro_security.ownership_tree_provider.class%'
+        class: Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider
         arguments:
             - '@doctrine'
             - '@oro_security.database_checker'
@@ -472,29 +428,29 @@ services:
             - { name: doctrine.event_listener, event: onFlush }
 
     oro_security.token.factory.username_password_organization:
-        class: '%oro_security.token.factory.username_password_organization.class%'
+        class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
 
     oro_security.token.factory.organization_rememberme:
-        class: '%oro_security.token.factory.organization_rememberme.class%'
+        class: Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory
 
     oro_security.authentication.listener.basic:
-        class: '%oro-security.authentication.listener.basic.class%'
+        class: Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationBasicAuthenticationListener
         arguments:
             - '@security.token_storage'
             - '@security.authentication.manager'
             - null
             - null
             - '@oro_organization.organization_manager'
-            - "@?logger"
+            - '@?logger'
         calls:
             - [setTokenFactory, ['@oro_security.token.factory.username_password_organization']]
         public: false
         abstract: true
 
     oro_security.authentication.provider.username_password_organization:
-        class: '%oro_security.authentication.provider.username_password_organization.class%'
+        class: Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
         arguments:
             - null
             - '@security.user_checker'
@@ -507,7 +463,7 @@ services:
         public: false
 
     oro_security.authentication.provider.organization_rememberme:
-        class: '%oro_security.authentication.provider.organization_rememberme.class%'
+        class: Oro\Bundle\SecurityBundle\Authentication\Provider\OrganizationRememberMeAuthenticationProvider
         arguments:
             - '@security.user_checker'
         calls:
@@ -523,7 +479,7 @@ services:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 7 }
 
     oro_security.listener.api_listener:
-          class: '%oro_security.listener.api_listener.class%'
+          class: Oro\Bundle\SecurityBundle\EventListener\ApiEventListener
           arguments:
               - '@oro_security.request_authorization_checker'
               - '@oro_security.acl_helper'
@@ -532,7 +488,7 @@ services:
               - { name: kernel.event_listener, event: oro_api.request.find.after, method: onFindAfter }
 
     oro_security.listener.refresh_context_listener:
-        class: '%oro_security.listener.refresh_context_listener.class%'
+        class: Oro\Bundle\SecurityBundle\EventListener\RefreshContextListener
         arguments:
             - '@security.token_storage'
             - '@doctrine'
@@ -541,14 +497,14 @@ services:
             - { name: doctrine.event_listener, event: onClear }
 
     oro_security.form.extension.aclprotected_type:
-        class: '%oro_security.form.extension.aclprotected_type.class%'
+        class: Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
         arguments:
             - '@oro_security.acl_helper'
         tags:
             - { name: form.type_extension, alias: entity, extended_type: Symfony\Bridge\Doctrine\Form\Type\EntityType }
 
     oro_security.listener.search_listener:
-          class: '%oro_security.listener.search_listener.class%'
+          class: Oro\Bundle\SecurityBundle\EventListener\SearchListener
           arguments:
               - '@oro_security.owner.ownership_metadata_provider'
           tags:
@@ -625,7 +581,7 @@ services:
             - '@oro_security.form.field_acl_helper'
             - '@logger'
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
     oro_security.acl.extension.field:
         public: false
@@ -661,25 +617,32 @@ services:
 
     oro_security.framework_extra.converter.doctrine.orm_decorator:
         class: Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter
-        decorates: 'sensio_framework_extra.converter.doctrine.orm'
-        parent: 'sensio_framework_extra.converter.doctrine.orm'
+        decorates: sensio_framework_extra.converter.doctrine.orm
+        parent: sensio_framework_extra.converter.doctrine.orm
         arguments:
             - '@oro_security.request_authorization_checker'
 
     oro_security.acl.cache.doctrine_decorator:
         class: Oro\Bundle\SecurityBundle\Acl\Cache\AclCache
-        decorates: 'security.acl.cache.doctrine'
-        parent: 'security.acl.cache.doctrine'
+        decorates: security.acl.cache.doctrine
+        parent: security.acl.cache.doctrine
         arguments:
             index_1: '@oro_security.acl.permission_granting_strategy'
         calls:
             - [setUnderlyingCache, ['@security.acl.underlying.cache']]
             - [setEventDispatcher, ['@event_dispatcher']]
 
+    oro_security.security.acl.security_identity_retrieval_strategy.cacheable:
+        class: Oro\Bundle\SecurityBundle\Acl\Domain\CacheableSecurityIdentityRetrievalStrategy
+        decorates: security.acl.security_identity_retrieval_strategy
+        decoration_priority: -255 # should be at the top of the decoration chain
+        arguments:
+            - '@oro_security.security.acl.security_identity_retrieval_strategy.cacheable.inner'
+
     oro_security.acl.voter.basic_permissions:
         class: Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter
-        decorates: 'security.acl.voter.basic_permissions'
-        parent: 'security.acl.voter.basic_permissions'
+        decorates: security.acl.voter.basic_permissions
+        parent: security.acl.voter.basic_permissions
         arguments:
             index_1: '@oro_security.acl.object_identity_retrieval_strategy'
             index_3: '@oro_security.acl.permission_map'
@@ -688,15 +651,15 @@ services:
             - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
 
     oro_security.acl.dbal.provider:
-        decorates: 'security.acl.dbal.provider'
-        parent: 'security.acl.dbal.provider'
+        decorates: security.acl.dbal.provider
+        parent: security.acl.dbal.provider
         # make ACL DBAL provider public because it can be used as standalone service, for example in migrations
         public: true
         arguments:
             index_1: '@oro_security.acl.permission_granting_strategy'
 
     oro_security.alias.acl.dbal.provider:
-        alias: 'security.acl.dbal.provider'
+        alias: security.acl.dbal.provider
         public: true
 
     oro_security.token_serializer:
@@ -705,7 +668,7 @@ services:
             - '@doctrine'
 
     oro_security.generator.random_token:
-        class: 'Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator'
+        class: Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator
         arguments:
             - '@oro_security.encoder.default'
 
@@ -713,7 +676,7 @@ services:
         alias: oro_security.generator.random_token
 
     oro_security.form.data_transformer.factory.crypted_data:
-        class: 'Oro\Bundle\SecurityBundle\Form\DataTransformer\Factory\CryptedDataTransformerFactory'
+        class: Oro\Bundle\SecurityBundle\Form\DataTransformer\Factory\CryptedDataTransformerFactory
         arguments:
             - '@oro_security.encoder.default'
             - '@logger'
@@ -801,7 +764,7 @@ services:
             - { name: oro_security.access_rule, permission: ASSIGN, availableOwnerEnable: true }
 
     oro_security.form.extension.autocomplete_password_type:
-        class: 'Oro\Bundle\SecurityBundle\Form\Extension\AutocompletePasswordTypeExtension'
+        class: Oro\Bundle\SecurityBundle\Form\Extension\AutocompletePasswordTypeExtension
         tags:
             - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\PasswordType }
 
