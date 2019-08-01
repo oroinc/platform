@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
+    var viewportManager;
     var module = require('module');
     var mediator = require('oroui/js/mediator');
     var _ = require('underscore');
     var error = require('oroui/js/error');
 
-    var viewportManager;
-
     /**
      * @default
      * Default values with breakpoints
-     * @type {*[]}
+     * @type {Array}
      */
     var screenMap = [
         {
@@ -51,6 +50,9 @@ define(function(require) {
          */
         viewport: null,
 
+        /**
+         * @property {Object}
+         */
         allowTypes: null,
 
         /**
@@ -101,7 +103,7 @@ define(function(require) {
         },
 
         /**
-         * Check viewport obility
+         * Check viewport ability
          * @param testViewport
          * @returns {boolean}
          */
@@ -135,8 +137,8 @@ define(function(require) {
          * @private
          */
         _collectCSSBreakpoints: function(cssVariables) {
-            var regexpMax = /(max-width:\s)([(\d+)]*)/g;
-            var regexpMin = /(min-width:\s)([(\d+)]*)/g;
+            var regexpMax = /(max-width:\s?)([(\d+)]*)/g;
+            var regexpMin = /(min-width:\s?)([(\d+)]*)/g;
 
             return _.reduce(cssVariables, function(collection, cssVar, varName) {
                 if (new RegExp(this.breakpointCSSVarPrefix).test(varName)) {
