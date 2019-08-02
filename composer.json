@@ -112,7 +112,9 @@
         "brick/math": "0.8.*",
         "bower-asset/fuse": "3.2.*",
         "phpdocumentor/reflection-docblock": "4.3.*",
-        "php-http/httplug-bundle": "1.15.2"
+        "php-http/httplug-bundle": "1.15.2",
+        "npm-asset/grapesjs": "0.15.3-RC.2",
+        "npm-asset/grapesjs-preset-webpage": "0.1.11"
     },
     "require-dev": {
         "behat/behat": "3.4.*",

@@ -1,0 +1,3 @@
+css:
+    inputs:
+        - 'bundles/npmassets/grapesjs/dist/css/grapes.min.css'
