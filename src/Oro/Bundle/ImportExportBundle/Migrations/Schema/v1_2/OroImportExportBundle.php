@@ -15,7 +15,7 @@ class OroImportExportBundle implements Migration
     {
         $table = $schema->getTable('oro_import_export_result');
         if (!$table->hasColumn('options')) {
-            $table->addColumn('options', 'array', ['comment' => '(DC2Type:array)']);
+            $table->addColumn('options', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
         }
     }
 }
