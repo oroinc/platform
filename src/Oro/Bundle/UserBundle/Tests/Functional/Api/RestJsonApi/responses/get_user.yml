@@ -25,7 +25,9 @@ data:
         groups:
             data: []
         owner:
-            data: null
+            data:
+                type: businessunits
+                id: '<toString(@business_unit->id)>'
         businessUnits:
             data: []
         organizations:

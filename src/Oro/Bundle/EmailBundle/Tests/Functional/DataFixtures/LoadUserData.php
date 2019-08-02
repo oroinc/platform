@@ -3,13 +3,15 @@
 namespace Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class LoadUserData extends AbstractFixture implements ContainerAwareInterface
+class LoadUserData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     /**
      * @var ContainerInterface
@@ -27,6 +29,14 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
     /**
      * {@inheritdoc}
      */
+    public function getDependencies()
+    {
+        return [LoadBusinessUnit::class];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function load(ObjectManager $manager)
     {
         $userManager = $this->container->get('oro_user.manager');
@@ -35,6 +45,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 
         $user = $userManager->createUser();
         $user->setUsername('simple_user')
+            ->setOwner($this->getReference('business_unit'))
             ->setPlainPassword('simple_password')
             ->setEmail('simple_user@example.com')
             ->setOrganization($organization)
@@ -57,6 +68,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 
         $user2 = $userManager->createUser();
         $user2->setUsername('simple_user2')
+            ->setOwner($this->getReference('business_unit'))
             ->setPlainPassword('simple_password2')
             ->setFirstName('Elley')
             ->setLastName('Towards')
