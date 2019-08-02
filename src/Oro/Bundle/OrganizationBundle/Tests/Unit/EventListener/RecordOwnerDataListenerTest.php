@@ -5,10 +5,12 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\EventListener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\EventListener\RecordOwnerDataListener;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -41,19 +43,21 @@ class RecordOwnerDataListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
-            ->will($this->returnValue(true));
-
+            ->willReturn(true);
         $this->tokenAccessor->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($token));
+            ->method('getUser')
+            ->willReturn($token->getUser());
+        $this->tokenAccessor->expects($this->any())
+            ->method('getOrganization')
+            ->willReturn($token instanceof OrganizationContextTokenInterface ? $token->getOrganizationContext() : null);
 
         $args = new LifecycleEventArgs($entity, $this->createMock('Doctrine\Common\Persistence\ObjectManager'));
         $this->configProvider->expects($this->once())
             ->method('hasConfig')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->configProvider->expects($this->once())
             ->method('getConfig')
-            ->will($this->returnValue($securityConfig));
+            ->willReturn($securityConfig);
 
         $this->listener->prePersist($args);
         if (isset($expect['owner'])) {
@@ -79,6 +83,16 @@ class RecordOwnerDataListenerTest extends \PHPUnit\Framework\TestCase
 
         $organization = new Organization();
         $organization->setId(3);
+        $organization1 = new Organization();
+        $organization1->getId(4);
+
+        $businessUnit = new BusinessUnit();
+        $businessUnit->setOrganization($organization);
+        $businessUnit1 = new BusinessUnit();
+        $businessUnit1->setOrganization($organization1);
+
+        $user->addBusinessUnit($businessUnit);
+        $user->addBusinessUnit($businessUnit1);
 
         $userConfig = new Config($entityConfigId);
         $userConfig->setValues(
@@ -114,7 +128,7 @@ class RecordOwnerDataListenerTest extends \PHPUnit\Framework\TestCase
             'OwnershipType BusinessUnit with UsernamePasswordOrganizationToken' => [
                 new UsernamePasswordOrganizationToken($user, 'admin', 'key', $organization),
                 $buConfig,
-                ['organization' => $organization]
+                ['owner' => $businessUnit, 'organization' => $organization]
 
             ],
             'OwnershipType Organization with UsernamePasswordOrganizationToken' => [
@@ -126,12 +140,6 @@ class RecordOwnerDataListenerTest extends \PHPUnit\Framework\TestCase
                 new UsernamePasswordToken($user, 'admin', 'key'),
                 $userConfig,
                 ['owner' => $user]
-            ],
-            'OwnershipType BusinessUnit with UsernamePasswordToken' => [
-                new UsernamePasswordToken($user, 'admin', 'key'),
-                $buConfig,
-                []
-
             ],
             'OwnershipType Organization with UsernamePasswordToken' => [
                 new UsernamePasswordToken($user, 'admin', 'key'),
@@ -145,7 +153,7 @@ class RecordOwnerDataListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->tokenAccessor->expects($this->never())
             ->method('getToken');

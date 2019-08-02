@@ -4,12 +4,9 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\Repository\UserApiRepository;
-use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Mailer\Processor;
@@ -140,44 +137,11 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->userManager->getApi($user, $organization));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Default user role not found
-     */
-    public function testUpdateUserUnsupported()
-    {
-        $user = new User();
-
-        $em = $this->expectGetEntityManager();
-
-        $metadata = $this->createMock(ClassMetadata::class);
-        $metadata->expects(self::once())
-            ->method('getAssociationTargetClass')
-            ->willReturn(Role::class);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($metadata);
-
-        $repository = $this->createMock(RoleRepository::class);
-        $em->expects(self::once())
-            ->method('getRepository')
-            ->with(Role::class)
-            ->willReturn($repository);
-
-        $em->expects(self::never())
-            ->method('persist');
-        $em->expects(self::never())
-            ->method('flush');
-
-        $this->userManager->updateUser($user);
-    }
-
-    public function testUpdateUserWithPlainPasswordAndWithoutRoles()
+    public function testUpdateUserWithPlainPassword()
     {
         $password = 'password';
         $encodedPassword = 'encodedPassword';
         $salt = 'salt';
-        $defaultRole = new Role(User::ROLE_DEFAULT);
 
         $user = new User();
         $user->setPlainPassword($password);
@@ -197,36 +161,15 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         $em->expects(self::once())
             ->method('flush');
 
-        $metadata = $this->createMock(ClassMetadata::class);
-        $metadata->expects(self::once())
-            ->method('getAssociationTargetClass')
-            ->willReturn(Role::class);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($metadata);
-
-        $repository = $this->createMock(RoleRepository::class);
-        $repository->expects(self::once())
-            ->method('findOneBy')
-            ->with($this->equalTo(['role' => User::ROLE_DEFAULT]))
-            ->willReturn($defaultRole);
-        $em->expects(self::once())
-            ->method('getRepository')
-            ->with(Role::class)
-            ->willReturn($repository);
-
         $this->userManager->updateUser($user);
 
         self::assertNull($user->getPlainPassword());
         self::assertEquals($encodedPassword, $user->getPassword());
-        self::assertCount(1, $user->getRoles());
-        self::assertSame($defaultRole, $user->getRole($defaultRole->getRole()));
     }
 
     public function testUpdateUserWithoutPlainPassword()
     {
         $user = new User();
-        $user->addRole(new Role(User::ROLE_ADMINISTRATOR));
 
         $em = $this->expectGetEntityManager();
         $em->expects(self::once())
@@ -239,32 +182,6 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
 
         self::assertNull($user->getPlainPassword());
         self::assertNull($user->getPassword());
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Expected Symfony\Component\Security\Core\Role\Role, stdClass given
-     */
-    public function testNotSupportedRole()
-    {
-        $user = new User();
-
-        $em = $this->expectGetEntityManager();
-
-        $em->expects(self::never())
-            ->method('persist');
-        $em->expects(self::never())
-            ->method('flush');
-
-        $metadata = $this->createMock(ClassMetadata::class);
-        $metadata->expects(self::once())
-            ->method('getAssociationTargetClass')
-            ->willReturn(\stdClass::class);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($metadata);
-
-        $this->userManager->updateUser($user);
     }
 
     public function testSetAuthStatus()

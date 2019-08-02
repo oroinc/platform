@@ -7,6 +7,8 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
+use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -52,6 +54,7 @@ class LoadUserData extends AbstractFixture implements
         $userManager = $this->container->get('oro_user.manager');
         $organization = $this->getReference('organization');
         $businessUnit = $this->getReference('business_unit');
+        $role = $manager->getRepository(Role::class)->findOneBy(['role' => User::ROLE_DEFAULT]);
 
         $user = $userManager->createUser();
         $user->setUsername(self::SIMPLE_USER)
@@ -62,8 +65,8 @@ class LoadUserData extends AbstractFixture implements
             ->setLastName(self::SIMPLE_USER_LAST_NAME)
             ->setOrganization($organization)
             ->addOrganization($organization)
+            ->addRole($role)
             ->setEnabled(true);
-
         $userManager->updateUser($user);
 
         $user2 = $userManager->createUser();
@@ -75,8 +78,8 @@ class LoadUserData extends AbstractFixture implements
             ->setEmail(self::SIMPLE_USER_2_EMAIL)
             ->setOrganization($organization)
             ->addOrganization($organization)
+            ->addRole($role)
             ->setEnabled(true);
-
         $userManager->updateUser($user2);
 
         $userWithToken = $userManager->createUser();
@@ -89,8 +92,8 @@ class LoadUserData extends AbstractFixture implements
             ->setOrganization($organization)
             ->setConfirmationToken(self::CONFIRMATION_TOKEN)
             ->addOrganization($organization)
+            ->addRole($role)
             ->setEnabled(true);
-
         $userManager->updateUser($userWithToken);
 
         $this->setReference(self::SIMPLE_USER, $user);
