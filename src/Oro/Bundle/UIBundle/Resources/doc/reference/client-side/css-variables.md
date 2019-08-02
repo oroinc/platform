@@ -1,10 +1,10 @@
 # CSS Variable Parser
 
-The CSS variable parser reads the current style file and collects the variables in `:root`.
+The CSS variable parser reads the current style file and collects all global css variables from `:root`.
 
-The module returns a promise to which you can connect using the `onReady` method call passing the callback function to the arguments.
+The module returns a promise which you can connect using the `onReady` method call passing the callback function to the arguments.
 
-You can also listen to the event of a mediator `css:variables:fetched`
+You can also listen the event via mediator `css:variables:fetched`
 
 Usage examples:
 
@@ -43,7 +43,7 @@ var Foo = function(cssVariables) {
     console.log(someVar); // variable value "#000000"
 }
 
-mediator.on('css:variables:fetched', Foo)
+mediator.on('css:variables:fetched', Foo);
 
 ```
 
