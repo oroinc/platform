@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\Api\RestJsonApi;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadBusinessUnitData;
@@ -21,7 +22,8 @@ class UserTest extends RestJsonApiTestCase
         parent::setUp();
         $this->loadFixtures([
             LoadUserData::class,
-            LoadBusinessUnitData::class
+            LoadBusinessUnitData::class,
+            LoadBusinessUnit::class
         ]);
         $role = $this->getEntityManager()
             ->getRepository(Role::class)
@@ -136,7 +138,7 @@ class UserTest extends RestJsonApiTestCase
         self::assertEquals($data['data']['attributes']['lastName'], $user->getLastName());
         self::assertEquals($data['data']['attributes']['email'], $user->getEmail());
         self::assertEquals($organizationId, $user->getOrganization()->getId());
-        self::assertNull($user->getOwner());
+        self::assertEquals($this->getReference('business_unit'), $user->getOwner());
 
         self::assertEmpty($user->getPlainPassword());
         self::assertNotEmpty($user->getPassword());

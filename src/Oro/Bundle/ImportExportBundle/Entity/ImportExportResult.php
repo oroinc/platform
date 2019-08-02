@@ -84,7 +84,7 @@ class ImportExportResult implements CreatedAtAwareInterface
     /**
      * @var array
      *
-     * @ORM\Column(name="options", type="array")
+     * @ORM\Column(name="options", type="array", nullable=true)
      */
     protected $options = [];
 

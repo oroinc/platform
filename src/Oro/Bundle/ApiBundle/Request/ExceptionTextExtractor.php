@@ -184,7 +184,11 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
             return $exception->getReason();
         }
         if ($exception instanceof AuthenticationException) {
-            return $this->translator->trans($exception->getMessageKey(), $exception->getMessageData());
+            return $this->translator->trans(
+                $exception->getMessageKey(),
+                $exception->getMessageData(),
+                'security'
+            );
         }
 
         return $exception->getMessage();
