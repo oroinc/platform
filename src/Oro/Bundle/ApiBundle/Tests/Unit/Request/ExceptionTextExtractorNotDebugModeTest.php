@@ -26,6 +26,7 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects(self::any())
             ->method('trans')
+            ->with(self::anything(), self::anything(), 'security')
             ->willReturnCallback(function ($label, $parameters) {
                 $result = 'translated: ' . $label;
                 if (!empty($parameters)) {

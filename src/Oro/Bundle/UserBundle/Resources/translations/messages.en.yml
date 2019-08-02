@@ -34,10 +34,6 @@ Login page: Login page
 "Return to Login": "Return to Login"
 "Request": "Request"
 
-User account is locked.: User account is locked
-User account is disabled.: User account is disabled
-User account has expired.: User account has expired
-
 change_password:
     flash:
         success: The password has been changed
