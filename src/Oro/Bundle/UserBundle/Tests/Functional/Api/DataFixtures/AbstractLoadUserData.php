@@ -3,16 +3,26 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 
-abstract class AbstractLoadUserData extends AbstractFixture
+abstract class AbstractLoadUserData extends AbstractFixture implements DependentFixtureInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return [LoadBusinessUnit::class];
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -47,6 +57,7 @@ abstract class AbstractLoadUserData extends AbstractFixture
                 ->addRole($role)
                 ->addGroup($group)
                 ->setEmail($userData['email'])
+                ->setOwner($this->getReference('business_unit'))
                 ->setOrganization($organization)
                 ->setOrganizations(new ArrayCollection([$organization]))
                 ->addApiKey($api)

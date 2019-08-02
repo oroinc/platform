@@ -5,6 +5,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -34,7 +35,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, D
      */
     public function getDependencies()
     {
-        return [LoadOrganization::class];
+        return [LoadOrganization::class, LoadBusinessUnit::class];
     }
 
     /**
@@ -60,6 +61,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, D
             ->setOrganization($organization);
 
         $user
+            ->setOwner($this->getReference('business_unit'))
             ->setUsername(self::USER_NAME)
             ->setPlainPassword(self::USER_PASSWORD)
             ->setFirstName('Simple')

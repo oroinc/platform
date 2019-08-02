@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Security;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Exception\CredentialsResetException;
+use Oro\Bundle\UserBundle\Exception\EmptyOwnerException;
 use Oro\Bundle\UserBundle\Exception\OrganizationException;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -13,6 +14,9 @@ use Symfony\Component\Security\Core\User\UserChecker as BaseUserChecker;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Checks User state during authentication.
+ */
 class UserChecker extends BaseUserChecker
 {
     /** @var TokenStorageInterface */
@@ -46,9 +50,15 @@ class UserChecker extends BaseUserChecker
     {
         parent::checkPostAuth($user);
 
-        if ($user instanceof User && null !== $user->getAuthStatus()) {
-            if (!$this->hasOrganization($user)) {
+        if ($user instanceof User) {
+            if (null !== $user->getAuthStatus() && !$this->hasOrganization($user)) {
                 $exception = new OrganizationException();
+                $exception->setUser($user);
+
+                throw $exception;
+            }
+            if (!$user->getOwner()) {
+                $exception = new EmptyOwnerException('The user does not have an owner.');
                 $exception->setUser($user);
 
                 throw $exception;
