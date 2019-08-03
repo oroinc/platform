@@ -24,7 +24,7 @@ interface ConfigExtraInterface
     public function configureContext(ConfigContext $context);
 
     /**
-     * Indicates whether this config extra should be used when a configuration of related entities will be built.
+     * Indicates whether this config extra should be used when a configuration of related entities is built.
      *
      * @return bool
      */

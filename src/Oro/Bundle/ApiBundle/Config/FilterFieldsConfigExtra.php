@@ -10,10 +10,10 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
  */
 class FilterFieldsConfigExtra implements ConfigExtraInterface
 {
-    const NAME = 'filter_fields';
+    public const NAME = 'filter_fields';
 
     /** @var array */
-    protected $fieldFilters;
+    private $fieldFilters;
 
     /**
      * @param array $fieldFilters The list of fields that should be returned for a specified type of an entity.

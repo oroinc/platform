@@ -10,10 +10,10 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
  */
 class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
 {
-    const NAME = 'expand_related_entities';
+    public const NAME = 'expand_related_entities';
 
     /** @var string[] */
-    protected $expandedEntities;
+    private $expandedEntities;
 
     /**
      * @param string[] $expandedEntities The list of related entities.

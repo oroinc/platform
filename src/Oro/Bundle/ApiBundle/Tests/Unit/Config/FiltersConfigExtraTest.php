@@ -21,7 +21,7 @@ class FiltersConfigExtraTest extends \PHPUnit\Framework\TestCase
 
     public function testIsPropagable()
     {
-        self::assertTrue($this->extra->isPropagable());
+        self::assertFalse($this->extra->isPropagable());
     }
 
     public function testCacheKeyPart()
