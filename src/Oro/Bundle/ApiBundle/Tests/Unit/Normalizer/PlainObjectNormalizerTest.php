@@ -42,111 +42,22 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNormalizeSimpleObject()
+    /**
+     * @param mixed $object
+     *
+     * @return mixed
+     */
+    private function normalizeObject($object)
     {
-        $object = new Entity\Group();
-        $object->setId(123);
-        $object->setName('test_name');
+        $normalizedObjects = $this->objectNormalizer->normalizeObjects([$object]);
 
-        $result = $this->objectNormalizer->normalizeObject($object);
-
-        self::assertEquals(
-            [
-                'id'   => 123,
-                'name' => 'test_name'
-            ],
-            $result
-        );
-    }
-
-    public function testNormalizeObjectWithNullToOneRelations()
-    {
-        $product = new Entity\Product();
-        $product->setId(123);
-        $product->setName('product_name');
-
-        $result = $this->objectNormalizer->normalizeObject($product);
-
-        self::assertEquals(
-            [
-                'id'            => 123,
-                'name'          => 'product_name',
-                'updatedAt'     => null,
-                'category'      => null,
-                'owner'         => null,
-                'price'         => null,
-                'priceValue'    => null,
-                'priceCurrency' => null
-            ],
-            $result
-        );
-    }
-
-    public function testNormalizeObjectWithToOneRelations()
-    {
-        $result = $this->objectNormalizer->normalizeObject(
-            $this->createProductObject()
-        );
-
-        self::assertEquals(
-            [
-                'id'            => 123,
-                'name'          => 'product_name',
-                'updatedAt'     => new \DateTime('2015-12-01 10:20:30', new \DateTimeZone('UTC')),
-                'category'      => 'category_name',
-                'owner'         => 'user_name',
-                'price'         => null,
-                'priceValue'    => null,
-                'priceCurrency' => null
-            ],
-            $result
-        );
-    }
-
-    public function testNormalizeObjectWithNullToManyRelations()
-    {
-        $user = new Entity\User();
-        $user->setId(123);
-        $user->setName('user_name');
-
-        $result = $this->objectNormalizer->normalizeObject($user);
-
-        self::assertEquals(
-            [
-                'id'       => 123,
-                'name'     => 'user_name',
-                'category' => null,
-                'groups'   => [],
-                'products' => [],
-                'owner'    => null
-            ],
-            $result
-        );
-    }
-
-    public function testNormalizeObjectWithToManyRelations()
-    {
-        $result = $this->objectNormalizer->normalizeObject(
-            $this->createProductObject()->getOwner()
-        );
-
-        self::assertEquals(
-            [
-                'id'       => 456,
-                'name'     => 'user_name',
-                'category' => 'owner_category_name',
-                'groups'   => ['owner_group1', 'owner_group2'],
-                'products' => ['product_name'],
-                'owner'    => null
-            ],
-            $result
-        );
+        return reset($normalizedObjects);
     }
 
     /**
      * @return Entity\Product
      */
-    protected function createProductObject()
+    private function createProductObject()
     {
         $product = new Entity\Product();
         $product->setId(123);
@@ -174,5 +85,106 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         $owner->addProduct($product);
 
         return $product;
+    }
+
+    public function testNormalizeSimpleObject()
+    {
+        $object = new Entity\Group();
+        $object->setId(123);
+        $object->setName('test_name');
+
+        $result = $this->normalizeObject($object);
+
+        self::assertEquals(
+            [
+                'id'   => 123,
+                'name' => 'test_name'
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeObjectWithNullToOneRelations()
+    {
+        $product = new Entity\Product();
+        $product->setId(123);
+        $product->setName('product_name');
+
+        $result = $this->normalizeObject($product);
+
+        self::assertEquals(
+            [
+                'id'            => 123,
+                'name'          => 'product_name',
+                'updatedAt'     => null,
+                'category'      => null,
+                'owner'         => null,
+                'price'         => null,
+                'priceValue'    => null,
+                'priceCurrency' => null
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeObjectWithToOneRelations()
+    {
+        $result = $this->normalizeObject(
+            $this->createProductObject()
+        );
+
+        self::assertEquals(
+            [
+                'id'            => 123,
+                'name'          => 'product_name',
+                'updatedAt'     => new \DateTime('2015-12-01 10:20:30', new \DateTimeZone('UTC')),
+                'category'      => 'category_name',
+                'owner'         => 'user_name',
+                'price'         => null,
+                'priceValue'    => null,
+                'priceCurrency' => null
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeObjectWithNullToManyRelations()
+    {
+        $user = new Entity\User();
+        $user->setId(123);
+        $user->setName('user_name');
+
+        $result = $this->normalizeObject($user);
+
+        self::assertEquals(
+            [
+                'id'       => 123,
+                'name'     => 'user_name',
+                'category' => null,
+                'groups'   => [],
+                'products' => [],
+                'owner'    => null
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeObjectWithToManyRelations()
+    {
+        $result = $this->normalizeObject(
+            $this->createProductObject()->getOwner()
+        );
+
+        self::assertEquals(
+            [
+                'id'       => 456,
+                'name'     => 'user_name',
+                'category' => 'owner_category_name',
+                'groups'   => ['owner_group1', 'owner_group2'],
+                'products' => ['product_name'],
+                'owner'    => null
+            ],
+            $result
+        );
     }
 }

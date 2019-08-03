@@ -53,6 +53,69 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @param mixed                       $object
+     * @param EntityDefinitionConfig|null $config
+     * @param array                       $context
+     *
+     * @return mixed
+     */
+    private function normalizeObject($object, EntityDefinitionConfig $config = null, array $context = [])
+    {
+        $normalizedObjects = $this->objectNormalizer->normalizeObjects([$object], $config, $context);
+
+        return reset($normalizedObjects);
+    }
+
+    /**
+     * @return Entity\Product
+     */
+    private function createProductObject()
+    {
+        $product = new Entity\Product();
+        $product->setId(123);
+        $product->setName('product_name');
+        $product->setUpdatedAt(new \DateTime('2015-12-01 10:20:30', new \DateTimeZone('UTC')));
+
+        $category = new Entity\Category('category_name');
+        $category->setLabel('category_label');
+        $product->setCategory($category);
+
+        $owner = new Entity\User();
+        $owner->setId(456);
+        $owner->setName('user_name');
+        $ownerCategory = new Entity\Category('owner_category_name');
+        $ownerCategory->setLabel('owner_category_label');
+        $owner->setCategory($ownerCategory);
+        $ownerGroup1 = new Entity\Group();
+        $ownerGroup1->setId(11);
+        $ownerGroup1->setName('owner_group1');
+        $owner->addGroup($ownerGroup1);
+        $ownerGroup2 = new Entity\Group();
+        $ownerGroup2->setId(22);
+        $ownerGroup2->setName('owner_group2');
+        $owner->addGroup($ownerGroup2);
+        $owner->addProduct($product);
+
+        return $product;
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return EntityDefinitionConfig
+     */
+    private function createConfigObject(array $config)
+    {
+        $configExtensionRegistry = new ConfigExtensionRegistry();
+        $configExtensionRegistry->addExtension(new FiltersConfigExtension(new FilterOperatorRegistry([])));
+        $configExtensionRegistry->addExtension(new SortersConfigExtension());
+
+        $loaderFactory = new ConfigLoaderFactory($configExtensionRegistry);
+
+        return $loaderFactory->getLoader(ConfigUtil::DEFINITION)->load($config);
+    }
+
     public function testNormalizeSimpleObject()
     {
         $object = new Entity\Group();
@@ -67,7 +130,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $object,
             $this->createConfigObject($config)
         );
@@ -97,7 +160,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $object,
             $this->createConfigObject($config)
         );
@@ -131,7 +194,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $object,
             $this->createConfigObject($config),
             ['key' => 'context value']
@@ -153,20 +216,27 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         $object->setName('test_name');
 
         $config = [
-            'exclusion_policy' => 'all',
-            'fields'           => [
+            'exclusion_policy'          => 'all',
+            'fields'                    => [
                 'id'   => null,
                 'name' => null
             ],
-            'post_serialize'   => function (array $item, array $context) {
+            'post_serialize'            => function (array $item, array $context) {
                 $item['name'] .= sprintf('_additional[%s]', $context['key']);
                 $item['another'] = 'value';
 
                 return $item;
+            },
+            'post_serialize_collection' => function (array $items, array $context) {
+                foreach ($items as $key => $item) {
+                    $items[$key]['name'] .= ' + collection';
+                }
+
+                return $items;
             }
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $object,
             $this->createConfigObject($config),
             ['key' => 'context value']
@@ -175,7 +245,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [
                 'id'      => 123,
-                'name'    => 'test_name_additional[context value]',
+                'name'    => 'test_name_additional[context value] + collection',
                 'another' => 'value'
             ],
             $result
@@ -213,7 +283,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $this->createProductObject(),
             $this->createConfigObject($config)
         );
@@ -261,7 +331,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $product,
             $this->createConfigObject($config)
         );
@@ -297,7 +367,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $this->createProductObject(),
             $this->createConfigObject($config)
         );
@@ -339,7 +409,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $data,
             $this->createConfigObject($config)
         );
@@ -390,7 +460,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $product,
             $this->createConfigObject($config)
         );
@@ -445,7 +515,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $this->createProductObject(),
             $this->createConfigObject($config),
             ['key' => 'context value']
@@ -504,7 +574,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $product,
             $this->createConfigObject($config)
         );
@@ -566,7 +636,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $product,
             $this->createConfigObject($config)
         );
@@ -630,7 +700,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $product,
             $this->createConfigObject($config)
         );
@@ -690,7 +760,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $product,
             $this->createConfigObject($config)
         );
@@ -733,7 +803,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $configObject = $this->createConfigObject($config);
         $srcConfig = $configObject->toArray();
-        $this->objectNormalizer->normalizeObject($object, $configObject);
+        $this->normalizeObject($object, $configObject);
 
         self::assertEquals($srcConfig, $configObject->toArray());
     }
@@ -754,7 +824,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $object,
             $this->createConfigObject($config)
         );
@@ -782,7 +852,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $object,
             $this->createConfigObject($config)
         );
@@ -814,7 +884,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $object,
             $this->createConfigObject($config)
         );
@@ -856,7 +926,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $this->createProductObject(),
             $this->createConfigObject($config)
         );
@@ -903,7 +973,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $this->createProductObject(),
             $this->createConfigObject($config)
         );
@@ -940,7 +1010,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         $object->id = 123;
         $object->category = new EntityIdentifier('category1', 'Test\Category');
 
-        $result = $this->objectNormalizer->normalizeObject(
+        $result = $this->normalizeObject(
             $object,
             $this->createConfigObject($config)
         );
@@ -975,58 +1045,9 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->objectNormalizer->normalizeObject(
+        $this->normalizeObject(
             $this->createProductObject(),
             $this->createConfigObject($config)
         );
-    }
-
-    /**
-     * @return Entity\Product
-     */
-    private function createProductObject()
-    {
-        $product = new Entity\Product();
-        $product->setId(123);
-        $product->setName('product_name');
-        $product->setUpdatedAt(new \DateTime('2015-12-01 10:20:30', new \DateTimeZone('UTC')));
-
-        $category = new Entity\Category('category_name');
-        $category->setLabel('category_label');
-        $product->setCategory($category);
-
-        $owner = new Entity\User();
-        $owner->setId(456);
-        $owner->setName('user_name');
-        $ownerCategory = new Entity\Category('owner_category_name');
-        $ownerCategory->setLabel('owner_category_label');
-        $owner->setCategory($ownerCategory);
-        $ownerGroup1 = new Entity\Group();
-        $ownerGroup1->setId(11);
-        $ownerGroup1->setName('owner_group1');
-        $owner->addGroup($ownerGroup1);
-        $ownerGroup2 = new Entity\Group();
-        $ownerGroup2->setId(22);
-        $ownerGroup2->setName('owner_group2');
-        $owner->addGroup($ownerGroup2);
-        $owner->addProduct($product);
-
-        return $product;
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return EntityDefinitionConfig
-     */
-    private function createConfigObject(array $config)
-    {
-        $configExtensionRegistry = new ConfigExtensionRegistry();
-        $configExtensionRegistry->addExtension(new FiltersConfigExtension(new FilterOperatorRegistry([])));
-        $configExtensionRegistry->addExtension(new SortersConfigExtension());
-
-        $loaderFactory = new ConfigLoaderFactory($configExtensionRegistry);
-
-        return $loaderFactory->getLoader(ConfigUtil::DEFINITION)->load($config);
     }
 }
