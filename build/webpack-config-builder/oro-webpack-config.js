@@ -91,8 +91,12 @@ class ConfigBuilder {
                     modules: [
                         resolvedPublicPath,
                         resolvedPublicPath + '/bundles',
-                        path.join(__dirname, '../node_modules'),
+                        path.join(__dirname, '../node_modules')
                     ],
+                    extensions: ['*', '.css', '.scss', '.js'],
+                    alias: {
+                        'node_modules':  resolvedPublicPath + '/bundles/npmassets'
+                    },
                     symlinks: false
                 },
                 resolveLoader: {
@@ -138,7 +142,6 @@ class ConfigBuilder {
                                     includePaths: [
                                         resolvedPublicPath + '/bundles',
                                         path.resolve(__dirname, '../node_modules'),
-
                                     ],
                                     sourceMap: true
                                 }
