@@ -148,7 +148,7 @@
                 this.fallback
             );
 
-            var _number  = parseInt(number, 10);
+            var _number  = parseFloat(number);
             parameters = parameters || {};
 
             if (parameters.count === undefined) {
@@ -436,7 +436,7 @@
             return Number.POSITIVE_INFINITY;
         }
 
-        return parseInt(number, 10);
+        return parseFloat(number);
     }
 
     /**
