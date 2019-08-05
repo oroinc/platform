@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\DateTimePicker;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
@@ -1873,6 +1874,106 @@ TEXT;
                 'Expected items/order does not match'
             );
         }
+    }
+
+    /**
+     * @When /^(?:|I )should see following filters in the grid settings:$/
+     *
+     * @param TableNode $table
+     */
+    public function iShouldSeeFollowingFiltersInGridSettings(TableNode $table)
+    {
+        $linkElement = $this->elementFactory->findElementContainsByXPath('Tab Link', 'Filters', false);
+        $linkElement->click();
+
+        $expectedItems = [];
+        foreach ($table->getRows() as $item) {
+            $expectedItems[] = $item[0];
+        }
+
+        $actualTable = $this->elementFactory->createElement('GridFilterManager');
+        $availableItems = $actualTable->findAll('css', 'td.title-cell label');
+        $availableValues = array_map(function (NodeElement $item) {
+            return $item->getText();
+        }, $availableItems);
+        $expectedValues = array_values($expectedItems);
+        $diff = array_diff($expectedValues, $availableValues);
+        self::assertEmpty($diff, sprintf('Attributes: %s are not present in the grid', implode(',', $diff)));
+    }
+
+    /**
+     * @When /^(?:|I )should not see following filters in the grid settings:$/
+     *
+     * @param TableNode $table
+     */
+    public function iShouldNotSeeFollowingFiltersInGridSettings(TableNode $table)
+    {
+        $linkElement = $this->elementFactory->findElementContainsByXPath('Tab Link', 'Filters', false);
+        $linkElement->click();
+
+        $expectedItems = [];
+        foreach ($table->getRows() as $item) {
+            $expectedItems[] = $item[0];
+        }
+
+        $actualTable = $this->elementFactory->createElement('GridFilterManager');
+        $availableItems = $actualTable->findAll('css', 'td.title-cell label');
+        $availableValues = array_map(function (NodeElement $item) {
+            return $item->getText();
+        }, $availableItems);
+        $expectedValues = array_values($expectedItems);
+        $intersect = array_intersect($availableValues, $expectedValues);
+        self::assertEmpty($intersect, sprintf('Attributes: %s are present in the grid', implode(',', $intersect)));
+    }
+
+    /**
+     * @When /^(?:|I )should see following columns in the grid settings:$/
+     *
+     * @param TableNode $table
+     */
+    public function iShouldSeeFollowingColumnsInGridSettings(TableNode $table)
+    {
+        $linkElement = $this->elementFactory->findElementContainsByXPath('Tab Link', 'Grid', false);
+        $linkElement->click();
+
+        $expectedItems = [];
+        foreach ($table->getRows() as $item) {
+            $expectedItems[] = $item[0];
+        }
+
+        $actualTable = $this->elementFactory->createElement('GridColumnManager');
+        $availableItems = $actualTable->findAll('css', 'td.title-cell label');
+        $availableValues = array_map(function (NodeElement $item) {
+            return $item->getText();
+        }, $availableItems);
+        $expectedValues = array_values($expectedItems);
+        $diff = array_diff($expectedValues, $availableValues);
+        self::assertEmpty($diff, sprintf('Attributes: %s are not present in the grid', implode(',', $diff)));
+    }
+
+    /**
+     * @When /^(?:|I )should not see following columns in the grid settings:$/
+     *
+     * @param TableNode $table
+     */
+    public function iShouldNotSeeFollowingColumnsInGridSettings(TableNode $table)
+    {
+        $linkElement = $this->elementFactory->findElementContainsByXPath('Tab Link', 'Grid', false);
+        $linkElement->click();
+
+        $expectedItems = [];
+        foreach ($table->getRows() as $item) {
+            $expectedItems[] = $item[0];
+        }
+
+        $actualTable = $this->elementFactory->createElement('GridColumnManager');
+        $availableItems = $actualTable->findAll('css', 'td.title-cell label');
+        $availableValues = array_map(function (NodeElement $item) {
+            return $item->getText();
+        }, $availableItems);
+        $expectedValues = array_values($expectedItems);
+        $intersect = array_intersect($availableValues, $expectedValues);
+        self::assertEmpty($intersect, sprintf('Attributes: %s are present in the grid', implode(',', $intersect)));
     }
 
     /**
