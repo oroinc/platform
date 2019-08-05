@@ -100,8 +100,12 @@ define(function(require) {
         initialize: function(grid, options) {
             _.extend(this, _.pick(options || {}, ['viewport']));
             this.grid = grid;
-            this.listenTo(this.grid, 'shown', this.enable);
-            mediator.on('viewport:change', this.onViewportChange, this);
+
+            this.listenToOnce(this.grid, 'shown', this.enable);
+            this.onViewportChange = this.onViewportChange.bind(this);
+            // add the event handler, that won't be removed through disable action
+            // (has to be removed only in dispose)
+            mediator.on('viewport:change', this.onViewportChange);
 
             return StickedScrollbarPlugin.__super__.initialize.apply(this, arguments);
         },
@@ -152,8 +156,8 @@ define(function(require) {
             }
 
             this.disable();
-            mediator.off('viewport:change', this.onViewportChange, this);
             delete this.domCache;
+            mediator.off('viewport:change', this.onViewportChange);
 
             return StickedScrollbarPlugin.__super__.dispose.apply(this, arguments);
         },
@@ -200,8 +204,6 @@ define(function(require) {
             }, this);
 
             this.stopListening();
-            // Need reenable event for wake up plugin
-            mediator.on('viewport:change', this.onViewportChange, this);
         },
 
         manageScroll: function() {
