@@ -153,6 +153,10 @@ define(function(require) {
         },
 
         _onLoadBuilder: function() {
+            GrapesJSModules.call('panel-manager', {
+                builder: this.builder
+            });
+
             mediator.trigger('grapesjs:loaded', this.builder);
         },
 

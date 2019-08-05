@@ -6,3 +6,4 @@ config:
 
         'orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-modules': 'bundles/oorocontentbuilder/js/app/views/grapesjs-modules/grapesjs-modules.js'
         'orocontentbuilder/js/app/views/grapesjs-modules/style-manager-module': 'bundles/oorocontentbuilder/js/app/views/grapesjs-modules/style-manager-module.js'
+        'orocontentbuilder/js/app/views/grapesjs-modules/panels-module': 'bundles/oorocontentbuilder/js/app/views/grapesjs-modules/panels-module.js'
