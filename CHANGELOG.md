@@ -30,6 +30,8 @@ The current file describes significant changes in the code that may affect the u
   no permissions to use an API resource. Before the fix `404 Not Found` status code was returned in both cases,
   when an entity did not exist and when there were no permissions to operate with it.
 * The service `oro_api.entity_serializer.acl_filter` was renamed to `oro_api.entity_serializer.field_filter`.
+* The method `normalizeObject` of `Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer`
+  was replaced with `normalizeObjects`.
 
 #### SearchBundle
 * The following deprecated methods were removed from `Oro\Bundle\SearchBundle\Query\Query`:

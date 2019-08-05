@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
  */
 class DescriptionsConfigExtra implements ConfigExtraInterface
 {
-    const NAME = 'descriptions';
+    public const NAME = 'descriptions';
 
     /**
      * {@inheritdoc}

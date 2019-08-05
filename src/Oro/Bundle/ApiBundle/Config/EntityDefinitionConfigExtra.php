@@ -11,19 +11,19 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class EntityDefinitionConfigExtra implements ConfigExtraInterface
 {
-    const NAME = ConfigUtil::DEFINITION;
+    public const NAME = ConfigUtil::DEFINITION;
 
     /** @var string|null */
-    protected $action;
+    private $action;
 
     /** @var bool */
-    protected $collection;
+    private $collection;
 
     /** @var string|null */
-    protected $parentClassName;
+    private $parentClassName;
 
     /** @var string|null */
-    protected $associationName;
+    private $associationName;
 
     /**
      * @param string|null $action          The name of the action for which the configuration is requested

@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
  */
 class CustomizeLoadedDataConfigExtra implements ConfigExtraInterface
 {
-    const NAME = 'customize_loaded_data';
+    public const NAME = 'customize_loaded_data';
 
     /**
      * {@inheritdoc}

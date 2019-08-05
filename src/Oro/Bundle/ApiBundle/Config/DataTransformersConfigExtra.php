@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
  */
 class DataTransformersConfigExtra implements ConfigExtraInterface
 {
-    const NAME = 'data_transformers';
+    public const NAME = 'data_transformers';
 
     /**
      * {@inheritdoc}
