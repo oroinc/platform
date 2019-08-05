@@ -30,7 +30,7 @@
             // .hide-on-strict-tablet,
             // .hide-on-strict-tablet-small
             // .hide-on-strict-mobile-landscape,
-            // .hide-on-strict-mobile
+            // .hide-on-strict-mobile-big
             .hide-on-#{$current-breakpoint-name} {
                 display: none !important;
             }

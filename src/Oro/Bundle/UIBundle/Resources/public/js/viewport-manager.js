@@ -7,37 +7,14 @@ define(function(require) {
     var _ = require('underscore');
     var error = require('oroui/js/error');
 
-    /**
-     * @default
-     * Default values with breakpoints
-     * @type {Array}
-     */
-    var screenMap = [
-        {
-            name: 'desktop',
-            min: 1100
-        },
-        {
-            name: 'tablet',
-            max: 1099
-        },
-        {
-            name: 'tablet-small',
-            max: 992
-        },
-        {
-            name: 'mobile-landscape',
-            max: 640
-        },
-        {
-            name: 'mobile',
-            max: 414
-        }
-    ];
-
     viewportManager = {
         options: {
-            screenMap: screenMap
+            /**
+             * @default
+             * Default values of breakpoints synchronized with global css variables from `:root`
+             * @type {Array}
+             */
+            screenMap: []
         },
 
         /**
@@ -48,7 +25,10 @@ define(function(require) {
         /**
          * @property {Object}
          */
-        viewport: null,
+        viewport: {
+            width: 0,
+            type: null
+        },
 
         /**
          * @property {Object}
@@ -69,8 +49,6 @@ define(function(require) {
             this.screenByTypes = this._prepareScreenMaps(options.cssVariables || {});
 
             this.viewport = {
-                width: 0,
-                type: null,
                 isMobile: _.isMobile(),
                 isApplicable: _.bind(this.isApplicable, this)
             };
@@ -135,6 +113,7 @@ define(function(require) {
          * @param cssVariables
          * @returns {*}
          * @private
+         * See [documentation](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/UIBundle/Resources/doc/reference/client-side/css-variables.md)
          */
         _collectCSSBreakpoints: function(cssVariables) {
             var regexpMax = /(max-width:\s?)([(\d+)]*)/g;
