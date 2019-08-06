@@ -167,6 +167,18 @@ define(function(require) {
                 }
             );
 
+            screenMap = _.map(screenMap, function(screens) {
+                if (!screens.max) {
+                    screens.max = Infinity;
+                }
+
+                if (!screens.min) {
+                    screens.min = 0;
+                }
+
+                return screens;
+            });
+
             screenMap = this._sortScreenTypes(screenMap);
 
             this.options.screenMap = screenMap;
@@ -301,49 +313,44 @@ define(function(require) {
         },
 
         /**
-         * Min screen type criteria
-         * @param minScreenType
-         * @returns {boolean}
-         * @private
-         */
-        _minScreenTypeChecker: function(minScreenType) {
-            if (minScreenType === 'any') {
-                return true;
-            }
-
-            var allowScreens = this.getAllowScreenTypes(minScreenType);
-            var minViewport = this._getScreenByTypes(minScreenType);
-
-            var _results = _.map(allowScreens, function(screen) {
-                var viewport = this._getScreenByTypes(screen);
-
-                return (_.isObject(viewport) && _.isObject(minViewport))
-                    ? viewport.max >= minViewport.max
-                    : false;
-            }, this);
-
-            return _.some(_results);
-        },
-
-        /**
          * Max screen type criteria
          * @param maxScreenType
          * @returns {boolean}
          * @private
          */
         _maxScreenTypeChecker: function(maxScreenType) {
-            if (maxScreenType === 'any') {
+            return this._screenSizeChecker(maxScreenType);
+        },
+
+        /**
+         * Min screen type criteria
+         * @param minScreenType
+         * @returns {boolean}
+         * @private
+         */
+        _minScreenTypeChecker: function(minScreenType) {
+          return this._screenSizeChecker(minScreenType);
+        },
+
+        /**
+         * Check max/min screen size criteria
+         * @param screenType
+         * @returns {boolean}
+         * @private
+         */
+        _screenSizeChecker: function(screenType) {
+            if (screenType === 'any') {
                 return true;
             }
 
-            var allowScreens = this.getAllowScreenTypes(maxScreenType);
-            var maxViewport = this._getScreenByTypes(maxScreenType);
+            var allowScreens = this.getAllowScreenTypes(screenType);
+            var currentViewport = this._getScreenByTypes(screenType);
 
             var _results = _.map(allowScreens, function(screen) {
                 var viewport = this._getScreenByTypes(screen);
 
-                return (_.isObject(viewport) && _.isObject(maxViewport))
-                    ? viewport.max <= maxViewport.max
+                return (_.isObject(viewport) && _.isObject(currentViewport))
+                    ? (viewport.max <= currentViewport.max || viewport.min >= currentViewport.min)
                     : false;
             }, this);
 
