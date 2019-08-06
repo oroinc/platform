@@ -10,10 +10,10 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
  */
 class MaxRelatedEntitiesConfigExtra implements ConfigExtraInterface
 {
-    const NAME = 'max_related_entities';
+    public const NAME = 'max_related_entities';
 
     /** @var int */
-    protected $maxRelatedEntities;
+    private $maxRelatedEntities;
 
     /**
      * @param int $maxRelatedEntities

@@ -5,7 +5,9 @@ namespace Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\Status;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -27,8 +29,9 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
      */
     public function load(ObjectManager $manager)
     {
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
         $userManager = $this->container->get('oro_user.manager');
+        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $role = $manager->getRepository(Role::class)->findOneBy(['role' => User::ROLE_DEFAULT]);
 
         $status1 = new Status();
         $status1->setStatus('status1');
@@ -39,11 +42,12 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $user->setUsername('simple_user')
             ->setPlainPassword('simple_password')
             ->setEmail('simple_user@example.com')
-            ->setFirstName("First Name")
-            ->setLastName("Last Name")
+            ->setFirstName('First Name')
+            ->setLastName('Last Name')
             ->setOrganization($organization)
             ->setOrganizations(new ArrayCollection([$organization]))
             ->setOwner($organization->getBusinessUnits()->first())
+            ->addRole($role)
             ->setEnabled(true);
         $userManager->updateUser($user);
 

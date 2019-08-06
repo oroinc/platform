@@ -49,7 +49,7 @@ class UpdateUserCommandEventListener
                 ->setEmail('admin@example.com')
                 ->setSalt('');
 
-            $this->userManager->updateUser($user, true);
+            $this->userManager->updateUser($user);
         }
     }
 }

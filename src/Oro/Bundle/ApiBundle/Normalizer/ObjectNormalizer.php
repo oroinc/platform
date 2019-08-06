@@ -68,29 +68,42 @@ class ObjectNormalizer
     }
 
     /**
-     * @param mixed                       $object  An object to be normalized
+     * @param array                       $objects The list of objects to be normalized
      * @param EntityDefinitionConfig|null $config  Normalization rules
      * @param array                       $context Options post serializers and data transformers have access to
      *
-     * @return mixed
+     * @return array
      */
-    public function normalizeObject($object, EntityDefinitionConfig $config = null, array $context = [])
-    {
-        if (null !== $object) {
+    public function normalizeObjects(
+        array $objects,
+        EntityDefinitionConfig $config = null,
+        array $context = []
+    ): array {
+        $normalizedObjects = [];
+        if ($objects) {
             if (null !== $config) {
                 $normalizedConfig = clone $config;
                 $this->configNormalizer->normalizeConfig($normalizedConfig);
                 $config = $normalizedConfig;
             }
-            $object = $this->normalizeValue($object, is_array($object) ? 0 : 1, $context, $config);
+            foreach ($objects as $key => $object) {
+                $object = $this->normalizeValue($object, 1, $context, $config);
+                if (null !== $config) {
+                    $data = $this->dataNormalizer->normalizeData([$object], $config);
+                    $object = reset($data);
+                }
+                $normalizedObjects[$key] = $object;
+            }
             if (null !== $config) {
-                $data = [$object];
-                $data = $this->dataNormalizer->normalizeData($data, $config);
-                $object = reset($data);
+                $normalizedObjects = $this->serializationHelper->processPostSerializeCollection(
+                    $normalizedObjects,
+                    $config,
+                    $context
+                );
             }
         }
 
-        return $object;
+        return $normalizedObjects;
     }
 
     /**

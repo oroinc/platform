@@ -6,7 +6,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
-use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
@@ -115,7 +114,6 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $user->setPlainPassword($password);
         $user->setSalt($salt);
-        $user->addRole(new Role(User::ROLE_ADMINISTRATOR));
 
         $encoder = $this->expectGetPasswordEncoder($user);
         $encoder->expects(self::once())
@@ -139,7 +137,6 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
     public function testUpdateUserWithoutPlainPassword()
     {
         $user = new User();
-        $user->addRole(new Role(User::ROLE_ADMINISTRATOR));
 
         $em = $this->expectGetEntityManager();
         $em->expects(self::once())
@@ -152,17 +149,6 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
 
         self::assertNull($user->getPlainPassword());
         self::assertNull($user->getPassword());
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage User must have at least one role.
-     */
-    public function testUpdateUserWithoutRoles()
-    {
-        $user = new User();
-
-        $this->userManager->updateUser($user);
     }
 
     public function testGeneratePasswordWithDefaultLength()

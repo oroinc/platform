@@ -148,6 +148,20 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetFirstLevelOfExpandedAssociationsForNestedFieldOfFieldWithoutPropertyPath()
+    {
+        $pathsToExpand = ['field1.field3'];
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1');
+
+        self::assertEquals(
+            [
+                'field1' => ['field3']
+            ],
+            $this->extractor->getFirstLevelOfExpandedAssociations($config, $pathsToExpand)
+        );
+    }
+
     public function testGetFirstLevelOfExpandedAssociationsForRenamedFieldWithPropertyPath()
     {
         $pathsToExpand = ['field1'];
@@ -156,6 +170,20 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [],
+            $this->extractor->getFirstLevelOfExpandedAssociations($config, $pathsToExpand)
+        );
+    }
+
+    public function testGetFirstLevelOfExpandedAssociationsForNestedFieldOfRenamedFieldWithPropertyPath()
+    {
+        $pathsToExpand = ['field1.field3'];
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1')->setPropertyPath('realField1');
+
+        self::assertEquals(
+            [
+                'field1' => ['field3']
+            ],
             $this->extractor->getFirstLevelOfExpandedAssociations($config, $pathsToExpand)
         );
     }
@@ -169,6 +197,20 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [
                 'field2' => ['field21']
+            ],
+            $this->extractor->getFirstLevelOfExpandedAssociations($config, $pathsToExpand)
+        );
+    }
+
+    public function testGetFirstLevelOfExpandedAssociationsForNestedFieldOfFieldWithPropertyPath()
+    {
+        $pathsToExpand = ['field1.field3'];
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1')->setPropertyPath('field2.field21');
+
+        self::assertEquals(
+            [
+                'field2' => ['field21.field3']
             ],
             $this->extractor->getFirstLevelOfExpandedAssociations($config, $pathsToExpand)
         );

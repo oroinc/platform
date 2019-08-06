@@ -22,6 +22,7 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@oro_segment.query.dynamic_segment.query_builder'
             - '@oro_security.owner.ownership_metadata_provider'
+            - '@oro_entity.orm.native_query_executor_helper'
 
     Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager:
         alias: oro_segment.static_segment_manager

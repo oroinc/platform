@@ -6,3 +6,4 @@ oro_user:
     login:
         errors:
             bad_credentials: 'Your login was unsuccessful. Please check your e-mail address and password before trying again. If you have forgotten your password, follow "Forgot your password?" link.'
+            empty_owner: 'There was an issue with your authentication, please contact the system administrator.'

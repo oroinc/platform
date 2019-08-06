@@ -29,7 +29,7 @@ The [ConfigExtraInterface](../../Config/ConfigExtraInterface.php) has the follow
  * **getName** - Returns a string used as a unique identifier of the configuration data.
  * **getCacheKeyPart** - Returns a string to add to a cache key used by the [configuration providers](../../Provider/AbstractConfigProvider.php). In most cases this method returns the same value as the `getName` method. However, more complicated extras can build the cache key part based on other properties, e.g. [MaxRelatedEntitiesConfigExtra](../../Config/MaxRelatedEntitiesConfigExtra.php).
  * **configureContext** - Adds additional values to the [ConfigContext](../../Processor/Config/ConfigContext.php). For example, the mentioned above [MaxRelatedEntitiesConfigExtra](../../Config/MaxRelatedEntitiesConfigExtra.php) adds the maximum number of related entities into the context of the [get_config](./actions.md#get_config-action) action and this value is used by the [SetMaxRelatedEntities](../../Processor/Config/GetConfig/SetMaxRelatedEntities.php) processor to make necessary modifications to the configuration.
- * **isPropagable** - Indicates whether to use this config extra when a configuration of related entities is built. For example, [DescriptionsConfigExtra](../../Config/DescriptionsConfigExtra.php) is propagable and so we will get human-readable descriptions of the main entity and all the related entities. When this extra is not propagable, only the descriptions of the main entity are returned.
+ * **isPropagable** - Indicates whether this config extra should be used when a configuration of related entities is built. For example, [DataTransformersConfigExtra](../../Config/DataTransformersConfigExtra.php) is propagable and as result field value data transformers will be returned for the main entity and all related entities.
 
 
 ## ConfigExtraSectionInterface
@@ -70,7 +70,7 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
 
     public function isPropagable()
     {
-        return true;
+        return false;
     }
 
     public function getCacheKeyPart()
