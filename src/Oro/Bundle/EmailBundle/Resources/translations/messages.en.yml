@@ -148,6 +148,8 @@ oro:
             organization.label:  Organization
             visible.label:       Visible
 
+            template_data_title: Template Data
+
             # sections for email template variables
             variables:
                 system: 'System variables'

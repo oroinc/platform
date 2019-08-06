@@ -478,6 +478,17 @@ class LocaleSettings
     }
 
     /**
+     * @param string $code
+     * @param string $locale
+     *
+     * @return string|null
+     */
+    public function getLocaleNameByCode(string $code, $locale = 'en'): ?string
+    {
+        return  Intl::getLocaleBundle()->getLocaleName($code, $locale);
+    }
+
+    /**
      * @param array  $codes
      * @param string $locale
      *
