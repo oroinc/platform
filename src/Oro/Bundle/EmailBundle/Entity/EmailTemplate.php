@@ -212,6 +212,8 @@ class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterfac
         $this->type         = $type;
         $this->content      = $parsedContent['content'];
         $this->translations = new ArrayCollection();
+
+        parent::__construct();
     }
 
     /**

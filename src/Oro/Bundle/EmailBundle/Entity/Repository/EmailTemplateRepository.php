@@ -163,6 +163,20 @@ class EmailTemplateRepository extends EntityRepository
 
     /**
      * @param EmailTemplateCriteria $criteria
+     * @return EmailTemplate
+     * @throws NonUniqueResultException
+     * @throws \Doctrine\ORM\NoResultException
+     */
+    public function findSingleByEmailTemplateCriteria(EmailTemplateCriteria $criteria): EmailTemplate
+    {
+        $queryBuilder = $this->createQueryBuilder('t')->select('t');
+        $this->resolveEmailTemplateCriteria($queryBuilder, $criteria);
+
+        return  $queryBuilder->getQuery()->getSingleResult();
+    }
+
+    /**
+     * @param EmailTemplateCriteria $criteria
      * @return bool
      */
     public function isExist(EmailTemplateCriteria $criteria): bool
