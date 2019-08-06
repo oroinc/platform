@@ -41,10 +41,7 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
     {
         /** @var CustomizeLoadedDataContext $context */
 
-        $data = $context->getResult();
-        if (!is_array($data) || empty($data)) {
-            return;
-        }
+        $data = $context->getData();
 
         $config = $context->getConfig();
         if (null === $config) {
@@ -70,7 +67,7 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
                 ? $this->getLocalizedValue($valuesPerField[$fieldName])
                 : null;
         }
-        $context->setResult($data);
+        $context->setData($data);
     }
 
     /**

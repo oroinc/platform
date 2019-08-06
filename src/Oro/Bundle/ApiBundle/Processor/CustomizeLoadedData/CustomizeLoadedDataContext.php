@@ -14,6 +14,33 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
     private const IDENTIFIER_ONLY = 'identifier_only';
 
     /**
+     * Gets the response data.
+     *
+     * The format of the data for a single item: [field name => field value, ...]
+     * The format of the data for a collection: [[field name => field value, ...], ...]
+     *
+     * This method is a alias for getResult, but with strict return data type.
+     *
+     * @return array
+     */
+    public function getData(): array
+    {
+        return $this->getResult();
+    }
+
+    /**
+     * Sets the response data.
+     *
+     * This method is a alias for setResult, but with strict data type of the parameter.
+     *
+     * @param array $data
+     */
+    public function setData(array $data): void
+    {
+        $this->setResult($data);
+    }
+
+    /**
      * Indicates whether "customize_loaded_data" action is executed for a relationship,
      * it means that only identifier field should be returned in response data.
      *
