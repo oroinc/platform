@@ -1,6 +1,7 @@
 <% var togglerId = _.uniqueId('dropdown-') %>
 <div class="dropdown">
     <a id="<%- togglerId %>" class="dropdown-toggle" data-toggle="dropdown" href="#" role="button"
+       data-adjust-height
        aria-haspopup="true" aria-expanded="false" aria-label="<%- _.__('Filter criteria') %>"><%- selectedChoiceLabel %></a>
     <ul class="dropdown-menu" role="menu" aria-labelledby="<%- togglerId %>">
         <% _.each(choices, function (option) { %>
