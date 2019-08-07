@@ -294,7 +294,6 @@ class EntitySerializer
         }
 
         $result = [];
-
         $idFieldName = $this->doctrineHelper->getEntityIdFieldName($entityClass);
         if ($useIdAsKey) {
             foreach ($entities as $entity) {
@@ -315,14 +314,7 @@ class EntitySerializer
             $context
         );
 
-        $handler = $config->getPostSerializeHandler();
-        if (null !== $handler) {
-            foreach ($result as $key => $item) {
-                $result[$key] = $this->serializationHelper->postSerialize($item, $handler, $context);
-            }
-        }
-
-        return $this->serializationHelper->processPostSerializeCollection($result, $config, $context);
+        return $this->serializationHelper->processPostSerializeItems($result, $config, $context);
     }
 
     /**
@@ -414,7 +406,6 @@ class EntitySerializer
         if (!empty($referenceFields)) {
             $result = $this->serializationHelper->handleFieldsReferencedToChildFields(
                 $result,
-                $entityClass,
                 $config,
                 $context,
                 $referenceFields
@@ -690,17 +681,8 @@ class EntitySerializer
     ) {
         $items = [$entity];
         $this->loadRelatedData($items, $entityClass, [$entityId], $config, $context);
+        $items = $this->serializationHelper->processPostSerializeItems($items, $config, $context);
         $entity = reset($items);
-
-        $handler = $config->getPostSerializeHandler();
-        if (null !== $handler) {
-            $entity = $this->serializationHelper->postSerialize($entity, $handler, $context);
-        }
-        $collectionHandler = $config->getPostSerializeCollectionHandler();
-        if (null !== $collectionHandler) {
-            $items = $this->serializationHelper->postSerializeCollection([$entity], $collectionHandler, $context);
-            $entity = reset($items);
-        }
     }
 
     /**
@@ -716,9 +698,10 @@ class EntitySerializer
         $entityIdFieldName = $this->fieldAccessor->getIdField($entityClass, $config);
         foreach ($result as &$resultItem) {
             if (!array_key_exists($entityIdFieldName, $resultItem)) {
-                throw new \RuntimeException(
-                    sprintf('The result item does not contain the entity identifier. Entity: %s.', $entityClass)
-                );
+                throw new \RuntimeException(sprintf(
+                    'The result item does not contain the entity identifier. Entity: %s.',
+                    $entityClass
+                ));
             }
             $entityId = $resultItem[$entityIdFieldName];
             foreach ($relatedData as $field => $relatedItems) {
@@ -768,15 +751,10 @@ class EntitySerializer
         $resultFieldName = $this->getIdFieldNameIfIdOnlyRequested($config, $entityClass);
         $relatedItemIds = $this->getRelatedItemsIds($bindings, $limit);
         if (null !== $resultFieldName) {
-            $handler = $config->getPostSerializeHandler();
             foreach ($relatedItemIds as $relatedItemId) {
-                $item = [$resultFieldName => $relatedItemId];
-                if (null !== $handler) {
-                    $item = $this->serializationHelper->postSerialize($item, $handler, $context);
-                }
-                $items[$relatedItemId] = $item;
+                $items[$relatedItemId] = [$resultFieldName => $relatedItemId];
             }
-            $items = $this->serializationHelper->processPostSerializeCollection($items, $config, $context);
+            $items = $this->serializationHelper->processPostSerializeItems($items, $config, $context);
         } else {
             $qb = $this->queryFactory->getRelatedItemsQueryBuilder($entityClass, $relatedItemIds);
             $this->updateQuery($qb, $config);
@@ -932,37 +910,27 @@ class EntitySerializer
         EntityConfig $config,
         array $context
     ) {
-        $result = [];
-        $handler = $config->getPostSerializeHandler();
-        $collectionHandler = $config->getPostSerializeCollectionHandler();
-        if (null === $collectionHandler) {
-            foreach ($items as $item) {
-                $serializeItem = $this->serializeItem($isObject ? $item[0] : $item, $entityClass, $config, $context);
-                if (null !== $handler) {
-                    $serializeItem = $this->serializationHelper->postSerialize($serializeItem, $handler, $context);
-                }
-                $result[$item['entityId']][] = $serializeItem;
-            }
-        } else {
-            $resultMap = [];
-            $serializedItems = [];
-            foreach ($items as $key => $item) {
-                $serializeItem = $this->serializeItem($isObject ? $item[0] : $item, $entityClass, $config, $context);
-                if (null !== $handler) {
-                    $serializeItem = $this->serializationHelper->postSerialize($serializeItem, $handler, $context);
-                }
-                $serializedItems[$key] = $serializeItem;
-                $resultMap[$item['entityId']][] = $key;
-            }
-            $serializedItems = $this->serializationHelper->postSerializeCollection(
-                $serializedItems,
-                $collectionHandler,
+        $resultMap = [];
+        $serializedItems = [];
+        foreach ($items as $key => $item) {
+            $serializedItems[$key] = $this->serializeItem(
+                $isObject ? $item[0] : $item,
+                $entityClass,
+                $config,
                 $context
             );
-            foreach ($resultMap as $entityId => $itemsPerEntity) {
-                foreach ($itemsPerEntity as $key) {
-                    $result[$entityId][] = $serializedItems[$key];
-                }
+            $resultMap[$item['entityId']][] = $key;
+        }
+        $serializedItems = $this->serializationHelper->processPostSerializeItems(
+            $serializedItems,
+            $config,
+            $context
+        );
+
+        $result = [];
+        foreach ($resultMap as $entityId => $itemsPerEntity) {
+            foreach ($itemsPerEntity as $key) {
+                $result[$entityId][] = $serializedItems[$key];
             }
         }
 

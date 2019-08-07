@@ -37,35 +37,31 @@ class SerializationHelper
     }
 
     /**
-     * Passes a serialized item through the specified "post serialization" handler.
+     * Passes a serialized items through "post serialization" handler for a single item
+     * if the given config has this handler.
      *
-     * @param array    $item
-     * @param callable $handler
-     * @param array    $context
+     * @param array|null   $item
+     * @param EntityConfig $config
+     * @param array        $context
      *
-     * @return array
+     * @return array|null
      */
-    public function postSerialize(array $item, $handler, array $context)
+    public function postSerializeItem(?array $item, EntityConfig $config, array $context): ?array
     {
-        return $handler($item, $context);
+        if (!$item) {
+            return $item;
+        }
+
+        $handler = $config->getPostSerializeHandler();
+        if (null !== $handler) {
+            $item = $handler($item, $context);
+        }
+
+        return $item;
     }
 
     /**
-     * Passes a collection of serialized items through the specified "post serialization" handler.
-     *
-     * @param array    $items
-     * @param callable $handler
-     * @param array    $context
-     *
-     * @return array
-     */
-    public function postSerializeCollection(array $items, $handler, array $context)
-    {
-        return $handler($items, $context);
-    }
-
-    /**
-     * Passes a collection of serialized items through the specified "post serialization" handler
+     * Passes a serialized items through "post serialization" handler for a list of items
      * if the given config has this handler.
      *
      * @param array        $items
@@ -74,11 +70,48 @@ class SerializationHelper
      *
      * @return array
      */
-    public function processPostSerializeCollection(array $items, EntityConfig $config, array $context)
+    public function postSerializeCollection(array $items, EntityConfig $config, array $context): array
     {
+        if (!$items) {
+            return $items;
+        }
+
         $collectionHandler = $config->getPostSerializeCollectionHandler();
         if (null !== $collectionHandler) {
-            $items = $this->postSerializeCollection($items, $collectionHandler, $context);
+            $items = $collectionHandler($items, $context);
+        }
+
+        return $items;
+    }
+
+    /**
+     * Passes a serialized items through "post serialization" handlers
+     * for a single item and for a list of items if the given config has these handlers.
+     *
+     * @param array        $items
+     * @param EntityConfig $config
+     * @param array        $context
+     *
+     * @return array
+     */
+    public function processPostSerializeItems(array $items, EntityConfig $config, array $context): array
+    {
+        if (empty($items)) {
+            return $items;
+        }
+
+        $handler = $config->getPostSerializeHandler();
+        if (null !== $handler) {
+            foreach ($items as $key => $item) {
+                if (\is_array($item) && !empty($item)) {
+                    $item = $handler($item, $context);
+                }
+                $items[$key] = $item;
+            }
+        }
+        $collectionHandler = $config->getPostSerializeCollectionHandler();
+        if (null !== $collectionHandler) {
+            $items = $collectionHandler($items, $context);
         }
 
         return $items;
@@ -91,7 +124,6 @@ class SerializationHelper
      * and returns the changed data.
      *
      * @param array        $serializedData
-     * @param string       $entityClass
      * @param EntityConfig $entityConfig
      * @param array        $context
      * @param array        $fields [field name => [property, ...], ...]
@@ -100,27 +132,26 @@ class SerializationHelper
      */
     public function handleFieldsReferencedToChildFields(
         array $serializedData,
-        $entityClass,
         EntityConfig $entityConfig,
         array $context,
         array $fields
-    ) {
+    ): array {
         foreach ($fields as $fieldName => $propertyPath) {
             $value = null;
             $firstField = $this->getFieldName($entityConfig, $propertyPath[0]);
-            if (array_key_exists($firstField, $serializedData)) {
+            if (\array_key_exists($firstField, $serializedData)) {
                 $currentData = $serializedData[$firstField];
                 $currentConfig = $this->getTargetEntityConfig($entityConfig, $firstField);
-                if (null !== $currentConfig && is_array($currentData)) {
-                    $lastIndex = count($propertyPath) - 1;
+                if (null !== $currentConfig && \is_array($currentData)) {
+                    $lastIndex = \count($propertyPath) - 1;
                     $index = 1;
                     while ($index < $lastIndex) {
                         $currentField = $this->getFieldName($currentConfig, $propertyPath[$index]);
-                        if (!array_key_exists($currentField, $currentData)) {
+                        if (!\array_key_exists($currentField, $currentData)) {
                             break;
                         }
                         $currentData = $currentData[$currentField];
-                        if (!is_array($currentData)) {
+                        if (!\is_array($currentData)) {
                             break;
                         }
                         $currentConfig = $this->getTargetEntityConfig($currentConfig, $currentField);
@@ -131,7 +162,7 @@ class SerializationHelper
                     }
                     if ($index === $lastIndex) {
                         $currentField = $this->getFieldName($currentConfig, $propertyPath[$lastIndex]);
-                        if (array_key_exists($currentField, $currentData)) {
+                        if (\array_key_exists($currentField, $currentData)) {
                             $value = $currentData[$currentField];
                             $currentConfig = $this->getTargetEntityConfig($currentConfig, $currentField);
                             if (null === $currentConfig) {
@@ -159,7 +190,7 @@ class SerializationHelper
      *
      * @return EntityConfig|null
      */
-    private function getTargetEntityConfig(EntityConfig $entityConfig, $fieldName)
+    private function getTargetEntityConfig(EntityConfig $entityConfig, string $fieldName): ?EntityConfig
     {
         $fieldConfig = $entityConfig->getField($fieldName);
         if (null === $fieldConfig) {
@@ -177,7 +208,7 @@ class SerializationHelper
      *
      * @return string
      */
-    private function getFieldName(EntityConfig $entityConfig, $property)
+    private function getFieldName(EntityConfig $entityConfig, string $property): string
     {
         $renamedFields = $entityConfig->get(ConfigUtil::RENAMED_FIELDS);
         if (null !== $renamedFields && isset($renamedFields[$property])) {
