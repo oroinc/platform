@@ -280,12 +280,14 @@ define(function(require) {
                 });
 
                 if (inRange) {
-                    this.viewport.type = screen.name;
                     _result.push(screen.name);
                 }
             }
 
             this.viewport.allowTypes = _result;
+            this.viewport.type = _.min(this.viewport.allowTypes, function(type) {
+                return Math.abs(viewportWidth - this.screenByTypes[type].max)
+            }, this)
         },
 
         /**
@@ -319,7 +321,16 @@ define(function(require) {
          * @private
          */
         _maxScreenTypeChecker: function(maxScreenType) {
-            return this._screenSizeChecker(maxScreenType);
+            if (maxScreenType === 'any') {
+                return true;
+            }
+
+            var viewport = this._getScreenByTypes(this.viewport.type);
+            var maxViewport = this._getScreenByTypes(maxScreenType);
+
+            return (_.isObject(viewport) && _.isObject(maxViewport))
+                ? viewport.max <= maxViewport.max
+                : false;
         },
 
         /**
@@ -329,32 +340,16 @@ define(function(require) {
          * @private
          */
         _minScreenTypeChecker: function(minScreenType) {
-          return this._screenSizeChecker(minScreenType);
-        },
-
-        /**
-         * Check max/min screen size criteria
-         * @param screenType
-         * @returns {boolean}
-         * @private
-         */
-        _screenSizeChecker: function(screenType) {
-            if (screenType === 'any') {
+            if (minScreenType === 'any') {
                 return true;
             }
 
-            var allowScreens = this.getAllowScreenTypes(screenType);
-            var currentViewport = this._getScreenByTypes(screenType);
+            var viewport = this._getScreenByTypes(this.viewport.type);
+            var minViewport = this._getScreenByTypes(minScreenType);
 
-            var _results = _.map(allowScreens, function(screen) {
-                var viewport = this._getScreenByTypes(screen);
-
-                return (_.isObject(viewport) && _.isObject(currentViewport))
-                    ? (viewport.max <= currentViewport.max || viewport.min >= currentViewport.min)
-                    : false;
-            }, this);
-
-            return _.some(_results);
+            return (_.isObject(viewport) && _.isObject(minViewport))
+                ? viewport.max >= minViewport.max
+                : false;
         },
 
         /**
