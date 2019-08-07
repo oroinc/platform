@@ -286,8 +286,8 @@ define(function(require) {
 
             this.viewport.allowTypes = _result;
             this.viewport.type = _.min(this.viewport.allowTypes, function(type) {
-                return Math.abs(viewportWidth - this.screenByTypes[type].max)
-            }, this)
+                return Math.abs(viewportWidth - this.screenByTypes[type].max);
+            }, this);
         },
 
         /**
