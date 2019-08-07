@@ -117,13 +117,15 @@
     }
 
     // Support of old markup
-    &, .dropdown-menu-items {
+    &,
+    .dropdown-menu-items {
         > li > a {
             @extend .dropdown-item;
         }
     }
-    
-    .btn-group {
+
+    // Add offset like in "bootstrap .dropdown-item" element
+    > li > .btn-group {
         padding: $dropdown-item-padding-y $dropdown-item-padding-x;
     }
 }
