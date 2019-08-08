@@ -99,29 +99,8 @@
     {{ QD.query_designer_column_chain_template('entity-column-chain-template') }}
 
     {% set requiredConstraint = {
-    "NotBlank": null
+        "NotBlank": null
     } %}
-    <style type="text/css">
-        .tab-data {
-            padding: 20px;
-        }
-
-        .transition-list .action-column {
-            width: 90px;
-        }
-
-        .steps-list .action-column {
-            width: 110px;
-        }
-
-        .transitions-list-short {
-            margin-left: 0;
-        }
-
-        .transitions-list-short li {
-            list-style: none;
-        }
-    </style>
 
     <script type="text/template" id="workflow-translate-link-template">
         <% if (translateLink) { %>{{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLink %>', true) }}<% } %>
@@ -557,42 +536,61 @@
     }] %}
 
     {% set stepsListWidget %}
-
     <div class="workflow-definition-buttons">
-        <div class="workflow-history-container pull-left"></div>
-        <div class="pull-left">
-            <button type="button" class="btn btn-secondary refresh-btn">
-                <span class="fa-refresh" aria-hidden="true"></span>
-                {{ 'Auto sort'|trans }}
-            </button>
-        </div>
         <div class="pull-right">
             <button type="button" class="btn btn-primary add-transition-btn">{{ 'Add transition'|trans }}</button>
             <button type="button" class="btn btn-primary add-step-btn">{{ 'Add step'|trans }}</button>
         </div>
     </div>
-
-    <div class="workflow-step-editor row-fluid clearfix">
+    <div class="row-fluid clearfix">
         <div class="workflow-table-container">
             <div class="workflow-definition-steps-list-container clearfix"></div>
         </div>
-        {% if not isMobileVersion() %}
-        <div {{ UI.renderPageComponentAttributes({
-            'view': 'oroworkflow/js/app/views/flowchart/flowchart-container-view',
-            'name': 'flowchart-container'
-        }) }}></div>
-        {% endif %}
     </div>
     {% endset %}
 
-    {% set dataBlocks = dataBlocks|merge([{
-        'title' : 'Designer'|trans,
-        'subblocks': [
+    {% set dataBlocks = dataBlocks|merge([
+        {
+            'title': 'oro.workflow.block.title.steps_and_transitions'|trans,
+            'subblocks': [
+                {
+                    'data':  [stepsListWidget]
+                },
+            ]
+        },
+    ]) %}
+
+    {% if not isMobileVersion() %}
+        {% set workflowDiagram %}
+            <div class="workflow-definition-buttons">
+                <div class="workflow-history-container pull-left"></div>
+                <div class="pull-left">
+                    <button type="button" class="btn btn-secondary refresh-btn">
+                        <span class="fa-refresh" aria-hidden="true"></span>
+                        {{ 'Auto sort'|trans }}
+                    </button>
+                </div>
+                <div class="pull-right">
+                    <button type="button" class="btn btn-primary add-transition-btn">{{ 'Add transition'|trans }}</button>
+                    <button type="button" class="btn btn-primary add-step-btn">{{ 'Add step'|trans }}</button>
+                </div>
+            </div>
+            <div class="workflow-step-editor" {{ UI.renderPageComponentAttributes({
+                'view': 'oroworkflow/js/app/views/flowchart/flowchart-container-view',
+                'name': 'flowchart-container'
+            }) }}></div>
+        {% endset %}
+        {% set dataBlocks = dataBlocks|merge([
             {
-                'data': [stepsListWidget]
-            }
-        ]
-    }] ) %}
+                'title': 'oro.workflow.block.title.workflow_diagrams'|trans,
+                'subblocks': [
+                    {
+                        'data':  [workflowDiagram]
+                    },
+                ]
+            },
+        ])%}
+    {% endif %}
 
     {% set id = 'workflow-designer' %}
     {% set data = {

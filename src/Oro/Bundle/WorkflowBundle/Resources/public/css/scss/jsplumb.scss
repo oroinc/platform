@@ -53,10 +53,6 @@
 
 .workflow-step-editor,
 .workflow-step-viewer {
-    .workflow-table-container {
-        padding-top: $flowchart-padding-top;
-    }
-
     .workflow-flowchart-container {
         background-color: $flowchart-bg-color;
         overflow: hidden;
@@ -76,6 +72,10 @@
             .workflow-flowchart-wrapper {
                 animation: fade-out .5s both;
             }
+        }
+
+        .zoom-controls {
+            padding: $flowchart-checkbox-group-padding;
         }
     }
 }
@@ -99,6 +99,7 @@
 .workflow-flowchart-wrapper {
     overflow: hidden;
     height: $flowchart-wrapper-height;
+    border: $flowchart-wrapper-border;
 
     .workflow-flowchart {
         position: relative;
