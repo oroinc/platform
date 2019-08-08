@@ -10,6 +10,8 @@ The current file describes significant changes in the code that may affect the u
 
 * CSSVariable parser `oroui/js/css-variables-manager` has been add. Source module [css-variables-manager](./src/Oro/Bundle/UIBundle/Resources/public/js/css-variables-manager.js)
 
+  Github link [https://github.com/jhildenbiddle/css-vars-ponyfill](https://github.com/jhildenbiddle/css-vars-ponyfill)
+
 ### Changed
 
 #### UIBundle

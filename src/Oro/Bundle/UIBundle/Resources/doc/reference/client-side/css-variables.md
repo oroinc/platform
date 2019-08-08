@@ -1,10 +1,39 @@
 # CSS Variable Parser
 
+For collect global CSS variables we use [css-vars-ponyfill](https://github.com/jhildenbiddle/css-vars-ponyfill)
+
 The CSS variable parser reads the current style file and collects all global css variables from `:root`.
 
 The module returns a promise which you can connect using the `onReady` method call passing the callback function to the arguments.
 
 You can also listen the event via mediator `css:variables:fetched`
+
+### Default options
+
+```javascript
+{
+    onlyLegacy: false,
+    preserveStatic: false,
+    updateDOM: false,
+    updateURLs: false
+}
+```
+Internet Explorer doesn't support global CSS variables. For enable support for IE set `updateDOM: true`
+
+Insert in twig file
+```twig
+<script type="text/javascript">
+    require({
+        config: {
+            'oroui/js/app/modules/css-variable-module': {
+                'updateDOM': true
+            }
+        }
+    });
+</script>
+```
+
+For more information navigate to official plugin [documentation](https://jhildenbiddle.github.io/css-vars-ponyfill)
 
 Usage examples:
 
@@ -66,3 +95,5 @@ setTimeout(function() {
     Foo(variables);
 }, 10000);
 ```
+
+SCSS breakpoints you can listen via mediator `css:breakpoints:fetched`

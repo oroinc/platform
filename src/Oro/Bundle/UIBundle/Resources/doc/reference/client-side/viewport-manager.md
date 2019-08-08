@@ -6,7 +6,7 @@ Possibility subscribe to event `viewport:change` in view and create a logic base
 For example [DOM Relocation View](../../../../../../../../../commerce/src/Oro/Bundle/FrontendBundle/Resources/doc/components/dom-relocation-view.md) already implemented functionality based by Viewport Manager.
 
 ## Screen Map
-By default these settings for list of screen types synchronized with global css variables from `:root`.
+By default these settings for list of screen types synchronized with scss breakpoints.
 
 ```scss
 // Desktop Media Breakpoint
