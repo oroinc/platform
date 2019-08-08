@@ -18,7 +18,6 @@
     position: relative;
     user-select: none;
     padding-bottom: 44px;
-    z-index: $sidebar-z-index;
 
     &.maximized {
         width: $sidebar-maximized-width;
