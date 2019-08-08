@@ -84,12 +84,15 @@ define(function(require) {
          * @inheritDoc
          */
         render: function() {
-            SidebarView.__super__.render.call(this);
-
             var isMaximized = this.model.isMaximized();
-
             this.$el.toggleClass('maximized', isMaximized);
             this.$el.toggleClass('minimized', !isMaximized);
+
+            SidebarView.__super__.render.call(this);
+            _.each(this.subviews, function(widgetContainer) {
+                widgetContainer.updatePosition();
+            });
+
             this.$list.sortable({
                 axis: 'y',
                 containment: 'parent',
