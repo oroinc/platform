@@ -1,7 +1,7 @@
 /* @theme: blank; */
 
 // Native breakpoints;
-// @Notice! These values contains in $oro_breakpoints array will be converted to global variables and synchronized with `viewportManager`
+// @Notice! These values contains in $oro_breakpoints array will be synchronized with `viewportManager`
 
 $oro_breakpoints: (
     'desktop': '(min-width: ' + $breakpoint-desktop + ')',

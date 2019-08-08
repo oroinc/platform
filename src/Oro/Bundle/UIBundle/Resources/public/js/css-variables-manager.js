@@ -7,7 +7,7 @@ define(function(require) {
     var cssVars = require('css-vars-ponyfill');
     var module = require('module');
     var config = _.defaults(module.config(), {
-        onlyLegacy: false
+        onlyLegacy: false,
         preserveStatic: false,
         updateDOM: false,
         updateURLs: false
