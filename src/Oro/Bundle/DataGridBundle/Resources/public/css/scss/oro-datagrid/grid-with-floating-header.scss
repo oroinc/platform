@@ -13,10 +13,6 @@
         display: none;
     }
 
-    .dropdown-menu {
-        z-index: $zindex-dropdown - 112;
-    }
-
     .grid-header:first-child {
         position: absolute;
         z-index: 3;

@@ -7,7 +7,7 @@ define(function(require) {
 
     AddressBookComponent = BaseComponent.extend({
         optionNames: BaseComponent.prototype.optionNames.concat([
-            'addressListUrl', 'addressBookSelector', 'addresses'
+            'addressListUrl', 'addressBookSelector', 'addresses', 'addressMapOptions'
         ]),
 
         addressBookSelector: '#address-book',
@@ -37,7 +37,8 @@ define(function(require) {
         _getAddressBookViewOptions: function() {
             return {
                 el: this.addressBookSelector,
-                addressListUrl: this.addressListUrl
+                addressListUrl: this.addressListUrl,
+                addressMapOptions: this.addressMapOptions || {}
             };
         },
 

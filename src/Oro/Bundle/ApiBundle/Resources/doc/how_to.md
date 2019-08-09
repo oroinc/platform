@@ -980,10 +980,7 @@ class ComputeProductPriceField implements ProcessorInterface
     {
         /** @var CustomizeLoadedDataContext $context */
 
-        $data = $context->getResult();
-        if (!is_array($data)) {
-            return;
-        }
+        $data = $context->getData();
 
         $priceFieldName = $context->getResultFieldName('price');
         if (!$context->isFieldRequested($priceFieldName, $data)) {
@@ -996,7 +993,7 @@ class ComputeProductPriceField implements ProcessorInterface
         }
 
         $data[$priceFieldName] = $this->loadProductPrice($data[$productIdFieldName]);
-        $context->setResult($data);
+        $context->setData($data);
     }
 
     /**

@@ -17,7 +17,6 @@
     height: 100%;
     user-select: none;
     padding-bottom: 90px;
-    z-index: $sidebar-z-index;
 
     &.maximized {
         width: $sidebar-maximized-width;

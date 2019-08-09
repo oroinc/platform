@@ -95,6 +95,20 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($sharedData, $normalizationContext['sharedData']);
     }
 
+    public function testData()
+    {
+        $data = ['key' => 'value'];
+        $this->context->setData($data);
+        self::assertSame($data, $this->context->getData());
+        self::assertTrue($this->context->hasResult());
+        self::assertSame($data, $this->context->getResult());
+
+        $this->context->setData([]);
+        self::assertSame([], $this->context->getData());
+        self::assertTrue($this->context->hasResult());
+        self::assertSame([], $this->context->getResult());
+    }
+
     public function testIdentifierOnly()
     {
         self::assertFalse($this->context->isIdentifierOnly());
