@@ -212,12 +212,6 @@
         type: type,
     }) %}
 
-    {% if src is defined %}
-        {% set attr = attr|merge({
-            href: src
-        }) %}
-    {% endif %}
-
     {% if media is defined %}
         {% set attr = attr|merge({
             media: media
@@ -237,8 +231,9 @@
     {% endif %}
 
     {% spaceless %}
-        {%- if attr.href is defined and attr.href is not empty -%}
-            <link rel="stylesheet"{{ block('block_attributes') }}/>
+        {%- if src is defined and src is not empty -%}
+            {% import '@OroAsset/Asset.html.twig' as Asset %}
+            {{ Asset.css(src, block('block_attributes')) }}
         {% else %}
             <style{{ block('block_attributes') }}>
                 {{ content|raw }}

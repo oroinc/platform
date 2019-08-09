@@ -6,7 +6,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Update cache of bundles path and application_url at asset-config.json, that used by webpack asset builder.
+ * Update cache of bundles path and webpack dev server options at asset-config.json, that used by webpack asset builder.
  */
 class AssetConfigCache implements WarmableInterface
 {
@@ -15,9 +15,21 @@ class AssetConfigCache implements WarmableInterface
      */
     private $kernel;
 
-    public function __construct(KernelInterface $kernel)
-    {
+    /**
+     * @var array
+     */
+    private $webpackDevServerOptions;
+
+    /**
+     * @param KernelInterface $kernel
+     * @param array           $webpackDevServerOptions
+     */
+    public function __construct(
+        KernelInterface $kernel,
+        array $webpackDevServerOptions
+    ) {
         $this->kernel = $kernel;
+        $this->webpackDevServerOptions = $webpackDevServerOptions;
     }
 
     /**
@@ -26,6 +38,7 @@ class AssetConfigCache implements WarmableInterface
     public function warmUp($cacheDir)
     {
         $config['paths'] = $this->getBundlesPath();
+        $config['devServerOptions'] = $this->webpackDevServerOptions;
 
         @file_put_contents($this->getFilePath($cacheDir), \json_encode($config));
     }

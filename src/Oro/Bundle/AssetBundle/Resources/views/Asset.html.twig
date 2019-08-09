@@ -1,0 +1,7 @@
+{% macro css(src, extra_attributes) %}
+    {% if webpack_hmr_enabled() %}
+        <script type="text/javascript" src="{{ asset(src|webpack_asset) }}"></script>
+    {% else %}
+        <link rel="stylesheet" {{ extra_attributes|raw }} href="{{ asset(src) }}"/>
+    {% endif %}
+{% endmacro %}
