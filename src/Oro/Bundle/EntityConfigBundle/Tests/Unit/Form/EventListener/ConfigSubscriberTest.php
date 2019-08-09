@@ -569,7 +569,7 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
                 [
                     'label' => 'label_key',
                     'icon'  => 'testIcon',
-                    'state' => 'Requires update',
+                    'state' => 'Active',
                 ],
                 []
             ],

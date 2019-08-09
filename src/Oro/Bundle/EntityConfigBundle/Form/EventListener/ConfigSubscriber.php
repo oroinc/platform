@@ -102,7 +102,10 @@ class ConfigSubscriber implements EventSubscriberInterface
 
                 $translatable = $provider->getPropertyConfig()->getTranslatableValues($configId);
                 foreach ($data[$scope] as $code => $value) {
-                    if (isset($changeSet[$code][static::NEW_PENDING_VALUE_KEY])) {
+                    if ($configModel->getId() &&
+                        $configModel instanceof FieldConfigModel &&
+                        isset($changeSet[$code][static::NEW_PENDING_VALUE_KEY])
+                    ) {
                         // we shouldn't overwrite config's value by data from form,
                         // if it was directly changed earlier by some form's listener or something like that
                         $value = $changeSet[$code][static::NEW_PENDING_VALUE_KEY];
