@@ -48,11 +48,25 @@ class DecimalAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
+    public function testGetFilterableNull()
+    {
+        $this->assertNull(
+            $this->getAttributeType()->getFilterableValue($this->attribute, null, $this->localization)
+        );
+    }
+
     public function testGetSortableValue()
     {
         $this->assertSame(
             42.42,
-            $this->getAttributeType()->getFilterableValue($this->attribute, '42.42 test', $this->localization)
+            $this->getAttributeType()->getSortableValue($this->attribute, '42.42 test', $this->localization)
+        );
+    }
+
+    public function testGetSortableValueNull()
+    {
+        $this->assertNull(
+            $this->getAttributeType()->getSortableValue($this->attribute, null, $this->localization)
         );
     }
 }

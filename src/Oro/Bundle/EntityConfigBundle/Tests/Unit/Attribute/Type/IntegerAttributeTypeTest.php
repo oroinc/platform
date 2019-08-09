@@ -48,11 +48,25 @@ class IntegerAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
+    public function testGetFilterableNull()
+    {
+        $this->assertNull(
+            $this->getAttributeType()->getFilterableValue($this->attribute, null, $this->localization)
+        );
+    }
+
     public function testGetSortableValue()
     {
         $this->assertSame(
             100,
             $this->getAttributeType()->getSortableValue($this->attribute, '100 test', $this->localization)
+        );
+    }
+
+    public function testGetSortableValueNull()
+    {
+        $this->assertNull(
+            $this->getAttributeType()->getSortableValue($this->attribute, null, $this->localization)
         );
     }
 }
