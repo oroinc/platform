@@ -1,0 +1,20 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/colors";
+
+$app-prefix: 'gjs-';
+
+// Palette variables
+$primaryColor: $primary-inverse;
+$secondaryColor: $primary-100;
+$tertiaryColor: $primary-830;
+$quaternaryColor: $primary-400;
+
+$colorWarn: $secondary;
+$fontColor: $primary-400;
+$mainLhlColor: $primary-400;
+
+$button-bg-color: $primary-830;
+
+$canvas-bg-color: $primary-inverse;
+$canvas-border: 2px solid #dedede;

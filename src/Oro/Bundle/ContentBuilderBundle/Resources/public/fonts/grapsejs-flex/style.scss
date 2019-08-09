@@ -1,0 +1,94 @@
+@import "variables";
+
+@font-face {
+  font-family: '#{$icomoon-font-family}';
+  src:  url('#{$icomoon-font-path}/#{$icomoon-font-family}.eot?1h0na8');
+  src:  url('#{$icomoon-font-path}/#{$icomoon-font-family}.eot?1h0na8#iefix') format('embedded-opentype'),
+    url('#{$icomoon-font-path}/#{$icomoon-font-family}.ttf?1h0na8') format('truetype'),
+    url('#{$icomoon-font-path}/#{$icomoon-font-family}.woff?1h0na8') format('woff'),
+    url('#{$icomoon-font-path}/#{$icomoon-font-family}.svg?1h0na8##{$icomoon-font-family}') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: '#{$icomoon-font-family}' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-flex-al-str {
+  &:before {
+    content: $icon-flex-al-str; 
+  }
+}
+.icon-flex-al-center {
+  &:before {
+    content: $icon-flex-al-center; 
+  }
+}
+.icon-flex-al-end {
+  &:before {
+    content: $icon-flex-al-end; 
+  }
+}
+.icon-flex-al-start {
+  &:before {
+    content: $icon-flex-al-start; 
+  }
+}
+.icon-flex-dir-col-rev {
+  &:before {
+    content: $icon-flex-dir-col-rev; 
+  }
+}
+.icon-flex-dir-col {
+  &:before {
+    content: $icon-flex-dir-col; 
+  }
+}
+.icon-flex-dir-row-rev {
+  &:before {
+    content: $icon-flex-dir-row-rev; 
+  }
+}
+.icon-flex-dir-row {
+  &:before {
+    content: $icon-flex-dir-row; 
+  }
+}
+.icon-flex-just-end {
+  &:before {
+    content: $icon-flex-just-end; 
+  }
+}
+.icon-flex-just-sp-ar {
+  &:before {
+    content: $icon-flex-just-sp-ar; 
+  }
+}
+.icon-flex-just-sp-bet {
+  &:before {
+    content: $icon-flex-just-sp-bet; 
+  }
+}
+.icon-flex-just-sp-cent {
+  &:before {
+    content: $icon-flex-just-sp-cent; 
+  }
+}
+.icon-flex-just-start {
+  &:before {
+    content: $icon-flex-just-start; 
+  }
+}
+

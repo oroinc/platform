@@ -352,26 +352,26 @@ define(function(require) {
                         {
                             value: 'row',
                             name: 'Row',
-                            className: 'icons-flex icon-dir-row',
+                            className: 'icon-flex-dir-row',
                             title: 'Row'
                         },
                         {
                             value: 'row-reverse',
                             name: 'Row reverse',
-                            className: 'icons-flex icon-dir-row-rev',
+                            className: 'icon-flex-dir-row-rev',
                             title: 'Row reverse'
                         },
                         {
                             value: 'column',
                             name: 'Column',
                             title: 'Column',
-                            className: 'icons-flex icon-dir-col'
+                            className: 'icon-flex-dir-col'
                         },
                         {
                             value: 'column-reverse',
                             name: 'Column reverse',
                             title: 'Column reverse',
-                            className: 'icons-flex icon-dir-col-rev',
+                            className: 'icon-flex-dir-col-rev',
                         }
                     ]
                 },
@@ -383,28 +383,28 @@ define(function(require) {
                     list: [
                         {
                             value: 'flex-start',
-                            className: 'icons-flex icon-just-start',
+                            className: 'icon-flex-just-start',
                             title: 'Start'
                         },
                         {
                             value: 'flex-end',
                             title: 'End',
-                            className: 'icons-flex icon-just-end'
+                            className: 'icon-flex-just-end'
                         },
                         {
                             value: 'space-between',
                             title: 'Space between',
-                            className: 'icons-flex icon-just-sp-bet'
+                            className: 'icon-flex-just-sp-bet'
                         },
                         {
                             value: 'space-around',
                             title: 'Space around',
-                            className: 'icons-flex icon-just-sp-ar'
+                            className: 'icon-flex-just-sp-ar'
                         },
                         {
                             value: 'center',
                             title: 'Center',
-                            className: 'icons-flex icon-just-sp-cent'
+                            className: 'icon-flex-just-sp-cent'
                         }
                     ]
                 },
@@ -417,22 +417,22 @@ define(function(require) {
                         {
                             value: 'flex-start',
                             title: 'Start',
-                            className: 'icons-flex icon-al-start'
+                            className: 'icon-flex-al-start'
                         },
                         {
                             value: 'flex-end',
                             title: 'End',
-                            className: 'icons-flex icon-al-end'
+                            className: 'icon-flex-al-end'
                         },
                         {
                             value: 'stretch',
                             title: 'Stretch',
-                            className: 'icons-flex icon-al-str',
+                            className: 'icon-flex-al-str',
                         },
                         {
                             value: 'center',
                             title: 'Center',
-                            className: 'icons-flex icon-al-center',
+                            className: 'icon-flex-al-center',
                         }
                     ]
                 },
@@ -490,22 +490,22 @@ define(function(require) {
                         {
                             value: 'flex-start',
                             title: 'Start',
-                            className: 'icons-flex icon-al-start'
+                            className: 'icon-flex-al-start'
                         },
                         {
                             value: 'flex-end',
                             title: 'End',
-                            className: 'icons-flex icon-al-end'
+                            className: 'icon-flex-al-end'
                         },
                         {
                             value: 'stretch',
                             title: 'Stretch',
-                            className: 'icons-flex icon-al-str'
+                            className: 'icon-flex-al-str'
                         },
                         {
                             value: 'center',
                             title: 'Center',
-                            className: 'icons-flex icon-al-center'
+                            className: 'icon-flex-al-center'
                         }
                     ]
                 }

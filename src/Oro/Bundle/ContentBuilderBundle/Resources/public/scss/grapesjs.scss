@@ -1,0 +1,314 @@
+/* @theme: admin.oro; */
+
+@import "../fonts/grapsejs-flex/style";
+@import "config/grapesjs-config";
+
+@import "bundles/npmassets/grapesjs/src/styles/scss/main.scss";
+
+.#{$app-prefix} {
+    &editor {
+        textarea,
+        input[type="text"],
+        input[type="password"],
+        input[type="datetime"],
+        input[type="datetime-local"],
+        input[type="date"],
+        input[type="month"],
+        input[type="time"],
+        input[type="week"],
+        input[type="number"],
+        input[type="email"],
+        input[type="url"],
+        input[type="search"],
+        input[type="tel"],
+        input[type="color"],
+        .uneditable-input,
+        .selector {
+            margin-bottom: 0;
+            height: auto;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        input[type='radio'],
+        input[type='checkbox'] {
+            & + label {
+                display: block;
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    &frame {
+        width: calc(100% - 16px);
+        height: calc(100% - 16px);
+        top: 8px;
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+    }
+
+    &cv-canvas {
+        border: $canvas-border;
+        background-color: $canvas-bg-color;
+        padding: 8px;
+        width: calc(85% - 16px);
+
+    }
+
+    &pn-commands {
+        box-shadow: none;
+        padding: 0;
+    }
+
+    &pn-views {
+        box-shadow: none;
+        padding: 0;
+        border-bottom: none;
+
+        .gjs-pn-buttons {
+            .gjs-pn-btn {
+                width: 100%;
+                margin-right: 0;
+                border-radius: 0;
+
+                background-color: #f8f8f8;
+                border-top: 2px solid #dedede;
+                border-left: 2px solid #dedede;
+                border-bottom: 2px solid #dedede;
+                line-height: 20px;
+
+                box-shadow: none;
+
+                &:last-child {
+                    border-right: 2px solid #dedede;
+                }
+
+                &.gjs-pn-active {
+                    border-top-color: $secondary;
+                    border-bottom-color: $primary-inverse;
+                    background-color: $primary-inverse;
+                }
+            }
+        }
+    }
+
+    &pn-panel {
+        padding: 0;
+
+        &.gjs-pn-options {
+            padding-right: 11px;
+        }
+    }
+
+    &pn-views-container {
+        box-shadow: none;
+        padding-top: 42px;
+    }
+
+    &pn-commands,
+    &pn-options,
+    &pn-devices-c {
+        .gjs-pn-btn {
+            background-color: $button-bg-color;
+            border-radius: 30px;
+
+            &.gjs-pn-active {
+                background-color: $additional-extra-light;
+                box-shadow: inset 0 2px 3px 2px rgba(0, 0, 0, 0.21);
+            }
+        }
+    }
+
+    &pn-btn {
+        font-size: 16px;
+        line-height: 23px;
+        min-width: 32px;
+        min-height: 32px;
+
+        &.fa-square-o {
+            &.gjs-pn-active {
+                &:before {
+                    content: "\f14a";
+                }
+            }
+        }
+    }
+
+    &sm-properties {
+        padding-left: 0;
+        padding-right: 0;
+        padding-bottom: 0;
+        font-size: 13px;
+    }
+
+    &sm-label,
+    #gjs-clm-label {
+        font-size: 14px;
+    }
+
+    &field {
+        border-radius: 2px;
+        background-color: #fff;
+        border: 2px solid #d6d6d6;
+
+        select {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        &-arrow-u {
+            border-bottom-color: $primary-400;
+        }
+        &-arrow-d {
+            border-top-color: $primary-400;
+        }
+    }
+
+    &field-radio {
+        border-radius: 20px;
+        border: none;
+
+        .gjs-radio-item {
+            border: none;
+            margin-left: 1px;
+            background-color: $primary-860;
+
+            &:first-child {
+                margin-left: 0;
+                border-radius: 20px 0 0 20px;
+                .gjs-radio-item-label {
+                    border-radius: 20px 0 0 20px;
+                }
+            }
+
+            &:last-child {
+                border-radius: 0 20px 20px 0;
+                .gjs-radio-item-label {
+                    border-radius: 0 20px 20px 0;
+                }
+            }
+
+            input:checked + .gjs-radio-item-label {
+                background-color: $additional-extra-light;
+                box-shadow: inset 0 2px 3px 2px rgba(0, 0, 0, 0.21);
+                line-height: 1;
+            }
+        }
+    }
+
+    &sm-clear {
+        font-size: 24px;
+    }
+
+    &clm-tags {
+        #gjs-clm-add-tag {
+            background-color: $secondary;
+            color: $primary-inverse;
+        }
+
+        #gjs-clm-tags-field {
+            padding-bottom: 2px;
+        }
+
+        .gjs-clm-tag {
+            padding: 2px 5px;
+        }
+    }
+
+    &clm-tag {
+        color: $primary-400;
+        #gjs-clm-checkbox,
+        #gjs-clm-tag-label,
+        #gjs-clm-close {
+            color: $primary-400;
+            opacity: 1;
+        }
+    }
+
+    &sm-sector,
+    &block-category {
+        margin-bottom: 8px;
+        border-bottom: none;
+
+        &.gjs-sm-open,
+        &.gjs-open {
+            border-bottom: none;
+        }
+
+        .gjs-sm-title,
+        .gjs-title {
+            border-bottom: none;
+            font-weight: 700;
+            padding: 6px 14px 5px;
+            letter-spacing: normal;
+            font-size: 14px;
+            color: $primary-100;
+            background-color: $primary-860;
+            border-radius: 4px;
+        }
+
+        .gjs-sm-field.gjs-sm-composite {
+            border: none;
+            border-radius: 0;
+        }
+
+        .gjs-sm-btn {
+            background-color: $secondary;
+            color: $primary-inverse;
+
+            text-shadow: none;
+        }
+
+        .gjs-sm-property {
+            .gjs-sm-layer {
+                #gjs-sm-close-layer,
+                #gjs-sm-close-layer {
+                    line-height: 0;
+                    top: 10px;
+                }
+            }
+        }
+    }
+
+    &layer-vis {
+        padding: 10px 5px 9px 10px;
+    }
+
+    &layer {
+        background: none;
+        &.gjs-hovered {
+            .gjs-layer-title {
+                background-color: $primary-860;
+                border-bottom: none;
+            }
+        }
+
+        &.gjs-selected {
+            .gjs-layer-title {
+                background-color: $primary-800;
+            }
+        }
+
+        .gjs-layer-title {
+            background-color: $primary-860;
+            border-bottom: none;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+    }
+
+    &layer-count {
+        top: 7px;
+    }
+}
+
+.gjs-dashed {
+    *[data-highlightable] {
+        padding: 10px;
+
+        &:not(:last-child) {
+            margin-bottom: 10px;
+        }
+    }
+}

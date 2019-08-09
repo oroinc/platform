@@ -4,6 +4,6 @@ config:
         'grapesjs-preset-webpage': 'bundles/npmassets/grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.js'
         'orocontentbuilder/js/app/views/grapesjs-editor-view': 'bundles/orocontentbuilder/js/app/views/grapesjs-editor-view.js'
 
-        'orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-modules': 'bundles/oorocontentbuilder/js/app/views/grapesjs-modules/grapesjs-modules.js'
-        'orocontentbuilder/js/app/views/grapesjs-modules/style-manager-module': 'bundles/oorocontentbuilder/js/app/views/grapesjs-modules/style-manager-module.js'
-        'orocontentbuilder/js/app/views/grapesjs-modules/panels-module': 'bundles/oorocontentbuilder/js/app/views/grapesjs-modules/panels-module.js'
+        'orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-modules': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-modules.js'
+        'orocontentbuilder/js/app/views/grapesjs-modules/style-manager-module': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/style-manager-module.js'
+        'orocontentbuilder/js/app/views/grapesjs-modules/panels-module': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/panels-module.js'
