@@ -77,15 +77,6 @@ services:
             - '@oro_api.profiler.get_config.processor.inner'
             - '@oro_api.profiler.logger'
 
-    oro_api.profiler.get_relation_config.processor:
-        class: Oro\Component\ChainProcessor\Debug\TraceableActionProcessor
-        public: false
-        decorates: oro_api.get_relation_config.processor
-        decoration_priority: -255 # should be at the top of the decoration chain
-        arguments:
-            - '@oro_api.profiler.get_relation_config.processor.inner'
-            - '@oro_api.profiler.logger'
-
     oro_api.profiler.get_metadata.processor:
         class: Oro\Component\ChainProcessor\Debug\TraceableActionProcessor
         public: false

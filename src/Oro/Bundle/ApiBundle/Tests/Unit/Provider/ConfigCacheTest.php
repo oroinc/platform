@@ -58,8 +58,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 ]
-            ],
-            'relations' => []
+            ]
         ];
 
         $cache = $this->createMock(ConfigCacheInterface::class);
@@ -98,8 +97,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 ]
-            ],
-            'relations' => []
+            ]
         ];
 
         $cache = $this->createMock(ConfigCacheInterface::class);

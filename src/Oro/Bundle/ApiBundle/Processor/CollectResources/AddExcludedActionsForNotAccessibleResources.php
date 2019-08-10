@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Disables all actions for resources which are not accessible through Data API.
+ * Disables all actions for resources which are not accessible through API.
  */
 class AddExcludedActionsForNotAccessibleResources implements ProcessorInterface
 {

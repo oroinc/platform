@@ -37,7 +37,7 @@ class ResourceDocParserRegistry
 
     /**
      * Gets an instance of ResourceDocParserInterface
-     * responsible to parse documentation for Data API resources for the specific request type.
+     * responsible to parse documentation for API resources for the specific request type.
      *
      * @param RequestType $requestType
      *

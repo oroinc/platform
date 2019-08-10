@@ -71,7 +71,7 @@ interface DocumentBuilderInterface
 
     /**
      * Adds an object related to the primary data.
-     * E.g. in JSON.API this object is added to the "included" section.
+     * E.g. in JSON:API this object is added to the "included" section.
      * @link http://jsonapi.org/format/#fetching-includes
      *
      * @param mixed               $object

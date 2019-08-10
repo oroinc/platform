@@ -17,7 +17,7 @@ use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Psr\Log\LoggerInterface;
 
 /**
- * The base class for document builders for different types of Data API responses.
+ * The base class for document builders for different types of API responses.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */

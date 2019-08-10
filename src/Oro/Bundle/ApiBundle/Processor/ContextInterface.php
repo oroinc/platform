@@ -19,7 +19,7 @@ use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 /**
- * Represents an execution context for Data API processors for public actions.
+ * Represents an execution context for API processors for public actions.
  */
 interface ContextInterface extends ComponentContextInterface
 {

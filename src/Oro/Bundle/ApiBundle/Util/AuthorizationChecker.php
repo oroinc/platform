@@ -12,7 +12,7 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
- * The main authorization point of the Security component for Data API.
+ * The main authorization point of the Security component for API.
  * @see \Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker
  */
 class AuthorizationChecker implements AuthorizationCheckerInterface

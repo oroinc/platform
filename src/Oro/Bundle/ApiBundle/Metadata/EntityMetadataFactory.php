@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
- * The factory to create Data API metadata based on ORM metadata.
+ * The factory to create API metadata based on ORM metadata.
  */
 class EntityMetadataFactory
 {

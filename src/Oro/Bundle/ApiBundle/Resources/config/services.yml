@@ -308,12 +308,6 @@ services:
         arguments:
             - '@oro_api.config_extension_registry'
 
-    oro_api.config_merger.relation:
-        class: Oro\Bundle\ApiBundle\Config\RelationConfigMerger
-        public: false
-        arguments:
-            - '@oro_api.config_extension_registry'
-
     oro_api.config_cache_factory:
         class: Oro\Bundle\ApiBundle\Provider\ConfigCacheFactory
         public: false
@@ -367,11 +361,6 @@ services:
         class: Oro\Bundle\ApiBundle\Provider\MetadataProvider
         arguments:
             - '@oro_api.get_metadata.processor'
-
-    oro_api.relation_config_provider:
-        class: Oro\Bundle\ApiBundle\Provider\RelationConfigProvider
-        arguments:
-            - '@oro_api.get_relation_config.processor'
 
     oro_api.entity_alias_resolver_registry:
         class: Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry

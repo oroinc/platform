@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * The CLI command to clear Data API cache.
+ * The CLI command to clear API cache.
  */
 class CacheClearCommand extends Command
 {
@@ -36,16 +36,16 @@ class CacheClearCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Clears Data API cache.')
+            ->setDescription('Clears API cache.')
             ->addOption('no-warmup', null, InputOption::VALUE_NONE, 'Do not warm up the cache.')
             ->setHelp(
                 <<<EOF
-The <info>%command.name%</info> command clears Data API cache:
+The <info>%command.name%</info> command clears API cache:
 
   <info>php %command.full_name%</info>
 
 Usually you need to run this command when you add a new entity to <comment>Resources/config/oro/api.yml</comment>
-or you add a new processor that changes a list of available through Data API resources
+or you add a new processor that changes a list of available through API resources
 EOF
             );
     }

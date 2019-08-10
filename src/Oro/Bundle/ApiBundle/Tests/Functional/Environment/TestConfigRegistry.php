@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment;
 use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
-use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
@@ -17,9 +16,6 @@ class TestConfigRegistry
     /** @var ConfigProvider */
     private $configProvider;
 
-    /** @var RelationConfigProvider */
-    private $relationConfigProvider;
-
     /** @var MetadataProvider */
     private $metadataProvider;
 
@@ -30,22 +26,19 @@ class TestConfigRegistry
     private $isResourcesCacheAffected = false;
 
     /**
-     * @param ConfigBagRegistry      $configBagRegistry
-     * @param ConfigProvider         $configProvider
-     * @param RelationConfigProvider $relationConfigProvider
-     * @param MetadataProvider       $metadataProvider
-     * @param ResourcesProvider      $resourcesProvider
+     * @param ConfigBagRegistry $configBagRegistry
+     * @param ConfigProvider    $configProvider
+     * @param MetadataProvider  $metadataProvider
+     * @param ResourcesProvider $resourcesProvider
      */
     public function __construct(
         ConfigBagRegistry $configBagRegistry,
         ConfigProvider $configProvider,
-        RelationConfigProvider $relationConfigProvider,
         MetadataProvider $metadataProvider,
         ResourcesProvider $resourcesProvider
     ) {
         $this->configBagRegistry = $configBagRegistry;
         $this->configProvider = $configProvider;
-        $this->relationConfigProvider = $relationConfigProvider;
         $this->metadataProvider = $metadataProvider;
         $this->resourcesProvider = $resourcesProvider;
     }
@@ -89,7 +82,6 @@ class TestConfigRegistry
     private function clearCaches()
     {
         $this->configProvider->clearCache();
-        $this->relationConfigProvider->clearCache();
         $this->metadataProvider->clearCache();
         if ($this->isResourcesCacheAffected) {
             $this->resourcesProvider->clearCache();

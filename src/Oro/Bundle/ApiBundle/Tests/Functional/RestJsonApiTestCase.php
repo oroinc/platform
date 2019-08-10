@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * The base class for REST API that conforms JSON.API specification functional tests.
+ * The base class for REST API that conforms JSON:API specification functional tests.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class RestJsonApiTestCase extends RestApiTestCase
@@ -368,7 +368,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     }
 
     /**
-     * Extracts JSON.API resource identifier from the response.
+     * Extracts JSON:API resource identifier from the response.
      *
      * @param Response $response
      *
@@ -404,7 +404,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     }
 
     /**
-     * Extracts the list of errors from JSON.API response.
+     * Extracts the list of errors from JSON:API response.
      *
      * @param Response $response
      *

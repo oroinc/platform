@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * and adds the validation listener if the validation is requested.
  * This extension is similar to Symfony's FormTypeValidatorExtension,
  * but it allows to disable the validation after submit of a form.
- * In Data API, the validation of forms is performed by processors.
+ * In API, the validation of forms is performed by processors.
  * @see \Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension
  * @see \Oro\Bundle\ApiBundle\Form\FormValidationHandler
  * @see \Oro\Bundle\ApiBundle\Processor\Shared\ValidateForm

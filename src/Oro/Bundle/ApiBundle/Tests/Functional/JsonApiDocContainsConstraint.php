@@ -7,7 +7,7 @@ use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 
 /**
- * Constraint that asserts that JSON.API document contains an expected JSON.API document.
+ * Constraint that asserts that JSON:API document contains an expected JSON:API document.
  */
 class JsonApiDocContainsConstraint extends ArrayContainsConstraint
 {

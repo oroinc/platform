@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\EntitySerializer\DataTransformerInterface;
 
 /**
- * Provides a way to convert a value to concrete data-type for Data API response.
+ * Provides a way to convert a value to concrete data-type for API response.
  */
 class ValueTransformer
 {

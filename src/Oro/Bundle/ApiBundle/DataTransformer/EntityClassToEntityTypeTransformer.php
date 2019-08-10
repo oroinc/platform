@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Component\EntitySerializer\DataTransformerInterface;
 
 /**
- * Transforms an entity class name to Data API entity type.
+ * Transforms an entity class name to API entity type.
  */
 class EntityClassToEntityTypeTransformer implements DataTransformerInterface
 {

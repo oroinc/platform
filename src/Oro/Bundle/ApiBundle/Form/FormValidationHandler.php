@@ -71,7 +71,7 @@ class FormValidationHandler
          * is a bit better approach than
          * using Form::submit($clearMissing = true) with a "pre-submit" listener that replaces missing fields
          * in submitted data with its default values from an entity.
-         * Using the first approach we can submit all Data API forms
+         * Using the first approach we can submit all API forms
          * with $clearMissing = false and manage the validation just via "enable_full_validation" form option.
          * @link https://symfony.com/doc/current/form/direct_submit.html
          * @see \Symfony\Component\Form\Form::submit

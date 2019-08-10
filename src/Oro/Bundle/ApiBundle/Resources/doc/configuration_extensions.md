@@ -49,8 +49,6 @@ The following table describes the existing sections for which you can add new op
 | --- | --- |
 | entities.entity | Add entity options. |
 | entities.entity.field | Add field options. |
-| relations.entity | Add entity options when the entity is used as a relationship to another entity. |
-| relations.entity.field | Add field options when the entity is used as a relationship to another entity. |
 | filters | Add options to the `filters` section. |
 | filters.field  | Add filter options. |
 | sorters | Add options to the `sorters` section |

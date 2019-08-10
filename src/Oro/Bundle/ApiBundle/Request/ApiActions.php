@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 /**
- * Provides the list of all Data API actions that are implemented "out of the box".
+ * Provides the list of all API actions that are implemented "out of the box".
  */
 final class ApiActions
 {

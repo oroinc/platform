@@ -19,5 +19,5 @@ api:
                 # the identifier of the target entity
                 id:
                     data_type: string
-            # this entity does not have own Data API resource
+            # this entity does not have own API resource
             actions: false

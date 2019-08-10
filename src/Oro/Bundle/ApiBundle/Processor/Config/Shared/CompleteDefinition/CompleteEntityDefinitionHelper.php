@@ -25,7 +25,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 /**
- * The helper class to complete the configuration of Data API resource based on ORM entity.
+ * The helper class to complete the configuration of API resource based on ORM entity.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */

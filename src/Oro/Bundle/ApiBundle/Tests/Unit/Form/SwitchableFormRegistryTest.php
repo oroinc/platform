@@ -210,7 +210,7 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The form type "Oro\Bundle\ApiBundle\Form\Type\BooleanType" is not configured to be used in Data API.
+     * @expectedExceptionMessage The form type "Oro\Bundle\ApiBundle\Form\Type\BooleanType" is not configured to be used in API.
      */
     // @codingStandardsIgnoreEnd
     public function testGetTypeShouldThrowExceptionForNotKnownApiFormType()

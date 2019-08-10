@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * The base class for handling Data API actions.
+ * The base class for handling API actions.
  */
 abstract class RequestActionHandler
 {

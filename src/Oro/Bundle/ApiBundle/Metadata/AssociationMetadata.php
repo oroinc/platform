@@ -285,7 +285,7 @@ class AssociationMetadata extends PropertyMetadata
     /**
      * Sets a flag indicates whether the association represents "to-many" or "to-one" relationship.
      *
-     * @param bool $value TRUE for "to-many" relation, FALSE for "to-one" relationship
+     * @param bool $value TRUE for "to-many" relationship, FALSE for "to-one" relationship
      */
     public function setIsCollection($value)
     {

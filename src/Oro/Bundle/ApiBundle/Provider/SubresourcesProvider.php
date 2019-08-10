@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 /**
- * Provides a list of all Data API sub-resources available for a specific entity.
+ * Provides a list of all API sub-resources available for a specific entity.
  */
 class SubresourcesProvider
 {
@@ -38,10 +38,10 @@ class SubresourcesProvider
     }
 
     /**
-     * Gets an entity sub-resources available through a given Data API version.
+     * Gets an entity sub-resources available through a given API version.
      *
      * @param string      $entityClass The FQCN of an entity
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return ApiResourceSubresources|null
@@ -72,11 +72,11 @@ class SubresourcesProvider
     }
 
     /**
-     * Gets a sub-resource for the given association available through a given Data API version.
+     * Gets a sub-resource for the given association available through a given API version.
      *
      * @param string      $entityClass     The FQCN of an entity
      * @param string      $associationName The name of an association
-     * @param string      $version         The Data API version
+     * @param string      $version         The API version
      * @param RequestType $requestType     The request type, for example "rest", "soap", etc.
      *
      * @return ApiSubresource|null

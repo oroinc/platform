@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- * The base class for CLI commands that shows a different kind of debug information about Data API configuration.
+ * The base class for CLI commands that shows a different kind of debug information about API configuration.
  */
 abstract class AbstractDebugCommand extends Command
 {
@@ -141,7 +141,7 @@ abstract class AbstractDebugCommand extends Command
 
         if (!$this->resourcesProvider->isResourceKnown($entityClass, $version, $requestType)) {
             throw new \RuntimeException(
-                sprintf('The "%s" entity is not configured to be used in Data API.', $entityClass)
+                sprintf('The "%s" entity is not configured to be used in API.', $entityClass)
             );
         }
 

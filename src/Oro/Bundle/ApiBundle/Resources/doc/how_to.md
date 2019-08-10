@@ -39,7 +39,7 @@ api:
 
 ## Turn on API for an Entity Disabled in "Resources/config/oro/entity.yml"
 
-The `exclusions` section of the `Resources/config/oro/entity.yml` configuration file is used to make an entity or a field inaccessible for a user. The entities and fields from this section are inaccessible via the data API as well. However, it is possible to override this rule for the data API. To do this, use the `exclude` option in `Resources/config/oro/api.yml`.
+The `exclusions` section of the `Resources/config/oro/entity.yml` configuration file is used to make an entity or a field inaccessible for a user. The entities and fields from this section are inaccessible via the API as well. However, it is possible to override this rule for the API. To do this, use the `exclude` option in `Resources/config/oro/api.yml`.
 
 Let us consider the case when you have the following `Resources/config/oro/entity.yml`:
 
@@ -50,7 +50,7 @@ oro_entity:
         - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity2, field: field1 }
 ```
 
-To override these rules in the data API, add the following lines to the `Resources/config/oro/api.yml`:
+To override these rules in the API, add the following lines to the `Resources/config/oro/api.yml`:
 
 ```yaml
 api:
@@ -249,7 +249,7 @@ api:
 
 ## Configure a Nested Object
 
-Sometimes it is required to group several fields and expose them as a nested object in the data API. For example, consider the case when an entity has two fields `intervalNumber` and `intervalUnit` but you need to expose them in API as `number` and `unit` properties of the `interval` field. To achieve it, use the following configuration:
+Sometimes it is required to group several fields and expose them as a nested object in the API. For example, consider the case when an entity has two fields `intervalNumber` and `intervalUnit` but you need to expose them in API as `number` and `unit` properties of the `interval` field. To achieve it, use the following configuration:
 
 ```yaml
 api:
@@ -274,7 +274,7 @@ api:
 
 Please note that an entity, in this example *Oro\Bundle\ReminderBundle\Entity\Reminder*, should have the `setInterval` method. This method is called by the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions to set the nested object. 
 
-Here is an example of how the nested objects look in JSON.API:
+Here is an example of how the nested objects look in JSON:API:
 
 ```json
 {
@@ -293,7 +293,7 @@ Here is an example of how the nested objects look in JSON.API:
 
 ## Configure a Nested Association
 
-Sometimes a relationship with a group of entities is implemented as two fields, "entityClass" and "entityId", rather than [many-to-one extended association](../../../EntityExtendBundle/Resources/doc/associations.md). But in the data API these fields should be represented as a regular relationship. To achieve this, a special data type named `nestedAssociation` was implemented. For example, let us suppose that an entity has two fields `sourceEntityClass` and `sourceEntityId` and you need to expose them in API as the `source` relationship. To achieve this, use the following configuration:
+Sometimes a relationship with a group of entities is implemented as two fields, "entityClass" and "entityId", rather than [many-to-one extended association](../../../EntityExtendBundle/Resources/doc/associations.md). But in the API these fields should be represented as a regular relationship. To achieve this, a special data type named `nestedAssociation` was implemented. For example, let us suppose that an entity has two fields `sourceEntityClass` and `sourceEntityId` and you need to expose them in API as the `source` relationship. To achieve this, use the following configuration:
 
 ```yaml
 api:
@@ -309,7 +309,7 @@ api:
                             property_path: sourceEntityId
 ```
 
-Here is an example of how the nested association looks in JSON.API:
+Here is an example of how the nested association looks in JSON:API:
 
 ```json
 {

@@ -6,22 +6,25 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * The class that helps get the name of the current ApiDoc view, API version and the request type.
+ */
 class RestDocViewDetector
 {
     /** @var RequestStack */
-    protected $requestStack;
+    private $requestStack;
 
     /** @var string|null */
-    protected $view;
+    private $view;
 
     /** @var string|null */
-    protected $version;
+    private $version;
 
     /** @var RequestType|null */
-    protected $requestType;
+    private $requestType;
 
     /** @var RequestTypeProviderInterface[] */
-    protected $requestTypeProviders = [];
+    private $requestTypeProviders = [];
 
     /**
      * @param RequestStack $requestStack
@@ -32,7 +35,7 @@ class RestDocViewDetector
     }
 
     /**
-     * Registers a Data API request type provider to the chain.
+     * Registers a API request type provider to the chain.
      *
      * @param RequestTypeProviderInterface $requestTypeProvider
      */
