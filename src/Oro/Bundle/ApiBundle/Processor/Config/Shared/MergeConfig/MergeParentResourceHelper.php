@@ -38,8 +38,8 @@ class MergeParentResourceHelper
             $context->getRequestType(),
             $context->getExtras()
         );
-        if ($parentConfig->hasDefinition()) {
-            $parentDefinition = $parentConfig->getDefinition();
+        $parentDefinition = $parentConfig->getDefinition();
+        if (null !== $parentDefinition) {
             $parentDefinition->setExclusionPolicy(null);
             if ($context->hasResult()) {
                 $this->mergeDefinition($parentDefinition, $context->getResult());
@@ -69,8 +69,8 @@ class MergeParentResourceHelper
         $this->mergeEntityConfigAttributes($config, $configToMerge);
         $fieldsToMerge = $configToMerge->getFields();
         foreach ($fieldsToMerge as $fieldName => $fieldToMerge) {
-            if ($config->hasField($fieldName)) {
-                $field = $config->getField($fieldName);
+            $field = $config->getField($fieldName);
+            if (null !== $field) {
                 $this->mergeFieldConfigAttributes($field, $fieldToMerge);
                 $targetEntity = $field->getTargetEntity();
                 $targetEntityToMerge = $fieldToMerge->getTargetEntity();
