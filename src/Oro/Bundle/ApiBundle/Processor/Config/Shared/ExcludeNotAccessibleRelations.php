@@ -159,7 +159,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         if ($this->resourcesProvider->isResourceKnown($targetClass, $version, $requestType)) {
             return true;
         }
-        if ($targetMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
+        if (!$targetMetadata->isInheritanceTypeNone()) {
             // check that at least one inherited entity has API resource
             foreach ($targetMetadata->subClasses as $inheritedEntityClass) {
                 $inheritedEntityClass = $this->resolveEntityClass($inheritedEntityClass, $entityOverrideProvider);
@@ -190,7 +190,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         if ($this->resourcesProvider->isResourceAccessible($targetClass, $version, $requestType)) {
             return true;
         }
-        if ($targetMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
+        if (!$targetMetadata->isInheritanceTypeNone()) {
             // check that at least one inherited entity has API resource
             foreach ($targetMetadata->subClasses as $inheritedEntityClass) {
                 $inheritedEntityClass = $this->resolveEntityClass($inheritedEntityClass, $entityOverrideProvider);

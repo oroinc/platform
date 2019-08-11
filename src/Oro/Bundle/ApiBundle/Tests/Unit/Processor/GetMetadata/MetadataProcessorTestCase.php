@@ -67,6 +67,11 @@ class MetadataProcessorTestCase extends \PHPUnit\Framework\TestCase
             $classMetadata = $this->createMock(ClassMetadata::class);
         }
         $classMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
+        $classMetadata->expects(self::any())
+            ->method('isInheritanceTypeNone')
+            ->willReturnCallback(function () use ($classMetadata) {
+                return ClassMetadata::INHERITANCE_TYPE_NONE === $classMetadata->inheritanceType;
+            });
 
         return $classMetadata;
     }

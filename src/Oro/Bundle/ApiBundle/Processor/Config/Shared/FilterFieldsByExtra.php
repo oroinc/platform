@@ -238,7 +238,7 @@ class FilterFieldsByExtra implements ProcessorInterface
     protected function getAllowedFields(ClassMetadata $metadata, array $fieldFilters)
     {
         $allowedFields = null;
-        if ($metadata->inheritanceType === ClassMetadata::INHERITANCE_TYPE_NONE) {
+        if ($metadata->isInheritanceTypeNone()) {
             if (!empty($fieldFilters[$metadata->name])) {
                 $allowedFields = $fieldFilters[$metadata->name];
             }

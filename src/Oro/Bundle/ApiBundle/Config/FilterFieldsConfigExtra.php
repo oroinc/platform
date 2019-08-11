@@ -25,6 +25,16 @@ class FilterFieldsConfigExtra implements ConfigExtraInterface
     }
 
     /**
+     * Gets the list of fields that should be returned for a specified type of an entity.
+     *
+     * @return array [entity type or entity class => [field name, ...], ...]
+     */
+    public function getFieldFilters(): array
+    {
+        return $this->fieldFilters;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getName()

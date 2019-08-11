@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData;
 
+use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\CustomizeDataContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -12,6 +13,9 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
 {
     /** a flag indicates whether "customize_loaded_data" action is executed for a relationship */
     private const IDENTIFIER_ONLY = 'identifier_only';
+
+    /** @var ConfigExtraInterface[] */
+    private $configExtras;
 
     /**
      * Gets the response data.
@@ -217,5 +221,61 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
         }
 
         return $ids;
+    }
+
+    /**
+     * Checks whether some configuration data for a customizing entity is requested.
+     *
+     * @param string $extraName
+     *
+     * @return bool
+     */
+    public function hasConfigExtra(string $extraName): bool
+    {
+        foreach ($this->configExtras as $extra) {
+            if ($extra->getName() === $extraName) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets a request for configuration data of a customizing entity by its name.
+     *
+     * @param string $extraName
+     *
+     * @return ConfigExtraInterface|null
+     */
+    public function getConfigExtra(string $extraName): ?ConfigExtraInterface
+    {
+        foreach ($this->configExtras as $extra) {
+            if ($extra->getName() === $extraName) {
+                return $extra;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets a list of requests for configuration data of a customizing entity.
+     *
+     * @return ConfigExtraInterface[]
+     */
+    public function getConfigExtras(): array
+    {
+        return $this->configExtras;
+    }
+
+    /**
+     * Sets a list of requests for configuration data of a customizing entity.
+     *
+     * @param ConfigExtraInterface[] $configExtras
+     */
+    public function setConfigExtras(array $configExtras): void
+    {
+        $this->configExtras = $configExtras;
     }
 }

@@ -12,12 +12,8 @@ class LoadTitleMetaPropertyForCollection extends LoadTitleMetaProperty
     /**
      * {@inheritdoc}
      */
-    protected function updateData(
-        array $data,
-        $entityClass,
-        EntityDefinitionConfig $config,
-        $titleFieldName
-    ) {
-        return $this->addTitles($data, $entityClass, $config, $titleFieldName);
+    protected function updateData(array $data, string $entityClass, EntityDefinitionConfig $config): array
+    {
+        return $this->addTitles($data, $entityClass, $config);
     }
 }

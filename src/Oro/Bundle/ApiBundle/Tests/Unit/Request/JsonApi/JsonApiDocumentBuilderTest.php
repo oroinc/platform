@@ -1851,7 +1851,6 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     [
                         'meta'          => [
                             '__path__'  => 'role',
-                            '__class__' => 'Test\Role',
                             '__type__'  => 'test_role',
                             '__id__'    => 'Test\Role::21'
                         ],
@@ -1893,7 +1892,6 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     [
                         'meta'          => [
                             '__path__'  => 'roles.1',
-                            '__class__' => 'Test\AnotherRole',
                             '__type__'  => 'test_anotherrole',
                             '__id__'    => 'Test\Role::22'
                         ],
@@ -2102,7 +2100,6 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     [
                         'meta'          => [
                             '__path__'  => '0.role',
-                            '__class__' => 'Test\Role',
                             '__type__'  => 'test_role',
                             '__id__'    => 'Test\Role::21'
                         ],
@@ -2144,7 +2141,6 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     [
                         'meta'          => [
                             '__path__'  => '0.roles.1',
-                            '__class__' => 'Test\AnotherRole',
                             '__type__'  => 'test_anotherrole',
                             '__id__'    => 'Test\Role::22'
                         ],

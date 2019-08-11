@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -31,6 +33,20 @@ class CompleteDisableInclusion implements ProcessorInterface
             return;
         }
 
+        if (!\is_a($context->getClassName(), EntityIdentifier::class, true)
+            && !$this->hasAssociations($definition)
+        ) {
+            $definition->disableInclusion();
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     *
+     * @return bool
+     */
+    private function hasAssociations(EntityDefinitionConfig $definition): bool
+    {
         $hasAssociations = false;
         $fields = $definition->getFields();
         foreach ($fields as $field) {
@@ -43,8 +59,6 @@ class CompleteDisableInclusion implements ProcessorInterface
             }
         }
 
-        if (!$hasAssociations) {
-            $definition->disableInclusion();
-        }
+        return $hasAssociations;
     }
 }

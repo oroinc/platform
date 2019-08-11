@@ -7,12 +7,14 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 
 class MaxRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
+    private const MAX_RELATED_ENTITIES = 123;
+
     /** @var MaxRelatedEntitiesConfigExtra */
     private $extra;
 
     protected function setUp()
     {
-        $this->extra = new MaxRelatedEntitiesConfigExtra(123);
+        $this->extra = new MaxRelatedEntitiesConfigExtra(self::MAX_RELATED_ENTITIES);
     }
 
     public function testGetName()
@@ -23,7 +25,7 @@ class MaxRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
     public function testGetMaxRelatedEntities()
     {
         self::assertEquals(
-            123,
+            self::MAX_RELATED_ENTITIES,
             $this->extra->getMaxRelatedEntities()
         );
     }
@@ -33,7 +35,7 @@ class MaxRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
         $context = new ConfigContext();
         $this->extra->configureContext($context);
         self::assertEquals(
-            123,
+            self::MAX_RELATED_ENTITIES,
             $context->getMaxRelatedEntities()
         );
     }

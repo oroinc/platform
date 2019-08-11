@@ -164,6 +164,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             ],
             $response
         );
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertArrayNotHasKey('included', $responseContent);
     }
 
     public function testGetWithRelationshipThatContainsNotAccessibleTargetAndWithIncludeFilter()
@@ -185,25 +187,103 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $this->assertResponseContains(
             [
-                'data' => [
+                'data'     => [
                     'type'          => $entityType,
                     'id'            => '<toString(@test_department->id)>',
                     'relationships' => [
                         'staff' => [
                             'data' => [
-                                ['type' => $accessibleEntityType, 'id' => '<toString(@test_employee1->id)>'],
-                                ['type' => $notAccessibleEntityType, 'id' => '<toString(@test_buyer1->id)>']
+                                ['type' => $notAccessibleEntityType, 'id' => '<toString(@test_buyer1->id)>'],
+                                ['type' => $accessibleEntityType, 'id' => '<toString(@test_employee1->id)>']
                             ]
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type'       => $accessibleEntityType,
+                        'id'         => '<toString(@test_employee1->id)>',
+                        'attributes' => [
+                            'name' => 'Test Employee 1'
                         ]
                     ]
                 ]
             ],
             $response
         );
-        // "included" section will be added in CRM-8250
-        // also check that not accessible entities are not returned in "included" section
         $responseContent = self::jsonToArray($response->getContent());
-        self::assertArrayNotHasKey('included', $responseContent);
+        self::assertCount(1, $responseContent['included'], 'included');
+        self::assertArrayNotHasKey('meta', $responseContent['included'][0], 'included[0]');
+    }
+
+    public function testGetRelationshipThatContainsNotAccessibleTarget()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $accessibleEntityType = $this->getEntityType(TestEmployee::class);
+        $notAccessibleEntityType = $this->getEntityType(TestBuyer::class);
+        $response = $this->getRelationship(
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'staff']
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $notAccessibleEntityType, 'id' => '<toString(@test_buyer1->id)>'],
+                    ['type' => $accessibleEntityType, 'id' => '<toString(@test_employee1->id)>']
+                ]
+            ],
+            $response,
+            true
+        );
+        $responseContent = self::jsonToArray($response->getContent());
+        foreach ($responseContent['data'] as $key => $item) {
+            self::assertArrayNotHasKey('meta', $item, sprintf('data[%s]', $key));
+            self::assertArrayNotHasKey('attributes', $item, sprintf('data[%s]', $key));
+            self::assertArrayNotHasKey('relationships', $item, sprintf('data[%s]', $key));
+        }
+    }
+
+    public function testGetSubresourceThatContainsNotAccessibleTarget()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $accessibleEntityType = $this->getEntityType(TestEmployee::class);
+        $notAccessibleEntityType = $this->getEntityType(TestBuyer::class);
+        $response = $this->getSubresource(
+            ['entity' => $entityType, 'id' => '<toString(@test_department->id)>', 'association' => 'staff']
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $notAccessibleEntityType, 'id' => '<toString(@test_buyer1->id)>'],
+                    [
+                        'type'          => $accessibleEntityType,
+                        'id'            => '<toString(@test_employee1->id)>',
+                        'attributes'    => [
+                            'name' => 'Test Employee 1'
+                        ],
+                        'relationships' => [
+                            'department'   => [
+                                'data' => ['type' => $entityType, 'id' => '<toString(@test_department->id)>']
+                            ],
+                            'organization' => [
+                                'data' => ['type' => 'organizations', 'id' => '<toString(@organization->id)>']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response,
+            true
+        );
+        $responseContent = self::jsonToArray($response->getContent());
+        foreach ($responseContent['data'] as $key => $item) {
+            self::assertArrayNotHasKey('meta', $item, sprintf('data[%s]', $key));
+            if ($item['type'] === $notAccessibleEntityType) {
+                self::assertArrayNotHasKey('attributes', $item, sprintf('data[%s]', $key));
+                self::assertArrayNotHasKey('relationships', $item, sprintf('data[%s]', $key));
+            }
+        }
     }
 
     public function testDisabledGet()

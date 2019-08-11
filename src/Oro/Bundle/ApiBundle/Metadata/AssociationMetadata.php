@@ -25,6 +25,9 @@ class AssociationMetadata extends PropertyMetadata
     private $allowEmptyAcceptableTargets = true;
 
     /** @var string */
+    private $associationPath;
+
+    /** @var string */
     private $associationType;
 
     /** @var bool */
@@ -38,6 +41,9 @@ class AssociationMetadata extends PropertyMetadata
 
     /** @var EntityMetadata|null */
     private $targetMetadata;
+
+    /** @var TargetMetadataAccessorInterface|null */
+    private $targetMetadataAccessor;
 
     /** @var MetaAttributeMetadata[] */
     private $metaProperties = [];
@@ -115,13 +121,50 @@ class AssociationMetadata extends PropertyMetadata
     }
 
     /**
-     * Gets metadata of the association target.
+     * Sets an accessor to target metadata by a specified target class name and association path.
+     * It is used for multi-target associations.
+     * @see \Oro\Bundle\ApiBundle\Model\EntityIdentifier
+     *
+     * @param TargetMetadataAccessorInterface|null $targetMetadataAccessor
+     */
+    public function setTargetMetadataAccessor(?TargetMetadataAccessorInterface $targetMetadataAccessor)
+    {
+        $this->targetMetadataAccessor = $targetMetadataAccessor;
+    }
+
+    /**
+     * Sets the path from a root entity to the association.
+     *
+     * @param string|null $associationPath
+     */
+    public function setAssociationPath(?string $associationPath)
+    {
+        $this->associationPath = $associationPath;
+    }
+
+    /**
+     * Gets metadata for the given association target class.
+     *
+     * @param string|null $targetClassName
      *
      * @return EntityMetadata|null
      */
-    public function getTargetMetadata()
+    public function getTargetMetadata(string $targetClassName = null)
     {
-        return $this->targetMetadata;
+        if (null === $this->targetMetadataAccessor
+            || !$this->associationPath
+            || !$targetClassName
+            || $targetClassName === $this->targetClass
+        ) {
+            return $this->targetMetadata;
+        }
+
+        $targetMetadata = $this->targetMetadataAccessor->getTargetMetadata(
+            $targetClassName,
+            $this->associationPath
+        );
+
+        return $targetMetadata ?? $this->targetMetadata;
     }
 
     /**

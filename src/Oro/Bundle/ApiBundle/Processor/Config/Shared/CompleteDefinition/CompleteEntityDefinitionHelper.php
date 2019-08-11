@@ -152,7 +152,7 @@ class CompleteEntityDefinitionHelper
             $this->completeCustomIdentifier($definition, $metadata, $context->getTargetAction());
         }
         // make sure "class name" meta field is added for entity with table inheritance
-        if ($metadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
+        if (!$metadata->isInheritanceTypeNone()) {
             $this->addClassNameField($definition);
         }
     }
