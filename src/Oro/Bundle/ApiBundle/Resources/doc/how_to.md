@@ -575,16 +575,17 @@ For example, imagine REST API resource for a profile of the logged in user. Let'
 resource should be `/api/userprofile`. If you take a look at [routing.yml](../../Resources/config/oro/routing.yml)
 you will see that this URI is matched by `/api/{entity}` pattern, but the action that handles this
 pattern works with a list of entities, not with a single entity. The challenge is to map `/api/userprofile` to
-`OroApiBundle:RestApi:item` action that works with a single entity and to remove handling of
-`/api/userprofile/{id}`. This can be achieved using own route definition with `override_path` option.
+`Oro\Bundle\ApiBundle\Controller\RestApiController::itemAction` action that works with a single entity
+and to remove handling of `/api/userprofile/{id}`. This can be achieved using own route definition
+with `override_path` option.
 
 Here is an example of the `Resources/config/oro/routing.yml` configuration file:
 
 ```yaml
 acme_rest_api_user_profile:
     path: '%oro_api.rest.prefix%userprofile'
+    controller: Oro\Bundle\ApiBundle\Controller\RestApiController::itemAction
     defaults:
-        _controller: OroApiBundle:RestApi:item
         entity: userprofile
     options:
         group: rest_api
@@ -680,13 +681,13 @@ The following steps describes how to create such API resources:
   ```
 
 - Register a route via `Resources/config/oro/routing.yml` configuration file in your bundle using
- `OroApiBundle:RestApi:itemWithoutId` as a controller, e.g.:
+ `Oro\Bundle\ApiBundle\Controller\RestApiController::itemWithoutIdAction` as a controller, e.g.:
 
   ```yml
   acme_rest_api_register_account:
       path: '%oro_api.rest.prefix%registeraccount'
+      controller: Oro\Bundle\ApiBundle\Controller\RestApiController::itemWithoutIdAction
       defaults:
-          _controller: OroApiBundle:RestApi:itemWithoutId
           entity: registeraccount
       options:
           group: rest_api
