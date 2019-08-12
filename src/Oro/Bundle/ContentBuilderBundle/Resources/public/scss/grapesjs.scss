@@ -147,6 +147,18 @@
         font-size: 14px;
     }
 
+    &sm-label {
+        color: $primary-700;
+
+        &.gjs-color-warn {
+            color: $primary-100;
+        }
+
+        &.gjs-four-color {
+            color: $warning-darken;
+        }
+    }
+
     &field {
         border-radius: 2px;
         background-color: #fff;
@@ -250,7 +262,8 @@
 
         .gjs-sm-field.gjs-sm-composite {
             border: none;
-            border-radius: 0;
+            background: $primary-900;
+            border-radius: 4px;
         }
 
         .gjs-sm-btn {
@@ -300,6 +313,56 @@
 
     &layer-count {
         top: 7px;
+    }
+
+    &toolbar-item {
+        background-color: $secondary;
+    }
+
+    &am-assets-cont {
+        background: none;
+    }
+
+    &btn {
+        &-prim {
+            color: $primary-inverse;
+            padding: 7px 5px 6px;
+        }
+    }
+
+    &mdl-dialog {
+        border-radius: 4px;
+    }
+
+    &mdl-header {
+        background: $primary-200;
+        padding: 10px 18px 10px 18px;
+        border-radius: 4px 4px 0 0;
+    }
+
+    &mdl-title {
+        color: $primary-inverse;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    &mdl-btn-close {
+        color: $primary-inverse;
+        font-size: 0;
+        top: 16px;
+        opacity: 1;
+
+        &:before {
+            content: "\F00D";
+            font-size: 18px;
+            font-family: FontAwesome;
+            text-align: center;
+            line-height: 1;
+        }
+    }
+
+    &mdl-content {
+        border-radius: 0 0 4px 4px;
     }
 }
 

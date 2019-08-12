@@ -21,7 +21,7 @@ define(function() {
             openSm && openSm.set('active', 1);
 
             var traitsSector = $('<div class="gjs-sm-sector no-select">'+
-                '<div class="gjs-sm-title"><span class="icon-settings fa fa-cog"></span> Settings</div>' +
+                '<div class="gjs-sm-title"><span class="fa fa-cog"></span> Settings</div>' +
                 '<div class="gjs-sm-properties" style="display: none;"></div></div>');
             var traitsProps = traitsSector.find('.gjs-sm-properties');
             traitsProps.append($('.gjs-trt-traits'));

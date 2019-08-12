@@ -41,6 +41,10 @@ define(function(require) {
             clearProperties: 1
         },
 
+        colorPicker: {
+            appendTo: '#grapesjs'
+        },
+
         /**
          * @property {String}
          */
@@ -203,6 +207,7 @@ define(function(require) {
         _getCanvasConfig: function() {
             var urlCSS = this.getCurrentThemeStylesheetURL();
             return {
+                canvasCss: '.gjs-comp-selected { outline: 3px solid #0c809e !important; }',
                 canvas: {
                     styles: [urlCSS]
                 }
