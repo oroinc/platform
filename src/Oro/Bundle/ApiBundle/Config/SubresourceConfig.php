@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * Represents the configuration of Data API sub-resource.
+ * Represents the configuration of API sub-resource.
  */
 class SubresourceConfig implements ConfigBagInterface
 {

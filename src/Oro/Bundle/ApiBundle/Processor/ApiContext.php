@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\Context as BaseContext;
 
 /**
- * The base execution context for Data API processors.
+ * The base execution context for API processors.
  */
 abstract class ApiContext extends BaseContext
 {

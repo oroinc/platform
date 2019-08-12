@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Request\DocumentBuilder;
 
+/**
+ * An interface for classes that can provide an access to properties of a different object types.
+ */
 interface ObjectPropertyAccessorInterface
 {
     /**
@@ -12,7 +15,7 @@ interface ObjectPropertyAccessorInterface
      *
      * @return mixed
      */
-    public function getValue($object, $propertyName);
+    public function getValue($object, string $propertyName);
 
     /**
      * Checks whether the object has a given property.
@@ -22,5 +25,5 @@ interface ObjectPropertyAccessorInterface
      *
      * @return bool
      */
-    public function hasProperty($object, $propertyName);
+    public function hasProperty($object, string $propertyName): bool;
 }

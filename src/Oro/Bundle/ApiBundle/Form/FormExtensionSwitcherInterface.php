@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
+/**
+ * Represents a service that is used to switch between the default and API form extensions.
+ */
 interface FormExtensionSwitcherInterface
 {
     /**
@@ -10,7 +13,7 @@ interface FormExtensionSwitcherInterface
     public function switchToDefaultFormExtension();
 
     /**
-     * Switches to Data API form extension.
+     * Switches to API form extension.
      */
     public function switchToApiFormExtension();
 }

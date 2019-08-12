@@ -61,7 +61,7 @@ api:
             documentation_resource: '@OroUserBundle/Resources/doc/api/user.md'
 
         Oro\Bundle\UserBundle\Entity\Email:
-            # this entity does not have own Data API resource
+            # this entity does not have own API resource
             actions: false
 
         Oro\Bundle\UserBundle\Api\Model\UserProfile:

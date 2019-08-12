@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
+/**
+ * The instance of this class is used to store a current state of Forms extension,
+ * that can be provide default forms or API forms.
+ */
 class FormExtensionState implements FormExtensionCheckerInterface
 {
     /** @var bool */
@@ -24,7 +28,7 @@ class FormExtensionState implements FormExtensionCheckerInterface
     }
 
     /**
-     * Switches to Data API form extension.
+     * Switches to API form extension.
      */
     public function switchToApiFormExtension()
     {

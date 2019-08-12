@@ -145,6 +145,7 @@ config:
         'cryptojs/sha256': 'bundles/bowerassets/crypto-js/sha256.js'
         'lightgallery': 'bundles/bowerassets/lightgallery/dist/js/lightgallery.js'
         'lightgallery.print': 'bundles/oroui/js/lightgallery/lg-print.js'
+        'css-vars-ponyfill': 'bundles/npmassets/css-vars-ponyfill/dist/css-vars-ponyfill.js'
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'
@@ -274,7 +275,11 @@ config:
         'oroui/js/app/views/jstree/move-action-view': 'bundles/oroui/js/app/views/jstree/move-action-view.js'
         'oroui/js/app/views/loading-bar-view': 'bundles/oroui/js/app/views/loading-bar-view.js'
 
+        'oroui/js/css-variables-manager': 'bundles/oroui/js/css-variables-manager.js'
+        'oroui/js/app/modules/css-variable-module': 'bundles/oroui/js/app/modules/css-variable-module.js'
+
     appmodules:
+        - oroui/js/app/modules/css-variable-module
         - oroui/js/app/modules/init-layout
         - oroui/js/app/modules/init-lightgallery
         - oroui/js/app/modules/layout-module

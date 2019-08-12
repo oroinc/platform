@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
- * Provides access to Data API resources and sub-resources related cache.
+ * Provides access to API resources and sub-resources related cache.
  */
 class ResourcesCache
 {
@@ -29,9 +29,9 @@ class ResourcesCache
     }
 
     /**
-     * Fetches a list of entity classes accessible through Data API from the cache.
+     * Fetches a list of entity classes accessible through API from the cache.
      *
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return array|null [entity class => accessible flag] or NULL if the list is not cached yet
@@ -50,7 +50,7 @@ class ResourcesCache
     /**
      * Fetches an information about excluded actions from the cache.
      *
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return array|null [entity class => [action, ...]] or NULL if the list is not cached yet
@@ -67,12 +67,12 @@ class ResourcesCache
     }
 
     /**
-     * Fetches all Data API resources from the cache.
+     * Fetches all API resources from the cache.
      *
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
-     * @return ApiResource[]|null The list of Data API resources or NULL if it is not cached yet
+     * @return ApiResource[]|null The list of API resources or NULL if it is not cached yet
      */
     public function getResources(string $version, RequestType $requestType): ?array
     {
@@ -94,7 +94,7 @@ class ResourcesCache
      * Fetches an entity sub-resources from the cache.
      *
      * @param string      $entityClass The FQCN of an entity
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return ApiResourceSubresources|null The list of sub-resources or NULL if it is not cached yet
@@ -116,7 +116,7 @@ class ResourcesCache
     /**
      * Fetches a list of entity classes for API resources that do not have an identifier.
      *
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return string[] The list of class names or NULL if it is not cached yet
@@ -133,13 +133,13 @@ class ResourcesCache
     }
 
     /**
-     * Puts Data API resources into the cache.
+     * Puts API resources into the cache.
      *
-     * @param string        $version             The Data API version
+     * @param string        $version             The API version
      * @param RequestType   $requestType         The request type, for example "rest", "soap", etc.
-     * @param ApiResource[] $resources           The list of Data API resources
-     * @param array         $accessibleResources The resources accessible through Data API
-     * @param array         $excludedActions     The actions excluded from Data API
+     * @param ApiResource[] $resources           The list of API resources
+     * @param array         $accessibleResources The resources accessible through API
+     * @param array         $excludedActions     The actions excluded from API
      */
     public function saveResources(
         string $version,
@@ -160,9 +160,9 @@ class ResourcesCache
     }
 
     /**
-     * Puts Data API resources that do not have an identifier into the cache.
+     * Puts API resources that do not have an identifier into the cache.
      *
-     * @param string        $version             The Data API version
+     * @param string        $version             The API version
      * @param RequestType   $requestType         The request type, for example "rest", "soap", etc.
      * @param string[]      $resourcesWithoutId  The list of resources without identifier
      */
@@ -177,7 +177,7 @@ class ResourcesCache
     /**
      * Puts sub-resources for all entities into the cache.
      *
-     * @param string                    $version      The Data API version
+     * @param string                    $version      The API version
      * @param RequestType               $requestType  The request type, for example "rest", "soap", etc.
      * @param ApiResourceSubresources[] $subresources The list of sub-resources
      */
@@ -194,7 +194,7 @@ class ResourcesCache
     }
 
     /**
-     * Deletes all Data API resources from the cache.
+     * Deletes all API resources from the cache.
      */
     public function clear(): void
     {

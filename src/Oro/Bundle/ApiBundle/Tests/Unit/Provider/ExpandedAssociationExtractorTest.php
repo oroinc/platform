@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 
 class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
@@ -25,9 +26,33 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         $associationTargetConfig->addField('id');
         $associationTargetConfig->addField('name');
 
+        $expandConfigExtra = new ExpandRelatedEntitiesConfigExtra([
+            'association'
+        ]);
+
         self::assertEquals(
             ['association' => $associationField],
-            $this->extractor->getExpandedAssociations($config)
+            $this->extractor->getExpandedAssociations($config, $expandConfigExtra)
+        );
+    }
+
+    public function testGetExpandedAssociationsWhenAssociationExistsInConfigButItWasNotRequested()
+    {
+        $config = new EntityDefinitionConfig();
+        $associationField = $config->addField('association');
+        $associationField->setTargetClass('Test\TargetEntity');
+        $associationTargetConfig = $associationField->createAndSetTargetEntity();
+        $associationTargetConfig->setIdentifierFieldNames(['id']);
+        $associationTargetConfig->addField('id');
+        $associationTargetConfig->addField('name');
+
+        $expandConfigExtra = new ExpandRelatedEntitiesConfigExtra([
+            'anotherAssociation'
+        ]);
+
+        self::assertEquals(
+            [],
+            $this->extractor->getExpandedAssociations($config, $expandConfigExtra)
         );
     }
 
@@ -42,13 +67,17 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         $associationTargetConfig->addField('id');
         $associationTargetConfig->addField('name');
 
+        $expandConfigExtra = new ExpandRelatedEntitiesConfigExtra([
+            'association'
+        ]);
+
         self::assertEquals(
             [],
-            $this->extractor->getExpandedAssociations($config)
+            $this->extractor->getExpandedAssociations($config, $expandConfigExtra)
         );
     }
 
-    public function testGetExpandedAssociationsForNotExpandedAssociation()
+    public function testGetExpandedAssociationsForAssociationThatHasOnlyIdInConfig()
     {
         $config = new EntityDefinitionConfig();
         $associationField = $config->addField('association');
@@ -57,9 +86,13 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         $associationTargetConfig->setIdentifierFieldNames(['id']);
         $associationTargetConfig->addField('id');
 
+        $expandConfigExtra = new ExpandRelatedEntitiesConfigExtra([
+            'association'
+        ]);
+
         self::assertEquals(
             [],
-            $this->extractor->getExpandedAssociations($config)
+            $this->extractor->getExpandedAssociations($config, $expandConfigExtra)
         );
     }
 
@@ -73,9 +106,13 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         $associationTargetConfig->addField('id');
         $associationTargetConfig->addField('name');
 
+        $expandConfigExtra = new ExpandRelatedEntitiesConfigExtra([
+            'association'
+        ]);
+
         self::assertEquals(
             [],
-            $this->extractor->getExpandedAssociations($config)
+            $this->extractor->getExpandedAssociations($config, $expandConfigExtra)
         );
     }
 
@@ -84,9 +121,13 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         $config = new EntityDefinitionConfig();
         $config->addField('field');
 
+        $expandConfigExtra = new ExpandRelatedEntitiesConfigExtra([
+            'association'
+        ]);
+
         self::assertEquals(
             [],
-            $this->extractor->getExpandedAssociations($config)
+            $this->extractor->getExpandedAssociations($config, $expandConfigExtra)
         );
     }
 
@@ -101,9 +142,13 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         $associationTargetConfig->addField('id');
         $associationTargetConfig->addField('name');
 
+        $expandConfigExtra = new ExpandRelatedEntitiesConfigExtra([
+            'association'
+        ]);
+
         self::assertEquals(
             [],
-            $this->extractor->getExpandedAssociations($config)
+            $this->extractor->getExpandedAssociations($config, $expandConfigExtra)
         );
     }
 
@@ -117,9 +162,13 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         $associationTargetConfig->addField('id');
         $associationTargetConfig->addField('name')->setMetaProperty(true);
 
+        $expandConfigExtra = new ExpandRelatedEntitiesConfigExtra([
+            'association'
+        ]);
+
         self::assertEquals(
             [],
-            $this->extractor->getExpandedAssociations($config)
+            $this->extractor->getExpandedAssociations($config, $expandConfigExtra)
         );
     }
 

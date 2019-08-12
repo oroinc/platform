@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * The base class for Data API functional tests.
+ * The base class for API functional tests.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class ApiTestCase extends WebTestCase

@@ -3,8 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource;
 
 use Oro\Bundle\ApiBundle\Config\Config;
-use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra;
-use Oro\Bundle\ApiBundle\Config\DataTransformersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
@@ -105,8 +103,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 
         $expectedParentConfigExtras = [
             new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
-            new CustomizeLoadedDataConfigExtra(),
-            new DataTransformersConfigExtra(),
             new FilterFieldsConfigExtra(
                 [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
             )
@@ -142,8 +138,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 
         $expectedParentConfigExtras = [
             new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
-            new CustomizeLoadedDataConfigExtra(),
-            new DataTransformersConfigExtra(),
             new FilterFieldsConfigExtra(
                 [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
             )
@@ -176,8 +170,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setAssociationName($associationName);
 
         self::assertTrue($this->context->hasParentConfigExtra(EntityDefinitionConfigExtra::NAME));
-        self::assertTrue($this->context->hasParentConfigExtra(CustomizeLoadedDataConfigExtra::NAME));
-        self::assertTrue($this->context->hasParentConfigExtra(DataTransformersConfigExtra::NAME));
         self::assertTrue($this->context->hasParentConfigExtra(FilterFieldsConfigExtra::NAME));
         self::assertFalse($this->context->hasParentConfigExtra('another'));
     }
@@ -197,14 +189,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(
             EntityDefinitionConfigExtra::class,
             $this->context->getParentConfigExtra(EntityDefinitionConfigExtra::NAME)
-        );
-        self::assertInstanceOf(
-            CustomizeLoadedDataConfigExtra::class,
-            $this->context->getParentConfigExtra(CustomizeLoadedDataConfigExtra::NAME)
-        );
-        self::assertInstanceOf(
-            DataTransformersConfigExtra::class,
-            $this->context->getParentConfigExtra(DataTransformersConfigExtra::NAME)
         );
         self::assertInstanceOf(
             FilterFieldsConfigExtra::class,
@@ -229,8 +213,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $this->context->addParentConfigExtra($extra);
 
         self::assertTrue($this->context->hasParentConfigExtra(EntityDefinitionConfigExtra::NAME));
-        self::assertTrue($this->context->hasParentConfigExtra(CustomizeLoadedDataConfigExtra::NAME));
-        self::assertTrue($this->context->hasParentConfigExtra(DataTransformersConfigExtra::NAME));
         self::assertTrue($this->context->hasParentConfigExtra(FilterFieldsConfigExtra::NAME));
         self::assertSame($extra, $this->context->getParentConfigExtra($extra->getName()));
     }
@@ -247,12 +229,10 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setParentClassName($parentEntityClass);
         $this->context->setAssociationName($associationName);
 
-        $this->context->removeParentConfigExtra(CustomizeLoadedDataConfigExtra::NAME);
+        $this->context->removeParentConfigExtra(FilterFieldsConfigExtra::NAME);
 
         self::assertTrue($this->context->hasParentConfigExtra(EntityDefinitionConfigExtra::NAME));
-        self::assertFalse($this->context->hasParentConfigExtra(CustomizeLoadedDataConfigExtra::NAME));
-        self::assertTrue($this->context->hasParentConfigExtra(DataTransformersConfigExtra::NAME));
-        self::assertTrue($this->context->hasParentConfigExtra(FilterFieldsConfigExtra::NAME));
+        self::assertFalse($this->context->hasParentConfigExtra(FilterFieldsConfigExtra::NAME));
     }
 
     public function testLoadParentConfig()
@@ -282,8 +262,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
                 new RequestType([$requestType]),
                 [
                     new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
-                    new CustomizeLoadedDataConfigExtra(),
-                    new DataTransformersConfigExtra(),
                     new FilterFieldsConfigExtra(
                         [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
                     )
@@ -331,8 +309,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
                 new RequestType([$requestType]),
                 [
                     new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
-                    new CustomizeLoadedDataConfigExtra(),
-                    new DataTransformersConfigExtra(),
                     new FilterFieldsConfigExtra(
                         [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
                     )
@@ -465,8 +441,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
                 new RequestType([$requestType]),
                 [
                     new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
-                    new CustomizeLoadedDataConfigExtra(),
-                    new DataTransformersConfigExtra(),
                     new FilterFieldsConfigExtra(
                         [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
                     )
@@ -528,8 +502,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
                 new RequestType([$requestType]),
                 [
                     new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
-                    new CustomizeLoadedDataConfigExtra(),
-                    new DataTransformersConfigExtra(),
                     new FilterFieldsConfigExtra(
                         [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
                     )
@@ -599,8 +571,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
                 new RequestType([$requestType]),
                 [
                     new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
-                    new CustomizeLoadedDataConfigExtra(),
-                    new DataTransformersConfigExtra(),
                     new FilterFieldsConfigExtra(
                         [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
                     )

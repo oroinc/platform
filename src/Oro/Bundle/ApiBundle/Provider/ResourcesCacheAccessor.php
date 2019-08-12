@@ -6,7 +6,7 @@ use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
- * Helper class to load/write entries from/to Data API resources cache.
+ * Helper class to load/write entries from/to API resources cache.
  */
 class ResourcesCacheAccessor
 {
@@ -43,7 +43,7 @@ class ResourcesCacheAccessor
     /**
      * Fetches an entry from the cache.
      *
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      * @param string      $id          The ID of the cache entry
      *
@@ -69,7 +69,7 @@ class ResourcesCacheAccessor
      * Puts data into the cache.
      * If a cache entry with the given ID already exists, its data will be replaced.
      *
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      * @param string      $id          The ID of the cache entry
      * @param mixed       $data        The data to be saved

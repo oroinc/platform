@@ -10,7 +10,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Tries to rename fields if they are equal to reserved words or not conform JSON.API specification.
+ * Tries to rename fields if they are equal to reserved words or not conform JSON:API specification.
  * * "type" field is renamed to {short class name} + "Type"
  * * "id" field is renamed to {short class name} + "Id" if it is not the identifier of an entity
  * * the single identifier field is renamed to "id" if it has a different name

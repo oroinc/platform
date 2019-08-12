@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 
 /**
- * The class that can be used to manage Data API caches.
+ * The class that can be used to manage API caches.
  */
 class CacheManager
 {
@@ -67,7 +67,7 @@ class CacheManager
     }
 
     /**
-     * Clears all Data API caches except API documentation cache.
+     * Clears all API caches except API documentation cache.
      * To clear API documentation cache the clearApiDocCache() method should be used.
      */
     public function clearCaches()
@@ -78,7 +78,7 @@ class CacheManager
     }
 
     /**
-     * Warms up all Data API caches except API documentation cache.
+     * Warms up all API caches except API documentation cache.
      * To warm up API documentation cache the warmUpApiDocCache() method should be used.
      */
     public function warmUpCaches()
@@ -89,7 +89,7 @@ class CacheManager
     }
 
     /**
-     * Warms up all dirty Data API caches and clears all affected API documentation caches.
+     * Warms up all dirty API caches and clears all affected API documentation caches.
      */
     public function warmUpDirtyCaches()
     {

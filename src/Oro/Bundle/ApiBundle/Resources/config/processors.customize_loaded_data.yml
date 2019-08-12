@@ -6,3 +6,13 @@ services:
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: customize_loaded_data }
+
+    oro_api.customize_loaded_data.expand_multi_target_associations:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\ExpandMultiTargetAssociations
+        arguments:
+            - '@oro_api.config_provider'
+            - '@oro_api.entity_serializer'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.resources_provider'
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, collection: true, priority: -100 }

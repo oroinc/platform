@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * The CLI command to clear Data API documentation cache (ApiDoc cache).
+ * The CLI command to clear API documentation cache (ApiDoc cache).
  */
 class DocCacheClearCommand extends Command
 {

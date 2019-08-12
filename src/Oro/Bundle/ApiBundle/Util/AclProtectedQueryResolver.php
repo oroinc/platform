@@ -10,7 +10,7 @@ use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\QueryResolver;
 
 /**
- * This query resolver modifies Data API queries in order to protect data
+ * This query resolver modifies API queries in order to protect data
  * that can be retrieved via these queries.
  */
 class AclProtectedQueryResolver extends QueryResolver

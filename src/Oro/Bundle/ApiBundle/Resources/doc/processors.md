@@ -8,7 +8,7 @@
 
 ## Overview
 
-A processor is the main element that implements the business logic of the data API. Each processor must implement [ProcessorInterface](../../../../Component/ChainProcessor/ProcessorInterface.php) and be registered in the dependency injection container using the `oro.api.processor` tag.
+A processor is the main element that implements the business logic of the API. Each processor must implement [ProcessorInterface](../../../../Component/ChainProcessor/ProcessorInterface.php) and be registered in the dependency injection container using the `oro.api.processor` tag.
 
 Please see [actions](./actions.md) and [Context](./actions.md#context-class) sections for more details about where and how processors are used.
 
@@ -58,7 +58,7 @@ Please note that:
 - The `priority` attribute is used to control the order in which processors are executed. The highest the priority, the earlier a processor is executed. The default value is 0. The possible range is from -255 to 255. However, for some types of processors the range can be different. For more details, see the [documentation of the ChainProcessor](../../../../Component/ChainProcessor/README.md#types-of-processors) component. If several processors have the same priority, the order in which they are executed is unpredictable.
 - Each processor should check whether its work is already done because there can be a processor with a higher priority which does the same but in another way. For example, such processors can be created for customization purposes.
 - Prefer [processor conditions](#processor-conditions) over a conditional logic inside a processor to avoid loading of unneeded processors.
-- As the data API resources can be created for any type of objects, not only ORM entities, it is always a good idea to check whether a processor is applicable for ORM entities. This check is very fast and allows avoiding possible logic issues and performance impact. Please use the `oro_api.doctrine_helper` service to get an instance of [Oro\Bundle\ApiBundle\Util\DoctrineHelper](../../Util/DoctrineHelper.php) as this class is optimized to be used in the data API stack. An example:
+- As API resources can be created for any type of objects, not only ORM entities, it is always a good idea to check whether a processor is applicable for ORM entities. This check is very fast and allows avoiding possible logic issues and performance impact. Please use the `oro_api.doctrine_helper` service to get an instance of [Oro\Bundle\ApiBundle\Util\DoctrineHelper](../../Util/DoctrineHelper.php) as this class is optimized to be used in the API stack. An example:
 
 ```php
     public function process(ContextInterface $context)
@@ -93,7 +93,7 @@ services:
 
 In this case, the `acme.api.do_something` is executed only in scope of the `get` action, for other actions this processor is skipped.
 
-Conditions provide a simple way to specify which processors are required to accomplish a work. Pay attention that the dependency injection container does not load processors that does not fit the conditions. Use conditions to create the fast data API.
+Conditions provide a simple way to specify which processors are required to accomplish a work. Pay attention that the dependency injection container does not load processors that does not fit the conditions. Use conditions to create the fast API.
 
 This allows building conditions based on any attribute from the context.
 
@@ -140,14 +140,14 @@ For performance reasons, the functionality of [SkipGroupApplicableChecker](../..
         - { name: oro.api.processor, action: get_list, group: initialize, requestType: !rest }
 ```
 
--  A processor is executed only for REST requests that conform to the [JSON.API](http://jsonapi.org/) specification.
+-  A processor is executed only for REST requests that conform to the [JSON:API](http://jsonapi.org/) specification.
 
 ```yaml
     tags:
         - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&json_api }
 ```
 
--  A processor is executed either for REST requests or requests that conform to the [JSON.API](http://jsonapi.org/) specification.
+-  A processor is executed either for REST requests or requests that conform to the [JSON:API](http://jsonapi.org/) specification.
 
 ```yaml
     tags:
@@ -156,7 +156,7 @@ For performance reasons, the functionality of [SkipGroupApplicableChecker](../..
 
 **Please note** that a value can contain either `&` (logical AND) or `|` (logical OR) operators, but it is not possible to combine them.
 
--  A processor is executed for all REST requests excluding requests that conform to the [JSON.API](http://jsonapi.org/) specification.
+-  A processor is executed for all REST requests excluding requests that conform to the [JSON:API](http://jsonapi.org/) specification.
 
 ```yaml
     tags:
@@ -366,7 +366,7 @@ Please note that the default HTTP status code for validation errors is `400 Bad 
 
 The [Constraint](../../Request/Constraint.php) class contains titles for different kind of validation errors. All titles end with word *constraint*. It is recommended to use the same template when adding custom types. 
 
-All data API logs are written into the **api** channel. To inject the data API logger directly to your processors, use the [common way](http://symfony.com/doc/current/reference/dic_tags.html#monolog-logger). For example:
+All API logs are written into the **api** channel. To inject the API logger directly to your processors, use the [common way](http://symfony.com/doc/current/reference/dic_tags.html#monolog-logger). For example:
 
 ```yaml
     acme.api.some_processor:

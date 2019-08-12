@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
- * Provides a set of static methods that may be helpful in Data API form processing.
+ * Provides a set of static methods that may be helpful in API form processing.
  */
 class FormUtil
 {

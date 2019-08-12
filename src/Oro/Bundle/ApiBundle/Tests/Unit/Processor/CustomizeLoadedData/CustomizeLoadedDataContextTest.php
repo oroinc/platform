@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
@@ -491,5 +492,24 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
                 'id'
             )
         );
+    }
+
+    public function testConfigExtras()
+    {
+        $this->context->setConfigExtras([]);
+        self::assertSame([], $this->context->getConfigExtras());
+        self::assertFalse($this->context->hasConfigExtra('test'));
+        self::assertNull($this->context->getConfigExtra('test'));
+
+        $configExtra = new TestConfigExtra('test');
+
+        $configExtras = [$configExtra];
+        $this->context->setConfigExtras($configExtras);
+        self::assertEquals($configExtras, $this->context->getConfigExtras());
+
+        self::assertTrue($this->context->hasConfigExtra('test'));
+        self::assertSame($configExtra, $this->context->getConfigExtra('test'));
+        self::assertFalse($this->context->hasConfigExtra('another'));
+        self::assertNull($this->context->getConfigExtra('another'));
     }
 }

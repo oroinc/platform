@@ -373,16 +373,14 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
                 'id'         => 123,
                 'categories' => [
                     [
-                        'entity'     => 'Test\Category1',
-                        'id'         => 456,
-                        'name'       => 'Category1',
-                        'meta_class' => 'Test\Category1'
+                        'entity' => 'Test\Category1',
+                        'id'     => 456,
+                        'name'   => 'Category1'
                     ],
                     [
-                        'entity'     => 'Test\Category2',
-                        'id'         => 457,
-                        'name'       => 'Category2',
-                        'meta_class' => 'Test\Category2'
+                        'entity' => 'Test\Category2',
+                        'id'     => 457,
+                        'name'   => 'Category2'
                     ]
                 ]
             ],
@@ -418,16 +416,14 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
                 'id'         => 123,
                 'categories' => [
                     [
-                        'entity'     => 'Test\Category1',
-                        'id'         => 456,
-                        'name'       => 'Category1',
-                        'meta_class' => 'Test\Category1'
+                        'entity' => 'Test\Category1',
+                        'id'     => 456,
+                        'name'   => 'Category1'
                     ],
                     [
-                        'entity'     => 'Test\Category2WithoutAlias',
-                        'id'         => 457,
-                        'name'       => 'Category2',
-                        'meta_class' => 'Test\Category2WithoutAlias'
+                        'entity' => 'Test\Category2WithoutAlias',
+                        'id'     => 457,
+                        'name'   => 'Category2'
                     ]
                 ]
             ],

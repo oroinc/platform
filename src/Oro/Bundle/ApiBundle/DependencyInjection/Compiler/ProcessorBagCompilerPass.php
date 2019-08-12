@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
- * Adds all registered Data API processors to the processor bag service.
+ * Adds all registered API processors to the processor bag service.
  * By performance reasons "customize_loaded_data" processors with "collection" attribute equals to TRUE
  * are moved to "collection" group and other processors to "item" group. The "collection" attribute is removed.
  * For "customize_loaded_data" processors that do not have "identifier_only" attribute,

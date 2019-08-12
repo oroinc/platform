@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * Represents the configuration of Data API resource actions.
+ * Represents the configuration of API resource actions.
  */
 class ActionsConfig
 {

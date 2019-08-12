@@ -14,7 +14,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $config = [];
-        foreach (['metadata', 'entities', 'relations'] as $section) {
+        foreach (['metadata', 'entities'] as $section) {
             $config[$section] = [
                 'Test\Class1' => [
                     'fields' => ['class1_v0' => []]
@@ -54,16 +54,6 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->configBag->getConfig($className, $version));
     }
 
-    public function testNoRelationConfig()
-    {
-        $className = 'Test\UnknownClass';
-        $version = Version::LATEST;
-
-        self::assertNull($this->configBag->getRelationConfig($className, $version));
-        // test that data is cached in memory
-        self::assertNull($this->configBag->getRelationConfig($className, $version));
-    }
-
     /**
      * @dataProvider getConfigProvider
      */
@@ -77,22 +67,6 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             $expectedConfig,
             $this->configBag->getConfig($className, $version)
-        );
-    }
-
-    /**
-     * @dataProvider getConfigProvider
-     */
-    public function testGetRelationConfig($className, $version, $expectedConfig)
-    {
-        self::assertEquals(
-            $expectedConfig,
-            $this->configBag->getRelationConfig($className, $version)
-        );
-        // test that data is cached in memory
-        self::assertEquals(
-            $expectedConfig,
-            $this->configBag->getRelationConfig($className, $version)
         );
     }
 

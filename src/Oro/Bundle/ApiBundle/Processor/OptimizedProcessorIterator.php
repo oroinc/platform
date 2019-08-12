@@ -10,7 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 /**
  * This iterator implements a group related checks in more performant way than
  * if it was implemented in applicable checkers.
- * It is very important for Data API, especially for generation of API documentation
+ * It is very important for API, especially for generation of API documentation
  * because huge number of processors are iterated in this case.
  */
 class OptimizedProcessorIterator extends ProcessorIterator

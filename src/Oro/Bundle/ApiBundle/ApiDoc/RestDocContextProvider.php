@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Symfony\Component\Routing\Route;
 
 /**
- * Helps RestDocHandler to get Data API context, config and metadata.
+ * Helps RestDocHandler to get API context, config and metadata.
  */
 class RestDocContextProvider
 {

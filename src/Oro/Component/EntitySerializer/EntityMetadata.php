@@ -4,10 +4,13 @@ namespace Oro\Component\EntitySerializer;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+/**
+ * A wrapper for a manageable entity metadata.
+ */
 class EntityMetadata
 {
     /** @var ClassMetadata */
-    protected $metadata;
+    private $metadata;
 
     /**
      * @param ClassMetadata $metadata
@@ -65,7 +68,7 @@ class EntityMetadata
      */
     public function hasInheritance()
     {
-        return $this->metadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE;
+        return !$this->metadata->isInheritanceTypeNone();
     }
 
     /**

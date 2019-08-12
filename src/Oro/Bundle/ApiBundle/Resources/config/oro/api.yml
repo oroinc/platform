@@ -7,7 +7,6 @@ api:
     entities:
         Oro\Bundle\ApiBundle\Model\EntityIdentifier:
             identifier_field_names: [id]
-            disable_fieldset: true
             fields:
                 # this is a predefined field name that is used to provide
                 # the class name of the target entity
@@ -19,5 +18,5 @@ api:
                 # the identifier of the target entity
                 id:
                     data_type: string
-            # this entity does not have own Data API resource
+            # this entity does not have own API resource
             actions: false

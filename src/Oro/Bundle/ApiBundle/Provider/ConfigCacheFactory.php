@@ -6,7 +6,7 @@ use Symfony\Component\Config\ConfigCache as Cache;
 use Symfony\Component\Config\ConfigCacheInterface;
 
 /**
- * A factory to create an object is used to store Data API configuration cache.
+ * A factory to create an object is used to store API configuration cache.
  */
 class ConfigCacheFactory
 {

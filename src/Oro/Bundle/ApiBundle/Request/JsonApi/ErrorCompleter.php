@@ -20,7 +20,7 @@ use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
- * The error completer for REST API response conforms JSON.API specification.
+ * The error completer for REST API response conforms JSON:API specification.
  */
 class ErrorCompleter extends AbstractErrorCompleter
 {

@@ -47,6 +47,47 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
     }
 
     /**
+     * Gets the name of the action for which the configuration is requested.
+     *
+     * @return string|null
+     */
+    public function getAction(): ?string
+    {
+        return $this->action;
+    }
+
+    /**
+     * Gets a flag indicates whether a configuration is requested
+     * for a list of entities resource or a single entity resource,
+     *
+     * @return bool
+     */
+    public function isCollection(): bool
+    {
+        return $this->collection;
+    }
+
+    /**
+     * Gets the class name of the parent entity for which the configuration is requested.
+     *
+     * @return string|null
+     */
+    public function getParentClassName(): ?string
+    {
+        return $this->parentClassName;
+    }
+
+    /**
+     * Gets the association name of a sub-resource for which the configuration is requested.
+     *
+     * @return string|null
+     */
+    public function getAssociationName(): ?string
+    {
+        return $this->associationName;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getName()

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 /**
- * Represents a collection of Data API sub-resources for a specific entity.
+ * Represents a collection of API sub-resources for a specific entity.
  */
 class ApiResourceSubresources
 {

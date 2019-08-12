@@ -4,10 +4,31 @@ The current file describes significant changes in the code that may affect the u
 
 ## 4.1.0-beta
 
+#### ApiBundle
+* The section `relations` was removed from `Resources/config/oro/api.yml`. The action `get_relation_config` that
+  was responsible to process this section was removed as well.
+  This section was not used to build API that conforms JSON:API specification that is the main API type.
+  In case if you need a special configuration for "plain" REST API, you can define it in
+  `Resources/config/oro/api_plain.yml` configuration files or create a processor for the `get_config` action.
+
 #### AssetBundle
 * The new feature, [Hot Module Replacement (HMR or Hot Reload) enabled for SCSS](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#hot-module-replacement-hmr-or-hot-reload-for-scss). To enable HMR for custom CSS links, please [follow the documentation](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#enable-for-css-links).
 
 ## 4.0.0
+
+### Added
+
+#### UIBundle
+
+* CSSVariable parser `oroui/js/css-variables-manager` has been add. Source module [css-variables-manager](./src/Oro/Bundle/UIBundle/Resources/public/js/css-variables-manager.js)
+
+  Github link [https://github.com/jhildenbiddle/css-vars-ponyfill](https://github.com/jhildenbiddle/css-vars-ponyfill)
+
+### Changed
+
+#### UIBundle
+
+* viewportManager has been updated. Add sync with CSS breakpoint variables
 
 ### Removed
 

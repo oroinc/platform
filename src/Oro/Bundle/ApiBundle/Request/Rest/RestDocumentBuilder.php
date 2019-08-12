@@ -82,6 +82,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
             }
             $result = $data;
         } else {
+            $metadata = $this->getTargetMetadataProvider()->getTargetMetadata($object, $metadata);
             $objectClass = $this->objectAccessor->getClassName($object);
             if (!$objectClass) {
                 $objectClass = $metadata->getClassName();
@@ -164,12 +165,16 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
             if (!$property->isOutput()) {
                 continue;
             }
+            $propertyPath = $property->getPropertyPath();
+            if ($this->isIgnoredMeta($propertyPath, $metadata)) {
+                continue;
+            }
             $resultName = $property->getResultName();
             if (\array_key_exists($name, $data)) {
                 $result[$resultName] = $data[$name];
             } else {
                 $value = null;
-                if ($this->resultDataAccessor->tryGetValue($property->getPropertyPath(), $value)) {
+                if ($this->resultDataAccessor->tryGetValue($propertyPath, $value)) {
                     $result[$resultName] = $value;
                 }
             }
@@ -266,7 +271,8 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
 
         $this->resultDataAccessor->addEntity();
         try {
-            $targetMetadata = $associationMetadata->getTargetMetadata();
+            $targetMetadata = $this->getTargetMetadataProvider()
+                ->getAssociationTargetMetadata($object, $associationMetadata);
             if ($targetMetadata && $this->hasIdentifierFieldsOnly($targetMetadata)) {
                 $data = $this->objectAccessor->toArray($object);
 

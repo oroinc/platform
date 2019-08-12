@@ -43,6 +43,22 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         );
     }
 
+    public function testCreateObjectMetadataForMultiTarget()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['id']);
+
+        $expected = new EntityMetadata();
+        $expected->setClassName(EntityIdentifier::class);
+        $expected->setIdentifierFieldNames(['id']);
+        $expected->setInheritedType(true);
+
+        self::assertEquals(
+            $expected,
+            $this->objectMetadataFactory->createObjectMetadata(EntityIdentifier::class, $config)
+        );
+    }
+
     public function testCreateAndAddMetaPropertyMetadata()
     {
         $entityMetadata = new EntityMetadata();

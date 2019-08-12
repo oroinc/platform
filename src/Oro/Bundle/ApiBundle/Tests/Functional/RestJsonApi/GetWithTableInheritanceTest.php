@@ -40,7 +40,7 @@ class GetWithTableInheritanceTest extends RestJsonApiTestCase
         $expects['data'][0]['relationships']['staff']['data'][0]['id'] =
             (string)$department->getStaff()->first()->getId();
         if (isset($expects['included'][0]['id'])) {
-            $expects['included'][0]['id'] = (string)(string)$department->getStaff()->first()->getId();
+            $expects['included'][0]['id'] = (string)$department->getStaff()->first()->getId();
         }
 
         $entityType = $this->getEntityType(TestDepartment::class);
@@ -49,6 +49,12 @@ class GetWithTableInheritanceTest extends RestJsonApiTestCase
         $response = $this->cget(['entity' => $entityType, 'page[size]' => 1], $params);
 
         $this->assertResponseContains($expects, $response);
+        $responseContent = self::jsonToArray($response->getContent());
+        if (isset($responseContent['included'])) {
+            foreach ($responseContent['included'] as $key => $item) {
+                self::assertArrayNotHasKey('meta', $item, sprintf('included[%s]', $key));
+            }
+        }
     }
 
     /**
@@ -76,7 +82,7 @@ class GetWithTableInheritanceTest extends RestJsonApiTestCase
                     'sort'    => '-id'
                 ],
                 'expects' => 'table_inheritance_2.yml'
-            ],
+            ]
         ];
     }
 }

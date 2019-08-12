@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
- * This class can be used to validate that the request data contains valid JSON.API object(s).
+ * This class can be used to validate that the request data contains valid JSON:API object(s).
  * @link http://jsonapi.org/format/#crud
  */
 class RequestDataValidator extends AbstractRequestDataValidator
