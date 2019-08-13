@@ -34,6 +34,10 @@ oro_behat_extension:
             type: xpath
             element: Select2Share
           Avatar: 'oro_user_user_form[avatar][file]'
+          Birthday:
+            locator: 'input[id^="date_selector_oro_user_user_form_birthday-uid"]'
+            type: css
+            element: DateTimePicker
 
     UserMenu:
       selector: {type: 'xpath', locator: '//*[@id="user-menu"]'}
