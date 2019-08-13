@@ -21,11 +21,6 @@ layout:
                     options:
                         name: viewport
                         content: 'width=device-width, initial-scale=1'
-                meta_theme_color:
-                    blockType: meta
-                    options:
-                        name: theme-color
-                        content: '#fcb91d'
                 theme_icon:
                     blockType: external_resource
                     options:
@@ -70,7 +65,6 @@ layout:
                         title: ~
                         meta_charset: ~
                         meta_viewport: ~
-                        meta_theme_color: ~
                         theme_icon: ~
                         styles: ~
                     body:
