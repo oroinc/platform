@@ -99,7 +99,7 @@ define(function(require) {
             // use capture phase to scroll dropdown toggle into view before dropdown will be opened
             this.$grid[0].addEventListener('click', _.bind(function(e) {
                 var dropdownToggle = $(e.target).closest('[data-toggle="dropdown"]');
-                if (dropdownToggle.length && dropdownToggle.parent().is('thead:first .dropdown:not(.shown)')) {
+                if (dropdownToggle.length && dropdownToggle.parent().is('thead:first .dropdown:not(.show)')) {
                     // this will hide dropdowns and ignore next calls to it
                     debouncedHideDropdowns();
                     this.isHeaderDropdownVisible = true;
