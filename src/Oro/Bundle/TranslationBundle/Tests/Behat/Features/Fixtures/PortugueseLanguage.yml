@@ -1,0 +1,6 @@
+Oro\Bundle\TranslationBundle\Entity\Language:
+    portuguese_lang:
+        code: 'pt'
+        enabled: true
+        organization: '@organization'
+        owner: '@admin'

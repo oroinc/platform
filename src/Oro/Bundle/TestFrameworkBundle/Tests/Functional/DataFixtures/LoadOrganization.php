@@ -11,6 +11,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\InitialFixtureInterface;
  */
 class LoadOrganization extends AbstractFixture implements InitialFixtureInterface
 {
+    public const ORGANIZATION = 'organization';
+
     /**
      * {@inheritdoc}
      */
@@ -22,6 +24,6 @@ class LoadOrganization extends AbstractFixture implements InitialFixtureInterfac
             ->getQuery()
             ->setMaxResults(1)
             ->getSingleResult();
-        $this->addReference('organization', $organization);
+        $this->addReference(self::ORGANIZATION, $organization);
     }
 }

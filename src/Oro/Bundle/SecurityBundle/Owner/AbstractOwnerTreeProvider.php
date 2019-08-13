@@ -14,13 +14,13 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
 {
     use LoggerAwareTrait;
 
-    private const CACHE_KEY = 'data';
+    protected const CACHE_KEY = 'data';
 
     /** @var DatabaseChecker */
     private $databaseChecker;
 
     /** @var CacheProvider */
-    private $cache;
+    protected $cache;
 
     /**
      * @param DatabaseChecker $databaseChecker
@@ -169,7 +169,7 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
      *
      * @return OwnerTreeInterface
      */
-    private function loadTree(): OwnerTreeInterface
+    protected function loadTree(): OwnerTreeInterface
     {
         $treeBuilder = $this->createTreeBuilder();
         if ($this->databaseChecker->checkDatabase()) {

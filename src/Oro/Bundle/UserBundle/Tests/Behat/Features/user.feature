@@ -1,5 +1,6 @@
 @regression
 @ticket-BB-16591
+@fixture-OroLocaleBundle:PortugueseLocalization.yml
 Feature: User
   In order to create users
   As a OroCRM Admin user
@@ -37,6 +38,7 @@ Feature: User
       | Last Name           | Last Name1      |
       | Primary Email       | email1@test.com |
       | Roles               | Administrator   |
+      | Birthday            | 1990-07-24      |
       | Enabled             | Enabled         |
       | Generate Password   | true            |
       | OroCRM Organization | true            |
@@ -45,6 +47,11 @@ Feature: User
   Scenario: Follow email link
     Given I save and close form
     Then I should see "User saved" flash message
+    And I should see user with:
+      | Username | userName1         |
+      | Emails   | email1@test.com   |
+      | Roles    | Administrator     |
+      | Birthday | Jul 24, 1990 (age |
     And I operate as the User
     And I follow "RESET PASSWORD" link from the email
     And fill "User Reset Password Form" with:
@@ -61,3 +68,36 @@ Feature: User
   Scenario: Login as new user with manually created password
     Given I login as "user1Name" user
     Then should see "Dashboard"
+
+  Scenario: Create new user with birthday field formatted in the Portuguese locale
+    Given I operate as the Admin
+    And I go to System/Configuration
+    And I follow "System Configuration/General Setup/Localization" on configuration sidebar
+    And I fill "Configuration Localization Form" with:
+      | Primary Location Use Default | false                 |
+      | Primary Location             | Brazil                |
+      | Enabled Localizations        | [English, Portuguese] |
+      | Default Localization         | Portuguese            |
+    And I click "Save settings"
+    And I should see "Configuration saved" flash message
+    And I go to System/User Management/Users
+    And I click "Create User"
+    When fill "Create User Form" with:
+      | Username            | userName2       |
+      | Password            | Pa$$w0rd        |
+      | Re-Enter Password   | Pa$$w0rd        |
+      | First Name          | First Name      |
+      | Last Name           | Last Name       |
+      | Primary Email       | email2@test.com |
+      | Roles               | Administrator   |
+      | Birthday            | 1990-07-24      |
+      | Enabled             | Enabled         |
+      | OroCRM Organization | true            |
+
+    And I save and close form
+    Then I should see "User saved" flash message
+    And I should see user with:
+      | Username | userName2              |
+      | Emails   | email2@test.com        |
+      | Roles    | Administrator          |
+      | Birthday | 24 de Jul de 1990 (age |
