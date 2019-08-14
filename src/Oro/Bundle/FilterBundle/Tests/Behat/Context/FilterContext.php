@@ -7,6 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use WebDriver\Key;
 
 class FilterContext extends OroFeatureContext implements OroPageObjectAware
 {
@@ -119,5 +120,63 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
                       . "//a[contains(@class, 'dropdown-toggle') and contains(., '{$condition}')]"
                       . "/following-sibling::input[contains(@name, 'value')]";
         $driver->typeIntoInput($inputXpath, $value);
+    }
+
+    /**
+     * @Given /^(?:|I )should see "(?P<column>(?:[^"]|\\")*)" filter column/
+     *
+     * @param string $column
+     */
+    public function shouldSeeFilterColumn(string $column)
+    {
+        $this->checkFilterColumn($column, true);
+    }
+
+    /**
+     * @Given /^(?:|I )should not see "(?P<column>(?:[^"]|\\")*)" filter column/
+     *
+     * @param string $column
+     */
+    public function shouldNotSeeFilterColumn(string $column)
+    {
+        $this->checkFilterColumn($column, false);
+    }
+
+    /**
+     * @param string $column
+     * @param bool $isShouldSee
+     */
+    private function checkFilterColumn(string $column, bool $isShouldSee): void
+    {
+        $lastConditionItem = $this->createElement('Last condition item');
+        $lastConditionItem->click();
+        $this->waitForAjax();
+
+        $searchResult = $this->spin(function (FilterContext $context) use ($column) {
+            $searchResult = $this->getPage()
+                ->find(
+                    'xpath',
+                    "//div[@id='select2-drop']//div[contains(., '{$column}')]"
+                );
+            if ($searchResult && $searchResult->isVisible()) {
+                return $searchResult;
+            }
+
+            return null;
+        }, 5);
+
+        if ($isShouldSee === true) {
+            self::assertNotNull(
+                $searchResult,
+                sprintf('The field "%s" was not found in the filter columns.', $column)
+            );
+        } else {
+            self::assertNull(
+                $searchResult,
+                sprintf('The field "%s" appears in the filter columns, but it should not.', $column)
+            );
+        }
+
+        $this->getDriver()->typeIntoInput("//div[@id='select2-drop']/div/input", Key::ESCAPE);
     }
 }

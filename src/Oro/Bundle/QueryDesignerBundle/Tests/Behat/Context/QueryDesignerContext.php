@@ -6,6 +6,7 @@ use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use WebDriver\Key;
 
 /**
  * The context for testing Query Designer related features.
@@ -53,6 +54,26 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
         $dateField = $this->createElement('Date Field')->getParent();
         $dateField->clickLink('Choose a field');
         $this->selectField([$field]);
+    }
+
+    /**
+     * @Given /^(?:|I )should see "(?P<column>(?:[^"]|\\")*)" grouping column/
+     *
+     * @param string $column
+     */
+    public function shouldSeeGroupingColumn(string $column)
+    {
+        $this->checkGroupingColumn($column, true);
+    }
+
+    /**
+     * @Given /^(?:|I )should not see "(?P<column>(?:[^"]|\\")*)" grouping column/
+     *
+     * @param string $column
+     */
+    public function shouldNotSeeGroupingColumn(string $column)
+    {
+        $this->checkGroupingColumn($column, false);
     }
 
     /**
@@ -140,5 +161,42 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
     {
         $columnLabel = $this->createElement('Column Label');
         $columnLabel->setValue($value);
+    }
+
+    /**
+     * @param string $column
+     * @param bool $isShouldSee
+     */
+    private function checkGroupingColumn(string $column, bool $isShouldSee): void
+    {
+        $this->clickLinkInGroupingDesigner('Choose a field');
+        $this->waitForAjax();
+
+        $searchResult = $this->spin(function () use ($column) {
+            $searchResult = $this->getPage()
+                ->find(
+                    'xpath',
+                    "//div[@id='select2-drop']//div[contains(., '{$column}')]"
+                );
+            if ($searchResult && $searchResult->isVisible()) {
+                return $searchResult;
+            }
+
+            return null;
+        }, 5);
+
+        if ($isShouldSee === true) {
+            self::assertNotNull(
+                $searchResult,
+                sprintf('The field "%s" was not found in the grouping columns.', $column)
+            );
+        } else {
+            self::assertNull(
+                $searchResult,
+                sprintf('The field "%s" appears in the grouping columns, but it should not.', $column)
+            );
+        }
+
+        $this->getDriver()->typeIntoInput("//div[@id='select2-drop']/div/input", Key::ESCAPE);
     }
 }

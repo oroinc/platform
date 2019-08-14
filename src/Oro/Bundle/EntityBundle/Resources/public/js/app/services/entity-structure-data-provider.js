@@ -366,6 +366,9 @@ define(function(require) {
             attrs.fields = attrs.fields.map(function(fieldData) {
                 fieldData = _.clone(fieldData);
                 fieldData.entity = attrs;
+                if (attrs.className) {
+                    fieldData.entityClassName = attrs.className;
+                }
                 if (fieldData.relationType && _.contains(['enum', 'multiEnum'], fieldData.type)) {
                     // @todo, should be fixed in API
                     // `enum` or `multiEnum` field has to be with empty relationType
