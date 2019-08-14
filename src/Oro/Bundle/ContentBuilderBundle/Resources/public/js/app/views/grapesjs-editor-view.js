@@ -105,7 +105,7 @@ define(function(require) {
          */
         getContainer: function() {
             var $editor = $('<div id="grapesjs" />');
-            $editor.html(this.$el.val().replace('<font>', '<style>').replace('</font>', '</style>'));
+            $editor.html(this.$el.val());
             this.$el.parent().append($editor);
 
             this.$el.hide();
@@ -122,6 +122,7 @@ define(function(require) {
             this.builder = GrapesJS.init(_.extend(
                 {}
                 , {
+                    avoidInlineStyle: 1,
                     container: this.getContainer()
                 }
                 , this._prepareBuilderOptions()));
@@ -129,6 +130,10 @@ define(function(require) {
             mediator.trigger('grapesjs:created', this.builder);
 
             this.builderDelegateEvents();
+
+            GrapesJSModules.call('components', {
+                builder: this.builder
+            });
         },
 
         builderDelegateEvents: function() {
@@ -175,7 +180,7 @@ define(function(require) {
 
         _updateInitialField: function() {
             var content = this.builder.getHtml();
-            content += '<font>' + this.builder.getCss() + '</font>';
+            content += '<style>' + this.builder.getCss() + '</style>';
             this.$el.val(content).trigger('change');
         },
 

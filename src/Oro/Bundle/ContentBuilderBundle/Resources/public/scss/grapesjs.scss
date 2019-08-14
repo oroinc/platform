@@ -163,10 +163,12 @@
         border-radius: 2px;
         background-color: #fff;
         border: 2px solid #d6d6d6;
+        color: $primary-100;
 
         select {
             padding-top: 0;
             padding-bottom: 0;
+            padding-right: 15px;
         }
 
         &-arrow-u {
@@ -174,6 +176,46 @@
         }
         &-arrow-d {
             border-top-color: $primary-400;
+        }
+
+        &.gjs-field-checkbox {
+            border: none;
+            background-color: none;
+            border-radius: 0;
+
+            .gjs-input-holder {
+                height: 16px;
+                width: 16px;
+
+                .gjs-chk-icon {
+                    transform: none;
+                    height: 16px;
+                    margin: auto;
+                    width: 16px;
+                    border: 2px solid #d9d9da;
+                    background-color: #fff;
+                    border-radius: 3px;
+                }
+
+                input[type="checkbox"]:checked {
+                    + .gjs-chk-icon {
+                        border-color: $secondary;
+                        background-color: $secondary;
+
+                        &:before {
+                            content: "\F00C";
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            font-size: 14px;
+                            line-height: 1;
+                            color: $primary-inverse;
+                            font-family: FontAwesome;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -363,6 +405,27 @@
 
     &mdl-content {
         border-radius: 0 0 4px 4px;
+    }
+
+    &rte-toolbar {
+        margin-left: -2px;
+    }
+
+    &rte-actionbar {
+        flex-direction: row;
+
+        .gjs-rte-action {
+            order: 1;
+
+            &:hover {
+                color: $primary-inverse;
+            }
+
+            &.text-format-action {
+                order: 0;
+                border-right: 1px solid $mainDkColor;
+            }
+        }
     }
 }
 
