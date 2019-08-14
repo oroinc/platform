@@ -9,6 +9,7 @@ use Oro\Bundle\EntityBundle\ORM\OrmConfiguration;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\OroEntityManagerStub;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class RegistryTest extends \PHPUnit\Framework\TestCase
@@ -50,7 +51,7 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
             ->method('isTransient')
             ->willReturn(false);
 
-        $manager = $this->getMockBuilder(OroEntityManager::class)
+        $manager = $this->getMockBuilder(OroEntityManagerStub::class)
             ->disableOriginalConstructor()
             ->setMethods(['getConfiguration', 'getMetadataFactory'])
             ->getMock();

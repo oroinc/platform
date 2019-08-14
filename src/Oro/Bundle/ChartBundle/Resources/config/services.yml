@@ -60,6 +60,7 @@ services:
 
     oro_chart.data_transformer.pie_chart:
         class: '%oro_chart.data_transformer.pie_chart.class%'
+        public: true
 
     oro_chart.options_builder:
         class: '%oro_chart.options_builder.class%'

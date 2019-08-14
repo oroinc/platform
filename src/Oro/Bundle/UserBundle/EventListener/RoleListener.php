@@ -8,7 +8,7 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Component\DependencyInjection\ServiceLink;
-use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\Role\Role;
 
 class RoleListener
 {

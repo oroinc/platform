@@ -25,6 +25,29 @@ class Configuration implements ConfigurationInterface
 
         $rootNode->children()
             ->arrayNode('wysiwyg')->children()
+                ->enumNode('html_purifier_mode')
+                    ->values(['strict', 'extended', 'disabled'])
+                    ->defaultValue('strict')
+                    ->info(
+                        "strict - filter html elements and attributes by white list. " .
+                        "Style and iframe elements are not allowed\n" .
+                        "extended - same as strict but style and iframe elements are allowed\n" .
+                        "disabled - HTML Purifier is disabled completely"
+                    )
+                ->end()
+                ->arrayNode('html_purifier_iframe_domains')
+                    ->prototype('scalar')->end()
+                    ->info(
+                        'only these domains will be allowed in iframes ' .
+                        '(in case iframes are enabled in extended mode)'
+                    )
+                ->end()
+                ->arrayNode('html_purifier_uri_schemes')
+                    ->prototype('scalar')->end()
+                    ->info(
+                        'allowed URI schemes for HTMLPurifier'
+                    )
+                ->end()
                 ->arrayNode('html_allowed_elements')
                     ->useAttributeAsKey('name')
                     ->prototype('array')

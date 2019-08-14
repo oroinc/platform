@@ -11,10 +11,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Invalidates Cache
+ */
 class InvalidateCacheScheduleCommand extends ContainerAwareCommand
 {
-    const NAME = 'oro:cache:invalidate:schedule';
-
     /**
      * @internal
      */
@@ -22,13 +23,15 @@ class InvalidateCacheScheduleCommand extends ContainerAwareCommand
 
     const ARGUMENT_PARAMETERS = 'parameters';
 
+    /** @var string */
+    protected static $defaultName = 'oro:cache:invalidate:schedule';
+
     /**
      * {@inheritDoc}
      */
     public function configure()
     {
         $this
-            ->setName(self::NAME)
             ->setDescription('Invalidate Cache')
             ->addArgument(
                 self::ARGUMENT_SERVICE_NAME,

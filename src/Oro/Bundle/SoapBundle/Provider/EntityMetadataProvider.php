@@ -5,7 +5,7 @@ namespace Oro\Bundle\SoapBundle\Provider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityMetadataProvider implements MetadataProviderInterface
 {

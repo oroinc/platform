@@ -7,7 +7,7 @@ use Oro\Bundle\SidebarBundle\Configuration\WidgetDefinitionProvider;
 use Oro\Bundle\SidebarBundle\Twig\SidebarExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\Asset\Packages as AssetHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
 {

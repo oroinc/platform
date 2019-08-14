@@ -42,7 +42,7 @@ class WidgetAttributesTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+        $this->translator = $this->getMockBuilder('Symfony\Contracts\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
             ->getMock();
 

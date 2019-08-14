@@ -206,9 +206,28 @@
     }
 }
 
-.ui-dialog .note-form textarea,
-.ui-dialog .note-form .mce-tinymce {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
+.ui-dialog {
+    .note-form {
+        .form-horizontal {
+            width: 617px;
+            margin: auto;
+
+            .control-group {
+                .controls {
+                    input,
+                    textarea,
+                    .select2-container,
+                    .validate-group,
+                    .mce-tinymce {
+                        width: 100%;
+                        max-width: 100%;
+                    }
+
+                    textarea {
+                        height: 200px;
+                    }
+                }
+            }
+        }
+    }
 }

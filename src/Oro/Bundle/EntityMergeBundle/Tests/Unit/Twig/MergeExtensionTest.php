@@ -6,7 +6,7 @@ use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\EntityMergeBundle\Twig\MergeExtension;
 use Oro\Bundle\EntityMergeBundle\Twig\MergeRenderer;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MergeExtensionTest extends \PHPUnit\Framework\TestCase
 {

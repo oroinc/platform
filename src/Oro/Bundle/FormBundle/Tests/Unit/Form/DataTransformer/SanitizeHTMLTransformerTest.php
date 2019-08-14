@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
+use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 
 class SanitizeHTMLTransformerTest extends \PHPUnit\Framework\TestCase
 {
@@ -15,7 +16,19 @@ class SanitizeHTMLTransformerTest extends \PHPUnit\Framework\TestCase
      */
     public function testTransform($value, $allowableTags, $expected)
     {
-        $transformer = new SanitizeHTMLTransformer($allowableTags);
+        /** @var HtmlTagProvider|\PHPUnit\Framework\MockObject\MockObject $htmlTagProvider */
+        $htmlTagProvider = $this->createMock(HtmlTagProvider::class);
+        $htmlTagProvider->expects($this->exactly(2))
+            ->method('isPurificationNeeded')
+            ->willReturn(true);
+        $htmlTagProvider->expects($this->once())
+            ->method('getIframeRegexp')
+            ->willReturn('<^https?://(www.)?(youtube.com/embed/|player.vimeo.com/video/)>');
+        $htmlTagProvider->expects($this->once())
+            ->method('getUriSchemes')
+            ->willReturn(['http' => true, 'https' => true]);
+
+        $transformer = new SanitizeHTMLTransformer($htmlTagProvider, $allowableTags);
 
         $this->assertEquals(
             $expected,
@@ -25,6 +38,28 @@ class SanitizeHTMLTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             $expected,
             $transformer->reverseTransform($value)
+        );
+    }
+
+    public function testTransformPurifierDisabled()
+    {
+        /** @var HtmlTagProvider|\PHPUnit\Framework\MockObject\MockObject $htmlTagProvider */
+        $htmlTagProvider = $this->createMock(HtmlTagProvider::class);
+        $htmlTagProvider->expects($this->exactly(2))
+            ->method('isPurificationNeeded')
+            ->willReturn(false);
+
+        $allowableTags = 'a';
+        $transformer = new SanitizeHTMLTransformer($htmlTagProvider, $allowableTags);
+
+        $this->assertEquals(
+            '<p>sometext</p>',
+            $transformer->transform('<p>sometext</p>')
+        );
+
+        $this->assertEquals(
+            '<p>sometext</p>',
+            $transformer->reverseTransform('<p>sometext</p>')
         );
     }
 
@@ -83,7 +118,27 @@ class SanitizeHTMLTransformerTest extends \PHPUnit\Framework\TestCase
                 '<div id="test" data-id="test2">sometext</div>',
                 'div[id]',
                 '<div id="test">sometext</div>'
-            ]
+            ],
+            'iframe allowed' => [
+                '<iframe id="video-iframe" allowfullscreen="" src="https://www.youtube.com/embed/XWyzuVHRe0A?' .
+                'rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
+                'iframe[id|allowfullscreen|src]',
+                '<iframe id="video-iframe" allowfullscreen src="https://www.youtube.com/embed/XWyzuVHRe0A?'.
+                'rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>'
+            ],
+            'iframe invalid src' => [
+                '<iframe id="video-iframe" allowfullscreen="" src="https://www.scam.com/embed/XWyzuVHRe0A?' .
+                'rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
+                'iframe[id|allowfullscreen|src]',
+                '<iframe id="video-iframe" allowfullscreen></iframe>'
+            ],
+            'iframe bypass src' => [
+                '<iframe id="video-iframe" allowfullscreen="" src="https://www.scam.com/embed/XWyzuVHRe0A' .
+                '?bypass=https://www.youtube.com/embed/XWyzuVHRe0A' .
+                'rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
+                'iframe[id|allowfullscreen|src]',
+                '<iframe id="video-iframe" allowfullscreen></iframe>'
+            ],
         ];
     }
 }

@@ -14,7 +14,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
- * The document builder for REST API response conforms JSON.API specification.
+ * The document builder for REST API response conforms JSON:API specification.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -94,6 +94,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         if (null === $metadata) {
             $result = [self::META => $data];
         } else {
+            $metadata = $this->getTargetMetadataProvider()->getTargetMetadata($object, $metadata);
             $hasIdentifierFields = $metadata->hasIdentifierFields();
             $objectClass = $this->objectAccessor->getClassName($object);
             if (!$objectClass) {
@@ -195,12 +196,16 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
             if (!$property->isOutput()) {
                 continue;
             }
+            $propertyPath = $property->getPropertyPath();
+            if ($this->isIgnoredMeta($propertyPath, $metadata)) {
+                continue;
+            }
             $resultName = $property->getResultName();
             if (\array_key_exists($name, $data)) {
                 $result[self::META][$resultName] = $data[$name];
             } else {
                 $value = null;
-                if ($this->resultDataAccessor->tryGetValue($property->getPropertyPath(), $value)) {
+                if ($this->resultDataAccessor->tryGetValue($propertyPath, $value)) {
                     $result[self::META][$resultName] = $value;
                 }
             }
@@ -405,7 +410,8 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     ) {
         $this->resultDataAccessor->addEntity();
         try {
-            $targetMetadata = $associationMetadata->getTargetMetadata();
+            $targetMetadata = $this->getTargetMetadataProvider()
+                ->getAssociationTargetMetadata($object, $associationMetadata);
             $preparedValue = $this->prepareRelatedValue(
                 $object,
                 $requestType,
@@ -450,12 +456,9 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         $targetEntityType = null;
         if (\is_array($object) || \is_object($object)) {
             if (null !== $targetMetadata) {
-                if ($targetMetadata->isInheritedType()) {
-                    $targetEntityType = $this->getEntityType(
-                        $this->objectAccessor->getClassName($object),
-                        $requestType,
-                        $targetClassName
-                    );
+                $objectClassName = $this->objectAccessor->getClassName($object);
+                if ($objectClassName) {
+                    $targetEntityType = $this->getEntityType($objectClassName, $requestType, $targetClassName);
                 }
 
                 if ($this->hasIdentifierFieldsOnly($targetMetadata)) {

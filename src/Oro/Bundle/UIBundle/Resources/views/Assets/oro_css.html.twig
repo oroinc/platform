@@ -1,4 +1,6 @@
-<link rel="stylesheet" media="all" href="{{ asset('css/themes/oro/oro.css') }}" />
+{% import '@OroAsset/Asset.html.twig' as Asset %}
+
+{{ Asset.css('css/themes/oro/oro.css', 'media="all"')}}
 {% if 'Trident' in app.request.headers.get('User-Agent') %}
-    <link rel="stylesheet" media="all" href="{{ asset('css/themes/oro/oro-ie.css') }}" />
+    {{ Asset.css('css/themes/oro/oro-ie.css', 'media="all"')}}
 {% endif %}

@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Async;
 
+use Monolog\Handler\TestHandler;
 use Oro\Bundle\EmailBundle\Async\SyncEmailSeenFlagMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -13,7 +14,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
-use Symfony\Bridge\Monolog\Handler\DebugHandler;
 use Symfony\Bridge\Monolog\Logger;
 
 /**
@@ -97,8 +97,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends WebTestCase
 
         /** @var Logger $logger */
         $logger = $this->getContainer()->get('logger');
-        $logger->pushHandler(new DebugHandler());
-        $this->getContainer()->set('logger', $logger);
+        $logger->pushHandler(new TestHandler());
 
         $this->assertEquals(SyncEmailSeenFlagMessageProcessor::ACK, $processor->process($message, new NullSession()));
         $this->assertEmpty($logger->getLogs());

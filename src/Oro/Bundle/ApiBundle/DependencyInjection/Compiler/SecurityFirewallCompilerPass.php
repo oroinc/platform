@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Configures Data API security firewalls to be able to work in two modes, stateless and statefull.
+ * Configures API security firewalls to be able to work in two modes, stateless and statefull.
  * The statefull mode is used when API is called internally from web pages as AJAX request.
  */
 class SecurityFirewallCompilerPass implements CompilerPassInterface

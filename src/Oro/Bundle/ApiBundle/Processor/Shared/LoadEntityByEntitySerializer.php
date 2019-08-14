@@ -2,12 +2,18 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\EntitySerializer\EntitySerializer;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Loads entity using the EntitySerializer component.
@@ -16,14 +22,27 @@ use Oro\Component\EntitySerializer\EntitySerializer;
 class LoadEntityByEntitySerializer implements ProcessorInterface
 {
     /** @var EntitySerializer */
-    protected $entitySerializer;
+    private $entitySerializer;
+
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
+
+    /** @var EntityClassResolver */
+    private $entityClassResolver;
 
     /**
-     * @param EntitySerializer $entitySerializer
+     * @param EntitySerializer    $entitySerializer
+     * @param DoctrineHelper      $doctrineHelper
+     * @param EntityClassResolver $entityClassResolver
      */
-    public function __construct(EntitySerializer $entitySerializer)
-    {
+    public function __construct(
+        EntitySerializer $entitySerializer,
+        DoctrineHelper $doctrineHelper,
+        EntityClassResolver $entityClassResolver
+    ) {
         $this->entitySerializer = $entitySerializer;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->entityClassResolver = $entityClassResolver;
     }
 
     /**
@@ -50,12 +69,35 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
             return;
         }
 
-        $result = $this->entitySerializer->serialize(
-            $query,
-            $config,
-            $context->getNormalizationContext()
+        $context->setResult(
+            $this->loadNormalizedData($query, $config, $context->getNormalizationContext())
         );
+
+        // data returned by the EntitySerializer are already normalized
+        $context->skipGroup('normalize_data');
+    }
+
+    /**
+     * @param QueryBuilder           $qb
+     * @param EntityDefinitionConfig $config
+     * @param array                  $normalizationContext
+     *
+     * @return array|null
+     */
+    private function loadNormalizedData(
+        QueryBuilder $qb,
+        EntityDefinitionConfig $config,
+        array $normalizationContext
+    ): ?array {
+        $initialQb = clone $qb;
+        $result = $this->entitySerializer->serialize($qb, $config, $normalizationContext);
         if (empty($result)) {
+            // use a query without ACL protection to check if an entity exists in DB
+            $this->prepareNotAclProtectedQueryBuilder($initialQb);
+            $notAclProtectedData = $initialQb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
+            if ($notAclProtectedData) {
+                throw new AccessDeniedException('No access to the entity.');
+            }
             $result = null;
         } elseif (count($result) === 1) {
             $result = reset($result);
@@ -63,9 +105,18 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
             throw new RuntimeException('The result must have one or zero items.');
         }
 
-        $context->setResult($result);
+        return $result;
+    }
 
-        // data returned by the EntitySerializer are already normalized
-        $context->skipGroup('normalize_data');
+    /**
+     * @param QueryBuilder $qb
+     */
+    private function prepareNotAclProtectedQueryBuilder(QueryBuilder $qb): void
+    {
+        $entityClass = $this->entityClassResolver->getEntityClass(QueryBuilderUtil::getSingleRootEntity($qb));
+        $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
+        if (\count($idFieldNames) !== 0) {
+            $qb->select(QueryBuilderUtil::getSingleRootAlias($qb) . '.' . \reset($idFieldNames));
+        }
     }
 }

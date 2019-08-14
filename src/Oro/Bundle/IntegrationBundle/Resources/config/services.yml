@@ -109,6 +109,7 @@ services:
         arguments:
             - []
         lazy: true
+        public: true
 
     oro_integration.manager.fields_changes:
         class: '%oro_integration.manager.fields_changes.class%'
@@ -141,6 +142,7 @@ services:
 
     oro_integration.reader.entity.by_id:
         class: '%oro_integration.reader.entity.by_id.class%'
+        public: true
         parent: oro_importexport.reader.entity
 
     oro_integration.helper.default_owner_helper:
@@ -197,6 +199,7 @@ services:
 
     oro_integration.delete_manager:
         class: '%oro_integration.delete_manager.class%'
+        public: true
         arguments: [ '@doctrine.orm.entity_manager' ]
 
     oro_integration.sync_scheduler:
@@ -245,11 +248,13 @@ services:
 
     oro_integration.utils.form_utils:
         class: '%oro_integration.utils.form_utils.class%'
+        public: true
         arguments:
             - '@oro_integration.manager.types_registry'
 
     oro_integration.datagrid.status_grid_helper:
         class: '%oro_integration.datagrid.status_grid_helper.class%'
+        public: true
         arguments:
             - '@oro_integration.manager.types_registry'
             - '@translator'
@@ -331,6 +336,7 @@ services:
 
     oro_integration.datagrid.action_configuration:
         class: Oro\Bundle\IntegrationBundle\Datagrid\ActionConfiguration
+        public: true
         arguments:
             - '@oro_integration.manager.types_registry'
 

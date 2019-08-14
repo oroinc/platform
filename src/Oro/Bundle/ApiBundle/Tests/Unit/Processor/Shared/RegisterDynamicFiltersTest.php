@@ -25,6 +25,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelated
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 {
     /** @var RegisterDynamicFilters */
@@ -63,7 +66,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
     {
         return new RestFilterValueAccessor(
             $request,
-            '!?=',
+            '(!|<|>|%21|%3C|%3E)?(=|%3D)|<>|%3C%3E|<|>|\*|%3C|%3E|%2A|(!|%21)?(\*|~|\^|\$|%2A|%7E|%5E|%24)',
             [ComparisonFilter::EQ => '=', ComparisonFilter::NEQ => '!=']
         );
     }
@@ -132,16 +135,11 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
     /**
      * @param $queryString
      *
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return Request
      */
     private function getRequest($queryString)
     {
-        $request = $this->createMock(Request::class);
-        $request->expects(self::any())
-            ->method('getQueryString')
-            ->willReturn($queryString);
-
-        return $request;
+        return new Request([], [], [], [], [], ['QUERY_STRING' => $queryString]);
     }
 
     public function testProcessWhenThisWorkAlreadyDone()

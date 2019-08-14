@@ -17,7 +17,7 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue as EnumEntity;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)

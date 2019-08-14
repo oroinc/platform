@@ -9,7 +9,7 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 /**
  * This command provides possibility to import entities via command line
  */
-class ImportCommand extends ContainerAwareCommand
+class ImportCommand extends Command
 {
     /**
      * @var string
@@ -129,7 +129,7 @@ class ImportCommand extends ContainerAwareCommand
             throw new \InvalidArgumentException('The --email option is required.');
         }
 
-        $importOwner = $this->getContainer()->get('oro_user.manager')->findUserByEmail((string) $email);
+        $importOwner = $this->userManger->findUserByEmail((string) $email);
         if (!$importOwner instanceof User) {
             throw new \InvalidArgumentException(sprintf('Invalid email. There is no user with %s email!', $email));
         }

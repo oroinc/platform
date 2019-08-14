@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * An instance of this class can be added to the config extras of the context
@@ -10,10 +11,13 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
  */
 class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
 {
-    const NAME = 'expand_related_entities';
+    public const NAME = 'expand_related_entities';
 
     /** @var string[] */
-    protected $expandedEntities;
+    private $expandedEntities;
+
+    /** @var array|null */
+    private $map;
 
     /**
      * @param string[] $expandedEntities The list of related entities.
@@ -39,6 +43,22 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
     public function getExpandedEntities()
     {
         return $this->expandedEntities;
+    }
+
+    /**
+     * Checks if it is requested to expand an entity by the given path.
+     *
+     * @param string $path
+     *
+     * @return bool
+     */
+    public function isExpandRequested(string $path): bool
+    {
+        if (null === $this->map) {
+            $this->map = $this->buildMap();
+        }
+
+        return isset($this->map[$path]);
     }
 
     /**
@@ -71,5 +91,27 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
     public function getCacheKeyPart()
     {
         return 'expand:' . implode(',', $this->expandedEntities);
+    }
+
+    /**
+     * @return array
+     */
+    private function buildMap(): array
+    {
+        $map = [];
+        foreach ($this->expandedEntities as $path) {
+            do {
+                if (isset($map[$path])) {
+                    break;
+                }
+                $map[$path] = true;
+                $lastDelimiter = \strrpos($path, ConfigUtil::PATH_DELIMITER);
+                $path = false !== $lastDelimiter
+                    ? \substr($path, 0, $lastDelimiter)
+                    : null;
+            } while ($path);
+        }
+
+        return $map;
     }
 }

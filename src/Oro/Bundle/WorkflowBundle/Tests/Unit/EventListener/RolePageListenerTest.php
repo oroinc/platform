@@ -21,7 +21,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $translator->expects($this->any())
             ->method('trans')
             ->willReturnCallback(function ($value) {

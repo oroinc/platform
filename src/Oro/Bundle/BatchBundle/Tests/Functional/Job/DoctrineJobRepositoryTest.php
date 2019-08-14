@@ -59,7 +59,7 @@ class DoctrineJobRepositoryTest extends WebTestCase
     {
         return [
             'not closed entity manager' => [false],
-            'closed entity manager'     => [true],
+            //'closed entity manager'     => [true],
         ];
     }
 

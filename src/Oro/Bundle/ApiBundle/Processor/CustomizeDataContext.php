@@ -13,7 +13,7 @@ abstract class CustomizeDataContext extends ApiContext
     /** FQCN of a root entity */
     const ROOT_CLASS_NAME = 'rootClass';
 
-    /** a path inside a root entity to a customizing entity */
+    /** a path from a root entity to a customizing entity */
     const PROPERTY_PATH = 'propertyPath';
 
     /** FQCN of a customizing entity */
@@ -49,7 +49,7 @@ abstract class CustomizeDataContext extends ApiContext
     }
 
     /**
-     * Gets a path inside a root entity to a customizing entity.
+     * Gets a path from a root entity to a customizing entity.
      *
      * @return string|null
      */
@@ -59,7 +59,7 @@ abstract class CustomizeDataContext extends ApiContext
     }
 
     /**
-     * Sets a path inside a root entity to a customizing entity.
+     * Sets a path from a root entity to a customizing entity.
      *
      * @param string $propertyPath
      */

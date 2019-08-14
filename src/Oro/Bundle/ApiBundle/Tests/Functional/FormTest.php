@@ -80,7 +80,7 @@ class FormTest extends WebTestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The form type "Symfony\Component\Form\Extension\Core\Type\HiddenType" is not configured to be used in Data API.
+     * @expectedExceptionMessage The form type "Symfony\Component\Form\Extension\Core\Type\HiddenType" is not configured to be used in API.
      */
     // @codingStandardsIgnoreEnd
     public function testApiFormWithFormTypeThatDoesNotExistInApi()

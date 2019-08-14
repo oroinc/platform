@@ -11,8 +11,13 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
 {
     private const METHOD_MAP = [
         ConfigUtil::DOCUMENTATION_RESOURCE    => 'setDocumentationResources',
+        ConfigUtil::COLLAPSE                  => 'setCollapsed',
         ConfigUtil::POST_SERIALIZE            => 'setPostSerializeHandler',
         ConfigUtil::POST_SERIALIZE_COLLECTION => 'setPostSerializeCollectionHandler',
+        ConfigUtil::DISABLE_SORTING           => ['disableSorting', 'enableSorting'],
+        ConfigUtil::DISABLE_INCLUSION         => ['disableInclusion', 'enableInclusion'],
+        ConfigUtil::DISABLE_FIELDSET          => ['disableFieldset', 'enableFieldset'],
+        ConfigUtil::DISABLE_META_PROPERTIES   => ['disableMetaProperties', 'enableMetaProperties'],
         ConfigUtil::FORM_EVENT_SUBSCRIBER     => 'setFormEventSubscribers'
     ];
 

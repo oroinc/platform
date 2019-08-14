@@ -15,18 +15,17 @@
     background-color: $sidebar-bg-color;
     width: $sidebar-minimized-width;
     height: 100%;
-    position: relative;
     user-select: none;
-    padding-bottom: 88px;
-    z-index: $sidebar-z-index;
+    padding-bottom: 90px;
 
     &.maximized {
         width: $sidebar-maximized-width;
+        padding-bottom: 45px;
     }
 
     &__scroll-container {
+        height: 100%;
         max-height: 100%;
-        overflow: auto;
         background-color: transparent;
     }
 
@@ -94,6 +93,18 @@
     &.sidebar-right &__add-widget,
     &.sidebar-right &__toggle {
         #{$start}: 0;
+    }
+
+    &.maximized.sidebar-right &__add-widget {
+        bottom: 0;
+        #{$start}: auto;
+        #{$end}: 0;
+    }
+
+    &.maximized.sidebar-left &__add-widget {
+        bottom: 0;
+        #{$start}: 0;
+        #{$end}: auto;
     }
 
     &.sidebar-left &__add-widget,

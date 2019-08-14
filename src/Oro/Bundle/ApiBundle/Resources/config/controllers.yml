@@ -1,0 +1,7 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\ApiBundle\Controller\RestApiController:
+        arguments:
+            - '@oro_api.rest.request_handler'

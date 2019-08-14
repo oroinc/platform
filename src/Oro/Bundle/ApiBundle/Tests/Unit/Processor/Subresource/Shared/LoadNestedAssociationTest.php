@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
+use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
@@ -28,7 +29,8 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         $this->processor = new LoadNestedAssociation(
             $this->entitySerializer,
             $this->doctrineHelper,
-            new EntityIdHelper()
+            new EntityIdHelper(),
+            $this->configProvider
         );
     }
 
@@ -85,6 +87,12 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
             ['id' => $parentId, $associationName => ['id' => 1]]
         ];
 
+        $parentConfigContainer = new Config();
+        $parentConfigContainer->setDefinition($parentConfig);
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($parentConfigContainer);
+
         $expectedQueryBuilder = $this->doctrineHelper
             ->createQueryBuilder($parentClassName, 'e')
             ->andWhere('e.id = :id')
@@ -123,6 +131,12 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
             ['id' => $parentId, $associationName => null]
         ];
 
+        $parentConfigContainer = new Config();
+        $parentConfigContainer->setDefinition($parentConfig);
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($parentConfigContainer);
+
         $expectedQueryBuilder = $this->doctrineHelper
             ->createQueryBuilder($parentClassName, 'e')
             ->andWhere('e.id = :id')
@@ -155,6 +169,12 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         $parentId = 123;
 
         $loadedData = [];
+
+        $parentConfigContainer = new Config();
+        $parentConfigContainer->setDefinition($parentConfig);
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($parentConfigContainer);
 
         $expectedQueryBuilder = $this->doctrineHelper
             ->createQueryBuilder($parentClassName, 'e')

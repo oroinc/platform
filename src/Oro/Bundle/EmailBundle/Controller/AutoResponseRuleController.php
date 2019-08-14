@@ -34,7 +34,7 @@ class AutoResponseRuleController extends AbstractController
      *      class="OroEmailBundle:AutoResponseRule",
      *      permission="CREATE"
      * )
-     * @Template("OroEmailBundle:AutoResponseRule:dialog/update.html.twig")
+     * @Template("@OroEmail/AutoResponseRule/dialog/update.html.twig")
      * @param Request $request
      * @param Mailbox|null $mailbox
      * @return array
@@ -57,7 +57,7 @@ class AutoResponseRuleController extends AbstractController
      *      class="OroEmailBundle:AutoResponseRule",
      *      permission="EDIT"
      * )
-     * @Template("OroEmailBundle:AutoResponseRule:dialog/update.html.twig")
+     * @Template("@OroEmail/AutoResponseRule/dialog/update.html.twig")
      * @param AutoResponseRule $rule
      * @param Request $request
      * @return array
@@ -82,7 +82,7 @@ class AutoResponseRuleController extends AbstractController
     /**
      * @Route("/template/{id}", options={"expose"=true})
      * @AclAncestor("oro_email_emailtemplate_update")
-     * @Template
+     * @Template("@OroEmail/AutoResponseRule/editTemplate.html.twig")
      *
      * @param EmailTemplate $template
      * @return array

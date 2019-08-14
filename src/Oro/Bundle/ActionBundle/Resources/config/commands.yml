@@ -3,10 +3,16 @@ services:
         public: false
 
     Oro\Bundle\ActionBundle\Command\DebugActionCommand:
+        arguments:
+            - '@oro_action.action_locator'
+            - '@oro_action.action_factory'
         tags:
             - { name: console.command }
 
     Oro\Bundle\ActionBundle\Command\DebugConditionCommand:
+        arguments:
+            - '@oro_action.condition_locator'
+            - '@oro_action.expression.factory'
         tags:
             - { name: console.command }
 

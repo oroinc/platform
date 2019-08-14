@@ -8,9 +8,11 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomDataTypeHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -20,7 +22,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Loads full configuration of the target entity for associations were requested to expand.
- * For example, in JSON.API the "include" filter can be used to request related entities.
+ * For example, in JSON:API the "include" filter can be used to request related entities.
  */
 class ExpandRelatedEntities implements ProcessorInterface
 {
@@ -132,11 +134,11 @@ class ExpandRelatedEntities implements ProcessorInterface
             }
 
             if (null !== $targetMetadata && $targetMetadata->hasAssociation($targetFieldName)) {
-                $targetClass = $targetMetadata->getAssociationTargetClass($targetFieldName);
-                $substituteTargetClass = $entityOverrideProvider->getSubstituteEntityClass($targetClass);
-                if ($substituteTargetClass) {
-                    $targetClass = $substituteTargetClass;
-                }
+                $targetClass = $this->getAssociationTargetClass(
+                    $targetMetadata,
+                    $targetFieldName,
+                    $entityOverrideProvider
+                );
                 $this->completeAssociation(
                     $definition,
                     $fieldName,
@@ -291,5 +293,45 @@ class ExpandRelatedEntities implements ProcessorInterface
         }
 
         return $definition->getField($fieldName)->getPropertyPath($fieldName);
+    }
+
+    /**
+     * @param ClassMetadata                   $parentMetadata
+     * @param string                          $associationName
+     * @param EntityOverrideProviderInterface $entityOverrideProvider
+     *
+     * @return string
+     */
+    private function getAssociationTargetClass(
+        ClassMetadata $parentMetadata,
+        string $associationName,
+        EntityOverrideProviderInterface $entityOverrideProvider
+    ): string {
+        $entityClass = $parentMetadata->getAssociationTargetClass($associationName);
+        // use EntityIdentifier as a target class for associations based on Doctrine's inheritance mapping
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
+        if (!$metadata->isInheritanceTypeNone()) {
+            return EntityIdentifier::class;
+        }
+
+        return $this->resolveEntityClass($entityClass, $entityOverrideProvider);
+    }
+
+    /**
+     * @param string                          $entityClass
+     * @param EntityOverrideProviderInterface $entityOverrideProvider
+     *
+     * @return string
+     */
+    private function resolveEntityClass(
+        string $entityClass,
+        EntityOverrideProviderInterface $entityOverrideProvider
+    ): string {
+        $substituteEntityClass = $entityOverrideProvider->getSubstituteEntityClass($entityClass);
+        if ($substituteEntityClass) {
+            return $substituteEntityClass;
+        }
+
+        return $entityClass;
     }
 }

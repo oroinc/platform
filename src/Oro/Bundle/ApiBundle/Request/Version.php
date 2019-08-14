@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 /**
- * Data API version related utilities.
+ * API version related utilities.
  */
 final class Version
 {

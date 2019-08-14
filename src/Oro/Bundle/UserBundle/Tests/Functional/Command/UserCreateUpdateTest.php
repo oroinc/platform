@@ -9,6 +9,7 @@ use Oro\Bundle\UserBundle\Command\CreateUserCommand;
 use Oro\Bundle\UserBundle\Command\UpdateUserCommand;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadCommandUserCreateUpdateData;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -36,12 +37,19 @@ class UserCreateUpdateTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-        $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadCommandUserCreateUpdateData']);
+        $this->loadFixtures([LoadCommandUserCreateUpdateData::class]);
+
+        $this->userManager = $this->getContainer()->get('oro_user.manager');
+
 
         $this->application = new Application($this->client->getKernel());
         $this->application->setAutoExit(false);
-        $this->application->add(new CreateUserCommand());
-        $this->application->add(new UpdateUserCommand());
+        $this->application->add(
+            new CreateUserCommand($this->userManager, $this->getContainer()->get('doctrine.orm.entity_manager'))
+        );
+        $this->application->add(
+            new UpdateUserCommand($this->userManager, $this->getContainer()->get('doctrine.orm.entity_manager'))
+        );
 
         $this->businessUnits = ['bu1' => $this->getReference('bu1')];
         $this->organizations = [
@@ -49,8 +57,6 @@ class UserCreateUpdateTest extends WebTestCase
             'org2' => $this->getReference('org2'),
             'org3' => $this->getReference('org3'),
         ];
-
-        $this->userManager = $this->getContainer()->get('oro_user.manager');
     }
 
     /**

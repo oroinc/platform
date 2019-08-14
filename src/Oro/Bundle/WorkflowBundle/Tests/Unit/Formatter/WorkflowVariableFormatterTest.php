@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowVariableFormatterTest extends \PHPUnit\Framework\TestCase
 {

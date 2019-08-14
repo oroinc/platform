@@ -74,7 +74,8 @@ class OroApiBundle extends Bundle
         );
         $container->addCompilerPass(
             new Compiler\ApiDocCompilerPass(),
-            PassConfig::TYPE_BEFORE_REMOVING
+            PassConfig::TYPE_BEFORE_OPTIMIZATION,
+            -250
         );
         $container->addCompilerPass(
             new Compiler\RemoveConfigParameterCompilerPass(),

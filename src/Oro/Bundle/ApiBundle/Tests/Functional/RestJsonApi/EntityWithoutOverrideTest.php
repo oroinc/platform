@@ -12,8 +12,11 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  * Tests similar to EntityOverrideTest, but without "override_class" option.
  * These tests are needed to make sure that "override_class" option related changes does not affect regular entities.
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityWithoutOverrideTest extends RestJsonApiTestCase
 {
@@ -195,6 +198,141 @@ class EntityWithoutOverrideTest extends RestJsonApiTestCase
             ],
             $response
         );
+    }
+
+    public function testGetWithIncludeFilterForEntityWithExtendedAssociation()
+    {
+        $response = $this->get(
+            ['entity' => 'testapiactivities', 'id' => '<toString(@activity_1->id)>'],
+            ['include' => 'activityTargets']
+        );
+
+        $this->assertResponseContains(
+            [
+                'data'     => [
+                    'type'          => 'testapiactivities',
+                    'id'            => '<toString(@activity_1->id)>',
+                    'attributes'    => [
+                        'name' => 'Activity 1'
+                    ],
+                    'relationships' => [
+                        'activityTargets' => [
+                            'data' => [
+                                ['type' => 'testapiowners', 'id' => '<toString(@owner_1->id)>']
+                            ]
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type'          => 'testapitargets',
+                        'id'            => '<toString(@target_1->id)>',
+                        'attributes'    => [
+                            'name' => 'Target 1 (customized)'
+                        ],
+                        'relationships' => [
+                            'owners' => [
+                                'data' => [
+                                    ['type' => 'testapiowners', 'id' => '<toString(@owner_1->id)>']
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type'          => 'testapiowners',
+                        'id'            => '<toString(@owner_1->id)>',
+                        'attributes'    => [
+                            'name' => 'Owner 1'
+                        ],
+                        'relationships' => [
+                            'target' => [
+                                'data' => ['type' => 'testapitargets', 'id' => '<toString(@target_1->id)>']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertCount(2, $responseContent['included'], 'included');
+        foreach ($responseContent['included'] as $key => $item) {
+            self::assertArrayNotHasKey('meta', $responseContent['included'][$key], sprintf('included[$s]', $key));
+        }
+    }
+
+    public function testGetSubresourceForExtendedAssociation()
+    {
+        $response = $this->getSubresource([
+            'entity'      => 'testapiactivities',
+            'id'          => '<toString(@activity_1->id)>',
+            'association' => 'activityTargets'
+        ]);
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type'          => 'testapitargets',
+                        'id'            => '<toString(@target_1->id)>',
+                        'attributes'    => [
+                            'name' => 'Target 1 (customized)'
+                        ],
+                        'relationships' => [
+                            'owners' => [
+                                'data' => [
+                                    ['type' => 'testapiowners', 'id' => '<toString(@owner_1->id)>']
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type'          => 'testapiowners',
+                        'id'            => '<toString(@owner_1->id)>',
+                        'attributes'    => [
+                            'name' => 'Owner 1'
+                        ],
+                        'relationships' => [
+                            'target' => [
+                                'data' => ['type' => 'testapitargets', 'id' => '<toString(@target_1->id)>']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response,
+            true
+        );
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertCount(2, $responseContent['data']);
+        foreach ($responseContent['data'] as $key => $item) {
+            self::assertArrayNotHasKey('meta', $item, sprintf('data[%s]', $key));
+        }
+    }
+
+    public function testGetRelationshipForExtendedAssociation()
+    {
+        $response = $this->getRelationship([
+            'entity'      => 'testapiactivities',
+            'id'          => '<toString(@activity_1->id)>',
+            'association' => 'activityTargets'
+        ]);
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => 'testapitargets', 'id' => '<toString(@target_1->id)>'],
+                    ['type' => 'testapiowners', 'id' => '<toString(@owner_1->id)>']
+                ]
+            ],
+            $response,
+            true
+        );
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertCount(2, $responseContent['data']);
+        foreach ($responseContent['data'] as $key => $item) {
+            self::assertArrayNotHasKey('meta', $item, sprintf('data[%s]', $key));
+            self::assertArrayNotHasKey('attributes', $item, sprintf('data[%s]', $key));
+            self::assertArrayNotHasKey('relationships', $item, sprintf('data[%s]', $key));
+        }
     }
 
     public function testFilterByExtendedAssociation()

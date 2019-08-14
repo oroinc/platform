@@ -43,13 +43,13 @@ abstract class DeleteDataByDeleteHandler implements ProcessorInterface
             return;
         }
 
-        $config = $context->getConfig();
-        $entityClass = $this->doctrineHelper->getManageableEntityClass($context->getClassName(), $config);
+        $entityClass = $context->getManageableEntityClass($this->doctrineHelper);
         if (!$entityClass) {
             // only manageable entities or resources based on manageable entities are supported
             return;
         }
 
+        $config = $context->getConfig();
         $deleteHandlerServiceId = null;
         if (null !== $config) {
             $deleteHandlerServiceId = $config->getDeleteHandler();

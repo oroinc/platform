@@ -14,6 +14,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * The controller for the email templates related functionality.
+ *
  * @Route("/emailtemplate")
  */
 class EmailTemplateController extends Controller
@@ -32,7 +34,7 @@ class EmailTemplateController extends Controller
      *      class="OroEmailBundle:EmailTemplate",
      *      permission="VIEW"
      * )
-     * @Template()
+     * @Template("@OroEmail/EmailTemplate/index.html.twig")
      */
     public function indexAction()
     {
@@ -49,7 +51,7 @@ class EmailTemplateController extends Controller
      *      class="OroEmailBundle:EmailTemplate",
      *      permission="EDIT"
      * )
-     * @Template()
+     * @Template("@OroEmail/EmailTemplate/update.html.twig")
      */
     public function updateAction(EmailTemplate $entity, $isClone = false)
     {
@@ -64,7 +66,7 @@ class EmailTemplateController extends Controller
      *      class="OroEmailBundle:EmailTemplate",
      *      permission="CREATE"
      * )
-     * @Template("OroEmailBundle:EmailTemplate:update.html.twig")
+     * @Template("@OroEmail/EmailTemplate/update.html.twig")
      */
     public function createAction()
     {
@@ -74,7 +76,7 @@ class EmailTemplateController extends Controller
     /**
      * @Route("/clone/{id}", requirements={"id"="\d+"}, defaults={"id"=0}))
      * @AclAncestor("oro_email_emailtemplate_create")
-     * @Template("OroEmailBundle:EmailTemplate:update.html.twig")
+     * @Template("@OroEmail/EmailTemplate/update.html.twig")
      */
     public function cloneAction(EmailTemplate $entity)
     {
@@ -89,7 +91,7 @@ class EmailTemplateController extends Controller
      *      class="OroEmailBundle:EmailTemplate",
      *      permission="VIEW"
      * )
-     * @Template("OroEmailBundle:EmailTemplate:preview.html.twig")
+     * @Template("@OroEmail/EmailTemplate/preview.html.twig")
      * @param Request $request
      * @param bool|int $id
      * @return array

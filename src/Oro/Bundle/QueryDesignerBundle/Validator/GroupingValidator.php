@@ -4,9 +4,9 @@ namespace Oro\Bundle\QueryDesignerBundle\Validator;
 
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\GroupingConstraint;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Validates AbstractQueryDesigner::definition

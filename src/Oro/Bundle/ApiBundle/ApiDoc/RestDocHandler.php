@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route;
 
 /**
- * Populates ApiDoc annotation based on the configuration of Data API resource.
+ * Populates ApiDoc annotation based on the configuration of API resource.
  */
 class RestDocHandler implements HandlerInterface
 {

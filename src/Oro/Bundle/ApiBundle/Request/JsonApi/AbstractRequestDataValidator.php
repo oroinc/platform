@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
- * The base class for the JSON.API request data typed and untyped validators.
+ * The base class for the JSON:API request data typed and untyped validators.
  */
 abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValidator
 {

@@ -138,18 +138,18 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
             ->method('getManageableEntityClass')
             ->with($parentClass, $parentConfig)
             ->willReturn($parentClass);
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityIdentifierFieldNamesForClass')
             ->with($parentClass)
             ->willReturn(['id']);
 
         $qb = $this->createMock(QueryBuilder::class);
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('createQueryBuilder')
             ->with($parentClass, 'e')
             ->willReturn($qb);
 
-        $this->entityIdHelper->expects(self::once())
+        $this->entityIdHelper->expects(self::exactly(2))
             ->method('applyEntityIdentifierRestriction')
             ->with(self::identicalTo($qb), $parentId, self::identicalTo($parentMetadata));
 
@@ -162,6 +162,74 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
             ->method('getOneOrNullResult')
             ->with(AbstractQuery::HYDRATE_ARRAY)
             ->willReturn(null);
+
+        $notAclProtectedQuery = $this->createMock(AbstractQuery::class);
+        $qb->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($notAclProtectedQuery);
+        $notAclProtectedQuery->expects(self::once())
+            ->method('getOneOrNullResult')
+            ->with(AbstractQuery::HYDRATE_ARRAY)
+            ->willReturn(null);
+
+        $this->context->setParentClassName($parentClass);
+        $this->context->setParentId($parentId);
+        $this->context->setAssociationName($associationName);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->processor->process($this->context);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @expectedExceptionMessage No access to the parent entity.
+     */
+    public function testProcessForManageableEntityWhenNoAccessToEntity()
+    {
+        $parentClass = 'Test\Class';
+        $parentId = 123;
+        $associationName = 'association';
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->addField($associationName);
+        $parentMetadata = new EntityMetadata();
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getManageableEntityClass')
+            ->with($parentClass, $parentConfig)
+            ->willReturn($parentClass);
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('getEntityIdentifierFieldNamesForClass')
+            ->with($parentClass)
+            ->willReturn(['id']);
+
+        $qb = $this->createMock(QueryBuilder::class);
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('createQueryBuilder')
+            ->with($parentClass, 'e')
+            ->willReturn($qb);
+
+        $this->entityIdHelper->expects(self::exactly(2))
+            ->method('applyEntityIdentifierRestriction')
+            ->with(self::identicalTo($qb), $parentId, self::identicalTo($parentMetadata));
+
+        $query = $this->createMock(AbstractQuery::class);
+        $this->queryFactory->expects(self::once())
+            ->method('getQuery')
+            ->with(self::identicalTo($qb), self::identicalTo($parentConfig))
+            ->willReturn($query);
+        $query->expects(self::once())
+            ->method('getOneOrNullResult')
+            ->with(AbstractQuery::HYDRATE_ARRAY)
+            ->willReturn(null);
+
+        $notAclProtectedQuery = $this->createMock(AbstractQuery::class);
+        $qb->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($notAclProtectedQuery);
+        $notAclProtectedQuery->expects(self::once())
+            ->method('getOneOrNullResult')
+            ->with(AbstractQuery::HYDRATE_ARRAY)
+            ->willReturn(['id' => $parentId]);
 
         $this->context->setParentClassName($parentClass);
         $this->context->setParentId($parentId);

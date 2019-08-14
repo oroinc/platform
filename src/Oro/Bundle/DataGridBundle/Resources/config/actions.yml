@@ -21,47 +21,55 @@ services:
     oro_datagrid.extension.action.type.navigate:
         class: '%oro_datagrid.extension.action.type.navigate.class%'
         shared: false
+        public: true
         tags:
             - { name:  oro_datagrid.extension.action.type, type: navigate }
 
     oro_datagrid.extension.action.type.ajax:
         class: '%oro_datagrid.extension.action.type.ajax.class%'
         shared: false
+        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: ajax }
 
     oro_datagrid.extension.action.type.delete:
         class: '%oro_datagrid.extension.action.type.delete.class%'
         shared: false
+        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: delete }
 
     oro_datagrid.extension.action.type.ajaxdelete:
         class: '%oro_datagrid.extension.action.type.ajaxdelete.class%'
         shared: false
+        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: ajaxdelete }
 
     oro_datagrid.extension.action.type.frontend:
         class: '%oro_datagrid.extension.action.type.frontend.class%'
         shared: false
+        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: frontend }
 
     oro_datagrid.extension.action.type.import:
         class: 'Oro\Bundle\DataGridBundle\Extension\Action\Actions\ImportAction'
         shared: false
+        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: import }
 
     oro_datagrid.extension.action.type.export:
         class: 'Oro\Bundle\DataGridBundle\Extension\Action\Actions\ExportAction'
         shared: false
+        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: export }
 
     oro_datagrid.extension.action.type.trigger_event:
         class: Oro\Bundle\DataGridBundle\Extension\Action\Actions\TriggerEventAction
         shared: false
+        public: true
         tags:
             - { name:  oro_datagrid.extension.action.type, type: trigger-event }

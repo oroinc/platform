@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Registers resource documentation parsers for all supported Data API request types.
+ * Registers resource documentation parsers for all supported API request types.
  */
 class ResourceDocParserCompilerPass implements CompilerPassInterface
 {

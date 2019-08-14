@@ -6,7 +6,7 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage as BaseEntityAliasStorage;
 
 /**
- * The storage for Data API entity aliases.
+ * The storage for API entity aliases.
  */
 class EntityAliasStorage extends BaseEntityAliasStorage
 {

@@ -92,6 +92,9 @@ class NavigationItemsProvider implements NavigationItemsProviderInterface, Featu
 
         try {
             $path = parse_url($item['url'], PHP_URL_PATH);
+            if ($path === null) {
+                $path = '';
+            }
 
             $routeMatch = $this->urlMatcher->match($path);
 

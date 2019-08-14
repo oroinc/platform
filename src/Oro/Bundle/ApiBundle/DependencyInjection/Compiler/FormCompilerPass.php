@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Form\FormRegistry;
 
 /**
- * Configures all services required for Data API forms.
+ * Configures all services required for API forms.
  */
 class FormCompilerPass implements CompilerPassInterface
 {
@@ -99,10 +99,25 @@ class FormCompilerPass implements CompilerPassInterface
                 self::API_FORM_TYPE_GUESSER_TAG
             );
 
-            // load form types, form type extensions and form type guessers for Data API form extension
+            // load form types, form type extensions and form type guessers for API form extension
             $apiFormExtensionDef->replaceArgument(1, $this->getApiFormTypes($container, $formTypeClassNames));
             $apiFormExtensionDef->replaceArgument(2, $this->getApiFormTypeExtensions($container));
             $apiFormExtensionDef->replaceArgument(3, $this->getApiFormTypeGuessers($container));
+
+            $serviceList = array_merge(
+                $apiFormExtensionDef->getArgument(1),
+                $apiFormExtensionDef->getArgument(3),
+                ...array_values($apiFormExtensionDef->getArgument(2))
+            );
+
+            foreach ($serviceList as $serviceId) {
+                if ($serviceId) {
+                    $serviceLocatorServices[$serviceId] = new Reference($serviceId);
+                }
+            }
+
+            $serviceLocator = $container->getDefinition('oro_api.form.extension_locator');
+            $serviceLocator->replaceArgument(0, $serviceLocatorServices ?? []);
         }
         if ($container->hasDefinition(self::API_FORM_METADATA_GUESSER_SERVICE_ID)) {
             $dataTypeMappings = [];
@@ -151,14 +166,14 @@ class FormCompilerPass implements CompilerPassInterface
         $formExtensions = $formRegistryDef->getArgument(0);
         if (!is_array($formExtensions)) {
             throw new LogicException(sprintf(
-                'Cannot register Data API form extension because it is expected'
+                'Cannot register API form extension because it is expected'
                 . ' that the first argument of "%s" service is array. "%s" given.',
                 self::FORM_REGISTRY_SERVICE_ID,
                 is_object($formExtensions) ? get_class($formExtensions) : gettype($formExtensions)
             ));
         } elseif (count($formExtensions) !== 1) {
             throw new LogicException(sprintf(
-                'Cannot register Data API form extension because it is expected'
+                'Cannot register API form extension because it is expected'
                 . ' that the first argument of "%s" service is array contains only one element.'
                 . ' Detected the following form extension: %s.',
                 self::FORM_REGISTRY_SERVICE_ID,

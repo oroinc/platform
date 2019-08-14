@@ -8,7 +8,7 @@ use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;

@@ -4,7 +4,7 @@ namespace Oro\Bundle\WsseAuthenticationBundle\Command;
 
 use Psr\Container\ContainerInterface;
 use Psr\SimpleCache\CacheInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Flushes WSSE nonce cache.
  */
-class DeleteNoncesCommand extends ContainerAwareCommand
+class DeleteNoncesCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:wsse:nonces:delete';

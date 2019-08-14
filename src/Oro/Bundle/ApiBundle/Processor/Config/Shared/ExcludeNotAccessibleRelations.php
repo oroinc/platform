@@ -17,7 +17,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Excludes relations that are pointed to not accessible resources.
- * For example if entity1 has a reference to to entity2, but entity2 does not have Data API resource,
+ * For example if entity1 has a reference to to entity2, but entity2 does not have API resource,
  * the relation will be excluded.
  */
 class ExcludeNotAccessibleRelations implements ProcessorInterface
@@ -159,8 +159,8 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         if ($this->resourcesProvider->isResourceKnown($targetClass, $version, $requestType)) {
             return true;
         }
-        if ($targetMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
-            // check that at least one inherited entity has Data API resource
+        if (!$targetMetadata->isInheritanceTypeNone()) {
+            // check that at least one inherited entity has API resource
             foreach ($targetMetadata->subClasses as $inheritedEntityClass) {
                 $inheritedEntityClass = $this->resolveEntityClass($inheritedEntityClass, $entityOverrideProvider);
                 if ($this->resourcesProvider->isResourceKnown($inheritedEntityClass, $version, $requestType)) {
@@ -190,8 +190,8 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         if ($this->resourcesProvider->isResourceAccessible($targetClass, $version, $requestType)) {
             return true;
         }
-        if ($targetMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
-            // check that at least one inherited entity has Data API resource
+        if (!$targetMetadata->isInheritanceTypeNone()) {
+            // check that at least one inherited entity has API resource
             foreach ($targetMetadata->subClasses as $inheritedEntityClass) {
                 $inheritedEntityClass = $this->resolveEntityClass($inheritedEntityClass, $entityOverrideProvider);
                 if ($this->resourcesProvider->isResourceAccessible($inheritedEntityClass, $version, $requestType)) {

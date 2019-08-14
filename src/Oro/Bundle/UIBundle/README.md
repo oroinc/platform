@@ -24,6 +24,7 @@ OroUIBundle defines the architecture of the front-end part of Oro application an
 - [Component Shorcuts](./Resources/doc/reference/component-shortcuts.md)
 - [Error Handler](./Resources/doc/reference/error-handler.md)
 - [Objects Registry](./Resources/doc/reference/client-side/registry.md)
+- [CSS Variables parser](./Resources/doc/reference/client-side/css-variables.md)
 
 ## Configuration Settings
 

@@ -5,7 +5,6 @@ namespace Oro\Bundle\CronBundle\Tests\Functional\Command;
 use Cron\CronExpression;
 use Oro\Bundle\CronBundle\Async\Topics;
 use Oro\Bundle\CronBundle\Helper\CronHelper;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -75,7 +74,8 @@ class CronCommandTest extends WebTestCase
     public function testDisabledAllJobs()
     {
         $this->mockCronHelper(true);
-        $this->mockFeatureChecker();
+        $this->getContainer()->get('oro_featuretoggle.checker.feature_checker')
+            ->setResourceEnabled(false);
 
         $result = $this->runCommand('oro:cron', ['-vvv' => true]);
         $this->assertNotEmpty($result);
@@ -95,19 +95,5 @@ class CronCommandTest extends WebTestCase
         $mockCronHelper->expects($this->any())->method('createCron')->willReturn($cronExpression);
 
         $this->getContainer()->set('oro_cron.helper.cron', $mockCronHelper);
-    }
-
-    protected function mockFeatureChecker()
-    {
-        $featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $featureChecker->expects($this->any())
-            ->method('isResourceEnabled')
-            ->with($this->anything())
-            ->willReturn(false);
-
-        $this->getContainer()->set('oro_featuretoggle.checker.feature_checker', $featureChecker);
     }
 }

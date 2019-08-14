@@ -15,11 +15,17 @@ class AssociationMetadata extends PropertyMetadata
     /** @var string */
     private $targetClass;
 
+    /** @var string|null */
+    private $baseTargetClass;
+
     /** @var string[] */
     private $acceptableTargetClasses = [];
 
     /** @var bool */
     private $allowEmptyAcceptableTargets = true;
+
+    /** @var string */
+    private $associationPath;
 
     /** @var string */
     private $associationType;
@@ -35,6 +41,9 @@ class AssociationMetadata extends PropertyMetadata
 
     /** @var EntityMetadata|null */
     private $targetMetadata;
+
+    /** @var TargetMetadataAccessorInterface|null */
+    private $targetMetadataAccessor;
 
     /** @var MetaAttributeMetadata[] */
     private $metaProperties = [];
@@ -64,6 +73,7 @@ class AssociationMetadata extends PropertyMetadata
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function toArray()
     {
@@ -78,6 +88,9 @@ class AssociationMetadata extends PropertyMetadata
         );
         if ($this->targetClass) {
             $result['target_class'] = $this->targetClass;
+        }
+        if ($this->baseTargetClass) {
+            $result['base_target_class'] = $this->baseTargetClass;
         }
         if ($this->acceptableTargetClasses) {
             $result['acceptable_target_classes'] = $this->acceptableTargetClasses;
@@ -108,13 +121,50 @@ class AssociationMetadata extends PropertyMetadata
     }
 
     /**
-     * Gets metadata of the association target.
+     * Sets an accessor to target metadata by a specified target class name and association path.
+     * It is used for multi-target associations.
+     * @see \Oro\Bundle\ApiBundle\Model\EntityIdentifier
+     *
+     * @param TargetMetadataAccessorInterface|null $targetMetadataAccessor
+     */
+    public function setTargetMetadataAccessor(?TargetMetadataAccessorInterface $targetMetadataAccessor)
+    {
+        $this->targetMetadataAccessor = $targetMetadataAccessor;
+    }
+
+    /**
+     * Sets the path from a root entity to the association.
+     *
+     * @param string|null $associationPath
+     */
+    public function setAssociationPath(?string $associationPath)
+    {
+        $this->associationPath = $associationPath;
+    }
+
+    /**
+     * Gets metadata for the given association target class.
+     *
+     * @param string|null $targetClassName
      *
      * @return EntityMetadata|null
      */
-    public function getTargetMetadata()
+    public function getTargetMetadata(string $targetClassName = null)
     {
-        return $this->targetMetadata;
+        if (null === $this->targetMetadataAccessor
+            || !$this->associationPath
+            || !$targetClassName
+            || $targetClassName === $this->targetClass
+        ) {
+            return $this->targetMetadata;
+        }
+
+        $targetMetadata = $this->targetMetadataAccessor->getTargetMetadata(
+            $targetClassName,
+            $this->associationPath
+        );
+
+        return $targetMetadata ?? $this->targetMetadata;
     }
 
     /**
@@ -145,6 +195,30 @@ class AssociationMetadata extends PropertyMetadata
     public function setTargetClassName($className)
     {
         $this->targetClass = $className;
+    }
+
+    /**
+     * Gets FQCN of the association target base class.
+     * E.g. if an association is bases on Doctrine's inheritance mapping,
+     * the target class will be Oro\Bundle\ApiBundle\Model\EntityIdentifier
+     * and the base target class will be a mapped superclass
+     * or a parent class for table inheritance association.
+     *
+     * @return string|null
+     */
+    public function getBaseTargetClassName()
+    {
+        return $this->baseTargetClass;
+    }
+
+    /**
+     * Sets FQCN of the association target.
+     *
+     * @param string $className
+     */
+    public function setBaseTargetClassName($className)
+    {
+        $this->baseTargetClass = $className;
     }
 
     /**
@@ -254,7 +328,7 @@ class AssociationMetadata extends PropertyMetadata
     /**
      * Sets a flag indicates whether the association represents "to-many" or "to-one" relationship.
      *
-     * @param bool $value TRUE for "to-many" relation, FALSE for "to-one" relationship
+     * @param bool $value TRUE for "to-many" relationship, FALSE for "to-one" relationship
      */
     public function setIsCollection($value)
     {

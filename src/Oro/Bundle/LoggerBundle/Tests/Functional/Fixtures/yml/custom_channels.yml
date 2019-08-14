@@ -3,6 +3,6 @@ monolog:
         - custom_channel
     handlers:
         custom_handler:
-            type:  debug
+            type: test
             channels:
                 - custom_channel

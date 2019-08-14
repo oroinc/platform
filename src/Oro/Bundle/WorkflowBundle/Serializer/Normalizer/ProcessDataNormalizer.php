@@ -6,6 +6,9 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 
+/**
+ * Normalizes/denormalizes before processing it
+ */
 class ProcessDataNormalizer extends AbstractProcessNormalizer
 {
     /**
@@ -45,7 +48,7 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $denormalizedData = $this->serializer->denormalize($data, null, $format, $context);
+        $denormalizedData = $this->serializer->denormalize($data, '', $format, $context);
         $denormalizedData = $denormalizedData ?: array();
 
         return new ProcessData($denormalizedData);

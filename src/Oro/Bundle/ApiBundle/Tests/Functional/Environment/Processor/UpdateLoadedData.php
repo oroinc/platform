@@ -26,8 +26,8 @@ class UpdateLoadedData implements ProcessorInterface
     {
         /** @var CustomizeLoadedDataContext $context */
 
-        $data = $context->getResult();
-        if (!is_array($data) || array_key_exists('computedName', $data) || !array_key_exists('name', $data)) {
+        $data = $context->getData();
+        if (array_key_exists('computedName', $data) || !array_key_exists('name', $data)) {
             return;
         }
 
@@ -37,6 +37,6 @@ class UpdateLoadedData implements ProcessorInterface
         }
 
         $data['computedName'] = $data['name'] . ' (computed' . $this->suffix . ')';
-        $context->setResult($data);
+        $context->setData($data);
     }
 }

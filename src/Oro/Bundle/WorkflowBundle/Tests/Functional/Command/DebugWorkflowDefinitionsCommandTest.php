@@ -9,8 +9,8 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithGroups;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 {
@@ -19,8 +19,8 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
         $this->initClient();
 
         $this->loadFixtures([
-            'Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions',
-            'Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithGroups',
+            LoadWorkflowDefinitions::class,
+            LoadWorkflowDefinitionsWithGroups::class,
         ]);
     }
 
@@ -28,7 +28,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
     {
         $workflows = $this->getWorkflowDefinitionRepository()->findAll();
 
-        $result = $this->runCommand(DebugWorkflowDefinitionsCommand::NAME);
+        $result = $this->runCommand(DebugWorkflowDefinitionsCommand::getDefaultName());
 
         /** @var TranslatorInterface $translator */
         $translator = $this->getContainer()->get('translator');
@@ -59,7 +59,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
         /** @var WorkflowDefinition $initialWorkflow */
         $initialWorkflow = $this->getWorkflowDefinitionRepository()->findOneBy(['name' => $workflowName]);
 
-        $result = $this->runCommand(DebugWorkflowDefinitionsCommand::NAME, [$workflowName], false);
+        $result = $this->runCommand(DebugWorkflowDefinitionsCommand::getDefaultName(), [$workflowName], false);
 
         if ($exists) {
             $this->assertNotContains('No workflow definitions found.', $result);

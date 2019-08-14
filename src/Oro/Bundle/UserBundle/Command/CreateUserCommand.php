@@ -5,16 +5,25 @@ namespace Oro\Bundle\UserBundle\Command;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Exception\InvalidArgumentException;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CreateUserCommand extends ContainerAwareCommand
+/**
+ * Creates a user.
+ */
+class CreateUserCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:user:create';
+
     /**
      * @var UserManager
      */
@@ -26,12 +35,22 @@ class CreateUserCommand extends ContainerAwareCommand
     protected $entityManager;
 
     /**
+     * @param UserManager $userManager
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(UserManager $userManager, EntityManagerInterface $entityManager)
+    {
+        $this->userManager = $userManager;
+        $this->entityManager = $entityManager;
+        parent::__construct();
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('oro:user:create')
             ->setDescription('Create user.')
             ->addOption('user-role', null, InputOption::VALUE_REQUIRED, 'User role')
             ->addOption('user-business-unit', null, InputOption::VALUE_REQUIRED, 'User business unit (required)')
@@ -55,7 +74,7 @@ class CreateUserCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var User $user */
-        $user = $this->getUserManager()->createUser();
+        $user = $this->userManager->createUser();
         $user->setEnabled(true);
 
         $options = $input->getOptions();
@@ -115,7 +134,7 @@ class CreateUserCommand extends ContainerAwareCommand
             ->setOrganizations($user, $options)
             ->setProperties($user, $options);
 
-        $this->getUserManager()->updateUser($user);
+        $this->userManager->updateUser($user);
     }
 
     /**
@@ -126,10 +145,16 @@ class CreateUserCommand extends ContainerAwareCommand
      */
     protected function setRole(User $user, $options)
     {
+        $roleName = null;
         if (!empty($options['user-role'])) {
-            $role = $this->getEntityManager()
-                ->getRepository('OroUserBundle:Role')
-                ->findOneBy(['role' => $options['user-role']]);
+            $roleName = $options['user-role'];
+        } elseif (null === $user->getId()) {
+            $roleName = User::ROLE_DEFAULT;
+        }
+        if ($roleName) {
+            $role = $this->entityManager
+                ->getRepository(Role::class)
+                ->findOneBy(['role' => $roleName]);
 
             if (!$role) {
                 throw new InvalidArgumentException('Invalid Role');
@@ -150,8 +175,8 @@ class CreateUserCommand extends ContainerAwareCommand
     protected function setBusinessUnit(User $user, $options)
     {
         if (!empty($options['user-business-unit'])) {
-            $businessUnit = $this->getEntityManager()
-                ->getRepository('OroOrganizationBundle:BusinessUnit')
+            $businessUnit = $this->entityManager
+                ->getRepository(BusinessUnit::class)
                 ->findOneBy(['name' => $options['user-business-unit']]);
 
             if (!$businessUnit) {
@@ -178,8 +203,8 @@ class CreateUserCommand extends ContainerAwareCommand
         if (!empty($options['user-organizations'])) {
             foreach ($options['user-organizations'] as $organizationName) {
                 try {
-                    $organization = $this->getEntityManager()
-                        ->getRepository('OroOrganizationBundle:Organization')
+                    $organization = $this->entityManager
+                        ->getRepository(Organization::class)
                         ->getOrganizationByName($organizationName);
                 } catch (NoResultException $e) {
                     throw new InvalidArgumentException('Invalid organization "' . $organizationName .
@@ -209,29 +234,5 @@ class CreateUserCommand extends ContainerAwareCommand
         }
 
         return $this;
-    }
-
-    /**
-     * @return UserManager
-     */
-    protected function getUserManager()
-    {
-        if (!$this->userManager) {
-            $this->userManager = $this->getContainer()->get('oro_user.manager');
-        }
-
-        return $this->userManager;
-    }
-
-    /**
-     * @return EntityManagerInterface
-     */
-    protected function getEntityManager()
-    {
-        if (!$this->entityManager) {
-            $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
-        }
-
-        return $this->entityManager;
     }
 }

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 /**
- * Represents a collection of Data API resources.
+ * Represents a collection of API resources.
  */
 class ApiResourceCollection implements \Countable, \IteratorAggregate
 {

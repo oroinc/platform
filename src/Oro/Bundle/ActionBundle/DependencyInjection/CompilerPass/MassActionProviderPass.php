@@ -5,6 +5,9 @@ namespace Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * Collects mass action providers by tag and puts them into registry.
+ */
 class MassActionProviderPass implements CompilerPassInterface
 {
     const PROVIDER_TAG = 'oro_action.datagrid.mass_action_provider';
@@ -28,7 +31,6 @@ class MassActionProviderPass implements CompilerPassInterface
 
         foreach ($providers as $id => $attributes) {
             $definition = $container->getDefinition($id);
-            $definition->setPublic(false);
 
             foreach ($attributes as $eachTag) {
                 $alias = empty($eachTag['alias']) ? $id : $eachTag['alias'];

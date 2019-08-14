@@ -22,7 +22,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 use Oro\Component\Action\Exception\AssemblerException;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
 {

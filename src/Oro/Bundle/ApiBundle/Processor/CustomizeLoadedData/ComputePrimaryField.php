@@ -53,15 +53,12 @@ class ComputePrimaryField implements ProcessorInterface
     {
         /** @var CustomizeLoadedDataContext $context */
 
-        $data = $context->getResult();
-        if (!is_array($data)) {
-            return;
-        }
+        $data = $context->getData();
 
         $primaryFieldName = $context->getResultFieldName($this->primaryFieldName);
         if ($context->isFieldRequested($primaryFieldName, $data)) {
             $data[$primaryFieldName] = $this->getPrimaryValue($context->getConfig(), $data);
-            $context->setResult($data);
+            $context->setData($data);
         }
     }
 

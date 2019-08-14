@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler;
 
+use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\RootPathConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 /**
@@ -27,6 +30,9 @@ class EntityHandler
     /** @var EntityDefinitionConfig */
     private $config;
 
+    /** @var ConfigExtraInterface[] */
+    private $configExtras;
+
     /** @var bool */
     private $collection;
 
@@ -39,6 +45,7 @@ class EntityHandler
      * @param RequestType              $requestType
      * @param string                   $entityClass
      * @param EntityDefinitionConfig   $config
+     * @param ConfigExtraInterface[]   $configExtras
      * @param bool                     $collection
      * @param callable|null            $previousHandler
      */
@@ -48,6 +55,7 @@ class EntityHandler
         RequestType $requestType,
         string $entityClass,
         EntityDefinitionConfig $config,
+        array $configExtras,
         bool $collection,
         ?callable $previousHandler = null
     ) {
@@ -56,6 +64,7 @@ class EntityHandler
         $this->requestType = $requestType;
         $this->entityClass = $entityClass;
         $this->config = $config;
+        $this->configExtras = $configExtras;
         $this->collection = $collection;
         $this->previousHandler = $this->getPreviousHandler($previousHandler);
     }
@@ -75,6 +84,7 @@ class EntityHandler
         }
 
         $customizationContext = $this->createCustomizationContext();
+        $this->adjustPropertyPath($customizationContext);
         $customizationContext->setResult($data);
         $customizationContext->setIdentifierOnly(
             $this->isIdentifierOnly($customizationContext->getConfig())
@@ -104,6 +114,7 @@ class EntityHandler
         $customizationContext->getRequestType()->set($this->requestType);
         $customizationContext->setClassName($this->entityClass);
         $customizationContext->setConfig($this->config);
+        $customizationContext->setConfigExtras($this->configExtras);
 
         return $customizationContext;
     }
@@ -123,6 +134,28 @@ class EntityHandler
             && $this->version === $handler->version
             && (string)$this->requestType === (string)$handler->requestType
             && \is_a($this->entityClass, $handler->entityClass, true);
+    }
+
+    /**
+     * @param CustomizeLoadedDataContext $customizationContext
+     */
+    private function adjustPropertyPath(CustomizeLoadedDataContext $customizationContext): void
+    {
+        /** @var RootPathConfigExtra|null $rootPathConfigExtra */
+        $rootPathConfigExtra = $customizationContext->getConfigExtra(RootPathConfigExtra::NAME);
+        if (null !== $rootPathConfigExtra) {
+            /**
+             * loading of additional entities, e.g.:
+             * @see \Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\ExpandMultiTargetAssociations
+             */
+            $rootPath = $rootPathConfigExtra->getPath();
+            $propertyPath = $customizationContext->getPropertyPath();
+            if ($propertyPath) {
+                $customizationContext->setPropertyPath($rootPath . ConfigUtil::PATH_DELIMITER . $propertyPath);
+            } else {
+                $customizationContext->setPropertyPath($rootPath);
+            }
+        }
     }
 
     /**

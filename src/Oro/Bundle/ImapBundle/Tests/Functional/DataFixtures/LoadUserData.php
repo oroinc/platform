@@ -4,6 +4,8 @@ namespace Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -34,6 +36,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
     {
         $userManager = $this->container->get('oro_user.manager');
         $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $role = $manager->getRepository(Role::class)->findOneBy(['role' => User::ROLE_DEFAULT]);
 
         $user = $userManager->createUser();
         $user->setUsername(self::SIMPLE_USER_ENABLED)
@@ -43,6 +46,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setLastName('Towards')
             ->setOrganization($organization)
             ->addOrganization($organization)
+            ->addRole($role)
             ->setEnabled(true);
 
         $userManager->updateUser($user);
@@ -55,6 +59,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setEmail('simple_user2@example.com')
             ->setOrganization($organization)
             ->addOrganization($organization)
+            ->addRole($role)
             ->setEnabled(false);
 
         $userManager->updateUser($user2);

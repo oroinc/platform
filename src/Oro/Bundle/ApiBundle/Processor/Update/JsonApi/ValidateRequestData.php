@@ -11,7 +11,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Validates that the request data contains valid JSON.API object.
+ * Validates that the request data contains valid JSON:API object.
  */
 class ValidateRequestData implements ProcessorInterface
 {

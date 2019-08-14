@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Registers all entity exclusion providers that are used only in Data API.
+ * Registers all entity exclusion providers that are used only in API.
  */
 class ExclusionProviderCompilerPass implements CompilerPassInterface
 {

@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\DataGrid\Formatter;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\AbstractProperty;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmbeddedFormTypeProperty extends AbstractProperty
 {

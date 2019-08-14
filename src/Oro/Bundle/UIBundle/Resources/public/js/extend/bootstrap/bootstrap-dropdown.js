@@ -75,6 +75,11 @@ define(function(require) {
                 config.placement = placement.join('-');
             }
 
+            if ('adjustHeight' in config) {
+                // empty attribute `data-adjust-height` considered as turn ON option
+                config.adjustHeight = config.adjustHeight === '' || config.adjustHeight;
+            }
+
             return config;
         },
 
@@ -216,6 +221,11 @@ define(function(require) {
             _.extend(config, _.pick(this._config, 'placement', 'positionFixed', 'eventsEnabled'));
             _.extend(config.modifiers, _.pick(this._config.modifiers, 'shift', 'offset', 'preventOverflow',
                 'keepTogether', 'arrow', 'flip', 'inner', 'hide', 'computeStyle', 'applyStyle'));
+
+            if (this._config.adjustHeight && config.placement.substring(0, 6) === 'bottom') {
+                config.modifiers.adjustHeight = {enabled: true};
+                config.modifiers.flip = {enabled: false};
+            }
 
             if (this._displayArrow()) {
                 var menu = this._getMenuElement();

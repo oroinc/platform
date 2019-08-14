@@ -3,14 +3,12 @@
 namespace Oro\Bundle\UserBundle\Entity;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-use Symfony\Component\Security\Core\Role\RoleInterface;
 
 /**
  * Provides a set of methods to simplify manage of the User entity.
@@ -97,33 +95,6 @@ class UserManager extends BaseUserManager
         $user->setConfirmationToken($user->generateToken());
         $this->getEmailProcessor()->sendResetPasswordEmail($user);
         $user->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function assertRoles(UserInterface $user): void
-    {
-        if (count($user->getRoles()) === 0) {
-            $em = $this->getEntityManager();
-
-            $roleClassName = $em->getClassMetadata(ClassUtils::getClass($user))
-                ->getAssociationTargetClass('roles');
-            if (!is_a($roleClassName, RoleInterface::class, true)) {
-                throw new \RuntimeException(
-                    sprintf('Expected %s, %s given', RoleInterface::class, $roleClassName)
-                );
-            }
-
-            /** @var RoleInterface|null $role */
-            $role = $em->getRepository($roleClassName)
-                ->findOneBy(['role' => User::ROLE_DEFAULT]);
-            if (!$role) {
-                throw new \RuntimeException('Default user role not found');
-            }
-
-            $user->addRole($role);
-        }
     }
 
     /**

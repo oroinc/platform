@@ -2,7 +2,33 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## 4.1.0-beta
+
+#### ApiBundle
+* The section `relations` was removed from `Resources/config/oro/api.yml`. The action `get_relation_config` that
+  was responsible to process this section was removed as well.
+  This section was not used to build API that conforms JSON:API specification that is the main API type.
+  In case if you need a special configuration for "plain" REST API, you can define it in
+  `Resources/config/oro/api_plain.yml` configuration files or create a processor for the `get_config` action.
+
+#### AssetBundle
+* The new feature, [Hot Module Replacement (HMR or Hot Reload) enabled for SCSS](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#hot-module-replacement-hmr-or-hot-reload-for-scss). To enable HMR for custom CSS links, please [follow the documentation](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#enable-for-css-links).
+
 ## 4.0.0
+
+### Added
+
+#### UIBundle
+
+* CSSVariable parser `oroui/js/css-variables-manager` has been add. Source module [css-variables-manager](./src/Oro/Bundle/UIBundle/Resources/public/js/css-variables-manager.js)
+
+  Github link [https://github.com/jhildenbiddle/css-vars-ponyfill](https://github.com/jhildenbiddle/css-vars-ponyfill)
+
+### Changed
+
+#### UIBundle
+
+* viewportManager has been updated. Add sync with CSS breakpoint variables
 
 ### Removed
 
@@ -10,6 +36,28 @@ The current file describes significant changes in the code that may affect the u
 * All filters and sorters were removed for all "relationships" resources that returns a collection,
   e.g. "GET /api/countries/{id}/relationships/regions". If you need filtered or sorted data, use sub-resources
   instead of relationships, e.g. "GET /api/countries/{id}/regions".
+
+### Changed
+
+#### EntitySerializer component
+* The interface `Oro\Component\EntitySerializer\Filter\EntityAwareFilterInterface` was renamed to
+  `Oro\Component\EntitySerializer\FieldFilterInterface` and the following changes was made in it:
+    - the constants `FILTER_ALL`, `FILTER_VALUE` and `FILTER_NOTHING` were removed
+    - the method `checkField` was changed from `checkField(object|array $entity, string $entityClass, string $field): int`
+      to `checkField(object $entity, string $entityClass, string $field): ?bool`
+* The class `Oro\Component\EntitySerializer\Filter\EntityAwareFilterChain` and the service
+  `oro_security.serializer.filter_chain` were removed.
+  Use decoration of `oro_security.entity_serializer.field_filter` and/or `oro_api.entity_serializer.field_filter`
+  services instead.
+* The method `setFieldsFilter` of `Oro\Component\EntitySerializer\EntitySerializer` was renamed to `setFieldFilter`.
+
+#### ApiBundle
+* The handling of HTTP response status code `403 Forbidden` was fixed. Now this status code is returned if there are
+  no permissions to use an API resource. Before the fix `404 Not Found` status code was returned in both cases,
+  when an entity did not exist and when there were no permissions to operate with it.
+* The service `oro_api.entity_serializer.acl_filter` was renamed to `oro_api.entity_serializer.field_filter`.
+* The method `normalizeObject` of `Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer`
+  was replaced with `normalizeObjects`.
 
 #### SearchBundle
 * The following deprecated methods were removed from `Oro\Bundle\SearchBundle\Query\Query`:
@@ -27,6 +75,11 @@ The current file describes significant changes in the code that may affect the u
     - getOrderDirection
 * The deprecated trait `Oro\Bundle\SearchBundle\EventListener\IndexationListenerTrait` was removed.
 * The deprecated trait `Oro\Bundle\SearchBundle\Engine\Orm\DBALPersisterDriverTrait` was removed.
+
+#### SecurityBundle
+* The class `Oro\Bundle\SecurityBundle\Filter\SerializerFieldFilter` was renamed to
+  `Oro\Bundle\SecurityBundle\Filter\EntitySerializerFieldFilter`.
+* The service `oro_security.serializer.acl_filter` was renamed to `oro_security.entity_serializer.field_filter`.
 
 ## 4.0.0-rc (2019-05-29)
 [Show detailed list of changes](incompatibilities-4-0-rc.md)

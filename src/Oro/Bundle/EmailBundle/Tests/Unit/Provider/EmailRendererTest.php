@@ -13,7 +13,7 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UIBundle\Twig\HtmlTagExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Extension\SandboxExtension;
 use Twig\Loader\ArrayLoader;

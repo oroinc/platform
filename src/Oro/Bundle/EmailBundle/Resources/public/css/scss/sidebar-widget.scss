@@ -29,6 +29,8 @@
 
 .sidebar-widget-recent-emails {
     .sidebar-widget__content {
+        overflow: hidden;
+
         .header {
             padding: 2px 17px;
         }

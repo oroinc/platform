@@ -5,6 +5,9 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Context;
 use Behat\Behat\Context\ContextClass\ClassResolver;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Resolves arbitrary context strings into a context classes.
+ */
 final class OroBehatClassResolver implements ClassResolver
 {
     /**
@@ -34,7 +37,7 @@ final class OroBehatClassResolver implements ClassResolver
     public function resolveClass($contextClassShortcut)
     {
         list($bundleName, $contextClass) = explode('::', $contextClassShortcut);
-        $fqdn = $this->kernel->getBundle('!' . $bundleName)->getNamespace() . '\Tests\Behat\Context\\' . $contextClass;
+        $fqdn = $this->kernel->getBundle($bundleName)->getNamespace() . '\Tests\Behat\Context\\' . $contextClass;
 
         if (!class_exists($fqdn)) {
             throw new \RuntimeException(

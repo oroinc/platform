@@ -54,6 +54,8 @@ close: close
 Save: Save
 Discard: Discard
 "Copy to Clipboard": "Copy to Clipboard"
+"Remove row": "Remove row"
+"Add row": "Add row"
 oro:
     ui:
         delete_confirm_cascade: Are you sure you want to delete this {{ entity_label }} with other entities related to it?
@@ -144,6 +146,8 @@ oro:
         reset: "Reset"
         close_menu: "Close menu"
         tab_view_more: '...'
+        scroll_up_label: 'Scroll up'
+        scroll_down_label: 'Scroll down'
 articles: "a|an|the|some|every|any|no"
 abbreviate_ignore_list: "a|an|the|of|at|per|in|on"
 postpositions: "ago|apart|aside|away|hence|through"

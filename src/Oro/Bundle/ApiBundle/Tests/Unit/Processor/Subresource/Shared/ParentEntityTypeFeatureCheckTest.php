@@ -24,7 +24,7 @@ class ParentEntityTypeFeatureCheckTest extends GetSubresourceProcessorTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function testProcessDisabled()
     {

@@ -210,6 +210,7 @@ services:
         arguments:
             - '@oro_entity_extend.extend.field_name_validation_helper'
             - '@oro_entity_extend.tools.class_method_name_checker'
+            - '@oro_entity_extend.extend.field_type_helper'
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_method_name }
 
@@ -412,6 +413,7 @@ services:
 
     oro_entity_extend.datagrid.column_options_guesser:
         class: '%oro_entity_extend.datagrid.column_options_guesser.class%'
+        public: true
         arguments:
             - "@oro_entity_config.config_manager"
         tags:
@@ -420,12 +422,14 @@ services:
     oro_entity_extend.datagrid.action.type.ajaxdeletefield:
         class: '%oro_entity_extend.datagrid.action.type.ajaxdeletefield.class%'
         shared: false
+        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: ajaxdeletefield }
 
     oro_entity_extend.datagrid.action.type.ajaxrestorefield:
         class: Oro\Bundle\EntityExtendBundle\Grid\Action\AjaxRestoreFieldAction
         shared: false
+        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: ajaxrestorefield }
 
@@ -554,6 +558,7 @@ services:
 
     oro_entity_extend.enum_value_provider:
         class: '%oro_entity_extend.enum_value_provider.class%'
+        public: true
         arguments:
             - "@oro_entity.doctrine_helper"
             - "@oro_entity_extend.cache.enum_translation_provider"
@@ -618,6 +623,7 @@ services:
 
     oro_entity_extend.cache_warmer_aggregate:
         class: Oro\Bundle\EntityExtendBundle\Cache\CacheWarmerAggregate
+        public: true
         arguments:
             - ~ # link to "cache_warmer" service; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\CacheWarmerPass
             - ~ # link to "oro_entity_extend.cache_warmer" service; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\CacheWarmerPass
@@ -625,6 +631,7 @@ services:
 
     oro_entity_extend.cache_warmer:
         class: Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate
+        public: true
         arguments:
             - [] # warmers; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\CacheWarmerPass
 

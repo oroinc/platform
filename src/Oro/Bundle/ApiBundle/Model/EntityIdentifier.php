@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Model;
 
 /**
- * This class can be used if you need a base class for an association that can
+ * This class should be used if you need a base class for an association that can
  * contain different types of entities that are not implemented via Doctrine table inheritance
  * and as result do not have a common superclass.
  */

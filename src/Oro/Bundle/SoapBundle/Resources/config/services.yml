@@ -40,6 +40,7 @@ services:
 
     oro_soap.handler.include_total_header:
         class: '%oro_soap.handler.include_total_header.class%'
+        public: true
         arguments:
             - '@oro_batch.orm.query_builder.count_query_optimizer'
         tags:
@@ -73,7 +74,7 @@ services:
             - '@oro_soap.entity_serializer.config_converter'
             - '@oro_soap.entity_serializer.data_normalizer'
         calls:
-            - [setFieldsFilter, ['@oro_security.serializer.filter_chain']]
+            - [setFieldFilter, ['@oro_security.entity_serializer.field_filter']]
 
     oro_soap.entity_serializer.doctrine_helper:
         class: Oro\Component\EntitySerializer\DoctrineHelper
@@ -182,3 +183,8 @@ services:
     oro_soap.client.factory.settings:
         class: 'Oro\Bundle\SoapBundle\Client\Settings\Factory\SoapClientSettingsFactory'
         public: false
+
+    # External services
+    oro_soap.request.param_fetcher:
+        alias: fos_rest.request.param_fetcher
+        public: true

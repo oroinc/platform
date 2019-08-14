@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides detailed information about entities.

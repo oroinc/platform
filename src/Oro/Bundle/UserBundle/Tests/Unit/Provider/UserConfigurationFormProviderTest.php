@@ -9,7 +9,7 @@ use Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserConfigurationFormProviderTest extends AbstractProviderTest
 {

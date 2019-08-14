@@ -165,6 +165,7 @@ services:
 
     oro_notification.grid_helper:
         class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationGridHelper
+        public: true
         arguments:
             - '@doctrine'
 

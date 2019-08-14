@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserChain;
@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
 
 /**
- * Provides all form types, type extensions and guessers that can be used in Data API forms.
+ * Provides all form types, type extensions and guessers that can be used in API forms.
  */
 class FormExtension implements FormExtensionInterface
 {

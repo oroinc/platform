@@ -4,14 +4,31 @@ namespace Oro\Bundle\ReportBundle\Command;
 
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\ReportBundle\Entity\Manager\CalendarDateManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CalendarDateCommand extends ContainerAwareCommand implements CronCommandInterface
+/**
+ * Generate calendar dates
+ */
+class CalendarDateCommand extends Command implements CronCommandInterface
 {
-    const STATUS_SUCCESS = 0;
-    const COMMAND_NAME   = 'oro:cron:calendar:date';
+    private const STATUS_SUCCESS = 0;
+
+    /** @var string */
+    protected static $defaultName = 'oro:cron:calendar:date';
+
+    /** @var CalendarDateManager */
+    private $calendarDateManager;
+
+    /**
+     * @param CalendarDateManager $calendarDateManager
+     */
+    public function __construct(CalendarDateManager $calendarDateManager)
+    {
+        $this->calendarDateManager = $calendarDateManager;
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -34,9 +51,7 @@ class CalendarDateCommand extends ContainerAwareCommand implements CronCommandIn
      */
     protected function configure()
     {
-        $this
-            ->setName(self::COMMAND_NAME)
-            ->setDescription('Generate calendar dates');
+        $this->setDescription('Generate calendar dates');
     }
 
     /**
@@ -44,9 +59,7 @@ class CalendarDateCommand extends ContainerAwareCommand implements CronCommandIn
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var CalendarDateManager $calendarDateManager */
-        $calendarDateManager = $this->getContainer()->get('oro_report.calendar_date_manager');
-        $calendarDateManager->handleCalendarDates(true);
+        $this->calendarDateManager->handleCalendarDates(true);
 
         return self::STATUS_SUCCESS;
     }

@@ -881,8 +881,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                     new Reference('oro_api.config_bag.second_0_internal'),
                     new Reference('oro_api.config_bag.second_1_internal')
                 ],
-                new Reference('oro_api.config_merger.entity'),
-                new Reference('oro_api.config_merger.relation')
+                new Reference('oro_api.config_merger.entity')
             ],
             $container->getDefinition('oro_api.config_bag.second')->getArguments()
         );

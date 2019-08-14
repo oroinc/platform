@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Datagrid;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\EntityBundle\Grid\GridHelper as BaseGridHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailTemplateGridHelper extends BaseGridHelper
 {

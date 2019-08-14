@@ -27,6 +27,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity');
         $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
 
         $response = $this->get(['entity' => $entityType, 'id' => (string)$entity->getId()]);
         $this->assertResponseContains(
@@ -35,12 +36,15 @@ class NestedAssociationTest extends RestJsonApiTestCase
                     'type'          => $entityType,
                     'id'            => '<toString(@test_entity->id)>',
                     'attributes'    => [
-                        'name' => null
+                        'name' => [
+                            'firstName' => null,
+                            'lastName'  => 'test'
+                        ]
                     ],
                     'relationships' => [
                         'relatedEntity' => [
                             'data' => [
-                                'type' => $this->getEntityType(TestRelatedEntity::class),
+                                'type' => $relatedEntityType,
                                 'id'   => '<toString(@test_related_entity1->id)>'
                             ]
                         ]
@@ -49,10 +53,105 @@ class NestedAssociationTest extends RestJsonApiTestCase
             ],
             $response
         );
-        $result = self::jsonToArray($response->getContent());
-        $attributes = $result['data']['attributes'];
+        $responseContent = self::jsonToArray($response->getContent());
+        $attributes = $responseContent['data']['attributes'];
         self::assertArrayNotHasKey('relatedClass', $attributes);
         self::assertArrayNotHasKey('relatedId', $attributes);
+    }
+
+    public function testGetWithTitleMetaProperty()
+    {
+        /** @var TestEntity $entity */
+        $entity = $this->getReference('test_entity');
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+
+        $response = $this->get(
+            ['entity' => $entityType, 'id' => (string)$entity->getId()],
+            ['meta' => 'title']
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type'          => $entityType,
+                    'id'            => '<toString(@test_entity->id)>',
+                    'meta'          => [
+                        'title' => 'test ' . TestRelatedEntity::class
+                    ],
+                    'attributes'    => [
+                        'name' => [
+                            'firstName' => null,
+                            'lastName'  => 'test'
+                        ]
+                    ],
+                    'relationships' => [
+                        'relatedEntity' => [
+                            'data' => [
+                                'type' => $relatedEntityType,
+                                'id'   => '<toString(@test_related_entity1->id)>'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+        $responseContent = self::jsonToArray($response->getContent());
+        $attributes = $responseContent['data']['attributes'];
+        self::assertArrayNotHasKey('relatedClass', $attributes);
+        self::assertArrayNotHasKey('relatedId', $attributes);
+    }
+
+    public function testGetWithIncludeFilter()
+    {
+        /** @var TestEntity $entity */
+        $entity = $this->getReference('test_entity');
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+
+        $response = $this->get(
+            ['entity' => $entityType, 'id' => (string)$entity->getId()],
+            ['include' => 'relatedEntity']
+        );
+        $this->assertResponseContains(
+            [
+                'data'     => [
+                    'type'          => $entityType,
+                    'id'            => '<toString(@test_entity->id)>',
+                    'attributes'    => [
+                        'name' => [
+                            'firstName' => null,
+                            'lastName'  => 'test'
+                        ]
+                    ],
+                    'relationships' => [
+                        'relatedEntity' => [
+                            'data' => [
+                                'type' => $relatedEntityType,
+                                'id'   => '<toString(@test_related_entity1->id)>'
+                            ]
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type'       => $relatedEntityType,
+                        'id'         => '<toString(@test_related_entity1->id)>',
+                        'attributes' => [
+                            'withDefaultValueString' => 'default'
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+        $responseContent = self::jsonToArray($response->getContent());
+        $attributes = $responseContent['data']['attributes'];
+        self::assertArrayNotHasKey('relatedClass', $attributes);
+        self::assertArrayNotHasKey('relatedId', $attributes);
+        foreach ($responseContent['included'] as $key => $item) {
+            self::assertArrayNotHasKey('meta', $item, sprintf('included[%s]', $key));
+        }
     }
 
     public function testCreate()
@@ -114,14 +213,14 @@ class NestedAssociationTest extends RestJsonApiTestCase
 
         $response = $this->post(['entity' => $entityType], $data);
 
-        $result = self::jsonToArray($response->getContent());
+        $responseContent = self::jsonToArray($response->getContent());
         self::assertNull(
-            $result['data']['relationships']['relatedEntity']['data']
+            $responseContent['data']['relationships']['relatedEntity']['data']
         );
 
         // test that the data was created
         $this->getEntityManager()->clear();
-        $entity = $this->getEntityManager()->find(TestEntity::class, (int)$result['data']['id']);
+        $entity = $this->getEntityManager()->find(TestEntity::class, (int)$responseContent['data']['id']);
         self::assertNull($entity->getRelatedClass());
         self::assertNull($entity->getRelatedId());
     }
@@ -156,13 +255,13 @@ class NestedAssociationTest extends RestJsonApiTestCase
             $data
         );
 
-        $result = self::jsonToArray($response->getContent());
+        $responseContent = self::jsonToArray($response->getContent());
         self::assertEquals(
             [
                 'type' => $relatedEntityType,
                 'id'   => (string)$relatedEntity2->id
             ],
-            $result['data']['relationships']['relatedEntity']['data']
+            $responseContent['data']['relationships']['relatedEntity']['data']
         );
 
         // test that the data was updated
@@ -195,9 +294,9 @@ class NestedAssociationTest extends RestJsonApiTestCase
             $data
         );
 
-        $result = self::jsonToArray($response->getContent());
+        $responseContent = self::jsonToArray($response->getContent());
         self::assertNull(
-            $result['data']['relationships']['relatedEntity']['data']
+            $responseContent['data']['relationships']['relatedEntity']['data']
         );
 
         // test that the data was updated
@@ -226,12 +325,17 @@ class NestedAssociationTest extends RestJsonApiTestCase
         $this->assertResponseContains(
             [
                 'data' => [
-                    'type' => $relatedEntityType,
-                    'id'   => (string)$relatedEntity->id
+                    'type'       => $relatedEntityType,
+                    'id'         => (string)$relatedEntity->id,
+                    'attributes' => [
+                        'withDefaultValueString' => 'default'
+                    ]
                 ]
             ],
             $response
         );
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertArrayNotHasKey('meta', $responseContent['data']);
     }
 
     public function testGetSubresourceWithTitle()
@@ -290,6 +394,10 @@ class NestedAssociationTest extends RestJsonApiTestCase
             ],
             $response
         );
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertArrayNotHasKey('meta', $responseContent['data']);
+        self::assertArrayNotHasKey('attributes', $responseContent['data']);
+        self::assertArrayNotHasKey('relationships', $responseContent['data']);
     }
 
     public function testUpdateRelationship()

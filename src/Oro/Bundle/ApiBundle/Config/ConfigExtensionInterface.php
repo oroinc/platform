@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSectionInterface;
 
+/**
+ * The interface for API configuration extensions.
+ */
 interface ConfigExtensionInterface
 {
     /**
@@ -18,7 +21,7 @@ interface ConfigExtensionInterface
      *
      * @return array [section => [function (NodeBuilder $node), ...], ...]
      *               Where the section is the name/path to a configuration section,
-     *               e.g. "entities.entity", "relations.entity.field", "sorters", "filters.field", etc.
+     *               e.g. "entities.entity", "entities.entity.field", "sorters", "filters.field", etc.
      */
     public function getConfigureCallbacks();
 
@@ -27,7 +30,7 @@ interface ConfigExtensionInterface
      *
      * @return array [section => [function (array|null $config) : array|null, ...], ...]
      *               Where the section is the name/path to a configuration section,
-     *               e.g. "entities.entity", "relations.entity.field", "sorters", "filters.field", etc.
+     *               e.g. "entities.entity", "entities.entity.field", "sorters", "filters.field", etc.
      */
     public function getPreProcessCallbacks();
 
@@ -36,7 +39,7 @@ interface ConfigExtensionInterface
      *
      * @return array [section => [function (array $config) : array, ...], ...]
      *               Where the section is the name/path to a configuration section,
-     *               e.g. "entities.entity", "relations.entity.field", "sorters", "filters.field", etc.
+     *               e.g. "entities.entity", "entities.entity.field", "sorters", "filters.field", etc.
      */
     public function getPostProcessCallbacks();
 

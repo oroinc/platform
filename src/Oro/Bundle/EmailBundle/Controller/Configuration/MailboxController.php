@@ -15,13 +15,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
- * Class MailboxController
+ * The controller for the mailboxes functionality.
  *
  * Actions in this controller are protected by MailboxAuthorizationListener because access to them is determined
  * by access to Organization entity which is not even always available.
  * @see \Oro\Bundle\EmailBundle\EventListener\MailboxAuthorizationListener
- *
- * @package Oro\Bundle\EmailBundle\Controller\Configuration
  */
 class MailboxController extends Controller
 {
@@ -37,7 +35,7 @@ class MailboxController extends Controller
      *      "mailbox",
      *      class="OroEmailBundle:Mailbox"
      * )
-     * @Template
+     * @Template("@OroEmail/Configuration/Mailbox/update.html.twig")
      *
      * @param Mailbox $mailbox
      * @param Request $request
@@ -97,7 +95,7 @@ class MailboxController extends Controller
 
     /**
      * @Route("/mailbox/create", name="oro_email_mailbox_create")
-     * @Template("OroEmailBundle:Configuration/Mailbox:update.html.twig")
+     * @Template("@OroEmail/Configuration/Mailbox/update.html.twig")
      *
      * @param Request      $request
      *

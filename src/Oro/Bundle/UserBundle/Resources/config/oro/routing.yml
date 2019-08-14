@@ -87,8 +87,8 @@ oro_api_post_group_deprecated:
 
 oro_rest_api_user_profile:
     path: '%oro_api.rest.prefix%userprofile'
+    controller: Oro\Bundle\ApiBundle\Controller\RestApiController::itemAction
     defaults:
-        _controller: OroApiBundle:RestApi:item
         entity: userprofile
     options:
         group: rest_api

@@ -6,28 +6,20 @@ use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Client\Meta\DestinationsCommand;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\Container;
 
 class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DestinationsCommand */
     private $command;
 
-    /** @var Container */
-    private $container;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
     protected function setUp()
     {
         $this->registry = $this->createMock(DestinationMetaRegistry::class);
 
-        $this->command = new DestinationsCommand();
-
-        $this->container = new Container();
-        $this->container->set('oro_message_queue.client.meta.destination_meta_registry', $this->registry);
-        $this->command->setContainer($this->container);
+        $this->command = new DestinationsCommand($this->registry);
     }
 
     public function testShouldHaveCommandName()

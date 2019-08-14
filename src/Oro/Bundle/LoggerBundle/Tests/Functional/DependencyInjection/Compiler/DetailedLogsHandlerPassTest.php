@@ -11,6 +11,7 @@ use Oro\Bundle\LoggerBundle\Tests\Functional\Stub\CustomLogChannelCommandStub;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Bridge\Monolog\Logger;
+use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\LoggerChannelPass;
 use Symfony\Bundle\MonologBundle\DependencyInjection\MonologExtension;
@@ -18,15 +19,23 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class DetailedLogsHandlerPassTest extends WebTestCase
 {
+    /** @var RequestStack */
+    private $requestStack;
+
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
         $this->initClient();
+
+        $this->requestStack = new RequestStack();
+        $this->requestStack->push(new Request());
     }
 
     public function testLogToCustomChannel()
@@ -60,7 +69,7 @@ class DetailedLogsHandlerPassTest extends WebTestCase
 
         /** @var Logger $logger */
         $logger = $containerBuilder->get(CustomLogChannelCommandStub::LOGGER_NAME);
-        $logs = $logger->getLogs();
+        $logs = $logger->getLogs($this->requestStack->getCurrentRequest());
 
         $this->assertNotEmpty($logs);
         $this->assertEquals(CustomLogChannelCommandStub::LOG_MESSAGE, $logs[0]['message']);
@@ -86,6 +95,9 @@ class DetailedLogsHandlerPassTest extends WebTestCase
         $this->loadYmlFixture($container, 'custom_channels');
 
         $container->compile();
+
+        $container->get(CustomLogChannelCommandStub::LOGGER_NAME)
+            ->pushProcessor(new DebugProcessor($this->requestStack));
 
         return $container;
     }

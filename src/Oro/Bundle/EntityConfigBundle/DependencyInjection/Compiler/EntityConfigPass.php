@@ -69,7 +69,8 @@ class EntityConfigPass implements CompilerPassInterface
         foreach ($scopes as $scope) {
             $provider = new Definition(ConfigProvider::class, [$scope]);
             $provider->setFactory([$providerBagRef, 'getProvider']);
-            $container->setDefinition(self::CONFIG_PROVIDER_SERVICE_PREFIX . $scope, $provider);
+            $container->setDefinition(self::CONFIG_PROVIDER_SERVICE_PREFIX . $scope, $provider)
+                ->setPublic(true);
         }
 
         // add scopes to the config cache

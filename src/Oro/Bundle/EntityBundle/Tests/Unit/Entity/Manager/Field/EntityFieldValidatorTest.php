@@ -22,7 +22,7 @@ class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translation = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translation = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
 
         $this->validator = new EntityFieldValidator($this->registry, $this->translation);
     }

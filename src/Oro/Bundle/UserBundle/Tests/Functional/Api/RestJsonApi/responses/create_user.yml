@@ -10,7 +10,7 @@ data:
         middleName: null
         lastName: Doo
         birthday: null
-        enabled: true
+        enabled: false
         loginCount: 0
         lastLogin: null
         passwordRequestedAt: null

@@ -21,6 +21,10 @@ oro_behat_extension:
           OroCRM Organization:
             locator: '(//div[contains(@class,"organization-structure")]//input[@type="checkbox"][@data-name="organization"])[1]'
             type: xpath
+          Birthday:
+            locator: 'input[id^="date_selector_oro_user_user_form_birthday-uid"]'
+            type: css
+            element: DateTimePicker
 
     Audit History Grid:
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid

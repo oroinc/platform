@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Cache;
 
 use Doctrine\Common\Cache\Cache;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Cache for Enum values

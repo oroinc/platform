@@ -517,10 +517,10 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
             'oro_message_queue.job.security_aware_extension',
             'oro_message_queue.job.root_job_status_extension',
             // commands.yml
-            'Oro\Bundle\MessageQueueBundle\Command\CleanupCommand',
-            'Oro\Bundle\MessageQueueBundle\Command\ClientConsumeMessagesCommand',
-            'Oro\Bundle\MessageQueueBundle\Command\ConsumerHeartbeatCommand',
-            'Oro\Bundle\MessageQueueBundle\Command\TransportConsumeMessagesCommand',
+            'Oro\\Bundle\\MessageQueueBundle\\Command\\CleanupCommand',
+            'Oro\\Bundle\\MessageQueueBundle\\Command\\ClientConsumeMessagesCommand',
+            'Oro\\Bundle\\MessageQueueBundle\\Command\\ConsumerHeartbeatCommand',
+            'Oro\\Bundle\\MessageQueueBundle\\Command\\TransportConsumeMessagesCommand',
             // defined in extension
             'oro_message_queue.transport.null.connection',
             'oro_message_queue.consumption.redelivery_message_extension',
@@ -551,12 +551,13 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
             'oro_message_queue.client.extension.create_queue',
             'oro_message_queue.client.queue_consumer',
             'oro_message_queue.client.created_queues',
-            'oro_message_queue.client.meta.topics_command',
-            'oro_message_queue.client.meta.destinations_command',
-            'oro_message_queue.client.create_queues_command',
             'oro_message_queue.profiler.message_queue_collector',
             'oro_message_queue.client.buffered_message_producer',
             'oro_message_queue.client.dbal_transaction_watcher',
+            // client_commands.yml
+            'Oro\\Component\\MessageQueue\\Client\\Meta\\TopicsCommand',
+            'Oro\\Component\\MessageQueue\\Client\\Meta\\DestinationsCommand',
+            'Oro\\Component\\MessageQueue\\Client\\CreateQueuesCommand',
         ];
     }
 }

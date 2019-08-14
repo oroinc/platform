@@ -19,16 +19,22 @@ class AliceReferenceResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * @var AliceReferenceResolver
      */
-    private $resolver;
+    private $aliceReferenceResolver;
+
+    protected function setUp()
+    {
+        $this->registry = $this->createMock(RegistryInterface::class);
+        $this->aliceReferenceResolver = new AliceReferenceResolver($this->registry);
+    }
 
     public function testResolveWhenObjectsDoesNotContainReference(): void
     {
-        $value = '@object';
-        $this->resolver->setReferences(new Collection());
+        $this->aliceReferenceResolver->setReferences(new Collection());
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Reference "object" not found');
-        $this->resolver->resolve($value);
+
+        $this->aliceReferenceResolver->resolve('@object');
     }
 
     /**
@@ -39,12 +45,12 @@ class AliceReferenceResolverTest extends \PHPUnit\Framework\TestCase
      * @param mixed $expectedValue
      * @dataProvider processProvider
      */
-    public function testResolve($referencePath, $object, $isContains, $objectFromDb, $expectedValue): void
+    public function testResolve($referencePath, $object, $isContains, $objectFromDb, $expectedValue)
     {
-        $this->resolver->setReferences(new Collection(['ref' => $object]));
+        $this->aliceReferenceResolver->setReferences(new Collection(['ref' => $object]));
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->registry->expects($this->any())
+        $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with(get_class($object))
             ->willReturn($entityManager);
@@ -67,7 +73,7 @@ class AliceReferenceResolverTest extends \PHPUnit\Framework\TestCase
             ->with(get_class($object), $identifier)
             ->willReturn($objectFromDb);
 
-        $value = $this->resolver->resolve($referencePath);
+        $value = $this->aliceReferenceResolver->resolve($referencePath);
         $this->assertEquals($expectedValue, $value);
     }
 
@@ -130,47 +136,6 @@ class AliceReferenceResolverTest extends \PHPUnit\Framework\TestCase
                 'objectFromDb' => $refClassMock2,
                 'expectedValue' => $ownerId,
             ],
-            'cannot be resolved 1' => [
-                'referencePath' => 'ref',
-                'object' => $proxyRefClassMock,
-                'isContains' => false,
-                'objectFromDb' => $refClassMock2,
-                'expectedValue' => 'ref',
-            ],
-            'cannot be resolved 2' => [
-                'referencePath' => '@ref*',
-                'object' => $proxyRefClassMock,
-                'isContains' => false,
-                'objectFromDb' => $refClassMock2,
-                'expectedValue' => '@ref*',
-            ],
-            'cannot be resolved 3' => [
-                'referencePath' => '@ref<current()>',
-                'object' => $proxyRefClassMock,
-                'isContains' => false,
-                'objectFromDb' => $refClassMock2,
-                'expectedValue' => '@ref<current()>',
-            ],
-            'cannot be resolved 4' => [
-                'referencePath' => '<current()>',
-                'object' => $proxyRefClassMock,
-                'isContains' => false,
-                'objectFromDb' => $refClassMock2,
-                'expectedValue' => '<current()>',
-            ],
-            'cannot be resolved 5' => [
-                'referencePath' => '<current()>@example.org',
-                'object' => $proxyRefClassMock,
-                'isContains' => false,
-                'objectFromDb' => $refClassMock2,
-                'expectedValue' => '<current()>@example.org',
-            ],
         ];
-    }
-
-    protected function setUp()
-    {
-        $this->registry = $this->createMock(RegistryInterface::class);
-        $this->resolver = new AliceReferenceResolver($this->registry);
     }
 }

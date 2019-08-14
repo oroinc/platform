@@ -11,9 +11,9 @@ define(function(require) {
     var DeleteConfirmation = require('oroui/js/delete-confirmation');
     var WidgetPickerModal = require('orosidebar/js/app/views/widget-picker-modal-view');
     var WidgetSetupModalView = require('orosidebar/js/app/views/widget-setup-modal-view');
+    var ScrollingOverlay = require('oroui/js/app/views/scrolling-overlay-view');
     var constants = require('orosidebar/js/sidebar-constants');
     require('jquery-ui');
-    require('styled-scroll-bar');
 
     SidebarView = BaseCollectionView.extend({
         optionNames: BaseView.prototype.optionNames.concat([
@@ -41,6 +41,7 @@ define(function(require) {
          * @inheritDoc
          */
         constructor: function SidebarView(options) {
+            this.updatedWidgetsPosition = _.debounce(this.updatedWidgetsPosition.bind(this), 20);
             SidebarView.__super__.constructor.call(this, options);
         },
 
@@ -83,12 +84,15 @@ define(function(require) {
          * @inheritDoc
          */
         render: function() {
-            SidebarView.__super__.render.call(this);
-
             var isMaximized = this.model.isMaximized();
-
             this.$el.toggleClass('maximized', isMaximized);
             this.$el.toggleClass('minimized', !isMaximized);
+
+            SidebarView.__super__.render.call(this);
+            _.each(this.subviews, function(widgetContainer) {
+                widgetContainer.updatePosition();
+            });
+
             this.$list.sortable({
                 axis: 'y',
                 containment: 'parent',
@@ -119,15 +123,15 @@ define(function(require) {
                 }.bind(this)
             });
 
-            this.$('[data-role="sidebar-scroll-container"]').styledScrollBar({
-                overflowBehavior: {
-                    x: 'hidden'
-                },
-                callbacks: {
-                    onScroll: _.debounce(this.updatedWidgetsPosition.bind(this), 5)
-                }
-            });
+            var scrollContainer = this.$('[data-role="sidebar-content"]');
 
+            scrollContainer.on('scroll' + this.eventNamespace(), this.updatedWidgetsPosition.bind(this));
+
+            this.subview('scrolling-overlay', new ScrollingOverlay({
+                autoRender: true,
+                $scrollingContent: scrollContainer,
+                buttonScrollClassName: 'scrolling-overlay-btn--light'
+            }));
             mediator.trigger('layout:adjustHeight');
 
             return this;
@@ -222,6 +226,7 @@ define(function(require) {
             modal.on('ok', function() {
                 subview.model.destroy();
                 modal.off();
+                mediator.trigger('layout:reposition');
             });
 
             modal.on('cancel', function() {
@@ -243,6 +248,18 @@ define(function(require) {
 
                 widgetSetupModal.open();
             });
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
+            this.$('[data-role="sidebar-content"]').off(this.eventNamespace());
+            SidebarView.__super__.dispose.call(this);
         }
     });
 

@@ -166,7 +166,7 @@ class ResetController extends Controller
         $actionName = $request->get('actionName');
 
         /** @var MassActionDispatcher $massActionDispatcher */
-        $massActionDispatcher = $this->get(MassActionDispatcher::class);
+        $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');
 
         $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
 

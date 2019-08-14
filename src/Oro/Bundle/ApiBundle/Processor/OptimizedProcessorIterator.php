@@ -10,17 +10,21 @@ use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 /**
  * This iterator implements a group related checks in more performant way than
  * if it was implemented in applicable checkers.
- * It is very important for Data API, especially for generation of API documentation
+ * It is very important for API, especially for generation of API documentation
  * because huge number of processors are iterated in this case.
  */
 class OptimizedProcessorIterator extends ProcessorIterator
 {
     /** @var array [group name => group index, ...] */
-    protected $groups;
+    private $groups;
+
+    /** @var array [processor index => group name, ...] */
+    private $processorGroups;
 
     /**
-     * @param array                      $processors
-     * @param string[]                   $groups
+     * @param array                      $processors      [[processor id, [attr name => attr value, ...]], ...]
+     * @param array                      $groups          [group name => group index, ...]
+     * @param array                      $processorGroups [processor index => group name, ...]
      * @param ComponentContextInterface  $context
      * @param ApplicableCheckerInterface $applicableChecker
      * @param ProcessorRegistryInterface $processorRegistry
@@ -28,12 +32,30 @@ class OptimizedProcessorIterator extends ProcessorIterator
     public function __construct(
         array $processors,
         array $groups,
+        array $processorGroups,
         ComponentContextInterface $context,
         ApplicableCheckerInterface $applicableChecker,
         ProcessorRegistryInterface $processorRegistry
     ) {
         parent::__construct($processors, $context, $applicableChecker, $processorRegistry);
-        $this->groups = $this->loadGroups($groups);
+        $this->groups = $groups;
+        $this->processorGroups = $processorGroups;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getProcessorAttributes()
+    {
+        $attributes = parent::getProcessorAttributes();
+        if (null !== $attributes) {
+            $group = $this->processorGroups[$this->index];
+            if ($group) {
+                $attributes['group'] = $group;
+            }
+        }
+
+        return $attributes;
     }
 
     /**
@@ -91,7 +113,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
     protected function processSkippedGroups($skippedGroups)
     {
         $index = $this->index + 1;
-        while ($index <= $this->maxIndex && \in_array($this->getGroupByIndex($index), $skippedGroups, true)) {
+        while ($index <= $this->maxIndex && \in_array($this->processorGroups[$index], $skippedGroups, true)) {
             $index++;
         }
         $this->index = $index - 1;
@@ -109,7 +131,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
         $firstGroupIndex = $this->groups[$firstGroup];
         $index = $this->index + 1;
         while ($index <= $this->maxIndex) {
-            $group = $this->getGroupByIndex($index);
+            $group = $this->processorGroups[$index];
             if (!$group || $this->groups[$group] >= $firstGroupIndex) {
                 break;
             }
@@ -128,14 +150,14 @@ class OptimizedProcessorIterator extends ProcessorIterator
             return;
         }
 
-        if (-1 !== $this->index && $this->getGroupByIndex($this->index) === $lastGroup) {
+        if (-1 !== $this->index && $this->processorGroups[$index] === $lastGroup) {
             // the current processor belongs to the last group from which processors should be executed
-            if ($this->getGroupByIndex($index) !== $lastGroup) {
+            if ($this->processorGroups[$index] !== $lastGroup) {
                 // skip all following processors as all processors from the last group have been iterated
                 $index = $this->getIndexOfUngroupedProcessor($index);
             }
         } else {
-            $group = $this->getGroupByIndex($index);
+            $group = $this->processorGroups[$index];
             if ($group && isset($this->groups[$lastGroup]) && $this->groups[$group] > $this->groups[$lastGroup]) {
                 $index = $this->getIndexOfUngroupedProcessor($index);
             }
@@ -154,39 +176,12 @@ class OptimizedProcessorIterator extends ProcessorIterator
     {
         $i = $this->maxIndex;
         while ($i > $index) {
-            if ($this->getGroupByIndex($i)) {
+            if ($this->processorGroups[$i]) {
                 break;
             }
             $i--;
         }
 
         return $i + 1;
-    }
-
-    /**
-     * @param int $index
-     *
-     * @return string null
-     */
-    protected function getGroupByIndex($index)
-    {
-        return $this->processors[$index][1]['group'] ?? null;
-    }
-
-    /**
-     * @param string[] $groups
-     *
-     * @return array [group name => group index, ...]
-     */
-    protected function loadGroups(array $groups)
-    {
-        $result = [];
-        $groupIndex = 0;
-        foreach ($groups as $group) {
-            $result[$group] = $groupIndex;
-            $groupIndex++;
-        }
-
-        return $result;
     }
 }

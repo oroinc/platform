@@ -50,6 +50,9 @@ class PriceType extends AbstractType
                 'compact' => $options['compact'],
                 'required' => $isRequiredPrice,
                 'placeholder' => $options['currency_empty_value'],
+                'attr' => [
+                    'data-validation-ignore-onblur' => true,
+                ],
             ];
         } else {
             $currencyType = HiddenType::class;

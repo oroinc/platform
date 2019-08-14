@@ -9,6 +9,9 @@ use Oro\Bundle\CacheBundle\DataStorage\DataStorageInterface;
 use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 
+/**
+ * Provides datetime or Schedule for cache invalidation.
+ */
 class InvalidateCacheTimeProvider
 {
     /**
@@ -65,7 +68,7 @@ class InvalidateCacheTimeProvider
     {
         $args = $this->scheduleArgsBuilder->build($dataStorage);
         $schedules = $this->scheduleManager->getSchedulesByCommandAndArguments(
-            InvalidateCacheScheduleCommand::NAME,
+            InvalidateCacheScheduleCommand::getDefaultName(),
             $args
         );
 

@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * The form type for a collection of objects.
- * Usually this form type is used if an association should be represented as a field in Data API.
+ * Usually this form type is used if an association should be represented as a field in API.
  * @see \Oro\Bundle\ApiBundle\Request\DataType::isAssociationAsField
  */
 class ScalarCollectionType extends AbstractType

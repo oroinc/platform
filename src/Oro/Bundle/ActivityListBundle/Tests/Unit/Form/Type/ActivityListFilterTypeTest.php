@@ -62,7 +62,7 @@ class ActivityListFilterTypeTest extends TypeTestCase
 
     protected function getExtensions()
     {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
 
         $filterType = new FilterType($translator);
 
