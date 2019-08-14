@@ -69,7 +69,7 @@ before_script:
   - set +e; DIFF=$(git diff --name-only --diff-filter=ACMR $TRAVIS_COMMIT_RANGE | grep -e ".*\.php$"); set -e;
 
 script:
-  - find "src" -ipath "**tests/unit" | parallel --gnu "tfold {} ./vendor/bin/phpunit {}"
-  - ls -d src/*/*/* | parallel --gnu "tfold {} ./vendor/bin/phpcs {} -p --encoding=utf-8 --extensions=php --standard=PSR2"
-  - ls -d src/*/*/* | parallel --gnu "tfold {} ./vendor/bin/php-cs-fixer fix --dry-run --config=./build/.php_cs --path-mode=intersection {}"
+  - find src/ -type f -ipath "**tests/unit**test.php" | parallel --gnu --keep-order --linebuffer --xargs -N100 "tfold {#} ./vendor/bin/phpunit {}"
+  - find src/ -type f -ipath "**.php" | parallel --gnu --keep-order --linebuffer --xargs -N100 "tfold {#} ./vendor/bin/phpcs {} -p --encoding=utf-8 --extensions=php --standard=PSR2"
+  - find src/ -type f -ipath "**.php" | parallel --gnu --keep-order --linebuffer --xargs -N200 "tfold {#} ./vendor/bin/php-cs-fixer fix --dry-run --config=./build/.php_cs --path-mode=intersection {}"
   - if [[ $DIFF ]]; then ./vendor/bin/phpmd ${DIFF//$'\n'/,} text ./build/phpmd.xml --suffixes php; fi
