@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ProductBundle\Tests\Functional\Entity\Factory;
+namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Manager;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\ProductBundle\Entity\Product;

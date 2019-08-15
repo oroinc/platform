@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Layout\Block\Type;
 
-use Oro\Bundle\EntityConfigBundle\Attribute\AttributeConfigurationProvider;
+use Oro\Bundle\EntityConfigBundle\Attribute\AttributeConfigurationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
@@ -19,13 +19,13 @@ class AttributeTextType extends AbstractType
 {
     const NAME = 'attribute_text';
 
-    /** @var AttributeConfigurationProvider */
+    /** @var AttributeConfigurationProviderInterface */
     protected $attributeConfigurationProvider;
 
     /**
-     * @param AttributeConfigurationProvider $attributeConfigurationProvider
+     * @param AttributeConfigurationProviderInterface $attributeConfigurationProvider
      */
-    public function __construct(AttributeConfigurationProvider $attributeConfigurationProvider)
+    public function __construct(AttributeConfigurationProviderInterface $attributeConfigurationProvider)
     {
         $this->attributeConfigurationProvider = $attributeConfigurationProvider;
     }

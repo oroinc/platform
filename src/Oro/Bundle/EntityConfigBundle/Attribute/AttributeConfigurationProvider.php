@@ -10,7 +10,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 /**
  * Provides a set of method to simplify working with attribute configuration data.
  */
-class AttributeConfigurationProvider
+class AttributeConfigurationProvider implements AttributeConfigurationProviderInterface
 {
     /** @var ConfigManager */
     protected $configManager;
