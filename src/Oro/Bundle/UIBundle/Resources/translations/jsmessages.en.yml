@@ -141,6 +141,7 @@ oro:
             out: Zoom out
             auto: Zoom auto
             steps: Zoom steps
+            scroll_hint: To change the scale press "Control" and use the "Scroll wheel"
 
         search: "Search"
         reset: "Reset"
