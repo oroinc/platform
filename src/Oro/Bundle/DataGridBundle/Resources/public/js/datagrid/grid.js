@@ -515,6 +515,7 @@ define(function(require) {
 
             this.callToolbar('dispose');
             delete this.toolbars;
+            mediator.off('import-export:handleExport', this.onHandleExport, this);
 
             Grid.__super__.dispose.call(this);
         },
@@ -533,7 +534,26 @@ define(function(require) {
 
                 this.listenTo(this.collection, 'backgrid:sort', _.debounce(this.sort, 50), this);
             }
+
+            mediator.on('import-export:handleExport', this.onHandleExport, this);
             return this;
+        },
+
+        /**
+         * Pass whole query string (with selected filters, sorters, etc) to the export url
+         * if "filteredResultsGrid" option was passed to the configuration.
+         *
+         * @param exportRouteOptions
+         */
+        onHandleExport: function(exportRouteOptions) {
+            if (exportRouteOptions.hasOwnProperty('filteredResultsGrid')) {
+                var queryParams = tools.unpackFromQueryString(window.location.search);
+                var gridName = exportRouteOptions['filteredResultsGrid'];
+
+                if (queryParams.hasOwnProperty('grid') && queryParams['grid'].hasOwnProperty(gridName)) {
+                    exportRouteOptions.filteredResultsGridParams = queryParams['grid'][gridName];
+                }
+            }
         },
 
         /**
