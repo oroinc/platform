@@ -11,7 +11,7 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
- * Warms up Data API configuration cache based on "config_files" section in the bundle configuration
+ * Warms up API configuration cache based on "config_files" section in the bundle configuration
  * and "entity_aliases", "exclusions" and "inclusions" sections
  * in "Resources/config/oro/api.yml" files.
  *

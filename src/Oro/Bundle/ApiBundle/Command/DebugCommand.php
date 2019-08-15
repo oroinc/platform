@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
- * The CLI command to show different kind of debug information about Data API.
+ * The CLI command to show different kind of debug information about API.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterface
@@ -61,7 +61,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
     protected function configure()
     {
         $this
-            ->setDescription('Shows details about registered Data API actions and processors.')
+            ->setDescription('Shows details about registered API actions and processors.')
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,

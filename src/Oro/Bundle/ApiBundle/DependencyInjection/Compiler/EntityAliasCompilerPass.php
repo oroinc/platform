@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Registers all entity alias providers that are used only in Data API.
+ * Registers all entity alias providers that are used only in API.
  */
 class EntityAliasCompilerPass implements CompilerPassInterface
 {

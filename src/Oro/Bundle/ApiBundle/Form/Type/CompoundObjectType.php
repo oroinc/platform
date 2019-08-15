@@ -13,9 +13,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * The form type for an object that properties are built based of Data API metadata
+ * The form type for an object that properties are built based of API metadata
  * and contain only properties classified as fields and associations that should be represented as a field.
- * Usually this form type is used if an object should be represented as a field in Data API.
+ * Usually this form type is used if an object should be represented as a field in API.
  * @see \Oro\Bundle\ApiBundle\Request\DataType::isAssociationAsField
  */
 class CompoundObjectType extends AbstractType

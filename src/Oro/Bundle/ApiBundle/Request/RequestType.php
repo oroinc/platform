@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Request;
 use Oro\Component\ChainProcessor\ToArrayInterface;
 
 /**
- * Represents the type of Data API requests.
+ * Represents the type of API requests.
  */
 class RequestType implements ToArrayInterface
 {

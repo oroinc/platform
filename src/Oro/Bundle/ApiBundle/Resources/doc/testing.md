@@ -14,7 +14,7 @@
 
 To ensure that your REST API resources work properly, cover them with [functional tests](https://oroinc.com/orocrm/doc/current/dev-guide/functional-tests). 
 
-To simplify creation of the functional test for REST API resources that conform [JSON.API specification](http://jsonapi.org/format/), the [RestJsonApiTestCase](../../Tests/Functional/RestJsonApiTestCase.php) test case was created. The following table contains the list of the most useful methods of this class:
+To simplify creation of the functional test for REST API resources that conform [JSON:API specification](http://jsonapi.org/format/), the [RestJsonApiTestCase](../../Tests/Functional/RestJsonApiTestCase.php) test case was created. The following table contains the list of the most useful methods of this class:
 
 | Method | Description |
 | --- | --- |
@@ -47,10 +47,10 @@ To simplify creation of the functional test for REST API resources that conform 
 | assertAllowResponseHeader | Asserts "Allow" response header equals to the expected value. |
 | assertMethodNotAllowedResponse | Asserts response status code equals to 405 (Method Not Allowed) and "Allow" response header equals to the expected value. |
 | dumpYmlTemplate | Saves a response content to a YAML file. If the first parameter is a file name, the file is saved into the `responses` directory next to the PHP file that contains the test. |
-| getResourceId | Extracts the JSON.API resource identifier from the response. For details, see [JSON.API Specification](http://jsonapi.org/format/#document-resource-objects). |
-| getNewResourceIdFromIncludedSection | Extracts the JSON.API resource identifier from the "included" section of the response. For details, see [Create and Update Related Resources Together with a Primary API Resource](https://oroinc.com/orocrm/doc/current/dev-guide/web-api#create-and-update-related-resources-together-with-a-primary-api-resource). |
+| getResourceId | Extracts the JSON:API resource identifier from the response. For details, see [JSON:API Specification](http://jsonapi.org/format/#document-resource-objects). |
+| getNewResourceIdFromIncludedSection | Extracts the JSON:API resource identifier from the "included" section of the response. For details, see [Create and Update Related Resources Together with a Primary API Resource](https://oroinc.com/orocrm/doc/current/dev-guide/web-api#create-and-update-related-resources-together-with-a-primary-api-resource). |
 | getRequestData | Converts the given request to an array that can be sent to the server. The given request can be a path to a file that contains the request data or an array with the request data. If the request is a file name, the file should be located in the `requests` directory next to the PHP file that contains the test. |
-| getResponseErrors | Extracts the list of errors from the JSON.API response. For details, see [JSON.API Specification](http://jsonapi.org/format/#errors). |
+| getResponseErrors | Extracts the list of errors from the JSON:API response. For details, see [JSON:API Specification](http://jsonapi.org/format/#errors). |
 | getApiBaseUrl | Returns the base URL for all REST API requests, e.g. `http://localhost/api`. |
 | appendEntityConfig | Appends a configuration of an entity. This method is helpful when you create a general functionality and need to test it for different configurations without creating a test entity for each of them. Please note that the configuration is restored after each test and thus, you do not need to do it manually. |
 
@@ -246,5 +246,5 @@ one of the following base classes can be used:
 | [ChangeSubresourceProcessorTestCase](../../Tests/Unit/Processor/Subresource/ChangeSubresourceProcessorTestCase.php) | [update_subresource](./actions.md#update_subresource-action), [add_subresource](./actions.md#add_subresource-action), [delete_subresource](./actions.md#delete_subresource-action) |
 | [ChangeRelationshipProcessorTestCase](../../Tests/Unit/Processor/Subresource/ChangeRelationshipProcessorTestCase.php) | [update_relationship](./actions.md#update_relationship-action), [add_relationship](./actions.md#add_relationship-action), [delete_relationship](./actions.md#delete_relationship-action) |
 | [OptionsProcessorTestCase](../../Tests/Unit/Processor/Options/OptionsProcessorTestCase.php) | [options](./actions.md#options-action) |
-| [ConfigProcessorTestCase](../../Tests/Unit/Processor/Config/ConfigProcessorTestCase.php) | [get_config](./actions.md#get_config-action), [get_relation_config](./actions.md#get_relation_config-action) |
+| [ConfigProcessorTestCase](../../Tests/Unit/Processor/Config/ConfigProcessorTestCase.php) | [get_config](./actions.md#get_config-action) |
 | [MetadataProcessorTestCase](../../Tests/Unit/Processor/GetMetadata/MetadataProcessorTestCase.php) | [get_metadata](./actions.md#get_metadata-action) |

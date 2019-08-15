@@ -24,7 +24,7 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 
 /**
- * Guesses form types based on "form_type_guesses" configuration and Data API metadata.
+ * Guesses form types based on "form_type_guesses" configuration and API metadata.
  */
 class MetadataTypeGuesser implements FormTypeGuesserInterface
 {

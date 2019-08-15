@@ -25,7 +25,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 /**
- * The helper class to complete the configuration of Data API resource based on ORM entity.
+ * The helper class to complete the configuration of API resource based on ORM entity.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -152,7 +152,7 @@ class CompleteEntityDefinitionHelper
             $this->completeCustomIdentifier($definition, $metadata, $context->getTargetAction());
         }
         // make sure "class name" meta field is added for entity with table inheritance
-        if ($metadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
+        if (!$metadata->isInheritanceTypeNone()) {
             $this->addClassNameField($definition);
         }
     }

@@ -32,7 +32,6 @@ Example:
     "id": "1",
     "attributes": {
       "code": "default_family",
-      "entityClass": "Oro\\Bundle\\ProductBundle\\Entity\\Product",
       "isEnabled": true
     },
     "relationships": {

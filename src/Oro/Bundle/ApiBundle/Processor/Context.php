@@ -21,6 +21,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\HateoasMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraCollection;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
+use Oro\Bundle\ApiBundle\Metadata\TargetMetadataAccessor;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
@@ -30,7 +31,7 @@ use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 /**
- * The base execution context for Data API processors for public actions.
+ * The base execution context for API processors for public actions.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
@@ -871,6 +872,7 @@ class Context extends NormalizeResultContext implements ContextInterface
                     $config,
                     $extras
                 );
+                $this->initializeMetadata($metadata);
             }
             $this->processLoadedMetadata($metadata);
         } catch (\Exception $e) {
@@ -887,5 +889,42 @@ class Context extends NormalizeResultContext implements ContextInterface
     {
         // add loaded metadata to the context
         $this->set(self::METADATA, $metadata);
+    }
+
+    /**
+     * @param EntityMetadata              $metadata
+     * @param string|null                 $path
+     * @param TargetMetadataAccessor|null $targetMetadataAccessor
+     */
+    private function initializeMetadata(
+        EntityMetadata $metadata,
+        string $path = null,
+        TargetMetadataAccessor $targetMetadataAccessor = null
+    ): void {
+        if (null === $targetMetadataAccessor) {
+            $targetMetadataAccessor = new TargetMetadataAccessor(
+                $this->getVersion(),
+                $this->getRequestType(),
+                $this->metadataProvider,
+                $this->getMetadataExtras(),
+                $this->configProvider,
+                $this->getConfigExtras()
+            );
+        }
+
+        $metadata->setTargetMetadataAccessor($targetMetadataAccessor);
+
+        $associations = $metadata->getAssociations();
+        foreach ($associations as $associationName => $association) {
+            $associationPath = $path
+                ? $path . ConfigUtil::PATH_DELIMITER . $associationName
+                : $associationName;
+            $association->setTargetMetadataAccessor($targetMetadataAccessor);
+            $association->setAssociationPath($associationPath);
+            $targetMetadata = $association->getTargetMetadata();
+            if (null !== $targetMetadata) {
+                $this->initializeMetadata($targetMetadata, $associationPath, $targetMetadataAccessor);
+            }
+        }
     }
 }

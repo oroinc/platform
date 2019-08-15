@@ -29,7 +29,7 @@ class CollectSubresourcesContext extends ApiContext
     }
 
     /**
-     * Indicates whether API resource for a given entity class is available through Data API.
+     * Indicates whether API resource for a given entity class is available through API.
      *
      * @param string $entityClass
      *
@@ -55,7 +55,7 @@ class CollectSubresourcesContext extends ApiContext
     }
 
     /**
-     * Gets a list of resources available through Data API.
+     * Gets a list of resources available through API.
      *
      * @return ApiResource[] [entity class => ApiResource, ... ]
      */
@@ -65,7 +65,7 @@ class CollectSubresourcesContext extends ApiContext
     }
 
     /**
-     * Sets a list of resources available through Data API.
+     * Sets a list of resources available through API.
      *
      * @param ApiResource[] $resources
      */
@@ -78,7 +78,7 @@ class CollectSubresourcesContext extends ApiContext
     }
 
     /**
-     * Gets a list of resources accessible through Data API.
+     * Gets a list of resources accessible through API.
      *
      * @return string[] The list of class names
      */
@@ -88,7 +88,7 @@ class CollectSubresourcesContext extends ApiContext
     }
 
     /**
-     * Sets a list of resources accessible through Data API.
+     * Sets a list of resources accessible through API.
      *
      * @param string[] $classNames
      */

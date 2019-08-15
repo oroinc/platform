@@ -2,12 +2,12 @@
 
 ## oro:api:cache:clear
 
-This command clears the data API cache.
+This command clears the API cache.
 
 Run this command when you add:
  
 * a new entity to `Resources/config/oro/api.yml`, 
-* a new processor that changes a list of  resources available via the data API.
+* a new processor that changes a list of  resources available via the API.
 
 ```bash
 php bin/console oro:api:cache:clear
@@ -37,7 +37,7 @@ php bin/console oro:api:doc:cache:clear --view=rest_json_api
 
 ## oro:api:dump
 
-This command shows all resources accessible via the data API.
+This command shows all resources accessible via the API.
 
 Run this command without parameters to display all available resources:
 
@@ -69,7 +69,7 @@ or
 php bin/console oro:api:dump users --sub-resources
 ```
 
-To get all entities that are not accessible via the data API, see the `--not-accessible` option:
+To get all entities that are not accessible via the API, see the `--not-accessible` option:
 
 ```bash
 php bin/console oro:api:dump --not-accessible
@@ -77,7 +77,7 @@ php bin/console oro:api:dump --not-accessible
 
 ## oro:api:debug
 
-This command shows details about the registered Data API actions and processors.
+This command shows details about the registered API actions and processors.
 
 To display all actions, run this command without parameters:
 
@@ -123,12 +123,6 @@ To display the configuration for a particular request type, use the `--request-t
 
 ```bash
 php bin/console oro:api:config:dump users --request-type=rest --request-type=json_api
-```
-
-To display a configuration of an entity referenced by another entity, use the `--section` option:
-
-```bash
-php bin/console oro:api:config:dump addresses --section=relations
 ```
 
 By default, no extra configuration data are added to the output. To add an extra data, use the `--extra` option.

@@ -12,13 +12,9 @@ class LoadTitleMetaPropertyForSingleItem extends LoadTitleMetaProperty
     /**
      * {@inheritdoc}
      */
-    protected function updateData(
-        array $data,
-        $entityClass,
-        EntityDefinitionConfig $config,
-        $titleFieldName
-    ) {
-        $data = $this->addTitles([$data], $entityClass, $config, $titleFieldName);
+    protected function updateData(array $data, string $entityClass, EntityDefinitionConfig $config): array
+    {
+        $data = $this->addTitles([$data], $entityClass, $config);
 
         return reset($data);
     }

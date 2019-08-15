@@ -303,8 +303,7 @@ class ConfigurationLoader
             ->register($configBagServiceId, CombinedConfigBag::class)
             ->setArguments([
                 $configBags,
-                new Reference('oro_api.config_merger.entity'),
-                new Reference('oro_api.config_merger.relation')
+                new Reference('oro_api.config_merger.entity')
             ])
             ->setPublic(true);
 

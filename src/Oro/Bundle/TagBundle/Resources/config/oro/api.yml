@@ -1,6 +1,6 @@
 api:
     entities:
-        # remove this exclusion when Tag entity will be ready to be enabled for Data API
+        # remove this exclusion when Tag entity will be ready to be enabled for API
         Oro\Bundle\TagBundle\Entity\Tag: { exclude: true}
 
         Oro\Bundle\TagBundle\Entity\Taxonomy:

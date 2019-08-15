@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Util\InheritDocUtil;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
 /**
- * Extracts Data API resources documentation from Markdown files.
+ * Extracts documentation for API resources from Markdown files.
  * This parser supports Markdown Extra syntax.
  * @link https://michelf.ca/projects/php-markdown/extra/
  *

@@ -8,16 +8,19 @@ use Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\LinkMetadataInterface;
 use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
+use Oro\Bundle\ApiBundle\Metadata\TargetMetadataProvider;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\AssociationToArrayAttributeConverter;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\EntityIdAccessor;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessor;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessorInterface;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Psr\Log\LoggerInterface;
 
 /**
- * The base class for document builders for different types of Data API responses.
+ * The base class for document builders for different types of API responses.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -59,6 +62,9 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 
     /** @var AssociationToArrayAttributeConverter */
     private $arrayAttributeConverter;
+
+    /** @var TargetMetadataProvider */
+    private $targetMetadataProvider;
 
     /**
      * @param ValueNormalizer             $valueNormalizer
@@ -398,6 +404,22 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     }
 
     /**
+     * @param string         $propertyPath
+     * @param EntityMetadata $metadata
+     *
+     * @return bool
+     */
+    protected function isIgnoredMeta(string $propertyPath, EntityMetadata $metadata): bool
+    {
+        return
+            ConfigUtil::CLASS_NAME === $propertyPath
+            && (
+                $metadata->isInheritedType()
+                || \is_a($metadata->getClassName(), EntityIdentifier::class, true)
+            );
+    }
+
+    /**
      * @param array  $data
      * @param string $associationName
      *
@@ -455,7 +477,30 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
      */
     protected function createArrayAttributeConverter(): AssociationToArrayAttributeConverter
     {
-        return new AssociationToArrayAttributeConverter($this->objectAccessor);
+        return new AssociationToArrayAttributeConverter(
+            $this->objectAccessor,
+            $this->getTargetMetadataProvider()
+        );
+    }
+
+    /**
+     * @return TargetMetadataProvider
+     */
+    protected function getTargetMetadataProvider(): TargetMetadataProvider
+    {
+        if (null === $this->targetMetadataProvider) {
+            $this->targetMetadataProvider = $this->createTargetMetadataProvider();
+        }
+
+        return $this->targetMetadataProvider;
+    }
+
+    /**
+     * @return TargetMetadataProvider
+     */
+    protected function createTargetMetadataProvider(): TargetMetadataProvider
+    {
+        return new TargetMetadataProvider($this->objectAccessor);
     }
 
     /**
@@ -510,13 +555,13 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 
     /**
      * @param RequestType         $requestType
-     * @param AssociationMetadata $association
+     * @param AssociationMetadata $associationMetadata
      *
      * @return array
      */
-    protected function getRelationshipData(RequestType $requestType, AssociationMetadata $association): array
+    protected function getRelationshipData(RequestType $requestType, AssociationMetadata $associationMetadata): array
     {
-        $targetClass = $association->getTargetClassName();
+        $targetClass = $associationMetadata->getTargetClassName();
         $targetAlias = $this->getEntityAlias($targetClass, $requestType);
 
         $data = [DataAccessorInterface::ENTITY_CLASS => $targetClass];

@@ -536,7 +536,7 @@ class EntityMapper
     {
         return
             $metadata->isMappedSuperclass
-            || $metadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE;
+            || !$metadata->isInheritanceTypeNone();
     }
 
     /**

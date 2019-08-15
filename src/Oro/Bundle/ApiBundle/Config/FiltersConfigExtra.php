@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class FiltersConfigExtra implements ConfigExtraSectionInterface
 {
-    const NAME = ConfigUtil::FILTERS;
+    public const NAME = ConfigUtil::FILTERS;
 
     /**
      * {@inheritdoc}
@@ -34,7 +34,7 @@ class FiltersConfigExtra implements ConfigExtraSectionInterface
      */
     public function isPropagable()
     {
-        return true;
+        return false;
     }
 
     /**

@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * Provides a set of methods to help loading of Data API metadata.
+ * Provides a set of methods to help loading of API metadata.
  */
 class MetadataHelper
 {

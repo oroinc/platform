@@ -25,12 +25,6 @@ class ComputePrimaryFieldTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenNoData()
-    {
-        $this->processor->process($this->context);
-        self::assertFalse($this->context->hasResult());
-    }
-
     public function testProcessWhenNoConfigForPrimaryField()
     {
         $config = new EntityDefinitionConfig();

@@ -25,7 +25,7 @@ class CollectResourcesContext extends ApiContext
     }
 
     /**
-     * Gets a list of resources accessible through Data API.
+     * Gets a list of resources accessible through API.
      *
      * @return string[] The list of class names
      */
@@ -35,7 +35,7 @@ class CollectResourcesContext extends ApiContext
     }
 
     /**
-     * Sets a list of resources accessible through Data API.
+     * Sets a list of resources accessible through API.
      *
      * @param string[] $classNames
      */

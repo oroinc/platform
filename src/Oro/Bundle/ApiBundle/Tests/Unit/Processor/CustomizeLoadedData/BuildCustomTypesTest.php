@@ -34,12 +34,6 @@ class BuildCustomTypesTest extends \PHPUnit\Framework\TestCase
         $this->processor = new BuildCustomTypes($this->associationManager, $this->doctrineHelper);
     }
 
-    public function testProcessWhenNoData()
-    {
-        $this->processor->process($this->context);
-        self::assertFalse($this->context->hasResult());
-    }
-
     public function testProcessWithoutConfig()
     {
         $data = [

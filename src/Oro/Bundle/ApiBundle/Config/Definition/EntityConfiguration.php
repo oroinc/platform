@@ -7,7 +7,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
- * The builder for "entities" and "relations" configuration sections.
+ * The builder for "entities" configuration section.
  */
 class EntityConfiguration
 {

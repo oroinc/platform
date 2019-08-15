@@ -43,6 +43,9 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
     /** @var ParameterBag|null */
     private $attributes;
 
+    /** @var TargetMetadataAccessorInterface|null */
+    private $targetMetadataAccessor;
+
     /**
      * Makes a deep copy of the object.
      */
@@ -108,6 +111,18 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Sets an accessor to target metadata by a specified target class name.
+     * It is used for multi-target associations.
+     * @see \Oro\Bundle\ApiBundle\Model\EntityIdentifier
+     *
+     * @param TargetMetadataAccessorInterface|null $targetMetadataAccessor
+     */
+    public function setTargetMetadataAccessor(?TargetMetadataAccessorInterface $targetMetadataAccessor)
+    {
+        $this->targetMetadataAccessor = $targetMetadataAccessor;
     }
 
     /**
@@ -190,6 +205,22 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
     public function setInheritedType($inherited)
     {
         $this->inherited = $inherited;
+    }
+
+    /**
+     * Gets metadata for the given entity class.
+     *
+     * @param string $className
+     *
+     * @return EntityMetadata|null
+     */
+    public function getEntityMetadata(string $className)
+    {
+        if (null === $this->targetMetadataAccessor || $className === $this->className) {
+            return null;
+        }
+
+        return $this->targetMetadataAccessor->getTargetMetadata($className, null);
     }
 
     /**

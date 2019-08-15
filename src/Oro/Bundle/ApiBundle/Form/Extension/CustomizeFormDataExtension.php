@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * all types of form related events dispatched in "customize_form_data" action,
  * and registers handlers for all the events, except "pre_validate" and "post_validate".
  * The "pre_validate" and "post_validate" events are processed by FormValidationHandler,
- * because the deferred validation is used in Data API.
+ * because the deferred validation is used in API.
  * @see \Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
  * @see \Oro\Bundle\ApiBundle\Form\FormValidationHandler
  */

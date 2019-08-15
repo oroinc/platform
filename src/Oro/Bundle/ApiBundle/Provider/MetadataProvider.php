@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 /**
- * Provides the metadata for a specific Data API resource.
+ * Provides the metadata for a specific API resource.
  */
 class MetadataProvider
 {

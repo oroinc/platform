@@ -44,17 +44,14 @@ class BuildCustomTypes implements ProcessorInterface
     {
         /** @var CustomizeLoadedDataContext $context */
 
-        $data = $context->getResult();
-        if (!\is_array($data)) {
-            return;
-        }
+        $data = $context->getData();
 
         $config = $context->getConfig();
         if (null === $config) {
             return;
         }
 
-        $context->setResult($this->processCustomTypes($data, $config, $context->getClassName()));
+        $context->setData($this->processCustomTypes($data, $config, $context->getClassName()));
     }
 
     /**

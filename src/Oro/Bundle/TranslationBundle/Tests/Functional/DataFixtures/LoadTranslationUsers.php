@@ -5,6 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -23,7 +24,7 @@ class LoadTranslationUsers extends AbstractFixture implements ContainerAwareInte
     public function getDependencies()
     {
         return [
-            LoadTranslationRoles::class,
+            LoadTranslationRoles::class, LoadBusinessUnit::class
         ];
     }
 
@@ -49,6 +50,7 @@ class LoadTranslationUsers extends AbstractFixture implements ContainerAwareInte
         /* @var $user User */
         $user = $userManager->createUser();
         $user
+            ->setOwner($this->getReference('business_unit'))
             ->setFirstName('Demo')
             ->setLastName('Translator')
             ->setEmail(self::TRANSLATOR_EMAIL)

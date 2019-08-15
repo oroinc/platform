@@ -40,7 +40,6 @@ services:
             - '@oro_api.resources_provider'
             - '@oro_api.processor_bag'
             - '@oro_api.config_provider'
-            - '@oro_api.relation_config_provider'
         tags:
             - { name: console.command }
 

@@ -147,6 +147,10 @@ The content of the file as a Base64 encoded string.
 
 *This field is **required** and must remain defined.*
 
+### parent
+
+The entity to which this file belongs.
+
 ## SUBRESOURCES
 
 ### owner
@@ -162,6 +166,33 @@ Retrieve the ID of the user who is the owner of a specific file record.
 #### update_relationship
 
 Replace the owner of a specific file record.
+
+{@request:json_api}
+Example:
+
+```JSON
+{
+  "data": {
+    "type": "users",
+    "id": "1"
+  }
+}
+```
+{@/request}
+
+### parent
+
+#### get_subresource
+
+Retrieve the entity to which a specific file belongs.
+
+#### get_relationship
+
+Retrieve the ID of the entity to which a specific file belongs.
+
+#### update_relationship
+
+Retrieve the entity to which a specific file belongs.
 
 {@request:json_api}
 Example:

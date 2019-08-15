@@ -55,6 +55,7 @@ class SetDataCustomizationHandler implements ProcessorInterface
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
         $entityClass = $context->getClassName();
+        $configExtras = $context->getExtras();
         $definition->setPostSerializeHandler(
             new EntityHandler(
                 $this->customizationProcessor,
@@ -62,6 +63,7 @@ class SetDataCustomizationHandler implements ProcessorInterface
                 $requestType,
                 $entityClass,
                 $definition,
+                $configExtras,
                 false,
                 $definition->getPostSerializeHandler()
             )
@@ -73,6 +75,7 @@ class SetDataCustomizationHandler implements ProcessorInterface
                 $requestType,
                 $entityClass,
                 $definition,
+                $configExtras,
                 true,
                 $definition->getPostSerializeCollectionHandler()
             )
@@ -134,6 +137,7 @@ class SetDataCustomizationHandler implements ProcessorInterface
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
         $definition = $context->getResult();
+        $configExtras = $context->getExtras();
         /** @var EntityDefinitionConfig $targetEntity */
         $targetEntity = $field->getTargetEntity();
         $targetEntityClass = $field->getTargetClass();
@@ -146,6 +150,7 @@ class SetDataCustomizationHandler implements ProcessorInterface
                 $fieldPath,
                 $targetEntityClass,
                 $definition,
+                $configExtras,
                 false,
                 $targetEntity->getPostSerializeHandler()
             )
@@ -159,6 +164,7 @@ class SetDataCustomizationHandler implements ProcessorInterface
                 $fieldPath,
                 $targetEntityClass,
                 $definition,
+                $configExtras,
                 true,
                 $targetEntity->getPostSerializeCollectionHandler()
             )

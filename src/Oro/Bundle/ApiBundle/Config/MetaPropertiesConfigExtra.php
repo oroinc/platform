@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
  */
 class MetaPropertiesConfigExtra implements ConfigExtraInterface
 {
-    const NAME = 'meta_properties';
+    public const NAME = 'meta_properties';
 
     /** @var array[] [property name => data type, ...] */
     private $metaProperties = [];

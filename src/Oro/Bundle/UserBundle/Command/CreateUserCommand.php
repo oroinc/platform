@@ -5,6 +5,9 @@ namespace Oro\Bundle\UserBundle\Command;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Exception\InvalidArgumentException;
@@ -14,7 +17,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Creates user
+ * Creates a user.
  */
 class CreateUserCommand extends Command
 {
@@ -142,10 +145,16 @@ class CreateUserCommand extends Command
      */
     protected function setRole(User $user, $options)
     {
+        $roleName = null;
         if (!empty($options['user-role'])) {
+            $roleName = $options['user-role'];
+        } elseif (null === $user->getId()) {
+            $roleName = User::ROLE_DEFAULT;
+        }
+        if ($roleName) {
             $role = $this->entityManager
-                ->getRepository('OroUserBundle:Role')
-                ->findOneBy(['role' => $options['user-role']]);
+                ->getRepository(Role::class)
+                ->findOneBy(['role' => $roleName]);
 
             if (!$role) {
                 throw new InvalidArgumentException('Invalid Role');
@@ -167,7 +176,7 @@ class CreateUserCommand extends Command
     {
         if (!empty($options['user-business-unit'])) {
             $businessUnit = $this->entityManager
-                ->getRepository('OroOrganizationBundle:BusinessUnit')
+                ->getRepository(BusinessUnit::class)
                 ->findOneBy(['name' => $options['user-business-unit']]);
 
             if (!$businessUnit) {
@@ -195,7 +204,7 @@ class CreateUserCommand extends Command
             foreach ($options['user-organizations'] as $organizationName) {
                 try {
                     $organization = $this->entityManager
-                        ->getRepository('OroOrganizationBundle:Organization')
+                        ->getRepository(Organization::class)
                         ->getOrganizationByName($organizationName);
                 } catch (NoResultException $e) {
                     throw new InvalidArgumentException('Invalid organization "' . $organizationName .

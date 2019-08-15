@@ -7,17 +7,17 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 
 class FilterFieldsConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
+    private const FIELD_FILTERS = [
+        'products'   => ['id', 'code'],
+        'categories' => ['name']
+    ];
+
     /** @var FilterFieldsConfigExtra */
     private $extra;
 
     protected function setUp()
     {
-        $this->extra = new FilterFieldsConfigExtra(
-            [
-                'products'   => ['id', 'code'],
-                'categories' => ['name']
-            ]
-        );
+        $this->extra = new FilterFieldsConfigExtra(self::FIELD_FILTERS);
     }
 
     public function testGetName()
@@ -25,15 +25,20 @@ class FilterFieldsConfigExtraTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(FilterFieldsConfigExtra::NAME, $this->extra->getName());
     }
 
-    public function testConfigureContext()
+    public function testGetFieldFilters()
+    {
+        self::assertEquals(
+            self::FIELD_FILTERS,
+            $this->extra->getFieldFilters()
+        );
+    }
+
+    public function testConfigureContextAndGetFieldFilters()
     {
         $context = new ConfigContext();
         $this->extra->configureContext($context);
         self::assertEquals(
-            [
-                'products'   => ['id', 'code'],
-                'categories' => ['name']
-            ],
+            self::FIELD_FILTERS,
             $context->get(FilterFieldsConfigExtra::NAME)
         );
     }

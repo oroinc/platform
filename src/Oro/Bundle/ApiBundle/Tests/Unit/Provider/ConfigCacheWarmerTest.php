@@ -157,8 +157,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
                 'Test\Entity30'         => [],
                 'Test\Entity31'         => [],
                 'Test\Entity3Undefined' => []
-            ],
-            'relations' => []
+            ]
         ];
     }
 
@@ -184,8 +183,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
                 'Test\Entity6'  => [],
                 'Test\Entity10' => [],
                 'Test\Entity11' => []
-            ],
-            'relations' => []
+            ]
         ];
     }
 
@@ -210,8 +208,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
                 'Test\Entity6'  => [],
                 'Test\Entity12' => [],
                 'Test\Entity13' => []
-            ],
-            'relations' => []
+            ]
         ];
     }
 

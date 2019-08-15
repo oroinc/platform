@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
  */
 class FilterIdentifierFieldsConfigExtra implements ConfigExtraInterface
 {
-    const NAME = 'identifier_fields_only';
+    public const NAME = 'identifier_fields_only';
 
     /**
      * {@inheritdoc}

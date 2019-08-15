@@ -622,6 +622,8 @@
                     border: $selector-border;
                     padding: $input-inner-offset;
                     min-width: 100%;
+                    height: $select2-tree-autocomplete-choice-item-height;
+                    line-height: $select2-tree-autocomplete-choice-item-line-height;
                 }
             }
 

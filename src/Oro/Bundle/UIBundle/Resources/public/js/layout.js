@@ -309,10 +309,10 @@ define(function(require) {
             labels.css('width', '');
 
             var width = labels.map(function(i, label) {
-                return label.clientWidth;
+                return label.getBoundingClientRect().width;
             }).get();
 
-            var newWidth = Math.max.apply(null, width) + 1;
+            var newWidth = Math.ceil(Math.max.apply(null, width));
             labels.css('width', newWidth);
 
             controlGroups.each(function(i, group) {

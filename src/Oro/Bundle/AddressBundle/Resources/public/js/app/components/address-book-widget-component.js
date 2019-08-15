@@ -22,8 +22,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        initialize: function() {
-            AddressBookWidgetComponent.__super__.initialize.call(this, arguments);
+        initialize: function(options) {
+            AddressBookWidgetComponent.__super__.initialize.call(this, options);
 
             widgetManager.getWidgetInstance(this.wid, this._onWidgetLoad.bind(this));
         },
@@ -32,27 +32,23 @@ define(function(require) {
             var addressDeleteRoute = this.addressDeleteRoute;
             var addressUpdateRoute = this.addressUpdateRoute;
 
-            return {
-                el: this.addressBookSelector,
-                addressListUrl: this.addressListUrl,
-                addressCreateUrl: this.addressCreateUrl,
-                addressUpdateUrl: function() {
-                    var address = arguments[0];
+            var options = AddressBookWidgetComponent.__super__._getAddressBookViewOptions.call(this);
 
+            return _.extend(options, {
+                addressCreateUrl: this.addressCreateUrl,
+                addressUpdateUrl: function(address) {
                     return routing.generate(
                         addressUpdateRoute.route,
                         _.extend({id: address.get('id')}, addressUpdateRoute.params)
                     );
                 },
-                addressDeleteUrl: function() {
-                    var address = arguments[0];
-
+                addressDeleteUrl: function(address) {
                     return routing.generate(
                         addressDeleteRoute.route,
                         _.extend({addressId: address.get('id')}, addressDeleteRoute.params)
                     );
                 }
-            };
+            });
         },
 
         _onWidgetLoad: function(widget) {

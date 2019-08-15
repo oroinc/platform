@@ -73,12 +73,25 @@ class ConfigBuilder {
             this._isProduction = args.mode === 'production';
             let theme = env ? env.theme : undefined;
             this._symfonyEnv = env ? env.symfony : undefined;
+            this._configuration = AssetConfigLoader.getConfig(this._cachePath, this._symfonyEnv);
 
             const resolvedPublicPath = path.resolve(this._publicPath);
+
+            const stats = env && env.stats ? env.stats : {
+                hash: false,
+                version: false,
+                children: false,
+                entrypoints: false,
+                performance: this._isProduction,
+                chunks: false,
+                modules: false,
+                source: false,
+                publicPath: false,
+                builtAt: false,
+                warnings: false
+            };
             let webpackConfig = {
-                stats: {
-                    warnings: false
-                },
+                stats: stats,
                 context: resolvedPublicPath,
                 entry: this._getEntryPoints(theme),
                 output: {
@@ -112,7 +125,7 @@ class ConfigBuilder {
                         {
                             test: /\.s?css$/,
                             use: [{
-                                loader: MiniCssExtractPlugin.loader,
+                                loader: args.hot ? 'style-loader' : MiniCssExtractPlugin.loader,
                             }, {
                                 loader: 'css-loader',
                                 options: {
@@ -167,6 +180,27 @@ class ConfigBuilder {
                     new CleanupStatsPlugin()
                 ]
             };
+            if (args.hot) {
+                const https = this._configuration.devServerOptions.https;
+                const schema = https ? 'https' : 'http';
+                const devServerHost = this._configuration.devServerOptions.host;
+                const devServerPort = this._configuration.devServerOptions.port;
+                webpackConfig.devServer = {
+                    contentBase: resolvedPublicPath,
+                    host: devServerHost,
+                    port: devServerPort,
+                    https: https,
+                    compress: true,
+                    stats: stats,
+                    disableHostCheck: true,
+                    clientLogLevel: 'error',
+                    headers: {
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                };
+                webpackConfig.output.publicPath = `${schema}://${devServerHost}:${devServerPort}/`;
+            }
+
 
             //Additional setting for production mode
             if (this._isProduction) {
@@ -196,8 +230,6 @@ class ConfigBuilder {
      * @private
      */
     _getEntryPoints(selectedTheme) {
-        this._configuration = AssetConfigLoader.getConfig(this._cachePath, this._symfonyEnv);
-
         const configLoader = new ConfigLoader(this._configuration.paths, '/Resources/public/themes/', 'settings.yml');
         const entryPointFileWriter = new EntryPointFileWriter(this._publicPath);
         const styleLoader = new StyleLoader(configLoader);

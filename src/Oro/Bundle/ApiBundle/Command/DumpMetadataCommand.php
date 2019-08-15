@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * The CLI command to show metadata of Data API resources.
+ * The CLI command to show metadata of API resources.
  */
 class DumpMetadataCommand extends AbstractDebugCommand
 {
@@ -63,7 +63,7 @@ class DumpMetadataCommand extends AbstractDebugCommand
     protected function configure()
     {
         $this
-            ->setDescription('Dumps entity metadata used in Data API.')
+            ->setDescription('Dumps entity metadata used in API.')
             ->addArgument(
                 'entity',
                 InputArgument::REQUIRED,

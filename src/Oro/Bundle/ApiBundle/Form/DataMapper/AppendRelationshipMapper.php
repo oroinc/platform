@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
- * The data mapper that is used in "add_relationship" Data API action.
+ * The data mapper that is used in "add_relationship" API action.
  */
 class AppendRelationshipMapper extends AbstractRelationshipMapper
 {

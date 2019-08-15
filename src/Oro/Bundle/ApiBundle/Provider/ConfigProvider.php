@@ -4,15 +4,16 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 /**
- * Provides the configuration for a specific Data API resource.
+ * Provides the configuration for a specific API resource.
  */
-class ConfigProvider extends AbstractConfigProvider
+class ConfigProvider
 {
     /** @var ActionProcessorInterface */
     private $processor;
@@ -87,5 +88,100 @@ class ConfigProvider extends AbstractConfigProvider
     public function clearCache(): void
     {
         $this->cache = [];
+    }
+
+    /**
+     * @param ConfigContext          $context
+     * @param string                 $className
+     * @param string                 $version
+     * @param RequestType            $requestType
+     * @param ConfigExtraInterface[] $extras
+     */
+    private function initContext(
+        ConfigContext $context,
+        string $className,
+        string $version,
+        RequestType $requestType,
+        array $extras
+    ): void {
+        $context->setClassName($className);
+        $context->setVersion($version);
+        $context->getRequestType()->set($requestType);
+        if (!empty($extras)) {
+            $context->setExtras($extras);
+        }
+    }
+
+    /**
+     * @param string                 $className
+     * @param string                 $version
+     * @param RequestType            $requestType
+     * @param ConfigExtraInterface[] $extras
+     *
+     * @return string
+     */
+    private function buildCacheKey(
+        string $className,
+        string $version,
+        RequestType $requestType,
+        array $extras
+    ): string {
+        $cacheKey = (string)$requestType . '|' . $version . '|' . $className;
+        foreach ($extras as $extra) {
+            $part = $extra->getCacheKeyPart();
+            if (!empty($part)) {
+                $cacheKey .= '|' . $part;
+            }
+        }
+
+        return $cacheKey;
+    }
+
+    /**
+     * @param string                 $className
+     * @param ConfigExtraInterface[] $extras
+     *
+     * @return string
+     */
+    private function buildConfigKey(string $className, array $extras): string
+    {
+        $configKey = $className;
+        foreach ($extras as $extra) {
+            if ($extra instanceof ConfigExtraSectionInterface) {
+                continue;
+            }
+            $part = $extra->getCacheKeyPart();
+            if (!empty($part)) {
+                $configKey .= '|' . $part;
+            }
+        }
+
+        return $configKey;
+    }
+
+    /**
+     * @param ConfigContext $context
+     *
+     * @return Config
+     */
+    private function buildResult(ConfigContext $context): Config
+    {
+        $config = new Config();
+        if ($context->hasResult()) {
+            $config->setDefinition($context->getResult());
+        }
+        $extras = $context->getExtras();
+        foreach ($extras as $extra) {
+            $sectionName = $extra->getName();
+            if ($extra instanceof ConfigExtraSectionInterface && $context->has($sectionName)) {
+                $config->set($sectionName, $context->get($sectionName));
+            }
+        }
+        $definition = $config->getDefinition();
+        if ($definition) {
+            $definition->setKey($this->buildConfigKey($context->getClassName(), $context->getExtras()));
+        }
+
+        return $config;
     }
 }

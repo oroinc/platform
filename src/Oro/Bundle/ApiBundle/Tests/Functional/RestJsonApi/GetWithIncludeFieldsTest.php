@@ -276,6 +276,51 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         self::assertTrue(count($data['included'][1]['relationships']) > 0);
     }
 
+    public function testIncludeFilterForRenamedAssociation()
+    {
+        $this->appendEntityConfig(
+            User::class,
+            [
+                'fields' => [
+                    'renamedOwner' => [
+                        'property_path' => 'owner'
+                    ]
+                ]
+            ]
+        );
+
+        $params = [
+            'page'    => ['size' => 1],
+            'include' => 'renamedOwner'
+        ];
+        $expectedResponse = [
+            'data'     => [
+                [
+                    'type'          => 'users',
+                    'id'            => '1',
+                    'relationships' => [
+                        'renamedOwner' => [
+                            'data' => ['type' => 'businessunits', 'id' => '1']
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                ['type' => 'businessunits', 'id' => '1']
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($expectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertTrue(count($data['data'][0]['attributes']) > 0);
+        self::assertTrue(count($data['data'][0]['relationships']) > 0);
+        self::assertCount(count($expectedResponse['included']), $data['included']);
+        self::assertTrue(count($data['included'][0]['attributes']) > 0);
+        self::assertTrue(count($data['included'][0]['relationships']) > 0);
+    }
+
     public function testIncludeFilterWhenIncludeFieldsExistInFieldsFilter()
     {
         $params = [
@@ -420,6 +465,166 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                     'id'            => '1',
                     'relationships' => [
                         'organization' => [
+                            'data' => ['type' => 'organizations', 'id' => '1']
+                        ]
+                    ]
+                ],
+                ['type' => 'organizations', 'id' => '1']
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($expectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertCount(count($expectedResponse['included']), $data['included']);
+    }
+
+    public function testIncludeFilterForSecondLevelRelatedEntityAndRenamedFirstLevelAssociation()
+    {
+        $this->appendEntityConfig(
+            User::class,
+            [
+                'fields' => [
+                    'renamedOwner' => [
+                        'property_path' => 'owner'
+                    ]
+                ]
+            ]
+        );
+
+        $params = [
+            'page'    => ['size' => 1],
+            'include' => 'renamedOwner.organization'
+        ];
+        $expectedResponse = [
+            'data'     => [
+                [
+                    'type'          => 'users',
+                    'id'            => '1',
+                    'relationships' => [
+                        'renamedOwner' => [
+                            'data' => ['type' => 'businessunits', 'id' => '1']
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type'          => 'businessunits',
+                    'id'            => '1',
+                    'relationships' => [
+                        'organization' => [
+                            'data' => ['type' => 'organizations', 'id' => '1']
+                        ]
+                    ]
+                ],
+                ['type' => 'organizations', 'id' => '1']
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($expectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertCount(count($expectedResponse['included']), $data['included']);
+    }
+
+    public function testIncludeFilterForSecondLevelRelatedEntityAndRenamedSecondLevelAssociation()
+    {
+        $this->appendEntityConfig(
+            BusinessUnit::class,
+            [
+                'fields' => [
+                    'renamedOrganization' => [
+                        'property_path' => 'organization'
+                    ]
+                ]
+            ]
+        );
+
+        $params = [
+            'page'    => ['size' => 1],
+            'include' => 'owner.renamedOrganization'
+        ];
+        $expectedResponse = [
+            'data'     => [
+                [
+                    'type'          => 'users',
+                    'id'            => '1',
+                    'relationships' => [
+                        'owner' => [
+                            'data' => ['type' => 'businessunits', 'id' => '1']
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type'          => 'businessunits',
+                    'id'            => '1',
+                    'relationships' => [
+                        'renamedOrganization' => [
+                            'data' => ['type' => 'organizations', 'id' => '1']
+                        ]
+                    ]
+                ],
+                ['type' => 'organizations', 'id' => '1']
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($expectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertCount(count($expectedResponse['included']), $data['included']);
+    }
+
+    public function testIncludeFilterForSecondLevelRelatedEntityAndRenamedFirstAndSecondLevelAssociations()
+    {
+        $this->appendEntityConfig(
+            User::class,
+            [
+                'fields' => [
+                    'renamedOwner' => [
+                        'property_path' => 'owner'
+                    ]
+                ]
+            ]
+        );
+        $this->appendEntityConfig(
+            BusinessUnit::class,
+            [
+                'fields' => [
+                    'renamedOrganization' => [
+                        'property_path' => 'organization'
+                    ]
+                ]
+            ]
+        );
+
+        $params = [
+            'page'    => ['size' => 1],
+            'include' => 'renamedOwner.renamedOrganization'
+        ];
+        $expectedResponse = [
+            'data'     => [
+                [
+                    'type'          => 'users',
+                    'id'            => '1',
+                    'relationships' => [
+                        'renamedOwner' => [
+                            'data' => ['type' => 'businessunits', 'id' => '1']
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type'          => 'businessunits',
+                    'id'            => '1',
+                    'relationships' => [
+                        'renamedOrganization' => [
                             'data' => ['type' => 'organizations', 'id' => '1']
                         ]
                     ]

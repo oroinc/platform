@@ -8,7 +8,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityRuleMatcher;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 /**
- * The exclusion provider for entities and fields excluded from Data API
+ * The exclusion provider for entities and fields excluded from API
  * via "Resources/config/oro/api.yml" files.
  */
 class ConfigExclusionProvider implements ExclusionProviderInterface

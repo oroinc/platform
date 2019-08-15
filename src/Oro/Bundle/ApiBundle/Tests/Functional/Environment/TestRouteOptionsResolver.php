@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment;
 
 use Oro\Bundle\ApiBundle\ApiDoc\RestRouteOptionsResolver;
+use Oro\Bundle\ApiBundle\Controller\RestApiController;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Symfony\Component\Routing\Route;
@@ -34,7 +35,7 @@ class TestRouteOptionsResolver implements RouteOptionsResolverInterface
             new Route(
                 '/api/testapicurrentdepartment',
                 [
-                    '_controller' => 'OroApiBundle:RestApi:item',
+                    '_controller' => RestApiController::class .  '::itemAction',
                     'entity'      => 'testapicurrentdepartments'
                 ],
                 [],
@@ -49,7 +50,7 @@ class TestRouteOptionsResolver implements RouteOptionsResolverInterface
             new Route(
                 '/api/testapicurrentdepartment/{association}',
                 [
-                    '_controller' => 'OroApiBundle:RestApi:subresource',
+                    '_controller' => RestApiController::class .  '::subresourceAction',
                     'entity'      => 'testapicurrentdepartments'
                 ],
                 [],
@@ -64,7 +65,7 @@ class TestRouteOptionsResolver implements RouteOptionsResolverInterface
             new Route(
                 '/api/testapicurrentdepartment/relationships/{association}',
                 [
-                    '_controller' => 'OroApiBundle:RestApi:relationship',
+                    '_controller' => RestApiController::class .  '::relationshipAction',
                     'entity'      => 'testapicurrentdepartments'
                 ],
                 [],
@@ -80,7 +81,7 @@ class TestRouteOptionsResolver implements RouteOptionsResolverInterface
             new Route(
                 '/api/testapiresourcewithoutidentifier',
                 [
-                    '_controller' => 'OroApiBundle:RestApi:itemWithoutId',
+                    '_controller' => RestApiController::class .  '::itemWithoutIdAction',
                     'entity'      => 'testapiresourcewithoutidentifier'
                 ],
                 [],

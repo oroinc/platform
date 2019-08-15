@@ -7,7 +7,7 @@ use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
- * A cache for Data API configuration.
+ * A cache for API configuration.
  */
 class ConfigCache implements ConfigCacheStateInterface
 {

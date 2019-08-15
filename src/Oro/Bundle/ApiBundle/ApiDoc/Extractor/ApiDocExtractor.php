@@ -34,7 +34,6 @@ class ApiDocExtractor extends BaseExtractor implements
          * because a lot of config and metadata objects with short lifetime are used
          * this happens because we work with clones of these objects
          * @see \Oro\Bundle\ApiBundle\Provider\ConfigProvider::getConfig
-         * @see \Oro\Bundle\ApiBundle\Provider\RelationConfigProvider::getRelationConfig
          * @see \Oro\Bundle\ApiBundle\Provider\MetadataProvider::getMetadata
          */
         gc_disable();

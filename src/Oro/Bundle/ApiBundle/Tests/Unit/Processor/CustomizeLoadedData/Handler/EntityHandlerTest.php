@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData\Handler;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler\EntityHandler;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -39,6 +40,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $requestType = new RequestType(['test']);
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
 
         $sharedData = $this->createMock(ParameterBagInterface::class);
@@ -50,6 +52,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             $entityClass,
             $config,
+            $configExtras,
             false
         );
 
@@ -64,12 +67,14 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
                     $requestType,
                     $entityClass,
                     $config,
+                    $configExtras,
                     $data
                 ) {
                     self::assertEquals($version, $context->getVersion());
                     self::assertEquals($requestType, $context->getRequestType());
                     self::assertEquals($entityClass, $context->getClassName());
                     self::assertSame($config, $context->getConfig());
+                    self::assertSame($configExtras, $context->getConfigExtras());
                     self::assertEquals($data, $context->getResult());
                     self::assertEquals('item', $context->getFirstGroup());
                     self::assertEquals('item', $context->getLastGroup());
@@ -94,6 +99,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $requestType = new RequestType(['test']);
         $entityClass = Entity\UserProfile::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
 
         $sharedData = $this->createMock(ParameterBagInterface::class);
@@ -105,6 +111,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             Entity\User::class,
             $config,
+            $configExtras,
             false
         );
         $handler = new EntityHandler(
@@ -113,6 +120,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             $entityClass,
             $config,
+            $configExtras,
             false,
             $previousHandler
         );
@@ -143,6 +151,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $requestType = new RequestType(['test']);
         $entityClass = Entity\UserProfile::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
 
         $sharedData = $this->createMock(ParameterBagInterface::class);
@@ -155,6 +164,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             Entity\User::class,
             $config,
+            $configExtras,
             false,
             $previousHandler1
         );
@@ -164,6 +174,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             $entityClass,
             $config,
+            $configExtras,
             false,
             $previousHandler2
         );
@@ -198,6 +209,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $requestType = new RequestType(['test']);
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
 
         $sharedData = $this->createMock(ParameterBagInterface::class);
@@ -209,6 +221,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             $entityClass,
             $config,
+            $configExtras,
             false
         );
         $handler = new EntityHandler(
@@ -217,6 +230,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             $entityClass,
             $config,
+            $configExtras,
             false,
             $previousHandler
         );
@@ -251,6 +265,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $requestType = new RequestType(['test']);
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
 
         $sharedData = $this->createMock(ParameterBagInterface::class);
@@ -262,6 +277,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             new RequestType(['test1']),
             $entityClass,
             $config,
+            $configExtras,
             false
         );
         $handler = new EntityHandler(
@@ -270,6 +286,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             $entityClass,
             $config,
+            $configExtras,
             false,
             $previousHandler
         );
@@ -304,6 +321,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $requestType = new RequestType(['test']);
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
 
         $sharedData = $this->createMock(ParameterBagInterface::class);
@@ -315,6 +333,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             Entity\Account::class,
             $config,
+            $configExtras,
             false
         );
         $handler = new EntityHandler(
@@ -323,6 +342,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             $entityClass,
             $config,
+            $configExtras,
             false,
             $previousHandler
         );
@@ -357,6 +377,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $requestType = new RequestType(['test']);
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
 
         $sharedData = $this->createMock(ParameterBagInterface::class);
@@ -373,6 +394,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             $entityClass,
             $config,
+            $configExtras,
             false,
             $previousHandler
         );
@@ -406,6 +428,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['id']);
         $config->addField('id');
+        $configExtras = [new EntityDefinitionConfigExtra()];
 
         $sharedData = $this->createMock(ParameterBagInterface::class);
         $context = ['action' => 'get', 'sharedData' => $sharedData];
@@ -416,6 +439,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             $entityClass,
             $config,
+            $configExtras,
             false
         );
 
@@ -443,6 +467,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $config->setIdentifierFieldNames(['id1', 'id2']);
         $config->addField('id1');
         $config->addField('id2');
+        $configExtras = [new EntityDefinitionConfigExtra()];
 
         $sharedData = $this->createMock(ParameterBagInterface::class);
         $context = ['action' => 'get', 'sharedData' => $sharedData];
@@ -453,6 +478,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             $entityClass,
             $config,
+            $configExtras,
             false
         );
 
@@ -479,6 +505,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['id']);
         $config->addField('field1');
+        $configExtras = [new EntityDefinitionConfigExtra()];
 
         $sharedData = $this->createMock(ParameterBagInterface::class);
         $context = ['action' => 'get', 'sharedData' => $sharedData];
@@ -489,6 +516,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             $entityClass,
             $config,
+            $configExtras,
             false
         );
 
@@ -514,6 +542,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $data = ['key' => 'value'];
         $config = new EntityDefinitionConfig();
         $config->addField('field1');
+        $configExtras = [new EntityDefinitionConfigExtra()];
 
         $sharedData = $this->createMock(ParameterBagInterface::class);
         $context = ['action' => 'get', 'sharedData' => $sharedData];
@@ -524,6 +553,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             $entityClass,
             $config,
+            $configExtras,
             false
         );
 
@@ -547,6 +577,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $requestType = new RequestType(['test']);
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
 
         $sharedData = $this->createMock(ParameterBagInterface::class);
@@ -558,6 +589,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             $requestType,
             $entityClass,
             $config,
+            $configExtras,
             true
         );
 
@@ -572,12 +604,14 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
                     $requestType,
                     $entityClass,
                     $config,
+                    $configExtras,
                     $data
                 ) {
                     self::assertEquals($version, $context->getVersion());
                     self::assertEquals($requestType, $context->getRequestType());
                     self::assertEquals($entityClass, $context->getClassName());
                     self::assertSame($config, $context->getConfig());
+                    self::assertSame($configExtras, $context->getConfigExtras());
                     self::assertEquals($data, $context->getResult());
                     self::assertEquals('collection', $context->getFirstGroup());
                     self::assertEquals('collection', $context->getLastGroup());

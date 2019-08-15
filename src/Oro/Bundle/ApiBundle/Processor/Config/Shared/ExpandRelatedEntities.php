@@ -22,7 +22,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Loads full configuration of the target entity for associations were requested to expand.
- * For example, in JSON.API the "include" filter can be used to request related entities.
+ * For example, in JSON:API the "include" filter can be used to request related entities.
  */
 class ExpandRelatedEntities implements ProcessorInterface
 {
