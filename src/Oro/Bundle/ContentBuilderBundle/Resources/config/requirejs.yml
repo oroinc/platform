@@ -8,5 +8,3 @@ config:
         'orocontentbuilder/js/app/views/grapesjs-modules/style-manager-module': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/style-manager-module.js'
         'orocontentbuilder/js/app/views/grapesjs-modules/panels-module': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/panels-module.js'
         'orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-components': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-components.js'
-        
-        'orocontentbuilder/templates/grapesjs-select-action.html': 'bundles/orocontentbuilder/templates/grapesjs-select-action.html'

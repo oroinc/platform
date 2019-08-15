@@ -168,7 +168,6 @@
         select {
             padding-top: 0;
             padding-bottom: 0;
-            padding-right: 15px;
         }
 
         &-arrow-u {
@@ -424,6 +423,10 @@
             &.text-format-action {
                 order: 0;
                 border-right: 1px solid $mainDkColor;
+            }
+
+            select {
+                padding-right: 15px;
             }
         }
     }
