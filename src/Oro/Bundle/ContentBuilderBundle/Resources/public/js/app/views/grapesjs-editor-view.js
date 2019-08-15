@@ -80,11 +80,24 @@ define(function(require) {
         },
 
         /**
-         * Current theme name
-         * @property {String}
+         * Themes list
+         * @property {Array}
          */
-        currentTheme: 'default',
-
+        themes: [
+            {
+                name: 'blank',
+                stylesheet: '/css/layout/blank/styles.css'
+            },
+            {
+                name: 'default',
+                stylesheet: '/css/layout/default/styles.css',
+                active: true
+            },
+            {
+                name: 'custom',
+                stylesheet: '/css/layout/custom/styles.css'
+            }
+        ],
         /**
          * List of grapesjs plugins
          * @property {Object}
@@ -199,11 +212,13 @@ define(function(require) {
         },
 
         /**
-         * Get current theme stylesheet path
-         * @returns {string}
+         * Get current theme
+         * @returns {Object}
          */
-        getCurrentThemeStylesheetURL: function() {
-            return '/css/layout/' + this.currentTheme + '/styles.css';
+        getCurrentTheme: function() {
+            return _.find(this.themes, function(theme) {
+                return theme.active;
+            });
         },
 
         /**
@@ -292,11 +307,11 @@ define(function(require) {
          * @private
          */
         _getCanvasConfig: function() {
-            var urlCSS = this.getCurrentThemeStylesheetURL();
+            var theme = this.getCurrentTheme();
             return {
                 canvasCss: '.gjs-comp-selected { outline: 3px solid #0c809e !important; }',
                 canvas: {
-                    styles: [urlCSS]
+                    styles: [theme.stylesheet]
                 }
             };
         },
