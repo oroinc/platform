@@ -3,7 +3,12 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfiguration;
+use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
+use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationProviderInterface;
+use Oro\Bundle\ImportExportBundle\Controller\ImportExportController;
 use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
+use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Tests\Functional\DataFixtures\LoadImportExportResultData;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
@@ -12,6 +17,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
 
 class ImportExportControllerTest extends WebTestCase
 {
@@ -287,6 +293,76 @@ class ImportExportControllerTest extends WebTestCase
         static::assertContains('Import file', $response->getContent());
     }
 
+    public function testImportValidateExportTemplateFormAction(): void
+    {
+        $registry = $this->getContainer()->get('oro_importexport.configuration.registry');
+        $registry->addConfiguration(
+            new class() implements ImportExportConfigurationProviderInterface {
+                /**
+                 * {@inheritdoc}
+                 */
+                public function get(): ImportExportConfigurationInterface
+                {
+                    return new ImportExportConfiguration([
+                        ImportExportConfiguration::FIELD_ENTITY_CLASS => \stdClass::class,
+                    ]);
+                }
+            },
+            'oro_test'
+        );
+
+        $controller = $this->getContainer()->get(ImportExportController::class);
+
+        $this->assertEquals(
+            [
+                'options' => [],
+                'alias' => 'oro_test',
+                'configsWithForm' => [],
+                'chosenEntityName' => \stdClass::class
+            ],
+            $controller->importValidateExportTemplateFormAction(
+                new Request(['alias' => 'oro_test', 'entity' => \stdClass::class])
+            )
+        );
+
+        $registry->addConfiguration(
+            new class() implements ImportExportConfigurationProviderInterface {
+                /**
+                 * {@inheritdoc}
+                 */
+                public function get(): ImportExportConfigurationInterface
+                {
+                    return new ImportExportConfiguration([
+                        ImportExportConfiguration::FIELD_ENTITY_CLASS => \stdClass::class,
+                        ImportExportConfiguration::FIELD_IMPORT_PROCESSOR_ALIAS => 'oro_test',
+                    ]);
+                }
+            },
+            'oro_test'
+        );
+
+        $formFactory = $this->getContainer()->get('form.factory');
+
+        $this->assertEquals(
+            [
+                'options' => [],
+                'alias' => 'oro_test',
+                'configsWithForm' => [
+                    [
+                        'form' => $formFactory->create(ImportType::class, null, ['entityName' => \stdClass::class]),
+                        'configuration' => new ImportExportConfiguration([
+                            ImportExportConfiguration::FIELD_ENTITY_CLASS => \stdClass::class,
+                            ImportExportConfiguration::FIELD_IMPORT_PROCESSOR_ALIAS => 'oro_test',
+                        ])
+                    ]
+                ],
+                'chosenEntityName' => \stdClass::class
+            ],
+            $controller->importValidateExportTemplateFormAction(
+                new Request(['alias' => 'oro_test', 'entity' => \stdClass::class])
+            )
+        );
+    }
 
     public function testDownloadExportResultActionExpiredResult()
     {
@@ -317,7 +393,6 @@ class ImportExportControllerTest extends WebTestCase
 
         $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 410);
     }
-
 
     /**
      * @return string
