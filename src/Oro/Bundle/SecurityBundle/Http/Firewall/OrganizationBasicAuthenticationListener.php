@@ -12,8 +12,9 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 
-class OrganizationBasicAuthenticationListener
+class OrganizationBasicAuthenticationListener implements ListenerInterface
 {
     /** @var TokenStorageInterface */
     protected $tokenStorage;
