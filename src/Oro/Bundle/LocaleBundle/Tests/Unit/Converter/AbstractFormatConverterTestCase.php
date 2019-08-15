@@ -10,6 +10,7 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
 {
     const LOCALE_EN = 'en';
     const LOCALE_RU = 'ru';
+    const LOCALE_PT_BR = 'pt_BR';
 
     /**
      * @var DateTimeFormatConverterInterface
@@ -49,6 +50,16 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
         [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_RU, null, "H:mm:ss"],
         [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_RU, null, "H:mm"],
         [\IntlDateFormatter::NONE, null, self::LOCALE_RU, null, "H:mm"],
+
+        [null, null, self::LOCALE_PT_BR, null, "d 'de' MMMM 'de' y HH:mm:ss"],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_PT_BR, null, "d 'de' MMMM 'de' y HH:mm:ss"],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_PT_BR, null, "d 'de' MMMM 'de' y"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_PT_BR, null, "d 'de' MMM 'de' y HH:mm"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_PT_BR, null, "d 'de' MMM 'de' y"],
+        [null, \IntlDateFormatter::NONE, self::LOCALE_PT_BR, null, "d 'de' MMMM 'de' y"],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_PT_BR, null, 'HH:mm:ss'],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_PT_BR, null, 'HH:mm'],
+        [\IntlDateFormatter::NONE, null, self::LOCALE_PT_BR, null, 'HH:mm:ss'],
     ];
 
     /**

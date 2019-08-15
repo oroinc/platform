@@ -54,12 +54,11 @@ class BaseUserManager
     /**
      * Updates a user
      *
-     * @param  UserInterface $user
-     * @param  bool          $flush Whether to flush the changes (default true)
+     * @param UserInterface $user
+     * @param bool          $flush Whether to flush the changes (default true)
      */
     public function updateUser(UserInterface $user, bool $flush = true): void
     {
-        $this->assertRoles($user);
         $this->updatePassword($user);
 
         $em = $this->getEntityManager();
@@ -210,18 +209,6 @@ class BaseUserManager
     protected function getEntityManager(): EntityManagerInterface
     {
         return $this->doctrine->getManagerForClass($this->userLoader->getUserClass());
-    }
-
-    /**
-     * @param UserInterface $user
-     *
-     * @throws \RuntimeException
-     */
-    protected function assertRoles(UserInterface $user): void
-    {
-        if (count($user->getRoles()) === 0) {
-            throw new \RuntimeException('User must have at least one role.');
-        }
     }
 
     /**

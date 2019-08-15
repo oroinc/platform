@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Adds request types for all registered API views to the Data API resources cache warmer.
+ * Adds request types for all registered API views to the API resources cache warmer.
  */
 class ResourcesCacheWarmerCompilerPass implements CompilerPassInterface
 {

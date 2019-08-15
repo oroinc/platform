@@ -54,6 +54,7 @@
             margin-#{$start}: $form-horizontal-control-margin-start;
             text-align: #{$start};
             flex-grow: 1;
+            min-width: 0;
 
             &:first-child {
                 margin-#{$start}: $form-horizontal-control-label-width + $form-horizontal-control-margin-start;

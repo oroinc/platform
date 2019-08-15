@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
 
 /**
- * Provides all form types, type extensions and guessers that can be used in Data API forms.
+ * Provides all form types, type extensions and guessers that can be used in API forms.
  */
 class FormExtension implements FormExtensionInterface
 {

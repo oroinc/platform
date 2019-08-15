@@ -39,7 +39,7 @@ api:
 
 ## Turn on API for an Entity Disabled in "Resources/config/oro/entity.yml"
 
-The `exclusions` section of the `Resources/config/oro/entity.yml` configuration file is used to make an entity or a field inaccessible for a user. The entities and fields from this section are inaccessible via the data API as well. However, it is possible to override this rule for the data API. To do this, use the `exclude` option in `Resources/config/oro/api.yml`.
+The `exclusions` section of the `Resources/config/oro/entity.yml` configuration file is used to make an entity or a field inaccessible for a user. The entities and fields from this section are inaccessible via the API as well. However, it is possible to override this rule for the API. To do this, use the `exclude` option in `Resources/config/oro/api.yml`.
 
 Let us consider the case when you have the following `Resources/config/oro/entity.yml`:
 
@@ -50,7 +50,7 @@ oro_entity:
         - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity2, field: field1 }
 ```
 
-To override these rules in the data API, add the following lines to the `Resources/config/oro/api.yml`:
+To override these rules in the API, add the following lines to the `Resources/config/oro/api.yml`:
 
 ```yaml
 api:
@@ -249,7 +249,7 @@ api:
 
 ## Configure a Nested Object
 
-Sometimes it is required to group several fields and expose them as a nested object in the data API. For example, consider the case when an entity has two fields `intervalNumber` and `intervalUnit` but you need to expose them in API as `number` and `unit` properties of the `interval` field. To achieve it, use the following configuration:
+Sometimes it is required to group several fields and expose them as a nested object in the API. For example, consider the case when an entity has two fields `intervalNumber` and `intervalUnit` but you need to expose them in API as `number` and `unit` properties of the `interval` field. To achieve it, use the following configuration:
 
 ```yaml
 api:
@@ -274,7 +274,7 @@ api:
 
 Please note that an entity, in this example *Oro\Bundle\ReminderBundle\Entity\Reminder*, should have the `setInterval` method. This method is called by the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions to set the nested object. 
 
-Here is an example of how the nested objects look in JSON.API:
+Here is an example of how the nested objects look in JSON:API:
 
 ```json
 {
@@ -293,7 +293,7 @@ Here is an example of how the nested objects look in JSON.API:
 
 ## Configure a Nested Association
 
-Sometimes a relationship with a group of entities is implemented as two fields, "entityClass" and "entityId", rather than [many-to-one extended association](../../../EntityExtendBundle/Resources/doc/associations.md). But in the data API these fields should be represented as a regular relationship. To achieve this, a special data type named `nestedAssociation` was implemented. For example, let us suppose that an entity has two fields `sourceEntityClass` and `sourceEntityId` and you need to expose them in API as the `source` relationship. To achieve this, use the following configuration:
+Sometimes a relationship with a group of entities is implemented as two fields, "entityClass" and "entityId", rather than [many-to-one extended association](../../../EntityExtendBundle/Resources/doc/associations.md). But in the API these fields should be represented as a regular relationship. To achieve this, a special data type named `nestedAssociation` was implemented. For example, let us suppose that an entity has two fields `sourceEntityClass` and `sourceEntityId` and you need to expose them in API as the `source` relationship. To achieve this, use the following configuration:
 
 ```yaml
 api:
@@ -309,7 +309,7 @@ api:
                             property_path: sourceEntityId
 ```
 
-Here is an example of how the nested association looks in JSON.API:
+Here is an example of how the nested association looks in JSON:API:
 
 ```json
 {
@@ -575,16 +575,17 @@ For example, imagine REST API resource for a profile of the logged in user. Let'
 resource should be `/api/userprofile`. If you take a look at [routing.yml](../../Resources/config/oro/routing.yml)
 you will see that this URI is matched by `/api/{entity}` pattern, but the action that handles this
 pattern works with a list of entities, not with a single entity. The challenge is to map `/api/userprofile` to
-`OroApiBundle:RestApi:item` action that works with a single entity and to remove handling of
-`/api/userprofile/{id}`. This can be achieved using own route definition with `override_path` option.
+`Oro\Bundle\ApiBundle\Controller\RestApiController::itemAction` action that works with a single entity
+and to remove handling of `/api/userprofile/{id}`. This can be achieved using own route definition
+with `override_path` option.
 
 Here is an example of the `Resources/config/oro/routing.yml` configuration file:
 
 ```yaml
 acme_rest_api_user_profile:
     path: '%oro_api.rest.prefix%userprofile'
+    controller: Oro\Bundle\ApiBundle\Controller\RestApiController::itemAction
     defaults:
-        _controller: OroApiBundle:RestApi:item
         entity: userprofile
     options:
         group: rest_api
@@ -680,13 +681,13 @@ The following steps describes how to create such API resources:
   ```
 
 - Register a route via `Resources/config/oro/routing.yml` configuration file in your bundle using
- `OroApiBundle:RestApi:itemWithoutId` as a controller, e.g.:
+ `Oro\Bundle\ApiBundle\Controller\RestApiController::itemWithoutIdAction` as a controller, e.g.:
 
   ```yml
   acme_rest_api_register_account:
       path: '%oro_api.rest.prefix%registeraccount'
+      controller: Oro\Bundle\ApiBundle\Controller\RestApiController::itemWithoutIdAction
       defaults:
-          _controller: OroApiBundle:RestApi:itemWithoutId
           entity: registeraccount
       options:
           group: rest_api
@@ -980,10 +981,7 @@ class ComputeProductPriceField implements ProcessorInterface
     {
         /** @var CustomizeLoadedDataContext $context */
 
-        $data = $context->getResult();
-        if (!is_array($data)) {
-            return;
-        }
+        $data = $context->getData();
 
         $priceFieldName = $context->getResultFieldName('price');
         if (!$context->isFieldRequested($priceFieldName, $data)) {
@@ -996,7 +994,7 @@ class ComputeProductPriceField implements ProcessorInterface
         }
 
         $data[$priceFieldName] = $this->loadProductPrice($data[$productIdFieldName]);
-        $context->setResult($data);
+        $context->setData($data);
     }
 
     /**

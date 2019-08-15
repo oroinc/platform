@@ -10,7 +10,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Switches to Data API form extension.
+ * Switches to API form extension.
  */
 class InitializeApiFormExtension extends SwitchFormExtension implements ProcessorInterface
 {

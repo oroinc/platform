@@ -11,6 +11,7 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationT
 use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
@@ -31,6 +32,7 @@ class LimitedAccessTest extends WebTestCase
         $userPwd = 'testUserPwd123';
 
         $this->initClient([], $this->generateBasicAuthHeader($userName, $userPwd));
+        $this->loadFixtures([LoadBusinessUnit::class]);
 
         /** @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine')->getManagerForClass('OroUserBundle:User');
@@ -45,6 +47,7 @@ class LimitedAccessTest extends WebTestCase
             $user = $userManager->createUser();
             $role = $em->getRepository('OroUserBundle:Role')->findOneBy(['role' => 'ROLE_USER']);
             $user
+                ->setOwner($this->getReference('business_unit'))
                 ->setUsername($userName)
                 ->setEmail($userEmail)
                 ->setPlainPassword($userPwd)

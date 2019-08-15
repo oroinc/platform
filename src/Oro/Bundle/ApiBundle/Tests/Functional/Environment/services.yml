@@ -16,7 +16,6 @@ services:
         arguments:
             - '@oro_api.config_bag_registry'
             - '@oro_api.config_provider'
-            - '@oro_api.relation_config_provider'
             - '@oro_api.metadata_provider'
             - '@oro_api.resources_provider'
 

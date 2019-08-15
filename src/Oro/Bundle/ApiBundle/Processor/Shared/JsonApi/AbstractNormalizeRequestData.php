@@ -18,7 +18,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
- * The base class for processors that prepare JSON.API request data to be processed by Symfony Forms.
+ * The base class for processors that prepare JSON:API request data to be processed by Symfony Forms.
  */
 abstract class AbstractNormalizeRequestData implements ProcessorInterface
 {

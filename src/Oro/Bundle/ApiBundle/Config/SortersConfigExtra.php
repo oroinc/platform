@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class SortersConfigExtra implements ConfigExtraSectionInterface
 {
-    const NAME = ConfigUtil::SORTERS;
+    public const NAME = ConfigUtil::SORTERS;
 
     /**
      * {@inheritdoc}
@@ -34,7 +34,7 @@ class SortersConfigExtra implements ConfigExtraSectionInterface
      */
     public function isPropagable()
     {
-        return true;
+        return false;
     }
 
     /**

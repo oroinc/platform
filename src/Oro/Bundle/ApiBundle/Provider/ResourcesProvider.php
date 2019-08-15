@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 /**
- * Provides an information about all registered Data API resources.
+ * Provides an information about all registered API resources.
  */
 class ResourcesProvider
 {
@@ -49,9 +49,9 @@ class ResourcesProvider
     }
 
     /**
-     * Gets a configuration of all resources for a given Data API version.
+     * Gets a configuration of all resources for a given API version.
      *
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return ApiResource[]
@@ -66,9 +66,9 @@ class ResourcesProvider
     }
 
     /**
-     * Gets a list of resources accessible through Data API.
+     * Gets a list of resources accessible through API.
      *
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return string[] The list of class names
@@ -89,10 +89,10 @@ class ResourcesProvider
     }
 
     /**
-     * Checks whether a given entity is accessible through Data API.
+     * Checks whether a given entity is accessible through API.
      *
      * @param string      $entityClass The FQCN of an entity
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return bool
@@ -115,12 +115,12 @@ class ResourcesProvider
     }
 
     /**
-     * Checks whether a given entity is configured to be used in Data API.
-     * A known resource can be accessible or not via Data API.
-     * To check whether a resource is accessible via Data API use isResourceAccessible() method.
+     * Checks whether a given entity is configured to be used in API.
+     * A known resource can be accessible or not via API.
+     * To check whether a resource is accessible via API use isResourceAccessible() method.
      *
      * @param string      $entityClass The FQCN of an entity
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return bool
@@ -137,10 +137,10 @@ class ResourcesProvider
     }
 
     /**
-     * Gets a list of actions that cannot be used in Data API from for a given entity.
+     * Gets a list of actions that cannot be used in API from for a given entity.
      *
      * @param string      $entityClass The FQCN of an entity
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return string[]
@@ -161,7 +161,7 @@ class ResourcesProvider
     /**
      * Gets a list of resources that do not have an identifier field.
      *
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return string[] The list of class names
@@ -179,7 +179,7 @@ class ResourcesProvider
      * Checks whether a given entity does not have an identifier field.
      *
      * @param string      $entityClass The FQCN of an entity
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return bool

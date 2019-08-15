@@ -2,10 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared\CompleteDefinition;
 
+use Oro\Bundle\ApiBundle\Config\Config;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteAssociationHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
@@ -25,6 +32,377 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         $this->completeAssociationHelper = new CompleteAssociationHelper(
             $this->configProvider
         );
+    }
+
+    /**
+     * @dataProvider completeAssociationDataProvider
+     */
+    public function testCompleteAssociation(
+        $config,
+        $targetConfig,
+        $extras,
+        $expectedConfig,
+        $expectedExtras
+    ) {
+        $config = $this->createConfigObject($config);
+        $targetClass = 'Test\TargetEntity';
+        $version = self::TEST_VERSION;
+        $requestType = new RequestType([self::TEST_REQUEST_TYPE]);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with($targetClass, $version, $requestType, $expectedExtras)
+            ->willReturn($this->createRelationConfigObject($targetConfig));
+
+        $this->completeAssociationHelper->completeAssociation(
+            $config->getField('association'),
+            $targetClass,
+            $version,
+            $requestType,
+            $extras
+        );
+
+        $this->assertConfig($expectedConfig, $config);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function completeAssociationDataProvider()
+    {
+        return [
+            'without config extras'                 => [
+                'config'         => [
+                    'fields' => [
+                        'association' => [
+                            'fields' => [
+                                'id' => null
+                            ]
+                        ]
+                    ]
+                ],
+                'targetConfig'   => [
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'id' => [
+                            'data_type' => 'string'
+                        ]
+                    ]
+                ],
+                'extras'         => [],
+                'expectedConfig' => [
+                    'fields' => [
+                        'association' => [
+                            'fields'                 => [
+                                'id' => [
+                                    'data_type' => 'string'
+                                ]
+                            ],
+                            'exclusion_policy'       => 'all',
+                            'target_class'           => 'Test\TargetEntity',
+                            'identifier_field_names' => ['id'],
+                            'collapse'               => true
+                        ]
+                    ]
+                ],
+                'expectedExtras' => [
+                    new FilterIdentifierFieldsConfigExtra(),
+                    new EntityDefinitionConfigExtra()
+                ]
+            ],
+            'collapse = true'                       => [
+                'config'         => [
+                    'fields' => [
+                        'association' => [
+                            'collapse' => true,
+                            'fields'   => [
+                                'id' => null
+                            ]
+                        ]
+                    ]
+                ],
+                'targetConfig'   => [
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'id' => [
+                            'data_type' => 'string'
+                        ]
+                    ]
+                ],
+                'extras'         => [],
+                'expectedConfig' => [
+                    'fields' => [
+                        'association' => [
+                            'fields'                 => [
+                                'id' => [
+                                    'data_type' => 'string'
+                                ]
+                            ],
+                            'exclusion_policy'       => 'all',
+                            'target_class'           => 'Test\TargetEntity',
+                            'identifier_field_names' => ['id'],
+                            'collapse'               => true
+                        ]
+                    ]
+                ],
+                'expectedExtras' => [
+                    new FilterIdentifierFieldsConfigExtra(),
+                    new EntityDefinitionConfigExtra()
+                ]
+            ],
+            'collapse = false'                      => [
+                'config'         => [
+                    'fields' => [
+                        'association' => [
+                            'collapse' => false,
+                            'fields'   => [
+                                'id' => null
+                            ]
+                        ]
+                    ]
+                ],
+                'targetConfig'   => [
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'id' => [
+                            'data_type' => 'string'
+                        ]
+                    ]
+                ],
+                'extras'         => [],
+                'expectedConfig' => [
+                    'fields' => [
+                        'association' => [
+                            'fields'                 => [
+                                'id' => [
+                                    'data_type' => 'string'
+                                ]
+                            ],
+                            'exclusion_policy'       => 'all',
+                            'target_class'           => 'Test\TargetEntity',
+                            'identifier_field_names' => ['id']
+                        ]
+                    ]
+                ],
+                'expectedExtras' => [new EntityDefinitionConfigExtra()]
+            ],
+            'with ExpandRelatedEntitiesConfigExtra' => [
+                'config'         => [
+                    'fields' => [
+                        'association' => [
+                            'collapse' => false,
+                            'fields'   => [
+                                'id' => null
+                            ]
+                        ]
+                    ]
+                ],
+                'targetConfig'   => [
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'id' => [
+                            'data_type' => 'string'
+                        ]
+                    ]
+                ],
+                'extras'         => [
+                    new ExpandRelatedEntitiesConfigExtra(['test'])
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'association' => [
+                            'fields'                 => [
+                                'id' => [
+                                    'data_type' => 'string'
+                                ]
+                            ],
+                            'exclusion_policy'       => 'all',
+                            'target_class'           => 'Test\TargetEntity',
+                            'identifier_field_names' => ['id']
+                        ]
+                    ]
+                ],
+                'expectedExtras' => [
+                    new ExpandRelatedEntitiesConfigExtra(['test']),
+                    new FilterFieldsConfigExtra(['Test\TargetEntity' => ['test']]),
+                    new EntityDefinitionConfigExtra()
+                ]
+            ],
+            'with target class'                     => [
+                'config'         => [
+                    'fields' => [
+                        'association' => [
+                            'target_class' => 'Test\AssociationTargetEntity',
+                            'fields'       => [
+                                'id' => null
+                            ]
+                        ]
+                    ]
+                ],
+                'targetConfig'   => [
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'id' => [
+                            'data_type' => 'string'
+                        ]
+                    ]
+                ],
+                'extras'         => [],
+                'expectedConfig' => [
+                    'fields' => [
+                        'association' => [
+                            'fields'                 => [
+                                'id' => [
+                                    'data_type' => 'string'
+                                ]
+                            ],
+                            'exclusion_policy'       => 'all',
+                            'target_class'           => 'Test\AssociationTargetEntity',
+                            'identifier_field_names' => ['id'],
+                            'collapse'               => true
+                        ]
+                    ]
+                ],
+                'expectedExtras' => [
+                    new FilterIdentifierFieldsConfigExtra(),
+                    new EntityDefinitionConfigExtra()
+                ]
+            ],
+            'without fields'                        => [
+                'config'         => [
+                    'fields' => [
+                        'association' => [
+                            'order_by' => ['name' => 'ASC']
+                        ]
+                    ]
+                ],
+                'targetConfig'   => [
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'id' => [
+                            'data_type' => 'string'
+                        ]
+                    ]
+                ],
+                'extras'         => [],
+                'expectedConfig' => [
+                    'fields' => [
+                        'association' => [
+                            'order_by'               => ['name' => 'ASC'],
+                            'fields'                 => [
+                                'id' => [
+                                    'data_type' => 'string'
+                                ]
+                            ],
+                            'exclusion_policy'       => 'all',
+                            'target_class'           => 'Test\TargetEntity',
+                            'identifier_field_names' => ['id'],
+                            'collapse'               => true
+                        ]
+                    ]
+                ],
+                'expectedExtras' => [
+                    new FilterIdentifierFieldsConfigExtra(),
+                    new EntityDefinitionConfigExtra()
+                ]
+            ],
+            'with id field names'                   => [
+                'config'         => [
+                    'fields' => [
+                        'association' => [
+                            'identifier_field_names' => ['association_id'],
+                            'collapse'               => false,
+                            'fields'                 => [
+                                'id'           => null,
+                                'association1' => [
+                                    'identifier_field_names' => ['association1_id'],
+                                    'collapse'               => false,
+                                    'fields'                 => [
+                                        'id' => null
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'targetConfig'   => [
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'id'           => [
+                            'data_type' => 'string'
+                        ],
+                        'association1' => [
+                            'identifier_field_names' => ['id'],
+                            'collapse'               => false,
+                            'fields'                 => [
+                                'id' => [
+                                    'data_type' => 'string'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'extras'         => [],
+                'expectedConfig' => [
+                    'fields' => [
+                        'association' => [
+                            'identifier_field_names' => ['association_id'],
+                            'fields'                 => [
+                                'id'           => [
+                                    'data_type' => 'string'
+                                ],
+                                'association1' => [
+                                    'identifier_field_names' => ['association1_id'],
+                                    'fields'                 => [
+                                        'id' => [
+                                            'data_type' => 'string'
+                                        ]
+                                    ]
+                                ]
+                            ],
+                            'exclusion_policy'       => 'all',
+                            'target_class'           => 'Test\TargetEntity'
+                        ]
+                    ]
+                ],
+                'expectedExtras' => [new EntityDefinitionConfigExtra()]
+            ],
+            'with exclusion_policy=all'             => [
+                'config'         => [
+                    'fields' => [
+                        'association' => [
+                            'exclusion_policy' => 'all',
+                            'collapse'         => false,
+                            'fields'           => [
+                                'id' => null
+                            ]
+                        ]
+                    ]
+                ],
+                'targetConfig'   => [
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'id' => [
+                            'data_type' => 'string'
+                        ]
+                    ]
+                ],
+                'extras'         => [],
+                'expectedConfig' => [
+                    'fields' => [
+                        'association' => [
+                            'fields'                 => [
+                                'id' => null
+                            ],
+                            'exclusion_policy'       => 'all',
+                            'target_class'           => 'Test\TargetEntity',
+                            'identifier_field_names' => ['id']
+                        ]
+                    ]
+                ],
+                'expectedExtras' => [new EntityDefinitionConfigExtra()]
+            ]
+        ];
     }
 
     public function testCompleteNestedObject()
@@ -241,7 +619,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
     {
         $config = $this->createConfigObject([
             'fields' => [
-                'source'            => [
+                'source' => [
                     'data_type' => 'nestedAssociation',
                     'fields'    => [
                         '__class__' => [
@@ -261,18 +639,14 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(EntityIdentifier::class, $version, $requestType)
-            ->willReturn(
-                $this->createRelationConfigObject(
-                    [
-                        'identifier_field_names' => ['id'],
-                        'fields'                 => [
-                            'id' => [
-                                'data_type' => 'string'
-                            ]
-                        ]
+            ->willReturn($this->createRelationConfigObject([
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id' => [
+                        'data_type' => 'string'
                     ]
-                )
-            );
+                ]
+            ]));
 
         $this->completeAssociationHelper->completeNestedAssociation(
             $config,
@@ -293,7 +667,8 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                                 'property_path' => 'sourceEntityClass'
                             ],
                             'id'        => [
-                                'property_path' => 'sourceEntityId'
+                                'property_path' => 'sourceEntityId',
+                                'data_type'     => 'string'
                             ]
                         ],
                         'exclusion_policy'       => 'all',
@@ -317,7 +692,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
     {
         $config = $this->createConfigObject([
             'fields' => [
-                'source'            => [
+                'source' => [
                     'data_type'  => 'nestedAssociation',
                     'depends_on' => ['otherField'],
                     'fields'     => [
@@ -338,18 +713,14 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(EntityIdentifier::class, $version, $requestType)
-            ->willReturn(
-                $this->createRelationConfigObject(
-                    [
-                        'identifier_field_names' => ['id'],
-                        'fields'                 => [
-                            'id' => [
-                                'data_type' => 'string'
-                            ]
-                        ]
+            ->willReturn($this->createRelationConfigObject([
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id' => [
+                        'data_type' => 'string'
                     ]
-                )
-            );
+                ]
+            ]));
 
         $this->completeAssociationHelper->completeNestedAssociation(
             $config,
@@ -370,7 +741,8 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                                 'property_path' => 'sourceEntityClass'
                             ],
                             'id'        => [
-                                'property_path' => 'sourceEntityId'
+                                'property_path' => 'sourceEntityId',
+                                'data_type'     => 'string'
                             ]
                         ],
                         'exclusion_policy'       => 'all',
@@ -420,18 +792,14 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(EntityIdentifier::class, $version, $requestType)
-            ->willReturn(
-                $this->createRelationConfigObject(
-                    [
-                        'identifier_field_names' => ['id'],
-                        'fields'                 => [
-                            'id' => [
-                                'data_type' => 'string'
-                            ]
-                        ]
+            ->willReturn($this->createRelationConfigObject([
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id' => [
+                        'data_type' => 'string'
                     ]
-                )
-            );
+                ]
+            ]));
 
         $this->completeAssociationHelper->completeNestedAssociation(
             $config,
@@ -452,7 +820,8 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                                 'property_path' => 'sourceEntityClass'
                             ],
                             'id'        => [
-                                'property_path' => 'sourceEntityId'
+                                'property_path' => 'sourceEntityId',
+                                'data_type'     => 'string'
                             ]
                         ],
                         'exclusion_policy'       => 'all',
@@ -476,7 +845,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
     {
         $config = $this->createConfigObject([
             'fields' => [
-                'source'            => [
+                'source'                   => [
                     'data_type' => 'nestedAssociation',
                     'fields'    => [
                         '__class__' => [
@@ -504,18 +873,14 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(EntityIdentifier::class, $version, $requestType)
-            ->willReturn(
-                $this->createRelationConfigObject(
-                    [
-                        'identifier_field_names' => ['id'],
-                        'fields'                 => [
-                            'id' => [
-                                'data_type' => 'string'
-                            ]
-                        ]
+            ->willReturn($this->createRelationConfigObject([
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id' => [
+                        'data_type' => 'string'
                     ]
-                )
-            );
+                ]
+            ]));
 
         $this->completeAssociationHelper->completeNestedAssociation(
             $config,
@@ -527,7 +892,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         $this->assertConfig(
             [
                 'fields' => [
-                    'source'            => [
+                    'source'                   => [
                         'data_type'              => 'nestedAssociation',
                         'property_path'          => '_',
                         'depends_on'             => ['sourceEntityClass', 'sourceEntityId'],
@@ -536,7 +901,8 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                                 'property_path' => 'sourceEntityClass'
                             ],
                             'id'        => [
-                                'property_path' => 'sourceEntityId'
+                                'property_path' => 'sourceEntityId',
+                                'data_type'     => 'string'
                             ]
                         ],
                         'exclusion_policy'       => 'all',
@@ -555,6 +921,62 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                 ]
             ],
             $config
+        );
+    }
+
+    public function testGetAssociationTargetType()
+    {
+        self::assertEquals('to-one', $this->completeAssociationHelper->getAssociationTargetType(false));
+        self::assertEquals('to-many', $this->completeAssociationHelper->getAssociationTargetType(true));
+    }
+
+    public function testLoadDefinition()
+    {
+        $entityClass = 'Test\Entity';
+        $version = '1.2';
+        $requestType = new RequestType([RequestType::REST]);
+        $extras = [new TestConfigExtra('test')];
+        $definition = new EntityDefinitionConfig();
+        $config = new Config();
+        $config->setDefinition($definition);
+        $expectedExtras = [$extras[0], new EntityDefinitionConfigExtra()];
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with($entityClass, $version, $requestType, $expectedExtras)
+            ->willReturn($config);
+
+        self::assertSame(
+            $definition,
+            $this->completeAssociationHelper->loadDefinition(
+                $entityClass,
+                $version,
+                $requestType,
+                $extras
+            )
+        );
+    }
+
+    public function testLoadDefinitionWhenItDoesNotExist()
+    {
+        $entityClass = 'Test\Entity';
+        $version = '1.2';
+        $requestType = new RequestType([RequestType::REST]);
+        $extras = [new TestConfigExtra('test')];
+        $expectedExtras = [$extras[0], new EntityDefinitionConfigExtra()];
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with($entityClass, $version, $requestType, $expectedExtras)
+            ->willReturn(new Config());
+
+        self::assertNull(
+            $this->completeAssociationHelper->loadDefinition(
+                $entityClass,
+                $version,
+                $requestType,
+                $extras
+            )
         );
     }
 }

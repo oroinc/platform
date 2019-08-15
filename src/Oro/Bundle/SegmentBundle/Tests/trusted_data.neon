@@ -2,8 +2,14 @@
 trusted_data:
     variables:
         Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager:
+            getQueryBuilderForSegment:
+                identifier: true
             getSelectSql:
                 identifier: true
+            executeInsertFromSelect:
+                dbQuery: true
+            executeInsertValues:
+                selectSql: true
             run:
                 dbQuery: true
         Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager:

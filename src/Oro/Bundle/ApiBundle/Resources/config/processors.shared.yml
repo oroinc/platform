@@ -679,6 +679,28 @@ services:
             - { name: oro.api.processor, action: get_subresource, group: load_data, priority: 100 }
             - { name: oro.api.processor, action: get_relationship, group: load_data, priority: 100 }
 
+    oro_api.subresource.load_extended_association:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadExtendedAssociation
+        arguments:
+            - '@oro_api.entity_serializer'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
+            - '@oro_api.config_provider'
+        tags:
+            - { name: oro.api.processor, action: get_relationship, group: load_data }
+            - { name: oro.api.processor, action: get_subresource, group: load_data }
+
+    oro_api.subresource.load_nested_association:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadNestedAssociation
+        arguments:
+            - '@oro_api.entity_serializer'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
+            - '@oro_api.config_provider'
+        tags:
+            - { name: oro.api.processor, action: get_relationship, group: load_data, collection: false }
+            - { name: oro.api.processor, action: get_subresource, group: load_data, collection: false }
+
     oro_api.load_entity_by_entity_serializer:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByEntitySerializer
         arguments:
@@ -1096,6 +1118,7 @@ services:
         arguments:
             - '@oro_api.entity_title_provider'
             - '@oro_api.expanded_association_extractor'
+            - '@oro_api.config_provider'
         tags:
             - { name: oro.api.processor, action: get, group: finalize, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: finalize, collection: false, priority: -10 }
@@ -1105,6 +1128,7 @@ services:
         arguments:
             - '@oro_api.entity_title_provider'
             - '@oro_api.expanded_association_extractor'
+            - '@oro_api.config_provider'
         tags:
             - { name: oro.api.processor, action: get_list, group: finalize, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: finalize, collection: true, priority: -10 }

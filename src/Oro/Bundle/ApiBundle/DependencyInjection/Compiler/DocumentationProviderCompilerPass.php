@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Registers all request type depended Data API documentation providers.
+ * Registers all request type depended API documentation providers.
  */
 class DocumentationProviderCompilerPass implements CompilerPassInterface
 {

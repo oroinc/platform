@@ -58,6 +58,12 @@ class ConfigurationTest extends TestCase
                     'npm_path' => 'npm',
                     'build_timeout' => 300,
                     'npm_install_timeout' => 900,
+                    'webpack_dev_server' => [
+                        'enable_hmr' => '%kernel.debug%',
+                        'host' => 'localhost',
+                        'port' => 8081,
+                        'https' => false,
+                    ],
                 ],
             ],
             [
@@ -66,12 +72,24 @@ class ConfigurationTest extends TestCase
                     'npm_path' => '/usr/local/bin/npm',
                     'build_timeout' => 300,
                     'npm_install_timeout' => null,
+                    'webpack_dev_server' => [
+                        'enable_hmr' => true,
+                        'host' => 'http://example.local',
+                        'port' => 65000,
+                        'https' => true,
+                    ],
                 ],
                 'expects' => [
                     'nodejs_path' => 'node',
                     'npm_path' => '/usr/local/bin/npm',
                     'build_timeout' => 300,
                     'npm_install_timeout' => null,
+                    'webpack_dev_server' => [
+                        'enable_hmr' => true,
+                        'host' => 'http://example.local',
+                        'port' => 65000,
+                        'https' => true,
+                    ],
                 ],
             ],
         ];

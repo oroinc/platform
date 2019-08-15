@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
 
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\CompleteDisableInclusion;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
@@ -154,5 +155,24 @@ class CompleteDisableInclusionTest extends ConfigProcessorTestCase
 
         self::assertTrue($this->context->getResult()->hasDisableInclusion());
         self::assertFalse($this->context->getResult()->isInclusionEnabled());
+    }
+
+    public function testProcessForMultiTargetEntity()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id' => [
+                    'data_type' => 'string'
+                ]
+            ]
+        ];
+
+        $this->context->setClassName(EntityIdentifier::class);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->getResult()->hasDisableInclusion());
+        self::assertTrue($this->context->getResult()->isInclusionEnabled());
     }
 }

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
- * An interface for the different kind of providers that get the request type depended Data API documentation.
+ * An interface for the different kind of providers that get the request type depended API documentation.
  */
 interface DocumentationProviderInterface
 {

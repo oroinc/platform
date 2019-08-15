@@ -9,9 +9,20 @@
     @import "board-view/board";
     @import "board-view/card";
 
+    .dropdown-menu {
+        z-index: $zindex-dropdown - 112;
+    }
+
     .loader-mask {
         z-index: $zindex-dropdown - 101; // to show under grid's filter
     }
+}
+
+.grid-scrollable-container {
+    margin: 0;
+    padding: 0;
+
+    overflow: auto;
 }
 
 .grid-editable {

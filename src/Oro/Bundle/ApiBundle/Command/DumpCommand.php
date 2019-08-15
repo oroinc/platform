@@ -21,7 +21,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * The CLI command to show resources accessible through Data API.
+ * The CLI command to show resources accessible through API.
  */
 class DumpCommand extends AbstractDebugCommand
 {
@@ -55,7 +55,7 @@ class DumpCommand extends AbstractDebugCommand
     {
         $this
             ->setName('oro:api:dump')
-            ->setDescription('Dumps all resources accessible through Data API.')
+            ->setDescription('Dumps all resources accessible through API.')
             ->addArgument(
                 'entity',
                 InputArgument::OPTIONAL,
@@ -71,7 +71,7 @@ class DumpCommand extends AbstractDebugCommand
                 'not-accessible',
                 null,
                 InputOption::VALUE_NONE,
-                'Shows only entities that are not accessible through Data API'
+                'Shows only entities that are not accessible through API'
             );
         parent::configure();
     }

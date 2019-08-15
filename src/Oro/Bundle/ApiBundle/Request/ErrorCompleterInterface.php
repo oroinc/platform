@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 
 /**
  * Provides an interface for classes that complete properties of the Error objects
- * for different kind of Data API requests.
+ * for different kind of API requests.
  */
 interface ErrorCompleterInterface
 {

@@ -17,7 +17,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Excludes fields according to requested fieldset.
- * For example, in JSON.API the "fields[TYPE]" filter can be used to request only specific fields.
+ * For example, in JSON:API the "fields[TYPE]" filter can be used to request only specific fields.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class FilterFieldsByExtra implements ProcessorInterface
@@ -238,7 +238,7 @@ class FilterFieldsByExtra implements ProcessorInterface
     protected function getAllowedFields(ClassMetadata $metadata, array $fieldFilters)
     {
         $allowedFields = null;
-        if ($metadata->inheritanceType === ClassMetadata::INHERITANCE_TYPE_NONE) {
+        if ($metadata->isInheritanceTypeNone()) {
             if (!empty($fieldFilters[$metadata->name])) {
                 $allowedFields = $fieldFilters[$metadata->name];
             }

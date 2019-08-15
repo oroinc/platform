@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\UserBundle\Security\UserChecker;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\OrganizationStub;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
@@ -89,6 +90,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         ];
 
         $user1 = new User();
+        $user1->setOwner(new BusinessUnit());
         $data[] = [
             'user' => $user1,
             'getTokenCalls' => 1,
@@ -97,6 +99,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         ];
 
         $user2 = new User();
+        $user2->setOwner(new BusinessUnit());
         $user2->setPasswordChangedAt(new \DateTime());
         $user2->setLastLogin((new \DateTime())->modify('+1 minute'));
         $data[] = [
@@ -107,6 +110,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         ];
 
         $user3 = new User();
+        $user3->setOwner(new BusinessUnit());
         $passwordChangedAt = new \DateTime();
         $lastLogin = clone $passwordChangedAt;
         $user3->setPasswordRequestedAt($passwordChangedAt);
@@ -119,6 +123,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         ];
 
         $user4 = new User();
+        $user4->setOwner(new BusinessUnit());
         $user4->setPasswordChangedAt(new \DateTime());
         $user4->setLastLogin((new \DateTime())->modify('-1 minute'));
         $data[] = [
@@ -144,6 +149,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $organization = new OrganizationStub();
         $organization->setEnabled(true);
         $user1 = new User();
+        $user1->setOwner($this->createMock(BusinessUnit::class));
         $user1->addOrganization($organization);
         $authStatus = $this->createMock('Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
         $user1->setAuthStatus($authStatus);
@@ -153,6 +159,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         ];
 
         $user2 = new User();
+        $user2->setOwner($this->createMock(BusinessUnit::class));
         $authStatus = $this->createMock('Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
         $user2->setAuthStatus($authStatus);
         $data['without_organization'] = [
@@ -161,5 +168,15 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         ];
 
         return $data;
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\UserBundle\Exception\EmptyOwnerException
+     */
+    public function testCheckPostAuthOnUserWithoutOwner()
+    {
+        $user = new User();
+
+        $this->userChecker->checkPostAuth($user);
     }
 }

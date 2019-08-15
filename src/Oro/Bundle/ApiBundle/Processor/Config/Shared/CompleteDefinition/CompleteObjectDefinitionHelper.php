@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
- * The helper class to complete the configuration of Data API resource based on not ORM entity.
+ * The helper class to complete the configuration of API resource based on not ORM entity.
  */
 class CompleteObjectDefinitionHelper
 {

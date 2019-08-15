@@ -13,13 +13,6 @@
     overflow: hidden;
 }
 
-.grid-scrollable-container {
-    margin: 0;
-    padding: 0;
-
-    overflow: auto;
-}
-
 .grid-header,
 .grid-footer {
     text-transform: uppercase;
@@ -74,7 +67,7 @@
 
         color: $oro-datagrid-label-color;
     }
-    
+
     &__link,
     &__label-container {
         display: flex;

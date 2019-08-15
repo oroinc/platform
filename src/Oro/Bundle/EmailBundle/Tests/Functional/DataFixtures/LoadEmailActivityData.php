@@ -48,7 +48,7 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
      */
     public function getDependencies()
     {
-        return ['Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadUserData'];
+        return [LoadUserData::class];
     }
 
     /**
@@ -56,7 +56,7 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
      */
     public function load(ObjectManager $manager)
     {
-        $this->em           = $manager;
+        $this->em = $manager;
         $this->organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
 
         $user1 = $this->createUser('Richard', 'Bradley');
@@ -136,7 +136,8 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
      */
     protected function createUser($firstName, $lastName)
     {
-        $user = new User();
+        /** @var User $user */
+        $user = $this->userManager->createUser();
         $user->setOrganization($this->organization);
         $user->setFirstName($firstName);
         $user->setLastName($lastName);

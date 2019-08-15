@@ -41,17 +41,12 @@ class NormalizeEntities implements ProcessorInterface
             return;
         }
 
-        $config = $context->getConfig();
-
-        $normalizedData = [];
-        $normalizationContext = $context->getNormalizationContext();
-        foreach ($data as $key => $value) {
-            $normalizedData[$key] = $this->objectNormalizer->normalizeObject(
-                $value,
-                $config,
-                $normalizationContext
-            );
-        }
-        $context->setResult($normalizedData);
+        $context->setResult(
+            $this->objectNormalizer->normalizeObjects(
+                $data,
+                $context->getConfig(),
+                $context->getNormalizationContext()
+            )
+        );
     }
 }

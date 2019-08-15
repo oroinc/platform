@@ -61,7 +61,7 @@
         "oro/doctrine-extensions": "1.2.*",
         "tinymce/tinymce": "4.6.*",
         "ezyang/htmlpurifier": "4.10.*",
-        "xemlock/htmlpurifier-html5": "0.1.*",
+        "xemlock/htmlpurifier-html5": "0.1.10",
         "hwi/oauth-bundle": "0.6.*",
         "kriswallsmith/buzz": "1.0.*",
         "npm-asset/jquery": "3.4.*",
@@ -114,7 +114,9 @@
         "bower-asset/fuse": "3.2.*",
         "phpdocumentor/reflection-docblock": "4.3.*",
         "php-http/httplug-bundle": "1.15.2",
-        "npm-asset/grapesjs": "0.15.3"
+        "npm-asset/css-vars-ponyfill": "2.0",
+        "npm-asset/grapesjs": "0.15.3",
+        "npm-asset/grapesjs-preset-webpage": "0.1.11"
     },
     "require-dev": {
         "behat/behat": "3.4.*",
@@ -152,6 +154,9 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "extra": {
+        "symfony": {
+            "require": "4.2.*"
+        },
         "branch-alias": {
             "dev-master": "4.0-dev"
         }

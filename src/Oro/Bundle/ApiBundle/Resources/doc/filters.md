@@ -22,7 +22,7 @@
 
 This chapter provides information on the existing filters and illustrates how to create them.
 
-Filters are used to limit a set of data or request additional information returned by the data API.
+Filters are used to limit a set of data or request additional information returned by the API.
 
 Filters for fields that have a database index are enabled automatically. Filters by all other fields should be
 [enabled explicitly](./configuration.md#filters-configuration-section), if necessary.
@@ -183,7 +183,7 @@ Examples of such filters are [PageNumberFilter](../../Filter/PageNumberFilter.ph
 The [Criteria](../../Collection/Criteria.php) class represents criteria for filtering data returned by ORM queries.
 This class extends
 [Doctrine Criteria](https://github.com/doctrine/collections/blob/master/lib/Doctrine/Common/Collections/Criteria.php)
-class and adds methods to work with joins. It is required because data API filters can be applied to associations
+class and adds methods to work with joins. It is required because API filters can be applied to associations
 at any nesting level.
 
 ## CriteriaConnector Class

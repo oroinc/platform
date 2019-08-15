@@ -32,10 +32,10 @@ class UpdateLoadedDataDecorator implements ProcessorInterface
 
         $this->innerProcessor->process($context);
 
-        $data = $context->getResult();
-        if (is_array($data) && isset($data['computedName'])) {
+        $data = $context->getData();
+        if (isset($data['computedName'])) {
             $data['computedName'] .= ' (decorated)';
-            $context->setResult($data);
+            $context->setData($data);
         }
     }
 }

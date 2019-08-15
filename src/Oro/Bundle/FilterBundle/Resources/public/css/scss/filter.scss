@@ -143,6 +143,8 @@
             width: $filter-box-oro-action-width;
             margin: $filter-box-oro-action-offset;
 
+            @include clearfix();
+
             .btn-group {
                 float: $filter-box-oro-action-btn-group-float;
             }

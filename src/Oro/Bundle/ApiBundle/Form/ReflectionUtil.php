@@ -8,7 +8,7 @@ use Symfony\Component\Inflector\Inflector;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * A set of utility methods for performing reflective operations are used in Data API forms.
+ * A set of utility methods for performing reflective operations are used in API forms.
  */
 class ReflectionUtil
 {

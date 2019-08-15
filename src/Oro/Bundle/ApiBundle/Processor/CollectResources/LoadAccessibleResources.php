@@ -8,7 +8,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Builds a list of resources accessible through Data API.
+ * Builds a list of resources accessible through API.
  */
 class LoadAccessibleResources implements ProcessorInterface
 {

@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\ToArrayInterface;
 use Oro\Component\EntitySerializer\ConfigUtil as BaseConfigUtil;
 
 /**
- * Provides a set of Data API configuration related reusable constants and static methods.
+ * Provides a set of API configuration related reusable constants and static methods.
  */
 class ConfigUtil extends BaseConfigUtil
 {

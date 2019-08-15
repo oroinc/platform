@@ -21,7 +21,6 @@
    - [**customize_loaded_data** Action](#customize_loaded_data-action)
    - [**customize_form_data** Action](#customize_form_data-action)
    - [**get_config** Action](#get_config-action)
-   - [**get_relation_config** Action](#get_relation_config-action)
    - [**get_metadata** Action](#get_metadata-action)
    - [**normalize_value** Action](#normalize_value-action)
    - [**collect_resources** Action](#collect_resources-action)
@@ -64,11 +63,10 @@ The following table shows all actions provided out of the box:
 | [customize_loaded_data](#customize_loaded_data-action) | Modifies the data loaded by [get](#get-action), [get_list](#get_list-action), and [get_subresource](#get_subresource-action) actions. |
 | [customize_form_data](#customize_form_data-action) | Modifies the submitted data for [create](#create-action) and [update](#update-action) actions. |
 | [get_config](#get_config-action) | Returns an entity configuration. |
-| [get_relation_config](#get_relation_config-action) | Returns a configuration of an entity used in a relationship. |
 | [get_metadata](#get_metadata-action) | Returns an entity's metadata. |
 | [normalize_value](#normalize_value-action) | Converts a value to the requested data type. |
-| [collect_resources](#collect_resources-action) | Returns a list of all resources accessible via the data API. |
-| [collect_subresources](#collect_subresources-action) | Returns a list of all sub-resources accessible via the data API for a given entity type. |
+| [collect_resources](#collect_resources-action) | Returns a list of all resources accessible via the API. |
+| [collect_subresources](#collect_subresources-action) | Returns a list of all sub-resources accessible via the API for a given entity type. |
 | [not_allowed](#not_allowed-action) | Builds a response for case when a request does not match any public action. E.g. when HTTP method is not supported for REST API request. |
 
 Please see [processors](./processors.md) section for more details about how to create a processor.
@@ -77,7 +75,7 @@ You can use the [oro:api:debug](./commands.md#oroapidebug) command to display th
 
 ## get Action
 
-This action is intended to retrieve an entity by its identifier. For more details, see the [Fetching Data](http://jsonapi.org/format/#fetching) section of the JSON.API specification.
+This action is intended to retrieve an entity by its identifier. For more details, see the [Fetching Data](http://jsonapi.org/format/#fetching) section of the JSON:API specification.
 
 The route name for REST API: `oro_rest_api_item`.
 
@@ -114,7 +112,7 @@ For examples of usage, see the `handleGet` method of [RequestActionHandler](../.
 
 ## get_list Action
 
-This action retrieves a list of entities. For more details, see the [Fetching Data](http://jsonapi.org/format/#fetching) section of the JSON.API specification.
+This action retrieves a list of entities. For more details, see the [Fetching Data](http://jsonapi.org/format/#fetching) section of the JSON:API specification.
 
 The route name for REST API: `oro_rest_api_list`.
 
@@ -151,7 +149,7 @@ For examples of usage, see the `handleGetList` method of [RequestActionHandler](
 
 ## delete Action
 
-This action deletes an entity by its identifier. For more details, see the [Deleting Resources](http://jsonapi.org/format/#crud-deleting) section of the JSON.API specification.
+This action deletes an entity by its identifier. For more details, see the [Deleting Resources](http://jsonapi.org/format/#crud-deleting) section of the JSON:API specification.
 
 The route name for REST API: `oro_rest_api_item`.
 
@@ -230,7 +228,7 @@ For examples of usage, see the `handleDeleteList` method of [RequestActionHandle
 
 ## create Action
 
-This action creates a new entity. For more details, see the [Creating Resources](http://jsonapi.org/format/#crud-creating) section of the JSON.API specification.
+This action creates a new entity. For more details, see the [Creating Resources](http://jsonapi.org/format/#crud-creating) section of the JSON:API specification.
 
 The route name for REST API: `oro_rest_api_list`.
 
@@ -268,7 +266,7 @@ For examples of usage, see the `handleCreate` method of [RequestActionHandler](.
 
 ## update Action
 
-This action updates an entity. For more details, see the [Updating Resources](http://jsonapi.org/format/#crud-updating) section of JSON.API specification.
+This action updates an entity. For more details, see the [Updating Resources](http://jsonapi.org/format/#crud-updating) section of JSON:API specification.
 
 The route name for REST API: `oro_rest_api_item`.
 
@@ -306,7 +304,7 @@ For examples of usage, see the `handleUpdate` method of [RequestActionHandler](.
 
 ## get_subresource Action
 
-This action retrieves an entity (for "to-one" relationship) or a list of entities (for "to-many" relationship) connected to the entity by a given association. For more details, see the [Fetching Resources](http://jsonapi.org/format/#fetching-resources) section of the JSON.API specification.
+This action retrieves an entity (for "to-one" relationship) or a list of entities (for "to-many" relationship) connected to the entity by a given association. For more details, see the [Fetching Resources](http://jsonapi.org/format/#fetching-resources) section of the JSON:API specification.
 
 The route name for REST API: `oro_rest_api_subresource`.
 
@@ -505,7 +503,7 @@ An example how to register a processor to build a form builder:
 
 ## get_relationship Action
 
-This action retrieves an entity identifier (for "to-one" relationship) or a list of entities' identifiers (for "to-many" relationship) connected to the entity by a given association. For more details, see the [Fetching Relationships](http://jsonapi.org/format/#fetching-relationships) section of the JSON.API specification.
+This action retrieves an entity identifier (for "to-one" relationship) or a list of entities' identifiers (for "to-many" relationship) connected to the entity by a given association. For more details, see the [Fetching Relationships](http://jsonapi.org/format/#fetching-relationships) section of the JSON:API specification.
 
 The route name for REST API: `oro_rest_api_relationship`.
 
@@ -542,7 +540,7 @@ For examples of usage, see the `handleGetRelationship` method of [RequestActionH
 
 ## update_relationship Action
 
-This action changes an entity (for "to-one" relationship) or completely replaces all entities (for "to-many" relationship) connected to a given entity by a given association. For more details, see the [Updating Relationships](http://jsonapi.org/format/#crud-updating-relationships) section of the JSON.API specification.
+This action changes an entity (for "to-one" relationship) or completely replaces all entities (for "to-many" relationship) connected to a given entity by a given association. For more details, see the [Updating Relationships](http://jsonapi.org/format/#crud-updating-relationships) section of the JSON:API specification.
 
 The route name for REST API: `oro_rest_api_relationship`.
 
@@ -579,7 +577,7 @@ For examples of usage, see the `handleUpdateRelationship` method of [RequestActi
 
 ## add_relationship Action
 
-This action adds one or several entities to a "to-many" relationship. For more details, see the [Updating Relationships](http://jsonapi.org/format/#crud-updating-relationships) section of the JSON.API specification.
+This action adds one or several entities to a "to-many" relationship. For more details, see the [Updating Relationships](http://jsonapi.org/format/#crud-updating-relationships) section of the JSON:API specification.
 
 The route name for REST API: `oro_rest_api_relationship`.
 
@@ -616,7 +614,7 @@ For examples of usage, see the `handleAddRelationship` method of [RequestActionH
 
 ## delete_relationship Action
 
-This action removes one or several entities from a "to-many" relationship. For more details, see the [Updating Relationships](http://jsonapi.org/format/#crud-updating-relationships) section of the JSON.API specification.
+This action removes one or several entities from a "to-many" relationship. For more details, see the [Updating Relationships](http://jsonapi.org/format/#crud-updating-relationships) section of the JSON:API specification.
 
 The route name for REST API: `oro_rest_api_relationship`.
 
@@ -763,26 +761,6 @@ $configProvider = $container->get('oro_api.config_provider');
 $config = $configProvider->getConfig($entityClassName, $version, $requestType, $configExtras);
 ```
 
-## get_relation_config Action
-
-This action retrieves a configuration of an entity used in a relationship.
-
-The context class: [RelationConfigContext](../../Processor/Config/GetRelationConfig/RelationConfigContext.php).
-
-The main processor class: [RelationConfigProcessor](../../Processor/Config/RelationConfigProcessor.php).
-
-Existing worker processors: [processors.get_config.yml](../../Resources/config/processors.get_config.yml). Run `php bin/console oro:api:debug get_relation_config` to see the list of processors.
-
-Additionally, [RelationConfigProvider](../../Provider/RelationConfigProvider.php) was created to make usage of this action as easy as possible.
-
-**Example:**
-
-```php
-/** @var RelationConfigProvider $configProvider */
-$configProvider = $container->get('oro_api.relation_config_provider');
-$config = $configProvider->getRelationConfig($entityClassName, $version, $requestType, $configExtras);
-```
-
 ## get_metadata Action
 
 This action retrieves a metadata of an entity.
@@ -825,11 +803,11 @@ $normalizedValue = $valueNormalizer->normalizeValue($value, $dataType, $requestT
 ```
 
 **Note:** The [ValueNormalizer](../../Request/ValueNormalizer.php) is intended to process input values only.
-In case you need to convert a value for the data API response, use [ValueTransformer](../../Request/ValueTransformer.php).
+In case you need to convert a value for the API response, use [ValueTransformer](../../Request/ValueTransformer.php).
 
 ## collect_resources Action
 
-This action gets a list of all resources accessible via the data API.
+This action gets a list of all resources accessible via the API.
 
 The context class: [CollectResourcesContext](../../Processor/CollectResources/CollectResourcesContext.php).
 
@@ -844,18 +822,18 @@ Additionally, [ResourcesProvider](../../Provider/ResourcesProvider.php) was crea
 ```php
 /** @var ResourcesProvider $resourcesProvider */
 $resourcesProvider = $container->get('oro_api.resources_provider');
-// get all Data API resources
-// (all resources are configured to be used in Data API, including not accessible resources)
+// get all API resources
+// (all resources are configured to be used in API, including not accessible resources)
 $resources = $resourcesProvider->getResources($version, $requestType);
-// check whether an entity is configured to be used in Data API
+// check whether an entity is configured to be used in API
 $isKnown = $resourcesProvider->isResourceKnown($entityClass, $version, $requestType);
-// check whether an entity is accessible through Data API
+// check whether an entity is accessible through API
 $isAccessible = $resourcesProvider->isResourceAccessible($entityClass, $version, $requestType);
 ```
 
 ## collect_subresources Action
 
-This action retrieves a list of all sub-resources accessible via the data API for a given entity type.
+This action retrieves a list of all sub-resources accessible via the API for a given entity type.
 
 The context class: [CollectSubresourcesContext](../../Processor/CollectSubresources/CollectSubresourcesContext.php).
 
@@ -979,8 +957,8 @@ General methods:
 - **setParentId(parentId)** - Sets an identifier of the parent entity.
 - **getAssociationName()** - Retrieves an association name that represents a relationship.
 - **setAssociationName(associationName)** - Sets an association name represented a relationship.
-- **isCollection()** - Indicates an association tht represents "to-many" or "to-one" relation.
-- **setIsCollection(value)** - Sets a flag that indicates whether an association represents "to-many" or "to-one" relation.
+- **isCollection()** - Indicates an association that represents "to-many" or "to-one" relationship.
+- **setIsCollection(value)** - Sets a flag that indicates whether an association represents "to-many" or "to-one" relationship.
 - **hasParentEntity()** - Checks whether the parent entity exists in the context.
 - **getParentEntity()** - Retrieves the parent entity object.
 - **setParentEntity(parentEntity)** - Sets the parent entity object.

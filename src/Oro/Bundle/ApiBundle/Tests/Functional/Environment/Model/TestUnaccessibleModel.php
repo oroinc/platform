@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model;
 
 /**
- * This model is used to test subresources to a model that is not accessible via Data API.
+ * This model is used to test subresources to a model that is not accessible via API.
  */
 class TestUnaccessibleModel
 {
