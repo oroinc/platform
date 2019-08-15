@@ -1,16 +1,37 @@
 define(function() {
     'use strict';
 
+    /**
+     * Create panel manager instance
+     * @param options
+     * @constructor
+     */
     var PanelManagerModule = function(options) {
         _.extend(this, _.pick(options, ['builder']));
 
         this.init();
     };
 
+    /**
+     * Reposition and change builder panels
+     * @type {{builder: null, init: init}}
+     */
     PanelManagerModule.prototype = {
         builder: null,
 
+        /**
+         * Run panels reformat
+         * @initialize
+         */
         init: function() {
+            this._moveSettings();
+        },
+
+        /**
+         * Move settings tab to style manager above style property
+         * @private
+         */
+        _moveSettings: function() {
             var $ = this.builder.$;
 
             var Panels = this.builder.Panels;

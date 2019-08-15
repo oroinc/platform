@@ -11,7 +11,14 @@ define(function(require) {
 
     require('grapesjs-preset-webpage');
 
+    /**
+     * Create GrapesJS content builder
+     * @type {*|void}
+     */
     GrapesjsEditorView = BaseView.extend({
+        /**
+         * @inheritDoc
+         */
         optionNames: BaseView.prototype.optionNames.concat([
             'builderOptions', 'storageManager', 'builderPlugins', 'storagePrefix',
             'currentTheme'
@@ -22,34 +29,66 @@ define(function(require) {
          */
         autoRender: true,
 
+        /**
+         * @property {GrapesJS.Instance}
+         */
         builder: null,
 
+        /**
+         * Main builder options
+         * @property {Object}
+         */
         builderOptions: {
             fromElement: true
         },
 
+        /**
+         * Storage prefix
+         * @property {String}
+         */
         storagePrefix: 'gjs-',
 
+        /**
+         * Storage options
+         * @property {Object}
+         */
         storageManager: {
             autosave: false,
             autoload: false
         },
 
+        /**
+         * Canvas options
+         * @property {Object}
+         */
         canvasConfig: {},
 
+        /**
+         * Style manager options
+         * @property {Object}
+         */
         styleManager: {
             clearProperties: 1
         },
 
+        /**
+         * Color picker options
+         * @property {Object}
+         */
         colorPicker: {
             appendTo: '#grapesjs'
         },
 
         /**
+         * Current theme name
          * @property {String}
          */
         currentTheme: 'default',
 
+        /**
+         * List of grapesjs plugins
+         * @property {Object}
+         */
         builderPlugins: {
             'gjs-preset-webpage': {
                 aviaryOpts: false,
@@ -96,10 +135,6 @@ define(function(require) {
             GrapesjsEditorView.__super__.dispose.call(this);
         },
 
-        delegateEvents: function() {
-            GrapesjsEditorView.__super__.delegateEvents.apply(this, arguments);
-        },
-
         /**
          * @TODO Should refactored
          */
@@ -136,6 +171,9 @@ define(function(require) {
             });
         },
 
+        /**
+         * Add builder event listeners
+         */
         builderDelegateEvents: function() {
             this.$el.closest('form').on(
                 'keyup' + this.eventNamespace() + ' keypress' + this.eventNamespace()
@@ -152,15 +190,26 @@ define(function(require) {
             this.builder.on('component:update', _.bind(this._onComponentUpdatedBuilder, this));
         },
 
+        /**
+         * Remove builder event listeners
+         */
         builderUndelegateEvents: function() {
             this.$el.closest('form').off(this.eventNamespace());
             this.builder.off();
         },
 
+        /**
+         * Get current theme stylesheet path
+         * @returns {string}
+         */
         getCurrentThemeStylesheetURL: function() {
             return '/css/layout/' + this.currentTheme + '/styles.css';
         },
 
+        /**
+         * Onload builder handler
+         * @private
+         */
         _onLoadBuilder: function() {
             GrapesJSModules.call('panel-manager', {
                 builder: this.builder
@@ -169,21 +218,39 @@ define(function(require) {
             mediator.trigger('grapesjs:loaded', this.builder);
         },
 
+        /**
+         * Update builder handler
+         * @private
+         */
         _onUpdatedBuilder: function() {
             mediator.trigger('grapesjs:updated', this.builder);
         },
 
+        /**
+         * Update components builder handler
+         * @param state
+         * @private
+         */
         _onComponentUpdatedBuilder: function(state) {
             this._updateInitialField();
             mediator.trigger('grapesjs:components:updated', state);
         },
 
+        /**
+         * Update source textarea
+         * @private
+         */
         _updateInitialField: function() {
             var content = this.builder.getHtml();
             content += '<style>' + this.builder.getCss() + '</style>';
             this.$el.val(content).trigger('change');
         },
 
+        /**
+         * Collect and compare builder options
+         * @returns {GrapesjsEditorView.builderOptions|{fromElement}}
+         * @private
+         */
         _prepareBuilderOptions: function() {
             _.extend(this.builderOptions
                 , this._getPlugins()
@@ -195,6 +262,11 @@ define(function(require) {
             return this.builderOptions;
         },
 
+        /**
+         * Get extended Storage Manager config
+         * @returns {{storageManager: (*|void)}}
+         * @private
+         */
         _getStorageManagerConfig: function() {
             return {
                 storageManager: _.extend({}, this.storageManager, {
@@ -203,12 +275,22 @@ define(function(require) {
             };
         },
 
+        /**
+         * Get extended Style Manager config
+         * @returns {{styleManager: *}}
+         * @private
+         */
         _getStyleManagerConfig: function() {
             return {
                 styleManager: this.styleManager
             };
         },
 
+        /**
+         * Get extended Canvas config
+         * @returns {{canvasCss: string, canvas: {styles: (*|string)[]}}}
+         * @private
+         */
         _getCanvasConfig: function() {
             var urlCSS = this.getCurrentThemeStylesheetURL();
             return {
@@ -219,6 +301,11 @@ define(function(require) {
             };
         },
 
+        /**
+         * Get plugins list with options
+         * @returns {{plugins: *, pluginsOpts: (GrapesjsEditorView.builderPlugins|{"gjs-preset-webpage"})}}
+         * @private
+         */
         _getPlugins: function() {
             return {
                 plugins: _.keys(this.builderPlugins),

@@ -5,24 +5,57 @@ define(function(require) {
     var TableComponents = require('./components/table');
     var selectTemplate = require('tpl!orocontentbuilder/templates/grapesjs-select-action.html');
 
+    /**
+     * Create component manager
+     * @param options
+     * @constructor
+     */
     var ComponentManager = function(options) {
         _.extend(this, _.pick(options, ['builder']));
 
         this.init();
     };
 
+    /**
+     * Component manager methods
+     * @type {{BlockManager: null, Commands: null, DomComponents: null, init: init, addComponents: addComponents, sortActionsRte: sortActionsRte}}
+     */
     ComponentManager.prototype = {
+        /**
+         * @property {Object}
+         */
         BlockManager: null,
 
+        /**
+         * @property {Object}
+         */
         Commands: null,
 
+        /**
+         * @property {Object}
+         */
         DomComponents: null,
 
+        /**
+         * @property {Object}
+         */
+        RichTextEditor: null,
+
+        /**
+         * Create manager
+         */
         init: function() {
             _.extend(this, _.pick(this.builder, ['BlockManager', 'Commands', 'DomComponents', 'RichTextEditor']));
 
             this.addComponents();
+            this.addBlocks();
+            this.addActionRte();
+        },
 
+        /**
+         * Add new component block
+         */
+        addBlocks: function() {
             this.BlockManager.add('table-block', {
                 id: 'table',
                 label: 'Table',
@@ -34,7 +67,12 @@ define(function(require) {
                     type: 'table'
                 }
             });
+        },
 
+        /**
+         * Add Rich Text Editor action
+         */
+        addActionRte: function() {
             this.RichTextEditor.add('formatBlock', {
                 icon: selectTemplate({
                     options: {
@@ -78,18 +116,13 @@ define(function(require) {
                     }
                 }
             });
-
-            this.sortActionsRte();
         },
 
+        /**
+         * Add components
+         */
         addComponents: function() {
             new TableComponents(this.builder);
-        },
-
-        sortActionsRte: function() {
-            this.RichTextEditor.actions = _.sortBy(this.RichTextEditor.actions, 'priority');
-
-
         }
     };
 

@@ -1,6 +1,11 @@
 define(function(require) {
     'use strict';
 
+    /**
+     * Create table component type for builder
+     * @param context
+     * @constructor
+     */
     var TableComponent = function(context) {
         var ComponentId = 'table';
         var domComps = context.DomComponents;

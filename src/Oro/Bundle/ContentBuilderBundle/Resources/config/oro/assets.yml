@@ -1,4 +1,3 @@
 css:
     inputs:
         - 'bundles/orocontentbuilder/scss/grapesjs.scss'
-#        - 'bundles/npmassets/grapesjs/src/styles/scss/main.scss'

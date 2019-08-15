@@ -1,6 +1,9 @@
 define(function(require) {
     'use strict';
 
+    /**
+     * Return style manager property config
+     */
     return [
         {
             name: 'General',
