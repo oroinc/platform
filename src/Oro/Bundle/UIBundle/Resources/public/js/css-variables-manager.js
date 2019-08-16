@@ -29,6 +29,7 @@ define(function(require) {
          * @returns {(target?: any) => JQueryPromise<T>}
          */
         initialize: function() {
+            this.createHandlers();
             this.getComputedVariables();
 
             cssVars(_.extend(config, {
@@ -58,6 +59,10 @@ define(function(require) {
             this.deferred.then(callback);
         },
 
+        createHandlers: function() {
+            mediator.setHandler('fetch:head:breakpoints', this.getHeadBreakpoints, this);
+        },
+
         /**
          * Get hot computed variables
          */
@@ -85,6 +90,10 @@ define(function(require) {
                     mediator.trigger('css:breakpoints:fetched', this.cssVariables);
                 }
             }, this));
+        },
+
+        getHeadBreakpoints: function() {
+
         }
     };
 
