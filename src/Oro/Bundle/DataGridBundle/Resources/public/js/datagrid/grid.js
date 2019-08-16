@@ -808,11 +808,21 @@ define(function(require) {
                     launcherOptions: this.actionOptions.refreshAction.launcherOptions,
                     order: 100
                 });
+
                 this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, _.debounce(function(ignoreVisibility) {
                     if (ignoreVisibility || this.$el.is(':visible')) {
                         this.refreshAction.execute();
+                    } else {
+                        this._hasDeferRefresh = true;
                     }
                 }, 100, true));
+
+                this.listenTo(mediator, 'content:shown', function() {
+                    if (this._hasDeferRefresh && this.$el.is(':visible')) {
+                        delete this._hasDeferRefresh;
+                        this.refreshAction.execute();
+                    }
+                }.bind(this));
 
                 this.listenTo(this.refreshAction, 'preExecute', function(action, options) {
                     this.$el.trigger('preExecute:refresh:' + this.name, [action, options]);
