@@ -21,7 +21,7 @@ define(function(require) {
          */
         optionNames: BaseView.prototype.optionNames.concat([
             'builderOptions', 'storageManager', 'builderPlugins', 'storagePrefix',
-            'currentTheme'
+            'currentTheme', 'contextClass'
         ]),
 
         /**
@@ -35,11 +35,26 @@ define(function(require) {
         builder: null,
 
         /**
+         * Page context class
+         * @property {String}
+         */
+        contextClass: 'cms-page',
+
+        /**
          * Main builder options
          * @property {Object}
          */
         builderOptions: {
-            fromElement: true
+            fromElement: true,
+
+            /**
+             * Color picker options
+             * @property {Object}
+             */
+            colorPicker: {
+                appendTo: 'body',
+                showPalette: false
+            }
         },
 
         /**
@@ -69,14 +84,6 @@ define(function(require) {
          */
         styleManager: {
             clearProperties: 1
-        },
-
-        /**
-         * Color picker options
-         * @property {Object}
-         */
-        colorPicker: {
-            appendTo: '#grapesjs'
         },
 
         /**
@@ -221,6 +228,19 @@ define(function(require) {
             });
         },
 
+        setCommandActive: function(panel, name) {
+            this.builder.Commands.run(name);
+            var button = this.builder.Panels.getButton(panel, name);
+
+            button.set('active', true);
+        },
+
+        _addClassForFrameWrapper: function() {
+            var iframe = this.builder.Canvas.getFrameEl().contentDocument;
+
+            iframe.querySelector('#wrapper').classList.add(this.contextClass);
+        },
+
         /**
          * Onload builder handler
          * @private
@@ -229,6 +249,9 @@ define(function(require) {
             GrapesJSModules.call('panel-manager', {
                 builder: this.builder
             });
+
+            this.setCommandActive('options', 'sw-visibility');
+            this._addClassForFrameWrapper();
 
             mediator.trigger('grapesjs:loaded', this.builder);
         },
