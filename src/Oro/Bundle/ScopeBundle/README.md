@@ -28,6 +28,20 @@ Scope Manager is a service that provides an interface for collecting the scope i
 * Create a collected scope in response to the findOrCreate operation (if the scope is not found).
 * Call Scope Criteria Provider's getCriteriaForCurrentScope() method to get a portion of the scope information.
 
+```php
+<?php
+
+// Find an existing scope or return null
+$scope = $scopeManager->find(ProductVisibility::getScopeType(), [
+    ScopeCriteriaProvider::WEBSITE => $website,
+]);
+
+// Find an existing scope or create a new one
+$scope = $scopeManager->findOrCreate(ProductVisibility::getScopeType(), [
+    ScopeCriteriaProvider::WEBSITE => $website,
+]);
+```
+
 ## Scope Criteria Providers
 
 Scope Criteria Provider is a service that calculates the value for the scope criterion based on the provided context. Scope criteria help model a relationship between the scope and the scope-consuming context. In any bundle, you can create a [Scope Criteria Provider](#configuring-scope-criteria-providers) service and register it as scope provider for the specific scope type. This service shall deliver the scope criterion value to the Scope Manager, who, in turn, use the scope criteria to filter the scope instances or find the one matching to the provided context.
