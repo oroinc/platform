@@ -67,10 +67,13 @@ define(function(require) {
             }
 
             // any dialog is opened -- hide page under dialog window (increases performance)
+            var $page = $('#page');
             if (_.some(dialogs)) {
-                $('#page').addClass('hidden-page');
+                $page.addClass('hidden-page');
+                mediator.trigger('content:hidden', $page);
             } else {
-                $('#page').removeClass('hidden-page');
+                $page.removeClass('hidden-page');
+                mediator.trigger('content:shown', $page);
             }
 
             // any modal is opened  -- prevent page scrolling under the modal window
