@@ -332,7 +332,9 @@ define(function(require) {
         _getCanvasConfig: function() {
             var theme = this.getCurrentTheme();
             return {
-                canvasCss: '.gjs-comp-selected { outline: 3px solid #0c809e !important; }',
+                canvasCss: '.gjs-comp-selected { outline: 3px solid #0c809e !important; ' +
+                    'outline-offset: 0 !important; }' +
+                    '#wrapper { padding: 3px; }',
                 canvas: {
                     styles: [theme.stylesheet]
                 }
