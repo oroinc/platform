@@ -435,6 +435,10 @@ services:
     oro_security.token.factory.organization_rememberme:
         class: Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory
 
+    oro_security.authentication.organization_guesser:
+        class: Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesser
+        public: true
+
     oro_security.authentication.listener.basic:
         class: Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationBasicAuthenticationListener
         arguments:
@@ -459,6 +463,7 @@ services:
             - '%security.authentication.hide_user_not_found%'
         calls:
             - [setTokenFactory, ['@oro_security.token.factory.username_password_organization']]
+            - [setOrganizationGuesser, ['@oro_security.authentication.organization_guesser']]
         abstract: true
         public: false
 
@@ -468,13 +473,16 @@ services:
             - '@security.user_checker'
         calls:
             - [setTokenFactory, ['@oro_security.token.factory.organization_rememberme']]
+            - [setOrganizationGuesser, ['@oro_security.authentication.organization_guesser']]
         abstract: true
         public: false
 
     oro_security.listener.context_listener:
         class: Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener
         arguments:
-            - '@service_container'
+            - '@security.token_storage'
+            - '@doctrine'
+            - '@logger'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 7 }
 

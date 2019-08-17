@@ -122,7 +122,7 @@ class UserPermissionApiEntityManager extends ApiEntityManager
         $organization = $currentToken->getOrganizationContext();
 
         // check if new user has access to the current organization
-        if (!$user->hasOrganization($organization)) {
+        if (!$user->isBelongToOrganization($organization)) {
             throw new AccessDeniedException();
         }
 

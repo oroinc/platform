@@ -7,8 +7,8 @@ use HWI\Bundle\OAuthBundle\Security\Core\Exception\OAuthAwareExceptionInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
 use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesserInterface;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -20,31 +20,26 @@ use Symfony\Component\Security\Core\User\UserCheckerInterface;
  */
 class OAuthProvider extends HWIOAuthProvider
 {
-    /**
-     * @var ResourceOwnerMap
-     */
-    protected $resourceOwnerMap;
+    /** @var ResourceOwnerMap */
+    private $resourceOwnerMap;
+
+    /** @var OAuthAwareUserProviderInterface */
+    private $userProvider;
+
+    /** @var UserCheckerInterface */
+    private $userChecker;
+
+    /** @var OAuthTokenFactoryInterface */
+    private $tokenFactory;
+
+    /** @var OrganizationGuesserInterface */
+    private $organizationGuesser;
 
     /**
-     * @var OAuthAwareUserProviderInterface
-     */
-    protected $userProvider;
-
-    /**
-     * @var UserCheckerInterface
-     */
-    protected $userChecker;
-
-    /**
-     * @var OAuthTokenFactoryInterface
-     */
-    protected $tokenFactory;
-
-    /**
-     * @param OAuthAwareUserProviderInterface $userProvider User provider
-     * @param ResourceOwnerMap $resourceOwnerMap Resource owner map
-     * @param UserCheckerInterface $userChecker User checker
-     * @param TokenStorageInterface $tokenStorage
+     * @param OAuthAwareUserProviderInterface $userProvider
+     * @param ResourceOwnerMap                $resourceOwnerMap
+     * @param UserCheckerInterface            $userChecker
+     * @param TokenStorageInterface           $tokenStorage
      */
     public function __construct(
         OAuthAwareUserProviderInterface $userProvider,
@@ -67,14 +62,23 @@ class OAuthProvider extends HWIOAuthProvider
     }
 
     /**
+     * @param OrganizationGuesserInterface $organizationGuesser
+     */
+    public function setOrganizationGuesser(OrganizationGuesserInterface $organizationGuesser): void
+    {
+        $this->organizationGuesser = $organizationGuesser;
+    }
+
+    /**
      * {@inheritDoc}
-     *
-     * @throws OAuthAwareExceptionInterface
      */
     public function authenticate(TokenInterface $token)
     {
         if (null === $this->tokenFactory) {
             throw new AuthenticationException('Token Factory is not set in OAuthProvider.');
+        }
+        if (null === $this->organizationGuesser) {
+            throw new AuthenticationException('Organization Guesser is not set in OAuthProvider.');
         }
 
         /* @var OAuthToken $token */
@@ -104,25 +108,22 @@ class OAuthProvider extends HWIOAuthProvider
     }
 
     /**
-     * Guess organization
-     *
-     * @param User $user
+     * @param AbstractUser   $user
      * @param TokenInterface $token
      *
      * @return Organization
-     *
-     * @throws BadCredentialsException
      */
-    protected function guessOrganization(User $user, TokenInterface $token)
+    private function guessOrganization(AbstractUser $user, TokenInterface $token): Organization
     {
-        $organizationGuesser = new UserOrganizationGuesser();
-        $organization = $organizationGuesser->guess($user, $token);
-        if (!$organization) {
-            throw new BadCredentialsException("You don't have active organization assigned.");
-        } elseif (!$user->getOrganizations(true)->contains($organization)) {
-            throw new BadCredentialsException(
-                sprintf("You don't have access to organization '%s'", $organization->getName())
-            );
+        $organization = $this->organizationGuesser->guess($user, $token);
+        if (null === $organization) {
+            throw new BadCredentialsException('The user does not have active organization assigned to it.');
+        }
+        if (!$user->isBelongToOrganization($organization, true)) {
+            throw new BadCredentialsException(sprintf(
+                'The user does not have access to organization "%s".',
+                $organization->getName()
+            ));
         }
 
         return $organization;

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Http\Firewall;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\NoResultException;
-use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Exception\OrganizationAccessDeniedException;
@@ -12,7 +11,6 @@ use Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -24,55 +22,34 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /**
-     * @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
-    /**
-     * @var OrganizationManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $organizationManager;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    /**
-     * @var ContextListener
-     */
+    /** @var ContextListener */
     private $listener;
 
     protected function setUp()
     {
-        /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject $container */
-        $container = $this->createMock(ContainerInterface::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $this->organizationManager = $this->createMock(OrganizationManager::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $container->expects($this->any())
-            ->method('get')
-            ->willReturnMap([
-                ['security.token_storage', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->tokenStorage],
-                [
-                    'oro_organization.organization_manager',
-                    ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                    $this->organizationManager
-                ],
-                [
-                    'logger',
-                    ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                    $this->logger
-                ]
-            ]);
-
-        $this->listener = new ContextListener($container);
+        $this->listener = new ContextListener(
+            $this->tokenStorage,
+            $this->doctrine,
+            $this->logger
+        );
     }
 
     /**
      * @dataProvider unsupportedTokenDataProvider
+     *
      * @param mixed $token
      */
     public function testOnKernelRequestUnsupportedTokenInstance($token)
@@ -84,7 +61,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $event = $this->createMock(GetResponseEvent::class);
         $event->expects($this->never())
             ->method($this->anything());
-        $this->organizationManager->expects($this->never())
+        $this->doctrine->expects($this->never())
             ->method($this->anything());
 
         $this->listener->onKernelRequest($event);
@@ -96,7 +73,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
     public function unsupportedTokenDataProvider()
     {
         return [
-            'invalid interface' => [$this->createMock(TokenInterface::class)],
+            'invalid interface'       => [$this->createMock(TokenInterface::class)],
             'no organization context' => [$this->createMock(OrganizationContextTokenInterface::class)]
         ];
     }
@@ -122,10 +99,15 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $event->expects($this->never())
             ->method($this->anything());
 
-        $noResultException = new NoResultException();
-        $this->organizationManager->expects($this->once())
-            ->method('getOrganizationById')
-            ->willThrowException($noResultException);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(Organization::class)
+            ->willReturn($em);
+        $em->expects($this->once())
+            ->method('find')
+            ->with(Organization::class, $organizationContext->getId())
+            ->willReturn(null);
 
         $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())
@@ -141,10 +123,9 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getRequest')
             ->willReturn($request);
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('error')
-            ->with('Could not find organization by id 1', ['exception' => $noResultException]);
+            ->with('Could not find organization by id 1');
 
         $this->expectException(OrganizationAccessDeniedException::class);
         $this->listener->onKernelRequest($event);
@@ -174,8 +155,14 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $event->expects($this->never())
             ->method($this->anything());
 
-        $this->organizationManager->expects($this->once())
-            ->method('getOrganizationById')
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(Organization::class)
+            ->willReturn($em);
+        $em->expects($this->once())
+            ->method('find')
+            ->with(Organization::class, $organizationContext->getId())
             ->willReturn($organizationContext);
 
         $this->listener->onKernelRequest($event);
@@ -188,8 +175,9 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
 
         $user = $this->createMock(AbstractUser::class);
         $user->expects($this->once())
-            ->method('getOrganizations')
-            ->willReturn(new ArrayCollection([$organizationContext]));
+            ->method('isBelongToOrganization')
+            ->with($this->identicalTo($organizationContext), $this->isTrue())
+            ->willReturn(true);
 
         $token = $this->createMock(OrganizationContextTokenInterface::class);
         $token->expects($this->any())
@@ -210,6 +198,16 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $event->expects($this->never())
             ->method($this->anything());
 
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(Organization::class)
+            ->willReturn($em);
+        $em->expects($this->once())
+            ->method('find')
+            ->with(Organization::class, $organizationContext->getId())
+            ->willReturn($organizationContext);
+
         $this->listener->onKernelRequest($event);
     }
 
@@ -218,13 +216,11 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         /** @var Organization $organizationContext */
         $organizationContext = $this->getEntity(Organization::class, ['id' => 1, 'name' => 'from context']);
 
-        /** @var Organization $knownOrganization */
-        $knownOrganization = $this->getEntity(Organization::class, ['id' => 2, 'name' => 'known']);
-
         $user = $this->createMock(AbstractUser::class);
         $user->expects($this->once())
-            ->method('getOrganizations')
-            ->willReturn(new ArrayCollection([$knownOrganization]));
+            ->method('isBelongToOrganization')
+            ->with($this->identicalTo($organizationContext), $this->isTrue())
+            ->willReturn(false);
 
         $token = $this->createMock(OrganizationContextTokenInterface::class);
         $token->expects($this->any())
@@ -233,7 +229,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $token->expects($this->any())
             ->method('getUser')
             ->willReturn($user);
-        $token->expects($this->never())
+        $token->expects($this->once())
             ->method('setOrganizationContext');
 
         $this->tokenStorage->expects($this->atLeastOnce())
@@ -242,6 +238,16 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $this->tokenStorage->expects($this->once())
             ->method('setToken')
             ->with(null);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(Organization::class)
+            ->willReturn($em);
+        $em->expects($this->once())
+            ->method('find')
+            ->with(Organization::class, $organizationContext->getId())
+            ->willReturn($organizationContext);
 
         $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())

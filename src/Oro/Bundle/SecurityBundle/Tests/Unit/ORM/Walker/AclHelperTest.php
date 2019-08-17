@@ -5,6 +5,7 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalkerContext;
@@ -79,6 +80,36 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
             'VIEW',
             User::class,
             $user->getId(),
+            $org->getId()
+        );
+        $this->assertEquals($context, $hints['oro_access_rule.context']);
+    }
+
+    public function testApplyToQueryWithDefaultConfigurationAndTokenWithOrganizationButWithoutUserObject()
+    {
+        $org = new Organization(2);
+        $token = $this->createMock(OrganizationContextTokenInterface::class);
+        $token->expects($this->any())
+            ->method('getOrganizationContext')
+            ->willReturn($org);
+        $token->expects($this->any())
+            ->method('getUser')
+            ->willReturn('anonymous');
+        $this->tokenStorage->setToken($token);
+
+        $query = new Query($this->em);
+
+        $this->helper->apply($query);
+        $hints = $query->getHints();
+
+        $this->assertCount(2, $hints);
+        $this->assertEquals([AccessRuleWalker::class], $hints['doctrine.customTreeWalkers']);
+
+        $context = new AccessRuleWalkerContext(
+            $this->accessRuleExecutor,
+            'VIEW',
+            null,
+            null,
             $org->getId()
         );
         $this->assertEquals($context, $hints['oro_access_rule.context']);

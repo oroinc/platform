@@ -64,9 +64,9 @@ class AclHelper
             if ($user instanceof UserInterface) {
                 $userId = $user->getId();
                 $userClass = ClassUtils::getClass($user);
-                if ($token instanceof OrganizationContextTokenInterface) {
-                    $organizationId = $token->getOrganizationContext()->getId();
-                }
+            }
+            if ($token instanceof OrganizationContextTokenInterface) {
+                $organizationId = $token->getOrganizationContext()->getId();
             }
         }
         $context = new AccessRuleWalkerContext(

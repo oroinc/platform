@@ -124,7 +124,7 @@ class BusinessUnitManager
         }
 
         if (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
-            return $newUser->getOrganizations()->contains($organization);
+            return $newUser->isBelongToOrganization($organization);
         }
 
         $allowedBuIds = $this->getAllowedBusinessUnitIds($currentUser, $accessLevel, $treeProvider, $organization);

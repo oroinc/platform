@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Provider\Console;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\PlatformBundle\Provider\Console\AbstractGlobalOptionsProvider;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
@@ -15,10 +16,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * Provides "current-user" and "current-organization" options for all commands.
+ */
 class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
 {
-    const OPTION_USER         = 'current-user';
-    const OPTION_ORGANIZATION = 'current-organization';
+    public const OPTION_USER         = 'current-user';
+    public const OPTION_ORGANIZATION = 'current-organization';
 
     /** @var ContainerInterface */
     private $container;
@@ -67,93 +71,108 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
             return;
         }
 
-        $tokenStorage = $this->getSecurityTokenStorage();
         $token = $this->createToken($user);
-        $tokenStorage->setToken($token);
+        $this->getSecurityTokenStorage()->setToken($token);
 
-        if ($token && $token instanceof OrganizationContextTokenInterface) {
+        if ($token instanceof OrganizationContextTokenInterface) {
             $this->setOrganization($organization, $token);
         }
     }
 
     /**
      * @param mixed $user
-     * @throws \InvalidArgumentException
      *
-     * @return TokenInterface
+     * @return TokenInterface|null
      */
-    protected function createToken($user)
+    private function createToken($user): ?TokenInterface
     {
         if (!$user) {
-            return;
+            return null;
         }
 
-        $userId = filter_var($user, FILTER_VALIDATE_INT);
-        if ($userId) {
-            $userEntity = $this->getDoctrine()->getRepository('OroUserBundle:User')->find($userId);
-        } else {
-            $userEntity = $this->getUserManager()->findUserByUsernameOrEmail($user);
+        $userEntity = $this->loadUser($user);
+        if (null === $userEntity) {
+            throw new \InvalidArgumentException(sprintf('Can\'t find user with identifier %s', $user));
         }
 
-        if ($userEntity) {
-            $token = new ConsoleToken($userEntity->getRoles());
-            $token->setUser($userEntity);
+        $token = new ConsoleToken($userEntity->getRoles());
+        $token->setUser($userEntity);
 
-            return $token;
-        } else {
-            throw new \InvalidArgumentException(
-                sprintf('Can\'t find user with identifier %s', $user)
-            );
-        }
+        return $token;
     }
 
     /**
-     * @param mixed $organization
-     * @param OrganizationContextTokenInterface $token
-     * @throws \InvalidArgumentException
+     * @param mixed $user
+     *
+     * @return User|null
      */
-    protected function setOrganization($organization, OrganizationContextTokenInterface $token)
+    private function loadUser($user): ?User
+    {
+        $userId = filter_var($user, FILTER_VALIDATE_INT);
+        if ($userId) {
+            return $this->getDoctrine()->getRepository(User::class)->find($userId);
+        }
+
+        return $this->getUserManager()->findUserByUsernameOrEmail($user);
+    }
+
+    /**
+     * @param mixed                             $organization
+     * @param OrganizationContextTokenInterface $token
+     */
+    private function setOrganization($organization, OrganizationContextTokenInterface $token): void
     {
         if (!$organization) {
             return;
         }
 
-        $organizationRepository = $this->getDoctrine()->getRepository('OroOrganizationBundle:Organization');
+        $organizationEntity = $this->loadOrganization($organization);
+        if (null === $organizationEntity) {
+            throw new \InvalidArgumentException(sprintf(
+                'Can\'t find organization with identifier %s',
+                $organization
+            ));
+        }
 
+        if (!$organizationEntity->isEnabled()) {
+            throw new \InvalidArgumentException(sprintf(
+                'Organization %s is not enabled',
+                $organizationEntity->getName()
+            ));
+        }
+
+        $user = $token->getUser();
+        if ($user instanceof User && !$user->isBelongToOrganization($organizationEntity)) {
+            throw new \InvalidArgumentException(sprintf(
+                'User %s is not in organization %s',
+                $user->getUsername(),
+                $organizationEntity->getName()
+            ));
+        }
+
+        $token->setOrganizationContext($organizationEntity);
+    }
+
+    /**
+     * @param mixed $organization
+     *
+     * @return Organization|null
+     */
+    private function loadOrganization($organization): ?Organization
+    {
+        $organizationRepository = $this->getDoctrine()->getRepository(Organization::class);
         $organizationId = filter_var($organization, FILTER_VALIDATE_INT);
         if ($organizationId) {
-            $organizationEntity = $organizationRepository->find($organizationId);
-        } else {
-            $organizationEntity = $organizationRepository->findOneBy(['name' => $organization]);
+            return $organizationRepository->find($organizationId);
         }
 
-        if ($organizationEntity) {
-            // organization must be enabled
-            if (!$organizationEntity->isEnabled()) {
-                throw new \InvalidArgumentException(
-                    sprintf('Organization %s is not enabled', $organizationEntity->getName())
-                );
-            }
-
-            $user = $token->getUser();
-            if ($user && $user instanceof User && !$user->hasOrganization($organizationEntity)) {
-                throw new \InvalidArgumentException(
-                    sprintf('User %s is not in organization %s', $user->getUsername(), $organizationEntity->getName())
-                );
-            }
-
-            $token->setOrganizationContext($organizationEntity);
-        } else {
-            throw new \InvalidArgumentException(
-                sprintf('Can\'t find organization with identifier %s', $organization)
-            );
-        }
+        return $organizationRepository->findOneBy(['name' => $organization]);
     }
 
     /**
      * @return ManagerRegistry
      */
-    protected function getDoctrine()
+    private function getDoctrine(): ManagerRegistry
     {
         return $this->container->get('doctrine');
     }
@@ -161,7 +180,7 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
     /**
      * @return TokenStorageInterface
      */
-    protected function getSecurityTokenStorage()
+    private function getSecurityTokenStorage(): TokenStorageInterface
     {
         return $this->container->get('security.token_storage');
     }
@@ -169,7 +188,7 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
     /**
      * @return UserManager
      */
-    protected function getUserManager()
+    private function getUserManager(): UserManager
     {
         return $this->container->get('oro_user.manager');
     }

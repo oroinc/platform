@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Symfony\Component\Security\Core\Role\Role;
 
@@ -22,7 +23,7 @@ abstract class AbstractUser implements
     UserInterface,
     LoginInfoInterface,
     \Serializable,
-    OrganizationAwareUserInterface,
+    OrganizationAwareInterface,
     PasswordRecoveryInterface
 {
     const ROLE_DEFAULT = 'ROLE_USER';
@@ -646,17 +647,36 @@ abstract class AbstractUser implements
     }
 
     /**
-     * {@inheritdoc}
+     * Checks whether the user is belong to the given organization.
+     *
+     * @param Organization $organization
+     * @param bool         $onlyEnabled Whether all or only enabled organizations should be checked
+     *
+     * @return bool
      */
-    public function getOrganizations($onlyActive = false)
+    public function isBelongToOrganization(Organization $organization, bool $onlyEnabled = false): bool
     {
-        $collection = new ArrayCollection();
-        if ($this->organization) {
-            if (!$onlyActive || ($onlyActive && $this->organization->isEnabled())) {
-                $collection->add($this->organization);
+        $organizationId = $organization->getId();
+        $organizations = $this->getOrganizations($onlyEnabled);
+        foreach ($organizations as $org) {
+            if (null === $organizationId) {
+                if ($org === $organization) {
+                    return true;
+                }
+            } elseif ($org->getId() === $organizationId) {
+                return true;
             }
         }
 
-        return $collection;
+        return false;
     }
+
+    /**
+     * Gets organizations the user is belong to.
+     *
+     * @param bool $onlyEnabled Whether all or only enabled organizations should be returned
+     *
+     * @return Collection|OrganizationInterface[]
+     */
+    abstract public function getOrganizations(bool $onlyEnabled = false);
 }

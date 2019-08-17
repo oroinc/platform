@@ -84,7 +84,7 @@ class AclPermissionController extends Controller
         if (!$token instanceof OrganizationContextTokenInterface ||
             !$token->getUser() instanceof User ||
             !$organization->isEnabled() ||
-            !$token->getUser()->getOrganizations()->contains($organization)
+            !$token->getUser()->isBelongToOrganization($organization)
         ) {
             throw new AccessDeniedException(
                 $this->get('translator')->trans(
@@ -98,7 +98,7 @@ class AclPermissionController extends Controller
         $this->get('event_dispatcher')->dispatch(OrganizationSwitchBefore::NAME, $event);
         $organization = $event->getOrganizationToSwitch();
 
-        if (!$user->getOrganizations(true)->contains($organization)) {
+        if (!$user->isBelongToOrganization($organization, true)) {
             $message = $this->get('translator')
                 ->trans('oro.security.organization.access_denied', ['%organization_name%' => $organization->getName()]);
 
