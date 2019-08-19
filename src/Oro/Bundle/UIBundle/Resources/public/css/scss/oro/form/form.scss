@@ -394,6 +394,13 @@ select[multiple] {
             border-color: $secondary-100;
         }
     }
+
+    &.error {
+        input:not(:focus),
+        .selector:not(.focus) {
+            border-color: $input-error-border-color;
+        }
+    }
 }
 
 .btn-group {

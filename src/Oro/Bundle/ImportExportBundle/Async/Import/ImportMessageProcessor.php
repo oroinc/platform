@@ -7,6 +7,7 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 use Oro\Component\MessageQueue\Job\JobRunner;
@@ -93,6 +94,7 @@ class ImportMessageProcessor implements MessageProcessorInterface
 
             return self::REJECT;
         }
+        $body[Config::PARAMETER_TOPIC_NAME] = $message->getProperty(Config::PARAMETER_TOPIC_NAME);
 
         try {
             $result = $this->jobRunner->runDelayed(

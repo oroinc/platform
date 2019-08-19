@@ -5,6 +5,9 @@ namespace Oro\Bundle\LocaleBundle\Converter;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Provided functionality to convert date time to different formats
+ */
 abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverterInterface
 {
     /**
@@ -19,7 +22,7 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
      *
      * @var array
      */
-    protected $defaultFormatMatch = array(
+    protected $defaultFormatMatch = [
         'GGGGG'  => '',
         'GGGG'   => '',
         'GGG'    => '',
@@ -120,14 +123,14 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
         'xxx'    => '',
         'xx'     => '',
         'x'      => '',
-    );
+    ];
 
     /**
      * Property should be overridden in descendant classes
      *
      * @var array
      */
-    protected $formatMatch = array();
+    protected $formatMatch = [];
 
     /** @var TranslatorInterface */
     private $translator;
@@ -214,8 +217,18 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
      */
     protected function convertFormat($format)
     {
-        $formatMatch = array_merge($this->defaultFormatMatch, $this->formatMatch);
+        $newFormat = '';
+        $start = 0;
 
-        return strtr($format, $formatMatch);
+        $formatMatch = array_merge($this->defaultFormatMatch, $this->formatMatch);
+        $tokens = preg_split("/[\s:,\.\/\x{00a0}]+/u", $format, -1, PREG_SPLIT_OFFSET_CAPTURE);
+        foreach ($tokens as $token) {
+            $newFormat .= substr($format, $start, $token[1] - $start);
+            $newFormat .= $formatMatch[$token[0]] ?? $token[0];
+
+            $start = strlen($token[0]) + $token[1];
+        }
+
+        return $newFormat;
     }
 }

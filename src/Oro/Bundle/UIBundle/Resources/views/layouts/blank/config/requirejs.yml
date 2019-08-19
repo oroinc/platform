@@ -42,6 +42,7 @@ config:
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
             'jquery.timepicker': 'oroui/js/extend/jquery.timepicker'
             'popper.js': 'popper'
+            'popper': 'extend-popper'
             'util.js': 'bootstrap-util'
             'alert.js': 'bootstrap-alert'
             'dropdown.js': 'bootstrap-dropdown'
@@ -87,6 +88,8 @@ config:
             'chaplin': 'chaplin'
         'oroui/js/tools':
             'chaplin': 'chaplin'
+        'extend-popper':
+            'popper': 'popper'
     paths:
         'text': 'bundles/bowerassets/text/text.js'
         'base64': 'oroui/js/extend/base64.js'
@@ -102,6 +105,7 @@ config:
         'jquery.cookie': 'bundles/bowerassets/jquery-cookie/jquery.cookie.js'
         'jquery.mCustomScrollbar': 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js'
         'popper': 'bundles/npmassets/popper.js/dist/umd/popper.js'
+        'extend-popper': 'bundles/oroui/js/extend/popper.js'
         'bootstrap-util': 'bundles/npmassets/bootstrap/js/dist/util.js'
         'bootstrap-alert': 'bundles/npmassets/bootstrap/js/dist/alert.js'
         'bootstrap-dropdown': 'bundles/npmassets/bootstrap/js/dist/dropdown.js'

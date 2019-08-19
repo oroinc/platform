@@ -20,7 +20,7 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
     private $databaseChecker;
 
     /** @var CacheProvider */
-    private $cache;
+    protected $cache;
 
     /**
      * @param DatabaseChecker $databaseChecker

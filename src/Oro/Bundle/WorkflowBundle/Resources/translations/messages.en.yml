@@ -108,6 +108,7 @@ oro:
                 process_info: Process Information
                 general_information: General Information
                 steps_and_transitions: Steps & Transitions
+                workflow_diagrams: Workflow Diagram
             view:
                 process:
                     trigger:

@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
+/**
+ * Integer field type
+ */
 class IntegerAttributeType implements AttributeTypeInterface
 {
     /** @var string */
@@ -63,7 +66,7 @@ class IntegerAttributeType implements AttributeTypeInterface
      */
     public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
-        return (int)$originalValue;
+        return ($originalValue === null) ? $originalValue : (int)$originalValue;
     }
 
     /**

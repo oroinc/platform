@@ -4,7 +4,6 @@
 @import "variables/workflow";
 
 $flowchart-bg-color: $primary-inverse !default;
-$flowchart-padding-top: 20px !default;
 
 $flowchart-controls-padding: 10px 10px 0 !default;
 $flowchart-controls-min-height: 32px !default;
@@ -14,6 +13,7 @@ $flowchart-checkbox-group-padding: side-values(5px 7px 2px) !default;
 $flowchart-alert-margin-top: 30px !default;
 
 $flowchart-wrapper-height: 700px !default;
+$flowchart-wrapper-border: 1px solid $additional-ultra-light !default;
 $jsplumb-endpoint-z-index: 100 !default;
 $jsplumb-source-radius: 7px !default;
 $jsplumb-source-border: 3px solid $primary-inverse !default;
