@@ -21,7 +21,7 @@ define(function(require) {
          */
         optionNames: BaseView.prototype.optionNames.concat([
             'builderOptions', 'storageManager', 'builderPlugins', 'storagePrefix',
-            'currentTheme', 'contextClass'
+            'currentTheme', 'contextClass', 'canvasConfig'
         ]),
 
         /**
@@ -331,14 +331,14 @@ define(function(require) {
          */
         _getCanvasConfig: function() {
             var theme = this.getCurrentTheme();
-            return {
+            return _.extend({}, this.canvasConfig, {
                 canvasCss: '.gjs-comp-selected { outline: 3px solid #0c809e !important; ' +
                     'outline-offset: 0 !important; }' +
                     '#wrapper { padding: 3px; }',
                 canvas: {
                     styles: [theme.stylesheet]
                 }
-            };
+            });
         },
 
         /**
