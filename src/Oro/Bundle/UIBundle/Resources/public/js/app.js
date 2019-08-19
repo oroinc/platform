@@ -1,11 +1,11 @@
-define([
-    'underscore',
-    './app/application',
-    './app/routes',
-    'module',
-    './extend/polyfill'
-].concat(requirejs.s.contexts._.config.appmodules), function(_, Application, routes, module) {
+define(function(require, exports, module) {
     'use strict';
+
+    var _ = require('underscore');
+    var Application = require('oroui/js/app/application');
+    var routes = require('oroui/js/app/routes');
+    require('oroui/js/extend/polyfill');
+    require('app-modules!');
 
     var options = _.extend(module.config(), {
         // load routers
