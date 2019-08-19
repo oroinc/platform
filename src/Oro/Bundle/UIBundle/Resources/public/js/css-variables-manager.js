@@ -60,16 +60,20 @@ define(function(require) {
         },
 
         createHandlers: function() {
-            mediator.setHandler('fetch:head:breakpoints', this.getHeadBreakpoints, this);
+            mediator.setHandler('fetch:head:computedVars', this.getHeadBreakpoints, this);
         },
 
         /**
          * Get hot computed variables
          */
-        getComputedVariables: function() {
+        getComputedVariables: function(context) {
+            if (!context) {
+                context = document.head;
+            }
+
             var regexp = /(--[\w-]*:)/g;
             var regexpVal = /:\s?[\w\d-(): ]*/g;
-            var content = window.getComputedStyle(document.head, ':before').getPropertyValue('content');
+            var content = window.getComputedStyle(context, ':before').getPropertyValue('content');
 
             if (content === 'none') {
                 this.deferred.resolve(this.cssVariables);
@@ -90,10 +94,12 @@ define(function(require) {
                     mediator.trigger('css:breakpoints:fetched', this.cssVariables);
                 }
             }, this));
+
+            return this.cssVariables;
         },
 
-        getHeadBreakpoints: function() {
-
+        getHeadBreakpoints: function(context) {
+            return this.getComputedVariables(context);
         }
     };
 
