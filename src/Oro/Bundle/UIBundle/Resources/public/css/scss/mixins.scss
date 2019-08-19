@@ -300,11 +300,11 @@ $enable-safe-area: true;
 
 // Creates set of keyframes with vendor prefixes
 @mixin keyframe($animation-name) {
-    @-webkit-keyframes $animation-name {
+    @-webkit-keyframes #{$animation-name} {
         @content;
     }
 
-    @keyframes $animation-name {
+    @keyframes #{$animation-name} {
         @content;
     }
 }
