@@ -87,6 +87,14 @@ define(function(require) {
         },
 
         /**
+         * Asset manager settings
+         * @property {Object}
+         */
+        assetManagerConfig: {
+            embedAsBase64: 1
+        },
+
+        /**
          * Themes list
          * @property {Array}
          */
@@ -186,6 +194,7 @@ define(function(require) {
 
             this.builderDelegateEvents();
 
+            console.log(this.builder)
             GrapesJSModules.call('components', {
                 builder: this.builder
             });
@@ -295,6 +304,7 @@ define(function(require) {
                 , this._getStorageManagerConfig()
                 , this._getCanvasConfig()
                 , this._getStyleManagerConfig()
+                , this._getAssetConfig()
             );
 
             return this.builderOptions;
@@ -339,6 +349,17 @@ define(function(require) {
                     styles: [theme.stylesheet]
                 }
             });
+        },
+
+        /**
+         * Get asset manager configuration
+         * @returns {*|void}
+         * @private
+         */
+        _getAssetConfig: function() {
+            return {
+                assetManager: this.assetManagerConfig
+            };
         },
 
         /**
