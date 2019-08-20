@@ -1063,4 +1063,56 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             ->setParameters(['{{ owner }}' => 'owner'])
             ->assertRaised();
     }
+
+    public function testValidNewEntityWithBusinessUnitOwnerAndWithoutUserInToken()
+    {
+        $tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $tokenAccessor->expects(self::any())
+            ->method('getUser')
+            ->willReturn(null);
+
+        $this->validator = new OwnerValidator(
+            $this->doctrine,
+            $this->ownershipMetadataProvider,
+            $this->authorizationChecker,
+            $tokenAccessor,
+            $this->ownerTreeProvider,
+            $this->aclVoter,
+            $this->aclGroupProvider,
+            $this->businessUnitManager
+        );
+
+        $ownershipMetadata = $this->createOwnershipMetadata('BUSINESS_UNIT');
+        $entityMetadata = $this->createMock(ClassMetadata::class);
+        $accessLevel = AccessLevel::DEEP_LEVEL;
+
+        $owner = $this->createBusinessUnit(123);
+        $this->testEntity->setOwner($owner);
+
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with($this->testEntity)
+            ->willReturn([]);
+
+        $this->ownershipMetadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(Entity::class)
+            ->willReturn($ownershipMetadata);
+
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('CREATE', 'entity:' . Entity::class)
+            ->willReturn(true);
+        $this->businessUnitManager->expects(self::never())
+            ->method('canBusinessUnitBeSetAsOwner');
+
+        $this->validator->validate($this->testEntity, $this->constraint);
+        $this->assertNoViolation();
+    }
 }

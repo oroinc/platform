@@ -35,9 +35,9 @@ define(function(require) {
     };
 
     DataGridComponent = BaseComponent.extend({
-        currentApperanceKey: 'grid',
+        currentAppearanceKey: 'grid',
 
-        currentApperanceId: void 0,
+        currentAppearanceId: void 0,
 
         changeAppearanceEnabled: false,
 
@@ -287,7 +287,7 @@ define(function(require) {
             if (this.changeAppearanceEnabled) {
                 grid.on('changeAppearance', _.bind(this.onChangeAppearance, this));
                 collection.on('updateState', _.bind(function() {
-                    if (this.currentApperanceKey !== collection.state.appearanceType ||
+                    if (this.currentAppearanceKey !== collection.state.appearanceType ||
                         this.currentAppearanceId !== collection.state.appearanceData.id) {
                         this.selectAppearanceById(collection.state.appearanceData.id);
                     }
@@ -330,12 +330,12 @@ define(function(require) {
         },
 
         selectAppearance: function(key, options) {
-            if (this.currentApperanceKey === key &&
+            if (this.currentAppearanceKey === key &&
                 this.currentAppearanceId === options.id) {
                 return;
             }
 
-            this.currentApperanceKey = key;
+            this.currentAppearanceKey = key;
             this.currentAppearanceId = options.id;
 
             if (this.lastAppearancePlugin) {

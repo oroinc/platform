@@ -30,11 +30,32 @@
             // .hide-on-strict-tablet,
             // .hide-on-strict-tablet-small
             // .hide-on-strict-mobile-landscape,
-            // .hide-on-strict-mobile
+            // .hide-on-strict-mobile-big
             .hide-on-#{$current-breakpoint-name} {
                 display: none !important;
             }
         }
+    }
+
+    // Breakpoint global variables
+    head:before {
+        $content: '';
+        $keyIndex: 0;
+        $sep: '|';
+        @each $breakpoint, $value in $breakpoints {
+            @if ($keyIndex == 0) {
+                $sep: ''
+            } @else {
+                $sep: '|'
+            }
+
+            $content: '#{$content}#{$sep}--breakpoints-#{$breakpoint}:#{$value}';
+
+            $keyIndex: $keyIndex + 1;
+        }
+
+        content: $content;
+        display: none;
     }
 }
 

@@ -5,6 +5,7 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
     var $ = require('jquery');
     var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
     var ZoomStateModel = require('oroui/js/app/models/zoom-state-model');
     var ZoomControlsView = require('./zoom-controls-view');
 
@@ -26,6 +27,14 @@ define(function(require) {
             autozoom: 'onZoomAuto'
         },
 
+        scrollHintContainerClass: 'zoom-scroll-hint',
+
+        scrollHintLabel: 'oro.ui.zoom.scroll_hint',
+
+        scrollHintTemplate: require('tpl!../../../templates/zoom-scroll-hint.html'),
+
+        scrollHintDelay: 1000,
+
         /**
          * @inheritDoc
          */
@@ -37,6 +46,8 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
+            _.extend(this, _.pick(options, 'scrollHintContainerClass', 'scrollHintLabel', 'scrollHintDelay'));
+
             ZoomAreaView.__super__.initialize.apply(this, arguments);
             this.$zoomedElement = this.$el.find('>*:first');
             if (!this.model) {
@@ -57,13 +68,59 @@ define(function(require) {
             }
         },
 
-        onMouseWheel: function(event, delta, deltaX, deltaY) {
-            var clientRect = this.el.getBoundingClientRect();
-            event.preventDefault();
-            if (deltaY > 0) {
-                this.model.zoomIn(event.clientX - clientRect.left, event.clientY - clientRect.top);
+        /**
+         * @inheritDoc
+         */
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
+            this.hideScrollHint();
+
+            ZoomAreaView.__super__.dispose.call(this);
+        },
+
+        showScrollHint: function() {
+            if (this.scrollHintTimeoutId) {
+                clearTimeout(this.scrollHintTimeoutId);
             } else {
-                this.model.zoomOut(event.clientX - clientRect.left, event.clientY - clientRect.top);
+                this.$el.append(this.scrollHintTemplate({
+                    containerClass: this.scrollHintContainerClass,
+                    label: __(this.scrollHintLabel)
+                }));
+            }
+
+            this.scrollHintTimeoutId = setTimeout(this.hideScrollHint.bind(this), this.scrollHintDelay);
+        },
+
+        hideScrollHint: function() {
+            if (!this.scrollHintTimeoutId) {
+                return;
+            }
+
+            clearTimeout(this.scrollHintTimeoutId);
+            delete this.scrollHintTimeoutId;
+            this.$el.find('.' + this.scrollHintContainerClass).remove();
+        },
+
+        onMouseWheel: function(event, delta, deltaX, deltaY) {
+            if (event.ctrlKey || event.altKey || event.metaKey) {
+                event.preventDefault();
+
+                this.hideScrollHint();
+
+                var clientRect = this.el.getBoundingClientRect();
+                var dx = event.clientX - clientRect.left;
+                var dy = event.clientY - clientRect.top;
+
+                if (deltaY > 0) {
+                    this.model.zoomIn(dx, dy);
+                } else {
+                    this.model.zoomOut(dx, dy);
+                }
+            } else {
+                this.showScrollHint();
             }
         },
 

@@ -29,3 +29,6 @@ oro_behat_extension:
       selector:
         type: 'xpath'
         locator: "//form[@name='oro_importexport_import_']/span[@class='validation-failed']/span"
+
+    ExportButtonDropdown:
+      selector: '.export-btn + .dropdown-toggle'
