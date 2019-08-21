@@ -180,6 +180,49 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     }
 
     /**
+     * Assert that activity item has excepted actions
+     * Example: I should see following actions on "Task For Charlie" in activity list:
+     *            | Start progress |
+     *            | Close          |
+     *
+     * @Given /^(?:|I )should see (?P<only>|only )following actions on "(?P<content>[\w\s]*)" in activity list:$/
+     *
+     * @param bool $only
+     * @param string $content
+     * @param TableNode $actions
+     */
+    public function iShouldSeeFollowingActionsInActivityItem(bool $only, string $content, TableNode $actions): void
+    {
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('Activity List');
+        $item = $activityList->getActivityListItem($content);
+
+        $actualActions = $item->getActions();
+
+        $errors = [];
+        foreach ($actions->getRows() as $action) {
+            foreach ($actualActions as $key => $actualAction) {
+                if (preg_match(sprintf('/%s/i', $action[0]), $actualAction->getText())) {
+                    unset($actualActions[$key]);
+                    continue 2;
+                }
+            }
+
+            $errors[] = sprintf('   - "%s"', $action[0]);
+        }
+
+        if ($only && $actualActions) {
+            foreach ($actualActions as $actualAction) {
+                $errors[] = sprintf('   + "%s"', $actualAction->getText());
+            }
+        }
+
+        if ($errors) {
+            self::fail(sprintf('Action list not expected: %s', PHP_EOL . implode(PHP_EOL, $errors)));
+        }
+    }
+
+    /**
      * Assert that email body in activity list has substring
      * Example: Then I should see "We have new role for you" in email body
      *
