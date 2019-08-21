@@ -441,6 +441,14 @@
             }
         }
     }
+
+    &am-highlight {
+        color: $primary-inverse;
+
+        .gjs-am-close {
+            top: -10px;
+        }
+    }
 }
 
 .gjs-dashed {
