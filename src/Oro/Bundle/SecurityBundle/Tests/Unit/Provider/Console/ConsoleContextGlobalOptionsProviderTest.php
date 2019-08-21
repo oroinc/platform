@@ -363,7 +363,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
 
         $expectedToken = new ConsoleToken([$role]);
         $expectedToken->setUser($user);
-        $expectedToken->setOrganizationContext($organization);
+        $expectedToken->setOrganization($organization);
 
         $this->provider->resolveGlobalOptions($input);
         $this->assertEquals($expectedToken, $this->tokenStorage->getToken());

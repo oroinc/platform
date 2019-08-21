@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
@@ -80,11 +80,11 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
     {
         $organization = null;
         $accessLevel = $this->getAccessLevel($triggeredMask);
-        if ($securityToken instanceof OrganizationContextTokenInterface) {
+        if ($securityToken instanceof OrganizationAwareTokenInterface) {
             if ($this->isAccessDeniedByOrganizationContext($object, $securityToken, $accessLevel)) {
                 return false;
             }
-            $organization = $securityToken->getOrganizationContext();
+            $organization = $securityToken->getOrganization();
         }
 
         return $this->isAccessGrantedByAccessLevel(
@@ -248,15 +248,15 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
      * We should check organization for all the entities what have ownership
      *  (USER, BUSINESS_UNIT, ORGANIZATION ownership types)
      *
-     * @param object                            $object
-     * @param OrganizationContextTokenInterface $securityToken
-     * @param string                            $accessLevel
+     * @param object                          $object
+     * @param OrganizationAwareTokenInterface $securityToken
+     * @param string                          $accessLevel
      *
      * @return bool
      */
     protected function isAccessDeniedByOrganizationContext(
         $object,
-        OrganizationContextTokenInterface $securityToken,
+        OrganizationAwareTokenInterface $securityToken,
         $accessLevel
     ) {
         $objectOrganizationId = $this->getOrganizationId($object);
@@ -264,7 +264,7 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
         // check entity organization with current organization
         return
             null !== $objectOrganizationId
-            && $objectOrganizationId !== $securityToken->getOrganizationContext()->getId();
+            && $objectOrganizationId !== $securityToken->getOrganization()->getId();
     }
 
     /**

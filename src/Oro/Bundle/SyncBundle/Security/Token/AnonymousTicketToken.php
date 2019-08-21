@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\SyncBundle\Security\Token;
 
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenSerializerTrait;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenTrait;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 
 /**
- * Anonymous security token for Sync authentication ticket.
+ * The anonymous authentication token for Sync authentication ticket.
  */
-class AnonymousTicketToken extends AnonymousToken implements OrganizationContextTokenInterface
+class AnonymousTicketToken extends AnonymousToken implements OrganizationAwareTokenInterface
 {
-    use OrganizationContextTokenSerializerTrait;
+    use OrganizationAwareTokenTrait;
 }

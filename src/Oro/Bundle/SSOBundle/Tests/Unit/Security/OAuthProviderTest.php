@@ -100,7 +100,7 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
         $token->setResourceOwnerName('google');
         $organization = new Organization();
         $organization->setEnabled(true);
-        $token->setOrganizationContext($organization);
+        $token->setOrganization($organization);
 
         $userResponse = $this->createMock(UserResponseInterface::class);
 

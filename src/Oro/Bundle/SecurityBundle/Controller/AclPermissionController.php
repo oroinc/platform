@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Controller;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Event\OrganizationSwitchAfter;
 use Oro\Bundle\SecurityBundle\Event\OrganizationSwitchBefore;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -81,7 +81,7 @@ class AclPermissionController extends Controller
         $token = $this->container->get('security.token_storage')->getToken();
         $user  = $token->getUser();
 
-        if (!$token instanceof OrganizationContextTokenInterface ||
+        if (!$token instanceof OrganizationAwareTokenInterface ||
             !$token->getUser() instanceof User ||
             !$organization->isEnabled() ||
             !$token->getUser()->isBelongToOrganization($organization)
@@ -94,7 +94,7 @@ class AclPermissionController extends Controller
             );
         }
 
-        $event = new OrganizationSwitchBefore($user, $token->getOrganizationContext(), $organization);
+        $event = new OrganizationSwitchBefore($user, $token->getOrganization(), $organization);
         $this->get('event_dispatcher')->dispatch(OrganizationSwitchBefore::NAME, $event);
         $organization = $event->getOrganizationToSwitch();
 
@@ -105,7 +105,7 @@ class AclPermissionController extends Controller
             throw new AccessDeniedException($message);
         }
 
-        $token->setOrganizationContext($organization);
+        $token->setOrganization($organization);
         $event = new OrganizationSwitchAfter($user, $organization);
         $this->get('event_dispatcher')->dispatch(OrganizationSwitchAfter::NAME, $event);
         $request->attributes->set('_fullRedirect', true);

@@ -5,7 +5,7 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalkerContext;
@@ -88,9 +88,9 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
     public function testApplyToQueryWithDefaultConfigurationAndTokenWithOrganizationButWithoutUserObject()
     {
         $org = new Organization(2);
-        $token = $this->createMock(OrganizationContextTokenInterface::class);
+        $token = $this->createMock(OrganizationAwareTokenInterface::class);
         $token->expects($this->any())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->willReturn($org);
         $token->expects($this->any())
             ->method('getUser')

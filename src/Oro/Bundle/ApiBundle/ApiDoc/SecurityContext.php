@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -69,8 +69,8 @@ class SecurityContext implements SecurityContextInterface
             return null;
         }
 
-        if ($token instanceof OrganizationContextTokenInterface) {
-            $organization = $token->getOrganizationContext();
+        if ($token instanceof OrganizationAwareTokenInterface) {
+            $organization = $token->getOrganization();
             foreach ($apiKeyKeys as $apiKeyKey) {
                 if ($apiKeyKey->getOrganization()->getId() === $organization->getId()) {
                     return $apiKeyKey->getApiKey();

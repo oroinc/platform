@@ -262,7 +262,8 @@ class UserController extends Controller
     {
         /** @var UsernamePasswordOrganizationToken $token */
         $token = $this->get('security.token_storage')->getToken();
-        return $token->getOrganizationContext();
+
+        return $token->getOrganization();
     }
 
     /**

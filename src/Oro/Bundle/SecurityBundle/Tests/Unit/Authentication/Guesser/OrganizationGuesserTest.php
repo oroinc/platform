@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authentication\Guesser;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesser;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class OrganizationGuesserTest extends \PHPUnit\Framework\TestCase
@@ -23,9 +23,9 @@ class OrganizationGuesserTest extends \PHPUnit\Framework\TestCase
         $user = $this->createMock(User::class);
         $organization = $this->createMock(Organization::class);
 
-        $token = $this->createMock(OrganizationContextTokenInterface::class);
+        $token = $this->createMock(OrganizationAwareTokenInterface::class);
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->willReturn($organization);
 
         $this->assertSame($organization, $this->guesser->guess($user, $token));
@@ -36,9 +36,9 @@ class OrganizationGuesserTest extends \PHPUnit\Framework\TestCase
         $user = $this->createMock(User::class);
         $userOrganization = $this->createMock(Organization::class);
 
-        $token = $this->createMock(OrganizationContextTokenInterface::class);
+        $token = $this->createMock(OrganizationAwareTokenInterface::class);
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->willReturn(null);
 
         $user->expects($this->once())
@@ -59,9 +59,9 @@ class OrganizationGuesserTest extends \PHPUnit\Framework\TestCase
         $organization1 = $this->createMock(Organization::class);
         $organization2 = $this->createMock(Organization::class);
 
-        $token = $this->createMock(OrganizationContextTokenInterface::class);
+        $token = $this->createMock(OrganizationAwareTokenInterface::class);
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->willReturn(null);
 
         $user->expects($this->once())
@@ -80,9 +80,9 @@ class OrganizationGuesserTest extends \PHPUnit\Framework\TestCase
         $user = $this->createMock(User::class);
         $userOrganization = $this->createMock(Organization::class);
 
-        $token = $this->createMock(OrganizationContextTokenInterface::class);
+        $token = $this->createMock(OrganizationAwareTokenInterface::class);
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->willReturn(null);
 
         $user->expects($this->once())

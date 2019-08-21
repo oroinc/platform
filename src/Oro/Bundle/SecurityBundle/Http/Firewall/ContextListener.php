@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Http\Firewall;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Exception\OrganizationAccessDeniedException;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Psr\Log\LoggerInterface;
@@ -49,11 +49,11 @@ class ContextListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $token = $this->tokenStorage->getToken();
-        if (!$token instanceof OrganizationContextTokenInterface) {
+        if (!$token instanceof OrganizationAwareTokenInterface) {
             return;
         }
 
-        $organization = $token->getOrganizationContext();
+        $organization = $token->getOrganization();
         if (null === $organization) {
             return;
         }
@@ -61,7 +61,7 @@ class ContextListener
         $isAccessGranted = false;
         $organization = $this->refreshOrganization($organization);
         if (null !== $organization) {
-            $token->setOrganizationContext($organization);
+            $token->setOrganization($organization);
 
             $user = $token->getUser();
             if (!$user instanceof AbstractUser || $user->isBelongToOrganization($organization, true)) {
@@ -100,13 +100,13 @@ class ContextListener
      */
     private function denyAccess(GetResponseEvent $event): void
     {
-        /** @var OrganizationContextTokenInterface $token */
+        /** @var OrganizationAwareTokenInterface $token */
         $token = $this->tokenStorage->getToken();
 
         $this->tokenStorage->setToken(null);
 
         $exception = new OrganizationAccessDeniedException();
-        $exception->setOrganizationName($token->getOrganizationContext()->getName());
+        $exception->setOrganizationName($token->getOrganization()->getName());
         $exception->setToken($token);
 
         $session = $event->getRequest()->getSession();

@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Functional\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -52,10 +52,10 @@ class RefreshContextListenerTest extends WebTestCase
             $unitOfWork->getEntityState($token->getUser())
         );
 
-        if ($token instanceof OrganizationContextTokenInterface) {
+        if ($token instanceof OrganizationAwareTokenInterface) {
             $this->assertEquals(
                 UnitOfWork::STATE_MANAGED,
-                $unitOfWork->getEntityState($token->getOrganizationContext())
+                $unitOfWork->getEntityState($token->getOrganization())
             );
         }
     }

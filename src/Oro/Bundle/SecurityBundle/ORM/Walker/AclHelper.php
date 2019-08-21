@@ -6,7 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -65,8 +65,8 @@ class AclHelper
                 $userId = $user->getId();
                 $userClass = ClassUtils::getClass($user);
             }
-            if ($token instanceof OrganizationContextTokenInterface) {
-                $organizationId = $token->getOrganizationContext()->getId();
+            if ($token instanceof OrganizationAwareTokenInterface) {
+                $organizationId = $token->getOrganization()->getId();
             }
         }
         $context = new AccessRuleWalkerContext(

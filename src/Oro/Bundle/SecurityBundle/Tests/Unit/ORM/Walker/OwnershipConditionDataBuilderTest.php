@@ -216,7 +216,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
             ->method('getUser')
             ->will($this->returnValue($user));
         $token->expects($this->any())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->will($this->returnValue($organization));
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface $aclGroupProvider */

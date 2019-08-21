@@ -98,7 +98,7 @@ class OAuthProvider extends HWIOAuthProvider
 
         $token = $this->tokenFactory->create($token->getRawToken(), $user->getRoles());
         $token->setResourceOwnerName($resourceOwner->getName());
-        $token->setOrganizationContext($organization);
+        $token->setOrganization($organization);
         $token->setUser($user);
         $token->setAuthenticated(true);
 

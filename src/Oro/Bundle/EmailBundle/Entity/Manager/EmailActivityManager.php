@@ -9,7 +9,7 @@ use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
@@ -114,13 +114,12 @@ class EmailActivityManager
             return;
         }
 
-        // @todo: Should be deleted after email sync process will be refactored
         $token = $this->tokenStorage->getToken();
         if ($token) {
             $ownerOrganization = $this->entityOwnerAccessorLink->getService()->getOrganization($owner);
             if ($ownerOrganization
-                && $token instanceof OrganizationContextTokenInterface
-                && $token->getOrganizationContext()->getId() !== $ownerOrganization->getId()
+                && $token instanceof OrganizationAwareTokenInterface
+                && $token->getOrganization()->getId() !== $ownerOrganization->getId()
             ) {
                 return;
             }

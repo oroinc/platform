@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Authentication\Guesser;
 
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -18,8 +18,8 @@ class OrganizationGuesser implements OrganizationGuesserInterface
      */
     public function guess(AbstractUser $user, TokenInterface $token = null): ?Organization
     {
-        if ($token instanceof OrganizationContextTokenInterface) {
-            $organization = $token->getOrganizationContext();
+        if ($token instanceof OrganizationAwareTokenInterface) {
+            $organization = $token->getOrganization();
             if (null !== $organization) {
                 return $organization;
             }

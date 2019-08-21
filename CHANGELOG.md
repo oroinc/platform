@@ -14,6 +14,12 @@ The current file describes significant changes in the code that may affect the u
 #### AssetBundle
 * The new feature, [Hot Module Replacement (HMR or Hot Reload) enabled for SCSS](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#hot-module-replacement-hmr-or-hot-reload-for-scss). To enable HMR for custom CSS links, please [follow the documentation](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#enable-for-css-links).
 
+#### SecurityBundle
+* The interface `Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface`
+  was renamed to `Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface`.
+  Also methods `getOrganizationContext` and `setOrganizationContext` were renamed to
+  `getOrganization` and `setOrganization`.
+
 ## 4.0.0
 
 ### Added

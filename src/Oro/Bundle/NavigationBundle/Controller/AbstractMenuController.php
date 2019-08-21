@@ -11,7 +11,7 @@ use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\UIBundle\Form\Type\TreeMoveType;
 use Oro\Bundle\UIBundle\Model\TreeCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -338,7 +338,9 @@ abstract class AbstractMenuController extends Controller
             return null;
         }
 
-        return $token instanceof OrganizationContextTokenInterface ? $token->getOrganizationContext() : null;
+        return $token instanceof OrganizationAwareTokenInterface
+            ? $token->getOrganization()
+            : null;
     }
 
     /**

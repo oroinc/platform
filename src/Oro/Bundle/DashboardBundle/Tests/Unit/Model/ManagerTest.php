@@ -283,7 +283,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($token));
 
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->will($this->returnValue($organization));
 
         $this->assertEquals($dashboardModel, $this->manager->createDashboardModel());
@@ -531,7 +531,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($token));
 
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->will($this->returnValue($organization));
 
         $this->activeDashboardRepository->expects($this->once())
@@ -570,7 +570,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($token));
 
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->will($this->returnValue($organization));
 
         $this->activeDashboardRepository->expects($this->once())
@@ -602,7 +602,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($token));
 
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->will($this->returnValue($organization));
 
         $this->dashboardRepository->expects($this->once())
@@ -635,7 +635,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($token));
 
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->will($this->returnValue($organization));
 
         $this->dashboardRepository->expects($this->once())
@@ -812,7 +812,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($token));
 
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->will($this->returnValue($organization));
 
         $this->activeDashboardRepository->expects($this->once())
@@ -850,7 +850,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($token));
 
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->will($this->returnValue($organization));
 
         $this->activeDashboardRepository->expects($this->once())

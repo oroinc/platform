@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\PlatformBundle\Provider\Console\AbstractGlobalOptionsProvider;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\Console\Command\Command;
@@ -74,7 +74,7 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
         $token = $this->createToken($user);
         $this->getSecurityTokenStorage()->setToken($token);
 
-        if ($token instanceof OrganizationContextTokenInterface) {
+        if ($token instanceof OrganizationAwareTokenInterface) {
             $this->setOrganization($organization, $token);
         }
     }
@@ -117,10 +117,10 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
     }
 
     /**
-     * @param mixed                             $organization
-     * @param OrganizationContextTokenInterface $token
+     * @param mixed                           $organization
+     * @param OrganizationAwareTokenInterface $token
      */
-    private function setOrganization($organization, OrganizationContextTokenInterface $token): void
+    private function setOrganization($organization, OrganizationAwareTokenInterface $token): void
     {
         if (!$organization) {
             return;
@@ -150,7 +150,7 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
             ));
         }
 
-        $token->setOrganizationContext($organizationEntity);
+        $token->setOrganization($organizationEntity);
     }
 
     /**

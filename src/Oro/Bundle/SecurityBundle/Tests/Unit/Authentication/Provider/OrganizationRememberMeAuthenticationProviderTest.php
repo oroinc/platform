@@ -86,7 +86,7 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framewor
             $resultToken
         );
         $this->assertSame($user, $resultToken->getUser());
-        $this->assertSame($organization, $resultToken->getOrganizationContext());
+        $this->assertSame($organization, $resultToken->getOrganization());
     }
 
     public function testOrganizationGuessedFromUser()
@@ -106,7 +106,7 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framewor
             $resultToken
         );
         $this->assertSame($user, $resultToken->getUser());
-        $this->assertSame($organization, $resultToken->getOrganizationContext());
+        $this->assertSame($organization, $resultToken->getOrganization());
     }
 
     /**
