@@ -1,7 +1,7 @@
 /* @theme: blank; */
 
-// Use: @include font-face('Lato', '../fonts/lato/lato-regular-webfont', 400, normal, ('woff', 'woff2'));
-@mixin font-face($font-family, $file-path, $font-weight, $font-style, $font-formats) {
+// Use: @include font-face('Lato', '../fonts/lato/lato-regular-webfont', 400, normal, ('woff', 'woff2'), swap);
+@mixin font-face($font-family, $file-path, $font-weight, $font-style, $font-formats, $font-display: swap) {
     @font-face {
         font-family: $font-family;
         @if ($font-formats) {
@@ -49,6 +49,7 @@
 
         font-weight: $font-weight;
         font-style: $font-style;
+        font-display: $font-display;
     }
 }
 
