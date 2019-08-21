@@ -40,12 +40,11 @@
 
         word-break: break-word;
 
-        &:before {
+        &::before {
             display: inline-block;
 
             width: $custom-radio-icon-size;
             height: $custom-radio-icon-size;
-            margin: $custom-radio-icon-offset;
 
             content: '';
             vertical-align: middle;
@@ -53,6 +52,10 @@
             border: $custom-radio-icon-border;
             border-radius: 50%;
             background: $custom-radio-icon-bg;
+        }
+
+        &:not(:empty)::before {
+            margin: $custom-radio-icon-offset;
         }
     }
 

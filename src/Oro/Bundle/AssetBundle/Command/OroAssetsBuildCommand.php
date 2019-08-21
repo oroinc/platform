@@ -298,6 +298,9 @@ DESCRIPTION
      */
     protected function handleSignals(Process $process): void
     {
+        if (!\extension_loaded('pcntl')) {
+            return;
+        }
         $killNodeProcess = function () use ($process) {
             $process->signal(SIGKILL);
             exit();

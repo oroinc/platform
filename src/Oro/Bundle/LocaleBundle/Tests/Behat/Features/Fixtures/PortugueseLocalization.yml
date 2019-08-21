@@ -1,0 +1,13 @@
+include:
+    - '@OroTranslationBundle:PortugueseLanguage.yml'
+
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+    title_localization_portuguese:
+        string: 'Portuguese'
+
+Oro\Bundle\LocaleBundle\Entity\Localization:
+    localization_portuguese:
+        name: 'Portuguese'
+        language: '@portuguese_lang'
+        formattingCode: 'pt_BR'
+        titles: ['@title_localization_portuguese']
