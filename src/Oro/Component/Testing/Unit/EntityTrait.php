@@ -5,6 +5,9 @@ namespace Oro\Component\Testing\Unit;
 use Oro\Component\Testing\Unit\PropertyAccess\PropertyAccessTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
+/**
+ * Trait that helps developer to work with Entity for the testing purpose without mocking them
+ */
 trait EntityTrait
 {
     use PropertyAccessTrait;
@@ -46,7 +49,6 @@ trait EntityTrait
      * @param object $object
      * @param string $property
      * @param string $value
-     * @return bool true if success, otherwise false
      */
     protected function setValue($object, $property, $value)
     {
@@ -54,14 +56,19 @@ trait EntityTrait
             $this->getPropertyAccessor()->setValue($object, $property, $value);
         } catch (NoSuchPropertyException $e) {
             $reflectionClass = new \ReflectionClass($object);
+
+            // Looking for the property in parent classes
+            // because it's impossible to get parent properties from the derived class
+            while (!$reflectionClass->hasProperty($property)
+                && $parentReflectionClass = $reflectionClass->getParentClass()
+            ) {
+                $reflectionClass = $parentReflectionClass;
+            }
+
             $method = $reflectionClass->getProperty($property);
             $method->setAccessible(true);
             $method->setValue($object, $value);
-        } catch (\ReflectionException $e) {
-            return false;
         }
-
-        return true;
     }
 
     /**

@@ -515,6 +515,7 @@ define(function(require) {
 
             this.callToolbar('dispose');
             delete this.toolbars;
+            mediator.off('import-export:handleExport', this.onHandleExport, this);
 
             Grid.__super__.dispose.call(this);
         },
@@ -533,7 +534,26 @@ define(function(require) {
 
                 this.listenTo(this.collection, 'backgrid:sort', _.debounce(this.sort, 50), this);
             }
+
+            mediator.on('import-export:handleExport', this.onHandleExport, this);
             return this;
+        },
+
+        /**
+         * Pass whole query string (with selected filters, sorters, etc) to the export url
+         * if "filteredResultsGrid" option was passed to the configuration.
+         *
+         * @param exportRouteOptions
+         */
+        onHandleExport: function(exportRouteOptions) {
+            if (exportRouteOptions.hasOwnProperty('filteredResultsGrid')) {
+                var queryParams = tools.unpackFromQueryString(window.location.search);
+                var gridName = exportRouteOptions['filteredResultsGrid'];
+
+                if (queryParams.hasOwnProperty('grid') && queryParams['grid'].hasOwnProperty(gridName)) {
+                    exportRouteOptions.filteredResultsGridParams = queryParams['grid'][gridName];
+                }
+            }
         },
 
         /**
@@ -788,11 +808,21 @@ define(function(require) {
                     launcherOptions: this.actionOptions.refreshAction.launcherOptions,
                     order: 100
                 });
+
                 this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, _.debounce(function(ignoreVisibility) {
                     if (ignoreVisibility || this.$el.is(':visible')) {
                         this.refreshAction.execute();
+                    } else {
+                        this._hasDeferRefresh = true;
                     }
                 }, 100, true));
+
+                this.listenTo(mediator, 'content:shown', function() {
+                    if (this._hasDeferRefresh && this.$el.is(':visible')) {
+                        delete this._hasDeferRefresh;
+                        this.refreshAction.execute();
+                    }
+                }.bind(this));
 
                 this.listenTo(this.refreshAction, 'preExecute', function(action, options) {
                     this.$el.trigger('preExecute:refresh:' + this.name, [action, options]);

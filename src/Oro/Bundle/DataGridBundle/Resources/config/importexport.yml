@@ -25,6 +25,13 @@ services:
             - '@oro_importexport.context_registry'
             - '@oro_datagrid.importexport.export_connector'
 
+    oro_datagrid.importexport.export_filtered_reader:
+        class: Oro\Bundle\DataGridBundle\ImportExport\FilteredEntityReader
+        arguments:
+            - '@oro_datagrid.datagrid.manager'
+            - '@oro_security.acl_helper'
+            - '@oro_importexport.reader.entity'
+
     oro_datagrid.importexport.export_connector:
         class: '%oro_datagrid.importexport.export_connector.class%'
         arguments:

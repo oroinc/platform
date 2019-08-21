@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Controller;
 
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
@@ -111,9 +112,7 @@ class ImportExportController extends Controller
 
         $entityName = $request->get('entity');
 
-        $configurationsByAlias = $this
-            ->get('oro_importexport.twig_extension.get_import_export_configuration')
-            ->getConfiguration($configAlias);
+        $configurationsByAlias = $this->getImportConfigurations($configAlias);
 
         $configsWithForm = [];
 
@@ -163,6 +162,24 @@ class ImportExportController extends Controller
             'configsWithForm' => $configsWithForm,
             'chosenEntityName' => $entityName
         ];
+    }
+
+    /**
+     * @param string $configAlias
+     * @return array
+     */
+    private function getImportConfigurations(string $configAlias): array
+    {
+        $configurationsByAlias = $this
+            ->get('oro_importexport.twig_extension.get_import_export_configuration')
+            ->getConfiguration($configAlias);
+
+        return array_filter(
+            $configurationsByAlias,
+            function (ImportExportConfigurationInterface $configuration) {
+                return $configuration->getImportProcessorAlias();
+            }
+        );
     }
 
     /**

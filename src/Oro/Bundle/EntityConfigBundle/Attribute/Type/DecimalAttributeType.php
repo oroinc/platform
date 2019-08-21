@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
+/**
+ * Decimal field type
+ */
 class DecimalAttributeType implements AttributeTypeInterface
 {
     /** @var string */
@@ -63,7 +66,7 @@ class DecimalAttributeType implements AttributeTypeInterface
      */
     public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
-        return (float)$originalValue;
+        return ($originalValue === null) ? $originalValue : (float)$originalValue;
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
+use Behat\Mink\Exception\ElementNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class DateTimePicker extends Element
@@ -14,7 +15,15 @@ class DateTimePicker extends Element
     {
         $this->open();
         $this->getYearPicker()->selectOption($dateTime->format('Y'));
-        $this->getMonthPicker()->selectOption($dateTime->format('M'));
+
+        $monthPicker = $this->getMonthPicker();
+        $month = $dateTime->format('M');
+        try {
+            $monthPicker->selectOption($month);
+        } catch (ElementNotFoundException $e) {
+            $monthPicker->selectOption(strtolower($month));
+        }
+
         $this->getCalendarDate($dateTime->format('j'))->click();
 
         if ($this->getElements('TimePicker')) {

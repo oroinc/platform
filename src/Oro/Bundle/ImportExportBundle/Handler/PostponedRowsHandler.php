@@ -8,6 +8,7 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
@@ -121,6 +122,9 @@ class PostponedRowsHandler
         $jobRunner->createDelayed(
             sprintf('%s:postponed:%s', $currentJob->getRootJob()->getName(), $attempts),
             function (JobRunner $jobRunner, Job $child) use ($body, $fileName, $attempts) {
+                $topic = $body[Config::PARAMETER_TOPIC_NAME] ?? Topics::HTTP_IMPORT;
+                unset($body[Config::PARAMETER_TOPIC_NAME]);
+
                 $body = array_merge($body, [
                     'jobId' => $child->getId(),
                     'attempts' => $attempts,
@@ -133,7 +137,7 @@ class PostponedRowsHandler
                 $message = new Message();
                 $message->setDelay(static::DELAY_SECONDS);
                 $message->setBody($body);
-                $this->messageProducer->send(Topics::HTTP_IMPORT, $message);
+                $this->messageProducer->send($topic, $message);
             }
         );
     }

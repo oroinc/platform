@@ -7,6 +7,7 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\Extension\ExtensionInterface;
@@ -150,6 +151,34 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
 
         $result = [];
         $body = ['attempts' => 0, 'options' => []];
+
+        $this->handler->postpone($this->jobRunner, $this->currentJob, '', $body, $result);
+    }
+
+    public function testPostponeWithCustomTopic()
+    {
+        $this->jobProcessor
+            ->method('findOrCreateChildJob')
+            ->willReturn($this->currentJob);
+
+        $topic = 'custom_topic';
+        $expectedMessage = new Message();
+        $expectedMessage->setBody([
+            'jobId' => 1,
+            'attempts' => 1,
+            'fileName' => '',
+            'options' => ['incremented_read' => false]
+        ]);
+        $expectedMessage->setDelay(PostponedRowsHandler::DELAY_SECONDS);
+        $this->messageProducer->expects($this->once())
+            ->method('send')
+            ->with(
+                $topic,
+                $expectedMessage
+            );
+
+        $result = [];
+        $body = ['attempts' => 0, 'options' => [], Config::PARAMETER_TOPIC_NAME => $topic];
 
         $this->handler->postpone($this->jobRunner, $this->currentJob, '', $body, $result);
     }

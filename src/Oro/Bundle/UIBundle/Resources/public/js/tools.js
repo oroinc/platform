@@ -236,8 +236,10 @@ define(function(require) {
          * Are we have touch screen
          */
         isTouchDevice: function() {
-            return ('ontouchstart' in window && window.ontouchstart) ||
-                ('DocumentTouch' in window && document instanceof window.DocumentTouch);
+            return 'ontouchstart' in window ||
+                window.DocumentTouch && document instanceof window.DocumentTouch ||
+                navigator.maxTouchPoints > 0 ||
+                window.navigator.msMaxTouchPoints > 0;
         },
 
         /**

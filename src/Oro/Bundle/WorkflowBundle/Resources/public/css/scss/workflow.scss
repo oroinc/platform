@@ -3,7 +3,6 @@
 .workflow-definition-buttons {
     @include clearfix();
 
-    margin-top: -13px;
     margin-bottom: 8px;
 
     button {
@@ -361,4 +360,8 @@ table.grid {
     .select2-container {
         max-width: 100%;
     }
+}
+
+.transitions-list-short li {
+    list-style: none;
 }

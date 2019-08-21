@@ -5,6 +5,10 @@
 .dropdown-menu {
     box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);
 
+    &[x-adjusted-height] {
+        overflow-y: auto;
+    }
+
     &[x-out-of-boundaries] {
         display: none;
     }
@@ -113,13 +117,15 @@
     }
 
     // Support of old markup
-    &, .dropdown-menu-items {
+    &,
+    .dropdown-menu-items {
         > li > a {
             @extend .dropdown-item;
         }
     }
-    
-    .btn-group {
+
+    // Add offset like in "bootstrap .dropdown-item" element
+    > li > .btn-group {
         padding: $dropdown-item-padding-y $dropdown-item-padding-x;
     }
 }
