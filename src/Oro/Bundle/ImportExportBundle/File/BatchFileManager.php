@@ -86,6 +86,8 @@ class BatchFileManager
         ));
         $this->reader->initializeByContext($context);
 
+        $batchSize = $context->getOption(Context::OPTION_BATCH_SIZE) ?: $this->sizeOfBatch;
+
         $data = [];
         $i = 0;
         $header = null;
@@ -94,7 +96,7 @@ class BatchFileManager
         while ($row = $this->reader->read($context)) {
             $header = $header ?: $this->reader->getHeader();
             $data[] = $row;
-            if (++$i == $this->sizeOfBatch) {
+            if (++$i == $batchSize) {
                 $files[] = $this->writeBatch($data, $header, $extension);
                 $data = [];
                 $i = 0;
