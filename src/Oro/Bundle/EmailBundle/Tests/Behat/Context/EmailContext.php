@@ -7,6 +7,7 @@ use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\EmailBundle\Tests\Behat\Mock\Mailer\DirectMailerDecorator;
+use Oro\Bundle\TestFrameworkBundle\Behat\Client\FileDownloader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 
@@ -19,6 +20,9 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
 
     /** @var DirectMailerDecorator */
     private $mailer;
+
+    /** @var string */
+    private $downloadedFile;
 
     /**
      * @BeforeScenario
@@ -206,6 +210,86 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
                     print_r($messagesData, true)
                 )
             );
+        }
+    }
+
+    /**
+     * @Given /^take the link from email and download the file from this link$/
+     */
+    public function downloadFileFromEmail()
+    {
+        $mailer = $this->getMailer();
+        if (!$mailer instanceof DirectMailerDecorator) {
+            return;
+        }
+
+        $pattern = '/<a\s+(?:[^>]*?\s+)?href=(["\'])(.*?)\1/mi';
+        $found = null;
+
+        /** @var \Swift_Mime_Message $message */
+        foreach ($mailer->getSentMessages() as $message) {
+            $body = $message->getBody();
+
+            if (!preg_match($pattern, $body, $matches)) {
+                continue;
+            }
+
+            $found = $matches[2];
+            break;
+        }
+
+        if ($found) {
+            $this->downloadedFile = tempnam(
+                sprintf(
+                    '%s%svar%simport_export',
+                    $this->getKernel()->getProjectDir(),
+                    DIRECTORY_SEPARATOR,
+                    DIRECTORY_SEPARATOR
+                ),
+                'file_from_email_'
+            );
+
+            self::assertTrue((new FileDownloader())->download($found, $this->downloadedFile, $this->getSession()));
+
+            return;
+        }
+
+        self::assertNotFalse($found, 'Sent emails don\'t contain expected data.');
+    }
+
+    /**
+     * @Given /^the downloaded file from email contains at least the following data:$/
+     *
+     * @param TableNode $expectedEntities
+     */
+    public function downloadedFileFromEmailMustContains(TableNode $expectedEntities)
+    {
+        try {
+            $exportedFile = new \SplFileObject($this->downloadedFile, 'rb');
+            // Treat file as CSV, skip empty lines.
+            $exportedFile->setFlags(\SplFileObject::READ_CSV
+                | \SplFileObject::READ_AHEAD
+                | \SplFileObject::SKIP_EMPTY
+                | \SplFileObject::DROP_NEW_LINE);
+
+            $headers = $exportedFile->current();
+            $expectedHeaders = $expectedEntities->getRow(0);
+
+            foreach ($exportedFile as $line => $data) {
+                $entityDataFromCsv = array_combine($headers, array_values($data));
+                $expectedEntityData = array_combine($expectedHeaders, array_values($expectedEntities->getRow($line)));
+
+                // Ensure that at least expected data is present.
+                foreach ($expectedEntityData as $property => $value) {
+                    static::assertEquals($value, $entityDataFromCsv[$property]);
+                }
+            }
+
+            static::assertCount($exportedFile->key(), $expectedEntities->getRows());
+        } finally {
+            // We have to release SplFileObject before trying to delete the underlying file.
+            $exportedFile = null;
+            unlink($this->downloadedFile);
         }
     }
 
