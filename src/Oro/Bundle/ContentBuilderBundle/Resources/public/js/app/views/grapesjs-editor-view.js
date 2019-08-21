@@ -179,8 +179,6 @@ define(function(require) {
 
             mediator.trigger('grapesjs:created', this.builder);
 
-            this.$builderIframe = this.builder.Canvas.getFrameEl();
-
             this.builderDelegateEvents();
 
             GrapesJSModules.call('components', {
@@ -234,16 +232,11 @@ define(function(require) {
                 builder: this.builder
             });
 
-            // _.delay(_.bind(this._getCSSBreakpoint, this), 200);
+            GrapesJSModules.call('devices', {
+                builder: this.builder
+            });
 
             mediator.trigger('grapesjs:loaded', this.builder);
-        },
-
-        _getCSSBreakpoint: function() {
-            var frameHead = this.$builderIframe.contentDocument.head;
-            var breakpoints = mediator.execute('fetch:head:computedVars', frameHead);
-
-            console.log(frameHead, breakpoints)
         },
 
         /**

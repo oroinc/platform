@@ -4,6 +4,7 @@ define(function(require) {
     var StyleManagerModule = require('orocontentbuilder/js/app/views/grapesjs-modules/style-manager-module');
     var PanelManagerModule = require('orocontentbuilder/js/app/views/grapesjs-modules/panels-module');
     var ComponentsModule = require('orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-components');
+    var DevicesModule = require('orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-devices-module');
     var _ = require('underscore');
 
     var GrapesJSModules;
@@ -46,7 +47,8 @@ define(function(require) {
     }, {
         'style-manager-module': StyleManagerModule,
         'panel-manager-module': PanelManagerModule,
-        'components-module': ComponentsModule
+        'components-module': ComponentsModule,
+        'devices-module': DevicesModule
     });
 
     return GrapesJSModules;

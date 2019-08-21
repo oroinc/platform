@@ -7,4 +7,5 @@ config:
         'orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-modules': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-modules.js'
         'orocontentbuilder/js/app/views/grapesjs-modules/style-manager-module': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/style-manager-module.js'
         'orocontentbuilder/js/app/views/grapesjs-modules/panels-module': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/panels-module.js'
+        'orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-devices-module': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-devices-module.js'
         'orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-components': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-components.js'

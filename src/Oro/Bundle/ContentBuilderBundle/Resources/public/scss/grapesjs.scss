@@ -2,6 +2,8 @@
 
 @import "../fonts/grapsejs-flex/style";
 @import "config/grapesjs-config";
+@import "oroui/css/scss/variables";
+@import "oroui/css/scss/mixins";
 
 @import "bundles/npmassets/grapesjs/src/styles/scss/main.scss";
 
@@ -46,6 +48,8 @@
         left: 8px;
         right: 8px;
         bottom: 8px;
+        box-sizing: content-box;
+        transition: width 1s, height 1s;
     }
 
     &cv-canvas {
@@ -54,6 +58,47 @@
         padding: 8px;
         width: calc(85% - 16px);
 
+        &:not(.desktop) {
+            background-color: transparent;
+            background-image: $canvas-pattern;
+            background-size: $canvas-pattern-size;
+            background-position: $canvas-pattern-position;
+        }
+
+        &.tablet,
+        &.tablet-small,
+        &.mobile,
+        &.mobile-small,
+        &.mobile-big,
+        &.mobile-landscape {
+            .gjs-frame {
+                border: solid #e9e9e9;
+                border-radius: 55px;
+                border-width: 55px 20px 75px;
+            }
+
+            .gjs-highlighter,
+            .gjs-badge,
+            .gjs-toolbar {
+                margin-left: 20px;
+                margin-top: 55px;
+            }
+        }
+
+        &.mobile-landscape {
+            .gjs-frame {
+                border: solid #e9e9e9;
+                border-radius: 55px;
+                border-width: 20px 75px 20px 55px;
+            }
+
+            .gjs-highlighter,
+            .gjs-badge,
+            .gjs-toolbar {
+                margin-left: 55px;
+                margin-top: 20px;
+            }
+        }
     }
 
     &pn-commands {
@@ -427,6 +472,52 @@
 
             select {
                 padding-right: 15px;
+            }
+        }
+    }
+
+    &pn-devices-c {
+        .gjs-pn-btn {
+            font-family: FontAwesome;
+
+            &.desktop {
+                &:before {
+                    content: $fa-var-desktop;
+                }
+            }
+
+            &.tablet {
+                font-size: 20px;
+            }
+
+            &.tablet,
+            &.tablet-small {
+                &:before {
+                    content: $fa-var-tablet;
+                }
+            }
+
+            &.mobile-big {
+                font-size: 20px;
+            }
+
+            &.mobile {
+                font-size: 18px;
+            }
+
+            &.mobile,
+            &.mobile-big,
+            &.mobile-small {
+                &:before {
+                    content: $fa-var-mobile;
+                }
+            }
+
+            &.mobile-landscape {
+                transform: rotate(90deg);
+                &:before {
+                    content: $fa-var-mobile;
+                }
             }
         }
     }
