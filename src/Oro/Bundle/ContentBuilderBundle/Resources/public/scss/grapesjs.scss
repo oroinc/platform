@@ -52,7 +52,7 @@
         border: $canvas-border;
         background-color: $canvas-bg-color;
         padding: 8px;
-        width: calc(85% - 16px);
+        width: calc(77% - 14px);
 
     }
 
@@ -68,6 +68,10 @@
 
         .gjs-pn-buttons {
             .gjs-pn-btn {
+                display: flex;
+                align-content: center;
+                justify-content: center;
+
                 width: 100%;
                 margin-right: 0;
                 border-radius: 0;
@@ -97,7 +101,8 @@
         padding: 0;
 
         &.gjs-pn-options {
-            padding-right: 11px;
+            right: 23%;
+            padding-right: 7px;
         }
     }
 
@@ -112,6 +117,7 @@
         .gjs-pn-btn {
             background-color: $button-bg-color;
             border-radius: 30px;
+            margin-right: 7px;
 
             &.gjs-pn-active {
                 background-color: $additional-extra-light;
