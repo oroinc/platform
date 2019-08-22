@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Handler;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler;
@@ -29,7 +31,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
     const FIELD_TYPE = 'enum';
     const CREATE_ACTION_REDIRECT_URL = 'create_redirect_action_url';
     const SUCCESS_MESSAGE = 'success_message';
-    const CLASS_NAME = 'class_name';
+    const CLASS_NAME = \stdClass::class;
 
     /**
      * @var ConfigHelperHandler|\PHPUnit\Framework\MockObject\MockObject
@@ -289,7 +291,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
             ->with($entityConfigModel)
             ->willReturn([self::FIELD_NAME, self::FIELD_TYPE]);
 
-        $extendEntityConfig = $this->createMock(ConfigInterface::class);
+        $extendEntityConfig = new Config(new EntityConfigId('extend', self::CLASS_NAME));
         $this->configHelper
             ->expects($this->once())
             ->method('getEntityConfig')
@@ -436,10 +438,6 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         FieldConfigModel $newFieldModel,
         ConfigInterface $extendEntityConfig
     ) {
-        $extendEntityConfig ->expects($this->once())
-            ->method('set')
-            ->with('upgradeable', true);
-
         $this->configManager
             ->expects($this->once())
             ->method('persist')
@@ -463,6 +461,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $entityConfigModel = $this->createEntityConfigModel();
 
+        /** @var Config $extendEntityConfig */
         list($newFieldModel, $extendEntityConfig) = $this->expectsCreateConfigFieldModelAndUpdateItWithFieldOptions(
             $entityConfigModel
         );
@@ -506,5 +505,6 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($redirectResponse->getTargetUrl(), $response->getTargetUrl());
         $this->assertEquals($redirectResponse->getStatusCode(), $response->getStatusCode());
+        $this->assertEquals($extendEntityConfig->get('upgradeable'), true);
     }
 }
