@@ -44,6 +44,8 @@ class TranslatorDependencyPass implements CompilerPassInterface
             [new Reference('event_dispatcher')]
         );
 
+        $translatorDef->addMethodCall('setLogger', [new Reference('logger')]);
+        
         $isInstalled = $container->hasParameter('installed') && $container->getParameter('installed');
         $translatorDef->addMethodCall('setInstalled', [$isInstalled]);
         $translatorDef->setPublic(true);

@@ -17,16 +17,21 @@ class ActivityListItem extends Element
     }
 
     /**
+     * @return NodeElement[]
+     */
+    public function getActions(): array
+    {
+        $this->find('css', 'div.activity-actions .dropdown-toggle')->mouseOver();
+        return $this->findAll('css', 'li.activity-action a');
+    }
+
+    /**
      * @param string $linkTitle
      * @return NodeElement|null
      */
     public function getActionLink($linkTitle)
     {
-        $this->find('css', 'div.activity-actions .dropdown-toggle')->mouseOver();
-        $links = $this->findAll('css', 'li.activity-action a');
-
-        /** @var NodeElement $link */
-        foreach ($links as $link) {
+        foreach ($this->getActions() as $link) {
             if (preg_match(sprintf('/%s/i', $linkTitle), $link->getText())) {
                 return $link;
             }

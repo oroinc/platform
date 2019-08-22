@@ -3,7 +3,9 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
+use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -15,12 +17,17 @@ class SecurityContext implements SecurityContextInterface
     /** @var TokenStorageInterface */
     private $tokenStorage;
 
+    /** @var RequestStack|null */
+    private $requestStack;
+
     /**
      * @param TokenStorageInterface $tokenStorage
+     * @param RequestStack|null     $requestStack
      */
-    public function __construct(TokenStorageInterface $tokenStorage)
+    public function __construct(TokenStorageInterface $tokenStorage, RequestStack $requestStack = null)
     {
         $this->tokenStorage = $tokenStorage;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -90,6 +97,25 @@ class SecurityContext implements SecurityContextInterface
             'To use WSSE authentication you need to generate API key for the current logged-in user.'
             . ' To do this, go to the My User page and click Generate Key near to API Key.'
             . ' After that reload this page.';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCsrfCookieName(): ?string
+    {
+        if (null === $this->requestStack) {
+            return null;
+        }
+
+        $request = $this->requestStack->getMasterRequest();
+        if (null === $request) {
+            return null;
+        }
+
+        return $request->isSecure()
+            ? 'https-' . CsrfRequestManager::CSRF_TOKEN_ID
+            : CsrfRequestManager::CSRF_TOKEN_ID;
     }
 
     /**
