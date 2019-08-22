@@ -33,7 +33,7 @@
                     <li class="endpoint">
                         <ul class="operations">
                             {% for data in methods %}
-                                {% include 'NelmioApiDocBundle::method.html.twig' %}
+                                {% include 'OroApiBundle:ApiDoc:collapsed_method.html.twig' %}
                             {% endfor %}
                         </ul>
                     </li>
