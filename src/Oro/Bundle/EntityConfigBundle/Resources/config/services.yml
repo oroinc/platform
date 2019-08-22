@@ -552,3 +552,4 @@ services:
         arguments:
             - '@oro_entity_config.manager.attribute_manager'
             - '@translator'
+        public: true
