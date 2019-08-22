@@ -246,6 +246,7 @@ services:
             - [ setNavigationHistoryItemType, ['history']]
             - [ addExcludedRoute, ['oro_default']]
             - [ addExcludedRoute, ['nelmio_api_doc_index']]
+            - [ addExcludedRoute, ['oro_rest_api_doc_resource']]
 
     oro_navigation.event.master_request_route_listener:
         class: Oro\Bundle\NavigationBundle\Event\AddMasterRequestRouteListener
