@@ -7,6 +7,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var GrapesJSModules = require('orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-modules');
+    var ControlsPlugin = require('orocontentbuilder/js/app/views/plugins/controls-plugin');
     var mediator = require('oroui/js/mediator');
 
     require('grapesjs-preset-webpage');
@@ -229,7 +230,8 @@ define(function(require) {
          */
         _onLoadBuilder: function() {
             GrapesJSModules.call('panel-manager', {
-                builder: this.builder
+                builder: this.builder,
+                themes: this.themes
             });
 
             GrapesJSModules.call('devices', {
@@ -330,7 +332,7 @@ define(function(require) {
          */
         _getPlugins: function() {
             return {
-                plugins: _.keys(this.builderPlugins),
+                plugins: _.keys(this.builderPlugins).concat([ControlsPlugin]),
                 pluginsOpts: this.builderPlugins
             };
         }

@@ -64,6 +64,7 @@ define(function(require) {
             var devicePanel = this.builder.Panels.getPanel('devices-c');
             var deviceButton = devicePanel.get('buttons');
 
+            this.builder.Panels.addElement()
             deviceButton.reset();
 
             var DeviceManager = this.builder.DeviceManager;
@@ -141,7 +142,7 @@ define(function(require) {
          */
         concatTitle: function(breakpoint, options) {
             var str = breakpoint.name + ' view';
-            console.log(breakpoint.max)
+
             if (breakpoint.max) {
                 str += ': ' + breakpoint.max;
             }

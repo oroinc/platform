@@ -1,4 +1,4 @@
-define(function() {
+define(function(require) {
     'use strict';
 
     /**
@@ -7,7 +7,7 @@ define(function() {
      * @constructor
      */
     var PanelManagerModule = function(options) {
-        _.extend(this, _.pick(options, ['builder']));
+        _.extend(this, _.pick(options, ['builder', 'themes']));
 
         this.init();
     };
@@ -19,12 +19,19 @@ define(function() {
     PanelManagerModule.prototype = {
         builder: null,
 
+        themes: [],
+
         /**
          * Run panels reformat
          * @initialize
          */
         init: function() {
             this._moveSettings();
+            this.createThemeSelector();
+        },
+
+        createThemeSelector: function() {
+
         },
 
         /**
