@@ -129,6 +129,8 @@ config:
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'
+        'app-modules': 'bundles/oroui/js/requirejs/app-modules.js'
+        'oroui/js/app': 'bundles/oroui/js/app.js'
         'oroui/blank/js/extend/bootstrap': 'bundles/oroui/blank/js/extend/bootstrap.js'
         'oroui/js/tools/api-accessor': 'bundles/oroui/js/tools/api-accessor.js'
         'oroui/js/app/ready-state-tracker': 'bundles/oroui/js/app/ready-state-tracker.js'
