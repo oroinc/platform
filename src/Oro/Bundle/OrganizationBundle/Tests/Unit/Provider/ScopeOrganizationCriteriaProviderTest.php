@@ -4,7 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -27,7 +27,7 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit\Framework\TestCase
         $organization = new Organization();
 
         /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $token */
-        $token = $this->createMock(OrganizationContextTokenInterface::class);
+        $token = $this->createMock(OrganizationAwareTokenInterface::class);
 
         $this->tokenStorage
             ->expects($this->once())
@@ -35,7 +35,7 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($token);
 
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->willReturn($organization);
 
         $actual = $this->provider->getCriteriaForCurrentScope();

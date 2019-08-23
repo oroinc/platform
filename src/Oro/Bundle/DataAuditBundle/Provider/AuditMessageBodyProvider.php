@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -60,8 +60,8 @@ class AuditMessageBodyProvider
                 $body['user_class'] = ClassUtils::getClass($user);
                 $body['owner_description'] = $this->entityNameResolver->getName($user, 'email');
             }
-            if ($securityToken instanceof OrganizationContextTokenInterface) {
-                $body['organization_id'] = $securityToken->getOrganizationContext()->getId();
+            if ($securityToken instanceof OrganizationAwareTokenInterface) {
+                $body['organization_id'] = $securityToken->getOrganization()->getId();
             }
 
             if ($securityToken->hasAttribute('IMPERSONATION')) {

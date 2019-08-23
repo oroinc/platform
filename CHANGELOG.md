@@ -18,6 +18,12 @@ The current file describes significant changes in the code that may affect the u
 * The service `kernel.listener.nav_history_response` was renamed to `oro_navigation.event_listener.navigation_history`.
 * The service `kernel.listener.hashnav_response` was renamed to `oro_navigation.event_listener.hash_navigation`.
 
+#### SecurityBundle
+* The interface `Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface`
+  was renamed to `Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface`.
+  Also methods `getOrganizationContext` and `setOrganizationContext` were renamed to
+  `getOrganization` and `setOrganization`.
+
 ## 4.0.0
 
 ### Added

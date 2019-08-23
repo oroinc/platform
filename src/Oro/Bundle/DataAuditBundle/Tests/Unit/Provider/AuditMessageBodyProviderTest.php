@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Provider;
 use Oro\Bundle\DataAuditBundle\Provider\AuditMessageBodyProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\AbstractUserStub;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -190,8 +190,8 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 
-        /** @var OrganizationContextTokenInterface|\PHPUnit\Framework\MockObject\MockObject $securityToken */
-        $securityToken = self::createMock(OrganizationContextTokenInterface::class);
+        /** @var OrganizationAwareTokenInterface|\PHPUnit\Framework\MockObject\MockObject $securityToken */
+        $securityToken = $this->createMock(OrganizationAwareTokenInterface::class);
 
         $securityToken->expects(self::once())
             ->method('getUser')
@@ -202,7 +202,7 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
 
         $organization = $this->getEntity(Organization::class, ['id' => 75]);
         $securityToken->expects(self::once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->willReturn($organization);
 
         $securityToken->expects(self::exactly(2))

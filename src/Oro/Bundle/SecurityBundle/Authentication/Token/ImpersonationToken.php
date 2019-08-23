@@ -7,11 +7,12 @@ use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Role\Role;
 
 /**
- * Token user impersonation.
+ * The authentication token that is used for an user impersonation.
  */
-class ImpersonationToken extends AbstractToken implements OrganizationContextTokenInterface
+class ImpersonationToken extends AbstractToken implements OrganizationAwareTokenInterface
 {
-    use OrganizationContextTokenSerializerTrait;
+    use OrganizationAwareTokenTrait;
+
     /**
      * @param string|object            $user         The username (like a nickname, email address, etc.),
      *                                               or a UserInterface instance
@@ -24,8 +25,8 @@ class ImpersonationToken extends AbstractToken implements OrganizationContextTok
         parent::__construct($roles);
 
         $this->setUser($user);
-        $this->setOrganizationContext($organization);
-        parent::setAuthenticated(count($roles) > 0);
+        $this->setOrganization($organization);
+        $this->setAuthenticated(count($roles) > 0);
     }
 
     /**

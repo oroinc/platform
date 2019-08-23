@@ -5,12 +5,15 @@ namespace Oro\Bundle\SecurityBundle\Authentication;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Role\Role;
 
+/**
+ * The default implementation of the security token serializer.
+ */
 class TokenSerializer implements TokenSerializerInterface
 {
     /** @var ManagerRegistry */
@@ -29,12 +32,12 @@ class TokenSerializer implements TokenSerializerInterface
      */
     public function serialize(TokenInterface $token)
     {
-        if ($token instanceof OrganizationContextTokenInterface) {
+        if ($token instanceof OrganizationAwareTokenInterface) {
             $user = $token->getUser();
             if ($user instanceof AbstractUser) {
                 return sprintf(
                     'organizationId=%d;userId=%d;userClass=%s;roles=%s',
-                    $token->getOrganizationContext()->getId(),
+                    $token->getOrganization()->getId(),
                     $user->getId(),
                     ClassUtils::getRealClass($user),
                     $this->packRoles($token)

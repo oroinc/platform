@@ -7,21 +7,22 @@ use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Role\Role;
 
 /**
- * Organization aware token.
+ * The organization aware authentication token.
  */
-class OrganizationToken extends AbstractToken implements OrganizationContextTokenInterface
+class OrganizationToken extends AbstractToken implements OrganizationAwareTokenInterface
 {
-    use OrganizationContextTokenSerializerTrait;
+    use OrganizationAwareTokenTrait;
+
     /**
-     * @param Organization             $organization The organization
-     * @param Role[]|string[]          $roles        An array of roles
+     * @param Organization    $organization
+     * @param Role[]|string[] $roles
      */
     public function __construct(Organization $organization, array $roles = [])
     {
         parent::__construct($roles);
 
-        $this->setOrganizationContext($organization);
-        parent::setAuthenticated(true);
+        $this->setOrganization($organization);
+        $this->setAuthenticated(true);
     }
 
     /**

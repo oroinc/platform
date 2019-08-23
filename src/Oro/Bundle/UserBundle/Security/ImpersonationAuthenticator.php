@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Security;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
+use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesserInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -35,6 +35,9 @@ class ImpersonationAuthenticator implements AuthenticatorInterface
     /** @var UsernamePasswordOrganizationTokenFactoryInterface */
     protected $tokenFactory;
 
+    /** @var OrganizationGuesserInterface */
+    protected $organizationGuesser;
+
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
@@ -42,19 +45,22 @@ class ImpersonationAuthenticator implements AuthenticatorInterface
     protected $router;
 
     /**
-     * @param ManagerRegistry $doctrine
+     * @param ManagerRegistry                                   $doctrine
      * @param UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param UrlGeneratorInterface $router
+     * @param OrganizationGuesserInterface                      $organizationGuesser
+     * @param EventDispatcherInterface                          $eventDispatcher
+     * @param UrlGeneratorInterface                             $router
      */
     public function __construct(
         ManagerRegistry $doctrine,
         UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory,
+        OrganizationGuesserInterface $organizationGuesser,
         EventDispatcherInterface $eventDispatcher,
         UrlGeneratorInterface $router
     ) {
         $this->doctrine = $doctrine;
         $this->tokenFactory = $tokenFactory;
+        $this->organizationGuesser = $organizationGuesser;
         $this->eventDispatcher = $eventDispatcher;
         $this->router = $router;
     }
@@ -146,9 +152,8 @@ class ImpersonationAuthenticator implements AuthenticatorInterface
      */
     public function createAuthenticatedToken(UserInterface $user, $providerKey)
     {
-        $guesser = new UserOrganizationGuesser();
         /** @var User $user */
-        $organization = $guesser->guessByUser($user);
+        $organization = $this->organizationGuesser->guess($user);
 
         if (!$organization) {
             throw new BadCredentialsException("You don't have active organization assigned.");

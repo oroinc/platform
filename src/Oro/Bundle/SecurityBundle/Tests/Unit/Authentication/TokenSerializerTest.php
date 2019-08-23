@@ -143,7 +143,7 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         );
 
         self::assertInstanceOf(ImpersonationToken::class, $token);
-        self::assertSame($organization, $token->getOrganizationContext());
+        self::assertSame($organization, $token->getOrganization());
         self::assertSame($user, $token->getUser());
         self::assertCount(2, $token->getRoles());
         self::assertSame($role1, $token->getRoles()[0]);

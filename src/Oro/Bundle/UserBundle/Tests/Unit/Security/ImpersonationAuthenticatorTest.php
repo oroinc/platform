@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesserInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
 use Oro\Bundle\UserBundle\Entity\Role;
@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
 
 class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
@@ -26,6 +25,9 @@ class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
 
     /** @var UsernamePasswordOrganizationTokenFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenFactory;
+
+    /** @var OrganizationGuesserInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $organizationGuesser;
 
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
@@ -40,12 +42,14 @@ class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->tokenFactory = $this->createMock(UsernamePasswordOrganizationTokenFactoryInterface::class);
+        $this->organizationGuesser = $this->createMock(OrganizationGuesserInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->router = $this->createMock(UrlGeneratorInterface::class);
 
         $this->authenticator = new ImpersonationAuthenticator(
             $this->doctrine,
             $this->tokenFactory,
+            $this->organizationGuesser,
             $this->eventDispatcher,
             $this->router
         );
@@ -53,17 +57,21 @@ class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
 
     public function testSupports(): void
     {
-        $this->assertTrue($this->authenticator
-            ->supports(new Request([ImpersonationAuthenticator::TOKEN_PARAMETER => 'sample-token'])));
+        $this->assertTrue($this->authenticator->supports(
+            new Request([ImpersonationAuthenticator::TOKEN_PARAMETER => 'sample-token'])
+        ));
 
-        $this->assertFalse($this->authenticator
-            ->supports(new Request()));
+        $this->assertFalse($this->authenticator->supports(new Request()));
     }
 
     public function testGetCredentials(): void
     {
-        $this->assertEquals('sample-token', $this->authenticator
-            ->getCredentials(new Request([ImpersonationAuthenticator::TOKEN_PARAMETER => 'sample-token'])));
+        $this->assertEquals(
+            'sample-token',
+            $this->authenticator->getCredentials(
+                new Request([ImpersonationAuthenticator::TOKEN_PARAMETER => 'sample-token'])
+            )
+        );
     }
 
     public function testCheckCredentials(): void
@@ -73,19 +81,20 @@ class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
 
     public function testOnAuthenticationFailure(): void
     {
-        $this->router
-            ->expects($this->once())
+        $url = '/sample/url';
+        $this->router->expects($this->once())
             ->method('generate')
             ->with('oro_user_security_login')
-            ->willReturn($url = '/sample/url');
+            ->willReturn($url);
 
         $request = new Request();
-        $request->setSession($session = $this->createMock(Session::class));
+        $session = $this->createMock(Session::class);
+        $request->setSession($session);
 
-        $session
-            ->expects($this->once())
+        $exception = new AuthenticationException();
+        $session->expects($this->once())
             ->method('set')
-            ->with(Security::AUTHENTICATION_ERROR, $exception = new AuthenticationException());
+            ->with(Security::AUTHENTICATION_ERROR, $exception);
 
         $response = $this->authenticator->onAuthenticationFailure($request, $exception);
 
@@ -95,19 +104,20 @@ class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
 
     public function testStartWhenAuthException(): void
     {
-        $this->router
-            ->expects($this->once())
+        $url = '/sample/url';
+        $this->router->expects($this->once())
             ->method('generate')
             ->with('oro_user_security_login')
-            ->willReturn($url = '/sample/url');
+            ->willReturn($url);
 
         $request = new Request();
-        $request->setSession($session = $this->createMock(Session::class));
+        $session = $this->createMock(Session::class);
+        $request->setSession($session);
 
-        $session
-            ->expects($this->once())
+        $exception = new AuthenticationException();
+        $session->expects($this->once())
             ->method('set')
-            ->with(Security::AUTHENTICATION_ERROR, $exception = new AuthenticationException());
+            ->with(Security::AUTHENTICATION_ERROR, $exception);
 
         $response = $this->authenticator->start($request, $exception);
 
@@ -117,17 +127,17 @@ class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
 
     public function testStartWhenNoAuthException(): void
     {
-        $this->router
-            ->expects($this->once())
+        $url = '/sample/url';
+        $this->router->expects($this->once())
             ->method('generate')
             ->with('oro_user_security_login')
-            ->willReturn($url = '/sample/url');
+            ->willReturn($url);
 
         $request = new Request();
-        $request->setSession($session = $this->createMock(Session::class));
+        $session = $this->createMock(Session::class);
+        $request->setSession($session);
 
-        $session
-            ->expects($this->never())
+        $session->expects($this->never())
             ->method('set');
 
         $response = $this->authenticator->start($request);
@@ -144,19 +154,27 @@ class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
     public function testCreateAuthenticatedTokenWhenOrganization(): void
     {
         $user = new User();
-        $user->setOrganization($organization = $this->createMock(Organization::class));
-        $user->setOrganizations(new ArrayCollection([$organization]));
-        $user->setRoles($roles = [new Role()]);
+        $organization = $this->createMock(Organization::class);
+        $roles = [new Role()];
+        $user->setRoles($roles);
 
-        $organization
-            ->method('isEnabled')
-            ->willReturn(true);
+        $this->organizationGuesser->expects($this->once())
+            ->method('guess')
+            ->with($this->identicalTo($user), $this->isNull())
+            ->willReturn($organization);
 
-        $this->tokenFactory
-            ->expects($this->once())
+        $token = $this->createMock(UsernamePasswordOrganizationToken::class);
+        $providerKey = 'sample-key';
+        $this->tokenFactory->expects($this->once())
             ->method('create')
-            ->with($user, null, $providerKey = 'sample-key', $organization, $roles)
-            ->willReturn($token = $this->createMock(UsernamePasswordOrganizationToken::class));
+            ->with(
+                $this->identicalTo($user),
+                $this->isNull(),
+                $providerKey,
+                $this->identicalTo($organization),
+                $roles
+            )
+            ->willReturn($token);
 
         $this->assertSame(
             $token,
@@ -164,11 +182,12 @@ class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedExceptionMessage You don't have active organization assigned.
+     */
     public function testCreateAuthenticatedTokenWhenNoOrganization(): void
     {
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('You don\'t have active organization assigned.');
-
         $this->authenticator->createAuthenticatedToken(new User(), 'sample-key');
     }
 }
