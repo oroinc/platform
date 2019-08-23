@@ -110,6 +110,7 @@
    - [Add a Computed Field](./how_to.md#add-a-computed-field)
    - [Add an Association with a Custom Query](./how_to.md#add-an-association-with-a-custom-query)
    - [Disable HATEOAS](./how_to.md#disable-hateoas)
+   - [Validate Virtual Fields](./how_to.md#validate-virtual-fields)
  - [CORS Configuration](./cors.md)
  - [Testing](./testing.md)
    - [Overview](./testing.md#overview)
