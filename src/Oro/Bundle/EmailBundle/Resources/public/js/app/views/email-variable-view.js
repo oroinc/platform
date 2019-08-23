@@ -20,7 +20,7 @@ define(function(require) {
             sectionTemplateSelector: null,
             sectionContentSelector: null,
             sectionTabSelector: null,
-            fieldsSelectors: ['input[name*="subject"]', 'textarea[name*="content"]'],
+            fieldsSelectors: ['input[type="text"][name*="subject"]', 'textarea[name*="content"]'],
             defaultFieldIndex: 1 // index in fieldsSelectors
         },
 

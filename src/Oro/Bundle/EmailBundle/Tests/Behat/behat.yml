@@ -30,7 +30,7 @@ oro_behat_extension:
             locator: ['field', 'From']
             element: Select2Offscreen
 
-    Email Template Form:
+    EmailTemplateForm:
       selector: "form[id^='oro_email_emailtemplate']"
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
