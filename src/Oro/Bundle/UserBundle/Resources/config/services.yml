@@ -186,6 +186,7 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_security.token.factory.username_password_organization'
+            - '@oro_security.authentication.organization_guesser'
             - '@event_dispatcher'
             - '@router'
 

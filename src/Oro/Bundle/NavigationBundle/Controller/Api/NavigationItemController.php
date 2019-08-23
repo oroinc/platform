@@ -38,7 +38,7 @@ class NavigationItemController extends FOSRestController
     {
         /** @var NavigationItemsProvider $navigationItemsProvider */
         $navigationItemsProvider = $this->container->get('oro_navigation.provider.navigation_items');
-        $organization = $this->container->get('security.token_storage')->getToken()->getOrganizationContext();
+        $organization = $this->container->get('security.token_storage')->getToken()->getOrganization();
 
         $items = $navigationItemsProvider->getNavigationItems($this->getUser(), $organization, $type);
 
@@ -74,7 +74,7 @@ class NavigationItemController extends FOSRestController
 
         $params['user'] = $this->getUser();
         $params['url']  = $this->normalizeUrl($params['url'], $params['type']);
-        $params['organization'] = $this->container->get('security.token_storage')->getToken()->getOrganizationContext();
+        $params['organization'] = $this->container->get('security.token_storage')->getToken()->getOrganization();
 
         /** @var $entity \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
         $entity = $this->getFactory()->createItem($type, $params);

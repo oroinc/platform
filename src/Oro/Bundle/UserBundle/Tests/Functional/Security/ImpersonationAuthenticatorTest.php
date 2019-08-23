@@ -26,6 +26,7 @@ class ImpersonationAuthenticatorTest extends WebTestCase
         $this->authenticator = new ImpersonationAuthenticator(
             $this->getContainer()->get('doctrine'),
             $this->getContainer()->get('oro_security.token.factory.username_password_organization'),
+            $this->getContainer()->get('oro_security.authentication.organization_guesser'),
             $this->getContainer()->get('event_dispatcher'),
             $this->getContainer()->get('router')
         );
@@ -66,6 +67,7 @@ class ImpersonationAuthenticatorTest extends WebTestCase
         $authenticator = new ImpersonationAuthenticator(
             $this->getContainer()->get('doctrine'),
             $this->getContainer()->get('oro_security.token.factory.username_password_organization'),
+            $this->getContainer()->get('oro_security.authentication.organization_guesser'),
             $eventDispatcher = $this->createMock(EventDispatcherInterface::class),
             $this->getContainer()->get('router')
         );

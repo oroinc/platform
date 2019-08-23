@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle;
 
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
+use Oro\Bundle\TranslationBundle\Async\Topics;
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\DebugTranslatorPass;
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationAdaptersPass;
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationContextResolverPass;
@@ -29,5 +31,8 @@ class OroTranslationBundle extends Bundle
         $container->addCompilerPass(new TranslationPackagesProviderPass());
         $container->addCompilerPass(new DynamicAssetVersionPass('translations'));
         $container->addCompilerPass(new TranslationAdaptersPass());
+
+        $addTopicPass = AddTopicMetaPass::create()->add(Topics::JS_TRANSLATIONS_DUMP, 'Dumps JS translations');
+        $container->addCompilerPass($addTopicPass);
     }
 }

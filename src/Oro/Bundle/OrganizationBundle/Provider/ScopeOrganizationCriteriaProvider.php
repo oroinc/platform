@@ -4,9 +4,12 @@ namespace Oro\Bundle\OrganizationBundle\Provider;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\ScopeBundle\Manager\AbstractScopeCriteriaProvider;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * Provides the current organization for Scope Criteria.
+ */
 class ScopeOrganizationCriteriaProvider extends AbstractScopeCriteriaProvider
 {
     const SCOPE_KEY = 'organization';
@@ -32,8 +35,8 @@ class ScopeOrganizationCriteriaProvider extends AbstractScopeCriteriaProvider
             return [];
         }
 
-        if ($token instanceof OrganizationContextTokenInterface) {
-            return [self::SCOPE_KEY => $token->getOrganizationContext()];
+        if ($token instanceof OrganizationAwareTokenInterface) {
+            return [self::SCOPE_KEY => $token->getOrganization()];
         }
 
         return [];

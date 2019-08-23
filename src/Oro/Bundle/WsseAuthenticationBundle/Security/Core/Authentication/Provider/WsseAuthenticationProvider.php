@@ -113,7 +113,7 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
                         $this->providerKey,
                         $user->getRoles()
                     );
-                    $authenticatedToken->setOrganizationContext($validUserApi->getOrganization());
+                    $authenticatedToken->setOrganization($validUserApi->getOrganization());
 
                     if ($this->nonceCache instanceof PruneableInterface) {
                         $this->nonceCache->prune();

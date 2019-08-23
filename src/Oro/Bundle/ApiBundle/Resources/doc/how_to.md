@@ -24,6 +24,7 @@
  - [Add a Computed Field](#add-a-computed-field)
  - [Add an Association with a Custom Query](#add-an-association-with-a-custom-query)
  - [Disable HATEOAS](#disable-hateoas)
+ - [Validate Virtual Fields](#validate-virtual-fields)
 
 
 ## Turn on API for an Entity
@@ -1225,3 +1226,60 @@ It is not possible to disable [HATEOAS](https://restfulapi.net/hateoas/) via con
 But you can send API request with `noHateoas` value in [X-Include header](./headers.md#existing-x-include-keys)
 to exclude HATEOAS links from a response of a particular request.
 
+## Validate Virtual Fields
+
+There are cases when an API resource contains virtual fields; these are fields that do not exist in an entity.
+
+Like with regular fields, values of these fields need to be validated during the [create](./actions.md#create-action)
+and [update](./actions.md#update-action) actions. 
+
+In this case, you can use an API processor for the `post_submit` event of the [customize_form_data](./actions.md#customize_form_data-action) action because common Symfony Forms validators are not applicable.
+
+For example, the following API processor validates that a value of a virtual field called `label` should not be blank for
+a new `Acme\DemoBundle\Entity\SomeEntity` entity:
+
+```php
+<?php
+
+namespace Acme\Bundle\DemoBundle\Api\Processor;
+
+use Oro\Bundle\ApiBundle\Form\FormUtil;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * Checks that "label" field is submitted during create.
+ */
+class ValidateLabelField implements ProcessorInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function process(ContextInterface $context)
+    {
+        /** @var CustomizeFormDataContext $context */
+        $form = $context->findFormField('label');
+        if (null === $form) {
+            return;
+        }
+
+        if ($context->getParentAction() === 'create' && !$form->isSubmitted()) {
+            FormUtil::addFormConstraintViolation($form, new NotBlank());
+        }
+
+        if ($form->isSubmitted() && (null === $form->getData() || '' === $form->getData())) {
+            FormUtil::addFormConstraintViolation($form, new NotBlank());
+        }
+    }
+}
+```
+
+```yml
+services:
+  acme.api.validate_label_field:
+      class: Acme\Bundle\DemoBundle\Api\Processor\ValidateLabelField
+      tags:
+          - { name: oro.api.processor, action: customize_form_data, event: post_submit, class: Acme\DemoBundle\Entity\SomeEntity }
+```
