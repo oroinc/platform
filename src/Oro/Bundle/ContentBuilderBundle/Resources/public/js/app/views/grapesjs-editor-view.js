@@ -7,7 +7,6 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var GrapesJSModules = require('orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-modules');
-    var ControlsPlugin = require('orocontentbuilder/js/app/views/plugins/controls-plugin');
     var mediator = require('oroui/js/mediator');
 
     require('grapesjs-preset-webpage');
@@ -42,7 +41,8 @@ define(function(require) {
          * @property {Object}
          */
         builderOptions: {
-            fromElement: true
+            fromElement: true,
+            height: '1500px'
         },
 
         /**
@@ -89,15 +89,18 @@ define(function(require) {
         themes: [
             {
                 name: 'blank',
+                label: 'Blank Theme',
                 stylesheet: '/css/layout/blank/styles.css'
             },
             {
                 name: 'default',
+                label: 'Default Theme',
                 stylesheet: '/css/layout/default/styles.css',
                 active: true
             },
             {
                 name: 'custom',
+                label: 'Custom Theme',
                 stylesheet: '/css/layout/custom/styles.css'
             }
         ],
@@ -204,6 +207,7 @@ define(function(require) {
             this.builder.on('load', _.bind(this._onLoadBuilder, this));
             this.builder.on('update', _.bind(this._onUpdatedBuilder, this));
             this.builder.on('component:update', _.bind(this._onComponentUpdatedBuilder, this));
+            this.builder.on('changeTheme', _.bind(this._updateTheme, this));
         },
 
         /**
@@ -258,6 +262,20 @@ define(function(require) {
         _onComponentUpdatedBuilder: function(state) {
             this._updateInitialField();
             mediator.trigger('grapesjs:components:updated', state);
+        },
+
+        _updateTheme: function(selected) {
+            _.each(this.themes, function(theme) {
+                theme.active = theme.name === selected;
+            });
+
+            var theme = _.find(this.themes, function(theme) {
+                return theme.active;
+            });
+
+            var style = this.builder.Canvas.getFrameEl().contentDocument.head.querySelector('link');
+
+            style.href = theme.stylesheet;
         },
 
         /**
@@ -332,7 +350,7 @@ define(function(require) {
          */
         _getPlugins: function() {
             return {
-                plugins: _.keys(this.builderPlugins).concat([ControlsPlugin]),
+                plugins: _.keys(this.builderPlugins),
                 pluginsOpts: this.builderPlugins
             };
         }

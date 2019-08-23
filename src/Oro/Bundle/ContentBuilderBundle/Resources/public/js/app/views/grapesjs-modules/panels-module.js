@@ -1,6 +1,8 @@
 define(function(require) {
     'use strict';
 
+    var ThemeSelectorView = require('./controls/theme-selector-view');
+
     /**
      * Create panel manager instance
      * @param options
@@ -31,7 +33,16 @@ define(function(require) {
         },
 
         createThemeSelector: function() {
+            var pn = this.builder.Panels.getPanel('options');
 
+            var themeSelector = new ThemeSelectorView({
+                editor: this.builder,
+                themes: this.themes
+            });
+
+            pn.view.$el.prepend(
+                themeSelector.$el
+            );
         },
 
         /**

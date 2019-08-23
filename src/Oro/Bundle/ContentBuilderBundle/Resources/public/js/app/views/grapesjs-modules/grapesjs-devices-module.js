@@ -40,6 +40,8 @@ define(function(require) {
             this.canvasEl = this.builder.Canvas.getElement();
 
             _.delay(_.bind(this._getCSSBreakpoint, this), 300);
+
+            this.builder.on('changeTheme', _.debounce(_.bind(this._getCSSBreakpoint, this), 300));
         },
 
         /**
@@ -63,12 +65,11 @@ define(function(require) {
         createButtons: function() {
             var devicePanel = this.builder.Panels.getPanel('devices-c');
             var deviceButton = devicePanel.get('buttons');
-
-            this.builder.Panels.addElement()
-            deviceButton.reset();
-
             var DeviceManager = this.builder.DeviceManager;
             var Commands = this.builder.Commands;
+
+            deviceButton.reset();
+            DeviceManager.getAll().reset();
 
             Commands.add('setDevice', {
                 run: function(editor, sender) {
@@ -85,7 +86,7 @@ define(function(require) {
             });
 
             _.each(this.breakpoints, function(breakpoint) {
-                if (breakpoint.name === 'desktop') {
+                if (this.canvasEl.classList.length === 1 && breakpoint.name === 'desktop') {
                     this.canvasEl.classList.add(breakpoint.name);
                 }
 

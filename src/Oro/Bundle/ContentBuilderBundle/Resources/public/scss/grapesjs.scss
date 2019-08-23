@@ -143,7 +143,20 @@
 
         &.gjs-pn-options {
             padding-right: 11px;
+            display: flex;
+            align-items: center;
         }
+
+        .nav-content {
+            padding: 2px 16px 10px;
+            input {
+                height: 32px;
+            }
+        }
+    }
+
+    &select-control {
+        margin-right: 5px;
     }
 
     &pn-views-container {

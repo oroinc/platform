@@ -37,6 +37,8 @@ define(function(require) {
                     this.cssVariables = _.extend(this.cssVariables, cssVariables);
 
                     mediator.trigger('css:variables:fetched', this.cssVariables);
+
+                    this.deferred.resolve(this.cssVariables);
                 }, this)
             }));
 
@@ -74,10 +76,10 @@ define(function(require) {
             var regexp = /(--[\w-]*:)/g;
             var regexpVal = /:\s?[\w\d-(): ]*/g;
             var content = window.getComputedStyle(context, ':before').getPropertyValue('content');
+            var breakpoint = {};
 
             if (content === 'none') {
-                this.deferred.resolve(this.cssVariables);
-                mediator.trigger('css:breakpoints:fetched', this.cssVariables);
+                mediator.trigger('css:breakpoints:fetched', breakpoint);
                 return;
             }
 
@@ -86,16 +88,15 @@ define(function(require) {
                 var name = value.match(regexp);
                 var varVal = value.match(regexpVal);
                 if (name && varVal) {
-                    this.cssVariables[name[0].slice(0, -1)] = varVal[0].substr(1).trim();
+                    breakpoint[name[0].slice(0, -1)] = varVal[0].substr(1).trim();
                 }
 
                 if (i === content.length - 1) {
-                    this.deferred.resolve(this.cssVariables);
-                    mediator.trigger('css:breakpoints:fetched', this.cssVariables);
+                    mediator.trigger('css:breakpoints:fetched', breakpoint);
                 }
             }, this));
 
-            return this.cssVariables;
+            return breakpoint;
         },
 
         getHeadBreakpoints: function(context) {
