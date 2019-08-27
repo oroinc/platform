@@ -5,36 +5,39 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\DeleteList;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListDataByDeleteHandler;
+use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteEntitiesByDeleteHandler;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerInterface;
+use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 
-class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
+class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var DeleteListDataByDeleteHandler */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDeleteHandlerRegistry */
+    private $deleteHandlerRegistry;
+
+    /** @var DeleteEntitiesByDeleteHandler */
     private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->container = $this->createMock(ContainerInterface::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->deleteHandlerRegistry = $this->createMock(EntityDeleteHandlerRegistry::class);
 
-        $this->processor = new DeleteListDataByDeleteHandler($this->doctrineHelper, $this->container);
+        $this->processor = new DeleteEntitiesByDeleteHandler(
+            $this->doctrineHelper,
+            $this->deleteHandlerRegistry
+        );
     }
 
     public function testProcessWithoutResult()
     {
-        $this->container->expects(self::never())
-            ->method('get');
+        $this->deleteHandlerRegistry->expects(self::never())
+            ->method('getHandler');
 
         $this->processor->process($this->context);
     }
@@ -51,8 +54,8 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
             ->willReturn(null);
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManagerForClass');
-        $this->container->expects(self::never())
-            ->method('get');
+        $this->deleteHandlerRegistry->expects(self::never())
+            ->method('getHandler');
 
         $this->context->setClassName($entityClass);
         $this->context->setResult([$entity]);
@@ -71,7 +74,7 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
         $entity = new \stdClass();
         $entityClass = \get_class($entity);
         $config = new EntityDefinitionConfig();
-        $deleteHandler = $this->createMock(DeleteHandler::class);
+        $deleteHandler = $this->createMock(EntityDeleteHandlerInterface::class);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -83,12 +86,12 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
             ->with($entityClass)
             ->willReturn($em);
 
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('oro_soap.handler.delete')
+        $this->deleteHandlerRegistry->expects(self::once())
+            ->method('getHandler')
+            ->with($entityClass)
             ->willReturn($deleteHandler);
         $deleteHandler->expects(self::never())
-            ->method('processDelete');
+            ->method('delete');
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($entity);
@@ -96,12 +99,12 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithDefaultDeleteHandler()
+    public function testProcess()
     {
         $entity = new \stdClass();
         $entityClass = \get_class($entity);
         $config = new EntityDefinitionConfig();
-        $deleteHandler = $this->createMock(DeleteHandler::class);
+        $deleteHandler = $this->createMock(EntityDeleteHandlerInterface::class);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -121,56 +124,13 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
         $connection->expects(self::once())
             ->method('commit');
 
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('oro_soap.handler.delete')
-            ->willReturn($deleteHandler);
-        $deleteHandler->expects(self::once())
-            ->method('processDelete')
-            ->with($entity, $em);
-
-        $this->context->setClassName($entityClass);
-        $this->context->setResult([$entity]);
-        $this->context->setConfig($config);
-        $this->processor->process($this->context);
-
-        self::assertFalse($this->context->hasResult());
-    }
-
-    public function testProcessWithCustomDeleteHandler()
-    {
-        $entity = new \stdClass();
-        $entityClass = \get_class($entity);
-        $config = new EntityDefinitionConfig();
-        $deleteHandlerServiceId = 'custom_delete_handler';
-        $deleteHandler = $this->createMock(DeleteHandler::class);
-        $config->setDeleteHandler($deleteHandlerServiceId);
-
-        $this->doctrineHelper->expects(self::once())
-            ->method('getManageableEntityClass')
-            ->with($entityClass, $config)
-            ->willReturn($entityClass);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getEntityManagerForClass')
+        $this->deleteHandlerRegistry->expects(self::once())
+            ->method('getHandler')
             ->with($entityClass)
-            ->willReturn($em);
-        $connection = $this->createMock(Connection::class);
-        $em->expects(self::exactly(2))
-            ->method('getConnection')
-            ->willReturn($connection);
-        $connection->expects(self::once())
-            ->method('beginTransaction');
-        $connection->expects(self::once())
-            ->method('commit');
-
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with($deleteHandlerServiceId)
             ->willReturn($deleteHandler);
         $deleteHandler->expects(self::once())
-            ->method('processDelete')
-            ->with($entity, $em);
+            ->method('delete')
+            ->with($entity);
 
         $this->context->setClassName($entityClass);
         $this->context->setResult([$entity]);
@@ -189,7 +149,7 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
         $entity = new \stdClass();
         $entityClass = \get_class($entity);
         $config = new EntityDefinitionConfig();
-        $deleteHandler = $this->createMock(DeleteHandler::class);
+        $deleteHandler = $this->createMock(EntityDeleteHandlerInterface::class);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -212,13 +172,13 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
             ->method('rollBack');
 
         $exception = new \LogicException('test exception');
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('oro_soap.handler.delete')
+        $this->deleteHandlerRegistry->expects(self::once())
+            ->method('getHandler')
+            ->with($entityClass)
             ->willReturn($deleteHandler);
         $deleteHandler->expects(self::once())
-            ->method('processDelete')
-            ->with($entity, $em)
+            ->method('delete')
+            ->with($entity)
             ->willThrowException($exception);
 
         $this->context->setClassName($entityClass);
@@ -234,7 +194,7 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
         $parentEntityClass = 'Test\Parent';
         $config = new EntityDefinitionConfig();
         $config->setParentResourceClass($parentEntityClass);
-        $deleteHandler = $this->createMock(DeleteHandler::class);
+        $deleteHandler = $this->createMock(EntityDeleteHandlerInterface::class);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -254,13 +214,13 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
         $connection->expects(self::once())
             ->method('commit');
 
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('oro_soap.handler.delete')
+        $this->deleteHandlerRegistry->expects(self::once())
+            ->method('getHandler')
+            ->with($parentEntityClass)
             ->willReturn($deleteHandler);
         $deleteHandler->expects(self::once())
-            ->method('processDelete')
-            ->with($entity, $em);
+            ->method('delete')
+            ->with($entity);
 
         $this->context->setClassName($entityClass);
         $this->context->setResult([$entity]);

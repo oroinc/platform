@@ -420,26 +420,6 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     }
 
     /**
-     * Gets a handler that should be used to delete the entity.
-     *
-     * @return string|null The service id
-     */
-    public function getDeleteHandler()
-    {
-        return $this->get(ConfigUtil::DELETE_HANDLER);
-    }
-
-    /**
-     * Sets a handler that should be used to delete the entity.
-     *
-     * @param string|null $handler The service id
-     */
-    public function setDeleteHandler($handler = null)
-    {
-        $this->set(ConfigUtil::DELETE_HANDLER, $handler);
-    }
-
-    /**
      * Indicates whether at least one link to documentation file exists.
      *
      * @return bool

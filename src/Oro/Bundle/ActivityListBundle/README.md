@@ -70,7 +70,7 @@ class CustomerUserRole extends AbstractRole { ... }
 To add a new entity to be displayed within a widget, register a service that implements **ActivityListProviderInterface** and tag it as **oro_activity_list.provider**. A working example of this can be found in EmailBundle or CalendarBundle:
 ```
     oro_calendar.activity_list.provider:
-        class: %oro_calendar.activity_list.provider.class%
+        class: Oro\Bundle\CalendarBundle\Provider\CalendarEventActivityListProvider
         arguments:
            - @oro_entity.doctrine_helper
            - @doctrine

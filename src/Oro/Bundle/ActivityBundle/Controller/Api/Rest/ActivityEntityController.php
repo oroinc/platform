@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * API CRUD controller for activity entities.
+ *
  * @RouteResource("activity_relation")
  * @NamePrefix("oro_api_")
  */
@@ -172,6 +174,6 @@ class ActivityEntityController extends RestController
      */
     protected function getDeleteHandler()
     {
-        return $this->get('oro_activity.handler.delete.activity_entity_proxy');
+        return $this->get('oro_activity.activity_entity_delete_handler.proxy');
     }
 }

@@ -93,7 +93,6 @@
    - [Change an ACL Resource for an Action](./how_to.md#change-an-acl-resource-for-an-action)
    - [Disable Access Checks for an Action](./how_to.md#disable-access-checks-for-an-action)
    - [Disable an Entity Action](./how_to.md#disable-an-entity-action)
-   - [Change the Delete Handler for an Entity](./how_to.md#change-the-delete-handler-for-an-entity)
    - [Change the Maximum Number of Entities that Can Be Deleted by One Request](./how_to.md#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request)
    - [Configure a Nested Object](./how_to.md#configure-a-nested-object)
    - [Configure a Nested Association](./how_to.md#configure-a-nested-association)

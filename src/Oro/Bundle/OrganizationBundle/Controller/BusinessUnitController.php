@@ -8,7 +8,6 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -46,10 +45,10 @@ class BusinessUnitController extends Controller
      */
     public function viewAction(BusinessUnit $entity)
     {
-        return array(
-            'entity' => $entity,
-            'allow_delete' => !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)
-        );
+        return [
+            'entity'       => $entity,
+            'allow_delete' => $this->isDeleteGranted($entity)
+        ];
     }
 
     /**
@@ -63,8 +62,8 @@ class BusinessUnitController extends Controller
     {
         $businessUnits = [];
         if ($organizationId) {
-            $businessUnits = $this->get('oro_organization.business_unit_manager')
-                ->getBusinessUnitRepo()
+            $businessUnits = $this->getDoctrine()
+                ->getRepository(BusinessUnit::class)
                 ->getOrganizationBusinessUnitsTree($organizationId);
         }
 
@@ -98,18 +97,16 @@ class BusinessUnitController extends Controller
      * @AclAncestor("oro_business_unit_view")
      * @Template()
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        return array(
-            'entity_class' => $this->container->getParameter('oro_organization.business_unit.entity.class')
-        );
+        return ['entity_class' => BusinessUnit::class];
     }
 
     /**
      * @param BusinessUnit $entity
      * @return array
      */
-    protected function update(BusinessUnit $entity)
+    private function update(BusinessUnit $entity)
     {
         if ($this->get('oro_organization.form.handler.business_unit')->process($entity)) {
             $this->get('session')->getFlashBag()->add(
@@ -120,13 +117,11 @@ class BusinessUnitController extends Controller
             return $this->get('oro_ui.router')->redirect($entity);
         }
 
-        return array(
-            'entity' => $entity,
-            'form' => $this->get('oro_organization.form.business_unit')->createView(),
-            'allow_delete' =>
-                $entity->getId() &&
-                !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)
-        );
+        return [
+            'entity'       => $entity,
+            'form'         => $this->get('oro_organization.form.business_unit')->createView(),
+            'allow_delete' => $entity->getId() && $this->isDeleteGranted($entity)
+        ];
     }
 
     /**
@@ -136,9 +131,7 @@ class BusinessUnitController extends Controller
      */
     public function infoAction(BusinessUnit $entity)
     {
-        return array(
-            'entity' => $entity,
-        );
+        return ['entity' => $entity];
     }
 
     /**
@@ -148,8 +141,18 @@ class BusinessUnitController extends Controller
      */
     public function usersAction(BusinessUnit $entity)
     {
-        return array(
-            'entity' => $entity,
-        );
+        return ['entity' => $entity];
+    }
+
+    /**
+     * @param BusinessUnit $entity
+     *
+     * @return bool
+     */
+    private function isDeleteGranted(BusinessUnit $entity): bool
+    {
+        return $this->get('oro_entity.delete_handler_registry')
+            ->getHandler(BusinessUnit::class)
+            ->isDeleteGranted($entity);
     }
 }

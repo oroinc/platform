@@ -8,7 +8,6 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -185,7 +184,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
         if ($e instanceof HttpExceptionInterface) {
             return $e->getStatusCode() < Response::HTTP_INTERNAL_SERVER_ERROR;
         }
-        if ($e instanceof AccessDeniedException || $e instanceof ForbiddenException) {
+        if ($e instanceof AccessDeniedException) {
             return true;
         }
         if ($e instanceof ValidationExceptionInterface) {
