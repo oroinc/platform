@@ -236,6 +236,25 @@ class WindowsStateControllerTest extends WebTestCase
         }
     }
 
+    public function testEmptyJsonInRequestData()
+    {
+        $this->client->request(
+            'POST',
+            $this->getUrl('oro_api_post_windows'),
+            [],
+            [],
+            $this->generateWsseAuthHeader(),
+            ''
+        );
+        $response = $this->client->getResponse();
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
+        self::assertResponseContentTypeEquals($response, 'application/json');
+        self::assertEquals(
+            ['code' => 400, 'message' => 'Bad Request'],
+            self::jsonToArray($response->getContent())
+        );
+    }
+
     public function testInvalidJsonInRequestData()
     {
         $this->client->request(
@@ -250,7 +269,11 @@ class WindowsStateControllerTest extends WebTestCase
         self::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
         self::assertResponseContentTypeEquals($response, 'application/json');
         self::assertEquals(
-            ['code' => 400, 'message' => 'Bad Request'],
+            [
+                'code'    => 400,
+                'message' => 'Invalid json message received.'
+                    . ' Parsing error in [1:22]. Expected \'null\'. Got: test'
+            ],
             self::jsonToArray($response->getContent())
         );
     }
