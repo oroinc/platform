@@ -24,9 +24,6 @@ parameters:
     oro_user.gender_provider.class:               Oro\Bundle\UserBundle\Provider\GenderProvider
     oro_user.email_recipients_provider.class:     Oro\Bundle\UserBundle\Provider\EmailRecipientsProvider
     oro_user.change_password.subscriber.class:    Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber
-    oro_user.handler.delete.class:                Oro\Bundle\UserBundle\Handler\UserDeleteHandler
-    oro_user.role.handler.delete.class:           Oro\Bundle\UserBundle\Handler\RoleDeleteHandler
-    oro_user.activity_widget_provider.class:      '%oro_activity.widget_provider.activities.menu.class%'
     oro_user.event_listener.owner_user_grid_listener.class: Oro\Bundle\UserBundle\EventListener\OwnerUserGridListener
     oro_user.placeholder.filter.class:            Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter
     oro_user.listener.choice_tree_filter_load_data_listener.class: Oro\Bundle\UserBundle\EventListener\ChoiceTreeFilterLoadDataListener
@@ -340,21 +337,22 @@ services:
             - '@form.factory'
             - '@oro_security.token_accessor'
 
-    oro_user.handler.delete:
-        class: '%oro_user.handler.delete.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
-        public: true
-        parent: oro_soap.handler.delete.abstract
-        calls:
-            - [ setTokenAccessor,  ['@oro_security.token_accessor'] ]
+    oro_user.delete_handler_extension.user:
+        class: Oro\Bundle\UserBundle\Handler\UserDeleteHandlerExtension
+        parent: oro_entity.delete_handler_extension
+        arguments:
+            - '@oro_security.token_accessor'
+            - '@oro_organization.owner_deletion_manager'
+        tags:
+            - { name: oro_entity.delete_handler_extension, entity: Oro\Bundle\UserBundle\Entity\User }
 
-    oro_user.role.handler.delete:
-        class: '%oro_user.role.handler.delete.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
-        public: true
-        parent: oro_soap.handler.delete.abstract
+    oro_user.delete_handler_extension.role:
+        class: Oro\Bundle\UserBundle\Handler\RoleDeleteHandlerExtension
+        parent: oro_entity.delete_handler_extension
         arguments:
             - '@oro_security.acl.sid_manager'
+        tags:
+            - { name: oro_entity.delete_handler_extension, entity: Oro\Bundle\UserBundle\Entity\Role }
 
     oro_user.handler.reset_password_handler:
         class: Oro\Bundle\UserBundle\Handler\ResetPasswordHandler
@@ -368,7 +366,7 @@ services:
             - '@logger'
 
     oro_user.activity_widget_provider:
-        class: '%oro_user.activity_widget_provider.class%'
+        class: Oro\Bundle\UIBundle\Provider\TabMenuWidgetProvider
         arguments:
            - '@oro_entity.entity_identifier_accessor'
            - '@oro_ui.twig.tab_extension'

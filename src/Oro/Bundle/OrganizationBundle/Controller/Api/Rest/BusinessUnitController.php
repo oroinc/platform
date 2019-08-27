@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * API CRUD controller for BusinessUnit entity.
+ *
  * @RouteResource("businessunit")
  * @NamePrefix("oro_api_")
  */
@@ -187,13 +189,5 @@ class BusinessUnitController extends RestController implements ClassResourceInte
     public function getFormHandler()
     {
         return $this->get('oro_organization.form.handler.business_unit.api');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDeleteHandler()
-    {
-        return $this->get('oro_organization.business_unit.handler.delete');
     }
 }

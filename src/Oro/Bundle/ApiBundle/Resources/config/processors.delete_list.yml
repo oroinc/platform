@@ -85,11 +85,11 @@ services:
         tags:
             - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -10 }
 
-    oro_api.delete_list.delete_data_by_handler:
-        class: Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListDataByDeleteHandler
+    oro_api.delete_list.delete_entities_by_delete_handler:
+        class: Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteEntitiesByDeleteHandler
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@service_container'
+            - '@oro_entity.delete_handler_registry'
         tags:
             - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -20 }
 

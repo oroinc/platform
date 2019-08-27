@@ -13,8 +13,6 @@ parameters:
 
     oro_tag.event_listener.search_results_grid_listener.class: Oro\Bundle\TagBundle\EventListener\TagSearchResultsGridListener
 
-    oro_tag.owner_assignment_checker.tag.class: Oro\Bundle\TagBundle\Ownership\TagOwnerAssignmentChecker
-
     oro_tag.event_listener.merge_listener.class: Oro\Bundle\TagBundle\EventListener\MergeListener
 
     oro_tag.workflow.action.copy_tagging.class: Oro\Bundle\TagBundle\Workflow\Action\CopyTagging
@@ -95,7 +93,7 @@ services:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.tag-results-grid, method: onBuildAfter }
 
     oro_tag.owner_assignment_checker.tag:
-        class: '%oro_tag.owner_assignment_checker.tag.class%'
+        class: Oro\Bundle\TagBundle\Ownership\TagOwnerAssignmentChecker
         tags:
             - { name: oro_organization.owner_assignment_checker, entity: Oro\Bundle\TagBundle\Entity\Tag }
 

@@ -45,7 +45,7 @@ At first, to be able to work with associations in API we need to create the enti
 You see that it has the AssociationManager injected into it as a dependency:
 ```yaml
     oro_activity.manager:
-        class: %oro_activity.manager.class%
+        class: Oro\Bundle\ActivityBundle\Manager\ActivityManager
         arguments:
             ...
             - @oro_entity_extend.association_manager
@@ -170,7 +170,7 @@ Here is how we register the API entity manager in the DI container:
 
 ```yaml
     oro_activity.manager.activity_entity.api:
-        class: %oro_activity.manager.activity_entity.api.class%
+        class: Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - @doctrine.orm.entity_manager
@@ -304,7 +304,7 @@ For a start, we need the entity manager to handle the associations between entit
 You can see that it has the AssociationManager injected into it as a dependency:
 ```yaml
     oro_activity.manager:
-        class: %oro_activity.manager.class%
+        class: Oro\Bundle\ActivityBundle\Manager\ActivityManager
         arguments:
             ...
             - @oro_entity_extend.association_manager
@@ -428,7 +428,7 @@ And register it in the DI container:
 
 ```yaml
     oro_activity.manager.activity_target.api:
-        class: %oro_activity.manager.activity_target.api.class%
+        class: Oro\Bundle\ActivityBundle\Entity\Manager\ActivityTargetApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - @doctrine.orm.entity_manager

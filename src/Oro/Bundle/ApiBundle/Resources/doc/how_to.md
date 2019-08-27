@@ -7,7 +7,6 @@
  - [Change an ACL Resource for an Action](#change-an-acl-resource-for-an-action)
  - [Disable Access Checks for an Action](#disable-access-checks-for-an-action)
  - [Disable an Entity Action](#disable-an-entity-action)
- - [Change the Delete Handler for an Entity](#change-the-delete-handler-for-an-entity)
  - [Change the Maximum Number of Entities that Can Be Deleted by One Request](#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request)
  - [Configure a Nested Object](#configure-a-nested-object)
  - [Configure a Nested Association](#configure-a-nested-association)
@@ -204,23 +203,6 @@ api:
             actions:
                 delete: false
 ```
-
-## Change the Delete Handler for an Entity
-
-By default, entity deletion is processed by [DeleteHandler](../../../SoapBundle/Handler/DeleteHandler.php).
-
-If your want to use another delete handler, set it using the `delete_handler` option in `Resources/config/oro/api.yml`:
-
-```yaml
-api:
-    entities:
-        Acme\Bundle\ProductBundle\Product:
-            delete_handler: acme.demo.product_delete_handler
-```
-
-Please note that the value of the `delete_handler` option is a service id.
-
-Additionally, you can create a custom delete handler. The handler class must be derived from [DeleteHandler](../../../SoapBundle/Handler/DeleteHandler.php).
 
 ## Change the Maximum Number of Entities that Can Be Deleted by One Request
 
@@ -545,7 +527,7 @@ class MyResourceController extends Controller
      */
     public function getAction(Request $request)
     {
-        // @todo: add an implementaution here
+        // add an implementation here
     }
 }
 ```

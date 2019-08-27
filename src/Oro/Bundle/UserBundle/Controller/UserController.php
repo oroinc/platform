@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -102,7 +101,6 @@ class UserController extends Controller
 
             return new JsonResponse($responseData, $status);
         }
-        $view = $form->createView();
 
         return $this->render(
             'OroUserBundle:User/widget:apiKeyGen.html.twig',
@@ -171,7 +169,7 @@ class UserController extends Controller
      *
      * @return RedirectResponse|array
      */
-    protected function update(User $entity)
+    private function update(User $entity)
     {
         if ($this->get('oro_user.form.handler.user')->process($entity)) {
             $this->get('session')->getFlashBag()->add(
@@ -185,7 +183,7 @@ class UserController extends Controller
         return [
             'entity'       => $entity,
             'form'         => $this->get('oro_user.form.user')->createView(),
-            'allow_delete' => $this->isUserDeleteAllowed($entity)
+            'allow_delete' => $entity->getId() && $this->isDeleteGranted($entity)
         ];
     }
 
@@ -194,21 +192,13 @@ class UserController extends Controller
      * @param bool $isProfileView
      * @return array
      */
-    protected function view(User $entity, $isProfileView = false)
+    private function view(User $entity, $isProfileView = false)
     {
         return [
-            'entity' => $entity,
-            'allow_delete' => $this->isUserDeleteAllowed($entity),
+            'entity'        => $entity,
+            'allow_delete'  => $this->isDeleteGranted($entity),
             'isProfileView' => $isProfileView
         ];
-    }
-
-    /**
-     * @return BusinessUnitManager
-     */
-    protected function getBusinessUnitManager()
-    {
-        return $this->get('oro_organization.business_unit_manager');
     }
 
     /**
@@ -242,7 +232,7 @@ class UserController extends Controller
      *
      * @return UserApi
      */
-    protected function getUserApi(User $user)
+    private function getUserApi(User $user)
     {
         $userManager  = $this->get('oro_user.manager');
         if (!$userApi = $userManager->getApi($user, $this->getOrganization())) {
@@ -258,7 +248,7 @@ class UserController extends Controller
      *
      * @return Organization
      */
-    protected function getOrganization()
+    private function getOrganization()
     {
         /** @var UsernamePasswordOrganizationToken $token */
         $token = $this->get('security.token_storage')->getToken();
@@ -271,13 +261,11 @@ class UserController extends Controller
      *
      * @return bool
      */
-    protected function isUserDeleteAllowed(User $entity)
+    private function isDeleteGranted(User $entity): bool
     {
-        $isDeleteAllowed = $entity->getId()
-            && $this->getUser()->getId() !== $entity->getId()
-            && !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity);
-
-        return $isDeleteAllowed;
+        return $this->get('oro_entity.delete_handler_registry')
+            ->getHandler(User::class)
+            ->isDeleteGranted($entity);
     }
 
     /**
@@ -285,7 +273,7 @@ class UserController extends Controller
      *
      * @return bool
      */
-    protected function isUserApiGenAllowed(User $entity)
+    private function isUserApiGenAllowed(User $entity)
     {
         return $this->get('oro_security.token_accessor')->getUserId() === $entity->getId()
                || $this->isGranted('MANAGE_API_KEY', $entity);
@@ -295,7 +283,7 @@ class UserController extends Controller
      * @param User    $user
      * @param UserApi $userApi
      */
-    protected function saveUserApi(User $user, UserApi $userApi)
+    private function saveUserApi(User $user, UserApi $userApi)
     {
         $em = $this->getDoctrine()->getManagerForClass(User::class);
 
