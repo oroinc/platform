@@ -50,6 +50,12 @@ class ImageFilterLoader
         $this->doctrineHelper = $doctrineHelper;
     }
 
+    public function forceLoad()
+    {
+        $this->shouldBeLoaded = true;
+        $this->load();
+    }
+
     public function load()
     {
         if (!$this->shouldBeLoaded) {

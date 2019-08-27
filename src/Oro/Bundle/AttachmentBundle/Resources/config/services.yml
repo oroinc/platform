@@ -316,10 +316,16 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
 
+    oro_attachment.url_generator:
+        class: Oro\Bundle\AttachmentBundle\Provider\AttachmentFilterAwareUrlGenerator
+        arguments:
+            - '@router'
+            - '@liip_imagine.filter.configuration'
+
     oro_attachment.provider.file_url:
         class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlProvider'
         arguments:
-            - '@router'
+            - '@oro_attachment.url_generator'
 
     oro_attachment.provider.resized_image_path:
         class: 'Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProvider'
@@ -364,6 +370,15 @@ services:
             - '@oro_api.security.authorization_checker'
         tags:
             - { name: oro.api.processor, action: get, group: data_security_check, class: '%oro_attachment.file.entity.class%', priority: 10 }
+
+    oro_attachment.filtered_attachment_migration:
+        class: 'Oro\Bundle\AttachmentBundle\Migration\FilteredAttachmentMigrationService'
+        public: true
+        arguments:
+            - '@knp_gaufrette.filesystem_map'
+            - '@liip_imagine.filter.configuration'
+            - '@oro_layout.loader.image_filter'
+            - '%oro_attachment.filesystem_name.mediacache%'
 
     oro_attachment.api.processor.files_view_security_check:
         class: Oro\Bundle\AttachmentBundle\Api\Processor\FilesViewSecurityCheck

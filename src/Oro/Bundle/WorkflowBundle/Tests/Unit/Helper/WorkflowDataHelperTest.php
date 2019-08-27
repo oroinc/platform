@@ -63,7 +63,7 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
     public function workflowsDataProvider()
     {
         return [
-            'two workflows' => [
+            'workflows' => [
                 'workflowsData' => [
                     [
                         'name' => 'started_flow',
@@ -108,6 +108,20 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
                             ],
                         ],
                         'allowed' => ['start'],
+                        'isStarted' => false,
+                    ],
+                    [
+                        'name' => 'flow_which_cannot_be_started',
+                        'transitions' => [
+                            [
+                                'name' => TransitionManager::DEFAULT_START_TRANSITION_NAME,
+                                'isStart' => false,
+                                'hasForm' => false,
+                                'isAvailable' => false,
+                            ],
+                        ],
+                        'allowed' => [],
+                        'isStartStep' => true,
                         'isStarted' => false,
                     ],
                 ],
@@ -158,6 +172,13 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
                                 'transitionUrl' => 'oro_api_workflow_start/unstarted_flow/start/',
                             ],
                         ],
+                    ],
+                    [
+                        'name' => 'flow_which_cannot_be_started',
+                        'label' => 'Flow_which_cannot_be_started',
+                        'isStarted' => false,
+                        'workflowItemId' => null,
+                        'transitionsData' => [],
                     ],
                 ],
             ],
@@ -224,7 +245,12 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
     {
         $workflows = array_map(
             function (array $workflow) {
-                return $this->getWorkflow($workflow['name'], $workflow['transitions'], $workflow['allowed']);
+                return $this->getWorkflow(
+                    $workflow['name'],
+                    $workflow['transitions'],
+                    $workflow['allowed'],
+                    $workflow['isStartStep'] ?? false
+                );
             },
             $workflowsData
         );
@@ -238,7 +264,7 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
             function (array $workflow) use ($entity) {
                 $workflowItem = new WorkflowItem();
                 $workflowItem->setId(1);
-                $workflowItem->setCurrentStep(new WorkflowStep());
+                $workflowItem->setCurrentStep((new WorkflowStep())->setName('Start'));
 
                 return [$entity, $workflow['name'], $workflow['isStarted'] ? $workflowItem : null];
             },
@@ -296,6 +322,18 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getStartTransitions')
             ->willReturn($startTransitions);
 
+
+        $defaultTransitions = array_filter(
+            array_column($extractTransitionsMap, 1),
+            function (Transition $transition) {
+                return $transition->getName() === TransitionManager::DEFAULT_START_TRANSITION_NAME;
+            }
+        );
+
+        $transitionManager->expects($this->any())
+            ->method('getDefaultStartTransition')
+            ->willReturn(reset($defaultTransitions));
+
         /** @var TransitionManager $transitionManager */
         return $transitionManager;
     }
@@ -304,23 +342,20 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
      * @param string $workflowName
      * @param array $transitionsData
      * @param array $allowed
+     * @param bool $isStartStep
      *
      * @return Workflow
      */
-    protected function getWorkflow($workflowName, array $transitionsData, array $allowed)
+    protected function getWorkflow($workflowName, array $transitionsData, array $allowed, bool $isStartStep)
     {
         $step = new Step();
         $step->setName('Start');
         $step->setAllowedTransitions($allowed);
 
-        /** @var StepManager|\PHPUnit\Framework\MockObject\MockObject $stepManager */
-        $stepManager = $this->getMockBuilder(StepManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stepManager->expects($this->any())
-            ->method('getStep')
-            ->willReturn($step);
+        $stepManager = new StepManager([$step]);
+        if ($isStartStep) {
+            $stepManager->setStartStepName($step->getName());
+        }
 
         /** @var AclManager $aclManager */
         $aclManager = $this->getMockBuilder(AclManager::class)

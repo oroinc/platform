@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Processor\CustomizeDataContext;
 use Symfony\Component\Form\FormInterface;
 
@@ -114,6 +115,19 @@ class CustomizeFormDataContext extends CustomizeDataContext
         } else {
             $this->remove(self::PARENT_ACTION);
         }
+    }
+
+    /**
+     * Finds a form field by its property path.
+     *
+     * @param string             $propertyPath The name of an entity field
+     * @param FormInterface|null $form         The parent form of the searching child form
+     *
+     * @return FormInterface|null
+     */
+    public function findFormField(string $propertyPath, FormInterface $form = null): ?FormInterface
+    {
+        return FormUtil::findFormFieldByPropertyPath($form ?? $this->getForm(), $propertyPath);
     }
 
     /**
