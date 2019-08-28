@@ -1,9 +1,19 @@
 nelmio_api_doc_index:
     path: '%oro_api.rest.prefix%doc/{view}'
     methods: [GET]
+    requirements:
+        view: '[\w-]+'
     defaults:
-        _controller: NelmioApiDocBundle:ApiDoc:index
+        _controller: OroApiBundle:RestApiDoc:index
         view: rest_json_api
+
+oro_rest_api_doc_resource:
+    path: '%oro_api.rest.prefix%doc/{view}/{resource}'
+    methods: [GET]
+    requirements:
+        view: '[\w-]+'
+    defaults:
+        _controller: OroApiBundle:RestApiDoc:resource
 
 # * GET method: returns an entity of the given type by its identifier
 # * DELETE method: deletes an entity of the given type by its identifier

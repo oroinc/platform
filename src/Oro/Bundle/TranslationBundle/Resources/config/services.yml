@@ -376,3 +376,11 @@ services:
             - '%installed%'
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad, priority: -100 }
+
+    oro_translation.async.message_processor.dump_js_translations:
+        class: Oro\Bundle\TranslationBundle\Async\DumpJsTranslationsMessageProcessor
+        arguments:
+            - '@oro_translation.js_dumper'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }

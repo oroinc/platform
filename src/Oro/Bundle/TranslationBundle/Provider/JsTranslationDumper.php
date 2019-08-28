@@ -67,8 +67,7 @@ class JsTranslationDumper implements LoggerAwareInterface
      * @param array         $locales
      *
      * @return bool
-     * @throws \Symfony\Component\Filesystem\Exception\IOException
-     * @throws \RuntimeException
+     * @throws IOException
      */
     public function dumpTranslations($locales = [])
     {
@@ -95,7 +94,7 @@ class JsTranslationDumper implements LoggerAwareInterface
             }
 
             if (false === @file_put_contents($target, $content)) {
-                throw new \RuntimeException('Unable to write file ' . $target);
+                throw new IOException('Unable to write file ' . $target);
             }
         }
 

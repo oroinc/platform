@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -167,6 +168,10 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $defaultHtmlFormatterDef->addMethodCall(
             'setDocumentationProvider',
             [new Reference(self::DOCUMENTATION_PROVIDER_SERVICE)]
+        );
+        $defaultHtmlFormatterDef->addMethodCall(
+            'setRequestStack',
+            [new Reference('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE)]
         );
 
         // configure composite HTML formatter and set it as default one

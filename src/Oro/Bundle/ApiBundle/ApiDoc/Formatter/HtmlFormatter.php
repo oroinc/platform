@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\ApiDoc\RestDocUrlGenerator;
 use Oro\Bundle\ApiBundle\ApiDoc\SecurityContextInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Templating\EngineInterface;
 
 /**
@@ -68,6 +69,9 @@ class HtmlFormatter extends AbstractFormatter
 
     /** @var DocumentationProviderInterface|null */
     protected $documentationProvider;
+
+    /** @var RequestStack|null */
+    private $requestStack;
 
     /**
      * @param SecurityContextInterface $securityContext
@@ -214,6 +218,14 @@ class HtmlFormatter extends AbstractFormatter
     }
 
     /**
+     * @param RequestStack|null $requestStack
+     */
+    public function setRequestStack(RequestStack $requestStack = null): void
+    {
+        $this->requestStack = $requestStack;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function renderOne(array $data)
@@ -268,6 +280,7 @@ class HtmlFormatter extends AbstractFormatter
             'userName'              => $this->securityContext->getUserName(),
             'apiKey'                => $this->securityContext->getApiKey(),
             'apiKeyGenerationHint'  => $this->securityContext->getApiKeyGenerationHint(),
+            'csrfCookieName'        => $this->getCsrfCookieName(),
             'loginRoute'            => $this->securityContext->getLoginRoute(),
             'logoutRoute'           => $this->securityContext->getLogoutRoute()
         ];
@@ -344,5 +357,26 @@ class HtmlFormatter extends AbstractFormatter
         }
 
         return $result;
+    }
+
+    /**
+     * Gets the name of CSRF cookie.
+     *
+     * @return string|null
+     */
+    private function getCsrfCookieName(): ?string
+    {
+        if (null === $this->requestStack) {
+            return null;
+        }
+
+        $request = $this->requestStack->getMasterRequest();
+        if (null === $request) {
+            return null;
+        }
+
+        return $request->isSecure()
+            ? 'https-_csrf'
+            : '_csrf';
     }
 }
