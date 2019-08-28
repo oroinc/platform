@@ -295,6 +295,8 @@ define(function(require) {
         // Since we often override original `delegateEvents` to bind events on elements placed outside view el
         // it needs call `undelegateEvents` even view el is going to be removed
         this.undelegateEvents();
+        // Before remove container should to destroy some plugins and widgets from child elements
+        this.disposeControls();
 
         return original.remove.call(this);
     };
