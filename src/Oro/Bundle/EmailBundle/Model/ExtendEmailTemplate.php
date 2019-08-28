@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Model;
 
-use Oro\Bundle\LocalizedEmailTemplatesBundle\Entity\EmailTemplateLocalization;
-
 /**
  * Extend class which allow to make EmailTemplate entity extandable
  */
