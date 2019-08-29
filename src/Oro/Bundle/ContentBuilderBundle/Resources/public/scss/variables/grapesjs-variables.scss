@@ -21,8 +21,8 @@ $mainLhColor: $secondary;
 $button-bg-color: $primary-830;
 
 $canvas-bg-color: $primary-inverse;
-$canvas-border: 2px solid #dedede;
-$canvas-pattern: linear-gradient(45deg, #F5F5F5 25%, transparent 25%),linear-gradient(-45deg, #F5F5F5 25%, transparent 25%),linear-gradient(45deg, transparent 75%, #F5F5F5 75%),linear-gradient(-45deg, transparent 75%, #F5F5F5 75%) !default;
+$canvas-border: 2px solid $primary-750;
+$canvas-pattern: linear-gradient(45deg, $primary-900 25%, transparent 25%),linear-gradient(-45deg, $primary-900 25%, transparent 25%),linear-gradient(45deg, transparent 75%, $primary-900 75%),linear-gradient(-45deg, transparent 75%, $primary-900 75%) !default;
 $canvas-pattern-size: 20px 20px !default;
 $canvas-pattern-position: 0 0, 0 10px, 10px -10px, -10px 0px !default;
 

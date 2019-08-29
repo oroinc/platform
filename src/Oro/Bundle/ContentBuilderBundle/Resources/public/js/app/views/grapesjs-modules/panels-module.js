@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var ThemeSelectorView = require('./controls/theme-selector-view');
+    var ThemeSelectorView = require('orocontentbuilder/js/app/views/grapesjs-modules/controls/theme-selector-view');
 
     /**
      * Create panel manager instance

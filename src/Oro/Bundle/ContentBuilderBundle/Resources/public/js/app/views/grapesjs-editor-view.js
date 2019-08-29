@@ -48,7 +48,7 @@ define(function(require) {
          */
         builderOptions: {
             fromElement: true,
-            height: '1500px',
+            height: '2000px',
             avoidInlineStyle: true,
 
             /**
@@ -391,7 +391,10 @@ define(function(require) {
             return _.extend({}, this.canvasConfig, {
                 canvasCss: '.gjs-comp-selected { outline: 3px solid #0c809e !important; ' +
                     'outline-offset: 0 !important; }' +
-                    '#wrapper { padding: 3px; }',
+                    '#wrapper { padding: 3px; }' +
+                    '* ::-webkit-scrollbar { width: 5px}' +
+                    '::-webkit-scrollbar-track { background: #f3f3f3 }' +
+                    '::-webkit-scrollbar-thumb { background: #e3e3e4 }',
                 canvas: {
                     styles: [theme.stylesheet]
                 }

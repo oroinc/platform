@@ -128,7 +128,8 @@ define(function(require) {
             if (!invert) {
                 invert = false;
             }
-            var height = invert ? width / 1.7 : width * 1.7;
+            var ratio = width <= 640 ? 1.7 : 1.3;
+            var height = invert ? width / ratio : width * ratio;
             if (height > this.canvasEl.offsetHeight) {
                 height = this.canvasEl.offsetHeight;
             }
