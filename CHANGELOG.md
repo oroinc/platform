@@ -39,7 +39,8 @@ The current file describes significant changes in the code that may affect the u
   `Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerInterface`
   and `Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerExtensionInterface`.
 
-## 4.0.0
+## 4.0.0 (2019-07-31)
+[Show detailed list of changes](incompatibilities-4-0.md)
 
 ### Added
 
