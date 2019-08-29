@@ -3,7 +3,7 @@ define(function(require) {
 
     var _ = require('underscore');
     var TableComponents = require('./components/table');
-    var ResponsiveTableComponents = require('./components/responsive-table');
+    var TableResponsiveComponent = require('./components/table-responsive');
     var selectTemplate = require('tpl!orocontentbuilder/templates/grapesjs-select-action.html');
 
     /**
@@ -19,7 +19,14 @@ define(function(require) {
 
     /**
      * Component manager methods
-     * @type {{BlockManager: null, Commands: null, DomComponents: null, init: init, addComponents: addComponents, sortActionsRte: sortActionsRte}}
+     * @type {{
+     *  BlockManager: null,
+     *  Commands: null,
+     *  DomComponents: null,
+     *  init: init,
+     *  addComponents: addComponents,
+     *  sortActionsRte: sortActionsRte
+     *  }}
      */
     ComponentManager.prototype = {
         /**
@@ -70,14 +77,14 @@ define(function(require) {
             // });
 
             this.BlockManager.add('responsive-table', {
-                id: 'responsive-table',
-                label: 'Responsive table',
+                id: 'table-responsive',
+                label: 'Table',
                 category: 'Basic',
                 attributes: {
                     class: 'fa fa-table'
                 },
                 content: {
-                    type: 'responsive-table'
+                    type: 'table-responsive'
                 }
             });
         },
@@ -136,7 +143,7 @@ define(function(require) {
          */
         addComponents: function() {
             new TableComponents(this.builder);
-            new ResponsiveTableComponents(this.builder);
+            new TableResponsiveComponent(this.builder);
         }
     };
 
