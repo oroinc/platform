@@ -194,33 +194,59 @@ define(function(require) {
                 });
             });
 
-            describe('handle load of changed remote data', function() {
-                beforeEach(function(done) {
-                    // simulate data sync action
-                    setTimeout(function() {
-                        instance.trigger('change'); // simulate change event of model
-                        instance.trigger('sync', instance, {foo: 'diff'});
-                        done();
-                    });
-                });
-
-                it('triggered event about stale data in use', function() {
-                    expect(instance.trigger).toHaveBeenCalledWith('proxy-cache:stale-data-in-use', instance);
-                });
-            });
-
             describe('handle load of updated remote data', function() {
-                beforeEach(function(done) {
-                    // simulate data sync action
-                    setTimeout(function() {
-                        instance.trigger('update'); // simulate update event of collection
-                        instance.trigger('sync', instance, [{foo: 'diff'}]);
-                        done();
-                    });
-                });
+                var cases = [
+                    ['added model', {
+                        changes: {
+                            added: [{}], // not empty list of added models
+                            removed: [],
+                            merged: [{
+                                hasChanged: function() {
+                                    return false;
+                                }
+                            }]
+                        }
+                    }],
+                    ['removed model', {
+                        changes: {
+                            added: [],
+                            removed: [{}], // not empty list of removed models
+                            merged: [{
+                                hasChanged: function() {
+                                    return false;
+                                }
+                            }]
+                        }
+                    }],
+                    ['updated model', {
+                        changes: {
+                            added: [],
+                            removed: [],
+                            merged: [{ // some model has been changed
+                                hasChanged: function() {
+                                    return true;
+                                }
+                            }]
+                        }
+                    }]
+                ];
 
-                it('triggered event about stale data in use', function() {
-                    expect(instance.trigger).toHaveBeenCalledWith('proxy-cache:stale-data-in-use', instance);
+                cases.forEach(function(testCase) {
+                    describe(testCase[0], function() {
+                        beforeEach(function(done) {
+                            // simulate data sync action
+                            setTimeout(function() {
+                                // simulate update event of collection
+                                instance.trigger('update', instance, testCase[1]);
+                                instance.trigger('sync', instance, [{foo: 'diff'}]);
+                                done();
+                            });
+                        });
+
+                        it('triggered event about stale data in use', function() {
+                            expect(instance.trigger).toHaveBeenCalledWith('proxy-cache:stale-data-in-use', instance);
+                        });
+                    });
                 });
             });
         });
