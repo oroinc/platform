@@ -64,18 +64,6 @@ define(function(require) {
          * Add new component block
          */
         addBlocks: function() {
-            // this.BlockManager.add('table-block', {
-            //     id: 'table',
-            //     label: 'Table',
-            //     category: 'Basic',
-            //     attributes: {
-            //         class: 'fa fa-table'
-            //     },
-            //     content: {
-            //         type: 'table'
-            //     }
-            // });
-
             this.BlockManager.add('responsive-table', {
                 id: 'table-responsive',
                 label: 'Table',
