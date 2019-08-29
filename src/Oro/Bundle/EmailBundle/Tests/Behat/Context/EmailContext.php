@@ -6,10 +6,14 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
+use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Tests\Behat\Mock\Mailer\DirectMailerDecorator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Client\FileDownloader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -517,5 +521,31 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
         self::assertNotNull($url, sprintf('"%s" link not found in the email', $linkCaption));
 
         $this->visitPath($url);
+    }
+
+    /**
+     * @Given /^(?:|I )send email template "(?P<templateName>(?:[^"]|\\")*)" to "(?P<username>(?:[^"]|\\")*)"$/
+     *
+     * @param string $templateName
+     */
+    public function sendEmailTemplateToUser(string $templateName, string $username): void
+    {
+        $doctrine = $this->getContainer()->get('doctrine');
+        $recipient = $doctrine->getRepository(User::class)->findOneBy(['username' => $username]);
+
+        /** @var TemplateEmailManager $emailTemplateManager */
+        $emailTemplateManager = $this->getContainer()->get('oro_email.manager.template_email');
+
+        $failedRecipients = [];
+        $emailTemplateManager->sendTemplateEmail(
+            From::emailAddress('no-reply@example.com'),
+            [$recipient],
+            new EmailTemplateCriteria($templateName),
+            [],
+            $failedRecipients
+        );
+
+        // Doctrine is caching email templates and after change template data not perform that changes in behat thread
+        $doctrine->resetManager();
     }
 }
