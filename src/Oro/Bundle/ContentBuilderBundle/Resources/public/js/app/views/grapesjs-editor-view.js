@@ -46,6 +46,7 @@ define(function(require) {
          */
         builderOptions: {
             fromElement: true,
+            avoidInlineStyle: true,
 
             /**
              * Color picker options
@@ -124,7 +125,10 @@ define(function(require) {
                 blocksBasicOpts: {
                     flexGrid: 1
                 },
-                customStyleManager: GrapesJSModules.getModule('style-manager')
+                customStyleManager: GrapesJSModules.getModule('style-manager'),
+                modalImportContent: function(editor) {
+                    return editor.getHtml() + '<style>' + editor.getCss() + '</style>';
+                }
             }
         },
 
@@ -249,6 +253,14 @@ define(function(require) {
         },
 
         /**
+         * Get editor content
+         * @returns {String}
+         */
+        getEditorContent: function() {
+            return this.builder.getHtml() + '<style>' + this.builder.getCss() + '</style>';
+        },
+
+        /**
          * Add wrapper classes for iframe with content
          */
         _addClassForFrameWrapper: function() {
@@ -293,9 +305,7 @@ define(function(require) {
          * @private
          */
         _updateInitialField: function() {
-            var content = this.builder.getHtml();
-            content += '<style>' + this.builder.getCss() + '</style>';
-            this.$el.val(content).trigger('change');
+            this.$el.val(this.getEditorContent()).trigger('change');
         },
 
         /**
