@@ -15,11 +15,12 @@ define(function(require) {
 
         domComps.addType(ComponentId, {
             model: dModel.extend({
-                defaults: _.extend(dModel.prototype.defaults, {
-                    type: 'table',
+                defaults: _.extend({}, dModel.prototype.defaults, {
+                    type: ComponentId,
                     tagName: 'table',
+                    draggable: ['div'],
                     droppable: ['tbody', 'thead', 'tfoot'],
-                    classes: ['table', 'table-striped', 'table-bordered']
+                    classes: ['table']
                 }),
                 initialize: function(o, opt) {
                     dModel.prototype.initialize.apply(this, arguments);
@@ -42,7 +43,7 @@ define(function(require) {
 
                     if (el.tagName === 'TABLE') {
                         result = {
-                            type: 'table'
+                            type: ComponentId
                         };
                     }
 

@@ -8,6 +8,7 @@ define(function(require) {
     var ImportDialogWidget = require('oroimportexport/js/widget/import-dialog-widget');
     var exportHandler = require('oroimportexport/js/export-handler');
     var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
 
     // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11702
     var ImportExportManager = function(options) {
@@ -109,8 +110,13 @@ define(function(require) {
 
             var exportUrl;
 
+            // Creates copy of route options which can be extended by event and used to create an url
+            // original option remains same
+            var routeOptions = $.extend(true, {}, this.routeOptions);
+            mediator.trigger('import-export:handleExport', routeOptions.options);
+
             if (this.options.isExportPopupRequired) {
-                exportUrl = routing.generate(this.options.exportConfigRoute, $.extend({}, this.routeOptions, {
+                exportUrl = routing.generate(this.options.exportConfigRoute, $.extend({}, routeOptions, {
                     processorAlias: this.options.exportProcessor,
                     filePrefix: this.options.filePrefix
                 }));
@@ -122,7 +128,7 @@ define(function(require) {
                     }
                 });
             } else {
-                exportUrl = routing.generate(this.options.exportRoute, $.extend({}, this.routeOptions, {
+                exportUrl = routing.generate(this.options.exportRoute, $.extend({}, routeOptions, {
                     processorAlias: this.options.exportProcessor,
                     filePrefix: this.options.filePrefix
                 }));

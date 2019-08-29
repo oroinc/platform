@@ -11,54 +11,42 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  */
 class CsrfRequestManager
 {
-    const CSRF_TOKEN_ID = '_csrf';
-    const CSRF_HEADER = 'X-CSRF-Header';
+    public const CSRF_TOKEN_ID = '_csrf';
+    public const CSRF_HEADER   = 'X-CSRF-Header';
 
-    /**
-     * @var CsrfTokenManagerInterface
-     */
+    /** @var CsrfTokenManagerInterface */
     private $csrfTokenManager;
 
     /**
-     * @var string
-     */
-    private $tokenId;
-
-    /**
      * @param CsrfTokenManagerInterface $csrfTokenManager
-     * @param string $tokenId
      */
-    public function __construct(
-        CsrfTokenManagerInterface $csrfTokenManager,
-        $tokenId = self::CSRF_TOKEN_ID
-    ) {
+    public function __construct(CsrfTokenManagerInterface $csrfTokenManager)
+    {
         $this->csrfTokenManager = $csrfTokenManager;
-        $this->tokenId = $tokenId;
     }
 
     /**
-     * Check that request is not a CSRF attack
+     * Checks that the given request is not a CSRF attack.
      *
      * @param Request $request
-     * @param bool $useRequestValue
+     * @param bool    $useRequestValue
+     *
      * @return bool
      */
-    public function isRequestTokenValid(Request $request, $useRequestValue = false)
+    public function isRequestTokenValid(Request $request, bool $useRequestValue = false): bool
     {
-        if ($useRequestValue) {
-            $tokenValue = $request->get($this->tokenId);
-        } else {
-            $tokenValue = $request->headers->get(self::CSRF_HEADER);
-        }
+        $tokenValue = $useRequestValue
+            ? $request->get(self::CSRF_TOKEN_ID)
+            : $request->headers->get(self::CSRF_HEADER);
 
-        return $this->csrfTokenManager->isTokenValid(new CsrfToken($this->tokenId, $tokenValue));
+        return $this->csrfTokenManager->isTokenValid(new CsrfToken(self::CSRF_TOKEN_ID, $tokenValue));
     }
 
     /**
-     * Refresh CSRF token value
+     * Generates a new token value for the CSRF token.
      */
-    public function refreshRequestToken()
+    public function refreshRequestToken(): void
     {
-        $this->csrfTokenManager->refreshToken($this->tokenId);
+        $this->csrfTokenManager->refreshToken(self::CSRF_TOKEN_ID);
     }
 }

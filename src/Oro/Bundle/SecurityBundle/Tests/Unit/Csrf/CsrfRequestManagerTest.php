@@ -9,39 +9,24 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class CsrfRequestManagerTest extends \PHPUnit\Framework\TestCase
 {
-    const TOKEN_ID = 'TOKEN_ID';
-
-    /**
-     * @var CsrfTokenManagerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var CsrfTokenManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $csrfTokenManager;
 
-    /**
-     * @var string
-     */
-    private $tokenId;
-
-    /**
-     * @var CsrfRequestManager
-     */
+    /** @var CsrfRequestManager */
     private $manager;
 
     protected function setUp()
     {
         $this->csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
-        $this->tokenId = self::TOKEN_ID;
 
-        $this->manager = new CsrfRequestManager(
-            $this->csrfTokenManager,
-            $this->tokenId
-        );
+        $this->manager = new CsrfRequestManager($this->csrfTokenManager);
     }
 
     public function testRefreshRequestToken()
     {
         $this->csrfTokenManager->expects($this->once())
             ->method('refreshToken')
-            ->with($this->tokenId);
+            ->with(CsrfRequestManager::CSRF_TOKEN_ID);
 
         $this->manager->refreshRequestToken();
     }
@@ -50,11 +35,11 @@ class CsrfRequestManagerTest extends \PHPUnit\Framework\TestCase
     {
         $request = Request::create('/');
         $value = 'test';
-        $request->query->set($this->tokenId, $value);
+        $request->query->set(CsrfRequestManager::CSRF_TOKEN_ID, $value);
 
         $this->csrfTokenManager->expects($this->once())
             ->method('isTokenValid')
-            ->with(new CsrfToken($this->tokenId, $value))
+            ->with(new CsrfToken(CsrfRequestManager::CSRF_TOKEN_ID, $value))
             ->willReturn(true);
 
         $this->assertTrue($this->manager->isRequestTokenValid($request, true));
@@ -68,9 +53,9 @@ class CsrfRequestManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->csrfTokenManager->expects($this->once())
             ->method('isTokenValid')
-            ->with(new CsrfToken($this->tokenId, $value))
+            ->with(new CsrfToken(CsrfRequestManager::CSRF_TOKEN_ID, $value))
             ->willReturn(true);
 
-        $this->assertTrue($this->manager->isRequestTokenValid($request, false));
+        $this->assertTrue($this->manager->isRequestTokenValid($request));
     }
 }

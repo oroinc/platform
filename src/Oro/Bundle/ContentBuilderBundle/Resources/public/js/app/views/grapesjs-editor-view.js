@@ -21,7 +21,7 @@ define(function(require) {
          */
         optionNames: BaseView.prototype.optionNames.concat([
             'builderOptions', 'storageManager', 'builderPlugins', 'storagePrefix',
-            'currentTheme'
+            'currentTheme', 'contextClass', 'canvasConfig'
         ]),
 
         /**
@@ -37,12 +37,28 @@ define(function(require) {
         $builderIframe: null,
 
         /**
+         * Page context class
+         * @property {String}
+         */
+        contextClass: 'body cms-page',
+
+        /**
          * Main builder options
          * @property {Object}
          */
         builderOptions: {
             fromElement: true,
-            height: '1500px'
+            height: '1500px',
+            avoidInlineStyle: true,
+
+            /**
+             * Color picker options
+             * @property {Object}
+             */
+            colorPicker: {
+                appendTo: 'body',
+                showPalette: false
+            }
         },
 
         /**
@@ -75,11 +91,11 @@ define(function(require) {
         },
 
         /**
-         * Color picker options
+         * Asset manager settings
          * @property {Object}
          */
-        colorPicker: {
-            appendTo: '#grapesjs'
+        assetManagerConfig: {
+            embedAsBase64: 1
         },
 
         /**
@@ -115,7 +131,10 @@ define(function(require) {
                 blocksBasicOpts: {
                     flexGrid: 1
                 },
-                customStyleManager: GrapesJSModules.getModule('style-manager')
+                customStyleManager: GrapesJSModules.getModule('style-manager'),
+                modalImportContent: function(editor) {
+                    return editor.getHtml() + '<style>' + editor.getCss() + '</style>';
+                }
             }
         },
 
@@ -170,7 +189,7 @@ define(function(require) {
         },
 
         /**
-         * Initialize builder instanse
+         * Initialize builder instance
          */
         initBuilder: function() {
             this.builder = GrapesJS.init(_.extend(
@@ -229,6 +248,33 @@ define(function(require) {
         },
 
         /**
+         * Set active state for button
+         * @param panel {String}
+         * @param name {String}
+         */
+        setActiveButton: function(panel, name) {
+            this.builder.Commands.run(name);
+            var button = this.builder.Panels.getButton(panel, name);
+
+            button.set('active', true);
+        },
+
+        /**
+         * Get editor content
+         * @returns {String}
+         */
+        getEditorContent: function() {
+            return this.builder.getHtml() + '<style>' + this.builder.getCss() + '</style>';
+        },
+
+        /**
+         * Add wrapper classes for iframe with content
+         */
+        _addClassForFrameWrapper: function() {
+            $(this.builder.Canvas.getFrameEl().contentDocument).find('#wrapper').addClass(this.contextClass);
+        },
+
+        /**
          * Onload builder handler
          * @private
          */
@@ -241,6 +287,9 @@ define(function(require) {
             GrapesJSModules.call('devices', {
                 builder: this.builder
             });
+
+            this.setActiveButton('options', 'sw-visibility');
+            this._addClassForFrameWrapper();
 
             mediator.trigger('grapesjs:loaded', this.builder);
         },
@@ -264,6 +313,11 @@ define(function(require) {
             mediator.trigger('grapesjs:components:updated', state);
         },
 
+        /**
+         * Update theme view in grapes iframe
+         * @param selected {String}
+         * @private
+         */
         _updateTheme: function(selected) {
             _.each(this.themes, function(theme) {
                 theme.active = theme.name === selected;
@@ -283,9 +337,7 @@ define(function(require) {
          * @private
          */
         _updateInitialField: function() {
-            var content = this.builder.getHtml();
-            content += '<style>' + this.builder.getCss() + '</style>';
-            this.$el.val(content).trigger('change');
+            this.$el.val(this.getEditorContent()).trigger('change');
         },
 
         /**
@@ -299,6 +351,7 @@ define(function(require) {
                 , this._getStorageManagerConfig()
                 , this._getCanvasConfig()
                 , this._getStyleManagerConfig()
+                , this._getAssetConfig()
             );
 
             return this.builderOptions;
@@ -335,11 +388,24 @@ define(function(require) {
          */
         _getCanvasConfig: function() {
             var theme = this.getCurrentTheme();
-            return {
-                canvasCss: '.gjs-comp-selected { outline: 3px solid #0c809e !important; }',
+            return _.extend({}, this.canvasConfig, {
+                canvasCss: '.gjs-comp-selected { outline: 3px solid #0c809e !important; ' +
+                    'outline-offset: 0 !important; }' +
+                    '#wrapper { padding: 3px; }',
                 canvas: {
                     styles: [theme.stylesheet]
                 }
+            });
+        },
+
+        /**
+         * Get asset manager configuration
+         * @returns {*|void}
+         * @private
+         */
+        _getAssetConfig: function() {
+            return {
+                assetManager: this.assetManagerConfig
             };
         },
 

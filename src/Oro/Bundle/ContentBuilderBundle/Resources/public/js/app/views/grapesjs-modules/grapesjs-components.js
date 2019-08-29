@@ -3,6 +3,7 @@ define(function(require) {
 
     var _ = require('underscore');
     var TableComponents = require('./components/table');
+    var TableResponsiveComponent = require('./components/table-responsive');
     var selectTemplate = require('tpl!orocontentbuilder/templates/grapesjs-select-action.html');
 
     /**
@@ -18,7 +19,14 @@ define(function(require) {
 
     /**
      * Component manager methods
-     * @type {{BlockManager: null, Commands: null, DomComponents: null, init: init, addComponents: addComponents, sortActionsRte: sortActionsRte}}
+     * @type {{
+     *  BlockManager: null,
+     *  Commands: null,
+     *  DomComponents: null,
+     *  init: init,
+     *  addComponents: addComponents,
+     *  sortActionsRte: sortActionsRte
+     *  }}
      */
     ComponentManager.prototype = {
         /**
@@ -56,15 +64,27 @@ define(function(require) {
          * Add new component block
          */
         addBlocks: function() {
-            this.BlockManager.add('table-block', {
-                id: 'table',
+            // this.BlockManager.add('table-block', {
+            //     id: 'table',
+            //     label: 'Table',
+            //     category: 'Basic',
+            //     attributes: {
+            //         class: 'fa fa-table'
+            //     },
+            //     content: {
+            //         type: 'table'
+            //     }
+            // });
+
+            this.BlockManager.add('responsive-table', {
+                id: 'table-responsive',
                 label: 'Table',
                 category: 'Basic',
                 attributes: {
                     class: 'fa fa-table'
                 },
                 content: {
-                    type: 'table'
+                    type: 'table-responsive'
                 }
             });
         },
@@ -123,6 +143,7 @@ define(function(require) {
          */
         addComponents: function() {
             new TableComponents(this.builder);
+            new TableResponsiveComponent(this.builder);
         }
     };
 

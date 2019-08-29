@@ -25,3 +25,15 @@ connector:
                         processor: oro_importexport.processor.export_delegate
                         writer:    oro_importexport.writer.xlsx
                     parameters: ~
+        export_filtered_to_csv:
+            title: "Entity Export Filtered to CSV"
+            type: export
+            steps:
+                export:
+                    title:     export
+                    class:     Oro\Bundle\BatchBundle\Step\ItemStep
+                    services:
+                        reader:    oro_datagrid.importexport.export_filtered_reader
+                        processor: oro_importexport.processor.export_delegate
+                        writer:    oro_importexport.writer.csv
+                    parameters: ~
