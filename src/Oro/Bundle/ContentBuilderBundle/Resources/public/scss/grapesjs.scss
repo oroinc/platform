@@ -1,10 +1,5 @@
 /* @theme: admin.oro; */
 
-@import "../fonts/grapsejs-flex/style";
-@import "config/grapesjs-config";
-
-@import "bundles/npmassets/grapesjs/src/styles/scss/main.scss";
-
 .#{$app-prefix} {
     &editor {
         textarea,
@@ -37,6 +32,11 @@
                 margin-bottom: 0;
             }
         }
+
+        &-cont {
+            padding: 12px;
+            background: $primary-inverse;
+        }
     }
 
     &frame {
@@ -66,29 +66,25 @@
         padding: 0;
         border-bottom: none;
 
-        .gjs-pn-buttons {
-            .gjs-pn-btn {
-                display: flex;
-                align-content: center;
-                justify-content: center;
-
+        .#{$pn-prefix}buttons {
+            .#{$pn-prefix}btn {
                 width: 100%;
                 margin-right: 0;
                 border-radius: 0;
 
-                background-color: #f8f8f8;
-                border-top: 2px solid #dedede;
-                border-left: 2px solid #dedede;
-                border-bottom: 2px solid #dedede;
+                background-color: $primary-900;
+                border-top: 2px solid $primary-750;
+                border-left: 2px solid $primary-750;
+                border-bottom: 2px solid $primary-750;
                 line-height: 20px;
 
                 box-shadow: none;
 
                 &:last-child {
-                    border-right: 2px solid #dedede;
+                    border-right: 2px solid $primary-750;
                 }
 
-                &.gjs-pn-active {
+                &.#{$pn-prefix}active {
                     border-top-color: $secondary;
                     border-bottom-color: $primary-inverse;
                     background-color: $primary-inverse;
@@ -100,26 +96,25 @@
     &pn-panel {
         padding: 0;
 
-        &.gjs-pn-options {
-            right: 23%;
+        &.#{$pn-prefix}options {
             padding-right: 7px;
         }
     }
 
     &pn-views-container {
         box-shadow: none;
-        padding-top: 42px;
+        padding-top: 40px;
     }
 
     &pn-commands,
     &pn-options,
     &pn-devices-c {
-        .gjs-pn-btn {
+        .#{$pn-prefix}btn {
             background-color: $button-bg-color;
             border-radius: 30px;
             margin-right: 7px;
 
-            &.gjs-pn-active {
+            &.#{$pn-prefix}active {
                 background-color: $additional-extra-light;
                 box-shadow: inset 0 2px 3px 2px rgba(0, 0, 0, 0.21);
             }
@@ -127,15 +122,23 @@
     }
 
     &pn-btn {
-        font-size: 16px;
-        line-height: 23px;
+        display: flex;
+        align-content: center;
+        justify-content: center;
+
+        font-size: $base-font-size--m;
+        line-height: 24px;
         min-width: 32px;
         min-height: 32px;
 
+        &.fa-code {
+            margin-top: -1px;
+        }
+
         &.fa-square-o {
-            &.gjs-pn-active {
+            &.#{$pn-prefix}active {
                 &:before {
-                    content: "\f14a";
+                    content: $fa-var-check-square;
                 }
             }
         }
@@ -145,29 +148,28 @@
         padding-left: 0;
         padding-right: 0;
         padding-bottom: 0;
-        font-size: 13px;
-    }
-
-    &sm-label,
-    #gjs-clm-label {
-        font-size: 14px;
+        font-size: $base-font-size--sm;
     }
 
     &sm-label {
-        color: $primary-700;
+        font-size: $base-font-size;
+    }
 
-        &.gjs-color-warn {
+    &sm-label {
+        color: $primary-600;
+
+        &.#{$app-prefix}color-warn {
             color: $primary-100;
         }
 
-        &.gjs-four-color {
+        &.#{$app-prefix}four-color {
             color: $warning-darken;
         }
     }
 
     &field {
         border-radius: 2px;
-        background-color: #fff;
+        background-color: $primary-inverse;
         border: 2px solid #d6d6d6;
         color: $primary-100;
 
@@ -183,37 +185,37 @@
             border-top-color: $primary-400;
         }
 
-        &.gjs-field-checkbox {
+        &.#{$app-prefix}field-checkbox {
             border: none;
             background-color: none;
             border-radius: 0;
 
-            .gjs-input-holder {
+            .#{$app-prefix}input-holder {
                 height: 16px;
                 width: 16px;
 
-                .gjs-chk-icon {
+                .#{$app-prefix}chk-icon {
                     transform: none;
                     height: 16px;
                     margin: auto;
                     width: 16px;
-                    border: 2px solid #d9d9da;
-                    background-color: #fff;
+                    border: 2px solid $primary-750;
+                    background-color: $primary-inverse;
                     border-radius: 3px;
                 }
 
                 input[type="checkbox"]:checked {
-                    + .gjs-chk-icon {
+                    + .#{$app-prefix}chk-icon {
                         border-color: $secondary;
                         background-color: $secondary;
 
                         &:before {
-                            content: "\F00C";
+                            content: $fa-var-check;
                             position: absolute;
                             top: 50%;
                             left: 50%;
                             transform: translate(-50%, -50%);
-                            font-size: 14px;
+                            font-size: $base-font-size;
                             line-height: 1;
                             color: $primary-inverse;
                             font-family: FontAwesome;
@@ -228,7 +230,7 @@
         border-radius: 20px;
         border: none;
 
-        .gjs-radio-item {
+        .#{$app-prefix}radio-item {
             border: none;
             margin-left: 1px;
             background-color: $primary-860;
@@ -236,19 +238,19 @@
             &:first-child {
                 margin-left: 0;
                 border-radius: 20px 0 0 20px;
-                .gjs-radio-item-label {
+                .#{$app-prefix}radio-item-label {
                     border-radius: 20px 0 0 20px;
                 }
             }
 
             &:last-child {
                 border-radius: 0 20px 20px 0;
-                .gjs-radio-item-label {
+                .#{$app-prefix}radio-item-label {
                     border-radius: 0 20px 20px 0;
                 }
             }
 
-            input:checked + .gjs-radio-item-label {
+            input:checked + .#{$app-prefix}radio-item-label {
                 background-color: $additional-extra-light;
                 box-shadow: inset 0 2px 3px 2px rgba(0, 0, 0, 0.21);
                 line-height: 1;
@@ -257,31 +259,105 @@
     }
 
     &sm-clear {
-        font-size: 24px;
+        font-size: $base-font-size--xl;
     }
 
     &clm-tags {
-        #gjs-clm-add-tag {
+        padding: 0 0 10px 0;
+        display: inline;
+
+        ##{$clm-prefix}add-tag {
+            display: inline-block;
+            width: 24px;
+            height: 22px;
+            margin: 3px 0;
+
+            font-size: $base-font-size--s;
+            text-align: center;
+            line-height: 18px;
+
             background-color: $secondary;
             color: $primary-inverse;
+            box-shadow: none;
+            border: 0;
         }
 
-        #gjs-clm-tags-field {
-            padding-bottom: 2px;
+        ##{$clm-prefix}tags-field {
+            display: inline-block;
+            width: 100%;
+            padding: 0 3px;
         }
 
-        .gjs-clm-tag {
-            padding: 2px 5px;
+        ##{$clm-prefix}up {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        ##{$clm-prefix}label {
+            padding: 6px 0;
+        }
+
+        ##{$app-prefix}sm-caret {
+            font-size: $base-font-size--m;
+        }
+
+        ##{$clm-prefix}sel {
+            word-break: break-word;
+            padding: 0;
+            line-height: 1.3;
+        }
+
+        ##{$clm-prefix}sel-help {
+            display: flex;
+            align-items: baseline;
+            font-style: italic;
+            color: $primary-550;
+            margin-bottom: 6px;
+        }
+
+        ##{$clm-prefix}tags-c {
+            display: inline;
+        }
+
+        ##{$clm-prefix}new[style*=block] { //Hank for correct alignment of multiselect with classes
+            display: inline !important;
+            width: auto;
+        }
+
+        .#{$clm-prefix}tag {
+            padding: 0 5px;
+            margin: 3px 0 3px 3px;
         }
     }
 
     &clm-tag {
         color: $primary-400;
-        #gjs-clm-checkbox,
-        #gjs-clm-tag-label,
-        #gjs-clm-close {
+        margin: 3px 3px 3px 0;
+
+        ##{$clm-prefix}checkbox,
+        ##{$clm-prefix}tag-label,
+        ##{$clm-prefix}close {
             color: $primary-400;
             opacity: 1;
+            font-size: $base-font-size--s;
+        }
+
+        ##{$clm-prefix}close {
+            font-size: $base-font-size--xl;
+            font-weight: bold;
+        }
+    }
+
+    &sm-sector {
+        ##{$app-prefix}sm-caret {
+            font-size: $base-font-size--m;
+        }
+
+        .#{$app-prefix}sm-title {
+            .fa {
+                min-width: 18px;
+            }
         }
     }
 
@@ -290,67 +366,85 @@
         margin-bottom: 8px;
         border-bottom: none;
 
-        &.gjs-sm-open,
-        &.gjs-open {
+        &.#{$app-prefix}sm-open,
+        &.#{$app-prefix}open {
             border-bottom: none;
         }
 
-        .gjs-sm-title,
-        .gjs-title {
+        .#{$app-prefix}sm-title,
+        .#{$app-prefix}title {
             border-bottom: none;
             font-weight: 700;
             padding: 6px 14px 5px;
             letter-spacing: normal;
-            font-size: 14px;
+            font-size: $base-font-size;
             color: $primary-100;
             background-color: $primary-860;
             border-radius: 4px;
         }
 
-        .gjs-sm-field.gjs-sm-composite {
+        .#{$sm-prefix}field.#{$sm-prefix}composite {
             border: none;
             background: $primary-900;
             border-radius: 4px;
         }
 
-        .gjs-sm-btn {
+        .#{$sm-prefix}btn {
             background-color: $secondary;
             color: $primary-inverse;
 
             text-shadow: none;
         }
 
-        .gjs-sm-property {
-            .gjs-sm-layer {
-                #gjs-sm-close-layer,
-                #gjs-sm-close-layer {
+        .#{$sm-prefix}property {
+            .#{$sm-prefix}layer {
+                ##{$sm-prefix}close-layer,
+                ##{$sm-prefix}close-layer {
                     line-height: 0;
                     top: 10px;
                 }
+
             }
         }
     }
 
     &layer-vis {
-        padding: 10px 5px 9px 10px;
+        padding: 11px 5px 9px 10px;
     }
 
+
+    &layer-caret {
+        width: 18px;
+        left: -13px;
+        top: 8px;
+        font-size: $base-font-size--s;
+        text-align: center;
+    }
+
+    &layer-move {
+        padding: 9px 10px 7px 5px;
+    }
+    
+    &layer-name {
+        padding: 5px 7px;
+    }
+    
     &layer {
         background: none;
-        &.gjs-hovered {
-            .gjs-layer-title {
+        &.#{$app-prefix}hovered {
+            .#{$app-prefix}layer-title {
                 background-color: $primary-860;
                 border-bottom: none;
             }
         }
 
-        &.gjs-selected {
-            .gjs-layer-title {
+        &.#{$app-prefix}selected {
+            .#{$app-prefix}layer-title {
                 background-color: $primary-800;
             }
         }
 
-        .gjs-layer-title {
+        .#{$app-prefix}layer-title {
             background-color: $primary-860;
             border-bottom: none;
             margin-bottom: 8px;
@@ -394,7 +488,7 @@
 
     &mdl-title {
         color: $primary-inverse;
-        font-size: 18px;
+        font-size: $base-font-size--l;
         font-weight: bold;
     }
 
@@ -405,8 +499,8 @@
         opacity: 1;
 
         &:before {
-            content: "\F00D";
-            font-size: 18px;
+            content: $fa-var-close;
+            font-size: $base-font-size--l;
             font-family: FontAwesome;
             text-align: center;
             line-height: 1;
@@ -424,7 +518,7 @@
     &rte-actionbar {
         flex-direction: row;
 
-        .gjs-rte-action {
+        .#{$rte-prefix}action {
             order: 1;
 
             &:hover {
@@ -445,13 +539,13 @@
     &am-highlight {
         color: $primary-inverse;
 
-        .gjs-am-close {
+        .#{$app-prefix}am-close {
             top: -10px;
         }
     }
 }
 
-.gjs-dashed {
+.#{$app-prefix}dashed {
     *[data-highlightable] {
         padding: 10px;
 
@@ -459,4 +553,9 @@
             margin-bottom: 10px;
         }
     }
+}
+
+//Additional styles for fullscreen mode
+.page-content-editor {
+    margin: -12px;
 }

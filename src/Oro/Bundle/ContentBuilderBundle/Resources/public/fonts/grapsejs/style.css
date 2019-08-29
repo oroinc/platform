@@ -1,17 +1,17 @@
 @font-face {
-  font-family: 'grapsejs-flex';
-  src:  url('fonts/grapsejs-flex.eot?1h0na8');
-  src:  url('fonts/grapsejs-flex.eot?1h0na8#iefix') format('embedded-opentype'),
-    url('fonts/grapsejs-flex.ttf?1h0na8') format('truetype'),
-    url('fonts/grapsejs-flex.woff?1h0na8') format('woff'),
-    url('fonts/grapsejs-flex.svg?1h0na8#grapsejs-flex') format('svg');
+  font-family: 'grapsejs';
+  src:  url('fonts/grapsejs.eot?1h0na8');
+  src:  url('fonts/grapsejs.eot?1h0na8#iefix') format('embedded-opentype'),
+    url('fonts/grapsejs.ttf?1h0na8') format('truetype'),
+    url('fonts/grapsejs.woff?1h0na8') format('woff'),
+    url('fonts/grapsejs.svg?1h0na8#grapsejs') format('svg');
   font-weight: normal;
   font-style: normal;
 }
 
 [class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'grapsejs-flex' !important;
+  font-family: 'grapsejs' !important;
   speak: none;
   font-style: normal;
   font-weight: normal;

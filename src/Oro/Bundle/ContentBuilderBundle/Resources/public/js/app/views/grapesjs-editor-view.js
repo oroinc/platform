@@ -38,7 +38,7 @@ define(function(require) {
          * Page context class
          * @property {String}
          */
-        contextClass: 'cms-page',
+        contextClass: 'body cms-page',
 
         /**
          * Main builder options
@@ -179,7 +179,7 @@ define(function(require) {
         },
 
         /**
-         * Initialize builder instanse
+         * Initialize builder instance
          */
         initBuilder: function() {
             this.builder = GrapesJS.init(_.extend(
@@ -194,7 +194,6 @@ define(function(require) {
 
             this.builderDelegateEvents();
 
-            console.log(this.builder)
             GrapesJSModules.call('components', {
                 builder: this.builder
             });
@@ -237,17 +236,23 @@ define(function(require) {
             });
         },
 
-        setCommandActive: function(panel, name) {
+        /**
+         * Set active state for button
+         * @param panel {String}
+         * @param name {String}
+         */
+        setActiveButton: function(panel, name) {
             this.builder.Commands.run(name);
             var button = this.builder.Panels.getButton(panel, name);
 
             button.set('active', true);
         },
 
+        /**
+         * Add wrapper classes for iframe with content
+         */
         _addClassForFrameWrapper: function() {
-            var iframe = this.builder.Canvas.getFrameEl().contentDocument;
-
-            iframe.querySelector('#wrapper').classList.add(this.contextClass);
+            $(this.builder.Canvas.getFrameEl().contentDocument).find('#wrapper').addClass(this.contextClass);
         },
 
         /**
@@ -259,7 +264,7 @@ define(function(require) {
                 builder: this.builder
             });
 
-            this.setCommandActive('options', 'sw-visibility');
+            this.setActiveButton('options', 'sw-visibility');
             this._addClassForFrameWrapper();
 
             mediator.trigger('grapesjs:loaded', this.builder);

@@ -1,7 +1,7 @@
 /* @theme: admin.oro; */
 
 @import "oroui/css/scss/colors";
-@import "../../fonts/grapsejs-flex/variables";
+@import "../../fonts/grapsejs/variables";
 
 $app-prefix: 'gjs-';
 
@@ -24,3 +24,7 @@ $canvas-bg-color: $primary-inverse;
 $canvas-border: 2px solid #dedede;
 
 $leftWidth: 23%;
+
+$fontSizeS: 0.9rem;
+
+$paddElClm: 3px 5px;
