@@ -22,8 +22,19 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var persistentStorage = require('oroui/js/persistent-storage');
-
+    var mediator = require('oroui/js/mediator');
     require('bootstrap-collapse');
+
+    var DATA_KEY = 'bs.collapse';
+    var EVENT_KEY = '.' + DATA_KEY;
+    var DATA_API_KEY = '.data-api';
+    var Event = {
+        SHOW: 'show' + EVENT_KEY,
+        SHOWN: 'shown' + EVENT_KEY,
+        HIDE: 'hide' + EVENT_KEY,
+        HIDDEN: 'hidden' + EVENT_KEY,
+        CLICK_DATA_API: 'click' + EVENT_KEY + DATA_API_KEY
+    };
 
     var STATE_ID_DATA_KEY = 'data-collapse-state-id';
     var Collapse = $.fn.collapse.Constructor;
@@ -46,6 +57,12 @@ define(function(require) {
     };
 
     $(document)
+        .on(Event.SHOWN, function(event) {
+            mediator.trigger('content:shown', $(event.target));
+        })
+        .on(Event.HIDDEN, function(event) {
+            mediator.trigger('content:hidden', $(event.target));
+        })
         .on('initLayout', function(event) {
             $(event.target).find('[data-toggle="collapse"]').each(function(index, el) {
                 var state = persistentStorage.getItem(el.getAttribute(STATE_ID_DATA_KEY));

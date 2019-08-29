@@ -36,6 +36,13 @@ interface SecurityContextInterface
     public function getApiKeyGenerationHint(): ?string;
 
     /**
+     * Gets the name of CSRF cookie.
+     *
+     * @return string|null
+     */
+    public function getCsrfCookieName(): ?string;
+
+    /**
      * Gets the route name to the sign in form.
      *
      * @return string|null

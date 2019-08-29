@@ -9,9 +9,12 @@ use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -76,6 +79,9 @@ class Translator extends BaseTranslator
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     /**
      * @param ContainerInterface $container
      * @param MessageFormatter $formatter
@@ -95,6 +101,7 @@ class Translator extends BaseTranslator
         $this->messageFormatter = $formatter;
         $this->originalOptions = $this->options;
         $this->resourceFiles = $this->options['resource_files'];
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -119,6 +126,14 @@ class Translator extends BaseTranslator
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -180,6 +195,40 @@ class Translator extends BaseTranslator
         }
 
         return $translations;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function trans($id, array $parameters = [], $domain = null, $locale = null)
+    {
+        try {
+            return parent::trans($id, $parameters, $domain, $locale);
+        } catch (InvalidArgumentException $e) {
+            $this->logger->warning($e->getMessage(), ['exception' => $e]);
+
+            $count = '';
+            if (isset($parameters['%count%'])) {
+                $count = ' ' . $parameters['%count%'];
+                unset($parameters['%count%']);
+            }
+
+            return $this->trans($id, $parameters, $domain, $locale) . $count;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
+    {
+        try {
+            return parent::transChoice($id, $number, $parameters, $domain, $locale);
+        } catch (InvalidArgumentException $e) {
+            $this->logger->warning($e->getMessage(), ['exception' => $e]);
+
+            return $this->trans($id, $parameters, $domain, $locale) . ' ' . $number;
+        }
     }
 
     /**

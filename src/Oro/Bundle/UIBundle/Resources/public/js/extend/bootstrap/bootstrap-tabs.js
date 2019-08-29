@@ -14,7 +14,7 @@ define(function(require) {
     };
 
     var mediator = require('oroui/js/mediator');
-
+    var Util = require('bootstrap-util');
 
     $(document)
         .on(Event.HIDDEN, function(event) {
@@ -26,8 +26,12 @@ define(function(require) {
                     .removeClass(ClassName.SHOW + ' ' + ClassName.ACTIVE)
                     .attr('aria-selected', false);
             }
+            var selector = Util.getSelectorFromElement(event.target);
+            mediator.trigger('content:hidden', $(selector));
         })
-        .on(Event.SHOWN, function() {
+        .on(Event.SHOWN, function(event) {
+            var selector = Util.getSelectorFromElement(event.target);
+            mediator.trigger('content:shown', $(selector));
             mediator.trigger('layout:reposition');
         });
 });

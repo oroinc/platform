@@ -14,6 +14,10 @@ The current file describes significant changes in the code that may affect the u
 #### AssetBundle
 * The new feature, [Hot Module Replacement (HMR or Hot Reload) enabled for SCSS](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#hot-module-replacement-hmr-or-hot-reload-for-scss). To enable HMR for custom CSS links, please [follow the documentation](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#enable-for-css-links).
 
+#### NavigationBundle
+* The service `kernel.listener.nav_history_response` was renamed to `oro_navigation.event_listener.navigation_history`.
+* The service `kernel.listener.hashnav_response` was renamed to `oro_navigation.event_listener.hash_navigation`.
+
 ## 4.0.0
 
 ### Added

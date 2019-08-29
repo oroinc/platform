@@ -90,8 +90,8 @@ class SecurityFirewallContextListener implements ListenerInterface
             null !== $this->session
             && $request->cookies->has($this->session->getName())
             && (
-                (!$isGetRequest && $this->csrfRequestManager->isRequestTokenValid($request, false))
-                || ($isGetRequest && $request->headers->has('X-CSRF-Header'))
+                (!$isGetRequest && $this->csrfRequestManager->isRequestTokenValid($request))
+                || ($isGetRequest && $request->headers->has(CsrfRequestManager::CSRF_HEADER))
             );
     }
 

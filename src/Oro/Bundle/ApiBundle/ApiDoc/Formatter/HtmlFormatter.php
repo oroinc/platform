@@ -268,6 +268,7 @@ class HtmlFormatter extends AbstractFormatter
             'userName'              => $this->securityContext->getUserName(),
             'apiKey'                => $this->securityContext->getApiKey(),
             'apiKeyGenerationHint'  => $this->securityContext->getApiKeyGenerationHint(),
+            'csrfCookieName'        => $this->securityContext->getCsrfCookieName(),
             'loginRoute'            => $this->securityContext->getLoginRoute(),
             'logoutRoute'           => $this->securityContext->getLogoutRoute()
         ];

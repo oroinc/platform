@@ -70,3 +70,28 @@ services:
     oro.cache.memory_cache_chain:
         public: false
         class: Oro\Bundle\CacheBundle\Provider\MemoryCacheChain
+
+    oro.cache.generator.object_cache_key:
+        class: Oro\Bundle\CacheBundle\Generator\ObjectCacheKeyGenerator
+        public: false
+        arguments:
+            - '@oro.cache.generator.object_cache_data_serializer'
+
+    oro.cache.generator.object_cache_data_serializer:
+        class: Oro\Bundle\CacheBundle\Generator\ObjectCacheDataSerializer
+        public: false
+        arguments:
+            - '@oro.cache.serializer'
+
+    oro.cache.serializer:
+        class: Symfony\Component\Serializer\Serializer
+        arguments:
+            -
+                - '@oro.cache.serializer.normalizer'
+            -
+                json: '@serializer.encoder.json'
+
+    oro.cache.serializer.normalizer:
+        class: Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer
+        arguments:
+            - '@oro.cache.serializer.mapping.factory.class_metadata' # Loaded by OroCacheExtension

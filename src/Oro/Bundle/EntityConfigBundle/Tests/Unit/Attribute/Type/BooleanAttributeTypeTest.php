@@ -54,6 +54,14 @@ class BooleanAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
+    public function testGetFilterableNull()
+    {
+        $this->assertSame(
+            BooleanAttributeType::FALSE_VALUE,
+            $this->getAttributeType()->getFilterableValue($this->attribute, null, $this->localization)
+        );
+    }
+
     public function testGetSortableValue()
     {
         $type = $this->getAttributeType();
