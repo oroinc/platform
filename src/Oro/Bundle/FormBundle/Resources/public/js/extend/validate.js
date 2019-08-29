@@ -283,7 +283,12 @@ define(function(require) {
                     this.settings.highlight(element);
 
                     if ($label.length) {
-                        this.showLabel(element, $label.text());
+                        var text = [];
+
+                        $label.each(function() {
+                            text.push($(this).text());
+                        });
+                        this.showLabel(element, text.join('<br>'));
                         $label.remove();
                     }
 
