@@ -536,11 +536,30 @@ define(function(require) {
             $el.closest('.control-group').find('.control-label').addClass('validation-error');
         },
         unhighlight: function(element) {
-            var $el = getErrorTarget(element);
-            $el.removeClass('error')
-                .closest('.controls')
-                .removeClass('validation-error');
-            $el.closest('.control-group').find('.control-label').removeClass('validation-error');
+            var $target = getErrorTarget(element);
+            var validGroup = true;
+
+            // Check if present more than one element in related container
+            if (!$target.is(':input')) {
+                var groupElementNames = _.reduce(this.elementsOf($target), function(memo, num) {
+                    memo.push(num.name);
+                    return memo;
+                }, []);
+
+                for (var i = 0; groupElementNames.length > i; i++) {
+                    if (this.invalid[groupElementNames[i]] === true) {
+                        validGroup = false;
+                        break;
+                    }
+                }
+            }
+
+            if (validGroup) {
+                $target.removeClass('error')
+                    .closest('.controls')
+                    .removeClass('validation-error');
+                $target.closest('.control-group').find('.control-label').removeClass('validation-error');
+            }
         },
         // ignore all invisible elements except input type=hidden, which are ':input[data-validate-element]'
         ignore: ':hidden:not([type=hidden]), [data-validation-ignore] :input',
@@ -625,7 +644,7 @@ define(function(require) {
         }
         if (optionalGroup) {
             var validator = $(element.form).data('validator');
-            validator.settings.unhighlight(element);
+            validator.settings.unhighlight.call(validator, element);
             _.each(rules, function(param) {
                 param.depends = function() {
                     // all fields in a group failed a required rule (have empty value) - stop group validation
