@@ -478,6 +478,15 @@
 
     &mdl-dialog {
         border-radius: 4px;
+
+        .#{$app-prefix}btn-prim {
+            display: inline-flex;
+            padding: 0 16px;
+            font-size: 0.875rem;
+            line-height: 32px;
+            border-radius: 16px;
+            margin-top: 10px;
+        }
     }
 
     &mdl-header {
@@ -504,6 +513,13 @@
             font-family: FontAwesome;
             text-align: center;
             line-height: 1;
+        }
+    }
+
+    &cm-editor {
+        ##{$app-prefix}cm-title {
+            background: none;
+            color: $secondaryColor;
         }
     }
 
