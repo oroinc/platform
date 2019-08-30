@@ -32,8 +32,6 @@ parameters:
     oro_navigation.breadcrumbs_manager.class:                  Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager
     oro_navigation.chain_breadcrumbs_manager.class:            Oro\Bundle\NavigationBundle\Menu\ChainBreadcrumbManager
 
-    oro_navigation.menu_update.scope_type:                     menu_default_visibility
-
 services:
     Knp\Menu\Twig\Helper:
         alias: knp_menu.helper
@@ -400,7 +398,7 @@ services:
             - "@doctrine"
             - "@oro_navigation.menu_helper.menu_update"
             - '%oro_navigation.entity.menu_update.class%'
-            - '%oro_navigation.menu_update.scope_type%'
+            - 'menu_default_visibility'
 
     oro_navigation.menu_manipulator:
         class: Knp\Menu\Util\MenuManipulator
@@ -411,7 +409,7 @@ services:
         arguments:
             - '@oro_menu.builder_chain'
             - '@oro_navigation.menu_manipulator'
-            - '%oro_navigation.menu_update.scope_type%'
+            - 'menu_default_visibility'
             - '@oro_navigation.configuration.provider'
         tags:
             - { name: oro_datagrid.datasource, type: menu-update }
@@ -476,7 +474,7 @@ services:
             - '@oro_navigation.repository.menu_update'
             - '@oro_navigation.menu_update.cache'
             - '@oro_scope.scope_manager'
-            - '%oro_navigation.menu_update.scope_type%'
+            - 'menu_default_visibility'
         tags:
             - { name: kernel.event_listener, event: oro_menu.menu_update_change, method: onMenuUpdateScopeChange }
 
@@ -511,7 +509,7 @@ services:
     oro_navigation.scope_criteria_provider.user:
         parent: oro_user.scope_criteria_provider.user
         tags:
-            - {name: oro_scope.provider, scopeType: '%oro_navigation.menu_update.scope_type%', priority: 20}
+            - { name: oro_scope.provider, scopeType: menu_default_visibility, priority: 20 }
 
     oro_navigation.configuration.provider:
         class: Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider

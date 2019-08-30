@@ -3,19 +3,19 @@
 namespace Oro\Bundle\OrganizationBundle\Provider;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\ScopeBundle\Manager\AbstractScopeCriteriaProvider;
+use Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
- * Provides the current organization for Scope Criteria.
+ * The scope criteria provider for the current organization.
  */
-class ScopeOrganizationCriteriaProvider extends AbstractScopeCriteriaProvider
+class ScopeOrganizationCriteriaProvider implements ScopeCriteriaProviderInterface
 {
-    const SCOPE_KEY = 'organization';
+    public const ORGANIZATION = 'organization';
 
     /** @var TokenStorageInterface */
-    protected $tokenStorage;
+    private $tokenStorage;
 
     /**
      * @param TokenStorageInterface $tokenStorage
@@ -28,26 +28,22 @@ class ScopeOrganizationCriteriaProvider extends AbstractScopeCriteriaProvider
     /**
      * {@inheritdoc}
      */
-    public function getCriteriaForCurrentScope()
+    public function getCriteriaField()
     {
-        $token = $this->tokenStorage->getToken();
-        if (!$token) {
-            return [];
-        }
-
-        if ($token instanceof OrganizationAwareTokenInterface) {
-            return [self::SCOPE_KEY => $token->getOrganization()];
-        }
-
-        return [];
+        return self::ORGANIZATION;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCriteriaField()
+    public function getCriteriaValue()
     {
-        return static::SCOPE_KEY;
+        $token = $this->tokenStorage->getToken();
+        if ($token instanceof OrganizationAwareTokenInterface) {
+            return $token->getOrganization();
+        }
+
+        return null;
     }
 
     /**

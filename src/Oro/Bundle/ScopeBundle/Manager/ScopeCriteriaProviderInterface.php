@@ -2,23 +2,20 @@
 
 namespace Oro\Bundle\ScopeBundle\Manager;
 
+/**
+ * Represents a provider that is used to fill ScopeCriteria object.
+ */
 interface ScopeCriteriaProviderInterface
 {
-    /**
-     * @param array|object $context
-     * @return array
-     */
-    public function getCriteriaByContext($context);
-
-    /**
-     * @return array
-     */
-    public function getCriteriaForCurrentScope();
-
     /**
      * @return string
      */
     public function getCriteriaField();
+
+    /**
+     * @return object|null
+     */
+    public function getCriteriaValue();
 
     /**
      * @return string

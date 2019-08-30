@@ -11,7 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Ajax User Menu Controller
+ * The AJAX controller for the user menu.
  * @Route("/menu/user")
  * @CsrfProtection()
  */
@@ -22,7 +22,7 @@ class UserAjaxMenuController extends AbstractAjaxMenuController
      */
     protected function getAllowedContextKeys()
     {
-        return [ScopeUserCriteriaProvider::SCOPE_KEY];
+        return [ScopeUserCriteriaProvider::USER];
     }
 
     /**
@@ -32,7 +32,7 @@ class UserAjaxMenuController extends AbstractAjaxMenuController
     {
         if (!$this->isGranted(
             'oro_user_user_update',
-            $context[ScopeUserCriteriaProvider::SCOPE_KEY]
+            $context[ScopeUserCriteriaProvider::USER]
         )
         ) {
             throw $this->createAccessDeniedException();
@@ -45,10 +45,10 @@ class UserAjaxMenuController extends AbstractAjaxMenuController
      */
     protected function getMenu($menuName, array $context)
     {
-        if (array_key_exists(ScopeUserCriteriaProvider::SCOPE_KEY, $context)) {
+        if (array_key_exists(ScopeUserCriteriaProvider::USER, $context)) {
             /** @var User $user */
-            $user = $context[ScopeUserCriteriaProvider::SCOPE_KEY];
-            $context[ScopeOrganizationCriteriaProvider::SCOPE_KEY] = $user->getOrganization();
+            $user = $context[ScopeUserCriteriaProvider::USER];
+            $context[ScopeOrganizationCriteriaProvider::ORGANIZATION] = $user->getOrganization();
         }
 
         return parent::getMenu($menuName, $context);

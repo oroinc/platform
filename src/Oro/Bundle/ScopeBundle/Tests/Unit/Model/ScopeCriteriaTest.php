@@ -4,6 +4,7 @@ namespace Oro\Bundle\ScopeBundle\Tests\Unit\Model;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\Join;
@@ -18,7 +19,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
             'field1' => 1,
             'field2' => 2,
         ];
-        $criteria = new ScopeCriteria($criteriaData, []);
+        $criteria = new ScopeCriteria($criteriaData, new ClassMetadata(Scope::class));
         $this->assertSame($criteriaData, $criteria->toArray());
     }
 
@@ -26,6 +27,14 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
     {
         /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
         $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
+        $scopeClassMetadata = new ClassMetadata(Scope::class);
+        $scopeClassMetadata->associationMappings = [
+            'nullField' => ['type' => ClassMetadata::MANY_TO_ONE],
+            'notNullField' => ['type' => ClassMetadata::MANY_TO_ONE],
+            'fieldWithValue' => ['type' => ClassMetadata::MANY_TO_ONE],
+            'ignoredField' => ['type' => ClassMetadata::MANY_TO_ONE],
+            'multiField' => ['type' => ClassMetadata::MANY_TO_MANY]
+        ];
         $criteria = new ScopeCriteria(
             [
                 'nullField' => null,
@@ -34,13 +43,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
                 'ignoredField' => 2,
                 'multiField' => [1, 2],
             ],
-            [
-                'nullField' => ['relation_type' => 'manyToOne'],
-                'notNullField' => ['relation_type' => 'manyToOne'],
-                'fieldWithValue' => ['relation_type' => 'manyToOne'],
-                'ignoredField' => ['relation_type' => 'manyToOne'],
-                'multiField' => ['relation_type' => 'manyToMany'],
-            ]
+            $scopeClassMetadata
         );
         $qb->method('expr')->willReturn(new Expr());
         $qb->expects($this->exactly(4))
@@ -74,7 +77,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
                 'fieldWithValue' => 1,
                 'ignoredField' => 2,
             ],
-            []
+            new ClassMetadata(Scope::class)
         );
         $qb->method('expr')->willReturn(new Expr());
         $qb->expects($this->exactly(3))
@@ -104,7 +107,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
                 'fieldWithValue' => 1,
                 'ignoredField' => 2,
             ],
-            []
+            new ClassMetadata(Scope::class)
         );
 
         $qb = $this->getBaseQbMock();
@@ -139,6 +142,14 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyToJoinWithPriority()
     {
+        $scopeClassMetadata = new ClassMetadata(Scope::class);
+        $scopeClassMetadata->associationMappings = [
+            'nullField' => ['type' => ClassMetadata::MANY_TO_ONE],
+            'notNullField' => ['type' => ClassMetadata::MANY_TO_ONE],
+            'fieldWithValue' => ['type' => ClassMetadata::MANY_TO_ONE],
+            'ignoredField' => ['type' => ClassMetadata::MANY_TO_ONE],
+            'multiField' => ['type' => ClassMetadata::MANY_TO_MANY]
+        ];
         $criteria = new ScopeCriteria(
             [
                 'joinField' => 5,
@@ -148,13 +159,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
                 'ignoredField' => 2,
                 'multiField' => [1, 2],
             ],
-            [
-                'nullField' => ['relation_type' => 'manyToOne'],
-                'notNullField' => ['relation_type' => 'manyToOne'],
-                'fieldWithValue' => ['relation_type' => 'manyToOne'],
-                'ignoredField' => ['relation_type' => 'manyToOne'],
-                'multiField' => ['relation_type' => 'manyToMany'],
-            ]
+            $scopeClassMetadata
         );
         $qb = $this->getBaseQbMock();
 
