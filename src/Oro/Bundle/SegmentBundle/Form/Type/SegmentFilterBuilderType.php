@@ -91,6 +91,7 @@ class SegmentFilterBuilderType extends AbstractType
                 'NotBlank' => ['message' => 'oro.query_designer.condition_builder.conditions_group.not_blank'],
             ],
         ]);
+        $resolver->setDefault('field_condition_options', []);
         $resolver->setRequired('segment_entity');
 
         $resolver->setAllowedTypes('segment_entity', 'string');
@@ -285,5 +286,7 @@ class SegmentFilterBuilderType extends AbstractType
         $view->vars['condition_builder_options'] = [
             'validation' => $options['condition_builder_validation'],
         ];
+
+        $view->vars['field_condition_options'] = $options['field_condition_options'];
     }
 }

@@ -30,7 +30,8 @@
         'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE'),
         'conditionBuilderOptions': condition_builder_options,
         'metadata': metadata,
-        'column_chain_template_selector': '#' ~ column_chain_template_id
+        'column_chain_template_selector': '#' ~ column_chain_template_id,
+        'fieldConditionOptions': field_condition_options|default([]),
     }) }}
 
     {% set widgetOptions = {
