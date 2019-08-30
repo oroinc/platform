@@ -2,9 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
+use Doctrine\DBAL\Types\Type;
+use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Query that helps to entirely remove field from class metadata.
+ */
 class RemoveFieldQuery extends ParametrizedMigrationQuery
 {
     /** @var string */
@@ -12,6 +17,12 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
 
     /** @var string */
     protected $entityField;
+
+    /**
+     * @deprecated since 3.1, will be removed in 4.0
+     * @var bool
+     */
+    private $dryRun;
 
     /**
      * @param string $entityClass
@@ -28,7 +39,13 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
      */
     public function getDescription()
     {
-        return 'Remove config for field ' . $this->entityField . ' of entity' . $this->entityClass;
+        $logger = new ArrayLogger();
+        $logger->info(
+            'Remove config for field ' . $this->entityField . ' of entity' . $this->entityClass
+        );
+        $this->doExecute($logger, true);
+
+        return $logger->getMessages();
     }
 
     /**
@@ -36,6 +53,16 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
      */
     public function execute(LoggerInterface $logger)
     {
+        $this->doExecute($logger);
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     * @param bool $dryRun
+     */
+    protected function doExecute(LoggerInterface $logger, bool $dryRun = false)
+    {
+        $this->dryRun = $dryRun;
         $fieldRow = $this->getFieldRow($this->entityClass, $this->entityField);
         if (!$fieldRow) {
             $logger->info("Field '{$this->entityField}' not found in '{$this->entityClass}'");
@@ -44,6 +71,7 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
         }
 
         $this->removeFieldConfig($logger, $fieldRow['id']);
+        $this->updateClassConfig($logger);
     }
 
     /**
@@ -96,8 +124,39 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
      */
     protected function executeQuery(LoggerInterface $logger, $sql, array $parameters = [])
     {
-        $statement = $this->connection->prepare($sql);
-        $statement->execute($parameters);
         $this->logQuery($logger, $sql, $parameters);
+        if (!$this->dryRun) {
+            $statement = $this->connection->prepare($sql);
+            $statement->execute($parameters);
+        }
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    protected function updateClassConfig(LoggerInterface $logger)
+    {
+        $sql = 'SELECT e.data FROM oro_entity_config as e WHERE e.class_name = ? LIMIT 1';
+        $row = $this->connection->fetchAssoc($sql, [$this->entityClass]);
+        if ($row) {
+            $data = $this->connection->convertToPHPValue($row['data'], Type::TARRAY);
+            if (isset($data['extend']['schema']['property'][$this->entityField])) {
+                unset($data['extend']['schema']['property'][$this->entityField]);
+            }
+            $entityName = $data['extend']['schema']['entity'];
+            if (isset($data['extend']['schema']['doctrine'][$entityName]['fields'][$this->entityField])) {
+                unset($data['extend']['schema']['doctrine'][$entityName]['fields'][$this->entityField]);
+            }
+            if (isset($data['extend']['index'][$this->entityField])) {
+                unset($data['extend']['index'][$this->entityField]);
+            }
+
+            $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+            $this->executeQuery(
+                $logger,
+                'UPDATE oro_entity_config SET data = ? WHERE class_name = ?',
+                [$data, $this->entityClass]
+            );
+        }
     }
 }

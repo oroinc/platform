@@ -756,6 +756,7 @@ services:
             - [setSecurityContext, ['@oro_api.api_doc.security_context']]
             - [setFileLocator, ['@file_locator']]
             - [setDocumentationProvider, ['@oro_api.api_doc.documentation_provider']]
+            - [setRequestStack, ['@?request_stack']]
 
     oro_api.api_doc.formatter.html_formatter.composite:
         class: Oro\Bundle\ApiBundle\ApiDoc\Formatter\CompositeFormatter
