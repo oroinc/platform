@@ -743,6 +743,7 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\SecurityContext
         arguments:
             - '@security.token_storage'
+            - '@?request_stack'
 
     oro_api.api_doc.formatter.html_formatter:
         class: Oro\Bundle\ApiBundle\ApiDoc\Formatter\NewHtmlFormatter

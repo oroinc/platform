@@ -8,7 +8,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
@@ -199,8 +199,8 @@ class OwnershipConditionDataBuilder extends AbstractOwnershipConditionDataBuilde
     protected function getOrganizationId(OwnershipMetadataInterface $metadata = null)
     {
         $token = $this->tokenStorage->getToken();
-        if ($token instanceof OrganizationContextTokenInterface) {
-            return $token->getOrganizationContext()->getId();
+        if ($token instanceof OrganizationAwareTokenInterface) {
+            return $token->getOrganization()->getId();
         }
 
         return null;

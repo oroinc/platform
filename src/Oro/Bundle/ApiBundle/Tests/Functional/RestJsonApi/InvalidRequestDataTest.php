@@ -8,6 +8,34 @@ use Symfony\Component\HttpFoundation\Response;
 
 class InvalidRequestDataTest extends RestJsonApiTestCase
 {
+    public function testEmptyJsonInRequestData()
+    {
+        $response = $this->request(
+            'POST',
+            $this->getUrl(
+                $this->getListRouteName(),
+                ['entity' => $this->getEntityType(TestProduct::class)]
+            ),
+            [],
+            [],
+            ''
+        );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        self::assertEquals(
+            [
+                'errors' => [
+                    [
+                        'status' => Response::HTTP_BAD_REQUEST,
+                        'title'  => 'request data constraint',
+                        'detail' => 'The request data should not be empty'
+                    ]
+                ]
+            ],
+            self::jsonToArray($response->getContent())
+        );
+    }
+
     public function testInvalidJsonInRequestData()
     {
         $response = $this->request(
@@ -23,7 +51,11 @@ class InvalidRequestDataTest extends RestJsonApiTestCase
         self::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
         self::assertResponseContentTypeEquals($response, 'application/json');
         self::assertEquals(
-            ['code' => 400, 'message' => 'Bad Request'],
+            [
+                'code'    => 400,
+                'message' => 'Invalid json message received.'
+                    . ' Parsing error in [1:22]. Expected \'null\'. Got: test'
+            ],
             self::jsonToArray($response->getContent())
         );
     }

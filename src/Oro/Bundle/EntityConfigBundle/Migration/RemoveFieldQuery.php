@@ -2,9 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
+use Doctrine\DBAL\Types\Type;
+use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Query that helps to entirely remove field from class metadata.
+ */
 class RemoveFieldQuery extends ParametrizedMigrationQuery
 {
     /** @var string */
@@ -28,13 +33,28 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
      */
     public function getDescription()
     {
-        return 'Remove config for field ' . $this->entityField . ' of entity' . $this->entityClass;
+        $logger = new ArrayLogger();
+        $logger->info(
+            'Remove config for field ' . $this->entityField . ' of entity' . $this->entityClass
+        );
+        $this->doExecute($logger, true);
+
+        return $logger->getMessages();
     }
 
     /**
      * {@inheritdoc}
      */
     public function execute(LoggerInterface $logger)
+    {
+        $this->doExecute($logger);
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     * @param bool $dryRun
+     */
+    protected function doExecute(LoggerInterface $logger, bool $dryRun = false)
     {
         $fieldRow = $this->getFieldRow($this->entityClass, $this->entityField);
         if (!$fieldRow) {
@@ -43,7 +63,8 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
             return;
         }
 
-        $this->removeFieldConfig($logger, $fieldRow['id']);
+        $this->removeFieldConfig($logger, $fieldRow['id'], $dryRun);
+        $this->updateClassConfig($logger, $dryRun);
     }
 
     /**
@@ -52,7 +73,7 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
      *
      * @return array
      */
-    protected function getFieldRow($entityClass, $entityField)
+    protected function getFieldRow(string $entityClass, string $entityField)
     {
         $getFieldSql = 'SELECT f.id, f.data
             FROM oro_entity_config_field as f
@@ -72,32 +93,66 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
 
     /**
      * @param LoggerInterface $logger
-     * @param integer         $fieldRowId
+     * @param integer $fieldRowId
+     * @param bool $dryRun
      *
      * @throws \Doctrine\DBAL\DBALException
      */
-    protected function removeFieldConfig(LoggerInterface $logger, $fieldRowId)
+    protected function removeFieldConfig(LoggerInterface $logger, $fieldRowId, bool $dryRun = false)
     {
         $this->executeQuery(
             $logger,
             'DELETE FROM oro_entity_config_field WHERE id = ?',
             [
                 $fieldRowId
-            ]
+            ],
+            $dryRun
         );
     }
 
     /**
      * @param LoggerInterface $logger
-     * @param                 $sql
-     * @param array           $parameters
-     *
-     * @throws \Doctrine\DBAL\DBALException
+     * @param string $sql
+     * @param array $parameters
+     * @param bool $dryRun
      */
-    protected function executeQuery(LoggerInterface $logger, $sql, array $parameters = [])
+    protected function executeQuery(LoggerInterface $logger, string $sql, array $parameters = [], bool $dryRun = false)
     {
-        $statement = $this->connection->prepare($sql);
-        $statement->execute($parameters);
         $this->logQuery($logger, $sql, $parameters);
+        if (!$dryRun) {
+            $statement = $this->connection->prepare($sql);
+            $statement->execute($parameters);
+        }
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     * @param bool $dryRun
+     */
+    protected function updateClassConfig(LoggerInterface $logger, bool $dryRun = false)
+    {
+        $sql = 'SELECT e.data FROM oro_entity_config as e WHERE e.class_name = ? LIMIT 1';
+        $row = $this->connection->fetchAssoc($sql, [$this->entityClass]);
+        if ($row) {
+            $data = $this->connection->convertToPHPValue($row['data'], Type::TARRAY);
+            if (isset($data['extend']['schema']['property'][$this->entityField])) {
+                unset($data['extend']['schema']['property'][$this->entityField]);
+            }
+            $entityName = $data['extend']['schema']['entity'];
+            if (isset($data['extend']['schema']['doctrine'][$entityName]['fields'][$this->entityField])) {
+                unset($data['extend']['schema']['doctrine'][$entityName]['fields'][$this->entityField]);
+            }
+            if (isset($data['extend']['index'][$this->entityField])) {
+                unset($data['extend']['index'][$this->entityField]);
+            }
+
+            $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+            $this->executeQuery(
+                $logger,
+                'UPDATE oro_entity_config SET data = ? WHERE class_name = ?',
+                [$data, $this->entityClass],
+                $dryRun
+            );
+        }
     }
 }

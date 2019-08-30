@@ -13,6 +13,6 @@ services:
             - '@oro_user.manager'
             - '@oro_scope.scope_manager'
             - '@oro_navigation.manager.menu_update'
-            - '%oro_navigation.menu_update.scope_type%'
+            - 'menu_default_visibility'
         tags:
             - { name: console.command }

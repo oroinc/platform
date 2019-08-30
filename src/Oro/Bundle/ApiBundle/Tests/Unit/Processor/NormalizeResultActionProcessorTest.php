@@ -12,7 +12,6 @@ use Oro\Bundle\ApiBundle\Processor\NormalizeResultContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -1318,7 +1317,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             [new HttpException(Response::HTTP_BAD_REQUEST)],
             [new HttpException(Response::HTTP_METHOD_NOT_ALLOWED)],
             [new AccessDeniedException()],
-            [new ForbiddenException('some reason')],
+            [new AccessDeniedException('some reason')],
             [new NotSupportedConfigOperationException('Test\Class', 'test_operation')]
         ];
     }

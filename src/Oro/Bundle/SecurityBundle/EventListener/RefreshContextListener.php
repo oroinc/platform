@@ -7,10 +7,13 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnClearEventArgs;
 use Oro\Bundle\EntityBundle\ORM\Event\PreCloseEventArgs;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * Refreshes the user and the organization in the security context when the entity manager is closed.
+ */
 class RefreshContextListener
 {
     /** @var TokenStorageInterface */
@@ -59,7 +62,7 @@ class RefreshContextListener
         $this->checkUser($event, $token);
 
         $token = $this->securityTokenStorage->getToken();
-        if ($token && $token instanceof OrganizationContextTokenInterface) {
+        if ($token && $token instanceof OrganizationAwareTokenInterface) {
             $this->checkOrganization($event, $token);
         }
     }
@@ -91,12 +94,12 @@ class RefreshContextListener
     }
 
     /**
-     * @param OnClearEventArgs                  $event
-     * @param OrganizationContextTokenInterface $token
+     * @param OnClearEventArgs                $event
+     * @param OrganizationAwareTokenInterface $token
      */
-    protected function checkOrganization(OnClearEventArgs $event, OrganizationContextTokenInterface $token)
+    protected function checkOrganization(OnClearEventArgs $event, OrganizationAwareTokenInterface $token)
     {
-        $organization = $token->getOrganizationContext();
+        $organization = $token->getOrganization();
         if (!is_object($organization)) {
             return;
         }
@@ -112,7 +115,7 @@ class RefreshContextListener
         if (!$organization) {
             return;
         }
-        $token->setOrganizationContext($organization);
+        $token->setOrganization($organization);
     }
 
     /**

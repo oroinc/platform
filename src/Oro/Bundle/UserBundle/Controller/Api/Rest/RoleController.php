@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * API CRUD controller for Role entity.
+ *
  * @NamePrefix("oro_api_")
  */
 class RoleController extends RestController implements ClassResourceInterface
@@ -196,13 +198,5 @@ class RoleController extends RestController implements ClassResourceInterface
     public function getFormHandler()
     {
         return $this->get('oro_user.form.handler.role.api');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDeleteHandler()
-    {
-        return $this->get('oro_user.role.handler.delete');
     }
 }

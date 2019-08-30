@@ -5,28 +5,23 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\EventListener;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\TestActivityScopeProvider;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTestActivitiesForScopes;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\TestActivityScopeProvider;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\WorkflowTestCase;
 
 class WorkflowDefinitionScopeListenerTest extends WorkflowTestCase
 {
-    const WITH_SCOPES_CONFIG_DIR = '/Tests/Functional/DataFixtures/WithScopes';
+    private const WITH_SCOPES_CONFIG_DIR = '/Tests/Functional/DataFixtures/WithScopes';
 
-    /**
-     * @var TestActivityScopeProvider
-     */
+    /** @var TestActivityScopeProvider */
     private $activityScopeProvider;
 
     protected function setUp()
     {
         $this->initClient();
         $this->loadFixtures([LoadTestActivitiesForScopes::class]);
-        $this->activityScopeProvider = new TestActivityScopeProvider();
-        self::getContainer()->get('oro_scope.scope_manager')
-            ->addProvider('workflow_definition', $this->activityScopeProvider);
     }
 
     /**

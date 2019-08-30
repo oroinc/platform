@@ -85,6 +85,32 @@
                 }
             };
 
+            var showResourceContent = function (contentContainer, updateHash) {
+                var toggler = contentContainer.prev(),
+                    resourceUrl = '{{ path(rootRoute) }}';
+                if (!window.location.pathname.substr(resourceUrl.length + 1)) {
+                    resourceUrl += '/{{ defaultView }}'
+                }
+                resourceUrl += '/' + toggler.data('href').substr(1);
+                $.ajax({
+                    url: resourceUrl,
+                    type: 'GET',
+                    success: function(html) {
+                        var newContentContainer = $(html).children('.content');
+                        contentContainer.replaceWith(newContentContainer);
+                        newContentContainer.trigger('api_resource_content:load');
+                        if (updateHash) {
+                            setHash(toggler.data('href'));
+                        }
+                    },
+                    error: function(xhr) {
+                        contentContainer.text(
+                            xhr.status === 404 ? 'Unknown API resource.' : 'The loading failed.'
+                        );
+                    }
+                });
+            };
+
             $(window).load(function() {
                 var id = getHash().substr(1).replace( /([:\.\[\]\{\}|])/g, "\\$1");
                 var elem = $('#' + id);
@@ -105,15 +131,21 @@
             });
 
             $('.toggler').click(function(event) {
-                var contentContainer = $(this).next();
-
-                if(contentContainer.is(':visible')) {
-                    clearHash();
-                } else {
-                    setHash($(this).data('href'));
-                }
+                var toggler = $(this),
+                    contentContainer = toggler.next(),
+                    isVisible = contentContainer.is(':visible');
 
                 contentContainer.slideToggle('fast');
+                if (contentContainer.data('state') !== 'collapsed') {
+                    if (isVisible) {
+                        clearHash();
+                    } else {
+                        setHash(toggler.data('href'));
+                    }
+                } else if (!isVisible) {
+                    showResourceContent(contentContainer, true);
+                }
+
                 return false;
             });
 
@@ -144,7 +176,14 @@
                     section.addClass('active');
                 }
                 $(section).find('ul').slideDown('fast');
-                $(section).find('.operation > .content').slideDown('fast');
+                $(section).find('.operation > .content').each(function(){
+                    var contentContainer = $(this),
+                        isVisible = contentContainer.is(':visible');
+                    contentContainer.slideDown('fast');
+                    if (!isVisible && contentContainer.data('state') === 'collapsed') {
+                        showResourceContent(contentContainer, false);
+                    }
+                });
             });
 
             {% if enableSandbox %}
@@ -299,7 +338,7 @@
                     });
                 });
 
-                $('.tabs li').click(function() {
+                $(document).on('click', '.tabs li', function() {
                     var contentGroup = $(this).parents('.content');
 
                     $('.pane.selected', contentGroup).removeClass('selected');
@@ -433,7 +472,7 @@
                     result_container.show();
                 };
 
-                $('.pane.sandbox form').submit(function() {
+                $(document).on('submit', '.pane.sandbox form', function() {
                     var url = $(this).attr('action'),
                         method = $('[name="header_method"]', this).val(),
                         self = this,
@@ -669,7 +708,7 @@
                     return false;
                 });
 
-                $('.operations').on('click', '.operation > .heading', function(e) {
+                $(document).on('click', '.operations .operation > .heading', function(e) {
                     if (history.pushState) {
                         history.pushState(null, null, $(this).data('href'));
                         e.preventDefault();
@@ -695,19 +734,19 @@
                     }, 100);
                 });
 
-                $('.pane.sandbox').on('click', '.to-raw', function(e) {
+                $(document).on('click', '.pane.sandbox .to-raw', function(e) {
                     renderRawBody($(this).parents('.pane').find('.response'));
 
                     e.preventDefault();
                 });
 
-                $('.pane.sandbox').on('click', '.to-prettify', function(e) {
+                $(document).on('click', '.pane.sandbox .to-prettify', function(e) {
                     renderPrettifiedBody($(this).parents('.pane').find('.response'));
 
                     e.preventDefault();
                 });
 
-                $('.pane.sandbox').on('click', '.to-expand, .to-shrink', function(e) {
+                $(document).on('click', '.pane.sandbox .to-expand, .to-shrink', function(e) {
                     var $headers = $(this).parents('.result').find('.headers');
                     var $label = $(this).parents('.result').find('a.to-expand');
 
@@ -726,19 +765,21 @@
 
 
                 // sets the correct parameter type on load
-                $('.pane.sandbox .tuple_type').each(function() {
-                    setParameterType($(this));
+                $(document).on('api_resource_content:load', function(e) {
+                    $(e.target).find('.pane.sandbox .tuple_type').each(function() {
+                        setParameterType($(this));
+                    });
                 });
 
 
                 // handles parameter type change
-                $('.pane.sandbox').on('change', '.tuple_type', function() {
+                $(document).on('change', '.pane.sandbox .tuple_type', function() {
                     setParameterType($(this),$(this).val());
                 });
 
 
 
-                $('.pane.sandbox').on('click', '.add_parameter', function() {
+                $(document).on('click', '.pane.sandbox .add_parameter', function() {
                     var html = $(this).parents('.pane').find('.parameters_tuple_template').html();
 
                     $(this).before(html);
@@ -746,7 +787,7 @@
                     return false;
                 });
 
-                $('.pane.sandbox').on('click', '.add_header', function() {
+                $(document).on('click', '.pane.sandbox .add_header', function() {
                     var html = $(this).parents('.pane').find('.headers_tuple_template').html();
 
                     $(this).before(html);
@@ -754,11 +795,11 @@
                     return false;
                 });
 
-                $('.pane.sandbox').on('click', '.remove', function() {
+                $(document).on('click', '.pane.sandbox .remove', function() {
                     $(this).parent().remove();
                 });
 
-                $('.pane.sandbox').on('click', '.set-content-type', function(e) {
+                $(document).on('click', '.pane.sandbox .set-content-type', function(e) {
                     var html;
                     var $element;
                     var $headers = $(this).parents('form').find('.headers');

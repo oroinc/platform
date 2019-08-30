@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * The controller for the user menu.
  * @Route("/menu/user")
  */
 class UserMenuController extends AbstractMenuController
@@ -85,7 +86,7 @@ class UserMenuController extends AbstractMenuController
      */
     private function getContext()
     {
-        return [ScopeUserCriteriaProvider::SCOPE_KEY => $this->getUser()->getId()];
+        return [ScopeUserCriteriaProvider::USER => $this->getUser()->getId()];
     }
 
     /**
@@ -95,7 +96,7 @@ class UserMenuController extends AbstractMenuController
     {
         if (!$this->isGranted(
             'oro_user_user_update',
-            $context[ScopeUserCriteriaProvider::SCOPE_KEY]
+            $context[ScopeUserCriteriaProvider::USER]
         )
         ) {
             throw $this->createAccessDeniedException();
@@ -108,10 +109,10 @@ class UserMenuController extends AbstractMenuController
      */
     protected function getMenu($menuName, array $context)
     {
-        if (array_key_exists(ScopeUserCriteriaProvider::SCOPE_KEY, $context)) {
+        if (array_key_exists(ScopeUserCriteriaProvider::USER, $context)) {
             /** @var User $user */
-            $user = $context[ScopeUserCriteriaProvider::SCOPE_KEY];
-            $context[ScopeOrganizationCriteriaProvider::SCOPE_KEY] = $user->getOrganization();
+            $user = $context[ScopeUserCriteriaProvider::USER];
+            $context[ScopeOrganizationCriteriaProvider::ORGANIZATION] = $user->getOrganization();
         }
 
         return parent::getMenu($menuName, $context);

@@ -12,9 +12,6 @@ parameters:
 
     oro_organization.provider.business_units.class:            Oro\Bundle\OrganizationBundle\Provider\BusinessUnitGridService
 
-    oro_organization.owner_deletion_manager.class:             Oro\Bundle\OrganizationBundle\Ownership\OwnerDeletionManager
-    oro_organization.owner_assignment_checker.default.class:   Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentChecker
-
     oro_organization.entity_config_dumper.extension.class:     Oro\Bundle\OrganizationBundle\Tools\OwnershipEntityConfigDumperExtension
 
     oro_organization.event.business_unit_grid_listener.class:  Oro\Bundle\OrganizationBundle\Event\BusinessUnitGridListener
@@ -85,20 +82,18 @@ services:
         alias: oro_organization.form.type.ownership_type
 
     oro_organization.owner_assignment_checker.default:
-        class: '%oro_organization.owner_assignment_checker.default.class%'
-        public: false
+        class: Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentChecker
+        tags:
+            - { name: oro_organization.owner_assignment_checker, entity: default }
 
     oro_organization.owner_deletion_manager:
-        class: '%oro_organization.owner_deletion_manager.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
-        public: true
+        class: Oro\Bundle\OrganizationBundle\Ownership\OwnerDeletionManager
         arguments:
-            - '@oro_organization.owner_assignment_checker.default'
+            - ~ # checkers; it is injected by Oro\Bundle\OrganizationBundle\DependencyInjection\Compiler\OwnerDeletionManagerPass
             - '@oro_entity_config.provider.ownership'
             - '@oro_security.owner.ownership_metadata_provider'
-            - '@doctrine.orm.entity_manager'
+            - '@oro_entity.doctrine_helper'
             - '@oro_security.acl.object_id_accessor'
-        lazy: true
 
     #
     # Twig
@@ -229,15 +224,21 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: widget_owner_business_units, acl_resource: oro_business_unit_view }
 
-    oro_organization.business_unit.handler.delete:
-        class: Oro\Bundle\OrganizationBundle\Handler\BusinessUnitDeleteHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
-        public: true
-        parent: oro_soap.handler.delete.abstract
+    oro_organization.delete_handler_extension.business_unit:
+        class: Oro\Bundle\OrganizationBundle\Handler\BusinessUnitDeleteHandlerExtension
+        parent: oro_entity.delete_handler_extension
+        arguments:
+            - '@oro_organization.owner_deletion_manager'
+        tags:
+            - { name: oro_entity.delete_handler_extension, entity: Oro\Bundle\OrganizationBundle\Entity\BusinessUnit }
 
-    oro_organization.organization.handler.delete:
-        class: Oro\Bundle\OrganizationBundle\Handler\OrganizationDeleteHandler
-        parent: oro_soap.handler.delete.abstract
+    oro_organization.delete_handler_extension.organization:
+        class: Oro\Bundle\OrganizationBundle\Handler\OrganizationDeleteHandlerExtension
+        parent: oro_entity.delete_handler_extension
+        arguments:
+            - '@oro_organization.owner_deletion_manager'
+        tags:
+            - { name: oro_entity.delete_handler_extension, entity: Oro\Bundle\OrganizationBundle\Entity\Organization }
 
     oro_organization.validator.owner:
         class: Oro\Bundle\OrganizationBundle\Validator\Constraints\OwnerValidator

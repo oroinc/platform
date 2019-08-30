@@ -277,7 +277,7 @@ class EmailController extends Controller
                 $this->getUser(),
                 $this->get('oro_email.mailbox.manager')->findAvailableMailboxes(
                     $this->getUser(),
-                    $this->get('security.token_storage')->getToken()->getOrganizationContext()
+                    $this->get('security.token_storage')->getToken()->getOrganization()
                 )
             );
         }

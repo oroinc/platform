@@ -6,7 +6,7 @@ use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SidebarBundle\Entity\AbstractWidget;
 use Oro\Bundle\SidebarBundle\Entity\Repository\WidgetRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
+ * The controller to manage sidebar widgets.
+ *
  * @RouteResource("sidebarwidgets")
  * @NamePrefix("oro_api_")
  */
@@ -36,8 +38,8 @@ class WidgetController extends FOSRestController
         $token = $this->container->get('security.token_storage')->getToken();
         $organization = null;
         $items = [];
-        if ($token instanceof OrganizationContextTokenInterface) {
-            $organization = $token->getOrganizationContext();
+        if ($token instanceof OrganizationAwareTokenInterface) {
+            $organization = $token->getOrganization();
             $items = $this->getRepository()->getWidgets($this->getUser(), $placement, $organization);
             $featureChecker = $this->get('oro_featuretoggle.checker.feature_checker');
             $items = array_filter(
@@ -84,8 +86,8 @@ class WidgetController extends FOSRestController
         $entity->setUser($this->getUser());
 
         $token = $this->container->get('security.token_storage')->getToken();
-        if ($token instanceof OrganizationContextTokenInterface) {
-            $entity->setOrganization($token->getOrganizationContext());
+        if ($token instanceof OrganizationAwareTokenInterface) {
+            $entity->setOrganization($token->getOrganization());
         }
 
         $manager = $this->getManager();

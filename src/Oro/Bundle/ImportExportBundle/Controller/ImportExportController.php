@@ -346,7 +346,7 @@ class ImportExportController extends AbstractController
             'outputFilePrefix' => $filePrefix,
             'options' => $options,
             'userId' => $this->getUser()->getId(),
-            'organizationId' => $token->getOrganizationContext()->getId(),
+            'organizationId' => $token->getOrganization()->getId(),
         ]);
 
         return new JsonResponse(['success' => true]);

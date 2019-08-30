@@ -4,13 +4,16 @@ namespace Oro\Bundle\SoapBundle\Controller\Api\Soap;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityNotFoundException;
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * The base class for SOAP API CRUD controllers.
+ */
 abstract class SoapController extends SoapGetController implements
     FormAwareInterface,
     FormHandlerAwareInterface,
@@ -56,10 +59,10 @@ abstract class SoapController extends SoapGetController implements
     {
         try {
             $this->getDeleteHandler()->handleDelete($id, $this->getManager());
-        } catch (EntityNotFoundException $notFoundEx) {
+        } catch (EntityNotFoundException $e) {
             throw new \SoapFault('NOT_FOUND', sprintf('Record with ID "%s" can not be found', $id));
-        } catch (ForbiddenException $forbiddenEx) {
-            throw new \SoapFault('FORBIDDEN', $forbiddenEx->getMessage());
+        } catch (AccessDeniedException $e) {
+            throw new \SoapFault('FORBIDDEN', $e->getMessage());
         }
 
         return true;

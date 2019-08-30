@@ -510,27 +510,6 @@ class OwnerFormExtension extends AbstractTypeExtension
     }
 
     /**
-     * @return bool|Organization
-     */
-    protected function getCurrentOrganization()
-    {
-        $businessUnit = $this->getCurrentBusinessUnit($this->getOrganization());
-        if (!$businessUnit) {
-            return true;
-        }
-
-        return $businessUnit->getOrganization();
-    }
-
-    /**
-     * @return int|null
-     */
-    protected function getOrganizationContextId()
-    {
-        return $this->getOrganization()->getId();
-    }
-
-    /**
      * Check is granting user to object in given permission
      *
      * @param string        $permission
@@ -577,19 +556,19 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected function getBusinessUnitIds()
     {
         if (AccessLevel::SYSTEM_LEVEL == $this->accessLevel) {
-            return $this->businessUnitManager->getBusinessUnitIds($this->getOrganizationContextId());
+            return $this->businessUnitManager->getBusinessUnitIds($this->getOrganizationId());
         } elseif (AccessLevel::LOCAL_LEVEL == $this->accessLevel) {
             return $this->treeProvider->getTree()->getUserBusinessUnitIds(
                 $this->currentUser->getId(),
-                $this->getOrganizationContextId()
+                $this->getOrganizationId()
             );
         } elseif (AccessLevel::DEEP_LEVEL === $this->accessLevel) {
             return $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
                 $this->currentUser->getId(),
-                $this->getOrganizationContextId()
+                $this->getOrganizationId()
             );
         } elseif (AccessLevel::GLOBAL_LEVEL === $this->accessLevel) {
-            return $this->businessUnitManager->getBusinessUnitIds($this->getOrganizationContextId());
+            return $this->businessUnitManager->getBusinessUnitIds($this->getOrganizationId());
         }
 
         return [];
@@ -612,5 +591,13 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected function getOrganization()
     {
         return $this->tokenAccessor->getOrganization();
+    }
+
+    /**
+     * @return int|null
+     */
+    protected function getOrganizationId()
+    {
+        return $this->getOrganization()->getId();
     }
 }
