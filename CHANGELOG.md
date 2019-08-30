@@ -4,6 +4,8 @@ The current file describes significant changes in the code that may affect the u
 
 ## 4.1.0-beta
 
+### Changed
+
 #### ActivityBundle
 * The DIC tag `oro_activity.activity_entity_delete_handler` was removed.
   Use decoration of `oro_activity.activity_entity_delete_handler_extension` service to instead.
@@ -26,6 +28,17 @@ The current file describes significant changes in the code that may affect the u
 * The service `kernel.listener.nav_history_response` was renamed to `oro_navigation.event_listener.navigation_history`.
 * The service `kernel.listener.hashnav_response` was renamed to `oro_navigation.event_listener.hash_navigation`.
 
+#### OrganizationBundle
+* The constant `SCOPE_KEY` in `Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider`
+  was replaced with `ORGANIZATION`.
+
+#### ScopeBundle
+* The method `getCriteriaByContext()` was removed from `Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface`.
+* The method `getCriteriaForCurrentScope()` in `Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface`
+  was replaced with `getCriteriaValue()`.
+* The class `Oro\Bundle\ScopeBundle\Manager\AbstractScopeCriteriaProvider` was removed.
+  Use direct implementation of `Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface` in your providers.
+
 #### SecurityBundle
 * The interface `Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface`
   was renamed to `Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface`.
@@ -38,6 +51,10 @@ The current file describes significant changes in the code that may affect the u
 * The interface `Oro\Bundle\SoapBundle\Handler\DeleteHandlerInterface` was replaced with
   `Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerInterface`
   and `Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerExtensionInterface`.
+
+#### UserBundle
+* The constant `SCOPE_KEY` in `Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider`
+  was replaced with `USER`.
 
 ## 4.0.0 (2019-07-31)
 [Show detailed list of changes](incompatibilities-4-0.md)

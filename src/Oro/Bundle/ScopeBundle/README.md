@@ -26,7 +26,7 @@ Sometimes in a bundle activities, you need to alter behavior or data based on th
 Scope Manager is a service that provides an interface for collecting the scope items in Oro application. It is in charge of the following functions:
 * Expose scope-related operations (find, findOrCreate, findDefaultScope, findRelatedScopes) to the scope-aware bundles and deliver requested scope(s) as a result. See [Scope Operations](#scope-operations) for more information.
 * Create a collected scope in response to the findOrCreate operation (if the scope is not found).
-* Call Scope Criteria Provider's getCriteriaForCurrentScope() method to get a portion of the scope information.
+* Use Scope Criteria Providers to get a portion of the scope information.
 
 ## Scope Criteria Providers
 
@@ -68,35 +68,55 @@ class OroAccountBundleScopeRelations implements Migration, ScopeExtensionAwareIn
 
 To extend a scope with a criterion that may be provided by your bundle:
 
-1. Create a **Scope<your criterion name>CriteriaProvider** class and implement getCriteriaForCurrentScope() and getCriteriaField() methods, as shown in the following examples. 
+1. Create a **Scope<your criterion name>CriteriaProvider** class and implement getCriteriaField(), getCriteriaValue()
+   and getCriteriaValueType() methods, as shown in the following example:
 
 ```
-class ScopeAccountCriteriaProvider extends AbstractScopeCriteriaProvider
+class ScopeUserCriteriaProvider implements ScopeCriteriaProviderInterface
 {
-    ...
-    /**
-     * @return array
-     */
-    public function getCriteriaForCurrentScope()
-    {
-        $token = $this->tokenStorage->getToken();
-        if (!$token) {
-            return [];
-        }
-        $loggedUser = $token->getUser();
-        if (null !== $loggedUser && $loggedUser instanceof CustomerUser) {
-            return [self::ACCOUNT => $loggedUser->getAccount()];
-        }
+    public const SCOPE_KEY = 'user';
 
-        return [];
-    } 
-      
+    /** @var TokenStorageInterface */
+    private $tokenStorage;
+
     /**
-     * @return string
+     * @param TokenStorageInterface $tokenStorage
+     */
+    public function __construct(TokenStorageInterface $tokenStorage)
+    {
+        $this->tokenStorage = $tokenStorage;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getCriteriaField()
     {
-        return static::ACCOUNT;
+        return self::SCOPE_KEY;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCriteriaValue()
+    {
+        $token = $this->tokenStorage->getToken();
+        if (null !== $token) {
+            $user = $token->getUser();
+            if ($user instanceof User) {
+                return $user;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCriteriaValueType()
+    {
+        return User::class;
     }
 }
 ```
@@ -106,7 +126,7 @@ class ScopeAccountCriteriaProvider extends AbstractScopeCriteriaProvider
 oro_customer.account_scope_criteria_provider:
     class: 'Oro\Bundle\CustomerBundle\Provider\ScopeAccountCriteriaProvider'
     tags:
-        - { name: oro_scope.provider, scopeType: web_content, priority: 30 }
+        - { name: oro_scope.provider, scopeType: web_content, priority: 200 }
 ```
 **Note:** One CriteriaScopeProvider can be used in many scope types.
 
@@ -200,12 +220,12 @@ The scope criteria providers are already registered in the *service.yml* file:
 oro_customer.account_scope_criteria_provider:
     class: 'Oro\Bundle\CustomerBundle\Provider\ScopeAccountCriteriaProvider'
     tags:
-        - { name: oro_scope.provider, scopeType: web_content, priority: 300 }
+        - { name: oro_scope.provider, scopeType: web_content, priority: 200 }
         
 oro_customer.account_group_scope_criteria_provider:
     class: 'Oro\Bundle\CustomerBundle\Provider\ScopeAccountGroupCriteriaProvider'
     tags:
-        - { name: oro_scope.provider, scopeType: web_content, priority: 200 } 
+        - { name: oro_scope.provider, scopeType: web_content, priority: 100 } 
 ```
 
 In this code example we build a query and modify it with the ScopeCriteria methods:

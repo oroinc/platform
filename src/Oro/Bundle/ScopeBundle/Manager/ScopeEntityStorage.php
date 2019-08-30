@@ -4,10 +4,14 @@ namespace Oro\Bundle\ScopeBundle\Manager;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 
+/**
+ * The storage for Scope entity.
+ */
 class ScopeEntityStorage
 {
     /**
@@ -83,6 +87,14 @@ class ScopeEntityStorage
     public function getRepository()
     {
         return $this->getEntityManager()->getRepository(Scope::class);
+    }
+
+    /**
+     * @return ClassMetadata
+     */
+    public function getClassMetadata()
+    {
+        return $this->getEntityManager()->getClassMetadata(Scope::class);
     }
 
     /**
