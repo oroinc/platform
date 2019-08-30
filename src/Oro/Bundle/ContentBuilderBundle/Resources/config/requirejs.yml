@@ -10,3 +10,5 @@ config:
         'orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-devices-module': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-devices-module.js'
         'orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-components': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-components.js'
         'orocontentbuilder/js/app/views/grapesjs-modules/controls/theme-selector-view': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/controls/theme-selector-view.js'
+        'orocontentbuilder/js/app/views/grapesjs-modules/components/table': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/components/table.js'
+        'orocontentbuilder/js/app/views/grapesjs-modules/components/table-responsive': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/components/table-responsive.js'

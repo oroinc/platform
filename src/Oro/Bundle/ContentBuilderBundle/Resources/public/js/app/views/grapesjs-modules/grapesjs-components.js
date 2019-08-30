@@ -2,8 +2,8 @@ define(function(require) {
     'use strict';
 
     var _ = require('underscore');
-    var TableComponents = require('./components/table');
-    var TableResponsiveComponent = require('./components/table-responsive');
+    var TableComponents = require('orocontentbuilder/js/app/views/grapesjs-modules/components/table');
+    var TableResponsiveComponent = require('orocontentbuilder/js/app/views/grapesjs-modules/components/table-responsive');
     var selectTemplate = require('tpl!orocontentbuilder/templates/grapesjs-select-action.html');
 
     /**
