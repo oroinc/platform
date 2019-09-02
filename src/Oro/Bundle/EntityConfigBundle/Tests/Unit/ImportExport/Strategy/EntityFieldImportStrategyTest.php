@@ -206,7 +206,7 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
             ->with(['first error message', 'second error message'], $this->context);
 
         $this->validationHelper->expects($this->once())
-            ->method('findExtendFieldConfig')
+            ->method('findFieldConfig')
             ->willReturn(null);
 
         self::assertNull($this->strategy->process($entity));

@@ -57,7 +57,7 @@ class ImportExportTest extends WebTestCase
 
         $this->assertErrors(
             '@OroEntityConfigBundle/Tests/Functional/ImportExport/data/change_field_type.csv',
-            'Error in row #1. Changing type of existing fields is not allowed.'
+            'Error in row #1. Changing name or type of existing fields is not allowed.'
         );
     }
 

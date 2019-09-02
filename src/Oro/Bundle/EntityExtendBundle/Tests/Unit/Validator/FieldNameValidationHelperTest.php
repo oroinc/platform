@@ -135,7 +135,7 @@ class FieldNameValidationHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             $expectedConfig,
-            $this->validationHelper->findExtendFieldConfig(self::ENTITY_CLASS, $fieldName)
+            $this->validationHelper->findFieldConfig(self::ENTITY_CLASS, $fieldName)
         );
     }
 

@@ -233,7 +233,7 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
             return false;
         }
 
-        return null === $this->fieldValidationHelper->findExtendFieldConfig(
+        return null === $this->fieldValidationHelper->findFieldConfig(
             $entity->getEntity()->getClassName(),
             $entity->getFieldName()
         );

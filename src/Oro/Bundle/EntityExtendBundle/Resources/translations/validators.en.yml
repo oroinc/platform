@@ -21,7 +21,7 @@ oro:
         enum:
             options_error.message: Invalid enum options provided
             options_duplicates.message: The option {{ value }} is duplicated.|The options {{ value }} are duplicated.
-        change_type_not_allowed.message: Changing type of existing field {{ field }} is not allowed.
+        change_type_not_allowed.message: Changing name or type of existing field {{ field }} is not allowed.
         attribute_field.message: Existing field "{{ field }}" is not an attribute.
         validator:
             attribute_configuration:
