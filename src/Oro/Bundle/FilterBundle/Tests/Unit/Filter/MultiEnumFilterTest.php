@@ -9,7 +9,7 @@ use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\MultiEnumFilter;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
@@ -28,7 +28,7 @@ class MultiEnumFilterTest extends OrmTestCase
 
     protected function setUp()
     {
-        $reader         = new AnnotationReader();
+        $reader = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(
             $reader,
             'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
@@ -68,7 +68,7 @@ class MultiEnumFilterTest extends OrmTestCase
         $this->assertAttributeEquals(
             [
                 FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
-                'options'                        => []
+                'options' => []
             ],
             'params',
             $this->filter
@@ -84,8 +84,8 @@ class MultiEnumFilterTest extends OrmTestCase
         $this->assertAttributeEquals(
             [
                 FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
-                'null_value'                     => ':empty:',
-                'options'                        => []
+                'null_value' => ':empty:',
+                'options' => []
             ],
             'params',
             $this->filter
@@ -101,7 +101,7 @@ class MultiEnumFilterTest extends OrmTestCase
         $this->assertAttributeEquals(
             [
                 FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
-                'options'                        => [
+                'options' => [
                     'class' => 'Test\EnumValue'
                 ]
             ],
@@ -119,7 +119,7 @@ class MultiEnumFilterTest extends OrmTestCase
         $this->assertAttributeEquals(
             [
                 FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
-                'options'                        => [
+                'options' => [
                     'enum_code' => 'test_enum'
                 ]
             ],
@@ -143,22 +143,26 @@ class MultiEnumFilterTest extends OrmTestCase
         );
     }
 
-    public function testApply()
+    /**
+     * @dataProvider applyDataProvider
+     *
+     * @param array $values
+     * @param mixed $comparisonType
+     * @param string $expectedDQL
+     */
+    public function testApply(array $values, $comparisonType, string $expectedDQL)
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id')
             ->from('Stub:TestEntity', 'o');
 
-        $values = [
-            new TestEnumValue('val1', 'Value1'),
-            new TestEnumValue('val2', 'Value2')
-        ];
-        $data   = [
-            'value' => $values
+        $data = [
+            'value' => $values,
+            'type' => $comparisonType,
         ];
 
         $params = [
-            'null_value'                 => ':empty:',
+            'null_value' => ':empty:',
             FilterUtility::DATA_NAME_KEY => 'o.values'
         ];
         $this->filter->init('test', $params);
@@ -175,65 +179,81 @@ class MultiEnumFilterTest extends OrmTestCase
 
         $this->filter->apply($ds, $data);
 
-        $result = $qb->getQuery()->getDQL();
-        $this->assertEquals(
-            'SELECT o.id FROM Stub:TestEntity o'
-            . ' WHERE o IN('
-            . 'SELECT filter_param1'
-            . ' FROM Stub:TestEntity filter_param1'
-            . ' INNER JOIN filter_param1.values filter_param1_rel'
-            . ' WHERE filter_param1_rel IN(:param1))',
-            $result
-        );
+        $this->assertEquals($expectedDQL, $qb->getQuery()->getDQL());
         $this->assertEquals($values, $qb->getParameter('param1')->getValue());
     }
 
-    public function testApplyNot()
+    /**
+     * @return array
+     */
+    public function applyDataProvider(): array
     {
-        $qb = $this->em->createQueryBuilder()
-            ->select('o.id')
-            ->from('Stub:TestEntity', 'o');
-
-        $values = [
-            new TestEnumValue('val1', 'Value1'),
-            new TestEnumValue('val2', 'Value2')
+        return [
+            [
+                'values' => [
+                    new TestEnumValue('val1', 'Value1'),
+                    new TestEnumValue('val2', 'Value2')
+                ],
+                'comparisonType' => null,
+                'expectedDQL' => 'SELECT o.id FROM Stub:TestEntity o'
+                    . ' WHERE o IN('
+                    . 'SELECT filter_param1'
+                    . ' FROM Stub:TestEntity filter_param1'
+                    . ' INNER JOIN filter_param1.values filter_param1_rel'
+                    . ' WHERE filter_param1_rel IN(:param1))',
+            ],
+            [
+                'values' => [
+                    new TestEnumValue('val1', 'Value1'),
+                    new TestEnumValue('val2', 'Value2')
+                ],
+                'comparisonType' => DictionaryFilterType::TYPE_NOT_IN,
+                'expectedDQL' => 'SELECT o.id FROM Stub:TestEntity o'
+                    . ' WHERE o NOT IN('
+                    . 'SELECT filter_param1'
+                    . ' FROM Stub:TestEntity filter_param1'
+                    . ' INNER JOIN filter_param1.values filter_param1_rel'
+                    . ' WHERE filter_param1_rel IN(:param1))',
+            ],
+            [
+                'values' => [
+                    new TestEnumValue('val1', 'Value1'),
+                    new TestEnumValue('val2', 'Value2')
+                ],
+                'comparisonType' => (string)DictionaryFilterType::TYPE_NOT_IN,
+                'expectedDQL' => 'SELECT o.id FROM Stub:TestEntity o'
+                    . ' WHERE o NOT IN('
+                    . 'SELECT filter_param1'
+                    . ' FROM Stub:TestEntity filter_param1'
+                    . ' INNER JOIN filter_param1.values filter_param1_rel'
+                    . ' WHERE filter_param1_rel IN(:param1))',
+            ],
+            [
+                'values' => [
+                    new TestEnumValue('val1', 'Value1'),
+                    new TestEnumValue('val2', 'Value2')
+                ],
+                'comparisonType' => DictionaryFilterType::NOT_EQUAL,
+                'expectedDQL' => 'SELECT o.id FROM Stub:TestEntity o'
+                    . ' WHERE o NOT IN('
+                    . 'SELECT filter_param1'
+                    . ' FROM Stub:TestEntity filter_param1'
+                    . ' INNER JOIN filter_param1.values filter_param1_rel'
+                    . ' WHERE filter_param1_rel IN(:param1))',
+            ],
+            [
+                'values' => [
+                    new TestEnumValue('val1', 'Value1'),
+                    new TestEnumValue('val2', 'Value2')
+                ],
+                'comparisonType' => (string)DictionaryFilterType::NOT_EQUAL,
+                'expectedDQL' => 'SELECT o.id FROM Stub:TestEntity o'
+                    . ' WHERE o NOT IN('
+                    . 'SELECT filter_param1'
+                    . ' FROM Stub:TestEntity filter_param1'
+                    . ' INNER JOIN filter_param1.values filter_param1_rel'
+                    . ' WHERE filter_param1_rel IN(:param1))',
+            ]
         ];
-        $data   = [
-            'type'  => ChoiceFilterType::TYPE_NOT_CONTAINS,
-            'value' => $values
-        ];
-
-        $params = [
-            'null_value'                 => ':empty:',
-            FilterUtility::DATA_NAME_KEY => 'o.values'
-        ];
-        $this->filter->init('test', $params);
-
-        /** @var OrmFilterDatasourceAdapter|\PHPUnit\Framework\MockObject\MockObject $ds */
-        $ds = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter')
-            ->setMethods(['generateParameterName'])
-            ->setConstructorArgs([$qb])
-            ->getMock();
-
-        $ds->expects($this->any())
-            ->method('generateParameterName')
-            ->will($this->returnValue('param1'));
-
-        $this->filter->apply($ds, $data);
-
-        $result = $qb->getQuery()->getDQL();
-        $this->assertEquals(
-            'SELECT o.id FROM Stub:TestEntity o'
-            . ' WHERE o NOT IN('
-            . 'SELECT filter_param1'
-            . ' FROM Stub:TestEntity filter_param1'
-            . ' INNER JOIN filter_param1.values filter_param1_rel'
-            . ' WHERE filter_param1_rel IN(:param1))',
-            $result
-        );
-        $this->assertEquals(
-            $values,
-            $qb->getParameter('param1')->getValue()
-        );
     }
 }
