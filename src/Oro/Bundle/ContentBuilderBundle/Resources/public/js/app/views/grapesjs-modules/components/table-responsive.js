@@ -34,7 +34,6 @@ define(function(require) {
             }, {
                 isComponent: function(el) {
                     var result = '';
-                    debugger;
                     if (el.tagName === 'DIV' && el.className.indexOf(ComponentId) !== -1) {
                         result = {
                             type: ComponentId
