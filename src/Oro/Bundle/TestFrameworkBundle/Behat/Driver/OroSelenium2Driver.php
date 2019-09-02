@@ -157,17 +157,11 @@ JS;
     {
         $jsCheck = <<<JS
         (function () {
-            if (document["readyState"] !== "complete") {
+            if (document['readyState'] !== 'complete') {
                 return false;
             }
             
-            if (document.title === "Loading...") {
-                return false;
-            }
-
-            if (document.querySelector('script[src*="js/oro.min.js"]') !== null
-                && (typeof(jQuery) === 'undefined' || jQuery == null || jQuery.active)
-            ) {
+            if (document.title === 'Loading...') {
                 return false;
             }
             
@@ -175,11 +169,13 @@ JS;
                 return false;
             }
 
-            if (document.querySelector('.loader-mask.shown') !== null) {
+            if (document.querySelector('.loader-mask.shown, .lazy-loading') !== null) {
                 return false;
             }
             
-            if (document.querySelector('div.lazy-loading') !== null) {
+            if (document.querySelector('script[src*="js/oro.min.js"]') !== null
+                && (typeof(jQuery) === 'undefined' || jQuery == null || jQuery.active)
+            ) {
                 return false;
             }
             

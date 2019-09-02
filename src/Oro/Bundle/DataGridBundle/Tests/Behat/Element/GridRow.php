@@ -168,13 +168,16 @@ class GridRow extends TableRow
     }
 
     /**
-     * @param $action
-     * @return NodeElement
+     * @param string $action
+     * @param bool $failIfNotFound
+     * @return NodeElement|null
      */
-    public function getActionLink($action)
+    public function getActionLink($action, $failIfNotFound = true)
     {
         $link = $this->findActionLink($action);
-        self::assertNotNull($link, sprintf('Row "%s" has no "%s" action', $this->getText(), $action));
+        if ($failIfNotFound) {
+            self::assertNotNull($link, sprintf('Row "%s" has no "%s" action', $this->getText(), $action));
+        }
 
         return $link;
     }
