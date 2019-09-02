@@ -103,6 +103,10 @@ define(function(require) {
                     widgetManager.getWidgetInstanceByAlias(
                         this.options.widgetAlias,
                         function(widget) {
+                            if (widget.loading) {
+                                widget.loading.abort();
+                            }
+
                             widget.setUrl(routing.generate(self.options.widgetRoute, widgetParams));
                             widget.render();
                         }
