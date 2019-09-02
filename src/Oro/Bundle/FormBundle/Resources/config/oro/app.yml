@@ -51,6 +51,16 @@ oro_form:
                     - nowrap
                     - width
                     - height
+            th:
+                attributes:
+                    - align
+                    - valign
+                    - rowspan
+                    - colspan
+                    - bgcolor
+                    - nowrap
+                    - width
+                    - height
             a:
                 attributes:
                     - "!href"

@@ -109,7 +109,7 @@ class FileManager
      * Returns a File object for the file stored in the Gaufrette file system.
      *
      * @param string $fileName
-     * @param bool   $throwException Whether to throw an exception in case the file does not exist
+     * @param bool   $throwException Whether to throw an exception in case the file does not exists
      *                               in the Gaufrette file system
      *
      * @return File|null

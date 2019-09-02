@@ -149,6 +149,8 @@ config:
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'
+        'app-modules': 'bundles/oroui/js/requirejs/app-modules.js'
+        'oroui/js/app': 'bundles/oroui/js/app.js'
         'oroui/js/tools/api-accessor': 'bundles/oroui/js/tools/api-accessor.js'
         'oroui/js/tools/search-api-accessor': 'bundles/oroui/js/tools/search-api-accessor.js'
         'oroui/js/tools/layout-helper': 'bundles/oroui/js/tools/layout-helper.js'

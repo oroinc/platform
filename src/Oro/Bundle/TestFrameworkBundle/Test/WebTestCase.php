@@ -257,10 +257,26 @@ abstract class WebTestCase extends BaseWebTestCase
         return self::$afterInitClientMethods[$className];
     }
 
-    /** {@inheritdoc} */
-    protected static function createKernel(array $options = array())
+    /**
+     * {@inheritdoc}
+     */
+    protected static function createKernel(array $options = [])
     {
-        $options['debug'] = false;
+        if (!array_key_exists('environment', $options)) {
+            if (isset($_ENV['SYMFONY_ENV'])) {
+                $options['environment'] = $_ENV['SYMFONY_ENV'];
+            } elseif (isset($_SERVER['SYMFONY_ENV'])) {
+                $options['environment'] = $_SERVER['SYMFONY_ENV'];
+            }
+        }
+
+        if (!array_key_exists('debug', $options)) {
+            if (isset($_ENV['SYMFONY_DEBUG'])) {
+                $options['debug'] = $_ENV['SYMFONY_DEBUG'];
+            } elseif (isset($_SERVER['SYMFONY_DEBUG'])) {
+                $options['debug'] = $_SERVER['SYMFONY_DEBUG'];
+            }
+        }
 
         return parent::createKernel($options);
     }

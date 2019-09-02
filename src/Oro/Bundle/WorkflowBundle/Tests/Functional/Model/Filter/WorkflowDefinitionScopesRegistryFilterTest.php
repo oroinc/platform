@@ -4,30 +4,32 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Model\Filter;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\TestActivityScopeProvider;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTestActivitiesForScopes;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\TestActivityScopeProvider;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\WorkflowTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 class WorkflowDefinitionScopesRegistryFilterTest extends WorkflowTestCase
 {
-    const WORKFLOW_SCOPES_CONFIG_DIR = '/Tests/Functional/DataFixtures/WithScopesAndWithout';
+    private const WORKFLOW_SCOPES_CONFIG_DIR = '/Tests/Functional/DataFixtures/WithScopesAndWithout';
 
-    /**
-     * @var TestActivityScopeProvider
-     */
+    /** @var TestActivityScopeProvider */
     private $activityScopeProvider;
 
     protected function setUp()
     {
         $this->initClient();
         $this->loadFixtures([LoadTestActivitiesForScopes::class]);
-        $this->activityScopeProvider = new TestActivityScopeProvider();
-        self::getContainer()->get('oro_scope.scope_manager')
-            ->addProvider('workflow_definition', $this->activityScopeProvider);
+
+        $this->activityScopeProvider = self::getContainer()->get('oro_workflow.test_activity_scope_provider');
+    }
+
+    protected function tearDown()
+    {
+        $this->activityScopeProvider->setCurrentTestActivity(null);
     }
 
     public function testFilter()

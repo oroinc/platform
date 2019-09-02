@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ScopeBundle\Tests\Functional\Entity\Repository;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
@@ -20,21 +21,21 @@ class ScopeRepositoryTest extends WebTestCase
 
     public function testFindByCriteria()
     {
-        $criteria = new ScopeCriteria([], []);
+        $criteria = new ScopeCriteria([], new ClassMetadata(Scope::class));
         $scopes = $this->getRepository()->findByCriteria($criteria);
         $this->assertCount(1, $scopes);
     }
 
     public function testFindOneByCriteria()
     {
-        $criteria = new ScopeCriteria([], []);
+        $criteria = new ScopeCriteria([], new ClassMetadata(Scope::class));
         $scope = $this->getRepository()->findOneByCriteria($criteria);
         $this->assertNotNull($scope);
     }
 
     public function testFindScalarByCriteria()
     {
-        $criteria = new ScopeCriteria([], []);
+        $criteria = new ScopeCriteria([], new ClassMetadata(Scope::class));
         $ids = $this->getRepository()->findIdentifiersByCriteria($criteria);
 
         /** @var Scope $scope */
@@ -44,7 +45,7 @@ class ScopeRepositoryTest extends WebTestCase
 
     public function testFindIdentifiersByCriteriaWithPriority()
     {
-        $criteria = new ScopeCriteria([], []);
+        $criteria = new ScopeCriteria([], new ClassMetadata(Scope::class));
         $ids = $this->getRepository()->findIdentifiersByCriteriaWithPriority($criteria);
 
         /** @var Scope $scope */
@@ -54,7 +55,7 @@ class ScopeRepositoryTest extends WebTestCase
 
     public function testFindMostSuitable()
     {
-        $criteria = new ScopeCriteria([], []);
+        $criteria = new ScopeCriteria([], new ClassMetadata(Scope::class));
         $actualScope = $this->getRepository()->findMostSuitable($criteria);
 
         /** @var Scope $expectedScope */

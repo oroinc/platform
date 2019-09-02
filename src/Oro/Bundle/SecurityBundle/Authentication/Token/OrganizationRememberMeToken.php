@@ -6,19 +6,22 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class OrganizationRememberMeToken extends RememberMeToken implements OrganizationContextTokenInterface
+/**
+ * The authentication token for "remember me" feature.
+ */
+class OrganizationRememberMeToken extends RememberMeToken implements OrganizationAwareTokenInterface
 {
-    use OrganizationContextTokenSerializerTrait;
+    use OrganizationAwareTokenTrait;
 
     /**
      * @param UserInterface $user
      * @param string        $providerKey
      * @param string        $key
-     * @param Organization $organizationContext
+     * @param Organization  $organization
      */
-    public function __construct(UserInterface $user, $providerKey, $key, $organizationContext)
+    public function __construct(UserInterface $user, $providerKey, $key, $organization)
     {
-        $this->setOrganizationContext($organizationContext);
         parent::__construct($user, $providerKey, $key);
+        $this->setOrganization($organization);
     }
 }

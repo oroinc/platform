@@ -68,11 +68,9 @@ The serializer of OroImportExportBundle should be aware of its normalizer. To ma
 **Example of Normalizer Service Configuration**
 
 ```yml
-parameters:
-    orocrm_contact.importexport.normalizer.group.class: Oro\Bundle\ContactBundle\ImportExport\Serializer\Normalizer\GroupNormalizer
 services:
     orocrm_contact.importexport.normalizer.group:
-        class: %orocrm_contact.importexport.normalizer.group.class%
+        class: Oro\Bundle\ContactBundle\ImportExport\Serializer\Normalizer\GroupNormalizer
         parent: oro_importexport.serializer.configurable_entity_normalizer
         tags:
             - { name: oro_importexport.normalizer }
@@ -191,8 +189,8 @@ Also, you can use [rows postponing](rows-postponing.md) in the strategy .
 
 ```yml
 services:
-    oro_contact.importexport.strategy.group.add_or_replace:
-        class: %orocrm_contact.importexport.strategy.group.class%
+    oro_contact.importexport.strategy.contact.add_or_replace:
+        class: Oro\Bundle\ContactBundle\ImportExport\Strategy\ContactAddOrReplaceStrategy
         parent: oro_importexport.strategy.configurable_add_or_replace
 ```
 
@@ -285,12 +283,9 @@ class ContactFixture implements TemplateFixtureInterface
 **Define a service:**
 
 ```yml
-parameters:
-    oro_contact.importexport.template_fixture.contact.class: Oro\Bundle\ContactBundle\ImportExport\TemplateFixture\ContactFixture
-
 services:
     oro_contact.importexport.template_fixture.contact:
-        class: %orocrm_contact.importexport.template_fixture.contact.class%
+        class: Oro\Bundle\ContactBundle\ImportExport\TemplateFixture\ContactFixture
         tags:
             - { name: oro_importexport.template_fixture }
 

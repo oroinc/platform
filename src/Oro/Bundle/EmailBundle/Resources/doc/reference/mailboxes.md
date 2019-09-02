@@ -200,7 +200,7 @@ Example provider registration:
 
 ```yaml
 oro_sales.provider.mailbox_process.lead:
-    class: %oro_sales.provider.mailbox_process.lead.class%
+    class: Oro\Bundle\SalesBundle\Provider\LeadMailboxProcessProvider
     tags:
         - { name: oro_email.mailbox_process, type: lead }
 ```

@@ -15,14 +15,10 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var CsrfRequestManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var CsrfRequestManager|\PHPUnit\Framework\MockObject\MockObject */
     private $csrfRequestManager;
 
-    /**
-     * @var CsrfProtectionRequestListener
-     */
+    /** @var CsrfProtectionRequestListener */
     private $listener;
 
     protected function setUp()
@@ -40,6 +36,9 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
             ->method('isMasterRequest')
             ->willReturn(false);
 
+        $event->expects($this->never())
+            ->method('getRequest');
+
         $this->csrfRequestManager->expects($this->never())
             ->method($this->anything());
 
@@ -56,7 +55,7 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $event->expects($this->any())
+        $event->expects($this->once())
             ->method('getRequest')
             ->willReturn($request);
 
@@ -77,7 +76,7 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $event->expects($this->any())
+        $event->expects($this->once())
             ->method('getRequest')
             ->willReturn($request);
 
@@ -101,7 +100,7 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $event->expects($this->any())
+        $event->expects($this->once())
             ->method('getRequest')
             ->willReturn($request);
 
@@ -128,7 +127,7 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $event->expects($this->any())
+        $event->expects($this->once())
             ->method('getRequest')
             ->willReturn($request);
 
@@ -161,7 +160,7 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $event->expects($this->any())
+        $event->expects($this->once())
             ->method('getRequest')
             ->willReturn($request);
 
@@ -214,7 +213,7 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $event->expects($this->any())
+        $event->expects($this->once())
             ->method('getRequest')
             ->willReturn($request);
 
@@ -238,7 +237,7 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $event->expects($this->any())
+        $event->expects($this->once())
             ->method('getRequest')
             ->willReturn($request);
 

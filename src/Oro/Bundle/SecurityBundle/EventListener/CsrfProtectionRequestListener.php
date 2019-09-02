@@ -10,15 +10,13 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
- * Implementation of double submit cookie approach to protect application against CSRF atatcks
+ * Implementation of double submit cookie approach to protect application against CSRF attacks
  * On kernel.controller if it controller or action is marked for CsrfProtection with annotation
  * listeners checks that value in cookie and value in request match. Otherwise access to controller is prohibited.
  */
 class CsrfProtectionRequestListener
 {
-    /**
-     * @var CsrfRequestManager
-     */
+    /** @var CsrfRequestManager */
     private $csrfRequestManager;
 
     /**
@@ -33,23 +31,25 @@ class CsrfProtectionRequestListener
      * Implements double submit cookie CSRF check.
      *
      * @param FilterControllerEvent $event
-     * @throws AccessDeniedHttpException when route is protecred against CSRF attacks and security check failed
+     *
+     * @throws AccessDeniedHttpException when route is protected against CSRF attacks and security check failed
      */
     public function onKernelController(FilterControllerEvent $event)
     {
-        $request = $event->getRequest();
-        $csrProtectionAttribute = '_' . CsrfProtection::ALIAS_NAME;
-        $refreshCsrfToken = false;
-
         if (!$event->isMasterRequest()) {
             return;
         }
 
-        // If CSRF cookie was not generated yet - force generation
-        if (!$event->getRequest()->cookies->has(CsrfRequestManager::CSRF_TOKEN_ID)) {
+        $request = $event->getRequest();
+
+        $refreshCsrfToken = false;
+        if (!$request->cookies->has(CsrfRequestManager::CSRF_TOKEN_ID)) {
+            // if CSRF cookie was not generated yet - force generation
             $refreshCsrfToken = true;
         }
-        // Check CSRF Protection annotation and validate token. Refresh used token after check.
+
+        // check CSRF Protection annotation and validate token. Refresh used token after check
+        $csrProtectionAttribute = '_' . CsrfProtection::ALIAS_NAME;
         if ($request->attributes->has($csrProtectionAttribute)) {
             /** @var CsrfProtection $csrProtectionAnnotation */
             $csrProtectionAnnotation = $request->attributes->get($csrProtectionAttribute);
@@ -72,17 +72,20 @@ class CsrfProtectionRequestListener
     }
 
     /**
-     * Regenerate CSRF cookie on each response.
+     * Regenerates CSRF cookie on each response.
      *
      * @param FilterResponseEvent $event
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        if ($event->isMasterRequest()
-            && $event->getRequest()->attributes->has(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE)
-        ) {
+        if (!$event->isMasterRequest()) {
+            return;
+        }
+
+        $request = $event->getRequest();
+        if ($request->attributes->has(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE)) {
             $event->getResponse()->headers->setCookie(
-                $event->getRequest()->attributes->get(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE)
+                $request->attributes->get(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE)
             );
         }
     }

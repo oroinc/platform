@@ -4,6 +4,7 @@ namespace Oro\Bundle\ScopeBundle\Tests\Unit\Manager;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeEntityStorage;
@@ -11,14 +12,10 @@ use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 
 class ScopeEntityStorageTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    /**
-     * @var ScopeEntityStorage
-     */
+    /** @var ScopeEntityStorage */
     private $storage;
 
     protected function setUp()
@@ -31,7 +28,7 @@ class ScopeEntityStorageTest extends \PHPUnit\Framework\TestCase
     public function testScheduleForInsert()
     {
         $scope = new Scope();
-        $scopeCriteria = new ScopeCriteria(['test' => 1], ['test']);
+        $scopeCriteria = new ScopeCriteria(['test' => 1], new ClassMetadata(Scope::class));
 
         $this->storage->scheduleForInsert($scope, $scopeCriteria);
         $this->assertSame($scope, $this->storage->getScheduledForInsertByCriteria($scopeCriteria));
@@ -61,7 +58,7 @@ class ScopeEntityStorageTest extends \PHPUnit\Framework\TestCase
     public function testFlush()
     {
         $scope = new Scope();
-        $scopeCriteria = new ScopeCriteria(['test' => 1], ['test']);
+        $scopeCriteria = new ScopeCriteria(['test' => 1], new ClassMetadata(Scope::class));
 
         $this->storage->scheduleForInsert($scope, $scopeCriteria);
 
@@ -79,9 +76,7 @@ class ScopeEntityStorageTest extends \PHPUnit\Framework\TestCase
 
     public function testGetRepository()
     {
-        $repository = $this->getMockBuilder(ScopeRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(ScopeRepository::class);
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())
             ->method('getRepository')
@@ -93,5 +88,21 @@ class ScopeEntityStorageTest extends \PHPUnit\Framework\TestCase
             ->willReturn($em);
 
         $this->assertSame($repository, $this->storage->getRepository());
+    }
+
+    public function testGetClassMetadata()
+    {
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(Scope::class)
+            ->willReturn($classMetadata);
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(Scope::class)
+            ->willReturn($em);
+
+        $this->assertSame($classMetadata, $this->storage->getClassMetadata());
     }
 }

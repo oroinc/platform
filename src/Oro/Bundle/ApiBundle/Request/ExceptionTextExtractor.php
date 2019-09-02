@@ -6,7 +6,6 @@ use Oro\Bundle\ApiBundle\Exception\ExceptionInterface as ApiException;
 use Oro\Bundle\ApiBundle\Exception\ValidationExceptionInterface;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -52,7 +51,6 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         $this->safeExceptions[] = HttpExceptionInterface::class;
         $this->safeExceptions[] = AccessDeniedException::class;
         $this->safeExceptions[] = AuthenticationException::class;
-        $this->safeExceptions[] = ForbiddenException::class;
     }
 
     /**
@@ -65,7 +63,6 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
             return $underlyingException->getStatusCode();
         }
         if ($underlyingException instanceof AccessDeniedException
-            || $underlyingException instanceof ForbiddenException
             || $underlyingException instanceof AuthenticationException
         ) {
             return Response::HTTP_FORBIDDEN;
@@ -180,8 +177,8 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
      */
     private function getSafeExceptionText(\Exception $exception)
     {
-        if ($exception instanceof ForbiddenException) {
-            return $exception->getReason();
+        if ($exception instanceof AccessDeniedException) {
+            return $exception->getMessage();
         }
         if ($exception instanceof AuthenticationException) {
             return $this->translator->trans(

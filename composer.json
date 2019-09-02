@@ -113,9 +113,8 @@
         "bower-asset/fuse": "3.2.*",
         "phpdocumentor/reflection-docblock": "4.3.*",
         "php-http/httplug-bundle": "1.15.2",
-        "npm-asset/css-vars-ponyfill": "2.0.2",
-        "npm-asset/grapesjs": "0.15.3-RC.2",
-        "npm-asset/grapesjs-preset-webpage": "0.1.11"
+        "npm-asset/css-vars-ponyfill": "^2.0",
+        "salsify/json-streaming-parser": "8.0.1"
     },
     "require-dev": {
         "behat/behat": "3.4.*",

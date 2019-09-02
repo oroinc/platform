@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\OrganizationBundle\Tests\Ownership;
+namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;

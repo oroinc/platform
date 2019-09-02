@@ -9,6 +9,9 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Provides IDs of business units from which the current user is granted to access to a specific entity type.
+ */
 class BusinessUnitAclProvider
 {
     /** @var AuthorizationCheckerInterface */
@@ -70,17 +73,17 @@ class BusinessUnitAclProvider
             $ids = $this->treeProvider->getTree()->getAllBusinessUnitIds();
         } elseif (AccessLevel::GLOBAL_LEVEL === $this->accessLevel) {
             $ids = $this->treeProvider->getTree()->getOrganizationBusinessUnitIds(
-                $this->getOrganizationContextId()
+                $this->getOrganizationId()
             );
         } elseif (AccessLevel::DEEP_LEVEL === $this->accessLevel) {
             $ids = $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
                 $currentUser->getId(),
-                $this->getOrganizationContextId()
+                $this->getOrganizationId()
             );
         } elseif (AccessLevel::LOCAL_LEVEL === $this->accessLevel) {
             $ids = $this->treeProvider->getTree()->getUserBusinessUnitIds(
                 $currentUser->getId(),
-                $this->getOrganizationContextId()
+                $this->getOrganizationId()
             );
         }
 
@@ -115,7 +118,7 @@ class BusinessUnitAclProvider
     /**
      * @return int
      */
-    protected function getOrganizationContextId()
+    protected function getOrganizationId()
     {
         return $this->tokenAccessor->getOrganization()->getId();
     }

@@ -46,6 +46,7 @@ api:
 
 ```
 
+Also, see how to [validate virtual fields](./how_to.md#validate-virtual-fields).
 
 ## Forms
 

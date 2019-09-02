@@ -92,7 +92,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($token));
 
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->will($this->returnValue($organization));
 
         $eventMock = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
@@ -158,7 +158,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($token));
 
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->will($this->returnValue($organization));
 
         $eventMock = $this->getMockBuilder('Symfony\Component\Form\FormEvent')

@@ -90,9 +90,6 @@ class ConfigUtil extends BaseConfigUtil
     /** a flag indicates whether a requesting of additional meta properties is disabled */
     public const DISABLE_META_PROPERTIES = 'disable_meta_properties';
 
-    /** a handler that should be used to delete the entity */
-    public const DELETE_HANDLER = 'delete_handler';
-
     /** the form type that should be used for the entity */
     public const FORM_TYPE = 'form_type';
 

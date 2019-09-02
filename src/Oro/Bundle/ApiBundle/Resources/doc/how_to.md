@@ -7,7 +7,6 @@
  - [Change an ACL Resource for an Action](#change-an-acl-resource-for-an-action)
  - [Disable Access Checks for an Action](#disable-access-checks-for-an-action)
  - [Disable an Entity Action](#disable-an-entity-action)
- - [Change the Delete Handler for an Entity](#change-the-delete-handler-for-an-entity)
  - [Change the Maximum Number of Entities that Can Be Deleted by One Request](#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request)
  - [Configure a Nested Object](#configure-a-nested-object)
  - [Configure a Nested Association](#configure-a-nested-association)
@@ -24,6 +23,7 @@
  - [Add a Computed Field](#add-a-computed-field)
  - [Add an Association with a Custom Query](#add-an-association-with-a-custom-query)
  - [Disable HATEOAS](#disable-hateoas)
+ - [Validate Virtual Fields](#validate-virtual-fields)
 
 
 ## Turn on API for an Entity
@@ -203,23 +203,6 @@ api:
             actions:
                 delete: false
 ```
-
-## Change the Delete Handler for an Entity
-
-By default, entity deletion is processed by [DeleteHandler](../../../SoapBundle/Handler/DeleteHandler.php).
-
-If your want to use another delete handler, set it using the `delete_handler` option in `Resources/config/oro/api.yml`:
-
-```yaml
-api:
-    entities:
-        Acme\Bundle\ProductBundle\Product:
-            delete_handler: acme.demo.product_delete_handler
-```
-
-Please note that the value of the `delete_handler` option is a service id.
-
-Additionally, you can create a custom delete handler. The handler class must be derived from [DeleteHandler](../../../SoapBundle/Handler/DeleteHandler.php).
 
 ## Change the Maximum Number of Entities that Can Be Deleted by One Request
 
@@ -544,7 +527,7 @@ class MyResourceController extends Controller
      */
     public function getAction(Request $request)
     {
-        // @todo: add an implementaution here
+        // add an implementation here
     }
 }
 ```
@@ -1225,3 +1208,60 @@ It is not possible to disable [HATEOAS](https://restfulapi.net/hateoas/) via con
 But you can send API request with `noHateoas` value in [X-Include header](./headers.md#existing-x-include-keys)
 to exclude HATEOAS links from a response of a particular request.
 
+## Validate Virtual Fields
+
+There are cases when an API resource contains virtual fields; these are fields that do not exist in an entity.
+
+Like with regular fields, values of these fields need to be validated during the [create](./actions.md#create-action)
+and [update](./actions.md#update-action) actions. 
+
+In this case, you can use an API processor for the `post_submit` event of the [customize_form_data](./actions.md#customize_form_data-action) action because common Symfony Forms validators are not applicable.
+
+For example, the following API processor validates that a value of a virtual field called `label` should not be blank for
+a new `Acme\DemoBundle\Entity\SomeEntity` entity:
+
+```php
+<?php
+
+namespace Acme\Bundle\DemoBundle\Api\Processor;
+
+use Oro\Bundle\ApiBundle\Form\FormUtil;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * Checks that "label" field is submitted during create.
+ */
+class ValidateLabelField implements ProcessorInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function process(ContextInterface $context)
+    {
+        /** @var CustomizeFormDataContext $context */
+        $form = $context->findFormField('label');
+        if (null === $form) {
+            return;
+        }
+
+        if ($context->getParentAction() === 'create' && !$form->isSubmitted()) {
+            FormUtil::addFormConstraintViolation($form, new NotBlank());
+        }
+
+        if ($form->isSubmitted() && (null === $form->getData() || '' === $form->getData())) {
+            FormUtil::addFormConstraintViolation($form, new NotBlank());
+        }
+    }
+}
+```
+
+```yml
+services:
+  acme.api.validate_label_field:
+      class: Acme\Bundle\DemoBundle\Api\Processor\ValidateLabelField
+      tags:
+          - { name: oro.api.processor, action: customize_form_data, event: post_submit, class: Acme\DemoBundle\Entity\SomeEntity }
+```

@@ -52,7 +52,7 @@ class OrganizationController extends AbstractController
     {
         /** @var UsernamePasswordOrganizationToken $token */
         $token = $this->get(TokenStorageInterface::class)->getToken();
-        $organization = $token->getOrganizationContext();
+        $organization = $token->getOrganization();
 
         return $this->update($organization);
     }
