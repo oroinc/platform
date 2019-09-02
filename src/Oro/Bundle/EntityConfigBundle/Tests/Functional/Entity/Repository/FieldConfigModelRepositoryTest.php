@@ -189,48 +189,25 @@ class FieldConfigModelRepositoryTest extends WebTestCase
         self::assertEquals([], $expectedAttributes);
     }
 
-    /**
-     * @param bool $isSystem
-     * @param array $expectedAttributes
-     * @param string $expectedOwner
-     * @dataProvider getAttributesByIsSystemDataProvider
-     */
-    public function testGetAttributesByIsSystem($isSystem, $expectedAttributes, $expectedOwner)
+    public function testGetAllAttributes(): void
     {
-        $attributes = $this->repository->getAttributesByIsSystem($isSystem);
+        $expectedAttributes = [
+            LoadAttributeData::SYSTEM_ATTRIBUTE_1,
+            LoadAttributeData::SYSTEM_ATTRIBUTE_2,
+            LoadAttributeData::REGULAR_ATTRIBUTE_1,
+            LoadAttributeData::REGULAR_ATTRIBUTE_2,
+            LoadAttributeData::NOT_USED_ATTRIBUTE
+        ];
+        $attributes = $this->repository->getAllAttributes();
 
         // Check only attributes added by this bundle because other bundles may add own attributes
         foreach ($attributes as $attribute) {
             self::assertInstanceOf(FieldConfigModel::class, $attribute);
             $attributeName = $attribute->getFieldName();
             if (in_array($attributeName, $expectedAttributes, true)) {
-                $extendOptions = $attribute->toArray('extend');
-                self::assertEquals($expectedOwner, $extendOptions['owner'], $attributeName);
+                unset($expectedAttributes[array_search($attributeName, $expectedAttributes, true)]);
             }
         }
-    }
-
-    public function getAttributesByIsSystemDataProvider()
-    {
-        return [
-            'system' => [
-                'isSystem' => true,
-                'expectedAttributes' => [
-                    LoadAttributeData::SYSTEM_ATTRIBUTE_1,
-                    LoadAttributeData::SYSTEM_ATTRIBUTE_2,
-                    LoadAttributeData::DELETED_SYSTEM_ATTRIBUTE
-                ],
-                'expectedOwner' => ExtendScope::OWNER_SYSTEM
-            ],
-            'non system' => [
-                'isSystem' => false,
-                'expectedAttributes' => [
-                    LoadAttributeData::REGULAR_ATTRIBUTE_1,
-                    LoadAttributeData::REGULAR_ATTRIBUTE_2,
-                    LoadAttributeData::NOT_USED_ATTRIBUTE
-                ],
-                'expectedOwner' => ExtendScope::OWNER_CUSTOM
-            ]
-        ];
+        self::assertEquals([], $expectedAttributes);
     }
 }

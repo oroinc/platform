@@ -173,24 +173,12 @@ class FieldConfigModelRepository extends EntityRepository
     }
 
     /**
-     * @param bool $isSystem
      * @return FieldConfigModel[]
      */
-    public function getAttributesByIsSystem($isSystem)
+    public function getAllAttributes(): array
     {
-        $attributes = $this->getBaseAttributeQueryBuilder()
-            ->innerJoin(
-                'f.indexedValues',
-                's',
-                'WITH',
-                's.scope = :extendScope AND s.code = :ownerCode AND s.value = :ownerValue'
-            )
-            ->setParameter('ownerCode', 'owner')
-            ->setParameter('extendScope', 'extend')
-            ->setParameter('ownerValue', ($isSystem ? ExtendScope::OWNER_SYSTEM : ExtendScope::OWNER_CUSTOM))
+        return $this->getBaseAttributeQueryBuilder()
             ->getQuery()
             ->getResult();
-
-        return $attributes;
     }
 }
