@@ -12,9 +12,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityConfigBundle\Model\ExtendAttributeFamily;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
-use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Layout\ContextItemInterface;
 
 /**
@@ -34,11 +31,9 @@ use Oro\Component\Layout\ContextItemInterface;
  *              "auditable"=true
  *          },
  *          "ownership"={
- *              "owner_type"="USER",
+ *              "owner_type"="ORGANIZATION",
  *              "owner_field_name"="owner",
- *              "owner_column_name"="user_owner_id",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
+ *              "owner_column_name"="organization_id"
  *          },
  *          "security"={
  *              "type"="ACL",
@@ -50,7 +45,6 @@ use Oro\Component\Layout\ContextItemInterface;
  */
 class AttributeFamily extends ExtendAttributeFamily implements
     DatesAwareInterface,
-    OrganizationAwareInterface,
     ContextItemInterface
 {
     use DatesAwareTrait;
@@ -136,19 +130,11 @@ class AttributeFamily extends ExtendAttributeFamily implements
     private $isEnabled = true;
 
     /**
-     * @var User
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
-
-    /**
      * @var Organization
-     *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
-    protected $organization;
+    protected $owner;
 
     /**
      * {@inheritdoc}
@@ -198,7 +184,7 @@ class AttributeFamily extends ExtendAttributeFamily implements
     }
 
     /**
-     * @return User
+     * @return Organization
      */
     public function getOwner()
     {
@@ -206,11 +192,11 @@ class AttributeFamily extends ExtendAttributeFamily implements
     }
 
     /**
-     * @param User $owner
+     * @param Organization $owner
      *
      * @return $this
      */
-    public function setOwner(User $owner)
+    public function setOwner(Organization $owner)
     {
         $this->owner = $owner;
 
@@ -335,25 +321,6 @@ class AttributeFamily extends ExtendAttributeFamily implements
         if ($this->attributeGroups->contains($attributeGroup)) {
             $this->attributeGroups->removeElement($attributeGroup);
         }
-
-        return $this;
-    }
-
-    /**
-     * @return OrganizationInterface|null
-     */
-    public function getOrganization()
-    {
-        return $this->organization;
-    }
-
-    /**
-     * @param OrganizationInterface|null $organization
-     * @return $this
-     */
-    public function setOrganization(OrganizationInterface $organization = null)
-    {
-        $this->organization = $organization;
 
         return $this;
     }

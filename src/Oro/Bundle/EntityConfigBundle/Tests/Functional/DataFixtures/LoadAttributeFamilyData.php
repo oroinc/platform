@@ -8,8 +8,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -53,7 +52,7 @@ class LoadAttributeFamilyData extends AbstractFixture implements DependentFixtur
         foreach ($this->families as $familyName => $groups) {
             $family = new AttributeFamily();
             $family->setDefaultLabel($familyName);
-            $family->setOwner($this->getAdminUser($manager));
+            $family->setOwner($this->getOrganization($manager));
             $family->setCode($familyName);
             $family->setEntityClass($entityConfigModel->getClassName());
             foreach ($groups as $group) {
@@ -72,12 +71,10 @@ class LoadAttributeFamilyData extends AbstractFixture implements DependentFixtur
 
     /**
      * @param ObjectManager $manager
-     * @return User
+     * @return Organization
      */
-    private function getAdminUser(ObjectManager $manager)
+    private function getOrganization(ObjectManager $manager): Organization
     {
-        $repository = $manager->getRepository(User::class);
-
-        return $repository->findOneBy(['email' => LoadAdminUserData::DEFAULT_ADMIN_EMAIL]);
+        return $manager->getRepository(Organization::class)->getFirst();
     }
 }
