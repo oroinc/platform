@@ -90,14 +90,16 @@ define(function(require) {
                     this.canvasEl.classList.add(breakpoint.name);
                 }
 
-                var width = breakpoint.max ? breakpoint.max + 'px' : '';
+                var width = breakpoint.max ? breakpoint.max + 'px' : false;
+                width = this.calculateDeviceWidth(width);
                 var options = {
                     height: this.calculateDeviceHeight(breakpoint.max)
                 };
 
                 if (breakpoint.name.indexOf('landscape') !== -1) {
                     options = {
-                        height: this.calculateDeviceHeight(breakpoint.max, true)
+                        height: this.calculateDeviceHeight(breakpoint.max, true),
+                        widthMedia: width
                     };
                 }
 
@@ -123,8 +125,11 @@ define(function(require) {
          */
         calculateDeviceHeight: function(width, invert) {
             if (!width) {
-                return false;
+                return '';
             }
+
+            width = parseInt(width);
+
             if (!invert) {
                 invert = false;
             }
@@ -134,6 +139,18 @@ define(function(require) {
                 height = this.canvasEl.offsetHeight;
             }
             return Math.round(height) + 'px';
+        },
+
+        calculateDeviceWidth: function(width, invert) {
+            if (!width) {
+                return '';
+            }
+
+            width = parseInt(width);
+            if (width > this.canvasEl.offsetWidth - 100) {
+                width = this.canvasEl.offsetWidth - 100;
+            }
+            return width + 'px';
         },
 
         /**

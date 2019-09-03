@@ -227,6 +227,15 @@ define(function(require) {
             this.builder.on('update', _.bind(this._onUpdatedBuilder, this));
             this.builder.on('component:update', _.bind(this._onComponentUpdatedBuilder, this));
             this.builder.on('changeTheme', _.bind(this._updateTheme, this));
+
+            // Fix reload form when click export to zip dialog
+            this.builder.on('run:export-template', _.bind(function() {
+                $(
+                    this.builder.Modal.getContentEl()
+                ).find('.gjs-btn-prim').bind('click', _.bind(function(e) {
+                    e.preventDefault();
+                }, this));
+            }, this));
         },
 
         /**
