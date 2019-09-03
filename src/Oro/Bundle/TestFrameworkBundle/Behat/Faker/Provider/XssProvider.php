@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 /**
- * Provides additional functions to the faker.
+ * Faker provider for XSS payloads
  */
 class XssProvider extends BaseProvider
 {
@@ -18,6 +18,16 @@ class XssProvider extends BaseProvider
      * @var int
      */
     protected static $idx = 0;
+
+    /**
+     * @var string
+     */
+    protected static $shortIdx = 'a';
+
+    /**
+     * @var array
+     */
+    public static $idxToIdentifierMap = [];
 
     /**
      * @var XssPayloadProvider
@@ -57,18 +67,41 @@ class XssProvider extends BaseProvider
 
     /**
      * @param string $identifier
-     * @param string|null $elementId
      * @param string|null $payloadType
+     * @param string|null $elementId
      * @return string
      */
-    public function xss($identifier = 'XSS', $elementId = null, $payloadType = null)
+    public function xss($identifier = 'XSS', $payloadType = null, $elementId = null)
     {
         if (!$elementId) {
             $elementId = $this->prefix . ++self::$idx;
         }
-        $jsPayload = sprintf('_x("%s","%s")', $elementId, $identifier);
+        self::$idxToIdentifierMap[$elementId] = $identifier;
+        $jsPayload = sprintf('_x`%s`', $elementId);
 
         return sprintf($this->payloadProvider->getPayload($jsPayload, $payloadType, $elementId));
+    }
+
+    /**
+     * @param int $maxLength
+     * @param string $identifier
+     * @param string|null $payloadType
+     * @param null|string $elementId
+     * @return string
+     */
+    public function xssShort($maxLength, $identifier = 'XSS', $payloadType = null, $elementId = null)
+    {
+        if (!$elementId) {
+            $elementId = self::$shortIdx++;
+        }
+
+        $payload = $this->xss($identifier, $payloadType, $elementId);
+
+        if (strlen($payload) > $maxLength) {
+            $payload = 'l' . $maxLength;
+        }
+
+        return $payload;
     }
 
     /**

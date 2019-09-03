@@ -13,6 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener\RestrictFlushInitializerListener;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -92,6 +93,9 @@ class DoctrineIsolator implements IsolatorInterface
         $em->getEventManager()->addEventListener([Events::preFlush], $restrictListener);
 
         foreach ($this->initializers as $initializer) {
+            if ($initializer instanceof ContainerAwareInterface) {
+                $initializer->setContainer($this->kernel->getContainer());
+            }
             $initializer->init($doctrine, $referenceRepository);
         }
 

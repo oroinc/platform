@@ -3,10 +3,12 @@
 namespace Oro\Bundle\FilterBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
+use Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entities;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use WebDriver\Exception\NoSuchElement;
 use WebDriver\Key;
 
 class FilterContext extends OroFeatureContext implements OroPageObjectAware
@@ -116,10 +118,26 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
     {
         /** @var OroSelenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
-        $inputXpath = "//span[contains(@class, 'active-filter')]"
-                      . "//a[contains(@class, 'dropdown-toggle') and contains(., '{$condition}')]"
-                      . "/following-sibling::input[contains(@name, 'value')]";
-        $driver->typeIntoInput($inputXpath, $value);
+        try {
+            $inputXpath = "//span[contains(@class, 'active-filter')]"
+                . "//a[contains(@class, 'dropdown-toggle') and contains(., '{$condition}')]"
+                . "/following-sibling::input[contains(@name, 'value')]";
+
+            $driver->typeIntoInput($inputXpath, $value);
+        } catch (NoSuchElement $e) {
+            $inputXpath = "//span[contains(@class, 'active-filter')]"
+                . "//a[contains(@class, 'dropdown-toggle') and contains(., '{$condition}')]"
+                . "/../following-sibling::div[contains(@class, 'select2-container')]"
+                . "//input[contains(@class, 'select2-input')]";
+
+            $select2Element = $this->getPage()->find('xpath', $inputXpath);
+
+            /** @var Select2Entities $select2Entities */
+            $select2Entities = $this->elementFactory->wrapElement('Select2Entities', $select2Element);
+            if ($select2Element->isVisible()) {
+                $select2Entities->setValue($value);
+            }
+        }
     }
 
     /**
