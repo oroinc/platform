@@ -93,12 +93,12 @@ define(function(require) {
                 var width = breakpoint.max ? breakpoint.max + 'px' : false;
                 width = this.calculateDeviceWidth(width);
                 var options = {
-                    height: this.calculateDeviceHeight(breakpoint.max)
+                    height: this.calculateDeviceHeight(width)
                 };
 
                 if (breakpoint.name.indexOf('landscape') !== -1) {
                     options = {
-                        height: this.calculateDeviceHeight(breakpoint.max, true),
+                        height: this.calculateDeviceHeight(width, true),
                         widthMedia: width
                     };
                 }
