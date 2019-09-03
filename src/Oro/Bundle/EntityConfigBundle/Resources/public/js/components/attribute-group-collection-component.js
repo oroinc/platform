@@ -57,10 +57,6 @@ define(function(require) {
                 }
                 return true;
             });
-            // temporary width fix
-            if (_.isDesktop()) {
-                $(this.options._sourceElement).parents().find('.oro-item-collection .row-oro').width(960);
-            }
         },
 
         showConfirmModal: function(removeBtn) {
