@@ -191,7 +191,7 @@ select[multiple] {
     box-sizing: $input-box-sizing;
     outline: $input-outline;
     width: $field-width;
-    height: $select-multiple-height !important;
+    height: $select-multiple-height;
     padding: $select-multiple-inner-offset;
     vertical-align: top;
     overflow-y: auto;
