@@ -230,11 +230,10 @@ define(function(require) {
 
             // Fix reload form when click export to zip dialog
             this.builder.on('run:export-template', _.bind(function() {
-                $(
-                    this.builder.Modal.getContentEl()
-                ).find('.gjs-btn-prim').bind('click', _.bind(function(e) {
-                    e.preventDefault();
-                }, this));
+                $(this.builder.Modal.getContentEl())
+                    .find('.gjs-btn-prim').bind('click', _.bind(function(e) {
+                        e.preventDefault();
+                    }, this));
             }, this));
         },
 
