@@ -1679,6 +1679,42 @@ TEXT;
     }
 
     /**
+     * Check filter is not present in grid
+     * Example: Then I should see Example filter in grid
+     *
+     * @Then /^(?:|I )should see "(?P<filterName>(?:[^"]|\\")*)" filter in grid$/
+     * @Then /^(?:|I )should see "(?P<filterName>(?:[^"]|\\")*)" filter in "(?P<gridName>[^"]+)"$/
+     * @param string $filterName
+     * @param null|string $gridName
+     */
+    public function iShouldSeeFilterInGrid($filterName, $gridName = 'Grid')
+    {
+        self::assertTrue(
+            $this->getGridFilters($gridName)
+                ->hasFilterItem($gridName . 'FilterItem', $filterName),
+            sprintf('"%s" filter is in grid', $filterName)
+        );
+    }
+
+    /**
+     * Check filter is present in grid
+     * Example: Then I should not see Example filter in grid
+     *
+     * @Then /^(?:|I )should not see "(?P<filterName>(?:[^"]|\\")*)" filter in grid$/
+     * @Then /^(?:|I )should not see "(?P<filterName>(?:[^"]|\\")*)" filter in "(?P<gridName>[^"]+)"$/
+     * @param string $filterName
+     * @param null|string $gridName
+     */
+    public function iShouldNotSeeFilterInGrid($filterName, $gridName = 'Grid')
+    {
+        self::assertFalse(
+            $this->getGridFilters($gridName)
+                ->hasFilterItem($gridName . 'FilterItem', $filterName),
+            sprintf('"%s" filter is in grid', $filterName)
+        );
+    }
+
+    /**
      * Check visibility checkbox for specified column
      * Show this column in grid
      *

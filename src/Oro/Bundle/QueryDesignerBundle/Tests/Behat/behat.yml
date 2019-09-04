@@ -14,3 +14,9 @@ oro_behat_extension:
         selector: "div[id$='-grouping-form']"
     Date Field:
         selector: "div[id*='dateGrouping_fieldName']"
+
+    ActiveFilterTypeSelector:
+        selector: '.condition-item .active-filter a.dropdown-toggle'
+
+    ActiveFilterValue:
+        selector: '.condition-item .active-filter input[name="value"]'
