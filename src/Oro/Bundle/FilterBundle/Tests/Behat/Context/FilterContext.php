@@ -141,30 +141,30 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @Given /^(?:|I )should see "(?P<column>(?:[^"]|\\")*)" filter column/
+     * @Given /^(?:|I )should see "(?P<column>(?:[^"]|\\")*)" in the field condition filter select/
      *
      * @param string $column
      */
-    public function shouldSeeFilterColumn(string $column)
+    public function shouldSeeInTheFieldConditionSelect(string $column)
     {
-        $this->checkFilterColumn($column, true);
+        $this->checkInTheFieldConditionSelect($column, true);
     }
 
     /**
-     * @Given /^(?:|I )should not see "(?P<column>(?:[^"]|\\")*)" filter column/
+     * @Given /^(?:|I )should not see "(?P<column>(?:[^"]|\\")*)" in the field condition filter select/
      *
      * @param string $column
      */
-    public function shouldNotSeeFilterColumn(string $column)
+    public function shouldNotSeeInTheFieldConditionSelect(string $column)
     {
-        $this->checkFilterColumn($column, false);
+        $this->checkInTheFieldConditionSelect($column, false);
     }
 
     /**
      * @param string $column
      * @param bool $isShouldSee
      */
-    private function checkFilterColumn(string $column, bool $isShouldSee): void
+    private function checkInTheFieldConditionSelect(string $column, bool $isShouldSee): void
     {
         $lastConditionItem = $this->createElement('Last condition item');
         $lastConditionItem->click();
