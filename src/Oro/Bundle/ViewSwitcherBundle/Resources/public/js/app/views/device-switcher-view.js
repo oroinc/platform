@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var DemoPageComponent;
+    var DeviceSwitcherView;
     var document = window.document;
     var location = window.location;
     var history = window.history;
@@ -9,12 +9,32 @@ define(function(require) {
     var COOKIE_VALUE = 'mobile';
     var $ = require('jquery');
     var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var DemoPageView = require('oroviewswitcher/js/app/views/demo-page-view');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var DeviceInnerPageView = require('oroviewswitcher/js/app/views/device-inner-page-view');
     var LoadingBarView = require('oroui/js/app/views/loading-bar-view');
+    var persistentStorage = require('oroui/js/persistent-storage');
     var config = require('module').config();
+    var stateDefault = {
+        items: [{
+            name: 'desktop',
+            title: 'Desktop',
+            mobile: false
+        }, {
+            name: 'pad',
+            title: 'Pad',
+            mobile: true
+        }, {
+            name: 'phone',
+            title: 'Phone',
+            mobile: true
+        }]
+    };
 
-    DemoPageComponent = BaseComponent.extend({
+    DeviceSwitcherView = BaseView.extend({
+        optionNames: BaseView.prototype.optionNames.concat([
+            'updateUrlDeviceFragment', 'updateFaviconPage', 'state',
+            'pageModel'
+        ]),
         /**
          * @type {String}
          */
@@ -76,6 +96,21 @@ define(function(require) {
         pageModel: null,
 
         /**
+         * @type {Boolean}
+         */
+        updateUrlDeviceFragment: true,
+
+        /**
+         * @type {Boolean}
+         */
+        updateFaviconPage: true,
+
+        /**
+         * @type {Object}
+         */
+        state: stateDefault,
+
+        /**
          * @inheritDoc
          */
         listen: {
@@ -85,8 +120,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DemoPageComponent(options) {
-            DemoPageComponent.__super__.constructor.call(this, options);
+        constructor: function DeviceSwitcherView(options) {
+            DeviceSwitcherView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -96,8 +131,6 @@ define(function(require) {
          */
         initialize: function(options) {
             var updateFavicon = _.once(_.bind(this.updateFavicon, this));
-            this.state = options.state;
-            this.pageModel = options.pageModel;
 
             if (config.frameUrlSegment) {
                 this.frameUrlSegment = config.frameUrlSegment;
@@ -133,7 +166,10 @@ define(function(require) {
                     this.startTrackUrlChanges();
                     url = iframe.location.pathname.split(this.frameUrlSegment).pop();
                     this.updateUrl(url);
-                    updateFavicon();
+
+                    if (this.updateFaviconPage) {
+                        updateFavicon();
+                    }
                     // add mobile scroll emulation if necessary
                     if (iframe.document.querySelectorAll('.mobile-version').length) {
                         if (iframe.require) {
@@ -169,7 +205,7 @@ define(function(require) {
                 }
             }, this), true);
             this.initLoadingView();
-            DemoPageComponent.__super__.initialize.apply(this, arguments);
+            DeviceSwitcherView.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -192,7 +228,7 @@ define(function(require) {
          * @param {HTMLElement} el
          */
         createPageView: function(el) {
-            this.pageView = new DemoPageView({
+            this.pageView = new DeviceInnerPageView({
                 model: this.pageModel,
                 el: el,
                 data: {
@@ -232,6 +268,10 @@ define(function(require) {
             } else {
                 this.pageView.setActiveView(viewName);
             }
+
+            if (!this.updateUrlDeviceFragment) {
+                persistentStorage.setItem('currentDevice', viewName);
+            }
         },
 
         /**
@@ -240,8 +280,16 @@ define(function(require) {
          * @returns {string}
          */
         getActiveView: function() {
-            var matches = location.pathname.match(this.urlRegExp);
-            var activeView = matches && matches[1] ? matches[1] : this.state.items[0].name;
+            var activeView;
+            if (this.updateUrlDeviceFragment) {
+                var matches = location.pathname.match(this.urlRegExp);
+                activeView = matches && matches[1] ? matches[1] : this.state.items[0].name;
+            } else {
+                var currentDeviceName = persistentStorage.getItem('currentDevice');
+
+                activeView = currentDeviceName ? currentDeviceName : this.state.items[0].name;
+            }
+
             return activeView;
         },
 
@@ -293,9 +341,14 @@ define(function(require) {
          */
         updateUrl: function(url, activeView) {
             var viewName;
+            var deviceFragment;
             var title;
             viewName = activeView ? activeView : this.getActiveView();
-            url = this.urlBase + viewName + url.replace(this.frameUrlSegment, '/').replace(/\/\//g, '/');
+
+            deviceFragment = this.updateUrlDeviceFragment ? this.urlBase + viewName : '';
+
+            url = this.urlBase + deviceFragment + url.replace(this.frameUrlSegment, '/').replace(/\/\//g, '/');
+            url = url.replace(/\/\//g, '/');
             title = this._isLoginPage(url) ? this._updateOriginalTitle(viewName) : this.getFrameWindow().document.title;
             history.replaceState({}, title, url);
 
@@ -439,5 +492,5 @@ define(function(require) {
         }
     });
 
-    return DemoPageComponent;
+    return DeviceSwitcherView;
 });

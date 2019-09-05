@@ -1,17 +1,22 @@
 define(function(require) {
     'use strict';
 
-    var DemoPageView;
+    var DeviceInnerPageView;
     var $ = require('jquery');
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
-    var DemoLogoutButtonView = require('oroviewswitcher/js/app/views/demo-logout-button-view');
-    var template = require('tpl!oroviewswitcher/templates/demo-page.html');
+    var template = require('tpl!oroviewswitcher/templates/switcher-inner-page.html');
 
-    DemoPageView = BaseView.extend({
+    DeviceInnerPageView = BaseView.extend({
+        optionNames: BaseView.prototype.optionNames.concat([
+            'data'
+        ]),
+
         keepElement: true,
+
         autoRender: true,
+
         template: template,
 
         events: {
@@ -25,44 +30,30 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DemoPageView(options) {
-            DemoPageView.__super__.constructor.call(this, options);
+        constructor: function DeviceInnerPageView(options) {
+            DeviceInnerPageView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, ['data']));
             this.data.showSwitcher = navigator.cookieEnabled && !window.frameElement;
 
             if (!this.data.showSwitcher) {
                 this.$el.addClass('closed-head-panel');
             }
 
-            DemoPageView.__super__.initialize.apply(this, arguments);
+            DeviceInnerPageView.__super__.initialize.apply(this, arguments);
         },
 
         /**
          * @inheritDoc
          */
         getTemplateData: function() {
-            var data = DemoPageView.__super__.getTemplateData.apply(this, arguments);
+            var data = DeviceInnerPageView.__super__.getTemplateData.apply(this, arguments);
 
             return _.extend({}, data, this.data);
-        },
-
-        render: function() {
-            this.removeSubview('logoutButton');
-
-            DemoPageView.__super__.render.call(this);
-
-            this.subview('logoutButton', new DemoLogoutButtonView({
-                el: this.$('[data-role="logo"]'),
-                model: this.model
-            }));
-
-            return this;
         },
 
         /**
@@ -141,5 +132,5 @@ define(function(require) {
         }
     });
 
-    return DemoPageView;
+    return DeviceInnerPageView;
 });

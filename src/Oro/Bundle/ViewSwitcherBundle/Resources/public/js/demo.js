@@ -4,44 +4,48 @@ define(function(require, exports, module) {
     require('oroui/js/extend/polyfill');
     require('app-modules!');
 
-    var DemoApp;
+    var DeviceSwitcherApp;
     var _ = require('underscore');
     var $ = require('jquery');
-    var state = require('oroviewswitcher/js/state');
-    var DemoPageComponent = require('oroviewswitcher/js/app/components/demo-page-component');
+    var DeviceSwitcherView = require('oroviewswitcher/js/app/views/device-switcher-view');
     var demoPageModelService = require('oroviewswitcher/js/app/services/demo-page-model-service');
     var DemoPopupView = require('oroviewswitcher/js/app/views/demo-popup-view');
     var DemoHelpCarouselView = require('oroviewswitcher/js/app/views/demo-help-carousel-view');
+    var DemoLogoutButtonView = require('oroviewswitcher/js/app/views/demo-logout-button-view');
 
     var config = module.config();
     var pageModel = demoPageModelService.getModel();
     pageModel.set(_.pick(config, 'personalDemoUrl', 'projectName'));
 
-    DemoApp = new DemoPageComponent({
+    DeviceSwitcherApp = new DeviceSwitcherView({
         _sourceElement: $('<div class="demo-page" />').appendTo('body'),
-        state: state,
         pageModel: pageModel
     });
 
-    DemoApp.demoHelpCarouselView = new DemoHelpCarouselView({
+    DeviceSwitcherApp.demoHelpCarouselView = new DemoHelpCarouselView({
         container: '.head-panel__col--center',
         model: pageModel
     });
 
+    DeviceSwitcherApp.pageView.subview('logoutButton', new DemoLogoutButtonView({
+        el: DeviceSwitcherApp.pageView.$('[data-role="control-action"]'),
+        model: pageModel
+    }));
+
     if (pageModel.get('isLoggedIn')) {
-        DemoApp.demoHelpCarouselView.openIfApplicable();
+        DeviceSwitcherApp.demoHelpCarouselView.openIfApplicable();
     } else {
         pageModel.once('change:isLoggedIn', function() {
-            DemoApp.demoHelpCarouselView.openIfApplicable();
+            DeviceSwitcherApp.demoHelpCarouselView.openIfApplicable();
         });
     }
 
     if (DemoPopupView.isApplicable()) {
-        DemoApp.demoPopupView = new DemoPopupView({
+        DeviceSwitcherApp.demoPopupView = new DemoPopupView({
             container: 'body',
             url: pageModel.get('personalDemoUrl')
         });
     }
 
-    return DemoApp;
+    return DeviceSwitcherApp;
 });
