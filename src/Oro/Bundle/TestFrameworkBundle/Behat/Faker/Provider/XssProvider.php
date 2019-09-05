@@ -9,12 +9,25 @@ use Oro\Bundle\TestFrameworkBundle\Provider\XssPayloadProvider;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
+/**
+ * Faker provider for XSS payloads
+ */
 class XssProvider extends BaseProvider
 {
     /**
      * @var int
      */
     protected static $idx = 0;
+
+    /**
+     * @var string
+     */
+    protected static $shortIdx = 'a';
+
+    /**
+     * @var array
+     */
+    public static $idxToIdentifierMap = [];
 
     /**
      * @var XssPayloadProvider
@@ -55,7 +68,7 @@ class XssProvider extends BaseProvider
     /**
      * @param string $identifier
      * @param string|null $payloadType
-     * @param null|string $elementId
+     * @param string|null $elementId
      * @return string
      */
     public function xss($identifier = 'XSS', $payloadType = null, $elementId = null)
@@ -63,9 +76,32 @@ class XssProvider extends BaseProvider
         if (!$elementId) {
             $elementId = $this->prefix . ++self::$idx;
         }
-        $jsPayload = sprintf('_x("%s","%s")', $elementId, $identifier);
+        self::$idxToIdentifierMap[$elementId] = $identifier;
+        $jsPayload = sprintf('_x`%s`', $elementId);
 
         return sprintf($this->payloadProvider->getPayload($jsPayload, $payloadType, $elementId));
+    }
+
+    /**
+     * @param int $maxLength
+     * @param string $identifier
+     * @param string|null $payloadType
+     * @param null|string $elementId
+     * @return string
+     */
+    public function xssShort($maxLength, $identifier = 'XSS', $payloadType = null, $elementId = null)
+    {
+        if (!$elementId) {
+            $elementId = self::$shortIdx++;
+        }
+
+        $payload = $this->xss($identifier, $payloadType, $elementId);
+
+        if (strlen($payload) > $maxLength) {
+            $payload = 'l' . $maxLength;
+        }
+
+        return $payload;
     }
 
     /**

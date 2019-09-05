@@ -282,15 +282,9 @@ footer {
     width: 100%;
 }
 
-.row-oro:after,
-.clearfix-oro:after {
-    content: ".";
-    visibility: hidden;
-    display: block;
-    height: 0;
-    clear: both;
-    line-height: 0;
-    overflow: hidden;
+.row-oro,
+.clearfix-oro {
+    @include clearfix();
 }
 
 .mce-tinymce {
@@ -484,11 +478,11 @@ textarea {
             transform: $btn-icon-fa-transform;
         }
     }
-    
+
     .removeRow {
         @include fa-icon($fa-var-trash-o);
     }
-    
+
     .addAfterRow {
         @include fa-icon($fa-var-plus);
     }

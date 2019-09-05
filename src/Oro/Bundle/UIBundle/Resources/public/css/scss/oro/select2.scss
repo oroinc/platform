@@ -581,6 +581,9 @@
     outline: $select2-offscreen-outline;
     left: $select2-offscreen-left;
 }
+.select2-offscreen[multiple] {
+    height: auto;
+}
 
 .select2-display-none {
     display: $select2-display-none-display;
