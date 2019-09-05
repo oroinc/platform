@@ -176,6 +176,10 @@ input[type="color"],
 .uneditable-input,
 .selector {
     @extend .input;
+
+    &.full {
+        width: 100%;
+    }
 }
 
 /*
