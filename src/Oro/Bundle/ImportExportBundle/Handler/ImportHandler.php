@@ -101,13 +101,14 @@ class ImportHandler extends AbstractHandler
         }
 
         return [
-            'success'        => $jobResult->isSuccessful() && isset($counts['process']) && $counts['process'] > 0,
+            'success'        => $this->isSuccessful($counts, $jobResult),
             'processorAlias' => $processorAlias,
             'counts'         => $counts,
             'errors'         => $errors,
             'entityName'     => $entityName,
             'options'        => $options,
             'postponedRows'  => $jobResult->getContext()->getPostponedRows(),
+            'postponedDelay' => $jobResult->getContext()->getValue('postponedRowsDelay')
         ];
     }
 
@@ -137,8 +138,7 @@ class ImportHandler extends AbstractHandler
             $errors = $this->getErrors($jobResult);
         }
 
-        $isSuccessful = $jobResult->isSuccessful() && isset($counts['process']) && $counts['process'] > 0;
-
+        $isSuccessful = $this->isSuccessful($counts, $jobResult);
         if ($isSuccessful) {
             $message = $this->translator->trans('oro.importexport.import.success');
 
@@ -159,6 +159,7 @@ class ImportHandler extends AbstractHandler
             'errors'  => $errors,
             'counts'  => $counts,
             'postponedRows' => $jobResult->getContext()->getPostponedRows(),
+            'postponedDelay' => $jobResult->getContext()->getValue('postponedRowsDelay'),
             'deadlockDetected' => $jobResult->getContext()->getValue('deadlockDetected')
         ];
     }
@@ -324,5 +325,22 @@ class ImportHandler extends AbstractHandler
             0,
             100
         );
+    }
+
+    /**
+     * @param array $counts
+     * @param JobResult $jobResult
+     * @return bool
+     */
+    private function isSuccessful(array $counts, JobResult $jobResult): bool
+    {
+        $processedCount = $counts['process'] ?? 0;
+        $postponedCount = count($jobResult->getContext()->getPostponedRows());
+        $isSuccessful = $jobResult->isSuccessful();
+        if ($processedCount === 0 && $postponedCount === 0) {
+            $isSuccessful = false;
+        }
+
+        return $isSuccessful;
     }
 }
