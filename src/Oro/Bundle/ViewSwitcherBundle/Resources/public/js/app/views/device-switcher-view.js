@@ -33,7 +33,7 @@ define(function(require) {
     DeviceSwitcherView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat([
             'updateUrlDeviceFragment', 'updateFaviconPage', 'state',
-            'pageModel'
+            'pageModel', 'switcherStyle'
         ]),
         /**
          * @type {String}
@@ -111,6 +111,11 @@ define(function(require) {
         state: stateDefault,
 
         /**
+         * @type {String}
+         */
+        switcherStyle: null,
+
+        /**
          * @inheritDoc
          */
         listen: {
@@ -137,6 +142,7 @@ define(function(require) {
             }
             this.originalTitle = document.title;
 
+            this._addStyleSheet();
             this.createUrlRegExp();
             this.updateCookie();
             this.createPageView(options._sourceElement[0]);
@@ -417,6 +423,12 @@ define(function(require) {
                 return item.name === viewName;
             });
             return item;
+        },
+
+        _addStyleSheet: function() {
+            if (this.switcherStyle) {
+                $(document.head).append('<link rel="stylesheet" href="' + this.switcherStyle + '">');
+            }
         },
 
         /**

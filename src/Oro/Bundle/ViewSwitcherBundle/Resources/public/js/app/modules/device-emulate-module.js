@@ -1,12 +1,13 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var $ = require('jquery');
     var DeviceSwitcherView = require('oroviewswitcher/js/app/views/device-switcher-view');
     var innerPageModelService = require('oroviewswitcher/js/app/services/inner-page-model-service');
     var tools = require('oroui/js/tools');
-
+    var config = module.config();
     var pageModel = innerPageModelService.getModel();
+
     pageModel.set({
         needHelp: null,
         personalDemoUrl: null
@@ -17,16 +18,10 @@ define(function(require) {
     if (params['device-emulate'] && !window.frameElement) {
         document.body.innerHTML = '';
 
-        var viewStyle = document.createElement('link');
-
-        viewStyle.href = '/css/themes/oro/view-switcher.css';
-        viewStyle.rel = 'stylesheet';
-
-        document.head.appendChild(viewStyle);
-
         new DeviceSwitcherView({
             _sourceElement: $('<div class="demo-page" />').appendTo('body'),
             pageModel: pageModel,
+            switcherStyle: config.stylePath || '/css/themes/oro/view-switcher.css',
             updateUrlDeviceFragment: false
         });
     }
