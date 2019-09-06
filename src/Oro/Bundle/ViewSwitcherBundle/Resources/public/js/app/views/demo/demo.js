@@ -2,16 +2,16 @@ define(function(require, exports, module) {
     'use strict';
 
     require('oroui/js/extend/polyfill');
-    require('app-modules!');
+    require('app-modules!package/commerce-demo/src/Oro/Bundle/DemoUserBundle/Resources/public/js/demo');
 
     var DeviceSwitcherApp;
     var _ = require('underscore');
     var $ = require('jquery');
     var DeviceSwitcherView = require('oroviewswitcher/js/app/views/device-switcher-view');
     var innerPageModelService = require('oroviewswitcher/js/app/services/inner-page-model-service');
-    var DemoPopupView = require('oroviewswitcher/js/app/views/demo-popup-view');
-    var DemoHelpCarouselView = require('oroviewswitcher/js/app/views/demo-help-carousel-view');
-    var DemoLogoutButtonView = require('oroviewswitcher/js/app/views/demo-logout-button-view');
+    var DemoPopupView = require('oroviewswitcher/js/app/views/demo/demo-popup-view');
+    var DemoHelpCarouselView = require('oroviewswitcher/js/app/views/demo/demo-help-carousel-view');
+    var DemoLogoutButtonView = require('oroviewswitcher/js/app/views/demo/demo-logout-button-view');
 
     var config = module.config();
     var pageModel = innerPageModelService.getModel();
