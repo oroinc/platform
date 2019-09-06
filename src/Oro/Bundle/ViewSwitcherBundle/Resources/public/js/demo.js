@@ -8,13 +8,13 @@ define(function(require, exports, module) {
     var _ = require('underscore');
     var $ = require('jquery');
     var DeviceSwitcherView = require('oroviewswitcher/js/app/views/device-switcher-view');
-    var demoPageModelService = require('oroviewswitcher/js/app/services/demo-page-model-service');
+    var innerPageModelService = require('oroviewswitcher/js/app/services/inner-page-model-service');
     var DemoPopupView = require('oroviewswitcher/js/app/views/demo-popup-view');
     var DemoHelpCarouselView = require('oroviewswitcher/js/app/views/demo-help-carousel-view');
     var DemoLogoutButtonView = require('oroviewswitcher/js/app/views/demo-logout-button-view');
 
     var config = module.config();
-    var pageModel = demoPageModelService.getModel();
+    var pageModel = innerPageModelService.getModel();
     pageModel.set(_.pick(config, 'personalDemoUrl', 'projectName'));
 
     DeviceSwitcherApp = new DeviceSwitcherView({

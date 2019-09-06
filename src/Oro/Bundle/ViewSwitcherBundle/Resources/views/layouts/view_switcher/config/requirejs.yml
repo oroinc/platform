@@ -46,8 +46,8 @@ config:
         'oroviewswitcher/js/app/views/device-switcher-view': 'bundles/oroviewswitcher/js/app/views/device-switcher-view.js'
         'oroviewswitcher/js/app/views/device-inner-page-view': 'bundles/oroviewswitcher/js/app/views/device-inner-page-view.js'
         'oroviewswitcher/js/app/views/demo-popup-view': 'bundles/oroviewswitcher/js/app/views/demo-popup-view.js'
-        'oroviewswitcher/js/app/models/demo-page-model': 'bundles/oroviewswitcher/js/app/models/demo-page-model.js'
-        'oroviewswitcher/js/app/services/demo-page-model-service': 'bundles/oroviewswitcher/js/app/services/demo-page-model-service.js'
+        'oroviewswitcher/js/app/models/inner-page-model': 'bundles/oroviewswitcher/js/app/models/inner-page-model.js'
+        'oroviewswitcher/js/app/services/inner-page-model-service': 'bundles/oroviewswitcher/js/app/services/inner-page-model-service.js'
         'oroviewswitcher/js/app/modules/help-sliders-module': 'bundles/oroviewswitcher/js/app/modules/help-sliders-module.js'
     appmodules:
         - oroviewswitcher/js/app/modules/help-sliders-module

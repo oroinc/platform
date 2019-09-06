@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var DemoPageModel = require('oroviewswitcher/js/app/models/demo-page-model');
+    var InnerPageModel = require('oroviewswitcher/js/app/models/inner-page-model');
     var instance;
 
     return {
@@ -10,7 +10,7 @@ define(function(require) {
                 return instance;
             }
 
-            return instance = new DemoPageModel();
+            return instance = new InnerPageModel();
         }
     };
 });
