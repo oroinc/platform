@@ -15,7 +15,7 @@ define(function(require, exports, module) {
 
     var config = module.config();
     var pageModel = demoPageModelService.getModel();
-    pageModel.set(_.pick(config, 'personalDemoUrl', 'projectName'));
+    pageModel.set(_.pick(config, 'personalDemoUrl', 'projectName', 'styleMode'));
 
     DemoApp = new DemoPageComponent({
         _sourceElement: $('<div class="demo-page" />').appendTo('body'),

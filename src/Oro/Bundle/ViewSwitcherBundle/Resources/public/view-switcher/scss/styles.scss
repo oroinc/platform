@@ -1,5 +1,12 @@
-@import "./variables/variables";
+/* @theme: view-switcher; */
 
-@import "demo-popup";
-@import "help-carousel";
+@import "bowerassets/font-awesome/scss/_variables";
+@import "oroui/css/scss/variables";
+@import "oroui/css/scss/oro/variables/loading-bar";
+@import "oroui/css/scss/oro/loading/loading-bar";
+
+@import "variables/variables-config";
+@import "bundles/bowerassets/font-awesome/scss/font-awesome.scss";
+@import "oroui/css/scss/mixins";
+
 @import "view-switcher";
