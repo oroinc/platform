@@ -13,6 +13,7 @@ oro_behat_extension:
         - OroActivityListBundle::ActivityContext
         - OroConfigBundle::FeatureContext
         - OroSecurityBundle::ACLContext
+        - OroLocaleBundle::LocalizationContext
       paths:
         - '@OroEmailBundle/Tests/Behat/Features'
   elements:
@@ -30,7 +31,7 @@ oro_behat_extension:
             locator: ['field', 'From']
             element: Select2Offscreen
 
-    Email Template Form:
+    EmailTemplateForm:
       selector: "form[id^='oro_email_emailtemplate']"
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:

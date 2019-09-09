@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -14,6 +14,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * Covers the CRUD functionality and the additional operation clone for the EmailTemplate entity.
+ *
  * @Route("/emailtemplate")
  */
 class EmailTemplateController extends Controller
@@ -33,6 +35,8 @@ class EmailTemplateController extends Controller
      *      permission="VIEW"
      * )
      * @Template()
+     *
+     * @return array
      */
     public function indexAction()
     {
@@ -50,6 +54,10 @@ class EmailTemplateController extends Controller
      *      permission="EDIT"
      * )
      * @Template()
+     *
+     * @param EmailTemplate $entity
+     * @param bool $isClone
+     * @return array
      */
     public function updateAction(EmailTemplate $entity, $isClone = false)
     {
@@ -65,6 +73,8 @@ class EmailTemplateController extends Controller
      *      permission="CREATE"
      * )
      * @Template("OroEmailBundle:EmailTemplate:update.html.twig")
+     *
+     * @return array
      */
     public function createAction()
     {
@@ -75,9 +85,18 @@ class EmailTemplateController extends Controller
      * @Route("/clone/{id}", requirements={"id"="\d+"}, defaults={"id"=0}))
      * @AclAncestor("oro_email_emailtemplate_create")
      * @Template("OroEmailBundle:EmailTemplate:update.html.twig")
+     *
+     * @param EmailTemplate $entity
+     * @return array
      */
     public function cloneAction(EmailTemplate $entity)
     {
+        $entity->setLocale($this->getParameter('stof_doctrine_extensions.default_locale'));
+
+        // refresh translations
+        $this->getEntityManager()
+            ->refresh($entity);
+
         return $this->update(clone $entity, true);
     }
 
@@ -90,6 +109,7 @@ class EmailTemplateController extends Controller
      *      permission="VIEW"
      * )
      * @Template("OroEmailBundle:EmailTemplate:preview.html.twig")
+     *
      * @param Request $request
      * @param bool|int $id
      * @return array
@@ -99,9 +119,9 @@ class EmailTemplateController extends Controller
         if (!$id) {
             $emailTemplate = new EmailTemplate();
         } else {
-            /** @var EntityManager $em */
-            $em = $this->get('doctrine.orm.entity_manager');
-            $emailTemplate = $em->getRepository('Oro\Bundle\EmailBundle\Entity\EmailTemplate')->find($id);
+            $emailTemplate = $this->getEntityManager()
+                ->getRepository('Oro\Bundle\EmailBundle\Entity\EmailTemplate')
+                ->find($id);
         }
 
         /** @var FormInterface $form */
@@ -142,5 +162,14 @@ class EmailTemplateController extends Controller
             'form'    => $this->get('oro_email.form.emailtemplate')->createView(),
             'isClone' => $isClone
         );
+    }
+
+    /**
+     * @return ObjectManager
+     */
+    private function getEntityManager()
+    {
+        return $this->get('doctrine')
+            ->getManagerForClass(EmailTemplate::class);
     }
 }

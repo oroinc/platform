@@ -53,13 +53,14 @@ class HttpImportHandler extends AbstractImportHandler
         }
 
         return [
-            'success'        => $jobResult->isSuccessful() && isset($counts['process']) && $counts['process'] > 0,
+            'success'        => $this->isSuccessful($counts, $jobResult),
             'processorAlias' => $processorAlias,
             'counts'         => $counts,
             'errors'         => $errorsAndExceptions,
             'entityName'     => $entityName,
             'options'        => $options,
-            'postponedRows'  => $jobResult->getContext()->getPostponedRows()
+            'postponedRows'  => $jobResult->getContext()->getPostponedRows(),
+            'postponedDelay' => $jobResult->getContext()->getValue('postponedRowsDelay'),
         ];
     }
 
@@ -102,12 +103,13 @@ class HttpImportHandler extends AbstractImportHandler
         }
 
         return [
-            'success'    => $jobResult->isSuccessful(),
+            'success'    => $this->isSuccessful($counts, $jobResult),
             'message'    => $message,
             'importInfo' => $importInfo,
             'errors'     => $errors,
             'counts'     => $counts,
             'postponedRows' => $jobResult->getContext()->getPostponedRows(),
+            'postponedDelay' => $jobResult->getContext()->getValue('postponedRowsDelay'),
             'deadlockDetected' => $jobResult->getContext()->getValue('deadlockDetected')
         ];
     }
