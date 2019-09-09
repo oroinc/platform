@@ -1,3 +1,5 @@
+/* @theme: view-switcher; */
+
 html,
 body {
     font-family: $body-font-family;
@@ -40,6 +42,31 @@ main {
     box-shadow: $head-panel-box-shadow;
     position: $head-panel-position;
     z-index: $head-panel-z-index;
+
+    &.dark-mode {
+        background-color: $dark-mode-head-panel-background-color;
+
+        .view-switcher {
+            &__item {
+                color: $dark-mode-view-switcher-item-color;
+
+                &.active,
+                &:hover {
+                    color: $dark-mode-view-switcher-item-active-color;
+                }
+            }
+        }
+    }
+
+    &.dark-mode & {
+        &__trigger-wrapper {
+            background-color: $dark-mode-head-panel-trigger-wrapper-background-color;
+        }
+
+        &__link {
+            color: $dark-mode-head-panel-link-color;
+        }
+    }
 
     &__logo {
         display: $head-panel-logo-display;
@@ -155,7 +182,6 @@ main {
 .view-switcher {
     display: $view-switcher-display;
     justify-content: $view-switcher-justify-content;
-    background: $view-switcher-background;
     z-index: $view-switcher-z-index;
     box-sizing: $demo-page-box-sizing;
 

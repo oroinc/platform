@@ -1,9 +1,18 @@
+/* @theme: view-switcher; */
+
 // main variables
 $global-bg-color: #f8f8f8 !default;
 $head-panel-height: 50px !default;
 $head-panel-mobile-height: 88px !default;
 $head-panel-bg-color: #fff !default;
 $head-panel-border: 2px solid #ffca18 !default;
+
+// dark-mode styles
+$dark-mode-head-panel-background-color: #5e5e60 !default;
+$dark-mode-view-switcher-item-color: #bababb !default;
+$dark-mode-view-switcher-item-active-color: #f5f5f5 !default;
+$dark-mode-head-panel-trigger-wrapper-background-color: #ffca18 !default;
+$dark-mode-head-panel-link-color: #fff !default;
 
 // additional variables
 $body-font-family: Arial, Helvetica, sans-serif !default;
@@ -75,7 +84,6 @@ $head-panel-closed-head-panel-trigger-wrapper-fa-icon: $fa-var-angle-down !defau
 // view-switcher container
 $view-switcher-display: inline-flex !default;
 $view-switcher-justify-content: center !default;
-$view-switcher-background: $head-panel-bg-color !default;
 $view-switcher-z-index: 998 !default;
 
 $view-switcher-after-bottom: 2px !default;
