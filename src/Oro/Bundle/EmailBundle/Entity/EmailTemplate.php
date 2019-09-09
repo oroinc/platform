@@ -8,6 +8,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
 use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+use Oro\Bundle\EmailBundle\Model\ExtendEmailTemplate;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -50,7 +51,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * )
  * @JMS\ExclusionPolicy("ALL")
  */
-class EmailTemplate implements EmailTemplateInterface, Translatable
+class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterface, Translatable
 {
     public const TYPE_HTML = 'html';
     public const TYPE_TEXT = 'text';
@@ -211,6 +212,8 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
         $this->type         = $type;
         $this->content      = $parsedContent['content'];
         $this->translations = new ArrayCollection();
+
+        parent::__construct();
     }
 
     /**

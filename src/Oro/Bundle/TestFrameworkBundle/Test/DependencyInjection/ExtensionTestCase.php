@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\Form\FormTypeExtensionInterface;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -26,9 +30,14 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 abstract class ExtensionTestCase extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var array
+     * @var Definition[]
      */
     protected $actualDefinitions = [];
+
+    /**
+     * @var Alias[]
+     */
+    protected $actualAliases = [];
 
     /**
      * @var array
@@ -68,6 +77,127 @@ abstract class ExtensionTestCase extends \PHPUnit\Framework\TestCase
                 sprintf('Definition for "%s" service is empty.', $serviceId)
             );
         }
+    }
+
+    /**
+     * Verifies that aliases have been initialized (defined and not empty)
+     *
+     * @param array $expectedAliases
+     */
+    protected function assertAliasesLoaded(array $expectedAliases)
+    {
+        foreach ($expectedAliases as $serviceId) {
+            $this->assertArrayHasKey(
+                $serviceId,
+                $this->actualAliases,
+                sprintf('Definition for "%s" service has not been loaded.', $serviceId)
+            );
+            $this->assertNotEmpty(
+                $this->actualAliases[$serviceId],
+                sprintf('Definition for "%s" service is empty.', $serviceId)
+            );
+        }
+    }
+
+    /**
+     * Verifies visibility of defined services and aliases
+     * NOTE: service visibility can be changed in compiler passes. This method check only config definition
+     *
+     * @param string[] $expectedPublicServices
+     */
+    protected function assertPublicServices(array $expectedPublicServices): void
+    {
+        $loadedServices = array_merge(array_keys($this->actualDefinitions), array_keys($this->actualAliases));
+        $publicServices = array_intersect($loadedServices, $expectedPublicServices);
+        $this->assertCount(count($expectedPublicServices), $publicServices);
+
+        foreach ($publicServices as $serviceId) {
+            $this->assertServiceIsPublic($serviceId);
+        }
+
+        foreach (array_diff($loadedServices, $publicServices) as $serviceId) {
+            $definitionId = (string) ($this->actualAliases[$serviceId] ?? $serviceId);
+
+            // Can't predict check aliases for services from another bundles
+            if (!isset($this->actualDefinitions[$definitionId])) {
+                continue;
+            }
+
+            $class = $this->actualDefinitions[$definitionId]->getClass();
+
+            // All controllers must be registered as public
+            if (is_subclass_of($class, Controller::class)) {
+                $this->assertServiceIsPublic(
+                    $serviceId,
+                    sprintf('Definition for "%s" must be public because it is Controller.', $serviceId)
+                );
+                continue;
+            }
+
+            // All form types must be registered as public
+            if (is_subclass_of($class, FormTypeInterface::class)
+                || is_subclass_of($class, FormTypeExtensionInterface::class)
+            ) {
+                $this->assertServiceIsPublic(
+                    $serviceId,
+                    sprintf(
+                        'Definition for "%s" must be public because it is FormType or FormTypeExtension.',
+                        $serviceId
+                    )
+                );
+                continue;
+            }
+
+            // Otherwise service must be a private as default
+            $this->assertServiceIsPrivate($serviceId);
+        }
+    }
+
+    /**
+     * Service or alias must be defined as public
+     *
+     * @param string $serviceId
+     * @param string|null $message
+     */
+    protected function assertServiceIsPublic(string $serviceId, ?string $message = null): void
+    {
+        $definition = $this->getLoadedDefinition($serviceId);
+
+        $this->assertTrue(
+            $definition->isPublic() && !$definition->isPrivate(),
+            $message ?? sprintf('Definition for "%s" must be public.', $serviceId)
+        );
+    }
+
+    /**
+     * Service or alias must be defined as private
+     * @param string $serviceId
+     * @param string|null $message
+     */
+    protected function assertServiceIsPrivate(string $serviceId, ?string $message = null): void
+    {
+        $definition = $this->getLoadedDefinition($serviceId);
+
+        $this->assertTrue(
+            !$definition->isPublic() || $definition->isPrivate(),
+            $message ?? sprintf('Definition for "%s" must be private.', $serviceId)
+        );
+    }
+
+    /**
+     * @param string $serviceId
+     * @return Alias|Definition
+     */
+    protected function getLoadedDefinition(string $serviceId)
+    {
+        /** @var Definition|Alias $definition */
+        $definition = $this->actualDefinitions[$serviceId] ?? $this->actualAliases[$serviceId] ?? null;
+        $this->assertNotNull(
+            $definition,
+            sprintf('Definition for "%s" service or alias has not been loaded.', $serviceId)
+        );
+
+        return $definition;
     }
 
     /**
@@ -120,6 +250,15 @@ abstract class ExtensionTestCase extends \PHPUnit\Framework\TestCase
                 $this->returnCallback(
                     function ($id, Definition $definition) {
                         $this->actualDefinitions[$id] = $definition;
+                    }
+                )
+            );
+        $container->expects($this->any())
+            ->method('setAlias')
+            ->will(
+                $this->returnCallback(
+                    function ($id, Alias $alias) {
+                        $this->actualAliases[$id] = $alias;
                     }
                 )
             );
