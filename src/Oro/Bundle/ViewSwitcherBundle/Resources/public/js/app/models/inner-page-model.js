@@ -11,7 +11,7 @@ define(function(require) {
             isLoggedIn: false,
             isAdminPanel: false,
             personalDemoUrl: '#',
-            styleMode: null, // VIew-switcher has one more styleMode: 'dark-mode'
+            styleMode: null, // View-switcher has one more styleMode: 'dark-mode'
             projectName: 'Oro',
             needHelp: 'Need Help?',
             personalizedDemo: 'Want a Personalized Demo?'
