@@ -1,6 +1,9 @@
 define(function(require, exports, module) {
     'use strict';
 
+    // This app module enable the device-switcher in case when url has the device-emulate param
+    // For example: http://localhost/?device-emulate=true
+
     var $ = require('jquery');
     var DeviceSwitcherView = require('oroviewswitcher/js/app/views/device-switcher-view');
     var innerPageModelService = require('oroviewswitcher/js/app/services/inner-page-model-service');
