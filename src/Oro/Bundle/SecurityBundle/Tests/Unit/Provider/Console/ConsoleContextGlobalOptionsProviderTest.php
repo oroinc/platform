@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Provider\Console;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
@@ -9,32 +10,70 @@ use Oro\Bundle\SecurityBundle\Provider\Console\ConsoleContextGlobalOptionsProvid
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Role\Role;
 
 class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $container;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    /**
-     * @var ConsoleContextGlobalOptionsProvider
-     */
+    /** @var TokenStorage */
+    private $tokenStorage;
+
+    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $userManager;
+
+    /** @var ConsoleContextGlobalOptionsProvider */
     private $provider;
 
     protected function setUp()
     {
-        $this->container = $this->createMock(ContainerInterface::class);
-        $this->provider = new ConsoleContextGlobalOptionsProvider($this->container);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->tokenStorage = new TokenStorage();
+        $this->userManager = $this->createMock(UserManager::class);
+
+        $container = TestContainerBuilder::create()
+            ->add('doctrine', $this->doctrine)
+            ->add('security.token_storage', $this->tokenStorage)
+            ->add('oro_user.manager', $this->userManager)
+            ->getContainer($this);
+
+        $this->provider = new ConsoleContextGlobalOptionsProvider($container);
+    }
+
+    /**
+     * @return UserRepository|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function getUserRepository()
+    {
+        $repository = $this->createMock(UserRepository::class);
+        $this->doctrine->expects($this->once())
+            ->method('getRepository')
+            ->with(User::class)
+            ->willReturn($repository);
+
+        return $repository;
+    }
+
+    /**
+     * @return OrganizationRepository|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function getOrganizationRepository()
+    {
+        $repository = $this->createMock(OrganizationRepository::class);
+        $this->doctrine->expects($this->once())
+            ->method('getRepository')
+            ->with(Organization::class)
+            ->willReturn($repository);
+
+        return $repository;
     }
 
     public function testAddGlobalOptions()
@@ -81,8 +120,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
                 ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
             )
             ->willReturn(null, null);
-        $this->container->expects($this->never())
-            ->method('get');
+
         $this->provider->resolveGlobalOptions($input);
     }
 
@@ -99,11 +137,6 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             )
             ->willReturn(null, $organizationId);
 
-        $tokenStorage = new TokenStorage();
-        $this->container->expects($this->once())
-            ->method('get')
-            ->with('security.token_storage')
-            ->willReturn($tokenStorage);
         $this->provider->resolveGlobalOptions($input);
     }
 
@@ -120,25 +153,11 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             )
             ->willReturn($userId, null);
 
-        $registry = $this->createMock(RegistryInterface::class);
-        $tokenStorage = new TokenStorage();
-        $this->container->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(
-                ['security.token_storage'],
-                ['doctrine']
-            )
-            ->willReturnOnConsecutiveCalls($tokenStorage, $registry);
-
-        $repository = $this->createMock(UserRepository::class);
+        $repository = $this->getUserRepository();
         $repository->expects($this->once())
             ->method('find')
             ->with($userId)
             ->willReturn(null);
-        $registry->expects($this->once())
-            ->method('getRepository')
-            ->with('OroUserBundle:User')
-            ->willReturn($repository);
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('Can\'t find user with identifier %s', $userId));
@@ -158,35 +177,21 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             )
             ->willReturn($userId, null);
 
-        $registry = $this->createMock(RegistryInterface::class);
-        $tokenStorage = new TokenStorage();
-        $this->container->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(
-                ['security.token_storage'],
-                ['doctrine']
-            )
-            ->willReturnOnConsecutiveCalls($tokenStorage, $registry);
-
-        /** @var RoleInterface $role */
+        /** @var Role $role */
         $role = $this->createMock(Role::class);
         $user = new User();
         $user->addRole($role);
-        $repository = $this->createMock(UserRepository::class);
+        $repository = $this->getUserRepository();
         $repository->expects($this->once())
             ->method('find')
             ->with($userId)
             ->willReturn($user);
-        $registry->expects($this->once())
-            ->method('getRepository')
-            ->with('OroUserBundle:User')
-            ->willReturn($repository);
 
         $expectedToken = new ConsoleToken([$role]);
         $expectedToken->setUser($user);
 
         $this->provider->resolveGlobalOptions($input);
-        $this->assertEquals($expectedToken, $tokenStorage->getToken());
+        $this->assertEquals($expectedToken, $this->tokenStorage->getToken());
     }
 
     public function testResolveGlobalOptionsWhenUserIsStringAndNoOrganization()
@@ -202,21 +207,11 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             )
             ->willReturn($username, null);
 
-        $userManager = $this->createMock(UserManager::class);
-        $tokenStorage = new TokenStorage();
-        $this->container->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(
-                ['security.token_storage'],
-                ['oro_user.manager']
-            )
-            ->willReturnOnConsecutiveCalls($tokenStorage, $userManager);
-
-        /** @var RoleInterface $role */
+        /** @var Role $role */
         $role = $this->createMock(Role::class);
         $user = new User();
         $user->addRole($role);
-        $userManager->expects($this->once())
+        $this->userManager->expects($this->once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
             ->willReturn($user);
@@ -225,7 +220,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $expectedToken->setUser($user);
 
         $this->provider->resolveGlobalOptions($input);
-        $this->assertEquals($expectedToken, $tokenStorage->getToken());
+        $this->assertEquals($expectedToken, $this->tokenStorage->getToken());
     }
 
     public function testResolveGlobalOptionsWhenUserIsStringAndOrganizationIsNotFound()
@@ -242,26 +237,13 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             )
             ->willReturn($username, $organizationId);
 
-        $userManager = $this->createMock(UserManager::class);
-        $tokenStorage = new TokenStorage();
-
-        $registry = $this->createMock(RegistryInterface::class);
-        $this->container->expects($this->exactly(3))
-            ->method('get')
-            ->withConsecutive(
-                ['security.token_storage'],
-                ['oro_user.manager'],
-                ['doctrine']
-            )
-            ->willReturnOnConsecutiveCalls($tokenStorage, $userManager, $registry);
-
         $user = new User();
-        $userManager->expects($this->once())
+        $this->userManager->expects($this->once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
             ->willReturn($user);
 
-        $organizationRepository = $this->getOrganizationRepository($registry);
+        $organizationRepository = $this->getOrganizationRepository();
         $organizationRepository->expects($this->once())
             ->method('find')
             ->with($organizationId)
@@ -286,21 +268,8 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             )
             ->willReturn($username, $organizationId);
 
-        $userManager = $this->createMock(UserManager::class);
-        $tokenStorage = new TokenStorage();
-
-        $registry = $this->createMock(RegistryInterface::class);
-        $this->container->expects($this->exactly(3))
-            ->method('get')
-            ->withConsecutive(
-                ['security.token_storage'],
-                ['oro_user.manager'],
-                ['doctrine']
-            )
-            ->willReturnOnConsecutiveCalls($tokenStorage, $userManager, $registry);
-
         $user = new User();
-        $userManager->expects($this->once())
+        $this->userManager->expects($this->once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
             ->willReturn($user);
@@ -308,7 +277,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $organization = new Organization();
         $organization->setEnabled(false);
         $organization->setName('testorg');
-        $organizationRepository = $this->getOrganizationRepository($registry);
+        $organizationRepository = $this->getOrganizationRepository();
         $organizationRepository->expects($this->once())
             ->method('find')
             ->with($organizationId)
@@ -333,32 +302,18 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             )
             ->willReturn($username, $organizationId);
 
-        $userManager = $this->createMock(UserManager::class);
-        $tokenStorage = new TokenStorage();
-
-        $registry = $this->createMock(RegistryInterface::class);
-        $this->container->expects($this->exactly(3))
-            ->method('get')
-            ->withConsecutive(
-                ['security.token_storage'],
-                ['oro_user.manager'],
-                ['doctrine']
-            )
-            ->willReturnOnConsecutiveCalls($tokenStorage, $userManager, $registry);
-
         $organization = new Organization();
         $organization->setEnabled(true);
         $organization->setName('testneworg');
-        $organizationRepository = $this->getOrganizationRepository($registry);
+        $organizationRepository = $this->getOrganizationRepository();
         $organizationRepository->expects($this->once())
             ->method('find')
             ->with($organizationId)
             ->willReturn($organization);
 
-        /** @var RoleInterface $role */
         $user = new User();
         $user->setUsername('testnewusername');
-        $userManager->expects($this->once())
+        $this->userManager->expects($this->once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
             ->willReturn($user);
@@ -386,59 +341,31 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             )
             ->willReturn($username, $organizationId);
 
-        $userManager = $this->createMock(UserManager::class);
-        $tokenStorage = new TokenStorage();
-
-        $registry = $this->createMock(RegistryInterface::class);
-        $this->container->expects($this->exactly(3))
-            ->method('get')
-            ->withConsecutive(
-                ['security.token_storage'],
-                ['oro_user.manager'],
-                ['doctrine']
-            )
-            ->willReturnOnConsecutiveCalls($tokenStorage, $userManager, $registry);
-
         $organization = new Organization();
         $organization->setEnabled(true);
         $organization->setName('testneworg');
-        $organizationRepository = $this->getOrganizationRepository($registry);
+        $organizationRepository = $this->getOrganizationRepository();
         $organizationRepository->expects($this->once())
             ->method('find')
             ->with($organizationId)
             ->willReturn($organization);
 
-        /** @var RoleInterface $role */
+        /** @var Role $role */
         $role = $this->createMock(Role::class);
         $user = new User();
         $user->setUsername('testnewusername');
         $user->addRole($role);
         $user->addOrganization($organization);
-        $userManager->expects($this->once())
+        $this->userManager->expects($this->once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
             ->willReturn($user);
 
         $expectedToken = new ConsoleToken([$role]);
         $expectedToken->setUser($user);
-        $expectedToken->setOrganizationContext($organization);
+        $expectedToken->setOrganization($organization);
 
         $this->provider->resolveGlobalOptions($input);
-        $this->assertEquals($expectedToken, $tokenStorage->getToken());
-    }
-
-    /**
-     * @param RegistryInterface|\PHPUnit\Framework\MockObject\MockObject $registry
-     * @return OrganizationRepository|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getOrganizationRepository(RegistryInterface $registry)
-    {
-        $repository = $this->createMock(OrganizationRepository::class);
-        $registry->expects($this->once())
-            ->method('getRepository')
-            ->with('OroOrganizationBundle:Organization')
-            ->willReturn($repository);
-
-        return $repository;
+        $this->assertEquals($expectedToken, $this->tokenStorage->getToken());
     }
 }

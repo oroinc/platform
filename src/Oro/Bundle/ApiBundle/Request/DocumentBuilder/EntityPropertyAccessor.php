@@ -5,10 +5,13 @@ namespace Oro\Bundle\ApiBundle\Request\DocumentBuilder;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Component\EntitySerializer\DataAccessorInterface;
 
+/**
+ * Provides an access to properties of manageable entities.
+ */
 class EntityPropertyAccessor implements ObjectPropertyAccessorInterface
 {
     /** @var DataAccessorInterface */
-    protected $dataAccessor;
+    private $dataAccessor;
 
     /**
      * @param DataAccessorInterface $dataAccessor
@@ -21,7 +24,7 @@ class EntityPropertyAccessor implements ObjectPropertyAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getValue($object, $propertyName)
+    public function getValue($object, string $propertyName)
     {
         return $this->dataAccessor->getValue($object, $propertyName);
     }
@@ -29,7 +32,7 @@ class EntityPropertyAccessor implements ObjectPropertyAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function hasProperty($object, $propertyName)
+    public function hasProperty($object, string $propertyName): bool
     {
         return $this->dataAccessor->hasGetter(ClassUtils::getClass($object), $propertyName);
     }

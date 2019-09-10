@@ -24,7 +24,6 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
             ->booleanNode(ConfigUtil::DISABLE_INCLUSION)->end()
             ->booleanNode(ConfigUtil::DISABLE_FIELDSET)->end()
             ->booleanNode(ConfigUtil::DISABLE_META_PROPERTIES)->end()
-            ->scalarNode(ConfigUtil::DELETE_HANDLER)->cannotBeEmpty()->end()
             ->arrayNode(ConfigUtil::DOCUMENTATION_RESOURCE)
                 ->beforeNormalization()
                     ->ifString()

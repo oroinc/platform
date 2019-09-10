@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * Represents the configuration of Data API resource.
+ * Represents the configuration of API resource.
  */
 class Config implements \IteratorAggregate
 {

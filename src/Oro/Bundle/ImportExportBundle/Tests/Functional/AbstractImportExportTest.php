@@ -290,7 +290,7 @@ abstract class AbstractImportExportTest extends WebTestCase
             'outputFilePrefix' => $configuration->getFilePrefix(),
             'options' => $configuration->getRouteOptions(),
             'userId' => $this->getCurrentUser()->getId(),
-            'organizationId' => $this->getSecurityToken()->getOrganizationContext()->getId()
+            'organizationId' => $this->getSecurityToken()->getOrganization()->getId()
         ]);
     }
 

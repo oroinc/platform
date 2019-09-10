@@ -103,7 +103,7 @@ class EmailVoter implements VoterInterface, ServiceSubscriberInterface
                     $manager = $this->container->get(MailboxManager::class);
                     $mailboxes = $manager->findAvailableMailboxes(
                         $token->getUser(),
-                        $token->getOrganizationContext()
+                        $token->getOrganization()
                     );
 
                     if (in_array($mailbox, $mailboxes)) {

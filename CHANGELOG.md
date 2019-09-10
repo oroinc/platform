@@ -2,7 +2,76 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
-## 4.0.0
+## 4.1.0-beta
+
+### Changed
+
+#### ActivityBundle
+* The DIC tag `oro_activity.activity_entity_delete_handler` was removed.
+  Use decoration of `oro_activity.activity_entity_delete_handler_extension` service to instead.
+* The interface `Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityDeleteHandlerInterface` was removed.
+  Use `Oro\Bundle\ActivityBundle\Handler\ActivityEntityDeleteHandlerExtensionInterface` instead.
+
+#### ApiBundle
+* The section `relations` was removed from `Resources/config/oro/api.yml`. The action `get_relation_config` that
+  was responsible to process this section was removed as well.
+  This section was not used to build API that conforms JSON:API specification that is the main API type.
+  In case if you need a special configuration for "plain" REST API, you can define it in
+  `Resources/config/oro/api_plain.yml` configuration files or create a processor for the `get_config` action.
+* The `delete_handler` configuration option was removed.
+  The `Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry` class is used to get the deletion handler instead.
+
+#### AssetBundle
+* The new feature, [Hot Module Replacement (HMR or Hot Reload) enabled for SCSS](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#hot-module-replacement-hmr-or-hot-reload-for-scss). To enable HMR for custom CSS links, please [follow the documentation](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#enable-for-css-links).
+
+#### NavigationBundle
+* The service `kernel.listener.nav_history_response` was renamed to `oro_navigation.event_listener.navigation_history`.
+* The service `kernel.listener.hashnav_response` was renamed to `oro_navigation.event_listener.hash_navigation`.
+
+#### OrganizationBundle
+* The constant `SCOPE_KEY` in `Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider`
+  was replaced with `ORGANIZATION`.
+
+#### ScopeBundle
+* The method `getCriteriaByContext()` was removed from `Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface`.
+* The method `getCriteriaForCurrentScope()` in `Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface`
+  was replaced with `getCriteriaValue()`.
+* The class `Oro\Bundle\ScopeBundle\Manager\AbstractScopeCriteriaProvider` was removed.
+  Use direct implementation of `Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface` in your providers.
+
+#### SecurityBundle
+* The interface `Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface`
+  was renamed to `Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface`.
+  Also methods `getOrganizationContext` and `setOrganizationContext` were renamed to
+  `getOrganization` and `setOrganization`.
+* The class `Oro\Bundle\SecurityBundle\Exception\ForbiddenException` was removed.
+  Use `Symfony\Component\Security\Core\Exception\AccessDeniedException` instead.
+
+#### SoapBundle
+* The interface `Oro\Bundle\SoapBundle\Handler\DeleteHandlerInterface` was replaced with
+  `Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerInterface`
+  and `Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerExtensionInterface`.
+
+#### UserBundle
+* The constant `SCOPE_KEY` in `Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider`
+  was replaced with `USER`.
+
+## 4.0.0 (2019-07-31)
+[Show detailed list of changes](incompatibilities-4-0.md)
+
+### Added
+
+#### UIBundle
+
+* CSSVariable parser `oroui/js/css-variables-manager` has been add. Source module [css-variables-manager](./src/Oro/Bundle/UIBundle/Resources/public/js/css-variables-manager.js)
+
+  Github link [https://github.com/jhildenbiddle/css-vars-ponyfill](https://github.com/jhildenbiddle/css-vars-ponyfill)
+
+### Changed
+
+#### UIBundle
+
+* viewportManager has been updated. Add sync with CSS breakpoint variables
 
 ### Removed
 

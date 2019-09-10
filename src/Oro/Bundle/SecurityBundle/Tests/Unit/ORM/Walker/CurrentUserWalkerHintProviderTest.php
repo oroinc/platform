@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalkerHintProvider;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -78,7 +79,7 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetHints()
     {
-        $token = $this->createMock('Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface');
+        $token = $this->createMock(OrganizationAwareTokenInterface::class);
         $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn($token);
@@ -97,7 +98,7 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getUser')
             ->willReturn($user);
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->willReturn($organization);
 
         $this->assertEquals(
@@ -113,7 +114,7 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetHintsWithCustomFields()
     {
-        $token = $this->createMock('Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface');
+        $token = $this->createMock(OrganizationAwareTokenInterface::class);
         $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn($token);
@@ -132,7 +133,7 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getUser')
             ->willReturn($user);
         $token->expects($this->once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->willReturn($organization);
 
         $this->assertEquals(

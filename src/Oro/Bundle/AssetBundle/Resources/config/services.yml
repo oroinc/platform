@@ -6,6 +6,7 @@ services:
         class: Oro\Bundle\AssetBundle\Cache\AssetConfigCache
         arguments:
             - '@kernel'
+            - '%oro_asset.webpack_dev_server_options%'
 
     oro_asset_bundle.asset_config.cache_warmer:
         class: Oro\Bundle\AssetBundle\Cache\AssetConfigCacheWarmer
@@ -32,3 +33,13 @@ services:
         class: Oro\Bundle\AssetBundle\NodeProcessFactory
         arguments:
             - '%oro_asset.nodejs_path%'
+
+    oro_asset.webpack_server:
+        class: Oro\Bundle\AssetBundle\Webpack\WebpackServer
+        arguments:
+            - '%oro_asset.webpack_dev_server_options%'
+        tags: ['twig.runtime']
+
+    oro_asset.webpack_twig_extension:
+        class: Oro\Bundle\AssetBundle\Twig\WebpackExtension
+        tags: ['twig.extension']

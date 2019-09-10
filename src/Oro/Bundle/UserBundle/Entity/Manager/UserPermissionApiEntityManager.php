@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Metadata\ClassSecurityMetadata;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -115,14 +115,14 @@ class UserPermissionApiEntityManager extends ApiEntityManager
     protected function impersonateUser(User $user)
     {
         $currentToken = $this->tokenStorage->getToken();
-        if (!$currentToken instanceof OrganizationContextTokenInterface) {
+        if (!$currentToken instanceof OrganizationAwareTokenInterface) {
             throw new \UnexpectedValueException('The current security token must be aware of the organization.');
         }
 
-        $organization = $currentToken->getOrganizationContext();
+        $organization = $currentToken->getOrganization();
 
         // check if new user has access to the current organization
-        if (!$user->hasOrganization($organization)) {
+        if (!$user->isBelongToOrganization($organization)) {
             throw new AccessDeniedException();
         }
 

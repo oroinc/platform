@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
- * Registers document builders for all supported Data API request types.
+ * Registers document builders for all supported API request types.
  */
 class DocumentBuilderCompilerPass implements CompilerPassInterface
 {

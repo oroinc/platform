@@ -56,6 +56,48 @@ services:
             - '%kernel.cache_dir%/oro/entity.php'
             - '%kernel.debug%'
 
+    oro_entity.delete_handler_registry:
+        class: Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
+        arguments:
+            - ~ # handlers; it is injected by Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityDeleteHandlerCompilerPass
+
+    oro_entity.delete_handler_extension_registry:
+        class: Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerExtensionRegistry
+        arguments:
+            - ~ # extensions; it is injected by Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityDeleteHandlerCompilerPass
+
+    oro_entity.delete_handler:
+        class: Oro\Bundle\EntityBundle\Handler\AbstractEntityDeleteHandler
+        abstract: true
+        calls:
+            - [setExtensionRegistry, ['@oro_entity.delete_handler_extension_registry']]
+            - [setDoctrine, ['@doctrine']]
+            - [setAccessDeniedExceptionFactory, ['@oro_entity.delete_handler_access_denied_exception_factory']]
+
+    oro_entity.delete_handler_extension:
+        class: Oro\Bundle\EntityBundle\Handler\AbstractEntityDeleteHandlerExtension
+        abstract: true
+        calls:
+            - [setDoctrine, ['@doctrine']]
+            - [setAccessDeniedExceptionFactory, ['@oro_entity.delete_handler_access_denied_exception_factory']]
+
+    oro_entity.delete_handler_access_denied_exception_factory:
+        class: Oro\Bundle\EntityBundle\Handler\EntityDeleteAccessDeniedExceptionFactory
+
+    oro_entity.delete_handler.default:
+        class: Oro\Bundle\EntityBundle\Handler\EntityDeleteHandler
+        parent: oro_entity.delete_handler
+        tags:
+            - { name: oro_entity.delete_handler, entity: default }
+
+    oro_entity.delete_handler_extension.default:
+        class: Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerExtension
+        parent: oro_entity.delete_handler_extension
+        tags:
+            - { name: oro_entity.delete_handler_extension, entity: default }
+
     oro_entity.converter.doctrine.orm.decorator:
         class: 'Oro\Bundle\EntityBundle\Request\ParamConverter\DoctrineParamConverterDecorator'
         decorates: 'sensio_framework_extra.converter.doctrine.orm'

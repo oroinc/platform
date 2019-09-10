@@ -4,8 +4,6 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource;
 
 use Oro\Bundle\ApiBundle\Config\ConfigExtraCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
-use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra;
-use Oro\Bundle\ApiBundle\Config\DataTransformersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
@@ -37,7 +35,7 @@ class SubresourceContext extends Context
     /** the association name the sub-resource represents */
     const ASSOCIATION = 'association';
 
-    /** a flag indicates if an association represents "to-many" or "to-one" relation */
+    /** a flag indicates if an association represents "to-many" or "to-one" relationship */
     const COLLECTION = 'collection';
 
     /** a configuration of the parent entity */
@@ -122,7 +120,7 @@ class SubresourceContext extends Context
     }
 
     /**
-     * Whether an association represents "to-many" or "to-one" relation.
+     * Whether an association represents "to-many" or "to-one" relationship.
      *
      * @return bool
      */
@@ -132,9 +130,9 @@ class SubresourceContext extends Context
     }
 
     /**
-     * Sets a flag indicates whether an association represents "to-many" or "to-one" relation.
+     * Sets a flag indicates whether an association represents "to-many" or "to-one" relationship.
      *
-     * @param bool $value TRUE for "to-many" relation, FALSE for "to-one" relation
+     * @param bool $value TRUE for "to-many" relationship, FALSE for "to-one" relationship
      */
     public function setIsCollection($value)
     {
@@ -335,8 +333,6 @@ class SubresourceContext extends Context
                 $this->getParentClassName(),
                 $this->getAssociationName()
             ),
-            new CustomizeLoadedDataConfigExtra(),
-            new DataTransformersConfigExtra(),
             new FilterFieldsConfigExtra([$this->getParentClassName() => [$this->getAssociationName()]])
         ];
     }

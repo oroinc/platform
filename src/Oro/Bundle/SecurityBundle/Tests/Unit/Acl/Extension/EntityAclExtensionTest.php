@@ -474,7 +474,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         /** @var \PHPUnit\Framework\MockObject\MockObject|UsernamePasswordOrganizationToken $token */
         $token =$this->createMock(UsernamePasswordOrganizationToken::class);
         $token->expects($this->any())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->will($this->returnValue($organization));
         $token->expects($this->any())
             ->method('getUser')

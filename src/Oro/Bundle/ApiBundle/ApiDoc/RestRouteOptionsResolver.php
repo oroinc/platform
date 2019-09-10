@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Adds all REST API routes to API sandbox based on the current API view and Data API configuration.
+ * Adds all REST API routes to API sandbox based on the current API view and API configuration.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */

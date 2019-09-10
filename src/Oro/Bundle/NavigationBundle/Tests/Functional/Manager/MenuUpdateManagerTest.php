@@ -8,6 +8,7 @@ use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData;
+use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UIBundle\Model\TreeItem;
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -204,9 +205,10 @@ class MenuUpdateManagerTest extends WebTestCase
      */
     protected function getScope()
     {
-        $scopeType = $this->getContainer()->getParameter('oro_navigation.menu_update.scope_type');
+        /** @var ScopeManager $scopeManager */
+        $scopeManager = $this->getContainer()->get('oro_scope.scope_manager');
 
-        return $this->getContainer()->get('oro_scope.scope_manager')->findOrCreate($scopeType, []);
+        return $scopeManager->findOrCreate('menu_default_visibility', []);
     }
 
     /**

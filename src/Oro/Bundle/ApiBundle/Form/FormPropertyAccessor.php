@@ -9,7 +9,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  * This property accessor allows to set NULL to a property value
  * even if it is not acceptable by a setter.
  * This is required to avoid exceptions like "Argument 1 passed to Class::setProperty()
- * must be an instance of Class, null given." during submitting Data API form.
+ * must be an instance of Class, null given." during submitting API form.
  * If NULL is not allowed for a property, the NotNull or NotBlank validation constraint
  * must be configured for this property.
  */

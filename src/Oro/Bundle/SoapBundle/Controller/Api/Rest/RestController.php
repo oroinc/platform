@@ -3,13 +3,16 @@
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityNotFoundException;
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * The base class for REST API CRUD controllers.
+ */
 abstract class RestController extends RestGetController implements
     FormAwareInterface,
     FormHandlerAwareInterface,
@@ -92,19 +95,19 @@ abstract class RestController extends RestGetController implements
     /**
      * {@inheritdoc}
      */
-    public function handleDeleteRequest($id)
+    public function handleDeleteRequest($id, array $options = [])
     {
         $isProcessed = false;
 
         try {
-            $this->getDeleteHandler()->handleDelete($id, $this->getManager());
+            $this->getDeleteHandler()->handleDelete($id, $this->getManager(), $options);
 
             $isProcessed = true;
             $view        = $this->view(null, Response::HTTP_NO_CONTENT);
-        } catch (EntityNotFoundException $notFoundEx) {
+        } catch (EntityNotFoundException $e) {
             $view = $this->view(null, Response::HTTP_NOT_FOUND);
-        } catch (ForbiddenException $forbiddenEx) {
-            $view = $this->view(['reason' => $forbiddenEx->getReason()], Response::HTTP_FORBIDDEN);
+        } catch (AccessDeniedException $e) {
+            $view = $this->view(['reason' => $e->getMessage()], Response::HTTP_FORBIDDEN);
         }
 
         return $this->buildResponse($view, self::ACTION_DELETE, ['id' => $id, 'success' => $isProcessed]);

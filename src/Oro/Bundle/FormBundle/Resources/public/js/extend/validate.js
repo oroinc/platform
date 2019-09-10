@@ -241,11 +241,17 @@ define(function(require) {
                 validateTopmostLabelMixin.init.call(this);
             }
 
-            $(this.currentForm).on('content:changed', function(event) {
-                validationHandler.initializeOptionalValidationGroupHandlers($(event.target));
-            }).on('disabled', function(e) {
-                this.hideElementErrors(e.target);
-            }.bind(this));
+            $(this.currentForm).on({
+                'content:initialized.validate': function(e) {
+                    this.bindInitialErrors(e.target);
+                }.bind(this),
+                'content:changed.validate': function(event) {
+                    validationHandler.initializeOptionalValidationGroupHandlers($(event.target));
+                },
+                'disabled.validate': function(e) {
+                    this.hideElementErrors(e.target);
+                }.bind(this)
+            });
 
             original.init.call(this);
 
@@ -259,8 +265,8 @@ define(function(require) {
          * Searches through backend rendered inputs which have errors, registers them and adds ID's to its error labels
          * to ability managing it in the same way as jquery.validate generated error labels
          */
-        bindInitialErrors: function() {
-            this.elementsOf(this.currentForm).each(function(i, element) {
+        bindInitialErrors: function(container) {
+            this.elementsOf(container || this.currentForm).each(function(i, element) {
                 if (element.name && element.classList.contains('error')) {
                     var $label;
                     var classesSelector = this.settings.errorClass.split(' ').join('.');
@@ -270,16 +276,20 @@ define(function(require) {
                     if ($placement.is('.fields-row-error')) {
                         $label = $placement.children(selector);
                     } else {
-                        $label = $placement.nextAll(selector);
+                        $label = $(element).nextAll(selector);
                     }
 
-                    if ($label.length) {
-                        var labelId = this.idOrName(element) + '-error';
+                    element.classList.remove('error');
+                    this.settings.highlight(element);
 
-                        if ($('#' + labelId).length === 0) {
-                            $label.attr( 'id', labelId);
-                            element.setAttribute('aria-describedby', labelId);
-                        }
+                    if ($label.length) {
+                        var text = [];
+
+                        $label.each(function() {
+                            text.push($(this).text());
+                        });
+                        this.showLabel(element, text.join('<br>'));
+                        $label.remove();
                     }
 
                     this.invalid[element.name] = true;
@@ -391,7 +401,8 @@ define(function(require) {
          */
         hideElementErrors: function(element) {
             var $placement = getErrorPlacement(element);
-            var selector = '#' + this.idOrName(element) + '-error';
+            // Since name of input can contain `[]` lets use `[id=...` selector instead `#...` to avoid jQuery error
+            var selector = '[id="' + this.idOrName($(element)[0]) + '-error"]';
 
             if ($placement.is('.fields-row-error')) {
                 $placement.children(selector).remove();
@@ -525,11 +536,30 @@ define(function(require) {
             $el.closest('.control-group').find('.control-label').addClass('validation-error');
         },
         unhighlight: function(element) {
-            var $el = getErrorTarget(element);
-            $el.removeClass('error')
-                .closest('.controls')
-                .removeClass('validation-error');
-            $el.closest('.control-group').find('.control-label').removeClass('validation-error');
+            var $target = getErrorTarget(element);
+            var validGroup = true;
+
+            // Check if present more than one element in related container
+            if (!$target.is(':input')) {
+                var groupElementNames = _.reduce(this.elementsOf($target), function(memo, num) {
+                    memo.push(num.name);
+                    return memo;
+                }, []);
+
+                for (var i = 0; groupElementNames.length > i; i++) {
+                    if (this.invalid[groupElementNames[i]] === true) {
+                        validGroup = false;
+                        break;
+                    }
+                }
+            }
+
+            if (validGroup) {
+                $target.removeClass('error')
+                    .closest('.controls')
+                    .removeClass('validation-error');
+                $target.closest('.control-group').find('.control-label').removeClass('validation-error');
+            }
         },
         // ignore all invisible elements except input type=hidden, which are ':input[data-validate-element]'
         ignore: ':hidden:not([type=hidden]), [data-validation-ignore] :input',
@@ -608,31 +638,23 @@ define(function(require) {
      */
     $.validator.dataRules = _.wrap($.validator.dataRules, function(dataRules, element) {
         var optionalGroup;
-        var validator;
         var rules = dataRules(element);
         if (!$.isEmptyObject(rules)) {
             optionalGroup = $(element).parents('[data-validation-optional-group]').get(0);
         }
         if (optionalGroup) {
-            validator = $(element.form).data('validator');
-            validator.settings.unhighlight(element);
+            var validator = $(element.form).data('validator');
+            validator.settings.unhighlight.call(validator, element);
             _.each(rules, function(param) {
                 param.depends = function() {
                     // all fields in a group failed a required rule (have empty value) - stop group validation
-                    var isValidFound = false;
-                    var isInvalidFound = false;
-                    _.each(validator.elementsOf(optionalGroup), function(elem) {
-                        var $element = $(elem);
-                        if ($element.prop('willValidate') && !$element.data('ignore-validation')) {
-                            if ($.validator.methods.required.call(validator, validator.elementValue(elem), elem)) {
-                                isValidFound = true;
-                            } else {
-                                isInvalidFound = true;
-                            }
-                        }
-                    });
 
-                    return isValidFound && isInvalidFound;
+                    return _.some(validator.elementsOf(optionalGroup), function(element) {
+                        var $element = $(element);
+
+                        return $element.prop('willValidate') && !$element.data('ignore-validation') &&
+                            $.validator.methods.required.call(validator, validator.elementValue(element), element);
+                    });
                 };
             });
         }

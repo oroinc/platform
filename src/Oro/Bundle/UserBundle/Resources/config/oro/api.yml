@@ -7,13 +7,12 @@ api:
     entities:
         Oro\Bundle\UserBundle\Entity\Group:
             documentation_resource: '@OroUserBundle/Resources/doc/api/group.md'
+
         Oro\Bundle\UserBundle\Entity\Role:
             documentation_resource: '@OroUserBundle/Resources/doc/api/role.md'
-            delete_handler: oro_user.role.handler.delete
 
         Oro\Bundle\UserBundle\Entity\User:
             documentation_resource: '@OroUserBundle/Resources/doc/api/user.md'
-            delete_handler: oro_user.handler.delete
             fields:
                 emails:
                     data_type: array
@@ -61,7 +60,7 @@ api:
             documentation_resource: '@OroUserBundle/Resources/doc/api/user.md'
 
         Oro\Bundle\UserBundle\Entity\Email:
-            # this entity does not have own Data API resource
+            # this entity does not have own API resource
             actions: false
 
         Oro\Bundle\UserBundle\Api\Model\UserProfile:

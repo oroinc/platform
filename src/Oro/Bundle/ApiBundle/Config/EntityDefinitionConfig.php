@@ -26,7 +26,6 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      * several times and as result it improves a performance.
      * @see \Oro\Bundle\ApiBundle\Provider\MetadataProvider
      * @see \Oro\Bundle\ApiBundle\Provider\ConfigProvider
-     * @see \Oro\Bundle\ApiBundle\Provider\RelationConfigProvider
      *
      * @var string|null
      */
@@ -353,7 +352,6 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     /**
      * Indicates whether the entity should be collapsed.
      * It means that target entity should be returned as a value, instead of an array with values of entity fields.
-     * Usually this property is set by "get_relation_config" processors to get identifier of the related entity.
      *
      * @return bool
      */
@@ -365,7 +363,6 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     /**
      * Sets a flag indicates whether the entity should be collapsed.
      * It means that target entity should be returned as a value, instead of an array with values of entity fields.
-     * Usually this property is set by "get_relation_config" processors to get identifier of the related entity.
      *
      * @param bool $collapse
      */
@@ -420,26 +417,6 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
         } else {
             unset($this->items[ConfigUtil::HINTS]);
         }
-    }
-
-    /**
-     * Gets a handler that should be used to delete the entity.
-     *
-     * @return string|null The service id
-     */
-    public function getDeleteHandler()
-    {
-        return $this->get(ConfigUtil::DELETE_HANDLER);
-    }
-
-    /**
-     * Sets a handler that should be used to delete the entity.
-     *
-     * @param string|null $handler The service id
-     */
-    public function setDeleteHandler($handler = null)
-    {
-        $this->set(ConfigUtil::DELETE_HANDLER, $handler);
     }
 
     /**

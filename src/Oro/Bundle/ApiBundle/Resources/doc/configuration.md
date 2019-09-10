@@ -10,13 +10,12 @@
  - [**sorters** Configuration Section](#sorters-configuration-section)
  - [**actions** Configuration Section](#actions-configuration-section)
  - [**subresources** Configuration Section](#subresources-configuration-section)
- - [**relations** Configuration Section](#relations-configuration-section)
 
 ## Overview
 
 The configuration declares all aspects related to a specific entity. The configuration should be placed in `Resources/config/oro/api.yml` to be automatically loaded.
 
-All entities, except custom entities, dictionaries, and enumerations are inaccessible via the data API. To make an entity available via the data, enable it directly. For example, to make the `Acme\Bundle\ProductBundle\Product` entity available via the data API, use the following configuration:
+All entities, except custom entities, dictionaries, and enumerations are inaccessible via the API. To make an entity available via the data, enable it directly. For example, to make the `Acme\Bundle\ProductBundle\Product` entity available via the API, use the following configuration:
 
 ```yaml
 api:
@@ -26,7 +25,7 @@ api:
 
 If an auto-generated alias for your entity does not look good enough for you, change it in `Resources/config/oro/entity.yml`. For more details, see the [entity aliases documentation](../../../EntityBundle/Resources/doc/entity_aliases.md).
 
-**Important:** Run the `oro:api:cache:clear` CLI command to immediately make an entity accessible via the data API.
+**Important:** Run the `oro:api:cache:clear` CLI command to immediately make an entity accessible via the API.
 If you use the API sandbox, run the `oro:api:doc:cache:clear` CLI command to apply the changes for it.
 
 For additional information, see [CLI commands](./commands.md).
@@ -59,7 +58,6 @@ The first level sections of configuration are:
 
 * [entity_aliases](#entity_aliases-configuration-section) - Allows overriding of entity aliases.
 * [entities](#entities-configuration-section) - Describes the configuration of entities.
-* [relations](#relations-configuration-section) - Describes the configuration of relationships.
 
 The top level configuration example:
 
@@ -86,23 +84,11 @@ api:
             subresources:
                 ...
         ...
-    relations:
-        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
-            ...
-            fields:
-                ...
-            filters:
-                fields:
-                    ...
-            sorters:
-                fields:
-                    ...
-        ...
 ```
 
 ## Exclude Option
 
-The `exclude` configuration option describes whether an entity or its fields should be excluded from the data API.
+The `exclude` configuration option describes whether an entity or its fields should be excluded from the API.
 
 **Example:**
 
@@ -110,11 +96,11 @@ The `exclude` configuration option describes whether an entity or its fields sho
 api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
-            exclude: true # exclude the entity from the data API
+            exclude: true # exclude the entity from the API
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity2:
             fields:
                 field1:
-                    exclude: true # exclude the field from the data API
+                    exclude: true # exclude the field from the API
 ```
 
 Additionally, use the `exclude` option to indicate whether to disable filtering or sorting for certain fields. Please note that for fields excluded as described above, filtering and sorting are disabled automatically.
@@ -135,7 +121,7 @@ api:
                         exclude: true
 ```
 
-Please note that the `exclude` option is applicable only for the data API. To exclude an entity or its fields globally, use `Resources/config/oro/entity.yml`:
+Please note that the `exclude` option is applicable only for the API. To exclude an entity or its fields globally, use `Resources/config/oro/entity.yml`:
 
 ```yaml
 oro_entity:
@@ -151,10 +137,10 @@ oro_entity:
 The `entity_aliases` section can be used to:
 
 - override the existing system-wide entity aliases
-- add aliases for models to be used only in the data API
+- add aliases for models to be used only in the API
 - completely replace an ORM entity with a model
 
-Use it when you need to provide entity aliases for the data API, but it is not possible to share them system-wide. For example, because of the backward compatibility promise or because your models were created for use only in the data API.
+Use it when you need to provide entity aliases for the API, but it is not possible to share them system-wide. For example, because of the backward compatibility promise or because your models were created for use only in the API.
 
 Please see the [entitiy aliases documentation](../../../EntityBundle/Resources/doc/entity_aliases.md) for more details about entity aliases.
 
@@ -221,17 +207,16 @@ The `entities` section describes a configuration of entities.
 * **documentation_resource** (*string*) - May contain the link to the [Markdown](https://en.wikipedia.org/wiki/Markdown) file that contains a detailed documentation for a single or multiple API resources. For more details, see [Documenting API Resources](./documentation.md). 
 
   Please note that the same entity can be configured in different `Resources/config/oro/api.yml` files, e.g. when some bundle needs to add a field to an entity declared in another bundle. In this case, all configuration files for this entity can have **documentation_resource** option and all documentation files declared there are merged. Pay attention that if the same field is documented in several documentation files, they are be merged and only a documentation from one file is used.
-* **exclude** (*boolean*) - Indicates whether the entity should be excluded from the data API. By default, `false`.
+* **exclude** (*boolean*) - Indicates whether the entity should be excluded from the API. By default, `false`.
 * **inherit** (*boolean*) - Indicates whether the configuration for certain entity should be merged with the configuration of a parent entity. By default, `true`. Set to `false` if a derived entity should have completely different configuration to the parent entity and merging with the parent configuration is not needed.
 * **exclusion_policy** (*string*) - Indicates the exclusion strategy to use for the entity. Possible values: `all`, `custom_fields` or `none`. By default, `none`. `none` - exclude fields marked with the `exclude` flag. `all` - exclude all fields that are not configured explicitly. `custom_fields` - exclude all custom fields (fields with `is_extend` = `true` and `owner` = `Custom` in `extend` scope in entity configuration) that are not configured explicitly.
 * **max_results** (*integer*) - The maximum number of entities in the result. Set `-1` (it means unlimited), zero, or positive number to define the limit. Use to set the limit for both the parent and related entities.
 * **order_by** (*array*) - The property can be used to configure the default ordering of the result. The item key is the name of a field. The value can be `ASC` or `DESC`. By default, the result is ordered by an identifier field.
-* **disable_inclusion** (*boolean*) - Indicates whether the inclusion of related entities is disabled. In JSON.API, the [**include** request parameter](http://jsonapi.org/format/#fetching-includes) is used to customize which related entities to return. By default, `false`.
-* **disable_fieldset** (*boolean*) - Indicates whether one can request a restricted set of fields. In JSON.API, the [**fields** request parameter](http://jsonapi.org/format/#fetching-sparse-fieldsets) is used to customize which fields to return. By default, `false`.
+* **disable_inclusion** (*boolean*) - Indicates whether the inclusion of related entities is disabled. In JSON:API, the [**include** request parameter](http://jsonapi.org/format/#fetching-includes) is used to customize which related entities to return. By default, `false`.
+* **disable_fieldset** (*boolean*) - Indicates whether one can request a restricted set of fields. In JSON:API, the [**fields** request parameter](http://jsonapi.org/format/#fetching-sparse-fieldsets) is used to customize which fields to return. By default, `false`.
 * **disable_meta_properties** *boolean*) - Indicates whether one can request additional meta properties. By default, `false`.
 * **hints** (*array*) - Sets thr [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). Each item can be a string or an array with the `name` and `value` keys. The string value is a short form of `[name: hint name]`.
-* **identifier_field_names** (*string[]*) - The names of identifier fields of the entity. Use this option to override names set in a configuration file (for the data API resource that are not based on ORM entity) or retrieved from an entity metadata (for ORM entities). This option is helpful when you do not want to use the primary key as an entity identifier in the data API.
-* **delete_handler** (*string*) - The identifier of a service that should be used to delete the entity via the [delete](./actions.md#delete-action) and [delete_list](./actions.md#delete_list-action) actions. By default, the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
+* **identifier_field_names** (*string[]*) - The names of identifier fields of the entity. Use this option to override names set in a configuration file (for the API resource that are not based on ORM entity) or retrieved from an entity metadata (for ORM entities). This option is helpful when you do not want to use the primary key as an entity identifier in the API.
 * **form_type** (*string*) - The form type to use for the entity in the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. By default, the `Symfony\Component\Form\Extension\Core\Type\FormType` form type is used.
 * **form_options** (*array*) - The form options to use for the entity in the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
 * **form_event_subscriber** - The form event subscribers that to use for the entity in the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. When the `form_type` option is not specified, this event subscriber is also used for the [update_relationship](./actions.md#update_relationship-action), [add_relationship](./actions.md#add_relationship-action), and [delete_relationship](./actions.md#delete_relationship-action) actions. For custom form types, this event subscriber is not used. Can be specified as service name or array of service names. An event subscriber service should implement the `Symfony\Component\EventDispatcher\EventSubscriberInterface` interface.
@@ -251,9 +236,9 @@ api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             documentation_resource: '@AcmeAcmeBundle/Resources/doc/api/acme_entity.md'
-            inherit:              false
-            exclusion_policy:     all
-            max_results:          25
+            inherit: false
+            exclusion_policy: all
+            max_results: 25
             order_by:
                 field1: DESC
                 field2: ASC
@@ -261,8 +246,7 @@ api:
                 - HINT_TRANSLATABLE
                 - { name: HINT_FILTER_BY_CURRENT_USER }
                 - { name: HINT_CUSTOM_OUTPUT_WALKER, value: 'Acme\Bundle\AcmeBundle\AST_Walker_Class'}
-            delete_handler:       acme.demo.test_entity.delete_handler
-            excluded:             false
+            excluded: false
             form_type: Acme\Bundle\AcmeBundle\Api\Form\Type\AcmeEntityType
             form_options:
                 validation_groups: ['Default', 'api', 'my_group']
@@ -276,13 +260,13 @@ This section describes configuration of entity fields.
 * **exclude** (*boolean*) - Indicates whether the field should be excluded. This property is described above in the [Exclude option](#exclude-option) section.
 * **description** (*string*) - A human-readable description of the field or a link to the [documentation resource](./documentation.md). Used in auto-generated documentation only.
 * **property_path** (*string*) - The property path to the field value. Can be used to rename the field or to access a field of a related entity. Use the "dot" notation to separate property names in the path, e.g. `user.firstName`. Each property name must be equal to the name of existing property of an entity.
-* **collapse** (*boolean*) - Indicates whether to collapse the entity. It is applicable for associations only. When `true`, the target entity is returned as a value instead of an array of entity fields values. Usually, this property is set by the [get_relation_config](./actions.md#get_relation_config-action) processors to get an identifier of the related entity.
+* **collapse** (*boolean*) - Indicates whether to collapse the entity. It is applicable for associations only. When `true`, the target entity is returned as a value instead of an array of entity fields values.
 * **form_type** (*string*) - The form type that to use for the field in the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
 * **form_options** (*array*) - The form options to use for the field in the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
 * **data_type** (*string*) - The data type of the field value. Can be `boolean`, `integer`, `string`, etc. If a field represents an association, the data type should be a type of an identity field of the target entity.
-* **meta_property** (*boolean*) - Indicates whether the field represents a meta information. For JSON.API, such fields are returned in the [meta](http://jsonapi.org/format/#document-meta) section. By default, `false`.
-* **target_class** (*string*) - The class name of a target entity if a field represents an association. If the data API resource is based on the non ORM entity, set the target class in a configuration file.
-* **target_type** (*string*) - The type of a target association. Can be *to-one* or *to-many*. Also *collection* can be used as an alias for **to-many**. **to-one** can be omitted as it is used by default. If the data API resource is based on the non ORM entity, set the target type in a configuration file.
+* **meta_property** (*boolean*) - Indicates whether the field represents a meta information. For JSON:API, such fields are returned in the [meta](http://jsonapi.org/format/#document-meta) section. By default, `false`.
+* **target_class** (*string*) - The class name of a target entity if a field represents an association. If the API resource is based on the non ORM entity, set the target class in a configuration file.
+* **target_type** (*string*) - The type of a target association. Can be *to-one* or *to-many*. Also *collection* can be used as an alias for **to-many**. **to-one** can be omitted as it is used by default. If the API resource is based on the non ORM entity, set the target type in a configuration file.
 * **depends_on** (*string[]*) - A list of entity properties that the field depends on. Use the "dot" notation to specify a path to a nested property, e.g. `user.firstName`. Each element in the path must be equal to the name of existing property of an entity. This option is helpful for computed fields: the specified fields will be loaded from the database even if they are excluded.
 
 Special data types:
@@ -291,9 +275,9 @@ The **data_type** attribute can serve to specify a data type of a field. However
 
 | Data Type | Description |
 | --- | --- |
-| scalar | Represents a field of a to-one association as a field of a parent entity. In JSON.API, it means that the association's field should be in the "attributes" section instead of the "relationships" section. |
-| object | Represents a to-one association as a field. In JSON.API, it means that the association should be in the "attributes" section instead of the "relationships" section. |
-| array | Represent a to-many association as a field. In JSON.API, it means that the association should be in the "attributes" section instead of the "relationships" section. |
+| scalar | Represents a field of a to-one association as a field of a parent entity. In JSON:API, it means that the association's field should be in the "attributes" section instead of the "relationships" section. |
+| object | Represents a to-one association as a field. In JSON:API, it means that the association should be in the "attributes" section instead of the "relationships" section. |
+| array | Represent a to-many association as a field. In JSON:API, it means that the association should be in the "attributes" section instead of the "relationships" section. |
 | nestedObject | Helps configure nested objects. For details, see [Configure a Nested Object](./how_to.md#configure-a-nested-object). |
 | nestedAssociation | Helps configure nested associations. For details, see [Configure a Nested Association](./how_to.md#configure-a-nested-association). |
 | association:relationType\[:associationKind\] | Helps configure extended associations. For details, see [Configure an Extended Many-To-One Association](./how_to.md#configure-an-extended-many-to-one-association), [Configure an Extended Many-To-Many Association](./how_to.md#configure-an-extended-many-to-many-association) and [Configure an Extended Multiple Many-To-One Association](./how_to.md#configure-an-extended-multiple-many-to-one-association). |
@@ -451,8 +435,8 @@ The `actions` configuration section serves to specify action-specific options. T
 * **order_by** (*array*) - Use this property to configure the default ordering of the result. The item key is the name of a field. The value can be *ASC* or *DESC*. By default, the result is ordered by an identifier field.
 * **page_size** (*integer*) - The default page size. Set to `-1` to disable the pagination, or to a positive number. By default, `10`.
 * **disable_sorting** (*boolean*) - Indicates whether to disable the sorting. By default, `false`.
-* **disable_inclusion** (*boolean*) - Indicates whether to disable the inclusion of related entities. In JSON.API, the [**include** request parameter](http://jsonapi.org/format/#fetching-includes) is used to customize which related entities to return. By default, `false`.
-* **disable_fieldset** (*boolean*) - Indicates whether a requesting of a restricted set of fields is disabled. In JSON.API, the [**fields** request parameter](http://jsonapi.org/format/#fetching-sparse-fieldsets) is used to customize which fields to return. By default, `false`.
+* **disable_inclusion** (*boolean*) - Indicates whether to disable the inclusion of related entities. In JSON:API, the [**include** request parameter](http://jsonapi.org/format/#fetching-includes) is used to customize which related entities to return. By default, `false`.
+* **disable_fieldset** (*boolean*) - Indicates whether a requesting of a restricted set of fields is disabled. In JSON:API, the [**fields** request parameter](http://jsonapi.org/format/#fetching-sparse-fieldsets) is used to customize which fields to return. By default, `false`.
 * **disable_meta_properties** *boolean*) - Indicates whether one can request additional meta properties. By default, `false`.
 * **form_type** (*string*) - The form type to use for the entity.
 * **form_options** (*array*) - The form options to use for the entity. If `form_type` is not specified, the form options specified here are merged with form options defined at the entity level. If `form_type` is specified in an action configuration, the action form options completely replace the form options defined at the entity level.
@@ -486,7 +470,7 @@ Disable all actions for an entity:
 api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
-            # this entity does not have own Data API resource
+            # this entity does not have own API resource
             actions: false
 ```
 
@@ -639,7 +623,3 @@ api:
                                 description: Indicates whether the current user should be excluded from the result.
                                 data_type: boolean
 ```
-
-## relations Configuration Section
-
-The `relations` configuration section describes a configuration of an entity used in a relationship. This section is not used for JSON.API but can be helpful for other types of API. This section is similar to the [entities](#entities-configuration-section) section.

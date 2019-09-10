@@ -109,6 +109,16 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
         $this->imageFilterLoader->load();
     }
 
+    public function testForceLoad()
+    {
+        $this->imageTypeProvider->getImageDimensions()->shouldBeCalledTimes(2)->willReturn([]);
+
+        $this->imageFilterLoader->load();
+
+        // Try to force load configuration again when nothing has changed
+        $this->imageFilterLoader->forceLoad();
+    }
+
     public function testLoadWhenNewCustomImageFilterProviderAdded()
     {
         $this->imageTypeProvider->getImageDimensions()->shouldBeCalledTimes(1)->willReturn([]);

@@ -61,7 +61,7 @@
         "oro/doctrine-extensions": "1.2.*",
         "tinymce/tinymce": "4.6.*",
         "ezyang/htmlpurifier": "4.10.*",
-        "xemlock/htmlpurifier-html5": "0.1.*",
+        "xemlock/htmlpurifier-html5": "0.1.10",
         "hwi/oauth-bundle": "0.6.*",
         "kriswallsmith/buzz": "1.0.*",
         "npm-asset/jquery": "3.4.*",
@@ -113,7 +113,9 @@
         "brick/math": "0.8.*",
         "bower-asset/fuse": "3.2.*",
         "phpdocumentor/reflection-docblock": "4.3.*",
-        "php-http/httplug-bundle": "1.15.2"
+        "php-http/httplug-bundle": "1.15.2",
+        "npm-asset/css-vars-ponyfill": "^2.0",
+        "salsify/json-streaming-parser": "8.0.1"
     },
     "require-dev": {
         "behat/behat": "3.4.*",

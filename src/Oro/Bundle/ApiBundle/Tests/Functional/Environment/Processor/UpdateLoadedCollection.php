@@ -15,10 +15,7 @@ class UpdateLoadedCollection implements ProcessorInterface
     {
         /** @var CustomizeLoadedDataContext $context */
 
-        $data = $context->getResult();
-        if (!is_array($data)) {
-            return;
-        }
+        $data = $context->getData();
 
         $config = $context->getConfig();
         if (!$config->hasField('computedIds') || $config->getField('computedIds')->isExcluded()) {
@@ -32,6 +29,6 @@ class UpdateLoadedCollection implements ProcessorInterface
         foreach ($data as $key => $item) {
             $data[$key]['computedIds'] = $computedIds;
         }
-        $context->setResult($data);
+        $context->setData($data);
     }
 }

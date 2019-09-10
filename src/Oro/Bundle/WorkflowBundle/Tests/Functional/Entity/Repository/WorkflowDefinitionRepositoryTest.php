@@ -5,53 +5,48 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 use Doctrine\Common\Persistence\Proxy;
 use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item2;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\TestActivityScopeProvider;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTestActivitiesForScopes;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionScopes;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\TestActivityScopeProvider;
 
 class WorkflowDefinitionRepositoryTest extends WebTestCase
 {
     /** @var EntityManager */
-    protected $em;
+    private $em;
 
     /** @var WorkflowDefinitionRepository */
-    protected $repository;
+    private $repository;
 
     /** @var ScopeManager */
-    protected $scopeManager;
+    private $scopeManager;
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var TestActivityScopeProvider */
+    private $activityScopeProvider;
+
     protected function setUp()
     {
         $this->initClient();
-
-        $this->em = $this->getContainer()->get('oro_entity.doctrine_helper')
-            ->getEntityManagerForClass(WorkflowDefinition::class);
-
-        $this->repository = $this->em->getRepository(WorkflowDefinition::class);
-
-        $this->scopeManager = $this->getContainer()->get('oro_scope.scope_manager');
-
         $this->loadFixtures([LoadWorkflowDefinitionScopes::class]);
+
+        $this->em = self::getContainer()->get('oro_entity.doctrine_helper')
+            ->getEntityManagerForClass(WorkflowDefinition::class);
+        $this->repository = $this->em->getRepository(WorkflowDefinition::class);
+        $this->scopeManager = self::getContainer()->get('oro_scope.scope_manager');
+        $this->activityScopeProvider = self::getContainer()->get('oro_workflow.test_activity_scope_provider');
     }
 
-    /**
-     * @inheritdoc
-     */
     protected function tearDown()
     {
+        $this->activityScopeProvider->setCurrentTestActivity(null);
         $this->repository->invalidateCache();
     }
 
@@ -96,10 +91,9 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
 
     public function testGetScopedByNames()
     {
-        $provider = new TestActivityScopeProvider();
-        $provider->setCurrentTestActivity($this->getReference(LoadTestActivitiesForScopes::TEST_ACTIVITY_2));
-
-        $this->registerScopeProvider($provider);
+        $this->activityScopeProvider->setCurrentTestActivity(
+            $this->getReference(LoadTestActivitiesForScopes::TEST_ACTIVITY_2)
+        );
 
         $workflows = $this->repository->getScopedByNames(
             [
@@ -115,14 +109,6 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
         $workflow = array_shift($workflows);
 
         $this->assertEquals(LoadWorkflowDefinitions::WITH_GROUPS1, $workflow->getName());
-    }
-
-    /**
-     * @param ScopeCriteriaProviderInterface $provider
-     */
-    protected function registerScopeProvider(ScopeCriteriaProviderInterface $provider)
-    {
-        $this->scopeManager->addProvider(WorkflowScopeManager::SCOPE_TYPE, $provider);
     }
 
     public function testFindActive()

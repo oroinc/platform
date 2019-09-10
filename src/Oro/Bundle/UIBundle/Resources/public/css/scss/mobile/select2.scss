@@ -104,6 +104,8 @@
             }
 
             .select2-search-field {
+                padding: 0;
+
                 input {
                     height: $mobile-select2-container-multi-select2-search-field-height;
                     margin-top: $mobile-select2-container-multi-select2-search-field-top-offset;
@@ -134,13 +136,14 @@
 
 .select2-container.select2-tree-autocomplete {
     &.select2-container-multi {
-        height: auto;
-        min-height: auto;
-
         .select2-choices {
             .select2-search-field {
                 .select2-input {
                     margin-top: 0;
+                    padding: $input-inner-offset;
+                    max-width: 100%;
+                    font-size: $mobile-select2-container-font-size;
+                    height: $mobile-select2-container-height;
                 }
             }
 

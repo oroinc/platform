@@ -33,11 +33,13 @@ services:
         tags:
            - {name: oro_activity_list.provider, priority: 40}
 
-    oro_note.handler.delete.activity_entity:
-        class: Oro\Bundle\NoteBundle\Entity\Manager\NoteActivityEntityDeleteHandler
-        parent: oro_activity.handler.delete.activity_entity
-        tags:
-            - { name: oro_activity.activity_entity_delete_handler, priority: -10 }
+    oro_note.activity_entity_delete_handler_extension:
+        class: Oro\Bundle\NoteBundle\Handler\NoteActivityEntityDeleteHandlerExtension
+        decorates: oro_activity.activity_entity_delete_handler_extension
+        arguments:
+            - '@oro_note.activity_entity_delete_handler_extension.inner'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity.delete_handler_access_denied_exception_factory'
 
     oro_note.listener.remove_note_configuration_scope:
         class: Oro\Bundle\NoteBundle\EventListener\RemoveNoteConfigurationScopeListener

@@ -8,6 +8,10 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * Enum filter supports the ability to select multiple values at once and
+ * provides possibility to create filter form and build an expression by passed enum data.
+ */
 class MultiEnumFilter extends BaseMultiChoiceFilter
 {
     const FILTER_TYPE_NAME = 'multi_enum';
@@ -79,7 +83,7 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
             $fieldName,
             $parameterName,
             $this->getName(),
-            in_array($comparisonType, [DictionaryFilterType::NOT_EQUAL, DictionaryFilterType::TYPE_NOT_IN], true)
+            in_array($comparisonType, [DictionaryFilterType::NOT_EQUAL, DictionaryFilterType::TYPE_NOT_IN], false)
         );
     }
 

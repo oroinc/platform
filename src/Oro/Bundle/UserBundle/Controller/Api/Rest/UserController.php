@@ -21,6 +21,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * API CRUD controller for User entity.
+ *
  * @NamePrefix("oro_api_")
  */
 class UserController extends RestController implements ClassResourceInterface
@@ -336,14 +338,6 @@ class UserController extends RestController implements ClassResourceInterface
         unset($result['organizations']);
         unset($result['emailOrigins']);
 
-        //todo: Add user avatar to api
-        /*$result['imagePath'] = null;
-        if (isset($result['image'])) {
-            $result['imagePath'] = $this->get('request_stack')
-                ->getCurrentRequest()->getBasePath() . '/' . $entity->getImagePath();
-        }
-        unset($result['image']);*/
-
         return $result;
     }
 
@@ -371,13 +365,5 @@ class UserController extends RestController implements ClassResourceInterface
     public function getFormHandler()
     {
         return $this->get('oro_user.form.handler.user.api');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDeleteHandler()
-    {
-        return $this->get('oro_user.handler.delete');
     }
 }

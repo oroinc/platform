@@ -18,9 +18,34 @@ use Symfony\Component\Process\Process;
  */
 class OroAssetsBuildCommand extends Command
 {
+    /**
+     * @see https://webpack.js.org/configuration/stats/#stats
+     */
+    protected const WEBPACK_VERBOSITY_MAP = [
+        OutputInterface::VERBOSITY_QUIET => 'none',
+        OutputInterface::VERBOSITY_NORMAL => false,
+        OutputInterface::VERBOSITY_VERBOSE => 'normal',
+        OutputInterface::VERBOSITY_VERY_VERBOSE => 'detailed',
+        OutputInterface::VERBOSITY_DEBUG => 'verbose',
+    ];
+
+    /**
+     * @see https://webpack.js.org/configuration/dev-server/#devserverstats-
+     */
+    protected const WEBPACK_DEV_SERVER_VERBOSITY_MAP = [
+        OutputInterface::VERBOSITY_QUIET => 'none',
+        OutputInterface::VERBOSITY_NORMAL => false,
+        OutputInterface::VERBOSITY_DEBUG => 'verbose',
+        OutputInterface::VERBOSITY_VERY_VERBOSE => 'normal',
+        OutputInterface::VERBOSITY_VERBOSE => 'minimal',
+    ];
+
+    /**
+     * {@inheritdoc}
+     */
     protected static $defaultName = 'oro:assets:build';
 
-    protected const BUILD_DIR = '/vendor/oro/platform/build/';
+    protected const BUILD_DIR = 'vendor/oro/platform/build/';
 
     /**
      * @var NodeProcessFactory
@@ -93,6 +118,51 @@ DESCRIPTION
                 'Theme name to build. When not provided, all available themes are built.'
             )
             ->addOption(
+                'hot',
+                null,
+                InputOption::VALUE_NONE,
+                'Turn on hot module replacement. It allows all styles to be updated at runtime 
+                without the need for a full refresh.'
+            )
+            ->addOption(
+                'key',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'SSL Certificate key PEM file path. Used only with hot module replacement.'
+            )
+            ->addOption(
+                'cert',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'SSL Certificate cert PEM file path. Used only with hot module replacement.'
+            )
+            ->addOption(
+                'cacert',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'SSL Certificate cacert PEM file path. Used only with hot module replacement.'
+            )
+            ->addOption(
+                'pfx',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'When used via the CLI, a path to an SSL .pfx file. '.
+                'If used in options, it should be the bytestream of the .pfx file. '.
+                'Used only with hot module replacement.'
+            )
+            ->addOption(
+                'pfxPassphrase',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'The passphrase to a SSL PFX file. Used only with hot module replacement.'
+            )
+            ->addOption(
+                'force-warmup',
+                'f',
+                InputOption::VALUE_NONE,
+                'Warm up the asset-config.json cache.'
+            )
+            ->addOption(
                 'watch',
                 'w',
                 InputOption::VALUE_NONE,
@@ -108,6 +178,7 @@ DESCRIPTION
             )
             ->addUsage('admin.oro --watch')
             ->addUsage('blank -w')
+            ->addUsage('blank --hot')
             ->addUsage('default')
             ->addUsage('-i');
     }
@@ -120,13 +191,13 @@ DESCRIPTION
         $kernel = $this->getKernel();
         $io = new SymfonyStyle($input, $output);
 
-        if (!$this->cache->exists($kernel->getCacheDir())) {
+        if ($input->getOption('force-warmup') || !$this->cache->exists($kernel->getCacheDir())) {
             $io->text('<info>Warming up the asset-config.json cache.</info>');
             $this->cache->warmUp($kernel->getCacheDir());
             $io->text('Done');
         }
 
-        $nodeModulesDir = $kernel->getProjectDir().self::BUILD_DIR.'node_modules';
+        $nodeModulesDir = $kernel->getProjectDir().'/'.self::BUILD_DIR.'node_modules';
         if (!file_exists($nodeModulesDir) || $input->getOption('npm-install')) {
             $output->writeln('<info>Installing npm dependencies.</info>');
             $this->npmInstall($output);
@@ -134,7 +205,9 @@ DESCRIPTION
 
         $output->writeln('<info>Building assets.</info>');
         $this->buildAssets($input, $output);
-        $io->success('All assets were successfully build.');
+        if (!$input->getOption('hot') && !$input->getOption('watch')) {
+            $io->success('All assets were successfully build.');
+        }
     }
 
     /**
@@ -143,31 +216,23 @@ DESCRIPTION
      */
     protected function buildAssets(InputInterface $input, OutputInterface $output): void
     {
-        $command = ['vendor/oro/platform/build/node_modules/webpack/bin/webpack.js'];
-
-        if ($input->getArgument('theme')) {
-            $command[] = '--env.theme='.$input->getArgument('theme');
+        $buildTimeout = $this->buildTimeout;
+        if ($input->getOption('hot')) {
+            $buildTimeout = null;
         }
-        if (true === $input->getOption('no-debug') || 'prod' === $input->getOption('env')) {
-            $command[] = '--mode=production';
-        }
-        if ($input->getOption('watch')) {
-            $command[] = '--watch';
-        }
-        $command[] = '--env.symfony='.$input->getOption('env');
-        $command[] = '--colors';
-
+        $command = $this->buildCommand($input, $output);
 
         $process = $this->nodeProcessFactory->create(
             $command,
             $this->getKernel()->getProjectDir(),
-            $this->buildTimeout
+            $buildTimeout
         );
         $output->writeln($process->getCommandLine());
 
         if ($input->getOption('watch')) {
             $process->setTimeout(null);
         }
+        $this->handleSignals($process);
 
         $process->run(
             function ($type, $buffer) use ($output) {
@@ -181,13 +246,78 @@ DESCRIPTION
     }
 
     /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     * @return array
+     */
+    protected function buildCommand(InputInterface $input, OutputInterface $output): array
+    {
+        if ($input->getOption('hot')) {
+            $command[] = self::BUILD_DIR.'node_modules/webpack-dev-server/bin/webpack-dev-server.js';
+            $command[] = '--hot';
+
+            foreach (['key', 'cert', 'cacert', 'pfx', 'pfxPassphrase'] as $optionName) {
+                $optionValue = $input->getOption($optionName);
+                if ($optionValue) {
+                    $command[] = "--{$optionName}={$optionValue}";
+                }
+            }
+        } else {
+            $command[] = self::BUILD_DIR.'/node_modules/webpack/bin/webpack.js';
+            $command[] = '--hide-modules';
+        }
+
+        if ($input->getArgument('theme')) {
+            $command[] = '--env.theme='.$input->getArgument('theme');
+        }
+        if (true === $input->getOption('no-debug') || 'prod' === $input->getOption('env')) {
+            $command[] = '--mode=production';
+        }
+        if ($input->getOption('watch')) {
+            $command[] = '--watch';
+        }
+
+        // Handle the verbosity level. Options are different for the webpack and webpack-dev-server
+        if ($input->getOption('hot')) {
+            $verbosity = self::WEBPACK_DEV_SERVER_VERBOSITY_MAP[$output->getVerbosity()];
+        } else {
+            $verbosity = self::WEBPACK_VERBOSITY_MAP[$output->getVerbosity()];
+        }
+        $command[] = '--env.stats='.$verbosity;
+
+        $command[] = '--env.symfony='.$input->getOption('env');
+        $command[] = '--colors';
+
+        return $command;
+    }
+
+    /**
+     * Handle exit signals, to make them processed by NodeJs
+     *
+     * @param Process $process
+     */
+    protected function handleSignals(Process $process): void
+    {
+        if (!\extension_loaded('pcntl')) {
+            return;
+        }
+        $killNodeProcess = function () use ($process) {
+            $process->signal(SIGKILL);
+            exit();
+        };
+        pcntl_async_signals(true);
+        pcntl_signal(SIGINT, $killNodeProcess);
+        pcntl_signal(SIGTERM, $killNodeProcess);
+    }
+
+    /**
      * @param OutputInterface $output
      */
     protected function npmInstall(OutputInterface $output): void
     {
-        $command = [$this->npmPath,'--no-audit', 'install'];
+        $command = [$this->npmPath, '--no-audit', 'install'];
         $output->writeln($command);
-        $path = $this->getKernel()->getProjectDir().self::BUILD_DIR;
+        $path = $this->getKernel()->getProjectDir().'/'.self::BUILD_DIR;
         $process = new Process($command, $path);
         $process->setTimeout($this->npmInstallTimeout);
 

@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * Represents the configuration of Data API resource action.
+ * Represents the configuration of API resource action.
  *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)

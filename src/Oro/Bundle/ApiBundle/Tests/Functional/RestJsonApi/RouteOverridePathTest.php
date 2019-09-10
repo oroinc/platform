@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Symfony\Component\HttpFoundation\Response;
@@ -238,6 +239,7 @@ class RouteOverridePathTest extends RestJsonApiTestCase
     {
         $this->loadCurrentDepartment();
 
+        $entityType = $this->getEntityType(TestDepartment::class);
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
 
         $response = $this->request(
@@ -247,28 +249,53 @@ class RouteOverridePathTest extends RestJsonApiTestCase
 
         self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        // "attributes" and "relationships" sections will be added in CRM-8250
         $this->assertResponseContains(
             [
                 'data' => [
                     [
-                        'type' => $employeeEntityType,
-                        'id'   => '<toString(@employee1->id)>'
+                        'type'          => $employeeEntityType,
+                        'id'            => '<toString(@employee1->id)>',
+                        'attributes'    => [
+                            'name' => 'Employee 1'
+                        ],
+                        'relationships' => [
+                            'department'   => [
+                                'data' => ['type' => $entityType, 'id' => '<toString(@current_department->id)>']
+                            ],
+                            'organization' => [
+                                'data' => ['type' => 'organizations', 'id' => '<toString(@organization->id)>']
+                            ]
+                        ]
                     ],
                     [
-                        'type' => $employeeEntityType,
-                        'id'   => '<toString(@employee2->id)>'
+                        'type'          => $employeeEntityType,
+                        'id'            => '<toString(@employee2->id)>',
+                        'attributes'    => [
+                            'name' => 'Employee 2'
+                        ],
+                        'relationships' => [
+                            'department'   => [
+                                'data' => ['type' => $entityType, 'id' => '<toString(@current_department->id)>']
+                            ],
+                            'organization' => [
+                                'data' => ['type' => 'organizations', 'id' => '<toString(@organization->id)>']
+                            ]
+                        ]
                     ]
                 ]
             ],
             $response
         );
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertArrayNotHasKey('meta', $responseContent['data'][0]);
+        self::assertArrayNotHasKey('meta', $responseContent['data'][1]);
     }
 
     public function testGetSubresourceWithTitleMetaPropertyWhenCurrentDepartmentExists()
     {
         $this->loadCurrentDepartment();
 
+        $entityType = $this->getEntityType(TestDepartment::class);
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
 
         $response = $this->request(
@@ -279,28 +306,52 @@ class RouteOverridePathTest extends RestJsonApiTestCase
 
         self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        // "attributes" and "relationships" sections will be added in CRM-8250
         $this->assertResponseContains(
             [
                 'data' => [
                     [
-                        'type' => $employeeEntityType,
-                        'id'   => '<toString(@employee1->id)>',
-                        'meta' => [
+                        'type'          => $employeeEntityType,
+                        'id'            => '<toString(@employee1->id)>',
+                        'meta'          => [
                             'title' => 'Employee 1'
+                        ],
+                        'attributes'    => [
+                            'name' => 'Employee 1'
+                        ],
+                        'relationships' => [
+                            'department'   => [
+                                'data' => ['type' => $entityType, 'id' => '<toString(@current_department->id)>']
+                            ],
+                            'organization' => [
+                                'data' => ['type' => 'organizations', 'id' => '<toString(@organization->id)>']
+                            ]
                         ]
                     ],
                     [
-                        'type' => $employeeEntityType,
-                        'id'   => '<toString(@employee2->id)>',
-                        'meta' => [
+                        'type'          => $employeeEntityType,
+                        'id'            => '<toString(@employee2->id)>',
+                        'meta'          => [
                             'title' => 'Employee 2'
+                        ],
+                        'attributes'    => [
+                            'name' => 'Employee 2'
+                        ],
+                        'relationships' => [
+                            'department'   => [
+                                'data' => ['type' => $entityType, 'id' => '<toString(@current_department->id)>']
+                            ],
+                            'organization' => [
+                                'data' => ['type' => 'organizations', 'id' => '<toString(@organization->id)>']
+                            ]
                         ]
                     ]
                 ]
             ],
             $response
         );
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertArrayNotHasKey(ConfigUtil::CLASS_NAME, $responseContent['data'][0]['meta']);
+        self::assertArrayNotHasKey(ConfigUtil::CLASS_NAME, $responseContent['data'][1]['meta']);
     }
 
     public function testGetRelationshipWhenCurrentDepartmentDoesNotExist()

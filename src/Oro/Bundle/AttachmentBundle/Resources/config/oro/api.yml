@@ -27,5 +27,14 @@ api:
                     form_options:
                         property_path: file
                         allow_file_upload: true
+                parent:
+                    data_type: nestedAssociation
+                    fields:
+                        __class__:
+                            property_path: parentEntityClass
+                        id:
+                            property_path: parentEntityId
+                parentFieldName:
+                    property_path: parentEntityFieldName
             actions:
                 get_list: false

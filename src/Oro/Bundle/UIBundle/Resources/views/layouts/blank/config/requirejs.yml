@@ -42,6 +42,7 @@ config:
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
             'jquery.timepicker': 'oroui/js/extend/jquery.timepicker'
             'popper.js': 'popper'
+            'popper': 'extend-popper'
             'util.js': 'bootstrap-util'
             'alert.js': 'bootstrap-alert'
             'dropdown.js': 'bootstrap-dropdown'
@@ -87,6 +88,8 @@ config:
             'chaplin': 'chaplin'
         'oroui/js/tools':
             'chaplin': 'chaplin'
+        'extend-popper':
+            'popper': 'popper'
     paths:
         'text': 'bundles/bowerassets/text/text.js'
         'base64': 'oroui/js/extend/base64.js'
@@ -103,6 +106,7 @@ config:
         'overlayScrollbars': 'bundles/npmassets/overlayscrollbars/js/OverlayScrollbars.js'
         'styled-scroll-bar': 'bundles/oroui/js/app/plugins/styled-scroll-bar.js'
         'popper': 'bundles/npmassets/popper.js/dist/umd/popper.js'
+        'extend-popper': 'bundles/oroui/js/extend/popper.js'
         'bootstrap-util': 'bundles/npmassets/bootstrap/js/dist/util.js'
         'bootstrap-alert': 'bundles/npmassets/bootstrap/js/dist/alert.js'
         'bootstrap-dropdown': 'bundles/npmassets/bootstrap/js/dist/dropdown.js'
@@ -121,9 +125,12 @@ config:
         'datepair': 'bundles/bowerassets/datepair/dist/datepair.js'
         'cryptojs/core': 'bundles/bowerassets/crypto-js/core.js'
         'cryptojs/sha256': 'bundles/bowerassets/crypto-js/sha256.js'
+        'css-vars-ponyfill': 'bundles/npmassets/css-vars-ponyfill/dist/css-vars-ponyfill.js'
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'
+        'app-modules': 'bundles/oroui/js/requirejs/app-modules.js'
+        'oroui/js/app': 'bundles/oroui/js/app.js'
         'oroui/blank/js/extend/bootstrap': 'bundles/oroui/blank/js/extend/bootstrap.js'
         'oroui/js/tools/api-accessor': 'bundles/oroui/js/tools/api-accessor.js'
         'oroui/js/app/ready-state-tracker': 'bundles/oroui/js/app/ready-state-tracker.js'
@@ -193,8 +200,13 @@ config:
 
         'oroui/js/app/views/layout-subtree-view': 'bundles/oroui/js/app/views/layout-subtree-view.js'
         'oroui/js/layout-subtree-manager': 'bundles/oroui/js/layout-subtree-manager.js'
+    
+    
+        'oroui/js/css-variables-manager': 'bundles/oroui/js/css-variables-manager.js'
+        'oroui/js/app/modules/css-variable-module': 'bundles/oroui/js/app/modules/css-variable-module.js'
 
     appmodules:
+        - oroui/js/app/modules/css-variable-module
         - oroui/js/app/modules/init-layout
         - oroui/js/app/modules/layout-module
         - oroui/js/app/modules/messenger-module

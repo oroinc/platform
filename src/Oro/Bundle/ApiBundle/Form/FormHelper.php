@@ -14,7 +14,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Provides a set of reusable utility methods to simplify
- * creation and configuration of FormBuilder for forms used in Data API actions,
+ * creation and configuration of FormBuilder for forms used in API actions,
  * such as "create", "update",
  * "update_subresource", "add_subresource" and "delete_subresource",
  * "update_relationship", "add_relationship" and "delete_relationship".

@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Request\Version;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
- * Warms up Data API resources and sub-resources caches.
+ * Warms up API resources and sub-resources caches.
  */
 class ResourcesCacheWarmer implements CacheWarmerInterface
 {

@@ -9,7 +9,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class RestDocUrlGenerator implements RestDocUrlGeneratorInterface
 {
-    public const ROUTE = 'nelmio_api_doc_index';
+    public const ROUTE          = 'nelmio_api_doc_index';
+    public const RESOURCE_ROUTE = 'oro_rest_api_doc_resource';
 
     /** @var UrlGeneratorInterface */
     private $urlGenerator;

@@ -57,9 +57,14 @@ class OwnerValidator extends AbstractOwnerValidator
      */
     protected function isValidExistingOwner(OwnershipMetadataInterface $ownershipMetadata, $owner, $accessLevel)
     {
+        $currentUser = $this->tokenAccessor->getUser();
+        if (null === $currentUser) {
+            return true;
+        }
+
         if ($ownershipMetadata->isUserOwned()) {
             return $this->businessUnitManager->canUserBeSetAsOwner(
-                $this->tokenAccessor->getUser(),
+                $currentUser,
                 $owner,
                 $accessLevel,
                 $this->ownerTreeProvider,
@@ -68,7 +73,7 @@ class OwnerValidator extends AbstractOwnerValidator
         }
         if ($ownershipMetadata->isBusinessUnitOwned()) {
             return $this->businessUnitManager->canBusinessUnitBeSetAsOwner(
-                $this->tokenAccessor->getUser(),
+                $currentUser,
                 $owner,
                 $accessLevel,
                 $this->ownerTreeProvider,

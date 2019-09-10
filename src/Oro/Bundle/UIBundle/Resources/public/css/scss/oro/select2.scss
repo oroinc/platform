@@ -581,6 +581,9 @@
     outline: $select2-offscreen-outline;
     left: $select2-offscreen-left;
 }
+.select2-offscreen[multiple] {
+    height: auto;
+}
 
 .select2-display-none {
     display: $select2-display-none-display;
@@ -622,6 +625,8 @@
                     border: $selector-border;
                     padding: $input-inner-offset;
                     min-width: 100%;
+                    height: $select2-tree-autocomplete-choice-item-height;
+                    line-height: $select2-tree-autocomplete-choice-item-line-height;
                 }
             }
 

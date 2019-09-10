@@ -10,7 +10,7 @@ use Oro\Bundle\OrganizationBundle\EventListener\RecordOwnerDataListener;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -49,7 +49,7 @@ class RecordOwnerDataListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($token->getUser());
         $this->tokenAccessor->expects($this->any())
             ->method('getOrganization')
-            ->willReturn($token instanceof OrganizationContextTokenInterface ? $token->getOrganizationContext() : null);
+            ->willReturn($token instanceof OrganizationAwareTokenInterface ? $token->getOrganization() : null);
 
         $args = new LifecycleEventArgs($entity, $this->createMock('Doctrine\Common\Persistence\ObjectManager'));
         $this->configProvider->expects($this->once())

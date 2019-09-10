@@ -84,8 +84,8 @@ class BuildTemplateFormSubscriber implements EventSubscriberInterface
     protected function initChoicesByEntityName($entityName, $fieldName, FormInterface $form)
     {
         /** @var UsernamePasswordOrganizationToken $token */
-        $token        = $this->tokenStorage->getToken();
-        $organization = $token->getOrganizationContext();
+        $token = $this->tokenStorage->getToken();
+        $organization = $token->getOrganization();
 
         $options = [
             'query_builder'  =>

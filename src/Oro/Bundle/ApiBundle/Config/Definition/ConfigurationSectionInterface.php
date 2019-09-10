@@ -19,7 +19,7 @@ interface ConfigurationSectionInterface
     /**
      * Checks if this section can be added to the given configuration section.
      *
-     * @param string $section Configuration section, e.g. entities.entity, relations.entity, etc.
+     * @param string $section Configuration section, e.g. "entities.entity", "filters.field", etc.
      *
      * @return bool
      */

@@ -22,45 +22,36 @@ class FileTest extends RestJsonApiTestCase
      */
     public function testPost()
     {
-        $response = $this->post(
-            ['entity' => 'files'],
-            [
-                'data' => [
-                    'type'       => 'files',
-                    'attributes' => [
-                        'mimeType'         => 'image/png',
-                        'originalFilename' => 'blank.png',
-                        'fileSize'         => 95,
-                        'content'          => self::$blankFileContent
+        $data = [
+            'data' => [
+                'type'          => 'files',
+                'attributes'    => [
+                    'mimeType'         => 'image/png',
+                    'originalFilename' => 'blank.png',
+                    'fileSize'         => 95,
+                    'content'          => self::$blankFileContent,
+                    'parentFieldName'  => 'avatar'
+                ],
+                'relationships' => [
+                    'parent' => [
+                        'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
                     ]
                 ]
             ]
+        ];
+        $response = $this->post(
+            ['entity' => 'files'],
+            $data
         );
 
-        $this->assertResponseContains(
-            [
-                'data' => [
-                    'type'          => 'files',
-                    'attributes'    => [
-                        'mimeType'         => 'image/png',
-                        'originalFilename' => 'blank.png',
-                        'fileSize'         => 95,
-                        'content'          => self::$blankFileContent
-                    ],
-                    'relationships' => [
-                        'owner' => [
-                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
-                        ]
-                    ]
-                ]
-            ],
-            $response
-        );
+        $expectedData = $data;
+        $expectedData['data']['relationships']['owner']['data'] = [
+            'type' => 'users',
+            'id'   => '<toString(@user->id)>'
+        ];
+        $this->assertResponseContains($expectedData, $response);
 
-        $fileId = $this->getResourceId($response);
-        self::assertNotEmpty($fileId);
-
-        $fileId = (int)$fileId;
+        $fileId = (int)$this->getResourceId($response);
 
         // test that the entity was created
         $entity = $this->getEntityManager()->find(File::class, $fileId);
@@ -92,10 +83,14 @@ class FileTest extends RestJsonApiTestCase
                         'mimeType'         => 'image/png',
                         'originalFilename' => 'blank.png',
                         'fileSize'         => 95,
-                        'content'          => self::$blankFileContent
+                        'content'          => self::$blankFileContent,
+                        'parentFieldName'  => 'avatar'
                     ],
                     'relationships' => [
-                        'owner' => [
+                        'owner'  => [
+                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                        ],
+                        'parent' => [
                             'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
                         ]
                     ]

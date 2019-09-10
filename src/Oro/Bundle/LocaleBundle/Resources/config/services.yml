@@ -409,7 +409,7 @@ services:
         arguments:
             - "@oro_locale.provider.current_localization"
         tags:
-            - {name: oro_scope.provider, scopeType: web_content, priority: 1}
+            - { name: oro_scope.provider, scopeType: web_content, priority: 1 }
 
     oro_locale.provider.chain_preferred_language_provider:
         class: Oro\Bundle\LocaleBundle\Provider\ChainPreferredLanguageProvider

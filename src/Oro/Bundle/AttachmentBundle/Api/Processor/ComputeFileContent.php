@@ -39,10 +39,7 @@ class ComputeFileContent implements ProcessorInterface
     {
         /** @var CustomizeLoadedDataContext $context */
 
-        $data = $context->getResult();
-        if (!is_array($data)) {
-            return;
-        }
+        $data = $context->getData();
 
         if (!$context->isFieldRequested(self::CONTENT_FIELD_NAME, $data)) {
             return;
@@ -56,7 +53,7 @@ class ComputeFileContent implements ProcessorInterface
         $content = $this->getFileContent($data[$fileNameFieldName]);
         if (null !== $content) {
             $data[self::CONTENT_FIELD_NAME] = $content;
-            $context->setResult($data);
+            $context->setData($data);
         }
     }
 

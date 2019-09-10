@@ -12,10 +12,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class CurrentApplicationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
-    protected $tokenStorage;
+    private $tokenStorage;
 
     /** @var CurrentApplicationProvider */
-    protected $provider;
+    private $provider;
 
     protected function setUp()
     {
@@ -24,34 +24,26 @@ class CurrentApplicationProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new CurrentApplicationProvider($this->tokenStorage);
     }
 
-    protected function tearDown()
-    {
-        unset($this->provider, $this->tokenStorage);
-    }
-
     /**
      * @dataProvider isApplicationsValidDataProvider
-     *
-     * @param array $applications
-     * @param TokenInterface|null $token
-     * @param bool $expectedResult
      */
-    public function testIsApplicationsValid(array $applications, $token, $expectedResult)
+    public function testIsApplicationsValid(array $applications, ?TokenInterface $token, bool $expectedResult)
     {
-        $this->tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
+        $this->tokenStorage->expects($this->any())
+            ->method('getToken')
+            ->willReturn($token);
 
         $this->assertEquals($expectedResult, $this->provider->isApplicationsValid($applications));
     }
 
     /**
      * @dataProvider getCurrentApplicationProvider
-     *
-     * @param TokenInterface|null $token
-     * @param string $expectedResult
      */
-    public function testGetCurrentApplication($token, $expectedResult)
+    public function testGetCurrentApplication(?TokenInterface $token, ?string $expectedResult)
     {
-        $this->tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
+        $this->tokenStorage->expects($this->any())
+            ->method('getToken')
+            ->willReturn($token);
 
         $this->assertSame($expectedResult, $this->provider->getCurrentApplication());
     }
@@ -126,8 +118,7 @@ class CurrentApplicationProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected function createToken($user, Invocation $expects = null)
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|TokenInterface $token */
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($expects ?: $this->once())
             ->method('getUser')
             ->willReturn($user);

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 /**
- * Represents Data API sub-resource.
+ * Represents API sub-resource.
  */
 class ApiSubresource
 {
@@ -72,7 +72,7 @@ class ApiSubresource
     /**
      * Sets a flag indicates whether the sub-resource represents "to-many" or "to-one" association.
      *
-     * @param bool $isCollection TRUE for "to-many" relation, FALSE for "to-one" relation
+     * @param bool $isCollection TRUE for "to-many" relationship, FALSE for "to-one" relationship
      */
     public function setIsCollection($isCollection)
     {

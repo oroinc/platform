@@ -258,16 +258,7 @@
     {% endset %}
 
     {% set workflowStepsAndTransitions %}
-        <style type="text/css">
-            .transitions-list-short {
-                margin-left: 0;
-            }
-
-            .transitions-list-short li {
-                list-style: none;
-            }
-        </style>
-        <div class="workflow-step-viewer row-fluid clearfix">
+        <div class="row-fluid clearfix">
             <div class="workflow-table-container">
                 <div class="workflow-definition-steps-list-container clearfix">
                     <div class="grid-container steps-list">
@@ -303,12 +294,6 @@
                     </div>
                 </div>
             </div>
-            {% if not isMobileVersion() %}
-            <div {{ UI.renderPageComponentAttributes({
-                'view': 'oroworkflow/js/app/views/flowchart/flowchart-container-view',
-                'name': 'flowchart-container'
-            }) }}></div>
-            {% endif %}
         </div>
     {% endset %}
 
@@ -328,6 +313,25 @@
             ]
         },
     ] %}
+
+    {% if not isMobileVersion() %}
+        {% set workflowDiagram %}
+            <div class="workflow-step-viewer" {{ UI.renderPageComponentAttributes({
+                'view': 'oroworkflow/js/app/views/flowchart/flowchart-container-view',
+                'name': 'flowchart-container'
+            }) }}></div>
+        {% endset %}
+        {% set dataBlocks = dataBlocks|merge([
+            {
+                'title': 'oro.workflow.block.title.workflow_diagrams'|trans,
+                'subblocks': [
+                    {
+                        'data':  [workflowDiagram]
+                    },
+                ]
+            },
+        ])%}
+    {% endif %}
 
     {% if variables is defined and variables|length %}
         {% set variablesInfo %}

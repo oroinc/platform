@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Controller;
 
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\ImportExportBundle\Exception\ImportExportExpiredException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
@@ -116,9 +117,7 @@ class ImportExportController extends AbstractController
 
         $entityName = $request->get('entity');
 
-        $configurationsByAlias = $this
-            ->get(GetImportExportConfigurationExtension::class)
-            ->getConfiguration($configAlias);
+        $configurationsByAlias = $this->getImportConfigurations($configAlias);
 
         $configsWithForm = [];
 
@@ -168,6 +167,24 @@ class ImportExportController extends AbstractController
             'configsWithForm' => $configsWithForm,
             'chosenEntityName' => $entityName
         ];
+    }
+
+    /**
+     * @param string $configAlias
+     * @return array
+     */
+    private function getImportConfigurations(string $configAlias): array
+    {
+        $configurationsByAlias = $this
+            ->get(GetImportExportConfigurationExtension::class)
+            ->getConfiguration($configAlias);
+
+        return array_filter(
+            $configurationsByAlias,
+            function (ImportExportConfigurationInterface $configuration) {
+                return $configuration->getImportProcessorAlias();
+            }
+        );
     }
 
     /**
@@ -329,7 +346,7 @@ class ImportExportController extends AbstractController
             'outputFilePrefix' => $filePrefix,
             'options' => $options,
             'userId' => $this->getUser()->getId(),
-            'organizationId' => $token->getOrganizationContext()->getId(),
+            'organizationId' => $token->getOrganization()->getId(),
         ]);
 
         return new JsonResponse(['success' => true]);

@@ -249,19 +249,13 @@ class BusinessUnitManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider canUserBeSetAsOwnerDataProvider
-     *
-     * @param User $currentUser
-     * @param $newUser
-     * @param int $accessLevel
-     * @param Organization $organizationContext
-     * @param bool $isCanBeSet
      */
     public function testCanUserBeSetAsOwner(
         User $currentUser,
         User $newUser,
-        $accessLevel,
-        Organization $organizationContext,
-        $isCanBeSet
+        int $accessLevel,
+        Organization $organization,
+        bool $isCanBeSet
     ) {
         $tree = new OwnerTree();
         $this->addUserInfoToTree($tree, $currentUser);
@@ -278,7 +272,7 @@ class BusinessUnitManagerTest extends \PHPUnit\Framework\TestCase
             $newUser,
             $accessLevel,
             $treeProvider,
-            $organizationContext
+            $organization
         );
         $this->assertEquals($isCanBeSet, $result);
     }
@@ -405,19 +399,13 @@ class BusinessUnitManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider canBusinessUnitBeSetAsOwnerDataProvider
-     *
-     * @param User $currentUser
-     * @param BusinessUnit $newBusinessUnit
-     * @param int $accessLevel
-     * @param Organization $organizationContext
-     * @param bool $isCanBeSet
      */
     public function testCanBusinessUnitBeSetAsOwner(
         User $currentUser,
         BusinessUnit $newBusinessUnit,
-        $accessLevel,
-        Organization $organizationContext,
-        $isCanBeSet
+        int $accessLevel,
+        Organization $organization,
+        bool $isCanBeSet
     ) {
         $tree = new OwnerTree();
         $this->addUserInfoToTree($tree, $currentUser);
@@ -440,7 +428,7 @@ class BusinessUnitManagerTest extends \PHPUnit\Framework\TestCase
                 $newBusinessUnit,
                 $accessLevel,
                 $treeProvider,
-                $organizationContext
+                $organization
             )
         );
     }

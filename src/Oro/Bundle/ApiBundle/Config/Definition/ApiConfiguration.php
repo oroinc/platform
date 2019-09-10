@@ -19,7 +19,6 @@ class ApiConfiguration implements ConfigurationInterface
     public const FIELD_ATTRIBUTE        = 'field';
     public const ENTITY_ALIASES_SECTION = 'entity_aliases';
     public const ENTITIES_SECTION       = 'entities';
-    public const RELATIONS_SECTION      = 'relations';
 
     public const ROOT_NODE = 'api';
 
@@ -55,11 +54,6 @@ class ApiConfiguration implements ConfigurationInterface
             $this->createEntityConfiguration(self::ENTITIES_SECTION, new EntityDefinitionConfiguration())
         );
         $entityNode->booleanNode(ConfigUtil::EXCLUDE);
-
-        $this->addEntitySection(
-            $children,
-            $this->createEntityConfiguration(self::RELATIONS_SECTION, new RelationDefinitionConfiguration())
-        );
 
         $rootNode
             ->validate()

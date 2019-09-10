@@ -33,12 +33,6 @@ class ComputeFileContentTest extends \PHPUnit\Framework\TestCase
         $this->processor = new ComputeFileContent($this->fileManager, $this->logger);
     }
 
-    public function testProcessWhenNoData()
-    {
-        $this->processor->process($this->context);
-        $this->assertFalse($this->context->hasResult());
-    }
-
     public function testProcessWhenNoConfigForContentField()
     {
         $config = new EntityDefinitionConfig();

@@ -28,8 +28,6 @@ abstract class PropertyMetadata extends ParameterBag implements ToArrayInterface
     private $flags;
 
     /**
-     * PropertyMetadata constructor.
-     *
      * @param string|null $name
      */
     public function __construct($name = null)

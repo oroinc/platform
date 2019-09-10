@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
@@ -47,6 +48,9 @@ class ObjectMetadataFactory
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setClassName($entityClass);
         $entityMetadata->setIdentifierFieldNames($config->getIdentifierFieldNames());
+        if (\is_a($entityClass, EntityIdentifier::class, true)) {
+            $entityMetadata->setInheritedType(true);
+        }
 
         return $entityMetadata;
     }

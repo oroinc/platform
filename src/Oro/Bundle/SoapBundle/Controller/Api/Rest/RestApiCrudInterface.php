@@ -4,6 +4,9 @@ namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Represents a controller for CRUD actions.
+ */
 interface RestApiCrudInterface extends RestApiReadInterface
 {
     const ACTION_CREATE = 'create';
@@ -29,9 +32,10 @@ interface RestApiCrudInterface extends RestApiReadInterface
     /**
      * Handles DELETE request for a single item
      *
-     * @param mixed $id The id of an entity to be deleted
+     * @param mixed $id      The id of an entity to be deleted
+     * @param array $options The options for the delete operation
      *
      * @return Response
      */
-    public function handleDeleteRequest($id);
+    public function handleDeleteRequest($id, array $options = []);
 }

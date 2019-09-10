@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Command;
 
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
-use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -20,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * The CLI command to show configuration of Data API resources.
+ * The CLI command to show configuration of API resources.
  */
 class DumpConfigCommand extends AbstractDebugCommand
 {
@@ -32,9 +31,6 @@ class DumpConfigCommand extends AbstractDebugCommand
 
     /** @var ConfigProvider */
     private $configProvider;
-
-    /** @var RelationConfigProvider */
-    private $relationConfigProvider;
 
     /**
      * @var array
@@ -53,20 +49,17 @@ class DumpConfigCommand extends AbstractDebugCommand
      * @param ResourcesProvider $resourcesProvider
      * @param ProcessorBagInterface $processorBag
      * @param ConfigProvider $configProvider
-     * @param RelationConfigProvider $relationConfigProvider
      */
     public function __construct(
         ValueNormalizer $valueNormalizer,
         ResourcesProvider $resourcesProvider,
         ProcessorBagInterface $processorBag,
-        ConfigProvider $configProvider,
-        RelationConfigProvider $relationConfigProvider
+        ConfigProvider $configProvider
     ) {
         parent::__construct($valueNormalizer, $resourcesProvider);
 
         $this->processorBag = $processorBag;
         $this->configProvider = $configProvider;
-        $this->relationConfigProvider = $relationConfigProvider;
     }
 
     /**
@@ -75,18 +68,11 @@ class DumpConfigCommand extends AbstractDebugCommand
     protected function configure()
     {
         $this
-            ->setDescription('Dumps entity configuration used in Data API.')
+            ->setDescription('Dumps entity configuration used in API.')
             ->addArgument(
                 'entity',
                 InputArgument::OPTIONAL,
                 'The entity class name or alias'
-            )
-            ->addOption(
-                'section',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'The configuration section. Can be "entities" or "relations"',
-                'entities'
             )
             ->addOption(
                 'extra',
@@ -143,19 +129,7 @@ class DumpConfigCommand extends AbstractDebugCommand
                 throw new RuntimeException('The "entity" argument is missing.');
             }
 
-            switch ($input->getOption('section')) {
-                case 'entities':
-                    $config = $this->getConfig($entityClass, $version, $requestType, $extras);
-                    break;
-                case 'relations':
-                    $config = $this->getRelationConfig($entityClass, $version, $requestType, $extras);
-                    break;
-                default:
-                    throw new \InvalidArgumentException(
-                        'The section should be either "entities" or "relations".'
-                    );
-            }
-
+            $config = $this->getConfig($entityClass, $version, $requestType, $extras);
             if ($isDocumentationResourcesRequested) {
                 $config = $this->getDocumentationResources($config);
             }
@@ -224,23 +198,6 @@ class DumpConfigCommand extends AbstractDebugCommand
     protected function getConfig($entityClass, $version, RequestType $requestType, array $extras)
     {
         $config = $this->configProvider->getConfig($entityClass, $version, $requestType, $extras);
-
-        return [
-            $entityClass => $this->convertConfigToArray($config)
-        ];
-    }
-
-    /**
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     * @param array       $extras
-     *
-     * @return array
-     */
-    protected function getRelationConfig($entityClass, $version, RequestType $requestType, array $extras)
-    {
-        $config = $this->relationConfigProvider->getRelationConfig($entityClass, $version, $requestType, $extras);
 
         return [
             $entityClass => $this->convertConfigToArray($config)

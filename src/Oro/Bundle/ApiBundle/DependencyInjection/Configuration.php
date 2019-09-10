@@ -68,7 +68,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('config_files')
-                ->info('All supported Data API configuration files')
+                ->info('All supported API configuration files')
                 ->validate()
                     ->always(function (array $value) {
                         if (!array_key_exists('default', $value)) {
@@ -107,7 +107,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->variableNode('file_name')
                             ->info(
-                                'The name of a file that contain Data API resources configuration.'
+                                'The name of a file that contain API resources configuration.'
                                 . ' Can contain several files, in this case all of them are merged.'
                             )
                             ->validate()
@@ -246,7 +246,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('actions')
-                ->info('A definition of Data API actions')
+                ->info('A definition of API actions')
                 ->example(
                     [
                         'get' => [
@@ -394,7 +394,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('form_types')
-                ->info('The form types that can be reused in Data API')
+                ->info('The form types that can be reused in API')
                 ->example([
                     'Symfony\Component\Form\Extension\Core\Type\FormType',
                     'oro_api.form.type.entity'
@@ -411,7 +411,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('form_type_extensions')
-                ->info('The form type extensions that can be reused in Data API')
+                ->info('The form type extensions that can be reused in API')
                 ->example(['form.type_extension.form.http_foundation'])
                 ->prototype('scalar')
                 ->end()
@@ -425,7 +425,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('form_type_guessers')
-                ->info('The form type guessers that can be reused in Data API')
+                ->info('The form type guessers that can be reused in API')
                 ->example(['form.type_guesser.validator'])
                 ->prototype('scalar')
                 ->end()

@@ -48,8 +48,13 @@ define(function(require) {
                 this.set(cache.data, {parse: true});
                 this.fetch(); // fetch actual data in background
                 this.markAsSynced(); // set flag that where's data ready to use
-                observer.listenToOnce(this, 'update change', function() {
-                    isModified = true;
+                observer.listenToOnce(this, 'update', function(collection, options) {
+                    isModified =
+                        Boolean(options.changes.added.length) ||
+                        Boolean(options.changes.removed.length) ||
+                        _.some(options.changes.merged, function(model) {
+                            return model.hasChanged();
+                        });
                 });
             }
 

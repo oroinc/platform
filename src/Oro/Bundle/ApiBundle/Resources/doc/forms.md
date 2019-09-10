@@ -10,15 +10,15 @@ The Symfony [Validation Component](http://symfony.com/doc/current/book/validatio
 
 ## Validation
 
-The validation rules are loaded from `Resources/config/validation.yml` and annotations as it is commonly done in Symfony applications. So, all validation rules defined for an entity are applied to the data API as well.
-By default, the data API uses two validation groups: **Default** and **api**. If you need to add validation constraints that should apply to the data API only, add them to the **api** validation group.
+The validation rules are loaded from `Resources/config/validation.yml` and annotations as it is commonly done in Symfony applications. So, all validation rules defined for an entity are applied to the API as well.
+By default, the API uses two validation groups: **Default** and **api**. If you need to add validation constraints that should apply to the API only, add them to the **api** validation group.
 
 In case a validation rule cannot be implemented as a regular validation constraint due to its complexity
 you can implement it as a processor for `post_validate` event of
 [customize_form_data](./actions.md#customize_form_data-action) action.
 Pay your attention on [FormUtil](../../Form/FormUtil.php) class, it contains methods that may be useful in such processor.
 
-If the input data violates validation constraints, they will be automatically converted to [validation errors](./processors.md#error-handling) that help build the correct response of the data API. The conversion is performed by the [CollectFormErrors](../../Processor/Shared/CollectFormErrors.php) processor. By default, the HTTP status code for validation errors is `400 Bad Request`. If you need to change it, you can do it in the following ways:
+If the input data violates validation constraints, they will be automatically converted to [validation errors](./processors.md#error-handling) that help build the correct response of the API. The conversion is performed by the [CollectFormErrors](../../Processor/Shared/CollectFormErrors.php) processor. By default, the HTTP status code for validation errors is `400 Bad Request`. If you need to change it, you can do it in the following ways:
 
 - Implement [ConstraintWithStatusCodeInterface](../../Validator/Constraints/ConstraintWithStatusCodeInterface.php) in your constraint class.
 - Implement a custom constraint text extractor. The API bundle has the [default implementation of constraint text extractor](../../Request/ConstraintTextExtractor.php). To add a new extractor, create a class that implements [ConstraintTextExtractorInterface](../../Request/ConstraintTextExtractorInterface.php) and tag it with the `oro.api.constraint_text_extractor` in the dependency injection container. This service can be also used to change an error code and type for a validation constraint.
@@ -46,11 +46,12 @@ api:
 
 ```
 
+Also, see how to [validate virtual fields](./how_to.md#validate-virtual-fields).
 
 ## Forms
 
-The data API forms are isolated from the UI forms. This helps avoid collisions and prevent unnecessary performance overhead in the data API.
-Consequently, all the data API form types, extensions, and guessers should be registered separately. There are two ways of how to complete this:
+The API forms are isolated from the UI forms. This helps avoid collisions and prevent unnecessary performance overhead in the API.
+Consequently, all the API form types, extensions, and guessers should be registered separately. There are two ways of how to complete this:
 
 - Use the application configuration file.
 - Tag the form elements by appropriate tags in the dependency injection container.
@@ -80,7 +81,7 @@ api:
 **Please note** that the `form_types` section can contain either the class name or the service id of a form type.
 Usually the service id is used if a form type depends on other services in the dependency injection container.
 
-You can find the already registered data API form elements in [Resources/config/oro/app.yml](../config/oro/app.yml).
+You can find the already registered API form elements in [Resources/config/oro/app.yml](../config/oro/app.yml).
 
 If you need to add new form elements can by tagging them in the dependency injection container, use the tags from the following table:
 
@@ -98,7 +99,7 @@ If you need to add new form elements can by tagging them in the dependency injec
         tags:
             # Enable usage of the form type on the UI.
             - { name: form.type, alias: acme_datetime }
-            # Enable usage of the form type in the data API.
+            # Enable usage of the form type in the API.
             - { name: oro.api.form.type, alias: acme_datetime }
 
     acme.form.extension.datetime:
@@ -106,7 +107,7 @@ If you need to add new form elements can by tagging them in the dependency injec
         tags:
             # Add the form extension to the UI forms.
             - { name: form.type_extension, extended_type: Acme\Bundle\AcmeBundle\Form\Type\DateTimeType }
-            # Add the form extension to the data API forms.
+            # Add the form extension to the API forms.
             - { name: oro.api.form.type_extension, extended_type: Acme\Bundle\AcmeBundle\Form\Type\DateTimeType }
 
     acme.form.guesser.test:
@@ -114,10 +115,10 @@ If you need to add new form elements can by tagging them in the dependency injec
         tags:
             # Add the form type guesser to the UI forms.
             - { name: form.type_guesser }
-            # Add the form type guesser to the data API forms.
+            # Add the form type guesser to the API forms.
             - { name: oro.api.form.type_guesser }
 ```
 
-To switch between the general and data API forms, use the [Processor\Shared\InitializeApiFormExtension](../../Processor/Shared/InitializeApiFormExtension.php) and [Processor\Shared\RestoreDefaultFormExtension](../../Processor/Shared/RestoreDefaultFormExtension.php) processors.
+To switch between the general and API forms, use the [Processor\Shared\InitializeApiFormExtension](../../Processor/Shared/InitializeApiFormExtension.php) and [Processor\Shared\RestoreDefaultFormExtension](../../Processor/Shared/RestoreDefaultFormExtension.php) processors.
 
-The [Processor\Shared\BuildFormBuilder](../../Processor/Shared/BuildFormBuilder.php) processor builds the form for a particular entity on the fly based on the [data API configuration](./configuration.md) and the entity metadata.
+The [Processor\Shared\BuildFormBuilder](../../Processor/Shared/BuildFormBuilder.php) processor builds the form for a particular entity on the fly based on the [API configuration](./configuration.md) and the entity metadata.

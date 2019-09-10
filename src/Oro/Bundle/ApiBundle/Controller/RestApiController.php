@@ -4,15 +4,25 @@ namespace Oro\Bundle\ApiBundle\Controller;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ApiBundle\Request\Rest\RequestHandler;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * REST API controller.
  */
-class RestApiController extends Controller
+class RestApiController
 {
+    /** @var RequestHandler */
+    private $requestHandler;
+
+    /**
+     * @param RequestHandler $requestHandler
+     */
+    public function __construct(RequestHandler $requestHandler)
+    {
+        $this->requestHandler = $requestHandler;
+    }
+
     /**
      * Handle an entity
      *
@@ -28,7 +38,7 @@ class RestApiController extends Controller
      */
     public function itemAction(Request $request): Response
     {
-        return $this->getHandler()->handleItem($request);
+        return $this->requestHandler->handleItem($request);
     }
 
     /**
@@ -46,7 +56,7 @@ class RestApiController extends Controller
      */
     public function listAction(Request $request): Response
     {
-        return $this->getHandler()->handleList($request);
+        return $this->requestHandler->handleList($request);
     }
 
     /**
@@ -64,7 +74,7 @@ class RestApiController extends Controller
      */
     public function subresourceAction(Request $request): Response
     {
-        return $this->getHandler()->handleSubresource($request);
+        return $this->requestHandler->handleSubresource($request);
     }
 
     /**
@@ -82,7 +92,7 @@ class RestApiController extends Controller
      */
     public function relationshipAction(Request $request): Response
     {
-        return $this->getHandler()->handleRelationship($request);
+        return $this->requestHandler->handleRelationship($request);
     }
 
     /**
@@ -100,14 +110,6 @@ class RestApiController extends Controller
      */
     public function itemWithoutIdAction(Request $request): Response
     {
-        return $this->getHandler()->handleItemWithoutId($request);
-    }
-
-    /**
-     * @return RequestHandler
-     */
-    private function getHandler(): RequestHandler
-    {
-        return $this->get('oro_api.rest.request_handler');
+        return $this->requestHandler->handleItemWithoutId($request);
     }
 }

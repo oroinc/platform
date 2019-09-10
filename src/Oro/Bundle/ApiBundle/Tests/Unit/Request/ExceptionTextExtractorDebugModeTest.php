@@ -6,7 +6,6 @@ use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
 use Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractor;
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -80,14 +79,12 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
             [new BadRequestHttpException(), 400],
             [$this->createExecutionFailedException(new BadRequestHttpException()), 400],
             [new AccessDeniedException(), 403],
-            [new ForbiddenException('test'), 403],
             [new LockedException('Reason.'), 403],
             [new DisabledException('Reason.'), 403],
             [new UsernameNotFoundException('Reason.'), 403],
             [new \InvalidArgumentException(), 500],
             [new RuntimeException(), 500],
             [new ActionNotAllowedException(), 405],
-            [new ForbiddenException('Reason.'), 403],
             [new ResourceNotAccessibleException(), 404],
             [new ServiceNotFoundException('test'), 500]
         ];
@@ -122,7 +119,6 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
             [new ActionNotAllowedException(), 'action not allowed exception'],
             [new AccessDeniedException('Reason.'), 'access denied exception'],
             [new AccessDeniedHttpException('Reason.'), 'access denied exception'],
-            [new ForbiddenException('Reason.'), 'forbidden exception'],
             [new LockedException('Reason.'), 'authentication exception'],
             [new DisabledException('Reason.'), 'authentication exception'],
             [new UsernameNotFoundException('Reason.'), 'authentication exception'],
@@ -205,10 +201,6 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
             [
                 new ActionNotAllowedException(),
                 'The action is not allowed.'
-            ],
-            [
-                new ForbiddenException('Reason.'),
-                'Reason.'
             ],
             [
                 new LockedException('Reason.'),

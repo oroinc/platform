@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class DependencyInjectionUtil
 {
-    /** the name of DIC tag for Data API processors */
+    /** the name of DIC tag for API processors */
     public const PROCESSOR_TAG = 'oro.api.processor';
 
     /** the attribute to specify the request type for "oro.api.processor" DIC tag */

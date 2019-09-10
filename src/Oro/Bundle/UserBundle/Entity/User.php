@@ -87,7 +87,6 @@ class User extends ExtendUser implements
     EmailHolderInterface,
     FullNameInterface,
     NotificationEmailInterface,
-    OrganizationAwareUserInterface,
     AdvancedApiUserInterface
 {
     const ROLE_DEFAULT = 'ROLE_USER';
@@ -1226,37 +1225,40 @@ class User extends ExtendUser implements
     }
 
     /**
-     * Add Organization to User
+     * Adds the given organization to the user.
      *
      * @param Organization $organization
-     * @return AbstractUser
+     *
+     * @return $this
      */
     public function addOrganization(Organization $organization)
     {
-        if (!$this->hasOrganization($organization)) {
-            $this->getOrganizations()->add($organization);
+        if (!$this->organizations->contains($organization)) {
+            $this->organizations->add($organization);
         }
 
         return $this;
     }
 
     /**
-     * Whether user in specified organization
+     * Checks whether the user has the given organization.
+     * Note: use {@see isBelongToOrganization} to check whether the user is belong to an organization.
      *
      * @param Organization $organization
+     *
      * @return bool
      */
-    public function hasOrganization(Organization $organization)
+    public function hasOrganization(Organization $organization): bool
     {
-        return $this->getOrganizations()->contains($organization);
+        return $this->organizations->contains($organization);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getOrganizations($onlyActive = false)
+    public function getOrganizations(bool $onlyEnabled = false)
     {
-        if ($onlyActive) {
+        if ($onlyEnabled) {
             return $this->organizations->filter(
                 function (Organization $organization) {
                     return $organization->isEnabled() === true;
@@ -1268,8 +1270,11 @@ class User extends ExtendUser implements
     }
 
     /**
+     * Replaces existing organizations with the given ones for the user.
+     *
      * @param Collection $organizations
-     * @return AbstractUser
+     *
+     * @return $this
      */
     public function setOrganizations(Collection $organizations)
     {
@@ -1279,15 +1284,16 @@ class User extends ExtendUser implements
     }
 
     /**
-     * Delete Organization from User
+     * Removes the given organization from the user.
      *
      * @param Organization $organization
-     * @return AbstractUser
+     *
+     * @return $this
      */
     public function removeOrganization(Organization $organization)
     {
-        if ($this->hasOrganization($organization)) {
-            $this->getOrganizations()->removeElement($organization);
+        if ($this->organizations->contains($organization)) {
+            $this->organizations->removeElement($organization);
         }
 
         return $this;

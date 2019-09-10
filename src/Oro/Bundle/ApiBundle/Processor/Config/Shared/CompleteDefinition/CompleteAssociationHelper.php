@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition;
 
+use Oro\Bundle\ApiBundle\Config\ConfigBagInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
@@ -44,19 +45,12 @@ class CompleteAssociationHelper
         RequestType $requestType,
         array $extras = []
     ) {
-        $expandRelatedEntitiesExtra = null;
-        foreach ($extras as $extra) {
-            if ($extra instanceof ExpandRelatedEntitiesConfigExtra) {
-                $expandRelatedEntitiesExtra = $extra;
-                break;
-            }
-        }
-
+        $expandRelatedEntitiesExtra = $this->getExpandRelatedEntitiesConfigExtra($extras);
         if (null !== $expandRelatedEntitiesExtra) {
-            $extras[] = new FilterFieldsConfigExtra(
-                [$targetClass => $expandRelatedEntitiesExtra->getExpandedEntities()]
-            );
-        } else {
+            $extras[] = new FilterFieldsConfigExtra([
+                $targetClass => $expandRelatedEntitiesExtra->getExpandedEntities()
+            ]);
+        } elseif (!$field->hasCollapsed() || $field->isCollapsed()) {
             $extras[] = new FilterIdentifierFieldsConfigExtra();
         }
 
@@ -67,18 +61,18 @@ class CompleteAssociationHelper
             }
 
             $targetEntity = $field->getTargetEntity();
-            $isExcludeAll = null !== $targetEntity && $targetEntity->isExcludeAll();
-            if (!$targetEntity) {
+            if (null === $targetEntity) {
                 $targetEntity = $field->createAndSetTargetEntity();
+            } elseif (!$targetEntity->getIdentifierFieldNames()) {
+                $targetEntity->setIdentifierFieldNames($targetDefinition->getIdentifierFieldNames());
             }
-
-            $targetEntity->setParentResourceClass($targetDefinition->getParentResourceClass());
-            $targetEntity->setIdentifierFieldNames($targetDefinition->getIdentifierFieldNames());
-
-            if (!$isExcludeAll) {
+            $this->mergeAttribute($targetEntity, $targetDefinition, ConfigUtil::PARENT_RESOURCE_CLASS);
+            if (!$targetEntity->isExcludeAll()) {
+                $this->mergeTargetEntityConfig($targetEntity, $targetDefinition);
                 $targetEntity->setExcludeAll();
-                $field->setCollapsed();
-                $this->mergeAssociationFields($field, $targetDefinition);
+                if (!$field->hasCollapsed()) {
+                    $field->setCollapsed();
+                }
             }
         }
     }
@@ -95,7 +89,7 @@ class CompleteAssociationHelper
         $target->setExcludeAll();
 
         $formOptions = $field->getFormOptions();
-        if (null === $formOptions || !array_key_exists('property_path', $formOptions)) {
+        if (null === $formOptions || !\array_key_exists('property_path', $formOptions)) {
             $formOptions['property_path'] = $fieldName;
             $field->setFormOptions($formOptions);
         }
@@ -152,40 +146,135 @@ class CompleteAssociationHelper
      */
     public function loadDefinition($entityClass, $version, RequestType $requestType, array $extras = [])
     {
-        $config = $this->configProvider->getConfig(
-            $entityClass,
-            $version,
-            $requestType,
-            array_merge($extras, [new EntityDefinitionConfigExtra()])
-        );
+        return $this->configProvider
+            ->getConfig(
+                $entityClass,
+                $version,
+                $requestType,
+                \array_merge($extras, [new EntityDefinitionConfigExtra()])
+            )
+            ->getDefinition();
+    }
 
-        $definition = null;
-        if ($config->hasDefinition()) {
-            $definition = $config->getDefinition();
+    /**
+     * @param ConfigExtraInterface[] $extras
+     *
+     * @return ExpandRelatedEntitiesConfigExtra|null
+     */
+    private function getExpandRelatedEntitiesConfigExtra(array $extras)
+    {
+        foreach ($extras as $extra) {
+            if ($extra instanceof ExpandRelatedEntitiesConfigExtra) {
+                return $extra;
+            }
         }
 
-        return $definition;
+        return null;
+    }
+
+    /**
+     * @param EntityDefinitionConfig $config
+     * @param EntityDefinitionConfig $configToMerge
+     */
+    private function mergeTargetEntityConfig(
+        EntityDefinitionConfig $config,
+        EntityDefinitionConfig $configToMerge
+    ) {
+        $this->mergeTargetEntityConfigAttributes($config, $configToMerge);
+        $fieldsToMerge = $configToMerge->getFields();
+        foreach ($fieldsToMerge as $fieldName => $fieldToMerge) {
+            $field = $config->getField($fieldName);
+            if (null !== $field) {
+                $this->mergeTargetEntityFieldConfig($field, $fieldToMerge);
+            } else {
+                $config->addField($fieldName, $fieldToMerge);
+            }
+        }
     }
 
     /**
      * @param EntityDefinitionFieldConfig $field
-     * @param EntityDefinitionConfig      $targetDefinition
+     * @param EntityDefinitionFieldConfig $fieldToMerge
      */
-    public function mergeAssociationFields(
+    private function mergeTargetEntityFieldConfig(
         EntityDefinitionFieldConfig $field,
-        EntityDefinitionConfig $targetDefinition
+        EntityDefinitionFieldConfig $fieldToMerge
     ) {
+        $this->mergeTargetEntityFieldConfigAttributes($field, $fieldToMerge);
         $targetEntity = $field->getTargetEntity();
-        $targetFields = $targetDefinition->getFields();
-        foreach ($targetFields as $targetFieldName => $targetField) {
-            if ($targetEntity->hasField($targetFieldName)) {
-                $existingField = $targetEntity->getField($targetFieldName);
-                if ($targetField->isMetaProperty()) {
-                    $existingField->setMetaProperty(true);
+        $targetEntityToMerge = $fieldToMerge->getTargetEntity();
+        if (null !== $targetEntity) {
+            if (null !== $targetEntityToMerge) {
+                if (!$targetEntity->getIdentifierFieldNames()) {
+                    $targetEntity->setIdentifierFieldNames($targetEntityToMerge->getIdentifierFieldNames());
                 }
-            } else {
-                $targetEntity->addField($targetFieldName, $targetField);
+                $this->mergeAttribute($targetEntity, $targetEntityToMerge, ConfigUtil::PARENT_RESOURCE_CLASS);
+                if (!$targetEntity->isExcludeAll()) {
+                    $this->mergeTargetEntityConfig($targetEntity, $targetEntityToMerge);
+                }
             }
+        } elseif (null !== $targetEntityToMerge) {
+            $field->setTargetEntity($targetEntityToMerge);
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $config
+     * @param EntityDefinitionConfig $configToMerge
+     */
+    private function mergeTargetEntityConfigAttributes(
+        EntityDefinitionConfig $config,
+        EntityDefinitionConfig $configToMerge
+    ) {
+        if (!$config->hasExclusionPolicy() && $configToMerge->hasExclusionPolicy()) {
+            $config->setExclusionPolicy($configToMerge->getExclusionPolicy());
+        }
+        if (!$config->getIdentifierFieldNames()) {
+            $config->setIdentifierFieldNames($configToMerge->getIdentifierFieldNames());
+        }
+        $this->mergeAttribute($config, $configToMerge, ConfigUtil::ORDER_BY);
+        $this->mergeAttribute($config, $configToMerge, ConfigUtil::MAX_RESULTS);
+        $this->mergeAttribute($config, $configToMerge, ConfigUtil::HINTS);
+    }
+
+    /**
+     * @param EntityDefinitionFieldConfig $field
+     * @param EntityDefinitionFieldConfig $fieldToMerge
+     */
+    private function mergeTargetEntityFieldConfigAttributes(
+        EntityDefinitionFieldConfig $field,
+        EntityDefinitionFieldConfig $fieldToMerge
+    ) {
+        if (!$field->hasExcluded() && $fieldToMerge->hasExcluded()) {
+            $field->setExcluded($fieldToMerge->isExcluded());
+        }
+        if (!$field->hasDataType() && $fieldToMerge->hasDataType()) {
+            $field->setDataType($fieldToMerge->getDataType());
+        }
+        $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::COLLAPSE);
+        $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::PROPERTY_PATH);
+        $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::DATA_TRANSFORMER);
+        $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::TARGET_CLASS);
+        $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::TARGET_TYPE);
+        $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::DEPENDS_ON);
+        $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::META_PROPERTY);
+        $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::META_PROPERTY_RESULT_NAME);
+        $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::FORM_TYPE);
+        $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::FORM_OPTIONS);
+    }
+
+    /**
+     * @param ConfigBagInterface $config
+     * @param ConfigBagInterface $configToMerge
+     * @param string             $attributeName
+     */
+    private function mergeAttribute(
+        ConfigBagInterface $config,
+        ConfigBagInterface $configToMerge,
+        string $attributeName
+    ) {
+        if ($configToMerge->has($attributeName) && !$config->has($attributeName)) {
+            $config->set($attributeName, $configToMerge->get($attributeName));
         }
     }
 
@@ -201,7 +290,7 @@ class CompleteAssociationHelper
         $targetFields = $field->getTargetEntity()->getFields();
         foreach ($targetFields as $targetFieldName => $targetField) {
             $targetPropertyPath = $targetField->getPropertyPath($targetFieldName);
-            if (!in_array($targetPropertyPath, $dependsOn, true)) {
+            if (!\in_array($targetPropertyPath, $dependsOn, true)) {
                 $dependsOn[] = $targetPropertyPath;
             }
         }

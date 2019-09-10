@@ -58,14 +58,6 @@ class TestConfigBag implements ConfigBagInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getRelationConfig(string $className, string $version): ?array
-    {
-        return $this->configBag->getRelationConfig($className, $version);
-    }
-
-    /**
      * @param string $entityClass
      * @param array  $config
      */

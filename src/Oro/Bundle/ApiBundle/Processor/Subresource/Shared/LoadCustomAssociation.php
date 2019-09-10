@@ -4,8 +4,10 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\TargetConfigExtraBuilder;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
@@ -27,19 +29,25 @@ abstract class LoadCustomAssociation implements ProcessorInterface
     /** @var EntityIdHelper */
     protected $entityIdHelper;
 
+    /** @var ConfigProvider */
+    private $configProvider;
+
     /**
      * @param EntitySerializer $entitySerializer
      * @param DoctrineHelper   $doctrineHelper
      * @param EntityIdHelper   $entityIdHelper
+     * @param ConfigProvider   $configProvider
      */
     public function __construct(
         EntitySerializer $entitySerializer,
         DoctrineHelper $doctrineHelper,
-        EntityIdHelper $entityIdHelper
+        EntityIdHelper $entityIdHelper,
+        ConfigProvider $configProvider
     ) {
         $this->entitySerializer = $entitySerializer;
         $this->doctrineHelper = $doctrineHelper;
         $this->entityIdHelper = $entityIdHelper;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -116,11 +124,40 @@ abstract class LoadCustomAssociation implements ProcessorInterface
                 $context->getParentId(),
                 $context->getParentMetadata()
             ),
-            $context->getParentConfig(),
+            $this->getLoadParentEntityDataConfig($context),
             $context->getNormalizationContext()
         );
 
         return reset($data);
+    }
+
+    /**
+     * @param SubresourceContext $context
+     *
+     * @return EntityDefinitionConfig
+     */
+    protected function getLoadParentEntityDataConfig(SubresourceContext $context)
+    {
+        $configExtras = TargetConfigExtraBuilder::buildParentConfigExtras(
+            $context->getConfigExtras(),
+            $context->getParentClassName(),
+            $context->getAssociationName()
+        );
+        $config = $this->configProvider
+            ->getConfig(
+                $context->getParentClassName(),
+                $context->getVersion(),
+                $context->getRequestType(),
+                $configExtras
+            )
+            ->getDefinition();
+        TargetConfigExtraBuilder::normalizeParentConfig(
+            $config,
+            $context->getAssociationName(),
+            $configExtras
+        );
+
+        return $config;
     }
 
     /**

@@ -9,6 +9,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\FieldMaskBuilder;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
@@ -371,12 +372,9 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
                 );
             }
         }
-        $token =
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $token = $this->createMock(UsernamePasswordOrganizationToken::class);
         $token->expects($this->any())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->will($this->returnValue($organization));
         $token->expects($this->any())
             ->method('getUser')

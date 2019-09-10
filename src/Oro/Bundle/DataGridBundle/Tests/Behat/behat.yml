@@ -76,6 +76,14 @@ oro_behat_extension:
       selector: '.value-field-frame .select2-input'
       class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entities
 
+    GridFilterChoiceTree:
+      selector: 'div.filter-item'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterChoiceTree
+
+    GridFilterChoiceTreeValueInput:
+      selector: '.select2-choices .select2-input'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\ChoiceTreeInput
+
     GridFilterItem:
       selector: 'div.filter-item'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterItem
