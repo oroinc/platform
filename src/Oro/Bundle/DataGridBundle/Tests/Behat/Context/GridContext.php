@@ -994,6 +994,46 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem->submit();
     }
 
+    /**
+     * Check that the item exists in grid filter options
+     *
+     * Example: Then I should see "Value" in the Test filter
+     *
+     * @When /^(?:|I )should see "(?P<value>[\w\s\,\.\_\%]+)" in the (?P<filterName>[\w\s]+) filter$/
+     *
+     * @param string $filterName
+     * @param string $value
+     */
+    public function shouldSeeChoiceTreeFilterOption($filterName, $value = null)
+    {
+        /** @var GridFilterChoiceTree $filterItem */
+        $filterItem = $this->getGridFilters('Grid')->getFilterItem('GridFilterChoiceTree', $filterName);
+
+        $filterItem->open();
+        $filterItem->checkValue($value, true);
+        $filterItem->close();
+    }
+
+    /**
+     * Check that the item in grid filter options does not exist
+     *
+     * Example: Then I should not see "Value" in the Test filter
+     *
+     * @When /^(?:|I )should not see "(?P<value>[\w\s\,\.\_\%]+)" in the (?P<filterName>[\w\s]+) filter$/
+     *
+     * @param string $filterName
+     * @param string $value
+     */
+    public function shouldNotSeeChoiceTreeFilterOption($filterName, $value = null)
+    {
+        /** @var GridFilterChoiceTree $filterItem */
+        $filterItem = $this->getGridFilters('Grid')->getFilterItem('GridFilterChoiceTree', $filterName);
+
+        $filterItem->open();
+        $filterItem->checkValue($value, false);
+        $filterItem->close();
+    }
+
     //@codingStandardsIgnoreStart
     /**
      * Filter grid by to dates between or not between
