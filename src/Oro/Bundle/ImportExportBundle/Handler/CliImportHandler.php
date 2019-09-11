@@ -38,11 +38,14 @@ class CliImportHandler extends AbstractImportHandler
         }
 
         return [
-            'success'        => $jobResult->isSuccessful() && isset($counts['process']) && $counts['process'] > 0,
+            'success'        => $this->isSuccessful($counts, $jobResult),
             'processorAlias' => $processorAlias,
             'counts'         => $counts,
             'errors'         => $errors,
             'entityName'     => $entityName,
+            'options'        => $options,
+            'postponedRows'  => $jobResult->getContext()->getPostponedRows(),
+            'postponedDelay' => $jobResult->getContext()->getValue('postponedRowsDelay'),
         ];
     }
 
@@ -63,7 +66,7 @@ class CliImportHandler extends AbstractImportHandler
             $errors = $this->getErrors($jobResult);
         }
 
-        $isSuccessful = $jobResult->isSuccessful() && isset($counts['process']) && $counts['process'] > 0;
+        $isSuccessful = $this->isSuccessful($counts, $jobResult);
 
         if ($isSuccessful) {
             $entityName = $this->processorRegistry->getProcessorEntityName(
@@ -82,6 +85,7 @@ class CliImportHandler extends AbstractImportHandler
             'message' => $message,
             'importInfo' => $this->getImportInfo($counts, $entityName),
             'postponedRows' => $jobResult->getContext()->getPostponedRows(),
+            'postponedDelay' => $jobResult->getContext()->getValue('postponedRowsDelay'),
             'deadlockDetected' => $jobResult->getContext()->getValue('deadlockDetected')
         ];
     }

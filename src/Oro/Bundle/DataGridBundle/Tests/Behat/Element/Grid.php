@@ -34,12 +34,16 @@ class Grid extends Table implements GridInterface
     /**
      * {@inheritdoc}
      */
-    public function getRowByContent($content)
+    public function getRowByContent($content, $failIfNotFound = true)
     {
         /** @var Table $table */
         $table = $this->getElement($this->getMappedChildElementName(self::GRID_TABLE_ELEMENT));
 
-        return $table->getRowByContentElement($content, $this->getMappedChildElementName(static::TABLE_ROW_ELEMENT));
+        return $table->getRowByContentElement(
+            $content,
+            $this->getMappedChildElementName(static::TABLE_ROW_ELEMENT),
+            $failIfNotFound
+        );
     }
 
     /**
@@ -244,12 +248,16 @@ class Grid extends Table implements GridInterface
     /**
      * {@inheritdoc}
      */
-    public function clickActionLink($content, $action)
+    public function clickActionLink($content, $action, $failIfNotFound = true)
     {
         /** @var GridRow $row */
-        $row = $this->getRowByContent($content);
-        $link = $row->getActionLink($action);
-        $link->click();
+        $row = $this->getRowByContent($content, $failIfNotFound);
+        if ($row) {
+            $link = $row->getActionLink($action, $failIfNotFound);
+            if ($link) {
+                $link->click();
+            }
+        }
     }
 
     /**

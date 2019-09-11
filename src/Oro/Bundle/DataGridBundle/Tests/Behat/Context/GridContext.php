@@ -716,9 +716,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | Email   | charlie@gmail.com   |
      *            | Phone   | +1 415-731-9375     |
      *
-     * @Then /^(?:|I )should see (?P<content>[\w\s\.\_\-\@]+) in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
-     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\-\@\(\)]+)" in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
-     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\-\@\(\)]+)" in "(?:|grid|(?P<gridName>[\s\w]+))" with following data:$/
+     * @Then /^(?:|I )should see (?P<content>[\w\s\.\_\-\@\:]+) in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
+     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\-\@\:\(\)]+)" in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
+     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\-\@\:\(\)]+)" in "(?:|grid|(?P<gridName>[\s\w]+))" with following data:$/
      */
     //@codingStandardsIgnoreEnd
     public function assertRowValues($content, TableNode $table, $gridName = null)
@@ -1821,16 +1821,13 @@ TEXT;
 
         // Actually element "GridFilterManager" points to all filter dropdowns, so we have to find out
         // which one is the actual filter manager dropdown.
-        $filterDropdowns = $grid->getElements($grid->getMappedChildElementName('GridFilterManager'));
-        $filterDropdowns = array_filter($filterDropdowns, function (Element $element) {
-            return $this->spin(function () use ($element) {
-                if ($element->isVisible()) {
-                    return true;
-                }
+        $filterDropdowns = $this->spin(function () use ($grid) {
+            $elements = $grid->getElements($grid->getMappedChildElementName('GridFilterManager'));
 
-                return false;
-            }, 3);
-        });
+            return array_filter($elements, function (Element $element) {
+                return $element->isVisible();
+            });
+        }, 3);
 
         $filterManager = array_shift($filterDropdowns);
         self::assertNotNull($filterManager, 'Filter manager dropdown was not found');

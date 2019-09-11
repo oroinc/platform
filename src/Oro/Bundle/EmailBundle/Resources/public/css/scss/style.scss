@@ -95,7 +95,7 @@
                 box-sizing: border-box;
             }
 
-            input {
+            input:not([type='checkbox']) {
                 height: 32px;
             }
         }

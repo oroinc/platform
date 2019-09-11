@@ -11,6 +11,9 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 
+/**
+ * Abstract implementation of import handler.
+ */
 abstract class AbstractImportHandler extends AbstractHandler
 {
     /**
@@ -256,5 +259,21 @@ abstract class AbstractImportHandler extends AbstractHandler
         );
 
         return $importInfo;
+    }
+
+    /**
+     * @param array $counts
+     * @param JobResult $jobResult
+     * @return bool
+     */
+    protected function isSuccessful(array $counts, JobResult $jobResult): bool
+    {
+        $processedCount = $counts['process'] ?? 0;
+        $postponedCount = count($jobResult->getContext()->getPostponedRows());
+        $isSuccessful = $jobResult->isSuccessful();
+        if ($processedCount === 0 && $postponedCount === 0) {
+            $isSuccessful = false;
+        }
+        return $isSuccessful;
     }
 }

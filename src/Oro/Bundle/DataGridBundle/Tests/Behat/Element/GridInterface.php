@@ -78,8 +78,9 @@ interface GridInterface extends GridMappedChildInterface
     /**
      * @param string $content
      * @param string $action
+     * @param bool $failIfNotFound
      */
-    public function clickActionLink($content, $action);
+    public function clickActionLink($content, $action, $failIfNotFound = true);
 
     /**
      * @return NodeElement

@@ -88,42 +88,43 @@
 
 {% block content_data %}
     {% set id = 'emailtemplate-edit' %}
-    {% set dataBlocks = [
-        {
-            'title': 'General'|trans,
-            'class': 'active',
-            'subblocks': [{
-                'title': '',
-                'data': [
-                    form_row(form.name),
-                    form_row(form.type, {'attr' : {'class': 'choice-template-type'}}),
-                    form_row(form.entityName)
-                ]
-            }]
-        },
-        {
-            'title': 'Template data'|trans,
-            'subblocks': [
+    {% if dataBlocks is not defined %}
+        {% set dataBlocks = [
             {
-                'title': '',
-                'data': [
-                    form_widget(form.translations)
-                ]
+                'title': 'oro.email.emailtemplate.sections.general'|trans,
+                'class': 'active',
+                'subblocks': [{
+                    'title': '',
+                    'data': [
+                        form_row(form.name),
+                        form_row(form.type, {'attr' : {'class': 'choice-template-type'}}),
+                        form_row(form.entityName)
+                    ]
+                }]
             },
             {
-                'title': '',
-                'data': [
-                    _emailMacros.renderAvailableVariablesWidget(form.vars.value.entityName, form.entityName.vars.id)
-                ]
-            }]
-        }
-    ] %}
+                'title': 'oro.email.emailtemplate.sections.template_data'|trans,
+                'subblocks': [
+                {
+                    'title': '',
+                    'data': [
+                        form_widget(form.translations)
+                    ]
+                },
+                {
+                    'title': '',
+                    'data': [
+                        _emailMacros.renderAvailableVariablesWidget(form.vars.value.entityName, form.entityName.vars.id)
+                    ]
+                }]
+            }
+        ] %}
+    {% endif %}
 
     {% set data = {
         'formErrors': form_errors(form)? form_errors(form) : null,
         'dataBlocks': dataBlocks,
-        }
-    %}
+    } %}
 
     {{ parent() }}
 {% endblock content_data %}
