@@ -32,8 +32,8 @@ define(function(require) {
 
     DeviceSwitcherView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat([
-            'updateUrlDeviceFragment', 'updateFaviconPage', 'state',
-            'pageModel', 'switcherStyle'
+            'updateUrlDeviceFragment', 'updateFaviconPage',
+            'state', 'pageModel', 'switcherStyle'
         ]),
         /**
          * @type {String}
@@ -139,6 +139,9 @@ define(function(require) {
 
             if (config.frameUrlSegment) {
                 this.frameUrlSegment = config.frameUrlSegment;
+            }
+            if (config.state) {
+                this.state = config.state;
             }
             this.originalTitle = document.title;
 
@@ -343,7 +346,7 @@ define(function(require) {
          * Combines full url (viewName + appUrl) and updates history
          *
          * @param {string} url
-         * @param {string=} activeView
+         * @param {string} activeView
          */
         updateUrl: function(url, activeView) {
             var viewName;
@@ -366,7 +369,7 @@ define(function(require) {
         /**
          * Updates version cookie
          *
-         * @param {string=} viewName
+         * @param {string} viewName
          */
         updateCookie: function(viewName) {
             var item;
