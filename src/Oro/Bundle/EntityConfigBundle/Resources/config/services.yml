@@ -464,6 +464,7 @@ services:
         public: true
         arguments:
             - '@doctrine'
+            - '@oro_security.acl_helper'
 
     oro_entity_config.event_listener.remove_attribute_group_relation:
         class: Oro\Bundle\EntityConfigBundle\EventListener\RemoveAttributeGroupRelationListener
