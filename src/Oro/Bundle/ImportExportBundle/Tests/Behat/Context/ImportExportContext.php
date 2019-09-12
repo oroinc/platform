@@ -5,13 +5,11 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Behat\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Session;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
 use Gaufrette\File;
 use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\CookieJar;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -667,25 +665,5 @@ class ImportExportContext extends OroFeatureContext implements
         static::assertTrue($jobResult->isSuccessful());
 
         return $filePath;
-    }
-
-    /**
-     * @param Session $session
-     *
-     * @return CookieJar
-     */
-    private function getCookieJar(Session $session)
-    {
-        $sessionCookies = $session->getDriver()->getWebDriverSession()->getCookie();
-        $cookies = [];
-        foreach ($sessionCookies as $sessionCookie) {
-            $cookie = [];
-            foreach ($sessionCookie as $key => $value) {
-                $cookie[ucwords($key, '-')] = $value;
-            }
-            $cookies[] = $cookie;
-        }
-
-        return new CookieJar(false, $cookies);
     }
 }
