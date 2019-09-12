@@ -48,10 +48,10 @@
                     {% endif %}
 
                     <li{% if selected %} class="selected"{% endif %}>
-                        <a href="{{ path('oro_search_results', { from: alias, search: searchString }) }}" {% if selected %}aria-selected="true"{% endif %}>
-                            {% if selected %}<span class="fa-chevron-right pull-right" aria-hidden="true"></span>{% endif %}
+                        <a href="{{ path('oro_search_results', { from: alias, search: searchString }) }}" {% if selected %}aria-selected="true"{% endif %} title="{{ label }}">
                             <span class="{{ iconClass }}" aria-hidden="true"></span>
-                            {{ label }} ({{ type.count }})
+                            <span class="search-label">{{ label|trans }}</span>
+                            <span>&nbsp;({{ type.count }})</span>
                         </a>
                     </li>
                 {% endfor %}
