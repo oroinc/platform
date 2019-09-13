@@ -7,7 +7,8 @@ use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * The base class for action processors that execute processors only from one group at the same time.
+ * The base processor for actions with "normalize_result" group
+ * and that execute processors only from one group at the same time.
  */
 class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcessor
 {
