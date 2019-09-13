@@ -22,7 +22,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 abstract class LoadTitleMetaProperty implements ProcessorInterface
 {
-    public const OPERATION_NAME = 'loadTitleMetaProperty';
+    public const OPERATION_NAME = 'load_title_meta_property';
 
     public const TITLE_META_PROPERTY_NAME = 'title';
 

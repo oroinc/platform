@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * The base class for action processors that execute processors only from one group at the same time.
+ * The base processor for actions with "normalize_result" group
+ * and that execute processors only from one group at the same time.
  */
 class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcessor
 {
@@ -49,7 +51,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
                 foreach ($processors as $processor) {
                     if (count($context->getErrors()) > $initialErrorCount) {
                         $errorsHandled = true;
-                        if (self::NORMALIZE_RESULT_GROUP !== $group) {
+                        if (ApiActionGroup::NORMALIZE_RESULT !== $group) {
                             $this->handleErrors($context, $processorId, $group);
                             break;
                         }
@@ -76,7 +78,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
     {
         /** @var ByStepNormalizeResultContext $context */
 
-        if (self::NORMALIZE_RESULT_GROUP !== $group) {
+        if (ApiActionGroup::NORMALIZE_RESULT !== $group) {
             $context->setFailedGroup($group);
         }
         parent::handleErrors($context, $processorId, $group);
@@ -89,7 +91,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
     {
         /** @var ByStepNormalizeResultContext $context */
 
-        if (self::NORMALIZE_RESULT_GROUP !== $group) {
+        if (ApiActionGroup::NORMALIZE_RESULT !== $group) {
             $context->setFailedGroup($group);
         }
         parent::handleException($e, $context, $processorId, $group);
@@ -108,7 +110,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
      */
     protected function executeNormalizeResultProcessors(NormalizeResultContext $context)
     {
-        $context->setLastGroup(self::NORMALIZE_RESULT_GROUP);
+        $context->setLastGroup(ApiActionGroup::NORMALIZE_RESULT);
         parent::executeNormalizeResultProcessors($context);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestPlain;
 
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\SkippedEntitiesProvider;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestPlainApiTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +20,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
      */
     public function testRestRequests($entityClass, $excludedActions)
     {
-        if (in_array(ApiActions::GET_LIST, $excludedActions, true)) {
+        if (in_array(ApiAction::GET_LIST, $excludedActions, true)) {
             return;
         }
 
@@ -40,11 +40,11 @@ class GetAndDeleteTest extends RestPlainApiTestCase
         $id = $this->getFirstEntityId($entityClass, self::jsonToArray($response->getContent()));
         if (null !== $id) {
             // test "get" request
-            if (!in_array(ApiActions::GET, $excludedActions, true)) {
+            if (!in_array(ApiAction::GET, $excludedActions, true)) {
                 $this->checkGetRequest($entityType, $id, Response::HTTP_OK);
             }
             // test "delete" request
-            if (!in_array(ApiActions::DELETE, $excludedActions, true)) {
+            if (!in_array(ApiAction::DELETE, $excludedActions, true)) {
                 $this->checkDeleteRequest($entityType, $id, $excludedActions);
             }
         }
@@ -58,8 +58,8 @@ class GetAndDeleteTest extends RestPlainApiTestCase
      */
     public function testDeleteList($entityClass, $excludedActions)
     {
-        if (in_array(ApiActions::DELETE_LIST, $excludedActions, true)
-            || in_array(ApiActions::GET_LIST, $excludedActions, true)
+        if (in_array(ApiAction::DELETE_LIST, $excludedActions, true)
+            || in_array(ApiAction::GET_LIST, $excludedActions, true)
         ) {
             return;
         }
@@ -78,7 +78,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
 
         $content = self::jsonToArray($response->getContent());
         if (!empty($content)) {
-            $idFieldName = $this->getEntityIdFieldName($entityClass, ApiActions::DELETE_LIST);
+            $idFieldName = $this->getEntityIdFieldName($entityClass, ApiAction::DELETE_LIST);
             if ($idFieldName) {
                 $response = $this->request(
                     'DELETE',
@@ -111,7 +111,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
         if ($response->getStatusCode() !== Response::HTTP_NO_CONTENT) {
             // process delete errors
             self::assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
-        } elseif (!in_array(ApiActions::GET, $excludedActions, true)) {
+        } elseif (!in_array(ApiAction::GET, $excludedActions, true)) {
             // check if entity was really deleted
             $this->checkGetRequest($entityType, $id, Response::HTTP_NOT_FOUND);
         }
@@ -143,7 +143,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
             return null;
         }
 
-        $idFieldName = $this->getEntityIdFieldName($entityClass, ApiActions::GET_LIST);
+        $idFieldName = $this->getEntityIdFieldName($entityClass, ApiAction::GET_LIST);
         if (!$idFieldName) {
             return null;
         }

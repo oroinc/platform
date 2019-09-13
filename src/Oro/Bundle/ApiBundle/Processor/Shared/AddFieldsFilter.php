@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -67,7 +68,7 @@ class AddFieldsFilter implements ProcessorInterface
         }
 
         $filterTemplate = $filterNames->getFieldsFilterTemplate();
-        if ('initialize' === $context->getLastGroup()) {
+        if (ApiActionGroup::INITIALIZE === $context->getLastGroup()) {
             // add "fields" filters for the primary entity and all associated entities
             // this is required to display them on the API Sandbox
             $this->addFiltersForDocumentation($context, $filterTemplate);

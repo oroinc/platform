@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\NormalizeResultContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
@@ -55,11 +56,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->processorRegistry);
         $this->processorBagConfigBuilder->addGroup('group1', self::TEST_ACTION, -1);
         $this->processorBagConfigBuilder->addGroup('group2', self::TEST_ACTION, -2);
-        $this->processorBagConfigBuilder->addGroup(
-            NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
-            self::TEST_ACTION,
-            -3
-        );
+        $this->processorBagConfigBuilder->addGroup(ApiActionGroup::NORMALIZE_RESULT, self::TEST_ACTION, -3);
 
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
@@ -145,7 +142,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         list($processor1, $processor10) = $this->addProcessors([
             'processor1'  => 'group1',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -180,7 +177,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -240,7 +237,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -297,7 +294,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -357,7 +354,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         list($processor1, $processor2, $processor10) = $this->addProcessors([
             'processor1'  => 'group1',
             'processor2'  => 'group1',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -418,7 +415,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -479,7 +476,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         list($processor1, $processor2, $processor10) = $this->addProcessors([
             'processor1'  => 'group1',
             'processor2'  => 'group1',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -541,7 +538,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -604,7 +601,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -662,7 +659,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -740,7 +737,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -798,8 +795,8 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         list($processor1, $processor10, $processor11) = $this->addProcessors([
             'processor1'  => 'group1',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
-            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -857,8 +854,8 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         list($processor1, $processor10, $processor11) = $this->addProcessors([
             'processor1'  => 'group1',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
-            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -911,8 +908,8 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         list($processor1, $processor10, $processor11) = $this->addProcessors([
             'processor1'  => 'group1',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
-            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -954,8 +951,8 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         list($processor1, $processor10, $processor11) = $this->addProcessors([
             'processor1'  => 'group1',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
-            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -1011,8 +1008,8 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         list($processor1, $processor10, $processor11) = $this->addProcessors([
             'processor1'  => 'group1',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
-            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -1060,8 +1057,8 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         list($processor1, $processor10, $processor11) = $this->addProcessors([
             'processor1'  => 'group1',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
-            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -1121,8 +1118,8 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         list($processor1, $processor10, $processor11) = $this->addProcessors([
             'processor1'  => 'group1',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
-            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -1167,8 +1164,8 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         list($processor1, $processor10, $processor11) = $this->addProcessors([
             'processor1'  => 'group1',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
-            'processor11' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -1214,7 +1211,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -1273,7 +1270,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())
@@ -1339,7 +1336,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
-            'processor10' => NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
 
         $processor1->expects(self::once())

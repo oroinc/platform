@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\RouteLinkMetadata;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\AbstractDocumentBuilder as ApiDoc;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -57,7 +57,7 @@ class AddHateoasLinks implements ProcessorInterface
 
         $requestType = $context->getRequestType();
         $entityClass = $context->getClassName();
-        if (ApiActions::GET_LIST !== $context->getAction()
+        if (ApiAction::GET_LIST !== $context->getAction()
             && $this->isGetListActionExcluded($entityClass, $context->getVersion(), $requestType)
         ) {
             return;
@@ -81,7 +81,7 @@ class AddHateoasLinks implements ProcessorInterface
     private function isGetListActionExcluded(string $entityClass, string $version, RequestType $requestType): bool
     {
         return \in_array(
-            ApiActions::GET_LIST,
+            ApiAction::GET_LIST,
             $this->resourcesProvider->getResourceExcludeActions($entityClass, $version, $requestType),
             true
         );

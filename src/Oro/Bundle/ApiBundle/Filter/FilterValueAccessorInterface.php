@@ -28,7 +28,7 @@ interface FilterValueAccessorInterface extends QueryStringAccessorInterface
     public function get(string $key): ?FilterValue;
 
     /**
-     * Gets all filters from the given group.
+     * Gets all filter values from the given group.
      *
      * @param string|null $group The name of a filter's group
      *
@@ -66,7 +66,7 @@ interface FilterValueAccessorInterface extends QueryStringAccessorInterface
     public function set(string $key, ?FilterValue $value): void;
 
     /**
-     * Removes a filter.
+     * Removes a filter value.
      *
      * @param string $key The key of a filter value
      */

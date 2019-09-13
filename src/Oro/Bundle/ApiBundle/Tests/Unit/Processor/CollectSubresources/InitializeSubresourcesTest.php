@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Processor\CollectSubresources\CollectSubresourcesContex
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\InitializeSubresources;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
@@ -156,14 +156,14 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $toOneAssociationSubresource->setIsCollection($toOneAssociation->isCollection());
         $toOneAssociationSubresource->setExcludedActions(
             [
-                ApiActions::GET_SUBRESOURCE,
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE,
-                ApiActions::GET_RELATIONSHIP,
-                ApiActions::UPDATE_RELATIONSHIP,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::GET_SUBRESOURCE,
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE,
+                ApiAction::GET_RELATIONSHIP,
+                ApiAction::UPDATE_RELATIONSHIP,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]
         );
         $expectedSubresources->addSubresource($toOneAssociation->getName(), $toOneAssociationSubresource);
@@ -222,14 +222,14 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $toManyAssociationSubresource->setIsCollection($toManyAssociation->isCollection());
         $toManyAssociationSubresource->setExcludedActions(
             [
-                ApiActions::GET_SUBRESOURCE,
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE,
-                ApiActions::GET_RELATIONSHIP,
-                ApiActions::UPDATE_RELATIONSHIP,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::GET_SUBRESOURCE,
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE,
+                ApiAction::GET_RELATIONSHIP,
+                ApiAction::UPDATE_RELATIONSHIP,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]
         );
         $expectedSubresources->addSubresource($toManyAssociation->getName(), $toManyAssociationSubresource);
@@ -288,11 +288,11 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $toOneAssociationSubresource->setIsCollection($toOneAssociation->isCollection());
         $toOneAssociationSubresource->setExcludedActions(
             [
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]
         );
         $expectedSubresources->addSubresource($toOneAssociation->getName(), $toOneAssociationSubresource);
@@ -351,9 +351,9 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $toManyAssociationSubresource->setIsCollection($toManyAssociation->isCollection());
         $toManyAssociationSubresource->setExcludedActions(
             [
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE
             ]
         );
         $expectedSubresources->addSubresource($toManyAssociation->getName(), $toManyAssociationSubresource);
@@ -413,11 +413,11 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $toOneAssociationSubresource->setIsCollection($toOneAssociation->isCollection());
         $toOneAssociationSubresource->setExcludedActions(
             [
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]
         );
         $expectedSubresources->addSubresource($toOneAssociation->getName(), $toOneAssociationSubresource);
@@ -477,9 +477,9 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $toManyAssociationSubresource->setIsCollection($toManyAssociation->isCollection());
         $toManyAssociationSubresource->setExcludedActions(
             [
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE
             ]
         );
         $expectedSubresources->addSubresource($toManyAssociation->getName(), $toManyAssociationSubresource);
@@ -539,12 +539,12 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $toOneAssociationSubresource->setIsCollection($toOneAssociation->isCollection());
         $toOneAssociationSubresource->setExcludedActions(
             [
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE,
-                ApiActions::UPDATE_RELATIONSHIP,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE,
+                ApiAction::UPDATE_RELATIONSHIP,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]
         );
         $expectedSubresources->addSubresource($toOneAssociation->getName(), $toOneAssociationSubresource);
@@ -604,12 +604,12 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $toManyAssociationSubresource->setIsCollection($toManyAssociation->isCollection());
         $toManyAssociationSubresource->setExcludedActions(
             [
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE,
-                ApiActions::UPDATE_RELATIONSHIP,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE,
+                ApiAction::UPDATE_RELATIONSHIP,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]
         );
         $expectedSubresources->addSubresource($toManyAssociation->getName(), $toManyAssociationSubresource);
@@ -800,11 +800,11 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $toOneAssociationSubresource->setIsCollection($toOneAssociation->isCollection());
         $toOneAssociationSubresource->setExcludedActions(
             [
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]
         );
         $expectedSubresources->addSubresource($toOneAssociation->getName(), $toOneAssociationSubresource);
@@ -862,9 +862,9 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $toManyAssociationSubresource->setIsCollection($toManyAssociation->isCollection());
         $toManyAssociationSubresource->setExcludedActions(
             [
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE
             ]
         );
         $expectedSubresources->addSubresource($toManyAssociation->getName(), $toManyAssociationSubresource);
@@ -878,7 +878,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
     public function testProcessWhenSubresourcesAreDisabled()
     {
         $resource = new ApiResource('Test\Class');
-        $resource->setExcludedActions([ApiActions::GET_SUBRESOURCE]);
+        $resource->setExcludedActions([ApiAction::GET_SUBRESOURCE]);
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
@@ -974,11 +974,11 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $associationSubresource->setIsCollection($association->isCollection());
         $associationSubresource->setExcludedActions(
             [
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]
         );
         $expectedSubresources->addSubresource($association->getName(), $associationSubresource);
@@ -1038,11 +1038,11 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $associationSubresource->setIsCollection($association->isCollection());
         $associationSubresource->setExcludedActions(
             [
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]
         );
         $expectedSubresources->addSubresource($association->getName(), $associationSubresource);
@@ -1102,11 +1102,11 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $associationSubresource->setIsCollection($association->isCollection());
         $associationSubresource->setExcludedActions(
             [
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]
         );
         $expectedSubresources->addSubresource($association->getName(), $associationSubresource);
@@ -1165,11 +1165,11 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $associationSubresource->setIsCollection($association->isCollection());
         $associationSubresource->setExcludedActions(
             [
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]
         );
         $expectedSubresources->addSubresource($association->getName(), $associationSubresource);

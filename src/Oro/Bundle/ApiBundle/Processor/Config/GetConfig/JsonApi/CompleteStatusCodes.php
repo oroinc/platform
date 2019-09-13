@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AbstractAddStatusCodes;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,10 +49,10 @@ class CompleteStatusCodes extends AbstractAddStatusCodes
     private function addStatusCodes(EntityDefinitionConfig $definition, $entityClass, $targetAction)
     {
         switch ($targetAction) {
-            case ApiActions::CREATE:
+            case ApiAction::CREATE:
                 $this->addStatusCodesForCreate($definition, $entityClass);
                 break;
-            case ApiActions::UPDATE:
+            case ApiAction::UPDATE:
                 $this->addStatusCodesForUpdate($definition->getStatusCodes());
                 break;
         }

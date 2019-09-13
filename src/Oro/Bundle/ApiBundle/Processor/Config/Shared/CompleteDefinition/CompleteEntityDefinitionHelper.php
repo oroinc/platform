@@ -14,7 +14,7 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\ExclusionProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -214,7 +214,7 @@ class CompleteEntityDefinitionHelper
         $targetAction
     ) {
         if ($metadata->usesIdGenerator()
-            && (ApiActions::CREATE === $targetAction || ApiActions::UPDATE === $targetAction)
+            && (ApiAction::CREATE === $targetAction || ApiAction::UPDATE === $targetAction)
             && !$this->entityIdHelper->isEntityIdentifierEqual($metadata->getIdentifierFieldNames(), $definition)
         ) {
             $propertyPaths = $metadata->getIdentifierFieldNames();

@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesWithoutIdentifierLoader;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
@@ -42,7 +42,7 @@ class ResourcesWithoutIdentifierLoaderTest extends \PHPUnit\Framework\TestCase
                 'Test\Entity1',
                 $version,
                 $requestType,
-                [new EntityDefinitionConfigExtra(ApiActions::GET), new FilterIdentifierFieldsConfigExtra()]
+                [new EntityDefinitionConfigExtra(ApiAction::GET), new FilterIdentifierFieldsConfigExtra()]
             )
             ->willReturn($config);
 
@@ -68,7 +68,7 @@ class ResourcesWithoutIdentifierLoaderTest extends \PHPUnit\Framework\TestCase
                 'Test\Entity1',
                 $version,
                 $requestType,
-                [new EntityDefinitionConfigExtra(ApiActions::GET), new FilterIdentifierFieldsConfigExtra()]
+                [new EntityDefinitionConfigExtra(ApiAction::GET), new FilterIdentifierFieldsConfigExtra()]
             )
             ->willReturn($config);
 

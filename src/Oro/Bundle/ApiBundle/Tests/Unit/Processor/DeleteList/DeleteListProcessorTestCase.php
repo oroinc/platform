@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\DeleteList;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class DeleteListProcessorTestCase extends \PHPUnit\Framework\TestCase
@@ -28,7 +28,7 @@ class DeleteListProcessorTestCase extends \PHPUnit\Framework\TestCase
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
         $this->context = new DeleteListContext($this->configProvider, $this->metadataProvider);
-        $this->context->setAction(ApiActions::DELETE_LIST);
+        $this->context->setAction(ApiAction::DELETE_LIST);
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
     }

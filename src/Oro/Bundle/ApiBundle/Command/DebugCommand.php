@@ -38,10 +38,10 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
     private $processorBag;
 
     /**
-     * @param ValueNormalizer $valueNormalizer
-     * @param ResourcesProvider $resourcesProvider
+     * @param ValueNormalizer             $valueNormalizer
+     * @param ResourcesProvider           $resourcesProvider
      * @param ActionProcessorBagInterface $actionProcessorBag
-     * @param ProcessorBagInterface $processorBag
+     * @param ProcessorBagInterface       $processorBag
      */
     public function __construct(
         ValueNormalizer $valueNormalizer,
@@ -143,7 +143,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
     /**
      * @param OutputInterface $output
      */
-    protected function dumpActions(OutputInterface $output)
+    private function dumpActions(OutputInterface $output)
     {
         $publicActions = $this->actionProcessorBag->getActions();
 
@@ -153,17 +153,22 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
         $allProcessorsIds = [];
         foreach ($this->processorBag->getActions() as $action) {
             $processorIds = $this->getProcessorIds($action);
-            $allProcessorsIds = array_merge($allProcessorsIds, $processorIds);
+            $allProcessorsIds[] = $processorIds;
             $numberOfProcessors = count($processorIds);
             $totalNumberOfProcessors += $numberOfProcessors;
-            $processorInfo = [$numberOfProcessors, $this->processorBag->getActionGroups($action)];
+            $processorInfo = [
+                $numberOfProcessors,
+                'customize_loaded_data' !== $action && 'customize_form_data' !== $action
+                    ? $this->processorBag->getActionGroups($action)
+                    : []
+            ];
             if (in_array($action, $publicActions, true)) {
                 $processorsForPublicActions[$action] = $processorInfo;
             } else {
                 $processorsForOtherActions[$action] = $processorInfo;
             }
         }
-        $allProcessorsIds = array_unique($allProcessorsIds);
+        $allProcessorsIds = array_unique(array_merge(...$allProcessorsIds));
         $processors = [];
         foreach ($processorsForOtherActions as $action => $processorInfo) {
             $processors[$action] = $processorInfo;
@@ -204,7 +209,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      * @param OutputInterface $output
      * @param array           $processors [action => [number of processors, groups], ...]
      */
-    protected function dumpAllActions(OutputInterface $output, array $processors)
+    private function dumpAllActions(OutputInterface $output, array $processors)
     {
         $table = new Table($output);
         $table->setHeaders(['Action', 'Groups', 'Details']);
@@ -227,12 +232,12 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      * @param OutputInterface $output
      * @param RequestType     $requestType
      */
-    protected function dumpAllProcessors(OutputInterface $output, RequestType $requestType)
+    private function dumpAllProcessors(OutputInterface $output, RequestType $requestType)
     {
         $output->writeln('The processors are displayed in alphabetical order.');
 
         $table = new Table($output);
-        $table->setHeaders(['Processor', 'Actions', 'Is Service?']);
+        $table->setHeaders(['Processor', 'Actions']);
 
         $context = new Context();
         $context->set(ApiContext::REQUEST_TYPE, $requestType);
@@ -252,23 +257,16 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
                 }
                 $className = get_class($processor);
                 if (!isset($processorsMap[$className])) {
-                    $processorsMap[$className] = [[], false];
+                    $processorsMap[$className] = [];
                 }
-                if (!in_array($action, $processorsMap[$className][0], true)) {
-                    $processorsMap[$className][0][] = $action;
-                }
-                if ($this->container->has($processors->getProcessorId())) {
-                    $processorsMap[$className][1][] = true;
+                if (!in_array($action, $processorsMap[$className], true)) {
+                    $processorsMap[$className][] = $action;
                 }
             }
         }
         ksort($processorsMap);
-        foreach ($processorsMap as $className => list($actionNames, $isService)) {
-            $isServiceStr = 'No';
-            if ($isService) {
-                $isServiceStr = 'Yes';
-            }
-            $table->addRow([$className, implode("\n", $actionNames), $isServiceStr]);
+        foreach ($processorsMap as $className => $actionNames) {
+            $table->addRow([$className, implode("\n", $actionNames)]);
         }
 
         $table->render();
@@ -278,7 +276,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      * @param OutputInterface $output
      * @param RequestType     $requestType
      */
-    protected function dumpProcessorsWithoutDescription(OutputInterface $output, RequestType $requestType)
+    private function dumpProcessorsWithoutDescription(OutputInterface $output, RequestType $requestType)
     {
         $output->writeln('The list of processors that do not have a description:');
 
@@ -317,7 +315,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      * @param RequestType     $requestType
      * @param string[]        $attributes
      */
-    protected function dumpProcessors(OutputInterface $output, $action, RequestType $requestType, array $attributes)
+    private function dumpProcessors(OutputInterface $output, $action, RequestType $requestType, array $attributes)
     {
         $output->writeln('The processors are displayed in the order they are executed.');
 
@@ -361,7 +359,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
                 $processorColumn .= PHP_EOL . $processorDescription;
             }
 
-            $attributesColumn = $this->formatProcessorAttributes($processors->getProcessorAttributes());
+            $attributesColumn = $this->formatProcessorAttributes($processors->getProcessorAttributes(), $action);
             $table->addRow([$processorColumn, $attributesColumn]);
             $i++;
         }
@@ -374,7 +372,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      *
      * @return string
      */
-    protected function getClassDocComment($className)
+    private function getClassDocComment($className)
     {
         $reflection = new \ReflectionClass($className);
 
@@ -388,33 +386,49 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
     }
 
     /**
-     * @param array $attributes
+     * @param array  $attributes
+     * @param string $action
      *
      * @return string
      */
-    protected function formatProcessorAttributes(array $attributes)
+    private function formatProcessorAttributes(array $attributes, $action)
     {
         $rows = [];
 
         if (array_key_exists('group', $attributes)) {
-            $rows[] = implode(
-                ': ',
-                [
-                    'group',
-                    sprintf(
-                        '<comment>%s</comment>',
-                        $this->convertProcessorAttributeValueToString($attributes['group'])
-                    )
-                ]
-            );
+            $group = $attributes['group'];
+            if ('customize_loaded_data' === $action) {
+                $rows[] = $this->formatProcessorAttribute('collection', 'collection' === $group, true);
+            } elseif ('customize_form_data' === $action) {
+                $rows[] = $this->formatProcessorAttribute('event', $group, true);
+            } else {
+                $rows[] = $this->formatProcessorAttribute('group', $group, true);
+            }
             unset($attributes['group']);
         }
 
         foreach ($attributes as $key => $val) {
-            $rows[] = implode(': ', [$key, $this->convertProcessorAttributeValueToString($val)]);
+            $rows[] = $this->formatProcessorAttribute($key, $val);
         }
 
         return implode(PHP_EOL, $rows);
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     * @param bool   $bold
+     *
+     * @return string
+     */
+    private function formatProcessorAttribute($name, $value, $bold = false)
+    {
+        $stringValue = $this->convertProcessorAttributeValueToString($value);
+        if ($bold) {
+            $stringValue = sprintf('<comment>%s</comment>', $stringValue);
+        }
+
+        return implode(': ', [$name, $stringValue]);
     }
 
     /**
@@ -422,7 +436,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      *
      * @return string
      */
-    protected function convertProcessorAttributeValueToString($value)
+    private function convertProcessorAttributeValueToString($value)
     {
         if (!is_array($value)) {
             return $this->convertValueToString($value);
@@ -468,7 +482,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      *
      * @return string[]
      */
-    protected function getProcessorIds($action)
+    private function getProcessorIds($action)
     {
         $context = new Context();
         $context->setAction($action);

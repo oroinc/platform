@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -84,7 +84,7 @@ abstract class LoadSubresources implements ProcessorInterface
         // make sure that default excluded actions for sub-resource exist
         $result = \array_merge($result, SubresourceUtil::SUBRESOURCE_DEFAULT_EXCLUDED_ACTIONS);
         // disable changes of relationships if the parent entity modification is disabled
-        if (\in_array(ApiActions::UPDATE, $resourceExcludedActions, true)) {
+        if (\in_array(ApiAction::UPDATE, $resourceExcludedActions, true)) {
             $result = \array_merge($result, SubresourceUtil::RELATIONSHIP_CHANGE_ACTIONS);
         }
 

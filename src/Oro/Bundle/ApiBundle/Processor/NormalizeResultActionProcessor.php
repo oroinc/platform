@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Exception\ValidationExceptionInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Model\Label;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
@@ -26,8 +27,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  */
 class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAwareInterface
 {
-    public const NORMALIZE_RESULT_GROUP = 'normalize_result';
-
     /** @var LoggerInterface */
     protected $logger;
 
@@ -55,7 +54,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
             foreach ($processors as $processor) {
                 if ($context->hasErrors()) {
                     $errorsHandled = true;
-                    if (self::NORMALIZE_RESULT_GROUP !== $group) {
+                    if (ApiActionGroup::NORMALIZE_RESULT !== $group) {
                         $this->handleErrors($context, $processorId, $group);
                         break;
                     }
@@ -120,7 +119,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
             $this->logException($e, $processorId, $context);
         }
 
-        if (self::NORMALIZE_RESULT_GROUP === $group || !$this->isNormalizeResultEnabled($context)) {
+        if (ApiActionGroup::NORMALIZE_RESULT === $group || !$this->isNormalizeResultEnabled($context)) {
             // rethrow an exception occurred in any processor from the "normalize_result" group
             // or if the "normalize_result" group is disabled,
             // this is required to prevent circular handling of such exception
@@ -214,7 +213,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
      */
     protected function executeNormalizeResultProcessors(NormalizeResultContext $context)
     {
-        $context->setFirstGroup(self::NORMALIZE_RESULT_GROUP);
+        $context->setFirstGroup(ApiActionGroup::NORMALIZE_RESULT);
         $processors = $this->processorBag->getProcessors($context);
         /** @var ProcessorInterface $processor */
         foreach ($processors as $processor) {

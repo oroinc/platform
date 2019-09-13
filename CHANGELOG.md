@@ -20,6 +20,10 @@ The current file describes significant changes in the code that may affect the u
   `Resources/config/oro/api_plain.yml` configuration files or create a processor for the `get_config` action.
 * The `delete_handler` configuration option was removed.
   The `Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry` class is used to get the deletion handler instead.
+* The class `Oro\Bundle\ApiBundle\Request\ApiActions` was renamed to `Oro\Bundle\ApiBundle\Request\ApiAction`.
+* The constant `NORMALIZE_RESULT_GROUP` was removed from
+  `Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor`
+  Use `NORMALIZE_RESULT` constant from `Oro\Bundle\ApiBundle\Request\ApiActionGroup` instead.
 
 #### AssetBundle
 * The new feature, [Hot Module Replacement (HMR or Hot Reload) enabled for SCSS](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#hot-module-replacement-hmr-or-hot-reload-for-scss). To enable HMR for custom CSS links, please [follow the documentation](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#enable-for-css-links).

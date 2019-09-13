@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContex
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler\AssociationHandler;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler\EntityHandler;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
@@ -131,7 +131,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject($config);
-        $this->context->setTargetAction(ApiActions::GET_LIST);
+        $this->context->setTargetAction(ApiAction::GET_LIST);
         $this->context->setResult($configObject);
         $this->processor->process($this->context);
 
