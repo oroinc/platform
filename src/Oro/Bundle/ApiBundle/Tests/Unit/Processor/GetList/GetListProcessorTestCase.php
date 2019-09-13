@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class GetListProcessorTestCase extends \PHPUnit\Framework\TestCase
@@ -31,7 +31,7 @@ class GetListProcessorTestCase extends \PHPUnit\Framework\TestCase
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
         $this->context = new GetListContext($this->configProvider, $this->metadataProvider);
-        $this->context->setAction(ApiActions::GET_LIST);
+        $this->context->setAction(ApiAction::GET_LIST);
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
         $this->context->setConfigExtras(

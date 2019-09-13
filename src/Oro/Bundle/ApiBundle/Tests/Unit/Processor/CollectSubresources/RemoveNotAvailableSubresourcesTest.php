@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectSubresources;
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\CollectSubresourcesContext;
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\LoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\RemoveNotAvailableSubresources;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresourcesCollection;
@@ -97,14 +97,14 @@ class RemoveNotAvailableSubresourcesTest extends \PHPUnit\Framework\TestCase
         $subresource->setTargetClassName($targetEntityClass);
         $subresource->setIsCollection(false);
         $subresource->setExcludedActions([
-            ApiActions::GET_SUBRESOURCE,
-            ApiActions::UPDATE_SUBRESOURCE,
-            ApiActions::ADD_SUBRESOURCE,
-            ApiActions::DELETE_SUBRESOURCE,
-            ApiActions::GET_RELATIONSHIP,
-            ApiActions::UPDATE_RELATIONSHIP,
-            ApiActions::ADD_RELATIONSHIP,
-            ApiActions::DELETE_RELATIONSHIP
+            ApiAction::GET_SUBRESOURCE,
+            ApiAction::UPDATE_SUBRESOURCE,
+            ApiAction::ADD_SUBRESOURCE,
+            ApiAction::DELETE_SUBRESOURCE,
+            ApiAction::GET_RELATIONSHIP,
+            ApiAction::UPDATE_RELATIONSHIP,
+            ApiAction::ADD_RELATIONSHIP,
+            ApiAction::DELETE_RELATIONSHIP
         ]);
 
         $this->context->setResources([$resource]);
@@ -128,13 +128,13 @@ class RemoveNotAvailableSubresourcesTest extends \PHPUnit\Framework\TestCase
         $subresource->setTargetClassName($targetEntityClass);
         $subresource->setIsCollection(false);
         $subresource->setExcludedActions([
-            ApiActions::GET_SUBRESOURCE,
-            ApiActions::ADD_SUBRESOURCE,
-            ApiActions::DELETE_SUBRESOURCE,
-            ApiActions::GET_RELATIONSHIP,
-            ApiActions::UPDATE_RELATIONSHIP,
-            ApiActions::ADD_RELATIONSHIP,
-            ApiActions::DELETE_RELATIONSHIP
+            ApiAction::GET_SUBRESOURCE,
+            ApiAction::ADD_SUBRESOURCE,
+            ApiAction::DELETE_SUBRESOURCE,
+            ApiAction::GET_RELATIONSHIP,
+            ApiAction::UPDATE_RELATIONSHIP,
+            ApiAction::ADD_RELATIONSHIP,
+            ApiAction::DELETE_RELATIONSHIP
         ]);
 
         $this->context->setResources([$resource]);

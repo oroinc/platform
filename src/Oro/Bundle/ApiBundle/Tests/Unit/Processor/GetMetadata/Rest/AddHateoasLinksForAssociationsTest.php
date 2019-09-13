@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\RouteLinkMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Rest\AddHateoasLinksForAssociations;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
@@ -119,7 +119,7 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
 
         $subresources = new ApiResourceSubresources($this->context->getClassName());
         $subresources->addSubresource($associationMetadata->getName())
-            ->addExcludedAction(ApiActions::GET_SUBRESOURCE);
+            ->addExcludedAction(ApiAction::GET_SUBRESOURCE);
 
         $this->subresourcesProvider->expects(self::once())
             ->method('getSubresources')
@@ -151,7 +151,7 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
 
         $subresources = new ApiResourceSubresources($this->context->getClassName());
         $subresources->addSubresource($associationMetadata->getName())
-            ->addExcludedAction(ApiActions::GET_RELATIONSHIP);
+            ->addExcludedAction(ApiAction::GET_RELATIONSHIP);
 
         $this->subresourcesProvider->expects(self::once())
             ->method('getSubresources')

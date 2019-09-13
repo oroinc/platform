@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
@@ -64,7 +64,7 @@ trait SpecialFieldsConsistencyTestTrait
     {
         $errors = [];
 
-        $actionsToCheck = [ApiActions::GET, ApiActions::GET_LIST, ApiActions::CREATE, ApiActions::UPDATE];
+        $actionsToCheck = [ApiAction::GET, ApiAction::GET_LIST, ApiAction::CREATE, ApiAction::UPDATE];
         foreach ($actionsToCheck as $action) {
             if (in_array($action, $excludedActions, true)) {
                 continue;

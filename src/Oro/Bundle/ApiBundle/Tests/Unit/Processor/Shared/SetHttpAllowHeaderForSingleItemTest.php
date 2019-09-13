@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Shared\SetHttpAllowHeaderForSingleItem;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
 class SetHttpAllowHeaderForSingleItemTest extends GetProcessorTestCase
@@ -66,7 +66,7 @@ class SetHttpAllowHeaderForSingleItemTest extends GetProcessorTestCase
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn([ApiActions::DELETE]);
+            ->willReturn([ApiAction::DELETE]);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setClassName('Test\Class');
@@ -84,7 +84,7 @@ class SetHttpAllowHeaderForSingleItemTest extends GetProcessorTestCase
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn([ApiActions::GET, ApiActions::UPDATE, ApiActions::DELETE]);
+            ->willReturn([ApiAction::GET, ApiAction::UPDATE, ApiAction::DELETE]);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setClassName('Test\Class');

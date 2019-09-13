@@ -259,6 +259,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 
 /**
  * Loads entity using the EntitySerializer component.
@@ -267,7 +268,7 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 class LoadEntityByEntitySerializer implements ProcessorInterface
 {
     /** @var EntitySerializer */
-    protected $entitySerializer;
+    private $entitySerializer;
 
     /**
      * @param EntitySerializer $entitySerializer
@@ -317,7 +318,7 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
         $context->setResult($result);
 
         // data returned by the EntitySerializer are already normalized
-        $context->skipGroup('normalize_data');
+        $context->skipGroup(ApiActionGroup::NORMALIZE_DATA);
     }
 }
 ```

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -41,7 +41,7 @@ class LoadAccessibleResources implements ProcessorInterface
         $resources = $context->getResult();
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
-            if (!\in_array(ApiActions::GET, $resource->getExcludedActions(), true)
+            if (!\in_array(ApiAction::GET, $resource->getExcludedActions(), true)
                 && null === $entityOverrideProvider->getSubstituteEntityClass($entityClass)
             ) {
                 $accessibleResources[] = $entityClass;

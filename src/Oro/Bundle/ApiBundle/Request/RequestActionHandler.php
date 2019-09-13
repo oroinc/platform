@@ -55,7 +55,7 @@ abstract class RequestActionHandler
      */
     public function handleGet(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::GET);
+        $processor = $this->getProcessor(ApiAction::GET);
         /** @var GetContext $context */
         $context = $processor->createContext();
         $this->preparePrimaryContext($context, $request);
@@ -77,7 +77,7 @@ abstract class RequestActionHandler
      */
     public function handleGetList(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::GET_LIST);
+        $processor = $this->getProcessor(ApiAction::GET_LIST);
         /** @var GetListContext $context */
         $context = $processor->createContext();
         $this->preparePrimaryContext($context, $request);
@@ -98,7 +98,7 @@ abstract class RequestActionHandler
      */
     public function handleDelete(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::DELETE);
+        $processor = $this->getProcessor(ApiAction::DELETE);
         /** @var DeleteContext $context */
         $context = $processor->createContext();
         $this->preparePrimaryContext($context, $request);
@@ -119,7 +119,7 @@ abstract class RequestActionHandler
      */
     public function handleDeleteList(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::DELETE_LIST);
+        $processor = $this->getProcessor(ApiAction::DELETE_LIST);
         /** @var DeleteListContext $context */
         $context = $processor->createContext();
         $this->preparePrimaryContext($context, $request);
@@ -140,7 +140,7 @@ abstract class RequestActionHandler
      */
     public function handleCreate(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::CREATE);
+        $processor = $this->getProcessor(ApiAction::CREATE);
         /** @var CreateContext $context */
         $context = $processor->createContext();
         $this->preparePrimaryContext($context, $request);
@@ -161,7 +161,7 @@ abstract class RequestActionHandler
      */
     public function handleUpdate(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::UPDATE);
+        $processor = $this->getProcessor(ApiAction::UPDATE);
         /** @var UpdateContext $context */
         $context = $processor->createContext();
         $this->preparePrimaryContext($context, $request);
@@ -185,7 +185,7 @@ abstract class RequestActionHandler
      */
     public function handleGetSubresource(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::GET_SUBRESOURCE);
+        $processor = $this->getProcessor(ApiAction::GET_SUBRESOURCE);
         /** @var GetSubresourceContext $context */
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);
@@ -209,7 +209,7 @@ abstract class RequestActionHandler
      */
     public function handleUpdateSubresource(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::UPDATE_SUBRESOURCE);
+        $processor = $this->getProcessor(ApiAction::UPDATE_SUBRESOURCE);
         /** @var ChangeSubresourceContext $context */
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);
@@ -233,7 +233,7 @@ abstract class RequestActionHandler
      */
     public function handleAddSubresource(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::ADD_SUBRESOURCE);
+        $processor = $this->getProcessor(ApiAction::ADD_SUBRESOURCE);
         /** @var ChangeSubresourceContext $context */
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);
@@ -257,7 +257,7 @@ abstract class RequestActionHandler
      */
     public function handleDeleteSubresource(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::DELETE_SUBRESOURCE);
+        $processor = $this->getProcessor(ApiAction::DELETE_SUBRESOURCE);
         /** @var ChangeSubresourceContext $context */
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);
@@ -280,7 +280,7 @@ abstract class RequestActionHandler
      */
     public function handleGetRelationship(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::GET_RELATIONSHIP);
+        $processor = $this->getProcessor(ApiAction::GET_RELATIONSHIP);
         /** @var GetRelationshipContext $context */
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);
@@ -303,7 +303,7 @@ abstract class RequestActionHandler
      */
     public function handleUpdateRelationship(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::UPDATE_RELATIONSHIP);
+        $processor = $this->getProcessor(ApiAction::UPDATE_RELATIONSHIP);
         /** @var UpdateRelationshipContext $context */
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);
@@ -324,7 +324,7 @@ abstract class RequestActionHandler
      */
     public function handleAddRelationship(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::ADD_RELATIONSHIP);
+        $processor = $this->getProcessor(ApiAction::ADD_RELATIONSHIP);
         /** @var AddRelationshipContext $context */
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);
@@ -345,7 +345,7 @@ abstract class RequestActionHandler
      */
     public function handleDeleteRelationship(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::DELETE_RELATIONSHIP);
+        $processor = $this->getProcessor(ApiAction::DELETE_RELATIONSHIP);
         /** @var DeleteRelationshipContext $context */
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);
@@ -366,7 +366,7 @@ abstract class RequestActionHandler
      */
     public function handleOptionsItem(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::OPTIONS);
+        $processor = $this->getProcessor(ApiAction::OPTIONS);
         /** @var OptionsContext $context */
         $context = $processor->createContext();
         $this->preparePrimaryContext($context, $request);
@@ -388,7 +388,7 @@ abstract class RequestActionHandler
      */
     public function handleOptionsList(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::OPTIONS);
+        $processor = $this->getProcessor(ApiAction::OPTIONS);
         /** @var OptionsContext $context */
         $context = $processor->createContext();
         $this->preparePrimaryContext($context, $request);
@@ -409,7 +409,7 @@ abstract class RequestActionHandler
      */
     public function handleOptionsSubresource(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::OPTIONS);
+        $processor = $this->getProcessor(ApiAction::OPTIONS);
         /** @var OptionsContext $context */
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);
@@ -430,7 +430,7 @@ abstract class RequestActionHandler
      */
     public function handleOptionsRelationship(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::OPTIONS);
+        $processor = $this->getProcessor(ApiAction::OPTIONS);
         /** @var OptionsContext $context */
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);
@@ -450,7 +450,7 @@ abstract class RequestActionHandler
      */
     public function handleNotAllowedItem(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::GET);
+        $processor = $this->getProcessor(ApiAction::GET);
         /** @var Context $context */
         $context = $processor->createContext();
         $this->preparePrimaryContext($context, $request);
@@ -470,7 +470,7 @@ abstract class RequestActionHandler
      */
     public function handleNotAllowedList(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::GET_LIST);
+        $processor = $this->getProcessor(ApiAction::GET_LIST);
         /** @var Context $context */
         $context = $processor->createContext();
         $this->preparePrimaryContext($context, $request);
@@ -490,7 +490,7 @@ abstract class RequestActionHandler
      */
     public function handleNotAllowedSubresource(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::GET_SUBRESOURCE);
+        $processor = $this->getProcessor(ApiAction::GET_SUBRESOURCE);
         /** @var SubresourceContext $context */
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);
@@ -510,7 +510,7 @@ abstract class RequestActionHandler
      */
     public function handleNotAllowedRelationship(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiActions::GET_RELATIONSHIP);
+        $processor = $this->getProcessor(ApiAction::GET_RELATIONSHIP);
         /** @var SubresourceContext $context */
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);

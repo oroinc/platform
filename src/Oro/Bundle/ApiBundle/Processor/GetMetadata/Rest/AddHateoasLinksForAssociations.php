@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Metadata\RouteLinkMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\AbstractDocumentBuilder as ApiDoc;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -76,7 +76,7 @@ class AddHateoasLinksForAssociations implements ProcessorInterface
             }
 
             if (!$association->hasRelationshipLink(ApiDoc::LINK_SELF)
-                && !$subresource->isExcludedAction(ApiActions::GET_RELATIONSHIP)
+                && !$subresource->isExcludedAction(ApiAction::GET_RELATIONSHIP)
             ) {
                 $association->addRelationshipLink(ApiDoc::LINK_SELF, new RouteLinkMetadata(
                     $this->urlGenerator,
@@ -90,7 +90,7 @@ class AddHateoasLinksForAssociations implements ProcessorInterface
             }
 
             if (!$association->hasRelationshipLink(ApiDoc::LINK_RELATED)
-                && !$subresource->isExcludedAction(ApiActions::GET_SUBRESOURCE)
+                && !$subresource->isExcludedAction(ApiAction::GET_SUBRESOURCE)
             ) {
                 $association->addRelationshipLink(ApiDoc::LINK_RELATED, new RouteLinkMetadata(
                     $this->urlGenerator,

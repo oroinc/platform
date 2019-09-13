@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -468,7 +468,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     private function isExcludedAction($action, $otherActions, $excludedActions)
     {
-        if (ApiActions::OPTIONS === $action) {
+        if (ApiAction::OPTIONS === $action) {
             return !$this->hasOtherActions($action, $otherActions, $excludedActions);
         }
 

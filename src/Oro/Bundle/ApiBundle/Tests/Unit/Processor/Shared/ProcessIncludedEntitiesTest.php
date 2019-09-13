@@ -10,7 +10,8 @@ use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Processor\Shared\ProcessIncludedEntities;
 use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
@@ -96,7 +97,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
         $expectedContext->skipFormValidation(true);
-        $expectedContext->setLastGroup('transform_data');
+        $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $expectedContext->setSoftErrorsHandling(true);
 
         $actionMetadata = new EntityMetadata();
@@ -105,7 +106,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionProcessor = $this->createMock(ActionProcessorInterface::class);
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
-            ->with(ApiActions::CREATE)
+            ->with(ApiAction::CREATE)
             ->willReturn($actionProcessor);
         $actionProcessor->expects(self::once())
             ->method('createContext')
@@ -156,7 +157,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
         $expectedContext->skipFormValidation(true);
-        $expectedContext->setLastGroup('transform_data');
+        $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $expectedContext->setSoftErrorsHandling(true);
 
         $actionMetadata = new EntityMetadata();
@@ -165,7 +166,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionProcessor = $this->createMock(ActionProcessorInterface::class);
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
-            ->with(ApiActions::CREATE)
+            ->with(ApiAction::CREATE)
             ->willReturn($actionProcessor);
         $actionProcessor->expects(self::once())
             ->method('createContext')
@@ -223,7 +224,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
         $expectedContext->skipFormValidation(true);
-        $expectedContext->setLastGroup('transform_data');
+        $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $expectedContext->setSoftErrorsHandling(true);
 
         $actionMetadata = new EntityMetadata();
@@ -232,7 +233,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionProcessor = $this->createMock(ActionProcessorInterface::class);
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
-            ->with(ApiActions::CREATE)
+            ->with(ApiAction::CREATE)
             ->willReturn($actionProcessor);
         $actionProcessor->expects(self::once())
             ->method('createContext')
@@ -287,7 +288,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
         $expectedContext->skipFormValidation(true);
-        $expectedContext->setLastGroup('transform_data');
+        $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $expectedContext->setSoftErrorsHandling(true);
 
         $actionMetadata = new EntityMetadata();
@@ -296,7 +297,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionProcessor = $this->createMock(ActionProcessorInterface::class);
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
-            ->with(ApiActions::UPDATE)
+            ->with(ApiAction::UPDATE)
             ->willReturn($actionProcessor);
         $actionProcessor->expects(self::once())
             ->method('createContext')
@@ -347,7 +348,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
         $expectedContext->skipFormValidation(true);
-        $expectedContext->setLastGroup('transform_data');
+        $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $expectedContext->setSoftErrorsHandling(true);
 
         $actionMetadata = new EntityMetadata();
@@ -356,7 +357,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionProcessor = $this->createMock(ActionProcessorInterface::class);
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
-            ->with(ApiActions::UPDATE)
+            ->with(ApiAction::UPDATE)
             ->willReturn($actionProcessor);
         $actionProcessor->expects(self::once())
             ->method('createContext')
