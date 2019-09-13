@@ -178,7 +178,12 @@ define(function(require) {
                 var renderedPropertyName = this.renderedPropertyName || 'name';
                 var label = [];
                 _.each(value.value.split(','), function(val) {
-                    var item = _.findWhere(this.data, {id: parseInt(val)});
+                    var id = parseInt(val);
+                    if (val && isNaN(id)) {
+                        id = val;
+                    }
+
+                    var item = _.findWhere(this.data, {id: id});
                     if (item !== void 0) {
                         if (item.treePath) {
                             var path = [];
