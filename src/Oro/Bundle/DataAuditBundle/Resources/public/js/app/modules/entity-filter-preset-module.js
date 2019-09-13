@@ -4,6 +4,6 @@ define(function(require) {
     var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
 
     EntityStructureDataProvider.defineFilterPreset('dataaudit', {
-        optionsFilter: {auditable: true}
+        optionsFilter: {auditable: true, exclude: false}
     });
 });

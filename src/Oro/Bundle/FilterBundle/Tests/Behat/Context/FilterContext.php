@@ -168,7 +168,6 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
     {
         $lastConditionItem = $this->createElement('Last condition item');
         $lastConditionItem->click();
-        $this->waitForAjax();
 
         $searchResult = $this->spin(function (FilterContext $context) use ($column) {
             $searchResult = $this->getPage()
