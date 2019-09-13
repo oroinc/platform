@@ -1843,11 +1843,13 @@ JS;
      * Expand node of JS Tree detected by given title
      * Example: When I expand "Retail Supplies" in tree
      *
-     * @When /^(?:|I )expand "(?P<nodeTitle>[\w\s]+)" in tree$/
+     * @When /^(?:|I )expand "(?P<nodeTitle>(?:[^"]|\\")+)" in tree$/
      * @param string $nodeTitle
      */
     public function iExpandNodeInTree($nodeTitle)
     {
+        $nodeTitle = $this->fixStepArgument($nodeTitle);
+
         $page = $this->getSession()->getPage();
         $nodeStateControl = $page->find(
             'xpath',
@@ -1863,12 +1865,15 @@ JS;
      * Check that some JS Tree node located right after another one node
      * Example: Then I see "By Brand" after "New Arrivals" in tree
      *
-     * @Then /^(?:|I )should see "(?P<nodeTitle>[\w\s]+)" after "(?P<anotherNodeTitle>[\w\s]+)" in tree$/
+     * @Then /^(?:|I )should see "(?P<nodeTitle>(?:[^"]|\\")+)" after "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree$/
      * @param string $nodeTitle
      * @param string $anotherNodeTitle
      */
     public function iSeeNodeAfterAnotherOneInTree($nodeTitle, $anotherNodeTitle)
     {
+        $nodeTitle = $this->fixStepArgument($nodeTitle);
+        $anotherNodeTitle = $this->fixStepArgument($anotherNodeTitle);
+
         $page = $this->getSession()->getPage();
         $resultElement = $page->find(
             'xpath',
@@ -1878,6 +1883,33 @@ JS;
 
         self::assertNotNull($resultElement, sprintf(
             'Node "%s" not found after "%s" in tree.',
+            $nodeTitle,
+            $anotherNodeTitle
+        ));
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Check that some JS Tree node belongs to another one node
+     * Example: Then I should see "By Brand" belongs to "New Arrivals" in tree
+     *
+     * @Then /^(?:|I )should see "(?P<nodeTitle>(?:[^"]|\\")+)" belongs to "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree$/
+     * @param string $nodeTitle
+     * @param string $anotherNodeTitle
+     */
+    //@codingStandardsIgnoreEnd
+    public function iSeeNodeBelongsAnotherOneInTree($nodeTitle, $anotherNodeTitle)
+    {
+        $page = $this->getSession()->getPage();
+        $resultElement = $page->find(
+            'xpath',
+            '//a[contains(., "' . $nodeTitle . '")]/parent::li[contains(@class, "jstree-node")]'
+            . '/parent::ul[contains(@class, "jstree-children")]/parent::li[contains(@class, "jstree-node")]'
+            . '/a[contains(., "' . $anotherNodeTitle . '")]'
+        );
+
+        self::assertNotNull($resultElement, sprintf(
+            'Node "%s" does not belong to "%s" in tree.',
             $nodeTitle,
             $anotherNodeTitle
         ));
@@ -2304,5 +2336,17 @@ JS;
         } catch (\Exception $e) {
             throw $e;
         }
+    }
+
+    /**
+     * Returns fixed step argument (\\" replaced back to ", \\# replaced back to #)
+     *
+     * @param string $argument
+     *
+     * @return string
+     */
+    protected function fixStepArgument($argument)
+    {
+        return str_replace(['\\"', '\\#'], ['"', '#'], $argument);
     }
 }

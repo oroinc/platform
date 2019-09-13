@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Behat\Context;
 
+use Behat\Behat\Hook\Scope\AfterFeatureScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
@@ -23,6 +24,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ImportExportContext extends OroFeatureContext implements
@@ -47,6 +49,21 @@ class ImportExportContext extends OroFeatureContext implements
     private $oroMainContext;
 
     /**
+     * @var string Path to saved template
+     */
+    protected $template;
+
+    /**
+     * @var string Path to import file
+     */
+    protected $importFile;
+
+    /**
+     * @var string Path to export file
+     */
+    protected static $exportFile;
+
+    /**
      * @param EntityAliasResolver $aliasResolver
      * @param ProcessorRegistry $processorRegistry
      */
@@ -66,14 +83,16 @@ class ImportExportContext extends OroFeatureContext implements
     }
 
     /**
-     * @var string Path to saved template
+     * @AfterFeature
+     * @param AfterFeatureScope $event
      */
-    protected $template;
-
-    /**
-     * @var string Path to import file
-     */
-    protected $importFile;
+    public static function afterFeature(AfterFeatureScope $event)
+    {
+        if (static::$exportFile) {
+            unlink(static::$exportFile);
+            static::$exportFile = null;
+        }
+    }
 
     /**
      * Open specific tab on multi-import modal
@@ -190,6 +209,16 @@ class ImportExportContext extends OroFeatureContext implements
     }
 
     /**
+     * @When /^(?:|I )run export for "(?P<entity>([\w\s]+))"$/
+     *
+     * @param string $entity
+     */
+    public function iRunExportForEntity(string $entity)
+    {
+        static::$exportFile = $this->performExport($entity, null);
+    }
+
+    /**
      * This method strictly compares data from the downloaded file
      *
      * @Given /^Exported file for "(?P<entity>([\w\s]+))" contains the following data:$/
@@ -215,10 +244,10 @@ class ImportExportContext extends OroFeatureContext implements
     //@codingStandardsIgnoreEnd
     public function exportedFileWithProcessorContainsFollowingData($entity, TableNode $expectedEntities, $processorName)
     {
-        $filePath = $this->performExport($entity, $processorName);
+        static::$exportFile = $this->performExport($entity, $processorName);
 
         try {
-            $handler = fopen($filePath, 'rb');
+            $handler = fopen(static::$exportFile, 'rb');
             $headers = fgetcsv($handler, 1000, ',');
             $expectedHeaders = $expectedEntities->getRow(0);
 
@@ -239,7 +268,6 @@ class ImportExportContext extends OroFeatureContext implements
             }
         } finally {
             fclose($handler);
-            unlink($filePath);
         }
 
         static::assertCount($i, $expectedEntities->getRows());
@@ -278,10 +306,10 @@ class ImportExportContext extends OroFeatureContext implements
         TableNode $expectedEntities,
         $processorName
     ) {
-        $filePath = $this->performExport($entity, $processorName);
+        static::$exportFile = $this->performExport($entity, $processorName);
 
         try {
-            $exportedFile = new \SplFileObject($filePath, 'rb');
+            $exportedFile = new \SplFileObject(static::$exportFile, 'rb');
             // Treat file as CSV, skip empty lines.
             $exportedFile->setFlags(\SplFileObject::READ_CSV
                 | \SplFileObject::READ_AHEAD
@@ -305,7 +333,6 @@ class ImportExportContext extends OroFeatureContext implements
         } finally {
             // We have to release SplFileObject before trying to delete the underlying file.
             $exportedFile = null;
-            unlink($filePath);
         }
     }
 
@@ -323,10 +350,10 @@ class ImportExportContext extends OroFeatureContext implements
         $entity,
         TableNode $expectedEntities
     ) {
-        $filePath = $this->performExport($entity, null);
+        static::$exportFile = $this->performExport($entity, null);
 
         try {
-            $exportedFile = new \SplFileObject($filePath, 'rb');
+            $exportedFile = new \SplFileObject(static::$exportFile, 'rb');
             // Treat file as CSV, skip empty lines.
             $exportedFile->setFlags(\SplFileObject::READ_CSV
                 | \SplFileObject::READ_AHEAD
@@ -342,7 +369,6 @@ class ImportExportContext extends OroFeatureContext implements
         } finally {
             // We have to release SplFileObject before trying to delete the underlying file.
             $exportedFile = null;
-            unlink($filePath);
         }
     }
 
@@ -435,10 +461,83 @@ class ImportExportContext extends OroFeatureContext implements
                     }
                 }
 
+                $regex = '/\<valueFromExportFile\("(?P<column>(?:[^"]|\\")+)",\s?'
+                    . '"(?P<searchedColumn>(?:[^"]|\\")+)",\s?'
+                    . '"(?P<searchedColumnValue>(?:[^"]|\\")+)"\)\>/i';
+                if (preg_match($regex, $value, $matches)) {
+                    $foundValue = $this->getValueFromExportFile(
+                        $matches['searchedColumn'],
+                        $matches['searchedColumnValue'],
+                        $matches['column']
+                    );
+
+                    self::assertNotNull(
+                        $foundValue,
+                        sprintf(
+                            'Searched value \"%s\" in column \"%s\" not found in export file',
+                            $matches['searchedColumnValue'],
+                            $matches['searchedColumn']
+                        )
+                    );
+
+                    $value = $foundValue;
+                }
+
                 $values[] = $value;
             }
             fputcsv($fp, $values);
         }
+    }
+
+    /**
+     * Takes from exported file the value of $column from row where $searchedColumn equals $searchedColumnValue
+     *
+     * @param string $searchedColumn
+     * @param string $searchedColumnValue
+     * @param string $column
+     *
+     * @return string|null
+     */
+    private function getValueFromExportFile(
+        string $searchedColumn,
+        string $searchedColumnValue,
+        string $column
+    ): ?string {
+        $export = $this->parseCsv(static::$exportFile);
+
+        self::assertArrayHasKey($column, $export[0], sprintf('Export file does not contain column %s', $column));
+
+        self::assertArrayHasKey(
+            $searchedColumn,
+            $export[0],
+            sprintf('Export file does not contain searched column %s', $searchedColumn)
+        );
+
+        $foundValue = null;
+        foreach ($export as $exportRow) {
+            if ($exportRow[$searchedColumn] === $searchedColumnValue) {
+                $foundValue = $exportRow[$column];
+                break;
+            }
+        }
+
+        return $foundValue;
+    }
+
+    /**
+     * @param string $csvFilePath
+     *
+     * @return array
+     */
+    private function parseCsv(string $csvFilePath): array
+    {
+        $csvData = array_map('str_getcsv', file($csvFilePath));
+        array_walk($csvData, static function (&$row) use ($csvData) {
+            $row = array_combine($csvData[0], $row);
+        });
+        array_shift($csvData);
+
+        return $csvData;
     }
 
     /**
