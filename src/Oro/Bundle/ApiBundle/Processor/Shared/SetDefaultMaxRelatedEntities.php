@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Config\MaxRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\MaxRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;

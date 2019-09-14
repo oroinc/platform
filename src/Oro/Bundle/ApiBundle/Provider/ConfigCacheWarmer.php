@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration as Config;
+use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

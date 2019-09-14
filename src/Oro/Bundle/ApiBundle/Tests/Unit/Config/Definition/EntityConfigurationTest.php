@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Definition;
 
-use Oro\Bundle\ApiBundle\Config\ActionsConfigExtension;
-use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityDefinitionConfiguration;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
-use Oro\Bundle\ApiBundle\Config\SubresourcesConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\ActionsConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
+use Oro\Bundle\ApiBundle\Config\Extension\FiltersConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\SortersConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\SubresourcesConfigExtension;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;

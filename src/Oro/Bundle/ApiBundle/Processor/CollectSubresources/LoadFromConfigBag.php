@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\CollectSubresources;
 
 use Oro\Bundle\ApiBundle\Config\ActionsConfig;
-use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\SubresourceConfig;
 use Oro\Bundle\ApiBundle\Config\SubresourcesConfig;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;

@@ -24,6 +24,48 @@ The current file describes significant changes in the code that may affect the u
 * The constant `NORMALIZE_RESULT_GROUP` was removed from
   `Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor`
   Use `NORMALIZE_RESULT` constant from `Oro\Bundle\ApiBundle\Request\ApiActionGroup` instead.
+* The following classes were moved from `Oro\Bundle\ApiBundle\Config` namespace to `Oro\Bundle\ApiBundle\Config\Extension`:
+    - ConfigExtensionInterface
+    - AbstractConfigExtension
+    - ConfigExtensionRegistry
+    - FeatureConfigurationExtension
+    - ActionsConfigExtension
+    - FiltersConfigExtension
+    - SortersConfigExtension
+    - SubresourcesConfigExtension
+* The following classes were moved from `Oro\Bundle\ApiBundle\Config` namespace to `Oro\Bundle\ApiBundle\Config\Extra`:
+    - ConfigExtraInterface
+    - ConfigExtraSectionInterface
+    - ConfigExtraCollection
+    - CustomizeLoadedDataConfigExtra
+    - DataTransformersConfigExtra
+    - DescriptionsConfigExtra
+    - EntityDefinitionConfigExtra
+    - ExpandRelatedEntitiesConfigExtra
+    - FilterFieldsConfigExtra
+    - FilterIdentifierFieldsConfigExtra
+    - FiltersConfigExtra
+    - MaxRelatedEntitiesConfigExtra
+    - MetaPropertiesConfigExtra
+    - RootPathConfigExtra
+    - SortersConfigExtra
+* The following classes were moved from `Oro\Bundle\ApiBundle\Config` namespace to `Oro\Bundle\ApiBundle\Config\Loader`:
+    - ConfigLoaderInterface
+    - AbstractConfigLoader
+    - ConfigLoaderFactory
+    - ConfigLoaderFactoryAwareInterface
+    - ActionsConfigLoader
+    - EntityDefinitionConfigLoader
+    - EntityDefinitionFieldConfigLoader
+    - FiltersConfigLoader
+    - SortersConfigLoader
+    - StatusCodesConfigLoader
+    - SubresourcesConfigLoader
+* The following classes were moved from `Oro\Bundle\ApiBundle\Metadata` namespace to `Oro\Bundle\ApiBundle\Metadata\Extra`:
+    - MetadataExtraInterface
+    - MetadataExtraCollection
+    - ActionMetadataExtra
+    - HateoasMetadataExtra
 
 #### AssetBundle
 * The new feature, [Hot Module Replacement (HMR or Hot Reload) enabled for SCSS](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#hot-module-replacement-hmr-or-hot-reload-for-scss). To enable HMR for custom CSS links, please [follow the documentation](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#enable-for-css-links).
