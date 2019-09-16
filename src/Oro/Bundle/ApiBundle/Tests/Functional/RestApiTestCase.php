@@ -3,10 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
-use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Symfony\Component\HttpFoundation\Response;
 

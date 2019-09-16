@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;

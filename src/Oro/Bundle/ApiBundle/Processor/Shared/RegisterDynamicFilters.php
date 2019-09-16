@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;

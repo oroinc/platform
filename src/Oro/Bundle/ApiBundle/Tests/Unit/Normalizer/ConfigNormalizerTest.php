@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
-use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
+use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 

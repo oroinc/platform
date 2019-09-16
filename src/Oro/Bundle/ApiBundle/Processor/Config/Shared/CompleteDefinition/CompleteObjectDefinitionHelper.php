@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
-use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;

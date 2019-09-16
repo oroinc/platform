@@ -3,12 +3,12 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\ApiBundle\Config\ActionsConfigExtension;
-use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
-use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
-use Oro\Bundle\ApiBundle\Config\SubresourcesConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\ActionsConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
+use Oro\Bundle\ApiBundle\Config\Extension\FiltersConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\SortersConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\SubresourcesConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;

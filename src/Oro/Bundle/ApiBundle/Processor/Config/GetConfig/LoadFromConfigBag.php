@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
-use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
-use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
-use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityConfigMerger;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
+use Oro\Bundle\ApiBundle\Config\Extra\DescriptionsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\SortersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\LoadFromConfigBag as BaseLoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeActionConfigHelper;

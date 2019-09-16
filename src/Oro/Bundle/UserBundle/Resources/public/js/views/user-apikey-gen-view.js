@@ -98,7 +98,7 @@ define([
             this.$apiKeyElement.html(newApiKey);
             messenger.notificationMessage(
                 'success',
-                __(this.responseMessage, {new_api_key: ' <strong>' + newApiKey + '</strong>'})
+                __(this.responseMessage, {new_api_key: ' <strong class="api-key">' + newApiKey + '</strong>'})
             );
         },
 

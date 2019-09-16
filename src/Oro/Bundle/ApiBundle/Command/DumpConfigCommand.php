@@ -3,13 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Command;
 
 use Oro\Bundle\ApiBundle\Config\Config;
-use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
-use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra;
-use Oro\Bundle\ApiBundle\Config\DataTransformersConfigExtra;
-use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\CustomizeLoadedDataConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\DataTransformersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\DescriptionsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiAction;

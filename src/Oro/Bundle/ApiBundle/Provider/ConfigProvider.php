@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Config\Config;
-use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
-use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;

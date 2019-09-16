@@ -3,14 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
 
 use Oro\Bundle\ApiBundle\Config\Config;
-use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
-use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityConfigMerger;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\DescriptionsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\LoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeActionConfigHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeFilterConfigHelper;

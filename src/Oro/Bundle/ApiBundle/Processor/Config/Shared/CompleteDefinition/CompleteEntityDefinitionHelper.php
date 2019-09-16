@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
-use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
