@@ -55,24 +55,25 @@ class ChoiceTreeInput extends Element
      */
     public function checkValue(string $value, bool $isShouldSee): void
     {
-        $this->getDriver()->waitForAjax();
         $this->focus();
         $this->type($value);
+        $this->getDriver()->waitForAjax();
         $searchResults = $this->getSearchResults();
-        $result = array_shift($searchResults);
 
         if ($isShouldSee === true) {
-            $this->assertNotEquals(
-                'No matches found',
-                $result->getText(),
-                sprintf('No matches found for "%s"', $value)
-            );
+            foreach ($searchResults as $searchResult) {
+                self::assertContains(
+                    $value,
+                    $searchResult->getText()
+                );
+            }
         } else {
-            $this->assertEquals(
-                'No matches found',
-                $result->getText(),
-                sprintf('The option "%s" appears in the results, but it should not.', $value)
-            );
+            foreach ($searchResults as $searchResult) {
+                self::assertNotContains(
+                    $value,
+                    $searchResult->getText()
+                );
+            }
         }
 
         $this->getDriver()->typeIntoInput($this->getXpath(), Key::ESCAPE);

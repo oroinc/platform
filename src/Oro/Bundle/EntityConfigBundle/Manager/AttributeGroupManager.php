@@ -4,53 +4,52 @@ namespace Oro\Bundle\EntityConfigBundle\Manager;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 /**
  * Manager for working with attributes groups
  */
 class AttributeGroupManager
 {
-    /** @var AttributeManager */
-    private $attributeManager;
-
-    /** @var TranslatorInterface */
-    private $translator;
+    /** @var ConfigManager */
+    private $configManager;
 
     /**
-     * @param AttributeManager $attributeManager
-     * @param TranslatorInterface $translator
+     * @param ConfigManager $configManager
      */
-    public function __construct(
-        AttributeManager $attributeManager,
-        TranslatorInterface $translator
-    ) {
-        $this->attributeManager = $attributeManager;
-        $this->translator = $translator;
+    public function __construct(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
     }
 
     /**
-     * @param string $className
-     *
-     * @return AttributeGroup
+     * @param string $entityClassName
+     * @param array $groups
+     * @return AttributeGroup[]
      */
-    public function createGroupWithSystemAttributes($className)
+    public function createGroupsWithAttributes(string $entityClassName, array $groups): array
     {
-        $group = new AttributeGroup();
-        $group->setDefaultLabel(
-            $this->translator->trans('oro.entity_config.form.default_group_label')
-        );
-        $systemAttributes = $this->attributeManager->getSystemAttributesByClass($className);
+        $attributeGroups = [];
+        foreach ($groups as $groupData) {
+            if (!isset($groupData['groupLabel'], $groupData['groupVisibility'], $groupData['groupCode'])) {
+                continue;
+            }
 
-        /** @var FieldConfigModel $systemAttribute */
-        foreach ($systemAttributes as $systemAttribute) {
-            $attributeGroupRelation = new AttributeGroupRelation();
-            $attributeGroupRelation->setEntityConfigFieldId($systemAttribute->getId());
-
-            $group->addAttributeRelation($attributeGroupRelation);
+            $attributeGroup = new AttributeGroup();
+            $attributeGroup->setDefaultLabel($groupData['groupLabel']);
+            $attributeGroup->setIsVisible($groupData['groupVisibility']);
+            $attributeGroup->setCode($groupData['groupCode']);
+            foreach ($groupData['attributes'] as $attribute) {
+                $fieldConfigModel = $this->configManager->getConfigFieldModel($entityClassName, $attribute);
+                if ($fieldConfigModel) {
+                    $attributeGroupRelation = new AttributeGroupRelation();
+                    $attributeGroupRelation->setEntityConfigFieldId($fieldConfigModel->getId());
+                    $attributeGroup->addAttributeRelation($attributeGroupRelation);
+                }
+            }
+            $attributeGroups[] = $attributeGroup;
         }
 
-        return $group;
+        return $attributeGroups;
     }
 }

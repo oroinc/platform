@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Manager;
 
-use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
-use Oro\Bundle\ProductBundle\Entity\Product;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class AttributeGroupManagerTest extends WebTestCase
@@ -14,17 +14,43 @@ class AttributeGroupManagerTest extends WebTestCase
         $this->client->useHashNavigation(true);
     }
 
-    public function testCreateGroupWithSystemAttributes()
+    public function testCreateGroupsWithAttributes(): void
     {
+        $groups = [
+            [
+                'groupLabel' => 'General',
+                'groupCode' => 'general',
+                'groupVisibility' => true,
+            ],
+            [
+                'groupCode' => 'test1',
+                'groupVisibility' => true,
+            ],
+            [
+                'groupLabel' => 'Test2',
+                'groupVisibility' => true,
+            ],
+            [
+                'groupLabel' => 'Test3',
+                'groupCode' => 'test3',
+            ]
+        ];
+
         $container = $this->getContainer();
-        $attributeGroupManager = $container->get('oro_entity_config.manager.attribute_group_manager');
-        $attributeGroup = $attributeGroupManager->createGroupWithSystemAttributes(Product::class);
-
-        $this->assertInstanceOf(AttributeGroup::class, $attributeGroup);
-
         $attributeManager = $container->get('oro_entity_config.manager.attribute_manager');
-        $systemAttributesCount = count($attributeManager->getSystemAttributesByClass(Product::class));
+        $groups[0]['attributes'] = array_map(
+            static function (FieldConfigModel $item) {
+                return $item->getFieldName();
+            },
+            $attributeManager->getSystemAttributesByClass(TestActivityTarget::class)
+        );
 
-        $this->assertCount($systemAttributesCount, $attributeGroup->getAttributeRelations());
+        $attributeGroupManager = $container->get('oro_entity_config.manager.attribute_group_manager');
+        $attributeGroups = $attributeGroupManager->createGroupsWithAttributes(TestActivityTarget::class, $groups);
+
+        $this->assertIsArray($attributeGroups);
+        $this->assertCount(1, $attributeGroups);
+
+        $this->assertCount(count($groups[0]['attributes']), $attributeGroups[0]->getAttributeRelations());
     }
 }
