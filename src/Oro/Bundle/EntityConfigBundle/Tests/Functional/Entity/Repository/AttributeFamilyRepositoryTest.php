@@ -97,25 +97,4 @@ class AttributeFamilyRepositoryTest extends WebTestCase
             }
         }
     }
-
-    public function testGetFamiliesByEntityClassQueryBuilder(): void
-    {
-        $className = LoadAttributeData::ENTITY_CONFIG_MODEL;
-        $queryBuilder = $this->repository->getFamiliesByEntityClassQueryBuilder($className);
-
-        $actualResults = $queryBuilder->getQuery()->getResult();
-        $this->assertIsArray($actualResults);
-
-        $expectedResults = $this->repository->findBy(['entityClass' => $className]);
-        $this->assertEquals($expectedResults, $actualResults);
-    }
-
-    public function testGetFamiliesByEntityClassQueryBuilderWithNotExistingEntityClass(): void
-    {
-        $queryBuilder = $this->repository->getFamiliesByEntityClassQueryBuilder(\stdClass::class);
-        $results = $queryBuilder->getQuery()->getResult();
-
-        $this->assertIsArray($results);
-        $this->assertEmpty($results);
-    }
 }

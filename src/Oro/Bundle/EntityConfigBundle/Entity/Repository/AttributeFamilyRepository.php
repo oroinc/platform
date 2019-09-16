@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
@@ -77,18 +76,5 @@ class AttributeFamilyRepository extends EntityRepository
             ->setParameter('entityClass', $entityClass)
             ->getQuery()
             ->getSingleScalarResult();
-    }
-
-    /**
-     * @param string $entityClass
-     * @return QueryBuilder
-     */
-    public function getFamiliesByEntityClassQueryBuilder(string $entityClass): QueryBuilder
-    {
-        $queryBuilder = $this->createQueryBuilder('family');
-
-        return $queryBuilder
-            ->andWhere($queryBuilder->expr()->eq('family.entityClass', ':entityClass'))
-            ->setParameter('entityClass', $entityClass);
     }
 }
