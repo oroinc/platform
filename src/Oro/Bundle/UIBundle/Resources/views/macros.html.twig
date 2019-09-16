@@ -104,12 +104,13 @@
     {% set options = {
         rootClass: null,
         termClass: null,
-        descriptionClass: null
+        descriptionClass: null,
+        tooltipHTML: null
     }|merge(options|default({})) %}
 
-    <div class="attribute-item {% if options.rootClass %} {{ options.rootClass }}{% endif %}">
-        <label class="attribute-item__term {% if options.termClass %} {{ options.termClass }}{% endif %}">{{ title }}</label>
-        <div class="attribute-item__description {% if options.descriptionClass %} {{ options.descriptionClass }}{% endif %}">
+    <div class="attribute-item{% if options.rootClass %} {{ options.rootClass }}{% endif %}">
+        <label class="attribute-item__term{% if options.termClass %} {{ options.termClass }}{% endif %}">{% if options.tooltipHTML %}{{ options.tooltipHTML|raw }} {% endif %}{{ title }}</label>
+        <div class="attribute-item__description{% if options.descriptionClass %} {{ options.descriptionClass }}{% endif %}">
             {{ data|raw }}
         </div>
     </div>
