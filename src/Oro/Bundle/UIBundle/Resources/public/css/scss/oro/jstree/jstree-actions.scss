@@ -26,20 +26,14 @@
 
             li {
                 display: $jstree-actions-menu-inline-li-display;
-                padding: $jstree-actions-menu-inline-li-padding;
+                padding-#{$end}: $jstree-actions-menu-item-gap;
 
-                &:before {
+                &:not(:first-child):before {
                     content: $jstree-actions-menu-inline-li-before-content;
-                    width: $jstree-actions-menu-inline-li-before-width;
                     height: $jstree-actions-menu-inline-li-before-height;
-                    margin: $jstree-actions-menu-inline-li-before-margin;
-                    background: $jstree-actions-menu-inline-li-before-background;
-                }
-
-                &:first-child {
-                    &:before {
-                        display: none;
-                    }
+                    border-#{$start}: 1px solid $jstree-actions-menu-separator-color;
+                    margin-#{$end}: $jstree-actions-menu-item-gap;
+                    align-self: center;
                 }
 
                 .action {
