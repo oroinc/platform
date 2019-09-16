@@ -7,6 +7,10 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 
+/**
+ * Splits import file in batches.
+ * Merges files into summary file.
+ */
 class BatchFileManager
 {
     /**

@@ -26,6 +26,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 {
@@ -753,7 +754,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($toBeUpdateEntity);
         $toBeDeletedEntity = new TestAuditDataOwner();
         $toBeDeletedEntity->setStringProperty('aString');
-        $em->persist($toBeUpdateEntity);
+        $em->persist($toBeDeletedEntity);
         $em->flush();
         self::getMessageCollector()->clear();
 
@@ -767,6 +768,40 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->flush();
 
         self::assertMessageSent(Topics::ENTITIES_CHANGED);
+    }
+
+    public function testShouldSendInBatches()
+    {
+        $em = $this->getEntityManager();
+
+        $toBeUpdated = [];
+        $toBeDeleted = [];
+        for ($i = 0; $i < 100; $i ++) {
+            $toBeUpdated[$i] = new TestAuditDataOwner();
+            $toBeUpdated[$i]->setStringProperty('aString');
+            $em->persist($toBeUpdated[$i]);
+
+            $toBeDeleted[$i] = new TestAuditDataOwner();
+            $toBeDeleted[$i]->setStringProperty('aString');
+            $em->persist($toBeDeleted[$i]);
+        }
+
+        self::getMessageCollector()->clear();
+
+        for ($i = 0; $i < 100; $i ++) {
+            $toBeUpdated[$i]->setStringProperty('anotherString');
+            $em->remove($toBeUpdated[$i]);
+
+            $toBeInsertedEntity = new TestAuditDataOwner();
+            $toBeInsertedEntity->setStringProperty('aString');
+            $em->persist($toBeInsertedEntity);
+        }
+
+        $em->flush();
+
+        $sentMessages = self::getSentMessagesByTopic(Topics::ENTITIES_CHANGED);
+
+        self::assertCount(2, $sentMessages);
     }
 
     public function testShouldNotSendLoggedInUserInfoIfPresentButNotUserInstance()
