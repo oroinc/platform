@@ -53,7 +53,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class EmailTemplate implements EmailTemplateInterface, Translatable
 {
     public const TYPE_HTML = 'html';
-    public const TYPE_TEXT = 'text';
+    public const TYPE_TEXT = 'txt';
 
     /**
      * @var integer
