@@ -8,11 +8,12 @@
 @import "role/permissions-grid";
 @import "role/capabilities";
 
-.api-block #btn-apigen {
-    display: inline;
-    line-height: 1.2em;
+.api-block .btn {
     vertical-align: baseline;
-    padding: 4px 12px;
+}
+
+.message .api-key {
+    word-break: break-all;
 }
 
 form.change-password-form {
