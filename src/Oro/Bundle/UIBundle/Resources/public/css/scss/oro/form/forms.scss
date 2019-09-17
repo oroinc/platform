@@ -242,8 +242,9 @@ label {
             font-size: 21px;
             font-style: normal;
             position: absolute;
-            top: -2px;
-            #{$end}: -11px;
+
+            margin-top: -2px;
+            margin-#{$start}: 4px;
         }
     }
 
