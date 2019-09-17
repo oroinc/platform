@@ -781,7 +781,9 @@ define(function(require) {
                     .done(_.bind(this._triggerContentLoadEvents, this, content))
                     .fail(_.bind(function(error) {
                         if (!this.disposing && !this.disposed) {
-                            errorHandler.showErrorInConsole(error || new Error('Widget rendering failed'));
+                            if (error) {
+                                errorHandler.showErrorInConsole(error);
+                            }
                             this._triggerContentLoadEvents();
                         }
                     }, this));

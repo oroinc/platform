@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 
 use Oro\Bundle\ApiBundle\ApiDoc\RestActionMapper;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -42,39 +42,39 @@ class RestActionMapperTest extends \PHPUnit\Framework\TestCase
             [
                 self::ITEM_ROUTE,
                 [
-                    ApiActions::OPTIONS,
-                    ApiActions::GET,
-                    ApiActions::DELETE,
-                    ApiActions::UPDATE
+                    ApiAction::OPTIONS,
+                    ApiAction::GET,
+                    ApiAction::DELETE,
+                    ApiAction::UPDATE
                 ]
             ],
             [
                 self::LIST_ROUTE,
                 [
-                    ApiActions::OPTIONS,
-                    ApiActions::GET_LIST,
-                    ApiActions::DELETE_LIST,
-                    ApiActions::CREATE
+                    ApiAction::OPTIONS,
+                    ApiAction::GET_LIST,
+                    ApiAction::DELETE_LIST,
+                    ApiAction::CREATE
                 ]
             ],
             [
                 self::SUBRESOURCE_ROUTE,
                 [
-                    ApiActions::OPTIONS,
-                    ApiActions::GET_SUBRESOURCE,
-                    ApiActions::UPDATE_SUBRESOURCE,
-                    ApiActions::ADD_SUBRESOURCE,
-                    ApiActions::DELETE_SUBRESOURCE
+                    ApiAction::OPTIONS,
+                    ApiAction::GET_SUBRESOURCE,
+                    ApiAction::UPDATE_SUBRESOURCE,
+                    ApiAction::ADD_SUBRESOURCE,
+                    ApiAction::DELETE_SUBRESOURCE
                 ]
             ],
             [
                 self::RELATIONSHIP_ROUTE,
                 [
-                    ApiActions::OPTIONS,
-                    ApiActions::GET_RELATIONSHIP,
-                    ApiActions::UPDATE_RELATIONSHIP,
-                    ApiActions::ADD_RELATIONSHIP,
-                    ApiActions::DELETE_RELATIONSHIP
+                    ApiAction::OPTIONS,
+                    ApiAction::GET_RELATIONSHIP,
+                    ApiAction::UPDATE_RELATIONSHIP,
+                    ApiAction::ADD_RELATIONSHIP,
+                    ApiAction::DELETE_RELATIONSHIP
                 ]
             ]
         ];
@@ -89,11 +89,11 @@ class RestActionMapperTest extends \PHPUnit\Framework\TestCase
     {
         self::assertEquals(
             [
-                ApiActions::OPTIONS,
-                ApiActions::GET,
-                ApiActions::DELETE,
-                ApiActions::CREATE,
-                ApiActions::UPDATE
+                ApiAction::OPTIONS,
+                ApiAction::GET,
+                ApiAction::DELETE,
+                ApiAction::CREATE,
+                ApiAction::UPDATE
             ],
             $this->actionMapper->getActionsForResourcesWithoutIdentifier()
         );
@@ -110,21 +110,21 @@ class RestActionMapperTest extends \PHPUnit\Framework\TestCase
     public function getMethodDataProvider()
     {
         return [
-            [ApiActions::OPTIONS, Request::METHOD_OPTIONS],
-            [ApiActions::GET, Request::METHOD_GET],
-            [ApiActions::GET_LIST, Request::METHOD_GET],
-            [ApiActions::DELETE, Request::METHOD_DELETE],
-            [ApiActions::DELETE_LIST, Request::METHOD_DELETE],
-            [ApiActions::UPDATE, Request::METHOD_PATCH],
-            [ApiActions::CREATE, Request::METHOD_POST],
-            [ApiActions::GET_SUBRESOURCE, Request::METHOD_GET],
-            [ApiActions::UPDATE_SUBRESOURCE, Request::METHOD_PATCH],
-            [ApiActions::ADD_SUBRESOURCE, Request::METHOD_POST],
-            [ApiActions::DELETE_SUBRESOURCE, Request::METHOD_DELETE],
-            [ApiActions::GET_RELATIONSHIP, Request::METHOD_GET],
-            [ApiActions::UPDATE_RELATIONSHIP, Request::METHOD_PATCH],
-            [ApiActions::ADD_RELATIONSHIP, Request::METHOD_POST],
-            [ApiActions::DELETE_RELATIONSHIP, Request::METHOD_DELETE]
+            [ApiAction::OPTIONS, Request::METHOD_OPTIONS],
+            [ApiAction::GET, Request::METHOD_GET],
+            [ApiAction::GET_LIST, Request::METHOD_GET],
+            [ApiAction::DELETE, Request::METHOD_DELETE],
+            [ApiAction::DELETE_LIST, Request::METHOD_DELETE],
+            [ApiAction::UPDATE, Request::METHOD_PATCH],
+            [ApiAction::CREATE, Request::METHOD_POST],
+            [ApiAction::GET_SUBRESOURCE, Request::METHOD_GET],
+            [ApiAction::UPDATE_SUBRESOURCE, Request::METHOD_PATCH],
+            [ApiAction::ADD_SUBRESOURCE, Request::METHOD_POST],
+            [ApiAction::DELETE_SUBRESOURCE, Request::METHOD_DELETE],
+            [ApiAction::GET_RELATIONSHIP, Request::METHOD_GET],
+            [ApiAction::UPDATE_RELATIONSHIP, Request::METHOD_PATCH],
+            [ApiAction::ADD_RELATIONSHIP, Request::METHOD_POST],
+            [ApiAction::DELETE_RELATIONSHIP, Request::METHOD_DELETE]
         ];
     }
 

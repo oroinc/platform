@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\Config;
-use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomDataTypeHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\ExpandRelatedEntities;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;

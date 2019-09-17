@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadExtendedAssociation;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
@@ -128,7 +129,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
             ['id' => 1],
             $this->context->getResult()
         );
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     public function testProcessForEmptyResultOfManyToOneExtendedAssociation()
@@ -169,7 +170,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     public function testProcessForEmptyResultOfManyToManyExtendedAssociation()
@@ -210,7 +211,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
 
         self::assertSame([], $this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     public function testProcessForEmptyResultOfMultipleManyToOneExtendedAssociation()
@@ -251,7 +252,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
 
         self::assertSame([], $this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     public function testProcessForManyToOneExtendedAssociationWhenParentEntityWasNotFound()
@@ -290,7 +291,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     public function testProcessForManyToManyExtendedAssociationWhenParentEntityWasNotFound()
@@ -329,7 +330,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
 
         self::assertSame([], $this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     public function testProcessForMultipleManyToOneExtendedAssociationWhenParentEntityWasNotFound()
@@ -368,6 +369,6 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
 
         self::assertSame([], $this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 }

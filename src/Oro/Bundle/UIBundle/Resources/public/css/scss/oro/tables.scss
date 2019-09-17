@@ -387,6 +387,10 @@
             }
         }
     }
+
+    &.table-fixed {
+        table-layout: fixed;
+    }
 }
 
 .td-expander {

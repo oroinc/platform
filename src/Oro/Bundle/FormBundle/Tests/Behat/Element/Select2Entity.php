@@ -19,7 +19,7 @@ class Select2Entity extends Element implements ClearableInterface
     /**
      * @var string
      */
-    protected $searchInputSelector = '.select2-search input';
+    protected $searchInputSelector = '.select2-drop-active .select2-input,.select2-dropdown-open .select2-input';
 
     /**
      * {@inheritdoc}
@@ -135,9 +135,10 @@ class Select2Entity extends Element implements ClearableInterface
     }
 
     /**
-     * @return NodeElement
+     * @param bool $failOnEmpty
+     * @return NodeElement|null
      */
-    public function getResultSet()
+    public function getResultSet($failOnEmpty = true)
     {
         $this->open();
         $this->waitFor(60, function () {
@@ -151,7 +152,11 @@ class Select2Entity extends Element implements ClearableInterface
             }
         }
 
-        self::fail('No select 2 entity results found on page');
+        if ($failOnEmpty) {
+            self::fail('No select 2 entity results found on page');
+        }
+
+        return null;
     }
 
     /**
@@ -270,7 +275,15 @@ class Select2Entity extends Element implements ClearableInterface
             }
             $this->getDriver()->waitForAjax();
 
-            return $this->elementFactory->createElement('UiDialog');
+            $dialogs = array_filter(
+                $this->elementFactory->findAllElements('UiDialog'),
+                function (UiDialog $dialog) {
+                    return $dialog->isValid() && $dialog->isVisible();
+                }
+            );
+            if ($dialogs) {
+                return end($dialogs);
+            }
         }
 
         return null;

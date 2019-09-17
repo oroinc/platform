@@ -3,8 +3,16 @@
 namespace Oro\Bundle\ApiBundle\Command;
 
 use Oro\Bundle\ApiBundle\Config\Config;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\CustomizeLoadedDataConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\DataTransformersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\DescriptionsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
@@ -32,16 +40,13 @@ class DumpConfigCommand extends AbstractDebugCommand
     /** @var ConfigProvider */
     private $configProvider;
 
-    /**
-     * @var array
-     */
-    protected $knownExtras = [
-        'Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra',
-        'Oro\Bundle\ApiBundle\Config\FiltersConfigExtra',
-        'Oro\Bundle\ApiBundle\Config\SortersConfigExtra',
-        'Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra',
-        'Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra',
-        'Oro\Bundle\ApiBundle\Config\DataTransformersConfigExtra',
+    private const KNOWN_EXTRAS = [
+        EntityDefinitionConfigExtra::class,
+        FiltersConfigExtra::class,
+        SortersConfigExtra::class,
+        DescriptionsConfigExtra::class,
+        CustomizeLoadedDataConfigExtra::class,
+        DataTransformersConfigExtra::class
     ];
 
     /**
@@ -82,7 +87,7 @@ class DumpConfigCommand extends AbstractDebugCommand
                 sprintf(
                     'Can be %s or the full name of a class implements "%s"',
                     '"' . implode('", "', array_keys($this->getKnownExtras())) . '"',
-                    'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'
+                    ConfigExtraInterface::class
                 ),
                 ['definition', 'filters', 'sorters', 'customize_loaded_data', 'data_transformers']
             )
@@ -92,7 +97,7 @@ class DumpConfigCommand extends AbstractDebugCommand
                 InputOption::VALUE_REQUIRED,
                 'The name of action for which the configuration should be displayed.' .
                 'Can be "get", "get_list", "create", "update", "delete", "delete_list", etc.',
-                'get'
+                ApiAction::GET_LIST
             )
             ->addOption(
                 'documentation-resources',
@@ -155,28 +160,28 @@ class DumpConfigCommand extends AbstractDebugCommand
                 $extraClassName = $knownExtras[$extraName];
             } else {
                 if (false === strpos($extraName, '\\')) {
-                    throw new \InvalidArgumentException(
-                        sprintf('Unknown value "%s" for the "--extra" option.', $extraName)
-                    );
+                    throw new \InvalidArgumentException(sprintf(
+                        'Unknown value "%s" for the "--extra" option.',
+                        $extraName
+                    ));
                 }
                 if (!class_exists($extraName)) {
-                    throw new \InvalidArgumentException(
-                        sprintf('The class "%s" passed as value for the "--extra" option not found.', $extraName)
-                    );
+                    throw new \InvalidArgumentException(sprintf(
+                        'The class "%s" passed as value for the "--extra" option not found.',
+                        $extraName
+                    ));
                 }
-                if (!is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface', true)) {
-                    throw new \InvalidArgumentException(
-                        sprintf(
-                            'The class "%s" passed as value for the "--extra" option must implement "%s".',
-                            $extraName,
-                            'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'
-                        )
-                    );
+                if (!is_a($extraName, ConfigExtraInterface::class, true)) {
+                    throw new \InvalidArgumentException(sprintf(
+                        'The class "%s" passed as value for the "--extra" option must implement "%s".',
+                        $extraName,
+                        ConfigExtraInterface::class
+                    ));
                 }
                 $extraClassName = $extraName;
             }
 
-            if ('Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra' === $extraClassName) {
+            if (EntityDefinitionConfigExtra::class === $extraClassName) {
                 $action = $input->getOption('action');
                 $result[] = new $extraClassName($action);
             } else {
@@ -259,7 +264,7 @@ class DumpConfigCommand extends AbstractDebugCommand
     protected function getKnownExtras()
     {
         $result = [];
-        foreach ($this->knownExtras as $className) {
+        foreach (self::KNOWN_EXTRAS as $className) {
             $result[constant($className . '::NAME')] = $className;
         }
 

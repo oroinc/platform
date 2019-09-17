@@ -118,9 +118,10 @@ class PostponedRowsHandler
             return;
         }
 
+        $delay = $result['postponedDelay'] ?? self::DELAY_SECONDS;
         $jobRunner->createDelayed(
-            sprintf('%s:postponed:%s', $currentJob->getRootJob()->getName(), $attempts),
-            function (JobRunner $jobRunner, Job $child) use ($body, $fileName, $attempts) {
+            $this->getDelayedJobName($currentJob, $attempts),
+            function (JobRunner $jobRunner, Job $child) use ($body, $fileName, $attempts, $delay) {
                 $body = array_merge($body, [
                     'jobId' => $child->getId(),
                     'attempts' => $attempts,
@@ -131,10 +132,28 @@ class PostponedRowsHandler
                     $body['options']['incremented_read'] = false;
                 }
                 $message = new Message();
-                $message->setDelay(static::DELAY_SECONDS);
+                if ($delay > 0) {
+                    $message->setDelay($delay);
+                }
                 $message->setBody($body);
                 $this->messageProducer->send(Topics::IMPORT, $message);
             }
         );
+    }
+
+    /**
+     * @param Job $currentJob
+     * @param int $attempts
+     * @return string
+     */
+    private function getDelayedJobName(Job $currentJob, int $attempts): string
+    {
+        $suffix = 'postponed:';
+        $jobName = $currentJob->getName();
+        if (preg_match('/' . $suffix . '\d+$/', $jobName)) {
+            return preg_replace('/' . $suffix . '(\d+)$/', $suffix . $attempts, $jobName);
+        }
+
+        return sprintf('%s:%s%d', $jobName, $suffix, $attempts);
     }
 }

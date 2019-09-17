@@ -14,13 +14,13 @@ Configuration extensions help add:
 
 ## Creating a Configuration Extension
 
-Each configuration extension must implement [ConfigExtensionInterface](../../Config/ConfigExtensionInterface.php) (you can also use [AbstractConfigExtension](../../Config/AbstractConfigExtension) as a superclass). To register a new configuration extension, add it to `Resources/config/oro/app.yml` of your bundle or use `config/config.yml` of your application:
+Each configuration extension must implement [ConfigExtensionInterface](../../Config/Extension/ConfigExtensionInterface.php) (you can also use [AbstractConfigExtension](../../Config/Extension/AbstractConfigExtension) as a superclass). To register a new configuration extension, add it to `Resources/config/oro/app.yml` of your bundle or use `config/config.yml` of your application:
 
 ```php
 <?php
 namespace Acme\Bundle\AcmeBundle\Api;
 
-use Oro\Bundle\ApiBundle\Config\AbstractConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\AbstractConfigExtension;
 
 class MyConfigExtension extends AbstractConfigExtension
 {
@@ -41,7 +41,7 @@ oro_api:
 
 ## Add Options to Existing Configuration Section
 
-To add options to an existing configuration section, implement the `getConfigureCallbacks` method of [ConfigExtensionInterface](../../Config/ConfigExtensionInterface.php). If you need to add logic before the normalization of during the validation of the configuration, implement the `getPreProcessCallbacks` and `getPostProcessCallbacks` methods.
+To add options to an existing configuration section, implement the `getConfigureCallbacks` method of [ConfigExtensionInterface](../../Config/Extension/ConfigExtensionInterface.php). If you need to add logic before the normalization of during the validation of the configuration, implement the `getPreProcessCallbacks` and `getPostProcessCallbacks` methods.
 
 The following table describes the existing sections for which you can add new options.
 
@@ -67,7 +67,7 @@ The following table describes the existing sections for which you can add new op
 namespace Acme\Bundle\AcmeBundle\Api;
 
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-use Oro\Bundle\ApiBundle\Config\AbstractConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\AbstractConfigExtension;
 
 class MyConfigExtension extends AbstractConfigExtension
 {
@@ -115,7 +115,7 @@ class MyConfigExtension extends AbstractConfigExtension
 
 To add a new configuration section, create a class that implements [ConfigurationSectionInterface](../../Config/Definition/ConfigurationSectionInterface.php) and return instance of it in the `getEntityConfigurationSections` method of your configuration extension. 
 
-By default, the configuration is returned as an array, but if you want to provide a class that represents the configuration of your section, you can implement a configuration loader. The loader is a class that implements [ConfigLoaderInterface](../../Config/ConfigLoaderInterface.php). An instance of the loader should be returned by the `getEntityConfigurationLoaders` method of your configuration extension.
+By default, the configuration is returned as an array, but if you want to provide a class that represents the configuration of your section, you can implement a configuration loader. The loader is a class that implements [ConfigLoaderInterface](../../Config/Loader/ConfigLoaderInterface.php). An instance of the loader should be returned by the `getEntityConfigurationLoaders` method of your configuration extension.
 
 An example of a simple configuration section:
 
@@ -168,7 +168,7 @@ An example of a configuration section loader:
 <?php
 namespace Acme\Bundle\AcmeBundle\Api;
 
-use Oro\Bundle\ApiBundle\Config\AbstractConfigLoader;
+use Oro\Bundle\ApiBundle\Config\Loader\AbstractConfigLoader;
 
 class MyConfigLoader extends AbstractConfigLoader
 {
@@ -193,7 +193,7 @@ An example of a configuration extension:
 <?php
 namespace Acme\Bundle\AcmeBundle\Api;
 
-use Oro\Bundle\ApiBundle\Config\AbstractConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\AbstractConfigExtension;
 
 class MyConfigExtension extends AbstractConfigExtension
 {

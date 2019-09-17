@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\DeleteList;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\InitializeConfigExtras;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 

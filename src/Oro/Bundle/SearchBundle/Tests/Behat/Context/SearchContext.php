@@ -32,13 +32,14 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
         $links = [];
 
         /** @var \DOMElement $link */
-        foreach ($crawler->filter('ul li') as $link) {
-            preg_match('/([\w\s]+).(\d+)/', $link->textContent, $matches);
-            $links[trim($matches[1])] = [
-                'number' => $matches[2],
-                'isSelected' => false !== stripos($link->getAttribute('class'), 'selected'),
+        $crawler->filter('ul li')->each(function (Crawler $listItem) use (&$links) {
+            preg_match('/\((\d+)\)/', $listItem->text(), $matches);
+
+            $links[trim($listItem->filter('.search-label')->text())] = [
+                'number' => $matches[1],
+                'isSelected' => false !== stripos($listItem->attr('class'), 'selected'),
             ];
-        }
+        });
 
         foreach ($table as $row) {
             $type = $row['Type'];
@@ -83,8 +84,7 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
 
             /** @var \DOMElement $link */
             foreach ($crawler->filter('ul li') as $link) {
-                preg_match('/([\w\s]+).(\d+)/', $link->textContent, $matches);
-                $links[trim($matches[1])] = $link;
+                $links[trim($link->childNodes->item(1)->textContent)] = $link;
             }
 
             foreach ($table as $row) {

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\MetaPropertiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\MetaPropertiesConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ContextInterface;

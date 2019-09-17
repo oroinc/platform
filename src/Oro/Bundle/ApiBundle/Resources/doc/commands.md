@@ -133,7 +133,7 @@ The value for  the`extra` option can be:
 * filters, 
 * sorters, 
 * descriptions, or
-* the full name of a class implements [ConfigExtraInterface](../../Config/ConfigExtraInterface.php).
+* the full name of a class implements [ConfigExtraInterface](../../Config/Extra/ConfigExtraInterface.php).
 
 ```bash
 php bin/console oro:api:config:dump users --extra=filters --extra=sorters

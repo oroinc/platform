@@ -30,6 +30,18 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
      */
     protected $entityClassNameHelper;
 
+    /**
+     * @return array
+     */
+    public function methodsDataProvider()
+    {
+        return [
+            'POST' => ['POST', true],
+            'PUT' => ['PUT', true],
+            'PATCH' => ['PATCH', false],
+        ];
+    }
+
     protected function setUp()
     {
         $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
@@ -69,12 +81,16 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $this->handler->process($entity, $form, $data, $method));
     }
 
-    public function testProcessDataEmpty()
+    /**
+     * @dataProvider methodsDataProvider
+     * @param string $method
+     * @param bool $clearMissing
+     */
+    public function testProcessDataEmpty($method, $clearMissing)
     {
         $entity = new SomeEntity();
         $form = $this->createMock('Symfony\Component\Form\FormInterface');
         $data = [];
-        $method = 'PATCH';
 
         $this->processor
             ->expects($this->once())
@@ -86,17 +102,21 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
             ->with($entity);
         $form->expects($this->once())
             ->method('submit')
-            ->with($data);
+            ->with($data, $clearMissing);
 
         $this->assertEquals([], $this->handler->process($entity, $form, $data, $method));
     }
 
-    public function testProcessInvalid()
+    /**
+     * @dataProvider methodsDataProvider
+     * @param string $method
+     * @param bool $clearMissing
+     */
+    public function testProcessInvalid($method, $clearMissing)
     {
         $entity = new SomeEntity();
         $form = $this->createMock('Symfony\Component\Form\FormInterface');
         $data = ['a' => '1', 'b' => '2'];
-        $method = 'PATCH';
 
         $this->processor
             ->expects($this->once())
@@ -108,7 +128,7 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
             ->with($entity);
         $form->expects($this->once())
             ->method('submit')
-            ->with($data);
+            ->with($data, $clearMissing);
         $form->expects($this->once())
             ->method('isValid')
             ->willReturn(false);
@@ -128,12 +148,16 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $this->handler->process($entity, $form, $data, $method));
     }
 
-    public function testProcessValid()
+    /**
+     * @dataProvider methodsDataProvider
+     * @param string $method
+     * @param bool $clearMissing
+     */
+    public function testProcessValid($method, $clearMissing)
     {
         $entity = new SomeEntity();
         $form = $this->createMock('Symfony\Component\Form\FormInterface');
         $data = ['a' => '1', 'b' => '2'];
-        $method = 'PATCH';
 
         $this->processor
             ->expects($this->once())
@@ -145,7 +169,7 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
             ->with($entity);
         $form->expects($this->once())
             ->method('submit')
-            ->with($data);
+            ->with($data, $clearMissing);
         $form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);

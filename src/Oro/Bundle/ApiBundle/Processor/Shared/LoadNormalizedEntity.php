@@ -4,9 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
-use Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -52,7 +52,7 @@ class LoadNormalizedEntity implements ProcessorInterface
 
         $entityId = $context->getId();
         if (null !== $entityId) {
-            $getProcessor = $this->processorBag->getProcessor(ApiActions::GET);
+            $getProcessor = $this->processorBag->getProcessor(ApiAction::GET);
             $getContext = $this->createGetContext($context, $getProcessor);
             $getProcessor->process($getContext);
             $this->processGetResult($getContext, $context);
@@ -86,9 +86,9 @@ class LoadNormalizedEntity implements ProcessorInterface
         if ($this->reuseExistingEntity && $context->hasResult()) {
             $getContext->setResult($context->getResult());
         }
-        $getContext->skipGroup('security_check');
-        $getContext->skipGroup('data_security_check');
-        $getContext->skipGroup(NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        $getContext->skipGroup(ApiActionGroup::SECURITY_CHECK);
+        $getContext->skipGroup(ApiActionGroup::DATA_SECURITY_CHECK);
+        $getContext->skipGroup(ApiActionGroup::NORMALIZE_RESULT);
         $getContext->setSoftErrorsHandling(true);
 
         return $getContext;

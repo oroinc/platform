@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
@@ -18,6 +18,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -77,7 +78,7 @@ class RegisterDynamicFilters extends RegisterFilters
         $filterGroup = $this->filterNamesRegistry
             ->getFilterNames($context->getRequestType())
             ->getDataFilterGroupName();
-        if ('initialize' === $context->getLastGroup()) {
+        if (ApiActionGroup::INITIALIZE === $context->getLastGroup()) {
             $this->prepareFiltersForDocumentation($filterCollection, $filterGroup);
         } else {
             $renameMap = [];

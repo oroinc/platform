@@ -87,11 +87,9 @@
 
             var showResourceContent = function (contentContainer, updateHash) {
                 var toggler = contentContainer.prev(),
-                    resourceUrl = '{{ path(rootRoute) }}';
-                if (!window.location.pathname.substr(resourceUrl.length + 1)) {
-                    resourceUrl += '/{{ defaultView }}'
-                }
-                resourceUrl += '/' + toggler.data('href').substr(1);
+                    rootPath = '{{ path(rootRoute) }}',
+                    apiType = window.location.pathname.substr(rootPath.length + 1) || '{{ defaultView }}',
+                    resourceUrl = rootPath + '/' + apiType + '/' + toggler.data('href').substr(1);
                 $.ajax({
                     url: resourceUrl,
                     type: 'GET',

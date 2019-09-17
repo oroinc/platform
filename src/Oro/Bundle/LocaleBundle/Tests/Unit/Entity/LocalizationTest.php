@@ -138,7 +138,7 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage There must be only one default title
+     * @expectedExceptionMessage There must be only one localized fallback value for "default" localization.
      */
     public function testGetDefaultTitleException()
     {

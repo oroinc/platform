@@ -7,6 +7,9 @@ use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerP
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+/**
+ * Used to pre-process entity and submit form data
+ */
 class EntityApiBaseHandler
 {
     /** @var Registry */
@@ -43,7 +46,7 @@ class EntityApiBaseHandler
         $form->setData($entity);
 
         if (in_array($method, ['POST', 'PUT', 'PATCH'], true)) {
-            $form->submit($data);
+            $form->submit($data, 'PATCH' !== $method);
 
             if ($form->isValid()) {
                 $this->processor->beforeProcess($entity);

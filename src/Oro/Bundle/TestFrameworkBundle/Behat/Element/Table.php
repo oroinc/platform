@@ -33,11 +33,12 @@ class Table extends Element
      * Get Element tr by row content
      *
      * @param string $content Any content that can identify row
+     * @param bool $failIfNotFound
      * @return TableRow tr element of table
      */
-    public function getRowByContent($content)
+    public function getRowByContent($content, $failIfNotFound = true)
     {
-        return $this->getRowByContentElement($content, static::TABLE_ROW_ELEMENT);
+        return $this->getRowByContentElement($content, static::TABLE_ROW_ELEMENT, $failIfNotFound);
     }
 
     public function assertNoRecords()
@@ -69,9 +70,10 @@ class Table extends Element
     /**
      * @param string $content Any content that can identify row
      * @param string $elementName
-     * @return TableRow
+     * @param bool $failIfNotFound
+     * @return TableRow|null
      */
-    public function getRowByContentElement($content, $elementName)
+    public function getRowByContentElement($content, $elementName, $failIfNotFound = true)
     {
         /** @var TableRow|bool $row */
         $row = $this->spin(function () use ($elementName, $content) {
@@ -80,8 +82,12 @@ class Table extends Element
             return $element->isIsset() ? $element : false;
         }, 2);
 
-        self::assertNotFalse($row, sprintf(static::ERROR_NO_ROW_CONTENT, $content));
-        $row->setOwner($this);
+        if ($failIfNotFound) {
+            self::assertNotFalse($row, sprintf(static::ERROR_NO_ROW_CONTENT, $content));
+        }
+        if ($row) {
+            $row->setOwner($this);
+        }
 
         return $row;
     }

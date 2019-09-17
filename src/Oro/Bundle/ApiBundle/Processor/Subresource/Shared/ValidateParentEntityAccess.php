@@ -20,6 +20,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class ValidateParentEntityAccess implements ProcessorInterface
 {
+    public const OPERATION_NAME = 'validate_parent_entity_access';
+
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
@@ -51,6 +53,11 @@ class ValidateParentEntityAccess implements ProcessorInterface
     {
         /** @var SubresourceContext $context */
 
+        if ($context->isProcessed(self::OPERATION_NAME)) {
+            // the access validation was already performed
+            return;
+        }
+
         $parentConfig = $context->getParentConfig();
         if (null === $parentConfig) {
             // unsupported API resource
@@ -80,6 +87,8 @@ class ValidateParentEntityAccess implements ProcessorInterface
             $parentConfig,
             $parentMetadata
         );
+
+        $context->setProcessed(self::OPERATION_NAME);
     }
 
     /**

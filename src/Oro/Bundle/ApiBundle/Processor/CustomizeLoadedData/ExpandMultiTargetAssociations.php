@@ -4,14 +4,14 @@ namespace Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Config\AssociationConfigUtil;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
-use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Config\TargetConfigExtraBuilder;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -143,7 +143,7 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
     {
         /** @var EntityDefinitionConfigExtra|null $entityConfigExtra */
         $entityConfigExtra = $context->getConfigExtra(EntityDefinitionConfigExtra::NAME);
-        if (null === $entityConfigExtra || $entityConfigExtra->getAction() !== ApiActions::GET_SUBRESOURCE) {
+        if (null === $entityConfigExtra || $entityConfigExtra->getAction() !== ApiAction::GET_SUBRESOURCE) {
             return null;
         }
 

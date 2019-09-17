@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadNestedAssociation;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
@@ -113,7 +114,7 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
             ['id' => 1],
             $this->context->getResult()
         );
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     public function testProcessForEmptyResultOfNestedAssociation()
@@ -154,7 +155,7 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     public function testProcessForNestedAssociationWhenParentEntityWasNotFound()
@@ -193,6 +194,6 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 }

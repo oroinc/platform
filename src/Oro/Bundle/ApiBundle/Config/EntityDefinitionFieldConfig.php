@@ -552,7 +552,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
-     * Gets ORM query builder for a query that should be used to load an association data.
+     * Gets ORM query builder for a query that should be used to load data if the field is a to-many association.
      *
      * @return QueryBuilder|null
      */
@@ -562,7 +562,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
-     * Sets ORM query builder for a query that should be used to load an association data.
+     * Sets ORM query builder for a query that should be used to load data if the field is a to-many association.
      *
      * IMPORTANT: the query builder must follow the rules described in AssociationQuery class.
      * @see \Oro\Component\EntitySerializer\AssociationQuery
