@@ -8,6 +8,14 @@
     margin: 0 3px;
 }
 
+.popover {
+    .popover-close {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+    }
+}
+
 .popover .arrow::before, .popover .arrow::after {
     position: absolute;
     display: block;
