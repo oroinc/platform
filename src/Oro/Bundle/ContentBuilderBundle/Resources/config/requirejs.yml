@@ -1,0 +1,14 @@
+config:
+    paths:
+        'grapesjs': 'bundles/npmassets/grapesjs/dist/grapes.js'
+        'grapesjs-preset-webpage': 'bundles/npmassets/grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.js'
+        'orocontentbuilder/js/app/views/grapesjs-editor-view': 'bundles/orocontentbuilder/js/app/views/grapesjs-editor-view.js'
+
+        'orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-modules': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-modules.js'
+        'orocontentbuilder/js/app/views/grapesjs-modules/style-manager-module': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/style-manager-module.js'
+        'orocontentbuilder/js/app/views/grapesjs-modules/panels-module': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/panels-module.js'
+        'orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-devices-module': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-devices-module.js'
+        'orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-components': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/grapesjs-components.js'
+        'orocontentbuilder/js/app/views/grapesjs-modules/controls/theme-selector-view': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/controls/theme-selector-view.js'
+        'orocontentbuilder/js/app/views/grapesjs-modules/components/table': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/components/table.js'
+        'orocontentbuilder/js/app/views/grapesjs-modules/components/table-responsive': 'bundles/orocontentbuilder/js/app/views/grapesjs-modules/components/table-responsive.js'

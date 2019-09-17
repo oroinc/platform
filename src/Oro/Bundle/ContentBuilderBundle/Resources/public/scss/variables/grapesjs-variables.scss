@@ -1,0 +1,33 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/colors";
+@import "../../fonts/grapsejs/variables";
+
+$app-prefix: 'gjs-';
+
+// Palette variables
+$primaryColor: $primary-inverse;
+$secondaryColor: $primary-100;
+$tertiaryColor: $primary-830;
+$quaternaryColor: $primary-400;
+
+$colorWarn: $secondary;
+$fontColor: $primary-400;
+$mainLhlColor: $primary-400;
+$colorBlue: $secondary;
+
+$mainLhColor: $secondary;
+
+$button-bg-color: $primary-830;
+
+$canvas-bg-color: $primary-inverse;
+$canvas-border: 2px solid $primary-750;
+$canvas-pattern: linear-gradient(45deg, $primary-900 25%, transparent 25%),linear-gradient(-45deg, $primary-900 25%, transparent 25%),linear-gradient(45deg, transparent 75%, $primary-900 75%),linear-gradient(-45deg, transparent 75%, $primary-900 75%) !default;
+$canvas-pattern-size: 20px 20px !default;
+$canvas-pattern-position: 0 0, 0 10px, 10px -10px, -10px 0px !default;
+
+$leftWidth: 23%;
+
+$fontSizeS: 0.9rem;
+
+$paddElClm: 3px 5px;
