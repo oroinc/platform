@@ -35,10 +35,6 @@ fieldset .span6 {
         margin-#{$end}: $content-padding-small;
     }
 
-    .select2-container {
-        width: 100% !important; //override js width setting
-    }
-
     input[type="text"]:not(.precision, .conversionRate),
     input[type="email"],
     input[type="password"] {
