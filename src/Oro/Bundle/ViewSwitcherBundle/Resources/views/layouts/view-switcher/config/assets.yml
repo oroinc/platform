@@ -1,0 +1,5 @@
+styles:
+    inputs:
+        - "bundles/npmassets/slick-carousel/slick/slick.scss"
+        - "bundles/oroviewswitcher/view-switcher/scss/styles.scss"
+    output: 'css/themes/oro/view-switcher.css'

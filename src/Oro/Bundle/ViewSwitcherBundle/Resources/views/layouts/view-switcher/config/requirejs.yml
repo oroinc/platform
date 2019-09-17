@@ -1,0 +1,48 @@
+config:
+    shim:
+        'asap':
+            exports: 'asap'
+    map:
+        '*':
+            'jquery': 'oroui/js/extend/jquery'
+            'chaplin': 'oroui/js/extend/chaplin'
+            'underscore': 'oroui/js/extend/underscore'
+            'backbone': 'oroui/js/extend/backbone'
+        'oroui/js/extend/jquery':
+            'jquery': 'jquery'
+        'chaplin':
+            'backbone': 'backbone'
+        'oroui/js/app/components/base/component':
+            'backbone': 'backbone'
+            'chaplin': 'chaplin'
+        'oroui/js/mediator':
+            'chaplin': 'chaplin'
+        'oroui/js/tools':
+            'chaplin': 'chaplin'
+        'oroui/js/extend/underscore':
+            'underscore': 'underscore'
+        'oroui/js/extend/backbone':
+            'backbone': 'backbone'
+        'oroui/js/extend/chaplin':
+            'chaplin': 'chaplin'
+    paths:
+        'jquery': 'bundles/npmassets/jquery/dist/jquery.js'
+        'backbone': 'bundles/npmassets/backbone/backbone.js'
+        'underscore': 'bundles/npmassets/underscore/underscore.js'
+        'chaplin': 'bundles/bowerassets/chaplin/chaplin.js'
+        'asap': 'bundles/ororequirejs/lib/asap/asap.js'
+        'slick': 'bundles/npmassets/slick-carousel/slick/slick.js'
+        'text': 'bundles/bowerassets/text/text.js'
+        'ready': 'bundles/oroui/js/requirejs/ready.js'
+        'tpl': 'bundles/oroui/js/requirejs/tpl.js'
+        'app-modules': 'bundles/oroui/js/requirejs/app-modules.js'
+        'requirejs-asap-init': 'bundles/ororequirejs/js/requirejs-asap-init.js'
+        'translator': 'bundles/orotranslation/lib/translator.js'
+        'orotranslation/js/translator': 'bundles/orotranslation/js/translator.js'
+        'oroui/js/extend/underscore': 'bundles/oroui/js/extend/underscore.js'
+        'oroui/js/app/views/base/view': 'bundles/oroui/js/app/views/base/view.js'
+        'oroui/js/app/views/loading-bar-view': 'bundles/oroui/js/app/views/loading-bar-view.js'
+        'oroviewswitcher/js/app/views/device-switcher-view': 'bundles/oroviewswitcher/js/app/views/device-switcher-view.js'
+        'oroviewswitcher/js/app/views/device-inner-page-view': 'bundles/oroviewswitcher/js/app/views/device-inner-page-view.js'
+        'oroviewswitcher/js/app/models/inner-page-model': 'bundles/oroviewswitcher/js/app/models/inner-page-model.js'
+        'oroviewswitcher/js/app/services/inner-page-model-service': 'bundles/oroviewswitcher/js/app/services/inner-page-model-service.js'
