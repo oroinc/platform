@@ -364,7 +364,7 @@ class ImportExportContext extends OroFeatureContext implements
      * Example: When I download Data Template file
      *          Then I don't see Business Customer Name column
      *
-     * @Then /^(?:|I )don't see (?P<column>([\w\s]+)) column$/
+     * @Then /^(?:|I )don't see (?P<column>([\w\s.+\/]+)) column$/
      */
     public function iDonTSeeColumn($column)
     {
