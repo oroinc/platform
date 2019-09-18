@@ -130,12 +130,6 @@
             .choice-widget-expanded {
                 padding-top: $control-group-choice-choice-widget-offset-top;
             }
-
-            .select2 {
-                + input {
-                    margin-top: $input-outer-offset-bottom;
-                }
-            }
         }
 
         &.control-group-oro_type_filter {
