@@ -4,7 +4,7 @@ oro_form:
         #          Style and iframe elements are not allowed
         # extended - same as strict but style and iframe elements are allowed
         # disabled - HTML Purifier is disabled completely
-        html_purifier_mode: disabled
+        html_purifier_mode: strict
 
         # only these domains will be allowed in iframes
         # (in case iframes are enabled in extended mode)

@@ -143,25 +143,14 @@ class OroRichTextType extends AbstractType
             $this->addDisabledModeParameters($defaultWysiwygOptions);
         }
 
-//        $defaults = [
-//            'wysiwyg_enabled' => (bool) $this->configManager->get('oro_form.wysiwyg_enabled'),
-//            'wysiwyg_options' => $defaultWysiwygOptions,
-//            'page-component'  => [
-//                'module'  => 'oroui/js/app/components/view-component',
-//                'options' => [
-//                    'view'        => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-//                    'content_css' => $assetsBaseUrl . 'bundles/oroform/css/wysiwyg-editor.css',
-//                ]
-//            ],
-//        ];
-
         $defaults = [
             'wysiwyg_enabled' => (bool) $this->configManager->get('oro_form.wysiwyg_enabled'),
             'wysiwyg_options' => $defaultWysiwygOptions,
             'page-component'  => [
                 'module'  => 'oroui/js/app/components/view-component',
                 'options' => [
-                    'view' => 'orocms/js/app/views/grapesjs-editor-view'
+                    'view'        => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
+                    'content_css' => $assetsBaseUrl . 'bundles/oroform/css/wysiwyg-editor.css',
                 ]
             ],
         ];
