@@ -1,4 +1,0 @@
-oro:
-    builder:
-        themeSelector:
-            placeholder: 'Type theme name'

@@ -161,7 +161,7 @@ class OroRichTextType extends AbstractType
             'page-component'  => [
                 'module'  => 'oroui/js/app/components/view-component',
                 'options' => [
-                    'view'        => 'orocontentbuilder/js/app/views/grapesjs-editor-view'
+                    'view' => 'orocms/js/app/views/grapesjs-editor-view'
                 ]
             ],
         ];

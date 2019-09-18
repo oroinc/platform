@@ -1,2 +1,0 @@
-bundles:
-    - { name: Oro\Bundle\ContentBuilderBundle\OroContentBuilderBundle, priority: 100 }
