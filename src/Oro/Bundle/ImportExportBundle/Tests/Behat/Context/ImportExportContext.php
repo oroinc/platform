@@ -432,6 +432,25 @@ class ImportExportContext extends OroFeatureContext implements
     }
 
     /**
+     * Assert that given columns are present in the downloaded csv template
+     * Example: When I download Data Template file
+     *          And I see the following columns in exact order in the downloaded csv template:
+     *              | sku    |
+     *              | status |
+     *              | type   |
+     *
+     * @Then /^(?:|I )see the following columns in exact order in the downloaded csv template:$/
+     */
+    public function iSeeColumnsInExactOrder(TableNode $table)
+    {
+        $csv = array_map('str_getcsv', file($this->template));
+        $rows = array_column($table->getRows(), 0);
+        foreach ($rows as $i => $row) {
+            self::assertEquals($row, $csv[0][$i] ?? '');
+        }
+    }
+
+    /**
      * Fill downloaded csv file template
      * Example: And I fill template with data:
      *            | Account Customer name | Channel Name        | Opportunity name | Status Id   |
