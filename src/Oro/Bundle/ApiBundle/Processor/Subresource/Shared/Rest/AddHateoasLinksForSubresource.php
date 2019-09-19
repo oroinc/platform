@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\RouteLinkMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\AbstractDocumentBuilder as ApiDoc;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -66,7 +66,7 @@ class AddHateoasLinksForSubresource implements ProcessorInterface
             $context->getVersion(),
             $requestType
         );
-        if (null === $subresource || $subresource->isExcludedAction(ApiActions::GET_SUBRESOURCE)) {
+        if (null === $subresource || $subresource->isExcludedAction(ApiAction::GET_SUBRESOURCE)) {
             return;
         }
 

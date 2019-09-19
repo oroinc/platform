@@ -4,17 +4,17 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Config\Config;
-use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraSectionInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
-use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Metadata\HateoasMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\Extra\HateoasMetadataExtra;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -804,7 +804,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Config\ConfigExtraInterface".
+     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface".
      */
     public function testSetInvalidConfigExtras()
     {
@@ -1135,7 +1135,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface".
+     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface".
      */
     public function testSetInvalidMetadataExtras()
     {

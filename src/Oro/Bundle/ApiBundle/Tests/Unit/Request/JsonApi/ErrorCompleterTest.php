@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\JsonApi;
 
-use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Filter\FilterNames;
 use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;

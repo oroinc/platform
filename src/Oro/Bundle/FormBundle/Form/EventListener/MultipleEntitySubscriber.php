@@ -14,6 +14,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * This subscriber adds and removes entities from relation collections.
+ */
 class MultipleEntitySubscriber implements EventSubscriberInterface
 {
     /** @var DoctrineHelper */
@@ -71,7 +74,7 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
         $removed = $form->get('removed')->getData();
 
         $parent = $form->getParent()->getData();
-        $parentMetadata = $this->doctrineHelper->getEntityMetadata(
+        $parentMetadata = !$parent ? null : $this->doctrineHelper->getEntityMetadata(
             ClassUtils::getClass($parent),
             false
         );
@@ -84,7 +87,10 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
             ) {
                 $this->setOneToManyTargetEntity($child, $parentMetadata, $fieldName, $parent);
             }
-            $children->add($child);
+
+            if (!$children->contains($child)) {
+                $children->add($child);
+            }
         }
         foreach ($removed as $child) {
             if (null !== $parentMetadata

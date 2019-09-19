@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\CollectSubresources;
 
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 
@@ -13,36 +13,36 @@ use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 class SubresourceUtil
 {
     public const SUBRESOURCE_DEFAULT_EXCLUDED_ACTIONS = [
-        ApiActions::UPDATE_SUBRESOURCE,
-        ApiActions::ADD_SUBRESOURCE,
-        ApiActions::DELETE_SUBRESOURCE
+        ApiAction::UPDATE_SUBRESOURCE,
+        ApiAction::ADD_SUBRESOURCE,
+        ApiAction::DELETE_SUBRESOURCE
     ];
 
     public const SUBRESOURCE_ACTIONS = [
-        ApiActions::GET_SUBRESOURCE,
-        ApiActions::UPDATE_SUBRESOURCE,
-        ApiActions::ADD_SUBRESOURCE,
-        ApiActions::DELETE_SUBRESOURCE,
-        ApiActions::GET_RELATIONSHIP,
-        ApiActions::UPDATE_RELATIONSHIP,
-        ApiActions::ADD_RELATIONSHIP,
-        ApiActions::DELETE_RELATIONSHIP
+        ApiAction::GET_SUBRESOURCE,
+        ApiAction::UPDATE_SUBRESOURCE,
+        ApiAction::ADD_SUBRESOURCE,
+        ApiAction::DELETE_SUBRESOURCE,
+        ApiAction::GET_RELATIONSHIP,
+        ApiAction::UPDATE_RELATIONSHIP,
+        ApiAction::ADD_RELATIONSHIP,
+        ApiAction::DELETE_RELATIONSHIP
     ];
 
     public const SUBRESOURCE_ACTIONS_WITHOUT_GET_SUBRESOURCE = [
-        ApiActions::UPDATE_SUBRESOURCE,
-        ApiActions::ADD_SUBRESOURCE,
-        ApiActions::DELETE_SUBRESOURCE,
-        ApiActions::GET_RELATIONSHIP,
-        ApiActions::UPDATE_RELATIONSHIP,
-        ApiActions::ADD_RELATIONSHIP,
-        ApiActions::DELETE_RELATIONSHIP
+        ApiAction::UPDATE_SUBRESOURCE,
+        ApiAction::ADD_SUBRESOURCE,
+        ApiAction::DELETE_SUBRESOURCE,
+        ApiAction::GET_RELATIONSHIP,
+        ApiAction::UPDATE_RELATIONSHIP,
+        ApiAction::ADD_RELATIONSHIP,
+        ApiAction::DELETE_RELATIONSHIP
     ];
 
     public const RELATIONSHIP_CHANGE_ACTIONS = [
-        ApiActions::UPDATE_RELATIONSHIP,
-        ApiActions::ADD_RELATIONSHIP,
-        ApiActions::DELETE_RELATIONSHIP
+        ApiAction::UPDATE_RELATIONSHIP,
+        ApiAction::ADD_RELATIONSHIP,
+        ApiAction::DELETE_RELATIONSHIP
     ];
 
     /**
@@ -52,7 +52,7 @@ class SubresourceUtil
      */
     public static function isSubresourcesEnabled(ApiResource $resource): bool
     {
-        return !\in_array(ApiActions::GET_SUBRESOURCE, $resource->getExcludedActions(), true);
+        return !\in_array(ApiAction::GET_SUBRESOURCE, $resource->getExcludedActions(), true);
     }
 
     /**
@@ -128,8 +128,8 @@ class SubresourceUtil
                 $subresource->setExcludedActions($subresourceExcludedActions);
             }
             if (!$subresource->isCollection()) {
-                self::ensureActionExcluded($subresource, ApiActions::ADD_RELATIONSHIP);
-                self::ensureActionExcluded($subresource, ApiActions::DELETE_RELATIONSHIP);
+                self::ensureActionExcluded($subresource, ApiAction::ADD_RELATIONSHIP);
+                self::ensureActionExcluded($subresource, ApiAction::DELETE_RELATIONSHIP);
             }
         } else {
             $subresource->setExcludedActions(self::SUBRESOURCE_ACTIONS);

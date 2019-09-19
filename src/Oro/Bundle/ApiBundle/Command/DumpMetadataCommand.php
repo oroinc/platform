@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
-use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
-use Oro\Bundle\ApiBundle\Metadata\HateoasMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\Extra\HateoasMetadataExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
@@ -75,7 +76,7 @@ class DumpMetadataCommand extends AbstractDebugCommand
                 InputOption::VALUE_REQUIRED,
                 'The name of action for which the metadata should be displayed.' .
                 'Can be "get", "get_list", "create", "update", "delete", "delete_list", etc.'.
-                'get'
+                ApiAction::GET_LIST
             )
             ->addOption(
                 'hateoas',

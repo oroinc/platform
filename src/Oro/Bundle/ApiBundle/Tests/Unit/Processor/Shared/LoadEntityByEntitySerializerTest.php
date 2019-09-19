@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByEntitySerializer;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorOrmRelatedTestCase;
@@ -107,7 +108,7 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
 
         self::assertEquals($entityData, $this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     /**
@@ -201,7 +202,7 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     /**

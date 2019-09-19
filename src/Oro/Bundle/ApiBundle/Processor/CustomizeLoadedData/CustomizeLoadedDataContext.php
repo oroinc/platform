@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData;
 
-use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\CustomizeDataContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 

@@ -351,7 +351,7 @@ class ImportExportContext extends OroFeatureContext implements
     public function exportedFileContainsAtLeastFollowingColumns(TableNode $expectedEntities)
     {
         $filePath = $this->getExportFile();
-        
+
         $this->assertFileContainsAtLeastFollowingColumns($filePath, $expectedEntities);
     }
 

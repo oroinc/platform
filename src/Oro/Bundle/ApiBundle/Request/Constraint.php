@@ -7,16 +7,16 @@ namespace Oro\Bundle\ApiBundle\Request;
  */
 final class Constraint
 {
-    const FILTER       = 'filter constraint';
-    const SORT         = 'sort constraint';
-    const REQUEST_DATA = 'request data constraint';
-    const REQUEST_TYPE = 'request type constraint';
-    const VALUE        = 'value constraint';
-    const ENTITY       = 'entity constraint';
-    const ENTITY_TYPE  = 'entity type constraint';
-    const ENTITY_ID    = 'entity identifier constraint';
-    const CONFLICT     = 'conflict constraint';
-    const FORM         = 'form constraint';
-    const EXTRA_FIELDS = 'extra fields constraint';
-    const RELATIONSHIP = 'relationship constraint';
+    public const FILTER       = 'filter constraint';
+    public const SORT         = 'sort constraint';
+    public const REQUEST_DATA = 'request data constraint';
+    public const REQUEST_TYPE = 'request type constraint';
+    public const VALUE        = 'value constraint';
+    public const ENTITY       = 'entity constraint';
+    public const ENTITY_TYPE  = 'entity type constraint';
+    public const ENTITY_ID    = 'entity identifier constraint';
+    public const CONFLICT     = 'conflict constraint';
+    public const FORM         = 'form constraint';
+    public const EXTRA_FIELDS = 'extra fields constraint';
+    public const RELATIONSHIP = 'relationship constraint';
 }

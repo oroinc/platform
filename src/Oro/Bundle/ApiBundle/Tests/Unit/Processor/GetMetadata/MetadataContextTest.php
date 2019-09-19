@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
+use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestMetadataExtra;
 
@@ -84,7 +84,7 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface".
+     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface".
      */
     public function testSetInvalidExtras()
     {

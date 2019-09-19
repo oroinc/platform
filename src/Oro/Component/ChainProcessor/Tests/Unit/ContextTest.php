@@ -71,6 +71,9 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
         $context->setFirstGroup('test');
         $this->assertEquals('test', $context->getFirstGroup());
+
+        $context->setFirstGroup(null);
+        $this->assertNull($context->getFirstGroup());
     }
 
     public function testLastGroup()
@@ -81,6 +84,9 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
         $context->setLastGroup('test');
         $this->assertEquals('test', $context->getLastGroup());
+
+        $context->setLastGroup(null);
+        $this->assertNull($context->getLastGroup());
     }
 
     public function testSkippedGroups()

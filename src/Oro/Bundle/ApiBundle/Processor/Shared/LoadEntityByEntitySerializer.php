@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -74,7 +75,7 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
         );
 
         // data returned by the EntitySerializer are already normalized
-        $context->skipGroup('normalize_data');
+        $context->skipGroup(ApiActionGroup::NORMALIZE_DATA);
     }
 
     /**

@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\RegisterDynamicFilters;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Filter\RequestAwareFilterStub;
@@ -175,7 +176,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->filterFactory->expects(self::never())
             ->method('createFilter');
 
-        $this->context->setLastGroup('initialize');
+        $this->context->setLastGroup(ApiActionGroup::INITIALIZE);
         $this->context->setClassName(Entity\Category::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);

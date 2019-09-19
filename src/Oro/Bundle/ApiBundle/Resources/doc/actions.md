@@ -913,13 +913,13 @@ General methods:
 
 Entity configuration related methods:
 
-- **getConfigExtras()** - Retrieves a list of [requests for the configuration data](../../Config/ConfigExtraInterface.php).
+- **getConfigExtras()** - Retrieves a list of [requests for the configuration data](../../Config/Extra/ConfigExtraInterface.php).
 - **setConfigExtras(extras)** - Sets a list of requests for the configuration data.
 - **hasConfigExtra(extraName)** - Checks whether a configuration data is requested.
 - **getConfigExtra(extraName)** - Retrieves a request for the configuration data by its name.
 - **addConfigExtra(extra)** - Adds a request for a configuration data.
 - **removeConfigExtra(extraName)** - Removes a request for the configuration data.
-- **getConfigSections()** - Retrieves names of all requested [configuration sections](../../Config/ConfigExtraSectionInterface.php).
+- **getConfigSections()** - Retrieves names of all requested [configuration sections](../../Config/Extra/ConfigExtraSectionInterface.php).
 - **hasConfig()** - Checks whether a configuration of an entity exists.
 - **getConfig()** - Retrieves a [configuration of an entity](../../Config/EntityDefinitionConfig.php).
 - **setConfig(config)** - Sets a custom configuration of an entity. This method can be used to completely override the default configuration of an entity.
@@ -936,7 +936,7 @@ Entity configuration related methods:
 Entity metadata related methods:
 
 - **hasIdentifierFields()** - Checks whether metadata of an entity has at least one identifier field.
-- **getMetadataExtras()** - Retrieves a list of [requests for additional metadata info](../../Metadata/MetadataExtraInterface.php).
+- **getMetadataExtras()** - Retrieves a list of [requests for additional metadata info](../../Metadata/Extra/MetadataExtraInterface.php).
 - **setMetadataExtras(extras)** - Sets a list of requests for additional metadata info.
 - **hasMetadataExtra()** - Checks whether some additional metadata info is requested.
 - **addMetadataExtra(extra)** - Adds a request for some additional metadata info.
@@ -965,7 +965,7 @@ General methods:
 
 Parent entity configuration related methods:
 
-- **getParentConfigExtras()** - Retrieves a list of [requests for the configuration data](../../Config/ConfigExtraInterface.php) for the parent entity.
+- **getParentConfigExtras()** - Retrieves a list of [requests for the configuration data](../../Config/Extra/ConfigExtraInterface.php) for the parent entity.
 - **setParentConfigExtras(extras)** - Sets a list of requests for the configuration data for the parent entity.
 - **hasParentConfig()** - Checks whether a configuration of the parent entity exists.
 - **getParentConfig()** - Retrieves a [configuration of the parent entity](../../Config/EntityDefinitionConfig.php).
@@ -973,7 +973,7 @@ Parent entity configuration related methods:
 
 Parent entity metadata related methods:
 
-- **getParentMetadataExtras()** - Retrieves a list of [requests for additional metadata info](../../Metadata/MetadataExtraInterface.php) for the parent entity.
+- **getParentMetadataExtras()** - Retrieves a list of [requests for additional metadata info](../../Metadata/Extra/MetadataExtraInterface.php) for the parent entity.
 - **setParentMetadataExtras(extras)** - Sets a list of requests for additional metadata info for the parent entity.
 - **hasParentMetadata()** - Checks whether a metadata of the parent entity exists.
 - **getParentMetadata()** - Retrieves a [metadata](../../Metadata/EntityMetadata.php) of the parent entity.

@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\SetHttpAllowHeaderForSubresource;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
 
@@ -80,10 +80,10 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([
-                ApiActions::GET_SUBRESOURCE,
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE
+                ApiAction::GET_SUBRESOURCE,
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE
             ]);
         $this->subresourcesProvider->expects(self::once())
             ->method('getSubresource')
@@ -136,9 +136,9 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE
             ]);
         $this->subresourcesProvider->expects(self::once())
             ->method('getSubresource')
@@ -164,9 +164,9 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([
-                ApiActions::GET_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE
+                ApiAction::GET_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE
             ]);
         $this->subresourcesProvider->expects(self::once())
             ->method('getSubresource')
@@ -191,9 +191,9 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE
             ]);
         $this->subresourcesProvider->expects(self::once())
             ->method('getSubresource')
@@ -216,12 +216,12 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
         $metadata->setIdentifierFieldNames(['id']);
 
         $subresource = new ApiSubresource();
-        $subresource->setExcludedActions([ApiActions::UPDATE_SUBRESOURCE]);
+        $subresource->setExcludedActions([ApiAction::UPDATE_SUBRESOURCE]);
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn([ApiActions::ADD_SUBRESOURCE, ApiActions::DELETE_SUBRESOURCE]);
+            ->willReturn([ApiAction::ADD_SUBRESOURCE, ApiAction::DELETE_SUBRESOURCE]);
         $this->subresourcesProvider->expects(self::once())
             ->method('getSubresource')
             ->with('Test\Class', 'testAssociation', $this->context->getVersion(), $this->context->getRequestType())

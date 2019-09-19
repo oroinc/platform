@@ -104,6 +104,8 @@
         "bower-asset/backbone-pageable": "1.2.3",
         "bower-asset/numeral": "2.0.6",
         "bower-asset/jquery-form": "4.2.1",
+        "bower-asset/jquery.nicescroll": "3.6.6",
+        "npm-asset/slick-carousel": "1.6.0",
         "npm-asset/requirejs": "2.3.*",
         "npm-asset/xregexp": "3.2.*",
         "robloach/component-installer": "0.2.*",

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared\CompleteDefinition;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteAssociationHelper;
@@ -14,7 +14,7 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\ExclusionProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
@@ -2014,7 +2014,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         return [
             'CREATE action, id generator, configured custom id'              => [
-                'targetAction'    => ApiActions::CREATE,
+                'targetAction'    => ApiAction::CREATE,
                 'usesIdGenerator' => true,
                 'config'          => [
                     'identifier_field_names' => ['field'],
@@ -2033,7 +2033,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             ],
             'UPDATE action, id generator, configured custom id'              => [
-                'targetAction'    => ApiActions::UPDATE,
+                'targetAction'    => ApiAction::UPDATE,
                 'usesIdGenerator' => true,
                 'config'          => [
                     'identifier_field_names' => ['field'],
@@ -2052,7 +2052,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             ],
             'another action, id generator, configured custom id'             => [
-                'targetAction'    => ApiActions::GET,
+                'targetAction'    => ApiAction::GET,
                 'usesIdGenerator' => true,
                 'config'          => [
                     'identifier_field_names' => ['field'],
@@ -2067,7 +2067,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             ],
             'no id generator, configured custom id'                          => [
-                'targetAction'    => ApiActions::CREATE,
+                'targetAction'    => ApiAction::CREATE,
                 'usesIdGenerator' => false,
                 'config'          => [
                     'identifier_field_names' => ['field'],
@@ -2082,7 +2082,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             ],
             'id generator, configured custom id equals to entity id'         => [
-                'targetAction'    => ApiActions::CREATE,
+                'targetAction'    => ApiAction::CREATE,
                 'usesIdGenerator' => true,
                 'config'          => [
                     'identifier_field_names' => ['id'],
@@ -2097,7 +2097,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             ],
             'id generator, configured custom id equals to renamed entity id' => [
-                'targetAction'    => ApiActions::CREATE,
+                'targetAction'    => ApiAction::CREATE,
                 'usesIdGenerator' => true,
                 'config'          => [
                     'identifier_field_names' => ['renamedId'],

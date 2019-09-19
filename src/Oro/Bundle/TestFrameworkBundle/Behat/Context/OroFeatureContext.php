@@ -4,8 +4,10 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Context;
 
 use Behat\Mink\Session;
 use Behat\MinkExtension\Context\RawMinkContext;
+use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Basic feature context which may be used as parent class for other contexts.
@@ -91,5 +93,26 @@ class OroFeatureContext extends RawMinkContext
         }
 
         return new CookieJar(false, $cookies);
+    }
+
+    /**
+     * @param string $imageUrl
+     *
+     * @return ResponseInterface
+     */
+    protected function loadImage(string $imageUrl): ResponseInterface
+    {
+        $imageUrl = $this->locatePath($imageUrl);
+        $imageUrl = filter_var($imageUrl, FILTER_VALIDATE_URL);
+
+        self::assertInternalType('string', $imageUrl, sprintf('Image src "%s" is not valid', $imageUrl));
+
+        $cookieJar = $this->getCookieJar($this->getSession());
+        $client = new Client([
+            'allow_redirects' => false,
+            'cookies' => $cookieJar,
+        ]);
+
+        return $client->get($imageUrl);
     }
 }

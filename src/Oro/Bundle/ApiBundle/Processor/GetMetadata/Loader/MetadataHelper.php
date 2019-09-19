@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
@@ -43,7 +43,7 @@ class MetadataHelper
     public function getFormPropertyPath(EntityDefinitionFieldConfig $field, $targetAction)
     {
         $propertyPath = null;
-        if (\in_array($targetAction, [ApiActions::CREATE, ApiActions::UPDATE], true)) {
+        if (\in_array($targetAction, [ApiAction::CREATE, ApiAction::UPDATE], true)) {
             $formOptions = $field->getFormOptions();
             if (!empty($formOptions) && \array_key_exists('property_path', $formOptions)) {
                 $propertyPath = $formOptions['property_path'];

@@ -4,11 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource;
 
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
-use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Metadata\HateoasMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\Extra\HateoasMetadataExtra;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -150,7 +150,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Config\ConfigExtraInterface".
+     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface".
      */
     public function testSetInvalidParentConfigExtras()
     {
@@ -405,7 +405,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface".
+     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface".
      */
     public function testSetInvalidParentMetadataExtras()
     {

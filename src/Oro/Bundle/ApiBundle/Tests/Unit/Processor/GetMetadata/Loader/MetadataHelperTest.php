@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata\Loader;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 
 class MetadataHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -57,37 +57,37 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
             [
                 null,
                 null,
-                ApiActions::CREATE
+                ApiAction::CREATE
             ],
             [
                 null,
                 null,
-                ApiActions::UPDATE
-            ],
-            [
-                null,
-                ['data_class' => 'Test\Class'],
-                ApiActions::CREATE
+                ApiAction::UPDATE
             ],
             [
                 null,
                 ['data_class' => 'Test\Class'],
-                ApiActions::UPDATE
+                ApiAction::CREATE
+            ],
+            [
+                null,
+                ['data_class' => 'Test\Class'],
+                ApiAction::UPDATE
             ],
             [
                 'test',
                 ['property_path' => 'test'],
-                ApiActions::CREATE
+                ApiAction::CREATE
             ],
             [
                 'test',
                 ['property_path' => 'test'],
-                ApiActions::UPDATE
+                ApiAction::UPDATE
             ],
             [
                 null,
                 ['property_path' => 'test'],
-                ApiActions::GET
+                ApiAction::GET
             ]
         ];
     }
@@ -102,7 +102,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
             $propertyMetadata,
             $fieldName,
             $field,
-            ApiActions::CREATE
+            ApiAction::CREATE
         );
         self::assertEquals($fieldName, $propertyMetadata->getPropertyPath());
     }
@@ -118,7 +118,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
             $propertyMetadata,
             $fieldName,
             $field,
-            ApiActions::CREATE
+            ApiAction::CREATE
         );
         self::assertEquals($fieldName, $propertyMetadata->getPropertyPath());
     }
@@ -134,7 +134,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
             $propertyMetadata,
             $fieldName,
             $field,
-            ApiActions::CREATE
+            ApiAction::CREATE
         );
         self::assertEquals('propertyPath', $propertyMetadata->getPropertyPath());
     }
@@ -150,7 +150,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
             $propertyMetadata,
             $fieldName,
             $field,
-            ApiActions::UPDATE
+            ApiAction::UPDATE
         );
         self::assertEquals('propertyPath', $propertyMetadata->getPropertyPath());
     }
@@ -166,7 +166,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
             $propertyMetadata,
             $fieldName,
             $field,
-            ApiActions::GET
+            ApiAction::GET
         );
         self::assertEquals($fieldName, $propertyMetadata->getPropertyPath());
     }

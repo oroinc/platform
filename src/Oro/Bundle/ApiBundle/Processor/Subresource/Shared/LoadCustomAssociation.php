@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Config\TargetConfigExtraBuilder;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
@@ -92,7 +93,7 @@ abstract class LoadCustomAssociation implements ProcessorInterface
         $context->setResult($data);
 
         // data returned by the EntitySerializer are already normalized
-        $context->skipGroup('normalize_data');
+        $context->skipGroup(ApiActionGroup::NORMALIZE_DATA);
     }
 
     /**

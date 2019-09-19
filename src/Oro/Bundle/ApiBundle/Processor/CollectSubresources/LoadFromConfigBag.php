@@ -3,14 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Processor\CollectSubresources;
 
 use Oro\Bundle\ApiBundle\Config\ActionsConfig;
-use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\SubresourceConfig;
 use Oro\Bundle\ApiBundle\Config\SubresourcesConfig;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
@@ -325,9 +325,9 @@ class LoadFromConfigBag extends LoadSubresources
                 $actions = $this->loadActionsConfig($config[ConfigUtil::ACTIONS]);
             }
             foreach ($subresources->getSubresources() as $subresource) {
-                $this->updateSubresourceActionExclusion($subresource, ApiActions::UPDATE_SUBRESOURCE, $actions);
-                $this->updateSubresourceActionExclusion($subresource, ApiActions::ADD_SUBRESOURCE, $actions);
-                $this->updateSubresourceActionExclusion($subresource, ApiActions::DELETE_SUBRESOURCE, $actions);
+                $this->updateSubresourceActionExclusion($subresource, ApiAction::UPDATE_SUBRESOURCE, $actions);
+                $this->updateSubresourceActionExclusion($subresource, ApiAction::ADD_SUBRESOURCE, $actions);
+                $this->updateSubresourceActionExclusion($subresource, ApiAction::DELETE_SUBRESOURCE, $actions);
             }
         }
 

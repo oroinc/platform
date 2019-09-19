@@ -8,9 +8,9 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
-use Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedIncludedEntities;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
@@ -76,7 +76,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
-            ->with(ApiActions::GET)
+            ->with(ApiAction::GET)
             ->willReturn($getProcessor);
         $getProcessor->expects(self::once())
             ->method('createContext')
@@ -93,8 +93,8 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext->setClassName($includedEntityClass);
         $expectedGetContext->setId($includedRealEntityId);
         $expectedGetContext->setResult($includedEntity);
-        $expectedGetContext->skipGroup('security_check');
-        $expectedGetContext->skipGroup(NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        $expectedGetContext->skipGroup(ApiActionGroup::SECURITY_CHECK);
+        $expectedGetContext->skipGroup(ApiActionGroup::NORMALIZE_RESULT);
         $expectedGetContext->setSoftErrorsHandling(true);
         $expectedGetContext->setMetadata($getMetadata);
 
@@ -157,7 +157,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
-            ->with(ApiActions::GET)
+            ->with(ApiAction::GET)
             ->willReturn($getProcessor);
         $getProcessor->expects(self::once())
             ->method('createContext')
@@ -173,8 +173,8 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext->setSharedData($this->sharedData);
         $expectedGetContext->setClassName($includedEntityClass);
         $expectedGetContext->setId($includedRealEntityId);
-        $expectedGetContext->skipGroup('security_check');
-        $expectedGetContext->skipGroup(NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        $expectedGetContext->skipGroup(ApiActionGroup::SECURITY_CHECK);
+        $expectedGetContext->skipGroup(ApiActionGroup::NORMALIZE_RESULT);
         $expectedGetContext->setSoftErrorsHandling(true);
         $expectedGetContext->setMetadata($getMetadata);
 
@@ -233,7 +233,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
-            ->with(ApiActions::GET)
+            ->with(ApiAction::GET)
             ->willReturn($getProcessor);
         $getProcessor->expects(self::once())
             ->method('createContext')

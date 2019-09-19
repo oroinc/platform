@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Shared\SetHttpAllowHeaderForList;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
@@ -66,7 +66,7 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn([ApiActions::DELETE_LIST]);
+            ->willReturn([ApiAction::DELETE_LIST]);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setClassName('Test\Class');
@@ -84,7 +84,7 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn([ApiActions::GET_LIST, ApiActions::DELETE_LIST, ApiActions::CREATE]);
+            ->willReturn([ApiAction::GET_LIST, ApiAction::DELETE_LIST, ApiAction::CREATE]);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setClassName('Test\Class');
