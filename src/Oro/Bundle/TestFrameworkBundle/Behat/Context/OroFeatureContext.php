@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Context;
 
+use Behat\Mink\Session;
 use Behat\MinkExtension\Context\RawMinkContext;
+use GuzzleHttp\Cookie\CookieJar;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 
 /**
@@ -42,7 +44,7 @@ class OroFeatureContext extends RawMinkContext
     }
 
     /**
-     * Returns fixed step argument (with \\" replaced back to ")
+     * Returns fixed step argument (\\" replaced back to ", \\# replaced back to #)
      *
      * @param string $argument
      *
@@ -50,7 +52,7 @@ class OroFeatureContext extends RawMinkContext
      */
     protected function fixStepArgument($argument)
     {
-        return str_replace('\\"', '"', $argument);
+        return str_replace(['\\"', '\\#'], ['"', '#'], $argument);
     }
 
     /**
@@ -69,5 +71,25 @@ class OroFeatureContext extends RawMinkContext
             default:
                 return (int) $count;
         }
+    }
+
+    /**
+     * @param Session $session
+     *
+     * @return CookieJar
+     */
+    protected function getCookieJar(Session $session)
+    {
+        $sessionCookies = $session->getDriver()->getWebDriverSession()->getCookie();
+        $cookies = [];
+        foreach ($sessionCookies as $sessionCookie) {
+            $cookie = [];
+            foreach ($sessionCookie as $key => $value) {
+                $cookie[ucwords($key, '-')] = $value;
+            }
+            $cookies[] = $cookie;
+        }
+
+        return new CookieJar(false, $cookies);
     }
 }
