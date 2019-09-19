@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectSubresources;
 
-use Oro\Bundle\ApiBundle\Config\ActionsConfigLoader;
 use Oro\Bundle\ApiBundle\Config\Config;
-use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\SubresourcesConfigLoader;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Loader\ActionsConfigLoader;
+use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Config\Loader\SubresourcesConfigLoader;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
@@ -18,7 +18,7 @@ use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Provider\ConfigCache;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresourcesCollection;
@@ -164,7 +164,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
     {
         $entityClass = 'Test\Class';
         $resource = new ApiResource($entityClass);
-        $resource->setExcludedActions([ApiActions::GET_SUBRESOURCE]);
+        $resource->setExcludedActions([ApiAction::GET_SUBRESOURCE]);
         $subresources = $this->getApiResourceSubresources($resource);
 
         $this->context->setResources([$resource]);
@@ -233,7 +233,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
                             'subresource1' => [
                                 'target_class' => $targetEntityClass,
                                 'target_type'  => 'to-one',
-                                'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+                                'actions'      => [ApiAction::UPDATE_SUBRESOURCE => ['exclude' => false]]
                             ]
                         ]
                     ]
@@ -253,12 +253,12 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresource->setTargetClassName($targetEntityClass);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
-            ApiActions::ADD_SUBRESOURCE,
-            ApiActions::DELETE_SUBRESOURCE,
-            ApiActions::GET_RELATIONSHIP,
-            ApiActions::UPDATE_RELATIONSHIP,
-            ApiActions::ADD_RELATIONSHIP,
-            ApiActions::DELETE_RELATIONSHIP
+            ApiAction::ADD_SUBRESOURCE,
+            ApiAction::DELETE_SUBRESOURCE,
+            ApiAction::GET_RELATIONSHIP,
+            ApiAction::UPDATE_RELATIONSHIP,
+            ApiAction::ADD_RELATIONSHIP,
+            ApiAction::DELETE_RELATIONSHIP
         ]);
         $expectedSubresources->addSubresource('subresource1', $expectedSubresource);
 
@@ -290,7 +290,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
                         'subresources' => [
                             'association1' => [
                                 'exclude' => true,
-                                'actions' => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+                                'actions' => [ApiAction::UPDATE_SUBRESOURCE => ['exclude' => false]]
                             ]
                         ]
                     ]
@@ -333,7 +333,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
                     $entityClass => [
                         'subresources' => [
                             'association1' => [
-                                'actions' => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+                                'actions' => [ApiAction::UPDATE_SUBRESOURCE => ['exclude' => false]]
                             ]
                         ]
                     ]
@@ -353,10 +353,10 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresource->setTargetClassName($targetEntityClass);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
-            ApiActions::ADD_SUBRESOURCE,
-            ApiActions::DELETE_SUBRESOURCE,
-            ApiActions::ADD_RELATIONSHIP,
-            ApiActions::DELETE_RELATIONSHIP
+            ApiAction::ADD_SUBRESOURCE,
+            ApiAction::DELETE_SUBRESOURCE,
+            ApiAction::ADD_RELATIONSHIP,
+            ApiAction::DELETE_RELATIONSHIP
         ]);
         $expectedSubresources->addSubresource('association1', $expectedSubresource);
 
@@ -388,7 +388,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
                     $entityClass => [
                         'subresources' => [
                             'association1' => [
-                                'actions' => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+                                'actions' => [ApiAction::UPDATE_SUBRESOURCE => ['exclude' => false]]
                             ]
                         ]
                     ]
@@ -408,10 +408,10 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresource->setTargetClassName($targetEntityClass);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
-            ApiActions::ADD_SUBRESOURCE,
-            ApiActions::DELETE_SUBRESOURCE,
-            ApiActions::ADD_RELATIONSHIP,
-            ApiActions::DELETE_RELATIONSHIP
+            ApiAction::ADD_SUBRESOURCE,
+            ApiAction::DELETE_SUBRESOURCE,
+            ApiAction::ADD_RELATIONSHIP,
+            ApiAction::DELETE_RELATIONSHIP
         ]);
         $expectedSubresources->addSubresource('association1', $expectedSubresource);
 
@@ -440,7 +440,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
                             'subresource1' => [
                                 'target_class' => $targetEntityClass,
                                 'target_type'  => 'to-one',
-                                'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['description' => 'test']]
+                                'actions'      => [ApiAction::UPDATE_SUBRESOURCE => ['description' => 'test']]
                             ]
                         ]
                     ]
@@ -460,12 +460,12 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresource->setTargetClassName($targetEntityClass);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
-            ApiActions::ADD_SUBRESOURCE,
-            ApiActions::DELETE_SUBRESOURCE,
-            ApiActions::GET_RELATIONSHIP,
-            ApiActions::UPDATE_RELATIONSHIP,
-            ApiActions::ADD_RELATIONSHIP,
-            ApiActions::DELETE_RELATIONSHIP
+            ApiAction::ADD_SUBRESOURCE,
+            ApiAction::DELETE_SUBRESOURCE,
+            ApiAction::GET_RELATIONSHIP,
+            ApiAction::UPDATE_RELATIONSHIP,
+            ApiAction::ADD_RELATIONSHIP,
+            ApiAction::DELETE_RELATIONSHIP
         ]);
         $expectedSubresources->addSubresource('subresource1', $expectedSubresource);
 
@@ -494,7 +494,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
                             'subresource1' => [
                                 'target_class' => $targetEntityClass,
                                 'target_type'  => 'to-one',
-                                'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+                                'actions'      => [ApiAction::UPDATE_SUBRESOURCE => ['exclude' => false]]
                             ]
                         ]
                     ]
@@ -514,14 +514,14 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresource->setTargetClassName($targetEntityClass);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
-            ApiActions::GET_SUBRESOURCE,
-            ApiActions::UPDATE_SUBRESOURCE,
-            ApiActions::ADD_SUBRESOURCE,
-            ApiActions::DELETE_SUBRESOURCE,
-            ApiActions::GET_RELATIONSHIP,
-            ApiActions::UPDATE_RELATIONSHIP,
-            ApiActions::ADD_RELATIONSHIP,
-            ApiActions::DELETE_RELATIONSHIP
+            ApiAction::GET_SUBRESOURCE,
+            ApiAction::UPDATE_SUBRESOURCE,
+            ApiAction::ADD_SUBRESOURCE,
+            ApiAction::DELETE_SUBRESOURCE,
+            ApiAction::GET_RELATIONSHIP,
+            ApiAction::UPDATE_RELATIONSHIP,
+            ApiAction::ADD_RELATIONSHIP,
+            ApiAction::DELETE_RELATIONSHIP
         ]);
         $expectedSubresources->addSubresource('subresource1', $expectedSubresource);
 
@@ -553,7 +553,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
                     $entityClass => [
                         'subresources' => [
                             'subresource1' => [
-                                'actions' => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+                                'actions' => [ApiAction::UPDATE_SUBRESOURCE => ['exclude' => false]]
                             ]
                         ]
                     ]
@@ -608,13 +608,13 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresource->setAcceptableTargetClassNames([]);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
-            ApiActions::UPDATE_SUBRESOURCE,
-            ApiActions::ADD_SUBRESOURCE,
-            ApiActions::DELETE_SUBRESOURCE,
-            ApiActions::GET_RELATIONSHIP,
-            ApiActions::UPDATE_RELATIONSHIP,
-            ApiActions::ADD_RELATIONSHIP,
-            ApiActions::DELETE_RELATIONSHIP
+            ApiAction::UPDATE_SUBRESOURCE,
+            ApiAction::ADD_SUBRESOURCE,
+            ApiAction::DELETE_SUBRESOURCE,
+            ApiAction::GET_RELATIONSHIP,
+            ApiAction::UPDATE_RELATIONSHIP,
+            ApiAction::ADD_RELATIONSHIP,
+            ApiAction::DELETE_RELATIONSHIP
         ]);
         $expectedSubresources->addSubresource('subresource1', $expectedSubresource);
 
@@ -643,7 +643,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
                             'subresource1' => [
                                 'target_class' => $targetEntityClass,
                                 'target_type'  => 'to-one',
-                                'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => true]]
+                                'actions'      => [ApiAction::UPDATE_SUBRESOURCE => ['exclude' => true]]
                             ]
                         ]
                     ]
@@ -663,13 +663,13 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresource->setTargetClassName($targetEntityClass);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
-            ApiActions::UPDATE_SUBRESOURCE,
-            ApiActions::ADD_SUBRESOURCE,
-            ApiActions::DELETE_SUBRESOURCE,
-            ApiActions::GET_RELATIONSHIP,
-            ApiActions::UPDATE_RELATIONSHIP,
-            ApiActions::ADD_RELATIONSHIP,
-            ApiActions::DELETE_RELATIONSHIP
+            ApiAction::UPDATE_SUBRESOURCE,
+            ApiAction::ADD_SUBRESOURCE,
+            ApiAction::DELETE_SUBRESOURCE,
+            ApiAction::GET_RELATIONSHIP,
+            ApiAction::UPDATE_RELATIONSHIP,
+            ApiAction::ADD_RELATIONSHIP,
+            ApiAction::DELETE_RELATIONSHIP
         ]);
         $expectedSubresources->addSubresource('subresource1', $expectedSubresource);
 
@@ -695,13 +695,13 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
                 'entities' => [
                     $entityClass => [
                         'actions'      => [
-                            ApiActions::UPDATE_SUBRESOURCE => ['exclude' => true]
+                            ApiAction::UPDATE_SUBRESOURCE => ['exclude' => true]
                         ],
                         'subresources' => [
                             'subresource1' => [
                                 'target_class' => $targetEntityClass,
                                 'target_type'  => 'to-one',
-                                'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['description' => 'test']]
+                                'actions'      => [ApiAction::UPDATE_SUBRESOURCE => ['description' => 'test']]
                             ]
                         ]
                     ]
@@ -721,13 +721,13 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresource->setTargetClassName($targetEntityClass);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
-            ApiActions::UPDATE_SUBRESOURCE,
-            ApiActions::ADD_SUBRESOURCE,
-            ApiActions::DELETE_SUBRESOURCE,
-            ApiActions::GET_RELATIONSHIP,
-            ApiActions::UPDATE_RELATIONSHIP,
-            ApiActions::ADD_RELATIONSHIP,
-            ApiActions::DELETE_RELATIONSHIP
+            ApiAction::UPDATE_SUBRESOURCE,
+            ApiAction::ADD_SUBRESOURCE,
+            ApiAction::DELETE_SUBRESOURCE,
+            ApiAction::GET_RELATIONSHIP,
+            ApiAction::UPDATE_RELATIONSHIP,
+            ApiAction::ADD_RELATIONSHIP,
+            ApiAction::DELETE_RELATIONSHIP
         ]);
         $expectedSubresources->addSubresource('subresource1', $expectedSubresource);
 
@@ -753,13 +753,13 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
                 'entities' => [
                     $entityClass => [
                         'actions'      => [
-                            ApiActions::CREATE => ['exclude' => true]
+                            ApiAction::CREATE => ['exclude' => true]
                         ],
                         'subresources' => [
                             'subresource1' => [
                                 'target_class' => $targetEntityClass,
                                 'target_type'  => 'to-one',
-                                'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['description' => 'test']]
+                                'actions'      => [ApiAction::UPDATE_SUBRESOURCE => ['description' => 'test']]
                             ]
                         ]
                     ]
@@ -779,12 +779,12 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $expectedSubresource->setTargetClassName($targetEntityClass);
         $expectedSubresource->setIsCollection(false);
         $expectedSubresource->setExcludedActions([
-            ApiActions::ADD_SUBRESOURCE,
-            ApiActions::DELETE_SUBRESOURCE,
-            ApiActions::GET_RELATIONSHIP,
-            ApiActions::UPDATE_RELATIONSHIP,
-            ApiActions::ADD_RELATIONSHIP,
-            ApiActions::DELETE_RELATIONSHIP
+            ApiAction::ADD_SUBRESOURCE,
+            ApiAction::DELETE_SUBRESOURCE,
+            ApiAction::GET_RELATIONSHIP,
+            ApiAction::UPDATE_RELATIONSHIP,
+            ApiAction::ADD_RELATIONSHIP,
+            ApiAction::DELETE_RELATIONSHIP
         ]);
         $expectedSubresources->addSubresource('subresource1', $expectedSubresource);
 

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest;
 
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -23,49 +23,49 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
     protected function addStatusCodes(StatusCodesConfig $statusCodes, $targetAction)
     {
         switch ($targetAction) {
-            case ApiActions::GET_LIST:
+            case ApiAction::GET_LIST:
                 $this->addStatusCodesForGetList($statusCodes);
                 break;
-            case ApiActions::GET:
+            case ApiAction::GET:
                 $this->addStatusCodesForGet($statusCodes);
                 break;
-            case ApiActions::UPDATE:
+            case ApiAction::UPDATE:
                 $this->addStatusCodesForUpdate($statusCodes);
                 break;
-            case ApiActions::CREATE:
+            case ApiAction::CREATE:
                 $this->addStatusCodesForCreate($statusCodes);
                 break;
-            case ApiActions::DELETE:
+            case ApiAction::DELETE:
                 $this->addStatusCodesForDelete($statusCodes);
                 break;
-            case ApiActions::DELETE_LIST:
+            case ApiAction::DELETE_LIST:
                 $this->addStatusCodesForDeleteList($statusCodes);
                 break;
-            case ApiActions::GET_SUBRESOURCE:
+            case ApiAction::GET_SUBRESOURCE:
                 $this->addStatusCodesForGetSubresource($statusCodes);
                 break;
-            case ApiActions::UPDATE_SUBRESOURCE:
+            case ApiAction::UPDATE_SUBRESOURCE:
                 $this->addStatusCodesForUpdateSubresource($statusCodes);
                 break;
-            case ApiActions::ADD_SUBRESOURCE:
+            case ApiAction::ADD_SUBRESOURCE:
                 $this->addStatusCodesForAddSubresource($statusCodes);
                 break;
-            case ApiActions::DELETE_SUBRESOURCE:
+            case ApiAction::DELETE_SUBRESOURCE:
                 $this->addStatusCodesForDeleteSubresource($statusCodes);
                 break;
-            case ApiActions::GET_RELATIONSHIP:
+            case ApiAction::GET_RELATIONSHIP:
                 $this->addStatusCodesForGetRelationship($statusCodes);
                 break;
-            case ApiActions::UPDATE_RELATIONSHIP:
+            case ApiAction::UPDATE_RELATIONSHIP:
                 $this->addStatusCodesForUpdateRelationship($statusCodes);
                 break;
-            case ApiActions::ADD_RELATIONSHIP:
+            case ApiAction::ADD_RELATIONSHIP:
                 $this->addStatusCodesForAddRelationship($statusCodes);
                 break;
-            case ApiActions::DELETE_RELATIONSHIP:
+            case ApiAction::DELETE_RELATIONSHIP:
                 $this->addStatusCodesForDeleteRelationship($statusCodes);
                 break;
-            case ApiActions::OPTIONS:
+            case ApiAction::OPTIONS:
                 $this->addStatusCodesForOptions($statusCodes);
                 break;
         }

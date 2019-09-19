@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Functional\DocumentationTestTrait;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
@@ -53,7 +53,7 @@ class DocumentationTest extends RestJsonApiTestCase
     public function testSimpleDataTypesInRequestAndResponse()
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
-        $docs = $this->getEntityDocsForAction($entityType, ApiActions::CREATE);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::CREATE);
 
         $data = $this->getSimpleFormatter()->format($docs);
         $resourceData = reset($data);
@@ -71,7 +71,7 @@ class DocumentationTest extends RestJsonApiTestCase
         $docs = $this->getSubresourceEntityDocsForAction(
             $entityType,
             'entity-identifier-target',
-            ApiActions::GET_SUBRESOURCE
+            ApiAction::GET_SUBRESOURCE
         );
 
         $data = $this->getSimpleFormatter()->format($docs);
@@ -89,7 +89,7 @@ class DocumentationTest extends RestJsonApiTestCase
         $docs = $this->getSubresourceEntityDocsForAction(
             $entityType,
             'unregistered-target',
-            ApiActions::GET_SUBRESOURCE
+            ApiAction::GET_SUBRESOURCE
         );
 
         self::assertEmpty($docs);
@@ -101,7 +101,7 @@ class DocumentationTest extends RestJsonApiTestCase
     public function testSimpleDataTypesInFilters()
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
-        $docs = $this->getEntityDocsForAction($entityType, ApiActions::GET_LIST);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::GET_LIST);
 
         $data = $this->getSimpleFormatter()->format($docs);
         $resourceData = reset($data);
@@ -116,7 +116,7 @@ class DocumentationTest extends RestJsonApiTestCase
     public function testAssociationsInRequestAndResponse()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
-        $docs = $this->getEntityDocsForAction($entityType, ApiActions::CREATE);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::CREATE);
 
         $data = $this->getSimpleFormatter()->format($docs);
         $resourceData = reset($data);
@@ -131,7 +131,7 @@ class DocumentationTest extends RestJsonApiTestCase
     public function testAssociationsInFilters()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
-        $docs = $this->getEntityDocsForAction($entityType, ApiActions::GET_LIST);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::GET_LIST);
 
         $data = $this->getSimpleFormatter()->format($docs);
         $resourceData = reset($data);
@@ -146,7 +146,7 @@ class DocumentationTest extends RestJsonApiTestCase
     public function testResourceWithoutIdentifier()
     {
         $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
-        $docs = $this->getEntityDocsForAction($entityType, ApiActions::CREATE);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::CREATE);
 
         $data = $this->getSimpleFormatter()->format($docs);
         $resourceData = reset($data);

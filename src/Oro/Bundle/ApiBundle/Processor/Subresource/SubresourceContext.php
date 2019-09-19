@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource;
 
-use Oro\Bundle\ApiBundle\Config\ConfigExtraCollection;
-use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraCollection;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
-use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Metadata\HateoasMetadataExtra;
-use Oro\Bundle\ApiBundle\Metadata\MetadataExtraCollection;
-use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
+use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\Extra\HateoasMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraCollection;
+use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;

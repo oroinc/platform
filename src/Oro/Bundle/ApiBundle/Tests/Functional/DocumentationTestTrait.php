@@ -6,7 +6,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
 use Nelmio\ApiDocBundle\Formatter\FormatterInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\Extractor\CachingApiDocExtractor;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -28,32 +28,32 @@ trait DocumentationTestTrait
      * @var array
      */
     private static $defaultDocumentation = [
-        ApiActions::GET                 => 'Get an entity',
-        ApiActions::GET_LIST            => 'Get a list of entities',
-        ApiActions::DELETE              => 'Delete an entity',
-        ApiActions::DELETE_LIST         => 'Delete a list of entities',
-        ApiActions::CREATE              => 'Create an entity',
-        ApiActions::UPDATE              => 'Update an entity',
-        ApiActions::GET_SUBRESOURCE     => [
+        ApiAction::GET                 => 'Get an entity',
+        ApiAction::GET_LIST            => 'Get a list of entities',
+        ApiAction::DELETE              => 'Delete an entity',
+        ApiAction::DELETE_LIST         => 'Delete a list of entities',
+        ApiAction::CREATE              => 'Create an entity',
+        ApiAction::UPDATE              => 'Update an entity',
+        ApiAction::GET_SUBRESOURCE     => [
             'Get a related entity',
             'Get a list of related entities'
         ],
-        ApiActions::DELETE_SUBRESOURCE  => [
+        ApiAction::DELETE_SUBRESOURCE  => [
             'Delete the specified related entity',
             'Delete the specified related entities'
         ],
-        ApiActions::ADD_SUBRESOURCE     => [
+        ApiAction::ADD_SUBRESOURCE     => [
             'Add the specified related entity',
             'Add the specified related entities'
         ],
-        ApiActions::UPDATE_SUBRESOURCE  => [
+        ApiAction::UPDATE_SUBRESOURCE  => [
             'Update the specified related entity',
             'Update the specified related entities'
         ],
-        ApiActions::GET_RELATIONSHIP    => 'Get the relationship data',
-        ApiActions::DELETE_RELATIONSHIP => 'Delete the specified members from the relationship',
-        ApiActions::ADD_RELATIONSHIP    => 'Add the specified members to the relationship',
-        ApiActions::UPDATE_RELATIONSHIP => [
+        ApiAction::GET_RELATIONSHIP    => 'Get the relationship data',
+        ApiAction::DELETE_RELATIONSHIP => 'Delete the specified members from the relationship',
+        ApiAction::ADD_RELATIONSHIP    => 'Add the specified members to the relationship',
+        ApiAction::UPDATE_RELATIONSHIP => [
             'Update the relationship',
             'Completely replace every member of the relationship'
         ]
@@ -358,7 +358,7 @@ trait DocumentationTestTrait
      */
     private function checkOptionsDocumentationForEntity($entityType)
     {
-        $docs = $this->getEntityDocsForAction($entityType, ApiActions::OPTIONS);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::OPTIONS);
         $data = $this->getSimpleFormatter()->format($docs);
         foreach ($data as $resource => $resourceData) {
             $resourceData = reset($resourceData);

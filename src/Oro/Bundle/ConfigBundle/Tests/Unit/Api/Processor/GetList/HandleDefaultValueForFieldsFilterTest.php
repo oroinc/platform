@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Api\Processor\GetList;
 
-use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\ConfigBundle\Api\Processor\GetList\HandleDefaultValueForFieldsFilter;
 

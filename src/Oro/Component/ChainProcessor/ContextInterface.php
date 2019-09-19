@@ -64,7 +64,7 @@ interface ContextInterface extends \ArrayAccess
     /**
      * Sets a group starting from which processors should be executed
      *
-     * @param string $group
+     * @param string|null $group
      */
     public function setFirstGroup($group);
 
@@ -78,7 +78,7 @@ interface ContextInterface extends \ArrayAccess
     /**
      * Sets a group after which processors should not be executed
      *
-     * @param string $group
+     * @param string|null $group
      */
     public function setLastGroup($group);
 

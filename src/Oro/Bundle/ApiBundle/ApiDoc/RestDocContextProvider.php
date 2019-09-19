@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Options\OptionsContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -58,7 +59,7 @@ class RestDocContextProvider
         $context->addConfigExtra(new DescriptionsConfigExtra());
         $context->getRequestType()->set($this->docViewDetector->getRequestType());
         $context->setVersion($this->docViewDetector->getVersion());
-        $context->setLastGroup('initialize');
+        $context->setLastGroup(ApiActionGroup::INITIALIZE);
         $context->setMasterRequest(true);
         if ($associationName && $context instanceof SubresourceContext) {
             $context->setParentClassName($entityClass);

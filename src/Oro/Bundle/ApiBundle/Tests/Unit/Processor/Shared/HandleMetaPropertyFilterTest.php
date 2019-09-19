@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Config\MetaPropertiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\MetaPropertiesConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterNames;
 use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;

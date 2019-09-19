@@ -3,7 +3,7 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Api\Processor\Config;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValidationHelper;
@@ -74,7 +74,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject($config);
         $this->context->setResult($configObject);
-        $this->context->setTargetAction(ApiActions::UPDATE);
+        $this->context->setTargetAction(ApiAction::UPDATE);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -104,7 +104,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject($config);
         $this->context->setResult($configObject);
-        $this->context->setTargetAction(ApiActions::UPDATE);
+        $this->context->setTargetAction(ApiAction::UPDATE);
         $this->processor->process($this->context);
 
         self::assertNull($configObject->getFormOptions());

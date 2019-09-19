@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\RouteLinkMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\AbstractDocumentBuilder as ApiDoc;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -68,8 +68,8 @@ class AddHateoasLinksForRelationship implements ProcessorInterface
         );
         if (null === $subresource
             || (
-                $subresource->isExcludedAction(ApiActions::GET_RELATIONSHIP)
-                && $subresource->isExcludedAction(ApiActions::GET_SUBRESOURCE)
+                $subresource->isExcludedAction(ApiAction::GET_RELATIONSHIP)
+                && $subresource->isExcludedAction(ApiAction::GET_SUBRESOURCE)
             )
         ) {
             return;
@@ -78,7 +78,7 @@ class AddHateoasLinksForRelationship implements ProcessorInterface
         $routes = $this->routesRegistry->getRoutes($requestType);
         $parentEntityAlias = $documentBuilder->getEntityAlias($context->getParentClassName(), $requestType);
         $parentEntityId = $documentBuilder->getEntityId($context->getParentId(), $requestType, $parentMetadata);
-        if (!$subresource->isExcludedAction(ApiActions::GET_RELATIONSHIP)) {
+        if (!$subresource->isExcludedAction(ApiAction::GET_RELATIONSHIP)) {
             $documentBuilder->addLinkMetadata(ApiDoc::LINK_SELF, new RouteLinkMetadata(
                 $this->urlGenerator,
                 $routes->getRelationshipRouteName(),
@@ -90,7 +90,7 @@ class AddHateoasLinksForRelationship implements ProcessorInterface
                 ]
             ));
         }
-        if (!$subresource->isExcludedAction(ApiActions::GET_SUBRESOURCE)) {
+        if (!$subresource->isExcludedAction(ApiAction::GET_SUBRESOURCE)) {
             $documentBuilder->addLinkMetadata(ApiDoc::LINK_RELATED, new RouteLinkMetadata(
                 $this->urlGenerator,
                 $routes->getSubresourceRouteName(),

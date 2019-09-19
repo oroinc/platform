@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodeConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\JsonApi\CompleteStatusCodes;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,7 +40,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
             ->willReturn(false);
 
         $this->context->setResult($definition);
-        $this->context->setTargetAction(ApiActions::CREATE);
+        $this->context->setTargetAction(ApiAction::CREATE);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -66,7 +66,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
             ->willReturn(true);
 
         $this->context->setResult($definition);
-        $this->context->setTargetAction(ApiActions::CREATE);
+        $this->context->setTargetAction(ApiAction::CREATE);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -102,7 +102,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
             ->willReturn(false);
 
         $this->context->setResult($definition);
-        $this->context->setTargetAction(ApiActions::CREATE);
+        $this->context->setTargetAction(ApiAction::CREATE);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -141,7 +141,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
             ->willReturn(['id']);
 
         $this->context->setResult($definition);
-        $this->context->setTargetAction(ApiActions::CREATE);
+        $this->context->setTargetAction(ApiAction::CREATE);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -180,7 +180,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
             ->willReturn(['id']);
 
         $this->context->setResult($definition);
-        $this->context->setTargetAction(ApiActions::CREATE);
+        $this->context->setTargetAction(ApiAction::CREATE);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -220,7 +220,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
             ->willReturn(['id']);
 
         $this->context->setResult($definition);
-        $this->context->setTargetAction(ApiActions::CREATE);
+        $this->context->setTargetAction(ApiAction::CREATE);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -240,7 +240,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
         $definition->getStatusCodes()->addCode(Response::HTTP_CONFLICT, new StatusCodeConfig());
 
         $this->context->setResult($definition);
-        $this->context->setTargetAction(ApiActions::CREATE);
+        $this->context->setTargetAction(ApiAction::CREATE);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -257,7 +257,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
         $definition->setStatusCodes(new StatusCodesConfig());
 
         $this->context->setResult($definition);
-        $this->context->setTargetAction(ApiActions::UPDATE);
+        $this->context->setTargetAction(ApiAction::UPDATE);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -278,7 +278,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
         $definition->getStatusCodes()->addCode(Response::HTTP_CONFLICT, new StatusCodeConfig());
 
         $this->context->setResult($definition);
-        $this->context->setTargetAction(ApiActions::UPDATE);
+        $this->context->setTargetAction(ApiAction::UPDATE);
         $this->processor->process($this->context);
 
         self::assertEquals(

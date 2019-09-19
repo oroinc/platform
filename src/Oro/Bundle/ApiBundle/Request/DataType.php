@@ -11,24 +11,27 @@ namespace Oro\Bundle\ApiBundle\Request;
  */
 final class DataType
 {
-    const INTEGER          = 'integer';
-    const SMALLINT         = 'smallint';
-    const BIGINT           = 'bigint';
-    const UNSIGNED_INTEGER = 'unsignedInteger';
-    const STRING           = 'string';
-    const BOOLEAN          = 'boolean';
-    const DECIMAL          = 'decimal';
-    const FLOAT            = 'float';
-    const DATETIME         = 'datetime';
-    const DATE             = 'date';
-    const TIME             = 'time';
-    const PERCENT          = 'percent';
-    const MONEY            = 'money';
-    const DURATION         = 'duration';
-    const GUID             = 'guid';
-    const ENTITY_TYPE      = 'entityType';
-    const ENTITY_CLASS     = 'entityClass';
-    const ORDER_BY         = 'orderBy';
+    public const INTEGER          = 'integer';
+    public const SMALLINT         = 'smallint';
+    public const BIGINT           = 'bigint';
+    public const UNSIGNED_INTEGER = 'unsignedInteger';
+    public const STRING           = 'string';
+    public const BOOLEAN          = 'boolean';
+    public const DECIMAL          = 'decimal';
+    public const FLOAT            = 'float';
+    public const DATETIME         = 'datetime';
+    public const DATE             = 'date';
+    public const TIME             = 'time';
+    public const PERCENT          = 'percent';
+    public const MONEY            = 'money';
+    public const DURATION         = 'duration';
+    public const GUID             = 'guid';
+    public const ARRAY            = 'array';
+    public const OBJECT           = 'object';
+    public const SCALAR           = 'scalar';
+    public const ENTITY_TYPE      = 'entityType';
+    public const ENTITY_CLASS     = 'entityClass';
+    public const ORDER_BY         = 'orderBy';
 
     private const NESTED_OBJECT                   = 'nestedObject';
     private const NESTED_ASSOCIATION              = 'nestedAssociation';

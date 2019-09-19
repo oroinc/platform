@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Config\MetaPropertiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\MetaPropertiesConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;

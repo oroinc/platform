@@ -270,35 +270,35 @@ services:
             - { name: kernel.event_listener, event: oro_featuretoggle.features.change, method: clearCache }
 
     oro_api.config_extension_registry:
-        class: Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry
+        class: Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry
         arguments:
             - 0 # config_max_nesting_level; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
 
     oro_api.config_extension.filters:
-        class: Oro\Bundle\ApiBundle\Config\FiltersConfigExtension
+        class: Oro\Bundle\ApiBundle\Config\Extension\FiltersConfigExtension
         public: false
         arguments:
             - '@oro_api.filter_operator_registry'
 
     oro_api.config_extension.sorters:
-        class: Oro\Bundle\ApiBundle\Config\SortersConfigExtension
+        class: Oro\Bundle\ApiBundle\Config\Extension\SortersConfigExtension
         public: false
 
     oro_api.config_extension.actions:
-        class: Oro\Bundle\ApiBundle\Config\ActionsConfigExtension
+        class: Oro\Bundle\ApiBundle\Config\Extension\ActionsConfigExtension
         public: false
         arguments:
             - '@oro_api.action_processor_bag'
 
     oro_api.config_extension.subresources:
-        class: Oro\Bundle\ApiBundle\Config\SubresourcesConfigExtension
+        class: Oro\Bundle\ApiBundle\Config\Extension\SubresourcesConfigExtension
         public: false
         arguments:
             - '@oro_api.action_processor_bag'
             - '@oro_api.filter_operator_registry'
 
     oro_api.config_extension.feature:
-        class: 'Oro\Bundle\ApiBundle\Config\FeatureConfigurationExtension'
+        class: Oro\Bundle\ApiBundle\Config\Extension\FeatureConfigurationExtension
         tags:
             - { name: oro_feature.config_extension }
 
@@ -347,7 +347,7 @@ services:
             - '@oro_api.request_expression_matcher'
 
     oro_api.config_loader_factory:
-        class: Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory
+        class: Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory
         public: false
         arguments:
             - '@oro_api.config_extension_registry'

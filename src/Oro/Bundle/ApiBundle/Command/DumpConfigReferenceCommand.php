@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
-use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
+use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

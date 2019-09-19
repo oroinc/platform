@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig;
 
+use Oro\Bundle\ApiBundle\Config\Loader\StatusCodesConfigLoader;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
-use Oro\Bundle\ApiBundle\Config\StatusCodesConfigLoader;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**

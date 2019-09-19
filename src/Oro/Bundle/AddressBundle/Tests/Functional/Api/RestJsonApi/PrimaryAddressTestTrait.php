@@ -4,7 +4,7 @@ namespace Oro\Bundle\AddressBundle\Tests\Functional\Api\RestJsonApi;
 
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\FormBundle\Entity\PrimaryItem;
 
 /**
@@ -89,7 +89,7 @@ trait PrimaryAddressTestTrait
 
     public function testCreateOneMorePrimaryAddressViaOwnerEntityUpdateResource()
     {
-        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiAction::UPDATE)) {
             self::markTestSkipped('The "update" action is disabled for owner entity');
         }
 
@@ -171,7 +171,7 @@ trait PrimaryAddressTestTrait
 
     public function testCreateNotPrimaryAddressWithOwnerEntityRelationshipViaOwnerEntityUpdateResource()
     {
-        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiAction::UPDATE)) {
             self::markTestSkipped('The "update" action is disabled for owner entity');
         }
 
@@ -221,7 +221,7 @@ trait PrimaryAddressTestTrait
 
     public function testCreateNotPrimaryAddressWithoutOwnerEntityRelationshipViaOwnerEntityUpdateResource()
     {
-        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiAction::UPDATE)) {
             self::markTestSkipped('The "update" action is disabled for owner entity');
         }
 
@@ -268,7 +268,7 @@ trait PrimaryAddressTestTrait
 
     public function testCreateSeveralPrimaryAddressesWithOwnerEntityRelationshipViaOwnerEntityUpdateResource()
     {
-        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiAction::UPDATE)) {
             self::markTestSkipped('The "update" action is disabled for owner entity');
         }
 
@@ -327,7 +327,7 @@ trait PrimaryAddressTestTrait
 
     public function testCreateSeveralPrimaryAddressesWithoutOwnerEntityRelationshipViaOwnerEntityUpdateResource()
     {
-        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiAction::UPDATE)) {
             self::markTestSkipped('The "update" action is disabled for owner entity');
         }
 
