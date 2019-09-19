@@ -109,8 +109,6 @@
         "npm-asset/requirejs": "2.3.*",
         "npm-asset/xregexp": "3.2.*",
         "npm-asset/css-vars-ponyfill": "^2.0",
-        "npm-asset/grapesjs": "0.15.3-RC.2",
-        "npm-asset/grapesjs-preset-webpage": "0.1.11",
         "robloach/component-installer": "0.2.*",
         "jms/cg": "1.2.*",
         "oro/redis-config": "4.0.*",
