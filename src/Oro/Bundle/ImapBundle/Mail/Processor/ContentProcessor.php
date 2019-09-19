@@ -4,8 +4,12 @@ namespace Oro\Bundle\ImapBundle\Mail\Processor;
 
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
 use Zend\Mail\Header\ContentType;
+use Zend\Mail\Header\HeaderInterface;
 use Zend\Mail\Storage\Part\PartInterface;
 
+/**
+ * Process email content based on type and parts.
+ */
 class ContentProcessor
 {
     /**
@@ -75,7 +79,6 @@ class ContentProcessor
             $contentType = $contentTypeHeader->getType();
             $charset     = $contentTypeHeader->getParameter('charset');
 
-            // TODO BAP-7343 Remove this quick fix
             if (null === $charset) {
                 foreach ($contentTypeHeader->getParameters() as $key => $paramValue) {
                     if ('charset' === trim($key)) {
@@ -95,6 +98,7 @@ class ContentProcessor
         if ($part->getHeaders()->has($headerKey)) {
             $header = $part->getHeader($headerKey);
             if ($header instanceof \ArrayIterator) {
+                /** @var HeaderInterface $headerItem */
                 foreach ($header as $headerItem) {
                     if ($headerItem->getFieldName() === $headerKey) {
                         $contentTransferEncoding = $headerItem->getFieldValue();

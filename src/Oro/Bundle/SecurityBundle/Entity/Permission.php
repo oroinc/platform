@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Permission entity
+ *
  * @ORM\Table("oro_security_permission")
  * @ORM\Entity(repositoryClass="Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository")
  */
@@ -86,7 +88,7 @@ class Permission
     protected $excludeEntities;
 
     /**
-     * @var array
+     * @var Collection
      *
      * @ORM\Column(name="group_names", type="array")
      */

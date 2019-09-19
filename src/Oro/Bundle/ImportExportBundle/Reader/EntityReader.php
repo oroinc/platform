@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
@@ -192,7 +193,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
     }
 
     /**
-     * @param ObjectManager $entityManager
+     * @param ObjectManager|EntityManager $entityManager
      * @param string $entityName
      * @param array $options
      *
@@ -203,6 +204,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         string $entityName,
         array $options = []
     ): QueryBuilder {
+        /** @var ClassMetadata $metadata */
         $metadata = $entityManager->getClassMetadata($entityName);
         $identifierName = $metadata->getSingleIdentifierFieldName();
         $queryBuilder = $entityManager
