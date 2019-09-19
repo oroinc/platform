@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Behat\Context;
 
-use Behat\Mink\Session;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\CookieJar;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
@@ -66,26 +64,6 @@ abstract class AttachmentContext extends OroFeatureContext
     protected function getAttachmentManager(): AttachmentManager
     {
         return $this->getContainer()->get('oro_attachment.manager');
-    }
-
-    /**
-     * @param Session $session
-     *
-     * @return CookieJar
-     */
-    private function getCookieJar(Session $session): CookieJar
-    {
-        $sessionCookies = $session->getDriver()->getWebDriverSession()->getCookie();
-        $cookies = [];
-        foreach ($sessionCookies as $sessionCookie) {
-            $cookie = [];
-            foreach ($sessionCookie as $key => $value) {
-                $cookie[ucwords($key, '-')] = $value;
-            }
-            $cookies[] = $cookie;
-        }
-
-        return new CookieJar(false, $cookies);
     }
 
     /**

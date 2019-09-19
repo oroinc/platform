@@ -148,3 +148,7 @@ If you want to apply access rule expressions to your type of queries, use a clas
 For example, [AstVisitor](../../ORM/Walker/AstVisitor.php) converts access rule expressions to Doctrine AST conditions.
 
 Check [AccessRuleWalker](../../ORM/Walker/AccessRuleWalker.php) for details on how to use this visitor.
+
+## Adding OR Expressions
+
+When adding OR expressions, they should be added with the lowest priority. If OR expression is added first, it will effectively function as AND expression.

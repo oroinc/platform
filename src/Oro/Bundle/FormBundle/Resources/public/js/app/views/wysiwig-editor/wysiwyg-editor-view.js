@@ -212,7 +212,8 @@ define(function(require) {
         },
 
         findFirstQuoteLine: function() {
-            var quote = $('<div>').html(this.$el[0].value).find('.quote').html();
+            var quoteElement = $.parseHTML('<div>' + this.$el[0].value + '</div>');
+            var quote = $(quoteElement).find('.quote').html();
             if (quote) {
                 quote = txtHtmlTransformer.html2text(quote);
                 this.firstQuoteLine = _.find(quote.split(/(\n\r?|\r\n?)/g), function(line) {

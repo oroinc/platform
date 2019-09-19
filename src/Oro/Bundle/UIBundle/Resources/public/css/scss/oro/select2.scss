@@ -49,8 +49,8 @@
             max-width: $select2-container-horizontal-max-width;
         }
 
-        .input-append &,
-        .input-prepend & {
+        @at-root #{map_get($oro-form-selectors, 'select2-append'),
+                   map_get($oro-form-selectors, 'select2-prepend')} {
             width: $select2-container-input-append-width;
             max-width: $select2-container-input-append-max-width;
         }
