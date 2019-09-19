@@ -10,6 +10,7 @@ use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
 
 /**
  * Walker that apply access rule conditions to DBAL query.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AccessRuleWalker extends TreeWalkerAdapter
 {

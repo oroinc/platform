@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -88,7 +88,7 @@ class ApiDocMetadataParser implements ParserInterface
         $associationsData = [];
 
         $identifiers = $metadata->getIdentifierFieldNames();
-        $isReadOnlyIdentifier = ApiActions::CREATE === $action && $metadata->hasIdentifierGenerator();
+        $isReadOnlyIdentifier = ApiAction::CREATE === $action && $metadata->hasIdentifierGenerator();
 
         $fields = $metadata->getFields();
         foreach ($fields as $fieldName => $fieldMetadata) {

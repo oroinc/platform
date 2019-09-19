@@ -7,8 +7,8 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
-use Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextStub;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
@@ -147,9 +147,9 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $expectedGetContext->setSharedData($this->sharedData);
         $expectedGetContext->setClassName($this->context->getClassName());
         $expectedGetContext->setId($this->context->getId());
-        $expectedGetContext->skipGroup('security_check');
-        $expectedGetContext->skipGroup('data_security_check');
-        $expectedGetContext->skipGroup(NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        $expectedGetContext->skipGroup(ApiActionGroup::SECURITY_CHECK);
+        $expectedGetContext->skipGroup(ApiActionGroup::DATA_SECURITY_CHECK);
+        $expectedGetContext->skipGroup(ApiActionGroup::NORMALIZE_RESULT);
         $expectedGetContext->setSoftErrorsHandling(true);
 
         $getProcessor->expects(self::once())

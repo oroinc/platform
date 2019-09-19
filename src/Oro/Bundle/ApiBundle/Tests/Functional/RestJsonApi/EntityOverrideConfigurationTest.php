@@ -3,12 +3,12 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
@@ -73,10 +73,10 @@ class EntityOverrideConfigurationTest extends RestJsonApiTestCase
     public function apiActionsProvider()
     {
         return [
-            [ApiActions::GET],
-            [ApiActions::CREATE],
-            [ApiActions::UPDATE],
-            [ApiActions::DELETE]
+            [ApiAction::GET],
+            [ApiAction::CREATE],
+            [ApiAction::UPDATE],
+            [ApiAction::DELETE]
         ];
     }
 

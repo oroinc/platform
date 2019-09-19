@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 
 class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase

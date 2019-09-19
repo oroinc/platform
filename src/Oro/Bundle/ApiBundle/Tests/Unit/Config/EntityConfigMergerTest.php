@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
-use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSettingsInterface;
 use Oro\Bundle\ApiBundle\Config\EntityConfigMerger;
+use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
 
 class EntityConfigMergerTest extends \PHPUnit\Framework\TestCase
 {

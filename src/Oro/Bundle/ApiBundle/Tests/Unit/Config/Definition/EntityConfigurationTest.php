@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Definition;
 
-use Oro\Bundle\ApiBundle\Config\ActionsConfigExtension;
-use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityDefinitionConfiguration;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
-use Oro\Bundle\ApiBundle\Config\SubresourcesConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\ActionsConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
+use Oro\Bundle\ApiBundle\Config\Extension\FiltersConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\SortersConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\SubresourcesConfigExtension;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub\TestConfigExtension;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -41,17 +41,17 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
         $actionProcessorBag->expects(self::any())
             ->method('getActions')
             ->willReturn([
-                ApiActions::GET,
-                ApiActions::GET_LIST,
-                ApiActions::UPDATE,
-                ApiActions::CREATE,
-                ApiActions::DELETE,
-                ApiActions::DELETE_LIST,
-                ApiActions::GET_SUBRESOURCE,
-                ApiActions::GET_RELATIONSHIP,
-                ApiActions::UPDATE_RELATIONSHIP,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::GET,
+                ApiAction::GET_LIST,
+                ApiAction::UPDATE,
+                ApiAction::CREATE,
+                ApiAction::DELETE,
+                ApiAction::DELETE_LIST,
+                ApiAction::GET_SUBRESOURCE,
+                ApiAction::GET_RELATIONSHIP,
+                ApiAction::UPDATE_RELATIONSHIP,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]);
         $filterOperatorRegistry = new FilterOperatorRegistry([
             ComparisonFilter::EQ              => '=',

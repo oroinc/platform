@@ -154,6 +154,8 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         $eventName = 'test_event';
         $this->context->setEvent($eventName);
         self::assertEquals($eventName, $this->context->getEvent());
+        self::assertEquals($eventName, $this->context->getFirstGroup());
+        self::assertEquals($eventName, $this->context->getLastGroup());
     }
 
     public function testParentAction()

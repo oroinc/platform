@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetMetadata;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
+use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
 /**
@@ -157,9 +157,10 @@ class MetadataContext extends ApiContext
         $names = [];
         foreach ($extras as $extra) {
             if (!$extra instanceof MetadataExtraInterface) {
-                throw new \InvalidArgumentException(
-                    'Expected an array of "Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface".'
-                );
+                throw new \InvalidArgumentException(sprintf(
+                    'Expected an array of "%s".',
+                    MetadataExtraInterface::class
+                ));
             }
             $names[] = $extra->getName();
             $extra->configureContext($this);

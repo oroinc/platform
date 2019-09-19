@@ -41,8 +41,6 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
     {
         /** @var CustomizeLoadedDataContext $context */
 
-        $data = $context->getData();
-
         $config = $context->getConfig();
         if (null === $config) {
             return;
@@ -53,19 +51,35 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
             return;
         }
 
-        list($ids, $idsPerField) = $this->getLocalizedFallbackValueIds($fieldNames, $config, $context, $data);
+        $data = $context->getData();
+
+        $ids = [];
+        $idsPerField = [];
+        foreach ($data as $key => $item) {
+            list($itemIds, $itemIdsPerField) = $this->getLocalizedFallbackValueIds(
+                $fieldNames,
+                $config,
+                $context,
+                $item
+            );
+            if (!empty($itemIds)) {
+                $ids[] = $itemIds;
+                $idsPerField[$key] = $itemIdsPerField;
+            }
+        }
         if (empty($ids)) {
             return;
         }
 
-        $valuesPerField = $this->groupLocalizedFallbackValues(
-            $this->loadLocalizedFallbackValues(array_unique($ids)),
-            $idsPerField
-        );
-        foreach ($fieldNames as $fieldName) {
-            $data[$fieldName] = isset($valuesPerField[$fieldName])
-                ? $this->getLocalizedValue($valuesPerField[$fieldName])
-                : null;
+        $ids = array_unique(array_merge(...$ids));
+        $values = $this->loadLocalizedFallbackValues($ids);
+        foreach ($idsPerField as $key => $itemIdsPerField) {
+            $valuesPerField = $this->groupLocalizedFallbackValues($values, $itemIdsPerField);
+            foreach ($fieldNames as $fieldName) {
+                $data[$key][$fieldName] = isset($valuesPerField[$fieldName])
+                    ? $this->getLocalizedValue($valuesPerField[$fieldName])
+                    : null;
+            }
         }
         $context->setData($data);
     }
@@ -76,7 +90,7 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
      * @param CustomizeLoadedDataContext $context
      * @param array                      $data
      *
-     * @return array [ids, idsPerField]
+     * @return array [ids, idsPerField ([field name => id, ...])]
      */
     private function getLocalizedFallbackValueIds(
         array $fieldNames,
@@ -114,40 +128,40 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
     /**
      * @param int[] $ids
      *
-     * @return LocalizedFallbackValue[]
+     * @return LocalizedFallbackValue[] [id => value, ...]
      */
     private function loadLocalizedFallbackValues(array $ids): array
     {
-        return $this->doctrineHelper
-            ->getEntityManagerForClass(LocalizedFallbackValue::class)
-            ->createQueryBuilder()
-            ->from(LocalizedFallbackValue::class, 'e')
-            ->select('e')
+        /** @var LocalizedFallbackValue[] $values */
+        $values = $this->doctrineHelper
+            ->createQueryBuilder(LocalizedFallbackValue::class, 'e')
             ->where('e.id IN (:ids)')
             ->setParameter('ids', $ids)
             ->getQuery()
             ->getResult();
+
+        $result = [];
+        foreach ($values as $value) {
+            $result[$value->getId()] = $value;
+        }
+
+        return $result;
     }
 
     /**
-     * @param LocalizedFallbackValue[] $values
+     * @param LocalizedFallbackValue[] $values      [id => value, ...]
      * @param array                    $idsPerField [field name => [localized fallback value ID. ...], ...]
      *
      * @return array [field name => localized fallback value collection, ...]
      */
     private function groupLocalizedFallbackValues(array $values, array $idsPerField): array
     {
-        $valuesMap = [];
-        foreach ($values as $value) {
-            $valuesMap[$value->getId()] = $value;
-        }
-
         $result = [];
         foreach ($idsPerField as $fieldName => $ids) {
             $collection = new ArrayCollection();
             foreach ($ids as $id) {
-                if (isset($valuesMap[$id])) {
-                    $collection->add($valuesMap[$id]);
+                if (isset($values[$id])) {
+                    $collection->add($values[$id]);
                 }
             }
             if (!$collection->isEmpty()) {

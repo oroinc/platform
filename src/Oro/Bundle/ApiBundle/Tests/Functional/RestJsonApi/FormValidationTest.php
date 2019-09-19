@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
@@ -22,7 +22,7 @@ class FormValidationTest extends RestJsonApiTestCase
      */
     public function testCreateRequests($entityClass, $excludedActions)
     {
-        if (in_array(ApiActions::CREATE, $excludedActions, true)) {
+        if (in_array(ApiAction::CREATE, $excludedActions, true)) {
             return;
         }
 
@@ -72,7 +72,7 @@ class FormValidationTest extends RestJsonApiTestCase
             return;
         }
 
-        $metadata = $this->getApiMetadata($entityClass, ApiActions::CREATE);
+        $metadata = $this->getApiMetadata($entityClass, ApiAction::CREATE);
         if (null === $metadata) {
             return;
         }

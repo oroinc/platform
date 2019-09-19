@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
-use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;

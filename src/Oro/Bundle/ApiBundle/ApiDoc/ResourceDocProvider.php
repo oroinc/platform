@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 
 /**
  * Provides default descriptions in English for API resources.
@@ -10,75 +10,75 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
 class ResourceDocProvider
 {
     private const TEMPLATES = [
-        ApiActions::OPTIONS             => [
+        ApiAction::OPTIONS             => [
             'description'   => 'Get options',
             'documentation' => 'Get communication options for a resource'
         ],
-        ApiActions::GET                 => [
+        ApiAction::GET                 => [
             'description'   => 'Get {name}',
             'documentation' => 'Get an entity'
         ],
-        ApiActions::GET_LIST            => [
+        ApiAction::GET_LIST            => [
             'description'   => 'Get {name}',
             'documentation' => 'Get a list of entities'
         ],
-        ApiActions::DELETE              => [
+        ApiAction::DELETE              => [
             'description'   => 'Delete {name}',
             'documentation' => 'Delete an entity'
         ],
-        ApiActions::DELETE_LIST         => [
+        ApiAction::DELETE_LIST         => [
             'description'   => 'Delete {name}',
             'documentation' => 'Delete a list of entities'
         ],
-        ApiActions::CREATE              => [
+        ApiAction::CREATE              => [
             'description'   => 'Create {name}',
             'documentation' => 'Create an entity'
         ],
-        ApiActions::UPDATE              => [
+        ApiAction::UPDATE              => [
             'description'   => 'Update {name}',
             'documentation' => 'Update an entity'
         ],
-        ApiActions::GET_SUBRESOURCE     => [
+        ApiAction::GET_SUBRESOURCE     => [
             'description'   => 'Get {association}',
             'documentation' => [
                 'single_item' => 'Get a related entity',
                 'collection'  => 'Get a list of related entities'
             ]
         ],
-        ApiActions::DELETE_SUBRESOURCE  => [
+        ApiAction::DELETE_SUBRESOURCE  => [
             'description'   => 'Delete {association}',
             'documentation' => [
                 'single_item' => 'Delete the specified related entity',
                 'collection'  => 'Delete the specified related entities'
             ]
         ],
-        ApiActions::ADD_SUBRESOURCE     => [
+        ApiAction::ADD_SUBRESOURCE     => [
             'description'   => 'Add {association}',
             'documentation' => [
                 'single_item' => 'Add the specified related entity',
                 'collection'  => 'Add the specified related entities'
             ]
         ],
-        ApiActions::UPDATE_SUBRESOURCE  => [
+        ApiAction::UPDATE_SUBRESOURCE  => [
             'description'   => 'Update {association}',
             'documentation' => [
                 'single_item' => 'Update the specified related entity',
                 'collection'  => 'Update the specified related entities'
             ]
         ],
-        ApiActions::GET_RELATIONSHIP    => [
+        ApiAction::GET_RELATIONSHIP    => [
             'description'   => 'Get "{association}" relationship',
             'documentation' => 'Get the relationship data'
         ],
-        ApiActions::DELETE_RELATIONSHIP => [
+        ApiAction::DELETE_RELATIONSHIP => [
             'description'   => 'Delete members from "{association}" relationship',
             'documentation' => 'Delete the specified members from the relationship'
         ],
-        ApiActions::ADD_RELATIONSHIP    => [
+        ApiAction::ADD_RELATIONSHIP    => [
             'description'   => 'Add members to "{association}" relationship',
             'documentation' => 'Add the specified members to the relationship'
         ],
-        ApiActions::UPDATE_RELATIONSHIP => [
+        ApiAction::UPDATE_RELATIONSHIP => [
             'description'   => [
                 'single_item' => 'Update "{association}" relationship',
                 'collection'  => 'Replace "{association}" relationship'

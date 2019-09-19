@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Metadata\RouteLinkMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\AbstractDocumentBuilder as ApiDoc;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -94,7 +94,7 @@ class AddPaginationLinksForAssociations implements ProcessorInterface
             }
 
             if (!$association->hasRelationshipLink(ApiDoc::LINK_NEXT)
-                && !$subresource->isExcludedAction(ApiActions::GET_RELATIONSHIP)
+                && !$subresource->isExcludedAction(ApiAction::GET_RELATIONSHIP)
             ) {
                 $association->addRelationshipLink(
                     ApiDoc::LINK_NEXT,
@@ -111,7 +111,7 @@ class AddPaginationLinksForAssociations implements ProcessorInterface
      * @param string $relationshipRouteName
      * @param string $associationName
      *
-     * @return string
+     * @return RouteLinkMetadata
      */
     private function getRelationshipLinkMetadata(
         string $relationshipRouteName,

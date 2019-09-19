@@ -7,8 +7,8 @@ use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
-use Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -77,7 +77,7 @@ class LoadNormalizedIncludedEntities implements ProcessorInterface
         $entityIncludeId,
         IncludedEntityData $entityData
     ) {
-        $getProcessor = $this->processorBag->getProcessor(ApiActions::GET);
+        $getProcessor = $this->processorBag->getProcessor(ApiAction::GET);
 
         /** @var GetContext $getContext */
         $getContext = $getProcessor->createContext();
@@ -91,8 +91,8 @@ class LoadNormalizedIncludedEntities implements ProcessorInterface
         if (!$entityData->isExisting()) {
             $getContext->setResult($entity);
         }
-        $getContext->skipGroup('security_check');
-        $getContext->skipGroup(NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        $getContext->skipGroup(ApiActionGroup::SECURITY_CHECK);
+        $getContext->skipGroup(ApiActionGroup::NORMALIZE_RESULT);
         $getContext->setSoftErrorsHandling(true);
 
         $getProcessor->process($getContext);

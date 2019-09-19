@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Update;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
-use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
+use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;

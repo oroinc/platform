@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\Rest;
 use Oro\Bundle\ApiBundle\Metadata\RouteLinkMetadata;
 use Oro\Bundle\ApiBundle\Processor\Shared\Rest\AddHateoasLinks;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
@@ -105,7 +105,7 @@ class AddHateoasLinksTest extends GetProcessorTestCase
     {
         $entityClass = 'Test\Entity';
         $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
-        $excludeActions = [ApiActions::GET_LIST];
+        $excludeActions = [ApiAction::GET_LIST];
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')

@@ -7,7 +7,8 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Request\ErrorStatusCodesWithoutContentTrait;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -94,7 +95,7 @@ class ProcessIncludedEntities implements ProcessorInterface
         IncludedEntityData $entityData
     ) {
         $actionProcessor = $this->processorBag->getProcessor(
-            $entityData->isExisting() ? ApiActions::UPDATE : ApiActions::CREATE
+            $entityData->isExisting() ? ApiAction::UPDATE : ApiAction::CREATE
         );
 
         /** @var SingleItemContext|FormContext $actionContext */
@@ -112,7 +113,7 @@ class ProcessIncludedEntities implements ProcessorInterface
         $actionContext->setResult($entity);
 
         $actionContext->skipFormValidation(true);
-        $actionContext->setLastGroup('transform_data');
+        $actionContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $actionContext->setSoftErrorsHandling(true);
 
         $actionProcessor->process($actionContext);

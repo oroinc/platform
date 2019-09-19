@@ -2,6 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\CustomizeLoadedDataConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\DataTransformersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\RootPathConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**

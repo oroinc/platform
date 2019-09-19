@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Config\FeatureConfigurationExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\FeatureConfigurationExtension;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\ChainProcessor\ContextInterface;

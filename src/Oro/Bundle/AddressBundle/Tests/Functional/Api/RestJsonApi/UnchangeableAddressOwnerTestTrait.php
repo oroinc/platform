@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AddressBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 
 /**
  * Tests to check that address owner is unchangeable.
@@ -24,7 +24,7 @@ trait UnchangeableAddressOwnerTestTrait
 {
     public function testCreateViaOwnerCreateResourceAndAddressDoesNotHaveOwnerRelationship()
     {
-        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::CREATE)) {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiAction::CREATE)) {
             self::markTestSkipped('The "create" action is disabled for owner entity');
         }
 
@@ -57,7 +57,7 @@ trait UnchangeableAddressOwnerTestTrait
 
     public function testCreateViaOwnerCreateResourceAndAddressHasOwnerRelationship()
     {
-        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::CREATE)) {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiAction::CREATE)) {
             self::markTestSkipped('The "create" action is disabled for owner entity');
         }
 
@@ -91,7 +91,7 @@ trait UnchangeableAddressOwnerTestTrait
 
     public function testCreateViaOwnerUpdateResourceAndAddressDoesNotHaveOwnerRelationship()
     {
-        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiAction::UPDATE)) {
             self::markTestSkipped('The "update" action is disabled for owner entity');
         }
 
@@ -134,7 +134,7 @@ trait UnchangeableAddressOwnerTestTrait
 
     public function testCreateViaOwnerUpdateResourceAndAddressHasOwnerRelationship()
     {
-        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiAction::UPDATE)) {
             self::markTestSkipped('The "update" action is disabled for owner entity');
         }
 
@@ -184,7 +184,7 @@ trait UnchangeableAddressOwnerTestTrait
 
     public function testTryToChangeOwnerViaOwnerCreateResource()
     {
-        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::CREATE)) {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiAction::CREATE)) {
             self::markTestSkipped('The "create" action is disabled for owner entity');
         }
 
@@ -229,7 +229,7 @@ trait UnchangeableAddressOwnerTestTrait
 
     public function testTryToChangeOwnerViaOwnerUpdateResource()
     {
-        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiAction::UPDATE)) {
             self::markTestSkipped('The "update" action is disabled for owner entity');
         }
 
@@ -276,7 +276,7 @@ trait UnchangeableAddressOwnerTestTrait
 
     public function testRemoveAddressFromOwnerViaOwnerUpdateResource()
     {
-        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiAction::UPDATE)) {
             self::markTestSkipped('The "update" action is disabled for owner entity');
         }
 
@@ -321,7 +321,7 @@ trait UnchangeableAddressOwnerTestTrait
 
     public function testTryToChangeOwnerViaOwnerUpdateResourceAndAddressHasOwnerRelationship()
     {
-        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiAction::UPDATE)) {
             self::markTestSkipped('The "update" action is disabled for owner entity');
         }
 

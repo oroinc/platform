@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 
 use Oro\Bundle\ApiBundle\Config\ActionsConfig;
-use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;

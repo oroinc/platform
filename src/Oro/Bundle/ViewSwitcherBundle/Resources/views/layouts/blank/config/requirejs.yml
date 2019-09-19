@@ -1,0 +1,5 @@
+config:
+    paths:
+        'oroviewswitcher/js/app/modules/device-emulate-module': 'bundles/oroviewswitcher/js/app/modules/device-emulate-module.js'
+    appmodules:
+        - oroviewswitcher/js/app/modules/device-emulate-module

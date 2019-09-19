@@ -97,6 +97,8 @@ class CustomizeFormDataContext extends CustomizeDataContext
     public function setEvent(string $event): void
     {
         $this->set(self::EVENT, $event);
+        $this->setFirstGroup($event);
+        $this->setLastGroup($event);
     }
 
     /**

@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Symfony\Component\HttpFoundation\Response;
@@ -308,14 +308,14 @@ class RestDocHandler implements HandlerInterface
         return \in_array(
             $action,
             [
-                ApiActions::CREATE,
-                ApiActions::UPDATE,
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE,
-                ApiActions::UPDATE_RELATIONSHIP,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::CREATE,
+                ApiAction::UPDATE,
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE,
+                ApiAction::UPDATE_RELATIONSHIP,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ],
             true
         );
@@ -333,7 +333,7 @@ class RestDocHandler implements HandlerInterface
     private function isActionWithOutput($action, ApiDoc $annotation)
     {
         $result = false;
-        if (ApiActions::OPTIONS !== $action) {
+        if (ApiAction::OPTIONS !== $action) {
             $statusCodes = ApiDocAnnotationUtil::getStatusCodes($annotation);
             foreach ($statusCodes as $statusCode => $description) {
                 if (\in_array($statusCode, self::SUCCESS_STATUS_CODES_WITH_CONTENT, true)) {
@@ -355,8 +355,8 @@ class RestDocHandler implements HandlerInterface
      */
     private function getOutputAction($action)
     {
-        if (\in_array($action, [ApiActions::CREATE, ApiActions::UPDATE], true)) {
-            return ApiActions::GET;
+        if (\in_array($action, [ApiAction::CREATE, ApiAction::UPDATE], true)) {
+            return ApiAction::GET;
         }
 
         return $action;

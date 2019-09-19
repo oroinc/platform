@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Options;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Options\InitializeConfigExtras;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 

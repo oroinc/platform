@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\RouteLinkMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\Rest\AddHateoasLinksForRelationship;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
@@ -117,8 +117,8 @@ class AddHateoasLinksForRelationshipTest extends GetSubresourceProcessorTestCase
         $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
 
         $subresource = new ApiSubresource();
-        $subresource->addExcludedAction(ApiActions::GET_SUBRESOURCE);
-        $subresource->addExcludedAction(ApiActions::GET_RELATIONSHIP);
+        $subresource->addExcludedAction(ApiAction::GET_SUBRESOURCE);
+        $subresource->addExcludedAction(ApiAction::GET_RELATIONSHIP);
 
         $this->subresourcesProvider->expects(self::once())
             ->method('getSubresource')

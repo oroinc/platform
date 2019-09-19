@@ -204,30 +204,45 @@ body.backdrop {
     line-height: 21px;
 
     > li {
-        min-height: 30px;
-        border-bottom: 1px solid #e6e6e6;
+        &:not(:last-child) {
+            border-bottom: 1px solid $additional-extra-lighten;
+        }
 
         a {
-            display: block;
-            padding-top: 5px;
+            display: flex;
+            align-items: center;
+            padding-top: 4px;
             padding-bottom: 4px;
         }
 
-        i[class^="fa-"] {
-            color: #444;
-
-            &.pull-right {
-                margin: 0 -14px 0 0;
-                line-height: 22px;
-            }
+        [class^="fa-"] {
+            color: $primary-100;
+            height: $dropdown-item-icon-fa-font-size;
         }
 
         &.selected {
-            a {
-                font-weight: bold;
-                background-color: #e8e8e8 !important;
-                color: #444;
+            position: relative;
+
+            @include fa-icon($fa-var-chevron-right, after, true) {
+                position: absolute;
+                top: 50%;
+                #{$end}: 8px;
+
+                margin-top: -$base-font-size--m / 2;
+                font-size: $base-font-size--m;
+                line-height: 1;
             }
+
+            a {
+                padding-#{$end}: 24px;
+                font-weight: bold;
+                background-color: $primary-800;
+                color: $primary-100;
+            }
+        }
+
+        .search-label {
+            @include text-line-truncate(null);
         }
     }
 }

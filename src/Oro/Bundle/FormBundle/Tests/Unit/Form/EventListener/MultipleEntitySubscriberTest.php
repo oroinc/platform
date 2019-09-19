@@ -35,9 +35,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testPostSetData($data, $expectedAddedData, $expectedRemovedData)
     {
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock('Oro\Bundle\EntityBundle\ORM\DoctrineHelper');
         $subscriber = new MultipleEntitySubscriber($doctrineHelper);
 
         $form  = $this->createMock('Symfony\Component\Form\Test\FormInterface');
@@ -121,9 +119,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
         $removed->setParent($parent);
         $children = new ArrayCollection([$existing, $removed]);
 
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock('Oro\Bundle\EntityBundle\ORM\DoctrineHelper');
         $doctrineHelper->expects($this->once())
             ->method('getEntityMetadata')
             ->willReturn(null);
@@ -155,9 +151,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
         $removed->setParent($parent);
         $children = new ArrayCollection([$existing, $removed]);
 
-        $parentMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $parentMetadata = $this->createMock('Doctrine\ORM\Mapping\ClassMetadata');
         $parentMetadata->expects($this->any())
             ->method('hasAssociation')
             ->with($fieldName)
@@ -172,16 +166,15 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock('Oro\Bundle\EntityBundle\ORM\DoctrineHelper');
         $doctrineHelper->expects($this->once())
             ->method('getEntityMetadata')
             ->with(get_class($parent))
             ->willReturn($parentMetadata);
         $subscriber = new MultipleEntitySubscriber($doctrineHelper);
 
-        $form = $this->getPostSubmitForm($parent, $children, [$added], [$removed]);
+        // Adding $existing and $added entities
+        $form = $this->getPostSubmitForm($parent, $children, [$existing, $added], [$removed]);
         $form->expects($this->once())
             ->method('getName')
             ->willReturn($fieldName);
@@ -193,6 +186,32 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($parent, $existing->getParent());
         $this->assertNull($added->getParent());
         $this->assertSame($parent, $removed->getParent());
+    }
+
+    public function testPostSubmitForManyToManyWithoutParentData()
+    {
+        $fieldName = 'children';
+
+        $existing = new ChildEntity('existing');
+        $added = new ChildEntity('added');
+        $removed = new ChildEntity('removed');
+        $children = new ArrayCollection([$existing, $removed]);
+
+        $doctrineHelper = $this->createMock('Oro\Bundle\EntityBundle\ORM\DoctrineHelper');
+        $doctrineHelper->expects($this->never())
+            ->method('getEntityMetadata');
+        $subscriber = new MultipleEntitySubscriber($doctrineHelper);
+
+        $form = $this->getPostSubmitForm(null, $children, [$added], [$removed]);
+        $form->expects($this->once())
+            ->method('getName')
+            ->willReturn($fieldName);
+
+        $event = new FormEvent($form, null);
+        $subscriber->postSubmit($event);
+
+        $this->assertEquals([$existing, $added], array_values($children->toArray()));
+        $this->assertNull($added->getParent());
     }
 
     public function testPostSubmitForOneToMany()
@@ -207,9 +226,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
         $removed->setParent($parent);
         $children = new ArrayCollection([$existing, $removed]);
 
-        $parentMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $parentMetadata = $this->createMock('Doctrine\ORM\Mapping\ClassMetadata');
         $parentMetadata->expects($this->any())
             ->method('hasAssociation')
             ->with($fieldName)
@@ -225,9 +242,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock('Oro\Bundle\EntityBundle\ORM\DoctrineHelper');
         $doctrineHelper->expects($this->once())
             ->method('getEntityMetadata')
             ->with(get_class($parent))

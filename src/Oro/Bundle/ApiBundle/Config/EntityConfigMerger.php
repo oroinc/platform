@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityDefinitionConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\TargetEntityDefinitionConfiguration;
+use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Processor;
