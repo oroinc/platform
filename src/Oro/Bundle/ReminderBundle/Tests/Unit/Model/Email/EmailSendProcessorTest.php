@@ -4,6 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model\Email;
 
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\ReminderBundle\Event\ReminderEvents;
 use Oro\Bundle\ReminderBundle\Event\SendReminderEmailEvent;
 use Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor;
 use Oro\Bundle\ReminderBundle\Model\Email\TemplateEmailNotification;
@@ -78,7 +79,7 @@ class EmailSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->emailNotification
             ->expects($this->exactly(2))
             ->method('setReminder')
-            ->withConsecutive($fooReminder, $barReminder);
+            ->withConsecutive([$fooReminder], [$barReminder]);
 
         $this->emailNotificationManager
             ->expects($this->exactly(2))
@@ -98,7 +99,10 @@ class EmailSendProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->withConsecutive($barEvent, $fooEvent);
+            ->withConsecutive(
+                [ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND, $barEvent],
+                [ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND, $fooEvent]
+            );
 
         $this->processor->push($fooReminder);
         $this->processor->push($barReminder);

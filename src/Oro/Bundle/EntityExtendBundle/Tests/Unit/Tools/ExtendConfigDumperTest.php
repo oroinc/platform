@@ -132,8 +132,8 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->exactly(2))
             ->method('persist')
             ->withConsecutive(
-                $this->configProvider->getConfig(self::CLASS_NAMESPACE . '\Entity\TestEntity1'),
-                $this->configProvider->getConfig(self::CLASS_NAMESPACE . '\Entity\TestEntity2')
+                [$this->configProvider->getConfig(self::CLASS_NAMESPACE . '\Entity\TestEntity1')],
+                [$this->configProvider->getConfig(self::CLASS_NAMESPACE . '\Entity\TestEntity2')]
             );
 
         $this->configManager->expects($this->once())

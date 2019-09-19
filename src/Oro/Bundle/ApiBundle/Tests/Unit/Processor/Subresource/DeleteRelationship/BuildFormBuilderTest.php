@@ -67,8 +67,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $formBuilder->expects(self::exactly(2))
             ->method('setDataMapper')
             ->withConsecutive(
-                self::isInstanceOf(PropertyPathMapper::class),
-                self::isInstanceOf(RemoveRelationshipMapper::class)
+                [self::isInstanceOf(PropertyPathMapper::class)],
+                [self::isInstanceOf(RemoveRelationshipMapper::class)]
             );
 
         $this->context->setParentConfig($parentConfig);
