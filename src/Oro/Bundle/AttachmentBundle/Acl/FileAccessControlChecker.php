@@ -38,6 +38,6 @@ class FileAccessControlChecker
             ->getFieldConfig('attachment', $parentEntityClass, $parentEntityFieldName);
 
 
-        return (bool) $config->get('acl_protected', false, true);
+        return (bool) $config->get('acl_protected', false, false);
     }
 }
