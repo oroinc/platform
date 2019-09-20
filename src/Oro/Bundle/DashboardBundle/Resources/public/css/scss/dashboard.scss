@@ -460,9 +460,18 @@
     flex-wrap: wrap;
 
     .controls.items-table-container {
-        margin-#{$start}: $dashboard-configuration-items-table-margin-start;
-        margin-top: $dashboard-configuration-items-table-margin-top;
         flex-basis: 100%;
+
+        .items-selector-widget {
+            margin-bottom: $dashboard-configuration-items-table-margin-y / 2;
+        }
+        .actions-wrap {
+            float: #{$start};
+            margin-bottom: $dashboard-configuration-items-table-margin-y;
+
+            @include clearfix();
+        }
+
     }
 
     .btn-group + .btn-group {

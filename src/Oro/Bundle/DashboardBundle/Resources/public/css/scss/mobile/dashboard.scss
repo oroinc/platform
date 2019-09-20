@@ -107,8 +107,10 @@
             width: 100%;
             margin-#{$end}: 0;
             margin-bottom: $content-padding-medium;
+        }
 
-            & + .btn-group + .btn-group {
+        .items-table-container {
+            .actions-wrap {
                 float: $end;
             }
         }
