@@ -203,6 +203,12 @@ define(function(require) {
                     this.uiDialog.css('z-index', 910);
                 }
                 oldMoveToTop.apply(this);
+            },
+
+            _title: function(title) {
+                title.html(
+                    $('<span/>', {'class': 'ui-dialog-title__inner'}).text(this.options.title)
+                );
             }
         });
     }());
