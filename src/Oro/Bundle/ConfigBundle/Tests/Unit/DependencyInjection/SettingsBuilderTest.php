@@ -1,28 +1,24 @@
 <?php
 
-namespace Oro\Bundle\ConfigBundle\DependencyInjection;
+namespace Oro\Bundle\ConfigBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testAppendBoolean()
     {
-        $root = new ArrayNodeDefinition('root');
-
-        $root
-            ->children()
-            ->scalarNode('foo')->end()
-            ->end();
+        $root = $this->getRootNode();
 
         SettingsBuilder::append(
             $root,
-            array(
-                'greeting' => array(
+            [
+                'greeting' => [
                     'value' => true,
-                    'type'  => 'boolean',
-                ),
-            )
+                    'type'  => 'boolean'
+                ]
+            ]
         );
 
         $children = $this->getField($root, 'children');
@@ -34,20 +30,16 @@ class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testAppendScalar()
     {
-        $root = new ArrayNodeDefinition('root');
-
-        $root
-            ->children()
-            ->scalarNode('foo')->end()
-            ->end();
+        $root = $this->getRootNode();
 
         SettingsBuilder::append(
             $root,
-            array(
-                'level' => array(
+            [
+                'level' => [
                     'value' => 10,
-                ),
-            )
+                    'type'  => 'scalar'
+                ]
+            ]
         );
 
         $children = $this->getField($root, 'children');
@@ -57,35 +49,113 @@ class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('level', $this->getField($children['settings'], 'children'));
     }
 
+    public function testAppendScalarWhenTypeIsNotSpecified()
+    {
+        $root = $this->getRootNode();
+
+        SettingsBuilder::append(
+            $root,
+            [
+                'level' => [
+                    'value' => 10
+                ]
+            ]
+        );
+
+        $children = $this->getField($root, 'children');
+
+        $this->assertCount(2, $children);
+        $this->assertArrayHasKey('settings', $children);
+        $this->assertArrayHasKey('level', $this->getField($children['settings'], 'children'));
+    }
+
+    public function testAppendString()
+    {
+        $root = $this->getRootNode();
+
+        SettingsBuilder::append(
+            $root,
+            [
+                'name' => [
+                    'value' => 'test',
+                    'type'  => 'string'
+                ]
+            ]
+        );
+
+        $children = $this->getField($root, 'children');
+
+        $this->assertCount(2, $children);
+        $this->assertArrayHasKey('settings', $children);
+        $this->assertArrayHasKey('name', $this->getField($children['settings'], 'children'));
+    }
+
     public function testAppendArray()
     {
-        $root = new ArrayNodeDefinition('root');
+        $root = $this->getRootNode();
 
+        SettingsBuilder::append(
+            $root,
+            [
+                'list' => [
+                    'value' => [1, 2, 3],
+                    'type'  => 'array'
+                ]
+            ]
+        );
+
+        $children = $this->getField($root, 'children');
+        $settings = $this->getField($children['settings'], 'children');
+        $list = $this->getField($settings['list'], 'children');
+
+        $this->assertCount(2, $children);
+        $this->assertArrayHasKey('value', $list);
+        $this->assertInstanceOf(ArrayNodeDefinition::class, $list['value']);
+    }
+
+    public function testAppendArrayWhenTypeIsNotSpecified()
+    {
+        $root = $this->getRootNode();
+
+        SettingsBuilder::append(
+            $root,
+            [
+                'list' => [
+                    'value' => [1, 2, 3]
+                ]
+            ]
+        );
+
+        $children = $this->getField($root, 'children');
+        $settings = $this->getField($children['settings'], 'children');
+        $list = $this->getField($settings['list'], 'children');
+
+        $this->assertCount(2, $children);
+        $this->assertArrayHasKey('value', $list);
+        $this->assertInstanceOf(ArrayNodeDefinition::class, $list['value']);
+    }
+
+    /**
+     * @return ArrayNodeDefinition
+     */
+    private function getRootNode(): ArrayNodeDefinition
+    {
+        $root = new ArrayNodeDefinition('root');
         $root
             ->children()
             ->scalarNode('foo')->end()
             ->end();
 
-        SettingsBuilder::append(
-            $root,
-            array(
-                'list' => array(
-                    'value' => array(1, 2, 3),
-                    'type'  => 'array',
-                ),
-            )
-        );
-
-        $children = $this->getField($root, 'children');
-        $settings = $this->getField($children['settings'], 'children');
-        $list     = $this->getField($settings['list'], 'children');
-
-        $this->assertCount(2, $children);
-        $this->assertArrayHasKey('value', $list);
-        $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition', $list['value']);
+        return $root;
     }
 
-    protected function getField($object, $field)
+    /**
+     * @param object $object
+     * @param string $field
+     *
+     * @return mixed
+     */
+    private function getField($object, $field)
     {
         $reflection = new \ReflectionProperty($object, $field);
         $reflection->setAccessible(true);

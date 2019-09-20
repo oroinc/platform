@@ -11,18 +11,19 @@ use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * This class should work on PHP 5.3
- * Keep old array syntax
- *
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * Adds the following features:
+ * * loading bundles based on "Resources/config/oro/bundles.yml" configuration files
+ * * loading configuration from "Resources/config/oro/*.yml" configuration files
+ * * extended error handling, {@see \Oro\Bundle\DistributionBundle\Error\ErrorHandler}
  */
 abstract class OroKernel extends Kernel
 {
@@ -37,7 +38,7 @@ abstract class OroKernel extends Kernel
         parent::initializeBundles();
 
         // initialize CumulativeResourceManager
-        $bundles = array();
+        $bundles = [];
         foreach ($this->bundles as $name => $bundle) {
             $bundles[$name] = get_class($bundle);
         }
@@ -51,7 +52,7 @@ abstract class OroKernel extends Kernel
      */
     public function registerBundles()
     {
-        $bundles = array();
+        $bundles = [];
         $cacheDir = $this->getCacheDir();
         if (!$cacheDir) {
             foreach ($this->collectBundles() as $class => $params) {
@@ -80,9 +81,9 @@ abstract class OroKernel extends Kernel
      *
      * @return array
      */
-    protected function findBundles($roots = array())
+    protected function findBundles($roots = [])
     {
-        $paths = array();
+        $paths = [];
         foreach ($roots as $root) {
             if (!is_dir($root)) {
                 continue;
@@ -104,14 +105,14 @@ abstract class OroKernel extends Kernel
                     }
                     if (!is_dir($current->getPathname() . '/Resources')) {
                         return true;
-                    } else {
-                        $file = $current->getPathname() . '/Resources/config/oro/bundles.yml';
-                        if (is_file($file)) {
-                            $paths[] = $file;
-                        }
-
-                        return false;
                     }
+
+                    $file = $current->getPathname() . '/Resources/config/oro/bundles.yml';
+                    if (is_file($file)) {
+                        $paths[] = $file;
+                    }
+
+                    return false;
                 }
             );
 
@@ -127,30 +128,34 @@ abstract class OroKernel extends Kernel
      */
     protected function collectBundles()
     {
-        $files = $this->findBundles(
-            array(
-                $this->getProjectDir() . '/src',
-                $this->getProjectDir() . '/vendor'
-            )
-        );
+        $files = $this->findBundles([
+            $this->getProjectDir() . '/src',
+            $this->getProjectDir() . '/vendor'
+        ]);
 
-        $bundles = array();
-        $exclusions = array();
+        $bundles = [];
+        $exclusions = [];
         foreach ($files as $file) {
             $import = Yaml::parse(file_get_contents($file));
             if (!empty($import)) {
                 if (!empty($import['bundles'])) {
-                    $bundles = array_merge($bundles, $this->getBundlesMapping($import['bundles']));
+                    $bundles[] = $this->getBundlesMapping($import['bundles']);
                 }
                 if (!empty($import['exclusions'])) {
-                    $exclusions = array_merge($exclusions, $this->getBundlesMapping($import['exclusions']));
+                    $exclusions[] = $this->getBundlesMapping($import['exclusions']);
                 }
             }
         }
 
-        $bundles = array_diff_key($bundles, $exclusions);
+        if ($bundles) {
+            $bundles = array_merge(...$bundles);
+        }
+        if ($exclusions) {
+            $exclusions = array_merge(...$exclusions);
+            $bundles = array_diff_key($bundles, $exclusions);
+        }
 
-        uasort($bundles, array($this, 'compareBundles'));
+        uasort($bundles, [$this, 'compareBundles']);
 
         return $bundles;
     }
@@ -162,24 +167,24 @@ abstract class OroKernel extends Kernel
      */
     protected function getBundlesMapping(array $bundles)
     {
-        $result = array();
+        $result = [];
         foreach ($bundles as $bundle) {
-            $kernel   = false;
+            $kernel = false;
             $priority = 0;
 
-            if (is_array($bundle)) {
-                $class    = $bundle['name'];
-                $kernel   = isset($bundle['kernel']) && true == $bundle['kernel'];
+            if (\is_array($bundle)) {
+                $class = $bundle['name'];
+                $kernel = isset($bundle['kernel']) && $bundle['kernel'];
                 $priority = isset($bundle['priority']) ? (int)$bundle['priority'] : 0;
             } else {
                 $class = $bundle;
             }
 
-            $result[$class] = array(
+            $result[$class] = [
                 'name'     => $class,
                 'kernel'   => $kernel,
-                'priority' => $priority,
-            );
+                'priority' => $priority
+            ];
         }
 
         return $result;
@@ -216,13 +221,11 @@ abstract class OroKernel extends Kernel
         include_once $this->getProjectDir() . '/var/OroRequirements.php';
 
         if (!version_compare($phpVersion, OroRequirements::REQUIRED_PHP_VERSION, '>=')) {
-            throw new \Exception(
-                sprintf(
-                    'PHP version must be at least %s (%s is installed)',
-                    OroRequirements::REQUIRED_PHP_VERSION,
-                    $phpVersion
-                )
-            );
+            throw new \RuntimeException(sprintf(
+                'PHP version must be at least %s (%s is installed)',
+                OroRequirements::REQUIRED_PHP_VERSION,
+                $phpVersion
+            ));
         }
 
         parent::boot();
@@ -230,7 +233,6 @@ abstract class OroKernel extends Kernel
 
     /**
      * {@inheritdoc}
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass)
     {
@@ -244,7 +246,7 @@ abstract class OroKernel extends Kernel
             $dumper->setProxyDumper(new ProxyDumper());
         }
 
-        $content = $dumper->dump(array(
+        $content = $dumper->dump([
             'class' => $class,
             'base_class' => $baseClass,
             'file' => $cache->getPath(),
@@ -256,26 +258,22 @@ abstract class OroKernel extends Kernel
             'build_time' => $container->hasParameter('kernel.container_build_time')
                 ? $container->getParameter('kernel.container_build_time')
                 : time(),
-        ));
+        ]);
 
         $rootCode = array_pop($content);
-        $dir = dirname($cache->getPath()).'/';
+        $dir = \dirname($cache->getPath()).'/';
         $fs = new Filesystem();
 
         foreach ($content as $file => $code) {
             $fs->dumpFile($dir.$file, $code);
             @chmod($dir.$file, 0666 & ~umask());
         }
-        @unlink(dirname($dir.$file).'.legacy');
+        $legacyFile = \dirname($dir.$file).'.legacy';
+        if (file_exists($legacyFile)) {
+            @unlink($legacyFile);
+        }
 
         $cache->write($rootCode, $container->getResources());
-
-        // we should not use parent::stripComments method to cleanup source code from the comments to avoid
-        // memory leaks what generate token_get_all function.
-        //@TODO investigate actuality memory leaks what generate token_get_all function in scope BAP-15236.
-//        if (!$this->debug) {
-//            $cache->write(php_strip_whitespace($cache->getPath()), $container->getResources());
-//        }
     }
 
     /**
@@ -296,8 +294,12 @@ abstract class OroKernel extends Kernel
      */
     protected function getContainerBuilder()
     {
-        $container = new ExtendedContainerBuilder(new ParameterBag($this->getKernelParameters()));
+        $container = new ExtendedContainerBuilder();
+        $container->getParameterBag()->add($this->getKernelParameters());
 
+        if ($this instanceof CompilerPassInterface) {
+            $container->addCompilerPass($this, PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
+        }
         if (class_exists('ProxyManager\Configuration')
             && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')
         ) {
