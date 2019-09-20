@@ -31,6 +31,11 @@
     overflow: hidden;
 }
 
+.ui-dialog-maximized .ui-dialog-content {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
 .ui-dialog-collapsed .ui-dialog-content,
 .ui-dialog-collapsed .ui-dialog-buttonpane,
 .ui-dialog-minimized .ui-dialog-content,
