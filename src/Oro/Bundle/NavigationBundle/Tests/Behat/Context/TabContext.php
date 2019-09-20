@@ -19,11 +19,20 @@ class TabContext extends OroFeatureContext implements
      * Click link in tab set
      * Example: When I click "General" tab
      *
-     * @When /^(?:|I )click "(?P<name>[\w\s-]+)" tab$/
+     * @When /^(?:|I )click "(?P<name>(?:[^"]|\\")*)" tab$/
+     * @When /^(?:|I )click "(?P<name>(?:[^"]|\\")*)" tab in "(?P<element>(?:[^"]|\\")*)" element$/
+     *
+     * @param string $name
+     * @param string|null $element
      */
-    public function iClickTabLink($name)
+    public function iClickTabLink(string $name, ?string $element = null)
     {
-        $linkElement = $this->elementFactory->findElementContainsByXPath('Tab Link', $name, false);
+        if ($element) {
+            $element = $this->createElement($element);
+            self::assertTrue($element->isValid());
+        }
+
+        $linkElement = $this->elementFactory->findElementContainsByXPath('Tab Link', $name, false, $element);
         self::assertTrue($linkElement->isValid(), "Link with '$name' text not found in tab");
 
         $linkElement->click();

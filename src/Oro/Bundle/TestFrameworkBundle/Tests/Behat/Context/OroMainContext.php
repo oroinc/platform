@@ -736,6 +736,22 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: When I click "Users" in "sidebar menu" element
+     *
+     * @Given /^(?:|I )click "(?P<needle>(?:[^"]|\\")*)" in "(?P<element>(?:[^"]|\\")*)" element$/
+     *
+     * @param string $needle
+     * @param string $element
+     */
+    public function iClickOnSmthInElement(string $needle, string $element)
+    {
+        $element = $this->createElement($element);
+        self::assertTrue($element->isValid());
+
+        $element->clickOrPress($needle);
+    }
+
+    /**
      * Click on element on page
      * Example: When I click on "Help Icon"
      *
