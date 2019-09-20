@@ -29,7 +29,6 @@ define(function(require) {
          * @returns {(target?: any) => JQueryPromise<T>}
          */
         initialize: function() {
-            this.createHandlers();
             this.getComputedVariables();
 
             cssVars(_.extend(config, {
@@ -37,8 +36,6 @@ define(function(require) {
                     this.cssVariables = _.extend(this.cssVariables, cssVariables);
 
                     mediator.trigger('css:variables:fetched', this.cssVariables);
-
-                    this.deferred.resolve(this.cssVariables);
                 }, this)
             }));
 
@@ -61,25 +58,17 @@ define(function(require) {
             this.deferred.then(callback);
         },
 
-        createHandlers: function() {
-            mediator.setHandler('fetch:head:computedVars', this.getHeadBreakpoints, this);
-        },
-
         /**
          * Get hot computed variables
          */
-        getComputedVariables: function(context) {
-            if (!context) {
-                context = document.head;
-            }
-
+        getComputedVariables: function() {
             var regexp = /(--[\w-]*:)/g;
             var regexpVal = /:\s?[\w\d-(): ]*/g;
-            var content = window.getComputedStyle(context, ':before').getPropertyValue('content');
-            var breakpoint = {};
+            var content = window.getComputedStyle(document.head, ':before').getPropertyValue('content');
 
             if (content === 'none') {
-                mediator.trigger('css:breakpoints:fetched', breakpoint);
+                this.deferred.resolve(this.cssVariables);
+                mediator.trigger('css:breakpoints:fetched', this.cssVariables);
                 return;
             }
 
@@ -88,19 +77,14 @@ define(function(require) {
                 var name = value.match(regexp);
                 var varVal = value.match(regexpVal);
                 if (name && varVal) {
-                    breakpoint[name[0].slice(0, -1)] = varVal[0].substr(1).trim();
+                    this.cssVariables[name[0].slice(0, -1)] = varVal[0].substr(1).trim();
                 }
 
                 if (i === content.length - 1) {
-                    mediator.trigger('css:breakpoints:fetched', breakpoint);
+                    this.deferred.resolve(this.cssVariables);
+                    mediator.trigger('css:breakpoints:fetched', this.cssVariables);
                 }
             }, this));
-
-            return breakpoint;
-        },
-
-        getHeadBreakpoints: function(context) {
-            return this.getComputedVariables(context);
         }
     };
 
