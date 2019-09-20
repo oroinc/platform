@@ -11,6 +11,8 @@ trusted_data:
             searchEntities:
                 currentField: true
     safe_methods:
+        Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager:
+            getEntityIdentifierFieldName: true
         Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder:
             setMaxResults: true
             setFirstResult: true

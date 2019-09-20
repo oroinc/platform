@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
@@ -362,9 +363,10 @@ class EmailActivityListProvider implements
             return [];
         }
 
+        /** @var ManagerRegistry $registry */
+        $registry = $this->doctrineRegistryLink->getService();
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $this->doctrineRegistryLink->getService()
-            ->getRepository(ActivityList::class)
+        $queryBuilder = $registry->getRepository(ActivityList::class)
             ->createQueryBuilder('a');
         $queryBuilder
             ->innerJoin(

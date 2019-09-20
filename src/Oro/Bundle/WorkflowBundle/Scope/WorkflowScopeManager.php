@@ -13,6 +13,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowScopeConfigurationException;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Manages workflow related scopes.
+ */
 class WorkflowScopeManager
 {
     const SCOPE_TYPE = 'workflow_definition';
@@ -64,7 +67,7 @@ class WorkflowScopeManager
             throw $e;
         }
 
-        /** @var Scope[] $scopes */
+        /** @var ArrayCollection|Scope[] $scopes */
         $scopes = new ArrayCollection();
         foreach ($contexts as $context) {
             $scopes->add($this->scopeManager->findOrCreate(self::SCOPE_TYPE, $context));

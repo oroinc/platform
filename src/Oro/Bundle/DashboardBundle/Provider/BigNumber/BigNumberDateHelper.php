@@ -6,6 +6,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -49,6 +50,7 @@ class BigNumberDateHelper
         if ((isset($dateRange['type']) && $dateRange['type'] === AbstractDateFilterType::TYPE_LESS_THAN)
             || (isset($dateRange['part']) && $dateRange['part'] === DateModifierInterface::PART_ALL_TIME)
         ) {
+            QueryBuilderUtil::checkIdentifier($field);
             $qb    = $this->doctrine
                 ->getRepository($entity)
                 ->createQueryBuilder('e')

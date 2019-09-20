@@ -31,7 +31,6 @@ class LoadCustomEntities implements ProcessorInterface
     public function process(ContextInterface $context)
     {
         /** @var CollectResourcesContext $context */
-
         $resources = $context->getResult();
         $configs = $this->configManager->getConfigs('extend', null, true);
         foreach ($configs as $config) {

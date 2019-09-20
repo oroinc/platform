@@ -12,4 +12,5 @@
         <type>error</type>
     </rule>
     <exclude-pattern>*/Acme/*</exclude-pattern>
+    <exclude-pattern>*/doctrine-em-loader.php</exclude-pattern>
 </ruleset>

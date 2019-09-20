@@ -5,24 +5,23 @@ namespace Oro\Bundle\ConfigBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
+/**
+ * Helps to build manageable system configuration ("settings" section of a bundle configuration).
+ */
 class SettingsBuilder
 {
-    const RESOLVED_KEY = 'resolved';
+    public const RESOLVED_KEY = 'resolved';
+
+    private const ALLOWED_TYPES = ['scalar', 'boolean', 'array'];
 
     /**
-     * @internal
-     */
-    const ALLOWED_TYPES = ['scalar', 'boolean', 'array'];
-
-    /**
-     *
-     * @param ArrayNodeDefinition $root     Config root node
+     * @param ArrayNodeDefinition $root
      * @param array               $settings
      */
-    public static function append(ArrayNodeDefinition $root, $settings)
+    public static function append(ArrayNodeDefinition $root, array $settings): void
     {
         $builder = new TreeBuilder();
-        $node    = $builder
+        $node = $builder
             ->root('settings')
             ->addDefaultsIfNotSet()
             ->children()
@@ -35,7 +34,12 @@ class SettingsBuilder
                 ->addDefaultsIfNotSet()
                 ->children();
 
-            if (isset($setting['type']) && in_array($setting['type'], static::ALLOWED_TYPES)) {
+            if (!isset($setting['type'])) {
+                $type = 'scalar';
+                if (isset($setting['value']) && \is_array($setting['value'])) {
+                    $type = 'array';
+                }
+            } elseif (\in_array($setting['type'], self::ALLOWED_TYPES, true)) {
                 $type = $setting['type'];
             } else {
                 $type = 'scalar';
@@ -44,22 +48,19 @@ class SettingsBuilder
             switch ($type) {
                 case 'scalar':
                     $child->scalarNode('value')->defaultValue($setting['value']);
-
                     break;
                 case 'boolean':
                     $child->booleanNode('value')->defaultValue((bool)$setting['value']);
-
                     break;
                 case 'array':
                     $child->arrayNode('value')
-                        ->treatNullLike(array())
-                        ->prototype('scalar')->end()
-                        ->defaultValue(isset($setting['value'])? $setting['value'] : array());
-
+                        ->treatNullLike([])
+                        ->prototype('variable')->end()
+                        ->defaultValue($setting['value'] ?? []);
                     break;
             }
 
-            $child->scalarNode('scope')->defaultValue(isset($setting['scope']) ? $setting['scope'] : 'app');
+            $child->scalarNode('scope')->defaultValue($setting['scope'] ?? 'app');
         }
 
         $root->children()->append($node->end());

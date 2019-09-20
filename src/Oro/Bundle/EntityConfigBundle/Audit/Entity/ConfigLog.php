@@ -3,10 +3,13 @@
 namespace Oro\Bundle\EntityConfigBundle\Audit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
+ * Holds links to the information about changes in the tracked entities.
+ *
  * @ORM\Table(name="oro_entity_config_log")
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
@@ -29,7 +32,7 @@ class ConfigLog
     protected $user;
 
     /**
-     * @var ConfigLogDiff[]
+     * @var Collection|ConfigLogDiff[]
      * @ORM\OneToMany(targetEntity="ConfigLogDiff", mappedBy="log", cascade={"all"})
      */
     protected $diffs;

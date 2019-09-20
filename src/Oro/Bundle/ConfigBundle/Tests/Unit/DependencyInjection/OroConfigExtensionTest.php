@@ -1,7 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ConfigBundle\DependencyInjection;
+namespace Oro\Bundle\ConfigBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\OroConfigExtension;
 use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Parser;
