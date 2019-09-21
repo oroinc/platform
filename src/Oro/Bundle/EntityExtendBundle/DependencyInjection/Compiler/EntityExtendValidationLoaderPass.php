@@ -1,15 +1,15 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler;
+namespace Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Adds validation loader for workflow entities.
+ * Adds validation loader for configurable entity fields.
  */
-class AddWorkflowValidationLoaderCompilerPass implements CompilerPassInterface
+class EntityExtendValidationLoaderPass implements CompilerPassInterface
 {
     /**
      * {@inheritdoc}
@@ -17,6 +17,6 @@ class AddWorkflowValidationLoaderCompilerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $container->getDefinition('validator.builder')
-            ->addMethodCall('addLoader', [new Reference('oro_workflow.validation_loader')]);
+            ->addMethodCall('addLoader', [new Reference('oro_entity_extend.validation_loader')]);
     }
 }
