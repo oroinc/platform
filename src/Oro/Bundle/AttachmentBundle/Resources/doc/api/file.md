@@ -95,7 +95,7 @@ Delete a set of file records.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 ### mimeType
 
@@ -103,7 +103,7 @@ Delete a set of file records.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
@@ -119,7 +119,7 @@ Delete a set of file records.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
@@ -137,7 +137,7 @@ The content of the file as a Base64 encoded string.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 

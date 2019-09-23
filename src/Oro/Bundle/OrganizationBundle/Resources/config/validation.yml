@@ -1,3 +1,10 @@
+Oro\Bundle\OrganizationBundle\Entity\Organization:
+    properties:
+        name:
+            - NotBlank: ~
+            - Length:
+                  max: 255
+
 Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
     constraints:
         - Oro\Bundle\OrganizationBundle\Validator\Constraints\BusinessUnitOwner: ~

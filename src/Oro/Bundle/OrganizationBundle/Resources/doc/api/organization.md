@@ -125,7 +125,7 @@ Example:
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 ### name
 
@@ -133,7 +133,7 @@ Example:
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update 
 

@@ -99,7 +99,7 @@ Delete a collection of user roles.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 ### id
 
@@ -107,7 +107,7 @@ Delete a collection of user roles.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 ## SUBRESOURCES
 

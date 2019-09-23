@@ -138,7 +138,7 @@ Delete a collection of user records.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 ### emails
 
@@ -166,7 +166,7 @@ Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
@@ -182,7 +182,7 @@ Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
@@ -198,7 +198,7 @@ Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
@@ -214,7 +214,7 @@ Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
@@ -223,6 +223,38 @@ Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}
 **Please note:**
 
 *This field is **required** and must remain defined.*
+
+### passwordChangedAt
+
+#### create, update
+
+{@inheritdoc}
+
+**The read-only field. A passed value will be ignored.**
+
+### passwordRequestedAt
+
+#### create, update
+
+{@inheritdoc}
+
+**The read-only field. A passed value will be ignored.**
+
+### loginCount
+
+#### create, update
+
+{@inheritdoc}
+
+**The read-only field. A passed value will be ignored.**
+
+### lastLogin
+
+#### create, update
+
+{@inheritdoc}
+
+**The read-only field. A passed value will be ignored.**
 
 ## SUBRESOURCES
 
