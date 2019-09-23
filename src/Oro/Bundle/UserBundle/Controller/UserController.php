@@ -9,14 +9,13 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationT
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenType;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -68,8 +67,7 @@ class UserController extends Controller
     }
 
     /**
-     * @Route("/apigen/{id}", name="oro_user_apigen", requirements={"id"="\d+"})
-     * @Method({"GET","POST"})
+     * @Route("/apigen/{id}", name="oro_user_apigen", requirements={"id"="\d+"}, methods={"GET", "POST"})
      *
      * @param User $user
      * @return JsonResponse|Response

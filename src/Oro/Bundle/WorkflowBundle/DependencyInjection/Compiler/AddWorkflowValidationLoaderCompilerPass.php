@@ -6,18 +6,17 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Adds validation loader for workflow entities.
+ */
 class AddWorkflowValidationLoaderCompilerPass implements CompilerPassInterface
 {
-    const WORKFLOW_VALIDATION_LOADER_ID = 'oro_workflow.validation_loader';
-
     /**
-     * @param ContainerBuilder $container
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if ($container->hasDefinition('validator.builder')) {
-            $validatorBuilder = $container->getDefinition('validator.builder');
-            $validatorBuilder->addMethodCall('addCustomLoader', [new Reference(self::WORKFLOW_VALIDATION_LOADER_ID)]);
-        }
+        $container->getDefinition('validator.builder')
+            ->addMethodCall('addLoader', [new Reference('oro_workflow.validation_loader')]);
     }
 }

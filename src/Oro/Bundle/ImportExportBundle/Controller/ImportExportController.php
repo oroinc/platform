@@ -23,9 +23,7 @@ use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -34,6 +32,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -247,9 +246,8 @@ class ImportExportController extends AbstractController
      * Validate import data
      * Called by importValidateExportTemplateFormAction with forward
      *
-     * @Route("/import/validate/{processorAlias}", name="oro_importexport_import_validate")
+     * @Route("/import/validate/{processorAlias}", name="oro_importexport_import_validate", methods={"POST"})
      * @AclAncestor("oro_importexport_import")
-     * @Method("POST")
      * @CsrfProtection()
      *
      * @param Request $request
@@ -288,9 +286,8 @@ class ImportExportController extends AbstractController
      * Execute import process
      * Called by importValidateExportTemplateFormAction with forward
      *
-     * @Route("/import/process/{processorAlias}", name="oro_importexport_import_process")
+     * @Route("/import/process/{processorAlias}", name="oro_importexport_import_process", methods={"POST"})
      * @AclAncestor("oro_importexport_export")
-     * @Method("POST")
      * @CsrfProtection()
      *
      * @param string $processorAlias
@@ -324,9 +321,8 @@ class ImportExportController extends AbstractController
     }
 
     /**
-     * @Route("/export/instant/{processorAlias}", name="oro_importexport_export_instant")
+     * @Route("/export/instant/{processorAlias}", name="oro_importexport_export_instant", methods={"POST"})
      * @AclAncestor("oro_importexport_export")
-     * @Method("POST")
      * @CsrfProtection()
      *
      * @param string $processorAlias

@@ -5,8 +5,8 @@ namespace Oro\Bundle\EmailBundle\Controller\Dashboard;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\EmailBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Provide functionality to manage recent emails on dashboard

@@ -50,6 +50,7 @@
     }
 
     &-title {
+        position: relative;
         color: $primary-inverse;
         font-weight: $dialog-title-font-weight;
         font-size: $base-font-size--l;
@@ -64,6 +65,22 @@
 
         .lang-en & {
             text-transform: capitalize;
+        }
+
+        &:after {
+            display: inline-block;
+            content: '';
+        }
+
+        &__inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
 

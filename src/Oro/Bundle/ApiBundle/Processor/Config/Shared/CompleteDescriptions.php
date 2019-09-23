@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\FieldDescriptionUtil;
 use Oro\Bundle\ApiBundle\Util\InheritDocUtil;
 use Oro\Bundle\ApiBundle\Util\RequestDependedTextProcessor;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -428,7 +429,7 @@ class CompleteDescriptions implements ProcessorInterface
             }
         }
 
-        $this->setDescriptionsForSpecialFields($definition, $entityClass);
+        $this->setDescriptionsForSpecialFields($definition, $entityClass, $targetAction);
     }
 
     /**
@@ -643,11 +644,12 @@ class CompleteDescriptions implements ProcessorInterface
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
+     * @param string                 $targetAction
      */
-    private function setDescriptionsForSpecialFields(EntityDefinitionConfig $definition, $entityClass)
+    private function setDescriptionsForSpecialFields(EntityDefinitionConfig $definition, $entityClass, $targetAction)
     {
-        $this->setDescriptionForCreatedAtField($definition);
-        $this->setDescriptionForUpdatedAtField($definition);
+        $this->setDescriptionForCreatedAtField($definition, $targetAction);
+        $this->setDescriptionForUpdatedAtField($definition, $targetAction);
         $this->setDescriptionsForOwnershipFields($definition, $entityClass);
         if (\is_a($entityClass, AbstractEnumValue::class, true)) {
             $this->setDescriptionsForEnumFields($definition);
@@ -656,26 +658,30 @@ class CompleteDescriptions implements ProcessorInterface
 
     /**
      * @param EntityDefinitionConfig $definition
+     * @param string                 $targetAction
      */
-    private function setDescriptionForCreatedAtField(EntityDefinitionConfig $definition)
+    private function setDescriptionForCreatedAtField(EntityDefinitionConfig $definition, $targetAction)
     {
         $this->updateFieldDescription(
             $definition,
             'createdAt',
             self::CREATED_AT_DESCRIPTION
         );
+        FieldDescriptionUtil::updateReadOnlyFieldDescription($definition, 'createdAt', $targetAction);
     }
 
     /**
      * @param EntityDefinitionConfig $definition
+     * @param string                 $targetAction
      */
-    private function setDescriptionForUpdatedAtField(EntityDefinitionConfig $definition)
+    private function setDescriptionForUpdatedAtField(EntityDefinitionConfig $definition, $targetAction)
     {
         $this->updateFieldDescription(
             $definition,
             'updatedAt',
             self::UPDATED_AT_DESCRIPTION
         );
+        FieldDescriptionUtil::updateReadOnlyFieldDescription($definition, 'updatedAt', $targetAction);
     }
 
     /**

@@ -16,11 +16,11 @@ use Oro\Bundle\WorkflowBundle\Provider\TransitionDataProvider;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider;
 use Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 /**

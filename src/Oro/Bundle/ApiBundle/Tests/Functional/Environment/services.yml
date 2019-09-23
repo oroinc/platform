@@ -6,9 +6,12 @@ services:
 
     oro_api.tests.entity_alias_provider:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestEntitiesAliasProvider
-        public: false
         tags:
             - { name: oro_entity.alias_provider }
+
+    oro_api.tests.skipped_entity_provider:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\NullSkippedEntityProvider
+        public: true
 
     oro_api.tests.config_registry:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry
@@ -21,7 +24,6 @@ services:
 
     oro_api.tests.test_route_options_resolver:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestRouteOptionsResolver
-        public: false
         tags:
             - { name: routing.options_resolver }
 

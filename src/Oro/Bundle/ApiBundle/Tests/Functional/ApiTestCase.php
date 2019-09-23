@@ -436,7 +436,7 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * Asserts response status code equals.
+     * Asserts response status code equals to one of the given status code.
      *
      * @param Response    $response
      * @param int|int[]   $statusCode
@@ -459,6 +459,44 @@ abstract class ApiTestCase extends WebTestCase
                 }
             } else {
                 \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
+            }
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            if ($response->getStatusCode() >= Response::HTTP_BAD_REQUEST
+                && static::isApplicableContentType($response->headers)
+            ) {
+                $e = new \PHPUnit\Framework\ExpectationFailedException(
+                    $e->getMessage() . "\nResponse content: " . $response->getContent(),
+                    $e->getComparisonFailure()
+                );
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Asserts response status code does not equal to any of the given status code.
+     *
+     * @param Response    $response
+     * @param int|int[]   $statusCode
+     * @param string $message
+     */
+    protected static function assertResponseStatusCodeNotEquals(Response $response, $statusCode, string $message = '')
+    {
+        try {
+            if (is_array($statusCode)) {
+                if (in_array($response->getStatusCode(), $statusCode, true)) {
+                    $failureMessage = sprintf(
+                        'Failed asserting that %s is not one of %s',
+                        $response->getStatusCode(),
+                        implode(', ', $statusCode)
+                    );
+                    if (!empty($message)) {
+                        $failureMessage = $message . "\n" . $failureMessage;
+                    }
+                    throw new \PHPUnit\Framework\ExpectationFailedException($failureMessage);
+                }
+            } else {
+                \PHPUnit\Framework\TestCase::assertNotEquals($statusCode, $response->getStatusCode(), $message);
             }
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             if ($response->getStatusCode() >= Response::HTTP_BAD_REQUEST

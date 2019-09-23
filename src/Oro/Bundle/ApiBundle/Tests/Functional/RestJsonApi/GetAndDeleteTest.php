@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Request\ApiAction;
-use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\SkippedEntitiesProvider;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\SkippedEntityProviderInterface;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -12,6 +12,19 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class GetAndDeleteTest extends RestJsonApiTestCase
 {
+    /**
+     * @param string $entityClass
+     *
+     * @return bool
+     */
+    private function isSkippedEntity(string $entityClass, string $action): bool
+    {
+        /** @var SkippedEntityProviderInterface $provider */
+        $provider = self::getContainer()->get('oro_api.tests.skipped_entity_provider');
+
+        return $provider->isSkippedEntity($entityClass, $action);
+    }
+
     /**
      * @param string   $entityClass
      * @param string[] $excludedActions
@@ -24,7 +37,7 @@ class GetAndDeleteTest extends RestJsonApiTestCase
             return;
         }
 
-        if (in_array($entityClass, SkippedEntitiesProvider::getForGetListAction(), true)) {
+        if ($this->isSkippedEntity($entityClass, ApiAction::GET_LIST)) {
             return;
         }
 
@@ -65,7 +78,9 @@ class GetAndDeleteTest extends RestJsonApiTestCase
             return;
         }
 
-        if (in_array($entityClass, SkippedEntitiesProvider::getForGetListAction(), true)) {
+        if ($this->isSkippedEntity($entityClass, ApiAction::DELETE_LIST)
+            || $this->isSkippedEntity($entityClass, ApiAction::GET_LIST)
+        ) {
             return;
         }
 
