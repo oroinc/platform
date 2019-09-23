@@ -128,7 +128,10 @@ class PostponedRowsHandler
                     'fileName' => $fileName,
                 ]);
 
-                if (array_key_exists('options', $body) && !array_key_exists('incremented_read', $body['options'])) {
+                $body['options']['attempts'] = $attempts;
+                $body['options']['max_attempts'] = self::MAX_ATTEMPTS;
+
+                if (!array_key_exists('incremented_read', $body['options'])) {
                     $body['options']['incremented_read'] = false;
                 }
                 $message = new Message();

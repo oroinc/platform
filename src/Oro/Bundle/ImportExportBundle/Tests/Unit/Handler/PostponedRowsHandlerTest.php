@@ -25,7 +25,7 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var Job|\PHPUnit\Framework\MockObject\MockObject */
     private $currentJob;
 
-    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject  */
+    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
     private $jobRunner;
 
     /** @var JobProcessor|\PHPUnit\Framework\MockObject\MockObject */
@@ -78,7 +78,18 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->currentJob);
 
         $expectedMessage = new Message();
-        $expectedMessage->setBody(['jobId' => 1, 'attempts' => 1, 'fileName' => '']);
+        $expectedMessage->setBody(
+            [
+                'jobId' => 1,
+                'attempts' => 1,
+                'fileName' => '',
+                'options' => [
+                    'incremented_read' => false,
+                    'attempts' => 1,
+                    'max_attempts' => PostponedRowsHandler::MAX_ATTEMPTS,
+                ],
+            ]
+        );
         $expectedMessage->setDelay(PostponedRowsHandler::DELAY_SECONDS);
         $this->messageProducer->expects($this->once())
             ->method('send')
@@ -134,12 +145,18 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->currentJob);
 
         $expectedMessage = new Message();
-        $expectedMessage->setBody([
-            'jobId' => 1,
-            'attempts' => 1,
-            'fileName' => '',
-            'options' => ['incremented_read' => false]
-        ]);
+        $expectedMessage->setBody(
+            [
+                'jobId' => 1,
+                'attempts' => 1,
+                'fileName' => '',
+                'options' => [
+                    'incremented_read' => false,
+                    'attempts' => 1,
+                    'max_attempts' => PostponedRowsHandler::MAX_ATTEMPTS,
+                ],
+            ]
+        );
         $expectedMessage->setDelay(PostponedRowsHandler::DELAY_SECONDS);
         $this->messageProducer->expects($this->once())
             ->method('send')

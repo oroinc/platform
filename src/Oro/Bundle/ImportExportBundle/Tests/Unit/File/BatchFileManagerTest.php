@@ -60,6 +60,54 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(2, $splittedFiles);
     }
 
+    public function testShouldSplitFileWithCustomBatchSize(): void
+    {
+        $context = new Context(
+            [
+                Context::OPTION_FILE_PATH => 'test.csv',
+                Context::OPTION_DELIMITER => ';',
+                Context::OPTION_ENCLOSURE => '|',
+                Context::OPTION_BATCH_SIZE => 3,
+            ]
+        );
+
+        $reader = $this->createReaderMock();
+        $reader->expects($this->once())
+            ->method('initializeByContext')
+            ->with($context);
+        $reader->expects($this->exactly(6))
+            ->method('read')
+            ->with($context)
+            ->willReturnOnConsecutiveCalls([1, 2], [3, 4], [5, 6], [7, 8], [9, 10], false);
+        $reader->expects($this->once())
+            ->method('getHeader')
+            ->willReturn(['a', 'b']);
+
+        $fileManagerMock = $this->createFileManagerMock();
+
+        $writer = $this->createWriterMock();
+        $writer->expects($this->exactly(2))
+            ->method('setImportExportContext');
+
+        $writer
+            ->expects($this->exactly(2))
+            ->method('write')
+            ->withConsecutive(
+                [[[1, 2], [3, 4], [5, 6]]],
+                [[[7, 8], [9, 10]]]
+            );
+        $batchFileManager = new BatchFileManager($fileManagerMock, 1);
+        $batchFileManager->setReader($reader);
+        $batchFileManager->setWriter($writer);
+        $batchFileManager->setConfigurationOptions([
+            Context::OPTION_DELIMITER => ';',
+            Context::OPTION_ENCLOSURE => '|',
+            Context::OPTION_BATCH_SIZE => 3,
+        ]);
+        $splittedFiles = $batchFileManager->splitFile('test.csv');
+        $this->assertCount(2, $splittedFiles);
+    }
+
     public function testShouldThrowErrorDuringSplitFile()
     {
         $fileManagerMock = $this->createFileManagerMock();

@@ -46,7 +46,7 @@ class OroFeatureContext extends RawMinkContext
     }
 
     /**
-     * Returns fixed step argument (with \\" replaced back to ")
+     * Returns fixed step argument (\\" replaced back to ", \\# replaced back to #)
      *
      * @param string $argument
      *
@@ -54,7 +54,7 @@ class OroFeatureContext extends RawMinkContext
      */
     protected function fixStepArgument($argument)
     {
-        return str_replace('\\"', '"', $argument);
+        return str_replace(['\\"', '\\#'], ['"', '#'], $argument);
     }
 
     /**
