@@ -5,9 +5,9 @@ namespace Oro\Bundle\NotificationBundle\Controller;
 use Oro\Bundle\NotificationBundle\Entity\MassNotification;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * The controller for MassNotification entity.
@@ -60,7 +60,7 @@ class MassNotificationController extends Controller
         $statusLabel = $massNotification->getStatus() == MassNotification::STATUS_FAILED ?
             $translator->trans('oro.notification.massnotification.status.failed') :
             $translator->trans('oro.notification.massnotification.status.success');
-        
+
         return [
             'entity'      => $massNotification,
             'statusLabel' => $statusLabel

@@ -9,13 +9,12 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Entity Attribute Controller
@@ -215,9 +214,9 @@ class AttributeController extends Controller
      *      "/remove/{id}",
      *      name="oro_attribute_remove",
      *      requirements={"id"="\d+"},
-     *      defaults={"id"=0}
+     *      defaults={"id"=0},
+     *      methods={"DELETE"}
      * )
-     * @Method("DELETE")
      * @CsrfProtection()
      * @param FieldConfigModel $field
      * @return \Symfony\Component\HttpFoundation\JsonResponse
@@ -240,9 +239,9 @@ class AttributeController extends Controller
      *      "/unremove/{id}",
      *      name="oro_attribute_unremove",
      *      requirements={"id"="\d+"},
-     *      defaults={"id"=0}
+     *      defaults={"id"=0},
+     *      methods={"POST"}
      * )
-     * @Method("POST")
      * @CsrfProtection()
      * @param FieldConfigModel $field
      * @return \Symfony\Component\HttpFoundation\JsonResponse

@@ -151,7 +151,7 @@ The layout is now ready. To test, we create a test controller:
 
 ```php
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Oro\Bundle\LayoutBundle\Annotation\Layout;
 
 class UserController extends Controller
