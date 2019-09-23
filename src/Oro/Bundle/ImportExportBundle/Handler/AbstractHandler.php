@@ -127,6 +127,16 @@ abstract class AbstractHandler
      */
     protected function getJobReader($jobName, $processorType)
     {
+        return $this->getJobStep($jobName, $processorType)->getReader();
+    }
+
+    /**
+     * @param string $jobName
+     * @param string $processorType
+     * @return ItemStep
+     */
+    protected function getJobStep($jobName, $processorType)
+    {
         /**  @var Job $job */
         $job = $this->jobExecutor->getJob(
             $processorType,
@@ -144,7 +154,7 @@ abstract class AbstractHandler
             throw new LogicException(sprintf('Step of Job\'s "%s" must be configured', $jobName));
         }
 
-        return $step->getReader();
+        return $step;
     }
 
     /**
