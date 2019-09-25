@@ -136,3 +136,9 @@ services:
             - '@oro_report.calendar_date_manager'
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
+
+    oro_report.grid.event_listener.column_format_normalization:
+        class: Oro\Bundle\ReportBundle\Grid\EventListener\ColumnCurrencyNormalization
+        public: false
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before, method: onBuildBefore }
