@@ -150,3 +150,5 @@ oro:
                 owner.label:              Owner
                 organization.label:       Organization
                 default.label:            Default
+            attributegroup:
+                entity_plural_label:      Attribute Groups
