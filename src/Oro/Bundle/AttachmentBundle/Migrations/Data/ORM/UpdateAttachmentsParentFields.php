@@ -46,8 +46,8 @@ class UpdateAttachmentsParentFields extends AbstractFixture
                 continue;
             }
 
-            foreach ($metadata->getAssociationMappings() as $associationMapping) {
-                if (!is_a($associationMapping['targetEntity'], File::class, true)) {
+            foreach ($metadata->getAssociationMappings() as $association) {
+                if (empty($association['isOwningSide']) || !is_a($association['targetEntity'], File::class, true)) {
                     continue;
                 }
 
@@ -61,7 +61,7 @@ class UpdateAttachmentsParentFields extends AbstractFixture
                                 $field['name']
                             );
                         },
-                        $associationMapping['joinColumns']
+                        $association['joinColumns']
                     )
                 );
 
@@ -74,7 +74,7 @@ class UpdateAttachmentsParentFields extends AbstractFixture
                         $metadata->getTableName(),
                         $fields,
                         \addslashes($metadata->getName()),
-                        $associationMapping['fieldName']
+                        $association['fieldName']
                     );
                 } else {
                     $queries[] = sprintf(
@@ -83,7 +83,7 @@ class UpdateAttachmentsParentFields extends AbstractFixture
                         'FROM %s e ' .
                         'WHERE af.parent_entity_id IS NULL AND %s;',
                         $metadata->getName(),
-                        $associationMapping['fieldName'],
+                        $association['fieldName'],
                         $metadata->getTableName(),
                         $fields
                     );

@@ -1,0 +1,14 @@
+oro:
+    digitalasset:
+        entity_label: Digital Asset
+        entity_plural_label: Digital Assets
+        entity_description: Digital Asset represents a file asset which can be used as upload file for other entities.
+
+        id.label: Id
+        titles.label: Title
+        source_file.label: Source File
+        child_files.label: Child Files
+        owner.label: Owner
+        organization.label: Organization
+
+    attachment.file.digital_asset.label: Digital Asset
