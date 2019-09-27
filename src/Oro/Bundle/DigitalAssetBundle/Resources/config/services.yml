@@ -1,0 +1,7 @@
+services:
+    oro_digital_asset.provider.mime_types:
+        class: Oro\Bundle\DigitalAssetBundle\Provider\MimeTypesProvider
+        # Public because used in digital-asset-grid
+        public: true
+        arguments:
+            - '@oro_config.manager'

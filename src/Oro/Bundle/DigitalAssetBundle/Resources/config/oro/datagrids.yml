@@ -1,0 +1,108 @@
+datagrids:
+    digital-asset-grid:
+        extended_entity_name: 'Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset'
+        source:
+            type: orm
+            query:
+                select:
+                    - digitalAsset
+                    - digitalAsset.id
+                    - file.originalFilename
+                    - file.mimeType
+                    - file.fileSize
+                    - file.createdAt
+                    - file.updatedAt
+                    - CONCAT(owner.firstName, ' ', owner.lastName) as ownerName
+                from:
+                    - { table: 'Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset', alias: digitalAsset }
+                join:
+                    left:
+                        - { join: digitalAsset.titles, alias: localizedTitles }
+                        - { join: digitalAsset.sourceFile, alias: file }
+                        - { join: digitalAsset.owner, alias: owner }
+        columns:
+            title:
+                type: localized_value
+                label: oro.digitalasset.titles.label
+                data_name: titles
+            originalFilename:
+                type: twig
+                label: oro.attachment.file.filename.label
+                frontend_type: html
+                template: 'OroDigitalAssetBundle:DigitalAsset/Datagrid/Property:sourceFileLink.html.twig'
+            fileSize:
+                label: oro.attachment.file.file_size.label
+                type: twig
+                frontend_type: html
+                template: 'OroDigitalAssetBundle:DigitalAsset/Datagrid/Property:fileSize.html.twig'
+            mimeType:
+                label: oro.attachment.file.mime_type.label
+            owner:
+                label: oro.attachment.file.owner.label
+                data_name: ownerName
+            createdAt:
+                label: oro.ui.created_at
+                frontend_type: datetime
+            updatedAt:
+                label: oro.ui.updated_at
+                frontend_type: datetime
+                renderable: false
+        properties:
+            id: ~
+            title:
+                type: localized_value
+                data_name: titles
+        sorters:
+            columns:
+                title:
+                    data_name: title
+                originalFilename:
+                    data_name: digitalAsset.originalFilename
+                fileSize:
+                    data_name: file.fileSize
+                mimeType:
+                    data_name: file.mimeType
+                owner:
+                    data_name: ownerName
+                createdAt:
+                    data_name: digitalAsset.createdAt
+                updatedAt:
+                    data_name: digitalAsset.updatedAt
+            default:
+                createdAt: DESC
+        filters:
+            columns:
+                title:
+                    type: string
+                    label: oro.digitalasset.titles.label
+                    data_name: title
+                originalFilename:
+                    type: string
+                    label: oro.attachment.file.filename.label
+                    data_name: file.originalFilename
+                fileSize:
+                    type: number
+                    label: oro.attachment.file.file_size.label
+                    data_name: file.fileSize
+                mimeType:
+                    type: choice
+                    label: oro.attachment.file.mime_type.label
+                    data_name: file.mimeType
+                    options:
+                        field_options:
+                            multiple: true
+                            choices: '@oro_digital_asset.provider.mime_types->getMimeTypesAsChoices'
+                            translatable_options: false
+                owner:
+                    type: choice-tree
+                    data_name: owner
+                    autocomplete_alias: assigned_to_organization_users
+                    renderedPropertyName: fullName
+                    className: 'Oro\Bundle\UserBundle\Entity\User'
+                createdAt:
+                    type: datetime
+                    data_name: digitalAsset.createdAt
+                updatedAt:
+                    type: datetime
+                    data_name: digitalAsset.updatedAt
+                    enabled: false

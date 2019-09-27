@@ -1,0 +1,6 @@
+services:
+    Oro\Bundle\DigitalAssetBundle\Controller\DigitalAssetController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }

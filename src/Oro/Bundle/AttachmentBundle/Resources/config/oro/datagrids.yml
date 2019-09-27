@@ -24,7 +24,7 @@ datagrids:
                 type: twig
                 label: oro.attachment.file.filename.label
                 frontend_type: html
-                template: OroAttachmentBundle:Attachment:Datagrid/Property/allachmentLink.html.twig
+                template: OroAttachmentBundle:Attachment:Datagrid/Property/attachmentLink.html.twig
             fileSize:
                 label: oro.attachment.file.file_size.label
                 type: twig

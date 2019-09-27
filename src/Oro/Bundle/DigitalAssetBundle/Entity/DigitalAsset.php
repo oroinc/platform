@@ -26,6 +26,7 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @Config(
+ *      routeName="oro_digital_asset_index",
  *      defaultValues={
  *          "entity"={
  *              "icon"="fa-file"
