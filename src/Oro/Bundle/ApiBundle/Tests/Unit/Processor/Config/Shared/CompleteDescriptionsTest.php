@@ -9,7 +9,9 @@ use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDescriptions;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\ProductPrice as TestEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\RequestDependedTextProcessor;
@@ -70,8 +72,11 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             $this->resourceDocParserRegistry,
             $this->translator,
             $this->ownershipConfigProvider,
-            new RequestDependedTextProcessor(new RequestExpressionMatcher())
+            new RequestDependedTextProcessor(new RequestExpressionMatcher()),
+            $this->createMock(ResourcesProvider::class)
         );
+
+        $this->context->setClassName(TestEntity::class);
     }
 
     public function testWithoutTargetAction()
@@ -440,7 +445,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         ];
 
         $this->ownershipConfigProvider->addEntityConfig(
-            self::TEST_CLASS_NAME,
+            TestEntity::class,
             []
         );
 
@@ -472,7 +477,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         ];
 
         $this->ownershipConfigProvider->addEntityConfig(
-            self::TEST_CLASS_NAME,
+            TestEntity::class,
             ['owner_field_name' => 'owner']
         );
 
@@ -506,7 +511,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         ];
 
         $this->ownershipConfigProvider->addEntityConfig(
-            self::TEST_CLASS_NAME,
+            TestEntity::class,
             ['organization_field_name' => 'organization']
         );
 
@@ -540,7 +545,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         ];
 
         $this->ownershipConfigProvider->addEntityConfig(
-            self::TEST_CLASS_NAME,
+            TestEntity::class,
             ['owner_field_name' => 'owner1']
         );
 
@@ -575,7 +580,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         ];
 
         $this->ownershipConfigProvider->addEntityConfig(
-            self::TEST_CLASS_NAME,
+            TestEntity::class,
             ['organization_field_name' => 'organization1']
         );
 
@@ -637,7 +642,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFieldDescriptionWhenItExistsInConfig()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
@@ -668,7 +673,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFieldDescriptionWhenItIsLabelObject()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
@@ -704,7 +709,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFieldDescriptionWhenItExistsInConfigAndContainsInheritDocPlaceholder()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
@@ -740,7 +745,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFieldDescriptionForRenamedFieldWhenItExistsInConfigAndContainsInheritDocPlaceholder()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
@@ -778,7 +783,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFieldDescriptionWhenItExistsInDocFile()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy' => 'all',
@@ -813,7 +818,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFieldDescriptionWhenItExistsInDocFileAndContainsInheritDocPlaceholder()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy' => 'all',
@@ -850,7 +855,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFieldDescriptionWhenItAndCommonDescriptionExistInDocFileAndContainsInheritDocPlaceholder()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy' => 'all',
@@ -892,7 +897,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFieldDescriptionWhenItExistsInDocFileAndContainsInheritDocPlaceholderButNoAndCommonDescription()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy' => 'all',
@@ -933,7 +938,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFieldDescriptionWhenItDoesNotExistInDocFileButExistCommonDescription()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy' => 'all',
@@ -970,7 +975,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFieldDescriptionWhenItDoesNotExistInDocFileButExistCommonDescriptionWithInheritDocPlaceholder()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy' => 'all',
@@ -1011,7 +1016,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFieldDescriptionWhenItAndCommonDescriptionDoNotExistInDocFile()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy' => 'all',
@@ -1052,7 +1057,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFieldDescriptionForNestedField()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy' => 'all',
@@ -1097,7 +1102,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFieldDescriptionForNestedFieldWhenFieldIsRenamed()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy' => 'all',
@@ -1144,7 +1149,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFieldDescriptionForRenamedNestedField()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy' => 'all',
@@ -1192,7 +1197,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFieldDescriptionForAssociationField()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy' => 'all',
@@ -1239,7 +1244,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFilterDescriptionWhenItExistsInConfig()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
@@ -1276,7 +1281,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFilterDescriptionWhenItIsLabelObject()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
@@ -1318,7 +1323,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFilterDescriptionWhenItExistsInDocFile()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
@@ -1358,7 +1363,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFilterDescriptionForRegularField()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
@@ -1398,7 +1403,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testFilterDescriptionForAssociation()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
@@ -1535,7 +1540,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             'description'      => 'test description'
         ];
 
-        $this->context->setParentClassName('Test\Entity');
+        $this->context->setParentClassName(TestEntity::class);
         $this->context->setAssociationName('testAssociation');
         $this->context->setTargetAction('get_subresource');
         $this->context->setResult($this->createConfigObject($config));
@@ -1589,7 +1594,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             ->with('description_label')
             ->willReturn('translated description');
 
-        $this->context->setParentClassName('Test\Entity');
+        $this->context->setParentClassName(TestEntity::class);
         $this->context->setAssociationName('testAssociation');
         $this->context->setTargetAction('get_subresource');
         $this->context->setResult($this->createConfigObject($config));
@@ -1607,13 +1612,13 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testPrimaryResourceDescriptionWhenEntityDocProviderReturnsNull()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get';
         $config = [
             'exclusion_policy' => 'all'
         ];
-        $entityDescription = 'Entity';
-        $actionDescription = 'Get Entity';
+        $entityDescription = 'Product Price';
+        $actionDescription = 'Get Product Price';
 
         $this->entityDocProvider->expects(self::once())
             ->method('getEntityDescription')
@@ -1641,13 +1646,13 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testPrimaryResourceDescriptionWhenEntityDocProviderReturnsNullForCollectionResource()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy' => 'all'
         ];
-        $entityDescription = 'Entity';
-        $actionDescription = 'Get list of Entity';
+        $entityDescription = 'Product Prices';
+        $actionDescription = 'Get list of Product Prices';
 
         $this->entityDocProvider->expects(self::once())
             ->method('getEntityPluralDescription')
@@ -1676,7 +1681,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testPrimaryResourceDescriptionLoadedByEntityDocProvider()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get';
         $config = [
             'exclusion_policy' => 'all'
@@ -1710,7 +1715,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testSubresourceDescriptionLoadedByEntityDocProvider()
     {
-        $parentEntityClass = 'Test\Entity';
+        $parentEntityClass = TestEntity::class;
         $associationName = 'testAssociation';
         $targetAction = 'get_subresource';
         $config = [
@@ -1746,7 +1751,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testPrimaryResourceDescriptionLoadedByEntityDocProviderForCollectionResource()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy' => 'all'
@@ -1781,7 +1786,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testSubresourceDescriptionLoadedByEntityDocProviderForCollectionResource()
     {
-        $parentEntityClass = 'Test\Entity';
+        $parentEntityClass = TestEntity::class;
         $associationName = 'testAssociation';
         $targetAction = 'get_subresource';
         $config = [
@@ -1818,7 +1823,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testPrimaryResourceRegisterDocumentationResources()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy'       => 'all',
@@ -1855,7 +1860,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testSubresourceRegisterDocumentationResources()
     {
-        $parentEntityClass = 'Test\Entity';
+        $parentEntityClass = TestEntity::class;
         $associationName = 'testAssociation';
         $targetAction = 'get_list';
         $config = [
@@ -1917,7 +1922,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             'documentation'    => 'test documentation'
         ];
 
-        $this->context->setParentClassName('Test\Entity');
+        $this->context->setParentClassName(TestEntity::class);
         $this->context->setAssociationName('testAssociation');
         $this->context->setTargetAction('get_subresource');
         $this->context->setResult($this->createConfigObject($config));
@@ -1935,7 +1940,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testPrimaryResourceDocumentationWithInheritDocPlaceholder()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $config = [
             'exclusion_policy' => 'all',
             'documentation'    => 'action documentation. {@inheritdoc}'
@@ -1963,7 +1968,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testPrimaryResourceDocumentationLoadedByResourceDocProvider()
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy' => 'all'
@@ -1997,7 +2002,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testSubresourceDocumentationLoadedByResourceDocProvider()
     {
-        $parentEntityClass = 'Test\Entity';
+        $parentEntityClass = TestEntity::class;
         $associationName = 'testAssociation';
         $targetAction = 'get_subresource';
         $config = [
@@ -2033,7 +2038,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
     public function testSubresourceDocumentationLoadedByResourceDocProviderForCollectionResource()
     {
-        $parentEntityClass = 'Test\Entity';
+        $parentEntityClass = TestEntity::class;
         $associationName = 'testAssociation';
         $targetAction = 'get_subresource';
         $config = [
@@ -2076,7 +2081,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $inheritDocText,
         $expectedText
     ) {
-        $entityClass = 'Test\Entity';
+        $entityClass = TestEntity::class;
         $config = [
             'exclusion_policy' => 'all',
             'documentation'    => $mainText

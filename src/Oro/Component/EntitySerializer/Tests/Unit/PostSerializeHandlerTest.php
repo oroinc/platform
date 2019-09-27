@@ -78,7 +78,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
             1,
             'SELECT u0_.id AS id_0, p1_.name AS name_1, p1_.id AS id_2'
             . ' FROM product_table p1_'
-            . ' INNER JOIN user_table u0_ ON (p1_.owner_id = u0_.id)'
+            . ' INNER JOIN user_table u0_ ON p1_.owner_id = u0_.id'
             . ' WHERE u0_.id = ?',
             [
                 [
@@ -196,7 +196,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
             1,
             'SELECT u0_.id AS id_0, p1_.name AS name_1, p1_.id AS id_2'
             . ' FROM product_table p1_'
-            . ' INNER JOIN user_table u0_ ON (p1_.owner_id = u0_.id)'
+            . ' INNER JOIN user_table u0_ ON p1_.owner_id = u0_.id'
             . ' WHERE u0_.id = ?',
             [
                 [
@@ -356,7 +356,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
             'SELECT u0_.id AS id_0,'
             . ' p1_.id AS id_1'
             . ' FROM product_table p1_'
-            . ' INNER JOIN user_table u0_ ON (p1_.owner_id = u0_.id)'
+            . ' INNER JOIN user_table u0_ ON p1_.owner_id = u0_.id'
             . ' WHERE u0_.id = ?',
             [
                 [
@@ -401,12 +401,9 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
             $conn,
             3,
             'SELECT p0_.id AS id_0, g1_.id AS id_1'
-            . ' FROM group_table g1_'
-            . ' INNER JOIN product_table p0_ ON (EXISTS ('
-            . 'SELECT 1 FROM rel_product_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.product_group_id = g3_.id'
-            . ' WHERE r2_.product_id = p0_.id AND g3_.id IN (g1_.id)'
-            . '))'
+            . ' FROM product_table p0_'
+            . ' INNER JOIN rel_product_to_group_table r2_ ON p0_.id = r2_.product_id'
+            . ' INNER JOIN group_table g1_ ON g1_.id = r2_.product_group_id'
             . ' WHERE p0_.id IN (?, ?)',
             [
                 [

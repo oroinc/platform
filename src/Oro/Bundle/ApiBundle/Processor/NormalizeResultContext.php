@@ -11,11 +11,8 @@ use Oro\Bundle\ApiBundle\Model\Error;
  */
 class NormalizeResultContext extends ApiContext
 {
-    /**
-     * a value indicates whether errors should just stop processing
-     * or an exception should be thrown is any error occurred
-     */
-    const SOFT_ERRORS_HANDLING = 'softErrorsHandling';
+    /** bool */
+    private $softErrorsHandling = false;
 
     /** @var Error[] */
     private $errors;
@@ -73,7 +70,7 @@ class NormalizeResultContext extends ApiContext
      */
     public function isSoftErrorsHandling()
     {
-        return (bool)$this->get(self::SOFT_ERRORS_HANDLING);
+        return $this->softErrorsHandling;
     }
 
     /**
@@ -84,10 +81,6 @@ class NormalizeResultContext extends ApiContext
      */
     public function setSoftErrorsHandling($softErrorsHandling)
     {
-        if ($softErrorsHandling) {
-            $this->set(self::SOFT_ERRORS_HANDLING, true);
-        } else {
-            $this->remove(self::SOFT_ERRORS_HANDLING);
-        }
+        $this->softErrorsHandling = $softErrorsHandling;
     }
 }

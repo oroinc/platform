@@ -213,7 +213,7 @@ class ConfigContext extends ApiContext
      */
     public function hasExtra($extraName)
     {
-        return in_array($extraName, $this->get(self::EXTRA), true);
+        return \in_array($extraName, $this->get(self::EXTRA), true);
     }
 
     /**
@@ -268,6 +268,29 @@ class ConfigContext extends ApiContext
 
         $this->extras = $extras;
         $this->set(self::EXTRA, $names);
+    }
+
+    /**
+     * Removes a request for some configuration data.
+     *
+     * @param string $extraName
+     */
+    public function removeExtra(string $extraName)
+    {
+        $keys = array_keys($this->extras);
+        foreach ($keys as $key) {
+            if ($this->extras[$key]->getName() === $extraName) {
+                unset($this->extras[$key]);
+            }
+        }
+        $this->extras = array_values($this->extras);
+
+        $names = $this->get(self::EXTRA);
+        $key = array_search($extraName, $names, true);
+        if (false !== $key) {
+            unset($names[$key]);
+            $this->set(self::EXTRA, array_values($names));
+        }
     }
 
     /**

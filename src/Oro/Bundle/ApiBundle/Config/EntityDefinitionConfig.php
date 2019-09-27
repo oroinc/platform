@@ -350,6 +350,31 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     }
 
     /**
+     * Checks whether this configuration represent a request for the entity identifier only
+     * or values of other fields should be returned as well.
+     *
+     * @return bool
+     */
+    public function isIdentifierOnlyRequested(): bool
+    {
+        if (empty($this->identifierFieldNames)
+            || \count($this->fields) !== \count($this->identifierFieldNames)
+        ) {
+            return false;
+        }
+
+        $isIdentifierOnly = true;
+        foreach ($this->identifierFieldNames as $idFieldName) {
+            if (!isset($this->fields[$idFieldName])) {
+                $isIdentifierOnly = false;
+                break;
+            }
+        }
+
+        return $isIdentifierOnly;
+    }
+
+    /**
      * Indicates whether the entity should be collapsed.
      * It means that target entity should be returned as a value, instead of an array with values of entity fields.
      *
@@ -830,21 +855,6 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
         } else {
             $maxResults = (int)$maxResults;
             $this->items[ConfigUtil::MAX_RESULTS] = $maxResults >= 0 ? $maxResults : -1;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setHasMore($hasMore)
-    {
-        parent::setHasMore($hasMore);
-        $fields = $this->getFields();
-        foreach ($fields as $field) {
-            $targetConfig = $field->getTargetEntity();
-            if (null !== $targetConfig) {
-                $targetConfig->setHasMore($hasMore);
-            }
         }
     }
 

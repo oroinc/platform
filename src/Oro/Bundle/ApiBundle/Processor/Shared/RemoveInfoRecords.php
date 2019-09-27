@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -65,6 +67,12 @@ abstract class RemoveInfoRecords implements ProcessorInterface
      */
     protected function processEntity(array &$data, EntityMetadata $metadata, string $propertyPath): array
     {
+        if (is_a($metadata->getClassName(), EntityIdentifier::class, true)
+            && !empty($data[ConfigUtil::CLASS_NAME])
+        ) {
+            $metadata = $metadata->getEntityMetadata($data[ConfigUtil::CLASS_NAME]);
+        }
+
         $result = [];
         foreach ($data as $fieldName => &$value) {
             $association = $metadata->getAssociation($fieldName);
@@ -75,16 +83,16 @@ abstract class RemoveInfoRecords implements ProcessorInterface
             $infoRecords = null;
             if ($association->isCollection()) {
                 if (!empty($value)) {
-                    $infoRecords = $this->processEntities(
+                    $infoRecords = $this->processAssociationEntities(
                         $value,
-                        $association->getTargetMetadata(),
+                        $association,
                         $this->buildPath($propertyPath, $fieldName)
                     );
                 }
             } elseif (\is_array($value)) {
-                $infoRecords = $this->processEntity(
+                $infoRecords = $this->processAssociationEntity(
                     $value,
-                    $association->getTargetMetadata(),
+                    $association,
                     $this->buildPath($propertyPath, $fieldName)
                 );
             }
@@ -126,6 +134,79 @@ abstract class RemoveInfoRecords implements ProcessorInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @param array               $data
+     * @param AssociationMetadata $association
+     * @param string              $propertyPath
+     *
+     * @return array [property path => info record, ...]
+     */
+    private function processAssociationEntity(
+        array &$data,
+        AssociationMetadata $association,
+        string $propertyPath
+    ): array {
+        return $this->processEntity(
+            $data,
+            $this->getAssociationTargetMetadata($association, $data),
+            $propertyPath
+        );
+    }
+
+    /**
+     * @param array               $data
+     * @param AssociationMetadata $association
+     * @param string              $propertyPath
+     *
+     * @return array [property path => info record, ...]
+     */
+    private function processAssociationEntities(
+        array &$data,
+        AssociationMetadata $association,
+        string $propertyPath
+    ): array {
+        $result = [];
+        if (isset($data[ConfigUtil::INFO_RECORD_KEY])) {
+            $result[$propertyPath] = $data[ConfigUtil::INFO_RECORD_KEY];
+            unset($data[ConfigUtil::INFO_RECORD_KEY]);
+        }
+        foreach ($data as $key => &$value) {
+            if (!\is_array($value)) {
+                continue;
+            }
+
+            $infoRecords = $this->processAssociationEntity(
+                $value,
+                $association,
+                $this->buildPath($propertyPath, (string)$key)
+            );
+            if (!empty($infoRecords)) {
+                foreach ($infoRecords as $path => $record) {
+                    $result[$path] = $record;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param AssociationMetadata $association
+     * @param array               $data
+     *
+     * @return EntityMetadata
+     */
+    private function getAssociationTargetMetadata(AssociationMetadata $association, array $data): EntityMetadata
+    {
+        if (is_a($association->getTargetClassName(), EntityIdentifier::class, true)
+            && !empty($data[ConfigUtil::CLASS_NAME])
+        ) {
+            return $association->getTargetMetadata($data[ConfigUtil::CLASS_NAME]);
+        }
+
+        return $association->getTargetMetadata();
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraSectionInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -37,7 +38,13 @@ class EnsureInitialized implements ProcessorInterface
                 $this->configLoaderFactory->getLoader(ConfigUtil::DEFINITION)->load([])
             );
         }
+
         $extras = $context->getExtras();
+        if (!$context->getResult()->isSortingEnabled() && $context->hasExtra(SortersConfigExtra::NAME)) {
+            $context->removeExtra(SortersConfigExtra::NAME);
+            $extras = $context->getExtras();
+        }
+
         foreach ($extras as $extra) {
             $sectionName = $extra->getName();
             if ($extra instanceof ConfigExtraSectionInterface && !$context->has($sectionName)) {

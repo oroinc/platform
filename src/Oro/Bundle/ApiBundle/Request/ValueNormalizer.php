@@ -11,22 +11,18 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
  */
 class ValueNormalizer
 {
-    const DEFAULT_REQUIREMENT = '.+';
+    public const DEFAULT_REQUIREMENT = '.+';
 
     /** @var ActionProcessorInterface */
-    protected $processor;
+    private $processor;
 
     /** @var string[] */
-    protected $requirements = [];
+    private $requirements = [];
 
-    /**
-     * List of data types, values of such types will be cached locally.
-     *
-     * @var array
-     */
-    protected $cachedData = [
+    /** @var array the data types that values can be cached in memory */
+    private $cachedData = [
         DataType::ENTITY_TYPE  => [],
-        DataType::ENTITY_CLASS => [],
+        DataType::ENTITY_CLASS => []
     ];
 
     /**
@@ -58,6 +54,8 @@ class ValueNormalizer
      * @param bool        $isRangeAllowed Whether a value can be a pair of "from" and "to" values.
      *
      * @return mixed
+     *
+     * @throws \UnexpectedValueException if the value cannot be converted the given data-type
      */
     public function normalizeValue(
         $value,
@@ -116,9 +114,10 @@ class ValueNormalizer
      * @param bool        $isRangeAllowed
      *
      * @return NormalizeValueContext
-     * @throws \Exception
+     *
+     * @throws \UnexpectedValueException if the value cannot be converted the given data-type
      */
-    protected function doNormalization(
+    private function doNormalization(
         $dataType,
         RequestType $requestType,
         $value,
@@ -149,8 +148,10 @@ class ValueNormalizer
      * @param bool        $isRangeAllowed
      *
      * @return mixed
+     *
+     * @throws \UnexpectedValueException if the value cannot be converted the given data-type
      */
-    protected function getNormalizedValue(
+    private function getNormalizedValue(
         $dataType,
         RequestType $requestType,
         $value,
@@ -168,7 +169,7 @@ class ValueNormalizer
      *
      * @return string
      */
-    protected function buildCacheKey(RequestType $requestType, $isArrayAllowed, $isRangeAllowed)
+    private function buildCacheKey(RequestType $requestType, $isArrayAllowed, $isRangeAllowed)
     {
         $result = (string)$requestType;
         if ($isArrayAllowed) {

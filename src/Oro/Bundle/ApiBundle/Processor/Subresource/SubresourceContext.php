@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraCollection;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\HateoasConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
@@ -168,7 +169,7 @@ class SubresourceContext extends Context
     public function getManageableEntityClass(DoctrineHelper $doctrineHelper)
     {
         $entityClass = $this->getClassName();
-        if (\is_a($entityClass, EntityIdentifier::class, true)) {
+        if (is_a($entityClass, EntityIdentifier::class, true)) {
             $entityClass = $this->getAssociationBaseTargetClassName();
         }
         if ($entityClass) {
@@ -226,6 +227,9 @@ class SubresourceContext extends Context
                 $this->parentConfigExtras = new ConfigExtraCollection();
             }
             $this->parentConfigExtras->setConfigExtras($extras);
+            if ($this->isHateoasEnabled() && !$this->parentConfigExtras->hasConfigExtra(HateoasConfigExtra::NAME)) {
+                $this->parentConfigExtras->addConfigExtra(new HateoasConfigExtra());
+            }
         }
     }
 
@@ -282,6 +286,28 @@ class SubresourceContext extends Context
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setHateoas(bool $flag)
+    {
+        parent::setHateoas($flag);
+        if (null !== $this->parentConfigExtras) {
+            if (!$flag) {
+                $this->parentConfigExtras->removeConfigExtra(HateoasConfigExtra::NAME);
+            } elseif (!$this->parentConfigExtras->hasConfigExtra(HateoasConfigExtra::NAME)) {
+                $this->parentConfigExtras->addConfigExtra(new HateoasConfigExtra());
+            }
+        }
+        if (null !== $this->parentMetadataExtras) {
+            if (!$flag) {
+                $this->parentMetadataExtras->removeMetadataExtra(HateoasMetadataExtra::NAME);
+            } elseif (!$this->parentMetadataExtras->hasMetadataExtra(HateoasMetadataExtra::NAME)) {
+                $this->parentMetadataExtras->addMetadataExtra(new HateoasMetadataExtra($this->getFilterValues()));
+            }
+        }
+    }
+
+    /**
      * Checks whether a configuration of the parent entity exists.
      *
      * @return bool
@@ -326,7 +352,7 @@ class SubresourceContext extends Context
      */
     protected function createParentConfigExtras()
     {
-        return [
+        $extras = [
             new EntityDefinitionConfigExtra(
                 $this->getAction(),
                 $this->isCollection(),
@@ -335,6 +361,11 @@ class SubresourceContext extends Context
             ),
             new FilterFieldsConfigExtra([$this->getParentClassName() => [$this->getAssociationName()]])
         ];
+        if ($this->isHateoasEnabled()) {
+            $extras[] = new HateoasConfigExtra();
+        }
+
+        return $extras;
     }
 
     /**
@@ -400,6 +431,11 @@ class SubresourceContext extends Context
                 $this->parentMetadataExtras = new MetadataExtraCollection();
             }
             $this->parentMetadataExtras->setMetadataExtras($extras);
+            if ($this->isHateoasEnabled()
+                && !$this->parentMetadataExtras->hasMetadataExtra(HateoasMetadataExtra::NAME)
+            ) {
+                $this->parentMetadataExtras->addMetadataExtra(new HateoasMetadataExtra($this->getFilterValues()));
+            }
         }
     }
 
@@ -453,6 +489,9 @@ class SubresourceContext extends Context
         if ($action) {
             $extras[] = new ActionMetadataExtra($action);
         }
+        if ($this->isHateoasEnabled()) {
+            $extras[] = new HateoasMetadataExtra($this->getFilterValues());
+        }
 
         return $extras;
     }
@@ -481,16 +520,12 @@ class SubresourceContext extends Context
         }
 
         try {
-            $extras = $this->getParentMetadataExtras();
-            if ($this->isHateoasEnabled()) {
-                $extras[] = new HateoasMetadataExtra($this->getFilterValues());
-            }
             $metadata = $this->metadataProvider->getMetadata(
                 $parentEntityClass,
                 $this->getVersion(),
                 $this->getRequestType(),
                 $this->getParentConfig(),
-                $extras
+                $this->getParentMetadataExtras()
             );
             $this->set(self::PARENT_METADATA, $metadata);
         } catch (\Exception $e) {

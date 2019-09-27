@@ -11,24 +11,27 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 /**
  * Contains a set of parameters to filter Scope entities
  * and provides methods to apply these parameters to scope related parts of ORM query.
+ *
+ * Note: parameters are sorted by priority,
+ * the higher the priority, the closer the parameter to the top of the parameter list.
  */
 class ScopeCriteria implements \IteratorAggregate
 {
     public const IS_NOT_NULL = 'IS_NOT_NULL';
 
-    /** @var array */
-    private $context;
+    /** @var array the parameter list */
+    private $parameters;
 
     /** @var ClassMetadata */
     private $scopeClassMetadata;
 
     /**
-     * @param array         $context            [parameter name => parameter value, ...]
+     * @param array         $parameters         [parameter name => parameter value, ...]
      * @param ClassMetadata $scopeClassMetadata The metadata of Scope entity
      */
-    public function __construct(array $context, ClassMetadata $scopeClassMetadata)
+    public function __construct(array $parameters, ClassMetadata $scopeClassMetadata)
     {
-        $this->context = $context;
+        $this->parameters = $parameters;
         $this->scopeClassMetadata = $scopeClassMetadata;
     }
 
@@ -79,19 +82,24 @@ class ScopeCriteria implements \IteratorAggregate
     }
 
     /**
+     * Returns all parameters.
+     * The parameters are sorted by priority, the higher the priority,
+     * the closer the parameter to the top of the parameter list.
+     *
      * @return array
      */
     public function toArray(): array
     {
-        return $this->context;
+        return $this->parameters;
     }
 
     /**
-     * {@inheritdoc}
+     * Returns an iterator by parameters are sorted by priority.
+     * The higher the priority, the earlier the parameter is returned by the iterator.
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->context);
+        return new \ArrayIterator($this->parameters);
     }
 
     /**
@@ -107,7 +115,7 @@ class ScopeCriteria implements \IteratorAggregate
         bool $withPriority
     ): void {
         QueryBuilderUtil::checkIdentifier($alias);
-        foreach ($this->context as $field => $value) {
+        foreach ($this->parameters as $field => $value) {
             QueryBuilderUtil::checkIdentifier($field);
             if (in_array($field, $ignoreFields, true)) {
                 continue;
@@ -158,7 +166,7 @@ class ScopeCriteria implements \IteratorAggregate
                 if ($joinCondition) {
                     $usedFields = $this->getUsedFields($joinCondition, $alias);
                 }
-                foreach ($this->context as $field => $value) {
+                foreach ($this->parameters as $field => $value) {
                     if (in_array($field, $ignoreFields, true) || in_array($field, $usedFields, true)) {
                         continue;
                     }

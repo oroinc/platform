@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -289,13 +290,15 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
 
         if ($this->hasReferenceRepository()) {
             $idReferences = [];
+            $doctrine = self::getContainer()->get('doctrine');
             $references = $this->getReferenceRepository()->getReferences();
             foreach ($references as $referenceId => $entity) {
                 $entityClass = ClassUtils::getClass($entity);
                 $entityType = $this->getEntityType($entityClass, false);
                 if ($entityType) {
-                    $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass, false);
-                    if (null !== $metadata) {
+                    $em = $doctrine->getManagerForClass($entityClass);
+                    if ($em instanceof EntityManagerInterface) {
+                        $metadata = $em->getClassMetadata($entityClass);
                         $entityId = $metadata->getIdentifierValues($entity);
                         if (count($entityId) === 1) {
                             $entityId = (string)reset($entityId);

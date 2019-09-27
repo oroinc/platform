@@ -43,6 +43,7 @@ services:
         arguments:
             - '@oro_api.config_loader_factory'
             - '@oro_api.config_bag_registry'
+            - '@oro_api.merge_config_helper.action'
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -110 }
 

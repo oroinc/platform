@@ -1,23 +1,12 @@
-parameters:
-    oro_installer.yaml_persister.class:               Oro\Bundle\InstallerBundle\Persister\YamlPersister
-    oro_installer.script_manager.class:               Oro\Bundle\InstallerBundle\ScriptManager
 services:
     oro_installer.yaml_persister:
-        class: '%oro_installer.yaml_persister.class%'
+        class: Oro\Bundle\InstallerBundle\Persister\YamlPersister
         arguments:
             - '%kernel.project_dir%/config'
             - '%kernel.environment%'
 
-    kernel.listener.install.event:
-        class: Oro\Bundle\InstallerBundle\EventListener\RequestListener
-        arguments:
-            - '%installed%'
-            - '%kernel.debug%'
-        tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onRequest, priority: 10 }
-
     oro_installer.script_manager:
-        class: '%oro_installer.script_manager.class%'
+        class: Oro\Bundle\InstallerBundle\ScriptManager
         arguments:
             - '@kernel'
 

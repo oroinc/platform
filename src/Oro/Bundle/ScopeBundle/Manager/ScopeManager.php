@@ -214,19 +214,24 @@ class ScopeManager
     }
 
     /**
-     * @param Scope  $scope
-     * @param string $scopeType
+     * @param Scope             $scope
+     * @param string            $scopeType
+     * @param array|object|null $context
      *
      * @return ScopeCriteria
      */
-    public function getCriteriaByScope(Scope $scope, string $scopeType): ScopeCriteria
+    public function getCriteriaByScope(Scope $scope, string $scopeType, $context = null): ScopeCriteria
     {
         $criteria = $this->getNullContext();
         $providerIds = $this->getProviderIds($scopeType);
         foreach ($providerIds as $providerId) {
             $provider = $this->getProvider($providerId);
             $field = $provider->getCriteriaField();
-            $criteria[$field] = $this->propertyAccessor->getValue($scope, $field);
+            $value = $this->getCriteriaValueFromContext($context, $provider);
+            if (false === $value) {
+                $value = $this->propertyAccessor->getValue($scope, $field);
+            }
+            $criteria[$field] = $value;
         }
 
         return new ScopeCriteria($criteria, $this->getScopeClassMetadata());
@@ -367,6 +372,10 @@ class ScopeManager
     }
 
     /**
+     * Gets IDs of providers for the given scope type.
+     * The providers are sorted by the priority, the higher the priority,
+     * the closer the provider to the top of the list.
+     *
      * @param string $scopeType
      *
      * @return string[]

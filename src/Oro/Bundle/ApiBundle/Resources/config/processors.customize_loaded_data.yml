@@ -1,4 +1,11 @@
 services:
+    oro_api.customize_loaded_data.processor:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor
+        public: false
+        arguments:
+            - '@oro_api.processor_bag'
+            - customize_loaded_data
+
     oro_api.customize_loaded_data.build_custom_types:
         class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\BuildCustomTypes
         arguments:
@@ -12,6 +19,7 @@ services:
         arguments:
             - '@oro_api.config_provider'
             - '@oro_api.entity_serializer'
+            - '@oro_api.entity_serializer.serialization_helper'
             - '@oro_api.doctrine_helper'
             - '@oro_api.resources_provider'
         tags:

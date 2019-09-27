@@ -93,24 +93,15 @@ class QueryFactory
      */
     public function getNotInitializedToManyAssociationQueryBuilder(array $associationMapping): QueryBuilder
     {
-        $qb = $this->doctrineHelper->createQueryBuilder($associationMapping['targetEntity'], 'r');
         if ($associationMapping['mappedBy'] && $associationMapping['type'] === ClassMetadata::ONE_TO_MANY) {
-            $qb->innerJoin(
-                $associationMapping['sourceEntity'],
-                'e',
-                'WITH',
-                \sprintf('r.%s = e', $associationMapping['mappedBy'])
-            );
-        } else {
-            $qb->innerJoin(
-                $associationMapping['sourceEntity'],
-                'e',
-                'WITH',
-                \sprintf('r MEMBER OF e.%s', $associationMapping['fieldName'])
-            );
+            return $this->doctrineHelper
+                ->createQueryBuilder($associationMapping['targetEntity'], 'r')
+                ->innerJoin('r.' . $associationMapping['mappedBy'], 'e');
         }
 
-        return $qb;
+        return $this->doctrineHelper
+            ->createQueryBuilder($associationMapping['sourceEntity'], 'e')
+            ->innerJoin('e.' . $associationMapping['fieldName'], 'r');
     }
 
     /**

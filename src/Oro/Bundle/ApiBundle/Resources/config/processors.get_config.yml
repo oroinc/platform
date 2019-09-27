@@ -209,6 +209,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: filters&definition, priority: -140 }
 
+    oro_api.get_config.set_has_more:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\SetHasMore
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&hateoas&definition', priority: -150 }
+
     oro_api.get_config.set_max_related_entities:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetMaxRelatedEntities
         arguments:
@@ -252,5 +257,6 @@ services:
             - '@translator'
             - '@oro_entity_config.provider.ownership'
             - '@oro_api.request_depended_text_processor'
+            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: get_config, extra: descriptions&definition, priority: -210 }

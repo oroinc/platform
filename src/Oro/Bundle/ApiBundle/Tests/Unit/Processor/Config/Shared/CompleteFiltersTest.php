@@ -1629,6 +1629,64 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
+    public function testCustomFilterWithSameNameAsExcludedField()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'     => null,
+                'field1' => [
+                    'exclude' => true
+                ]
+            ]
+        ];
+
+        $filters = [
+            'fields' => [
+                'field1' => [
+                    'data_type' => 'string',
+                    'type'      => 'customFilterType'
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getIndexedFields')
+            ->with(self::identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getIndexedAssociations')
+            ->with(self::identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'data_type' => 'string',
+                        'type'      => 'customFilterType'
+                    ]
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
     public function testIdentifierField()
     {
         $config = [

@@ -32,15 +32,11 @@ class NormalizeResultContextTest extends \PHPUnit\Framework\TestCase
     public function testSoftErrorsHandling()
     {
         self::assertFalse($this->context->isSoftErrorsHandling());
-        self::assertFalse($this->context->has(NormalizeResultContext::SOFT_ERRORS_HANDLING));
 
         $this->context->setSoftErrorsHandling(true);
         self::assertTrue($this->context->isSoftErrorsHandling());
-        self::assertTrue($this->context->has(NormalizeResultContext::SOFT_ERRORS_HANDLING));
-        self::assertTrue($this->context->get(NormalizeResultContext::SOFT_ERRORS_HANDLING));
 
         $this->context->setSoftErrorsHandling(false);
         self::assertFalse($this->context->isSoftErrorsHandling());
-        self::assertFalse($this->context->has(NormalizeResultContext::SOFT_ERRORS_HANDLING));
     }
 }

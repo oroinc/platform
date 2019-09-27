@@ -13,6 +13,7 @@ class ConfigNormalizer extends BaseConfigNormalizer
 {
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function doNormalizeConfig(array $config)
     {
@@ -25,8 +26,15 @@ class ConfigNormalizer extends BaseConfigNormalizer
                 if ($this->isExtendedAssociation($field)) {
                     $field[ConfigUtil::PROPERTY_PATH] = ConfigUtil::IGNORE_PROPERTY_PATH;
                 }
-                if ($this->isIgnoredField($field)) {
-                    $toRemove[] = $fieldName;
+                if (!empty($field[ConfigUtil::PROPERTY_PATH])) {
+                    $propertyPath = $field[ConfigUtil::PROPERTY_PATH];
+                    if (ConfigUtil::IGNORE_PROPERTY_PATH === $propertyPath) {
+                        if (!isset($field[ConfigUtil::ASSOCIATION_QUERY])) {
+                            $toRemove[] = $fieldName;
+                        }
+                    } elseif (!ConfigUtil::isExclude($field)) {
+                        $this->processDependentFields($config, [$propertyPath]);
+                    }
                 }
                 if (!empty($field[ConfigUtil::DEPENDS_ON]) && !ConfigUtil::isExclude($field)) {
                     $this->processDependentFields($config, $field[ConfigUtil::DEPENDS_ON]);
@@ -68,18 +76,17 @@ class ConfigNormalizer extends BaseConfigNormalizer
         if (!\array_key_exists(ConfigUtil::FIELDS, $config)) {
             $config[ConfigUtil::FIELDS] = [];
         }
-        $dependsOnFieldName = $this->findFieldByPropertyPath(
-            $config[ConfigUtil::FIELDS],
-            $dependsOnPropertyPath[0]
-        );
+
+        $dependsOnFieldName = $this->findFieldByPropertyPath($config[ConfigUtil::FIELDS], $dependsOnPropertyPath[0]);
         if (!$dependsOnFieldName) {
-            return;
+            if (\count($dependsOnPropertyPath) > 1) {
+                return;
+            }
+            $dependsOnFieldName = $dependsOnPropertyPath[0];
         }
 
         if (!\array_key_exists($dependsOnFieldName, $config[ConfigUtil::FIELDS])) {
-            $config[ConfigUtil::FIELDS][$dependsOnFieldName] = \count($dependsOnPropertyPath) > 1
-                ? []
-                : null;
+            $config[ConfigUtil::FIELDS][$dependsOnFieldName] = \count($dependsOnPropertyPath) > 1 ? [] : null;
         }
         if (\is_array($config[ConfigUtil::FIELDS][$dependsOnFieldName])) {
             if (ConfigUtil::isExclude($config[ConfigUtil::FIELDS][$dependsOnFieldName])) {
@@ -98,19 +105,6 @@ class ConfigNormalizer extends BaseConfigNormalizer
                 );
             }
         }
-    }
-
-    /**
-     * @param array $config The config of a field
-     *
-     * @return bool
-     */
-    protected function isIgnoredField(array $config)
-    {
-        return
-            !empty($config[ConfigUtil::PROPERTY_PATH])
-            && ConfigUtil::IGNORE_PROPERTY_PATH === $config[ConfigUtil::PROPERTY_PATH]
-            && !isset($config[ConfigUtil::ASSOCIATION_QUERY]);
     }
 
     /**

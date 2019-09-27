@@ -18,6 +18,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
+use Oro\Component\EntitySerializer\SerializationHelper;
 
 /**
  * Checks if expanding of a multi-target association was requested,
@@ -33,6 +34,9 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
     /** @var EntitySerializer */
     private $entitySerializer;
 
+    /** @var SerializationHelper */
+    private $serializationHelper;
+
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
@@ -40,19 +44,22 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
     private $resourcesProvider;
 
     /**
-     * @param ConfigProvider    $configProvider
-     * @param EntitySerializer  $entitySerializer
-     * @param DoctrineHelper    $doctrineHelper
-     * @param ResourcesProvider $resourcesProvider
+     * @param ConfigProvider      $configProvider
+     * @param EntitySerializer    $entitySerializer
+     * @param SerializationHelper $serializationHelper
+     * @param DoctrineHelper      $doctrineHelper
+     * @param ResourcesProvider   $resourcesProvider
      */
     public function __construct(
         ConfigProvider $configProvider,
         EntitySerializer $entitySerializer,
+        SerializationHelper $serializationHelper,
         DoctrineHelper $doctrineHelper,
         ResourcesProvider $resourcesProvider
     ) {
         $this->configProvider = $configProvider;
         $this->entitySerializer = $entitySerializer;
+        $this->serializationHelper = $serializationHelper;
         $this->doctrineHelper = $doctrineHelper;
         $this->resourcesProvider = $resourcesProvider;
     }
@@ -428,10 +435,6 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
         CustomizeLoadedDataContext $context,
         ?string $associationPath
     ): ?array {
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            return null;
-        }
-
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
         if (!$this->resourcesProvider->isResourceAccessible($entityClass, $version, $requestType)) {
@@ -449,11 +452,22 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
             return null;
         }
 
-        $qb = $this->doctrineHelper->createQueryBuilder($entityClass, 'e')
-            ->where('e IN (:ids)')
-            ->setParameter('ids', $entityIds);
-
-        $items = $this->entitySerializer->serialize($qb, $entityConfig, $context->getNormalizationContext());
+        $normalizationContext = $context->getNormalizationContext();
+        if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            $items = $this->loadExpandedDataForManageableEntities(
+                $entityClass,
+                $entityIds,
+                $entityConfig,
+                $normalizationContext
+            );
+        } else {
+            $items = $this->loadExpandedDataForNotManageableEntities(
+                $entityClass,
+                $entityIds,
+                $entityConfig,
+                $normalizationContext
+            );
+        }
 
         $result = [];
         foreach ($items as $item) {
@@ -464,6 +478,63 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @param string                 $entityClass
+     * @param array                  $entityIds
+     * @param EntityDefinitionConfig $entityConfig
+     * @param array                  $normalizationContext
+     *
+     * @return array [entity data, ...]
+     */
+    private function loadExpandedDataForManageableEntities(
+        string $entityClass,
+        array $entityIds,
+        EntityDefinitionConfig $entityConfig,
+        array $normalizationContext
+    ): array {
+        $qb = $this->doctrineHelper->createQueryBuilder($entityClass, 'e')
+            ->where('e IN (:ids)')
+            ->setParameter('ids', $entityIds);
+
+        return $this->entitySerializer->serialize($qb, $entityConfig, $normalizationContext);
+    }
+
+    /**
+     * @param string                 $entityClass
+     * @param array                  $entityIds
+     * @param EntityDefinitionConfig $entityConfig
+     * @param array                  $normalizationContext
+     *
+     * @return array [entity data, ...]
+     */
+    private function loadExpandedDataForNotManageableEntities(
+        string $entityClass,
+        array $entityIds,
+        EntityDefinitionConfig $entityConfig,
+        array $normalizationContext
+    ): array {
+        $idFieldNames = $entityConfig->getIdentifierFieldNames();
+        if (!$idFieldNames) {
+            return [];
+        }
+
+        $items = [];
+        $idFieldName = reset($idFieldNames);
+        foreach ($entityIds as $entityId) {
+            $items[] = $this->serializationHelper->postSerializeItem(
+                [ConfigUtil::CLASS_NAME => $entityClass, $idFieldName => $entityId],
+                $entityConfig,
+                $normalizationContext
+            );
+        }
+
+        return $this->serializationHelper->postSerializeCollection(
+            $items,
+            $entityConfig,
+            $normalizationContext
+        );
     }
 
     /**

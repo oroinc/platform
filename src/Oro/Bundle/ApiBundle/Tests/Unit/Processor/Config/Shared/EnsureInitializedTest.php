@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
+use Oro\Bundle\ApiBundle\Config\Extra\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\EnsureInitialized;
 use Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub\TestConfigExtension;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
@@ -67,6 +68,55 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
         );
         self::assertFalse(
             $this->context->has('test')
+        );
+    }
+
+    public function testProcessForDisabledSorting()
+    {
+        $definition = [
+            'disable_sorting' => true
+        ];
+        $this->context->setResult($this->createConfigObject($definition));
+        $this->context->setExtras([
+            new SortersConfigExtra(),
+            new TestConfigSection('test_section')
+        ]);
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            $definition,
+            $this->context->getResult()
+        );
+        self::assertFalse($this->context->hasExtra(SortersConfigExtra::NAME));
+        self::assertFalse($this->context->has(SortersConfigExtra::NAME));
+        $this->assertConfig(
+            [],
+            $this->context->get('test_section')
+        );
+    }
+
+    public function testProcessForEnabledSorting()
+    {
+        $definition = [];
+        $this->context->setResult($this->createConfigObject($definition));
+        $this->context->setExtras([
+            new SortersConfigExtra(),
+            new TestConfigSection('test_section')
+        ]);
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            $definition,
+            $this->context->getResult()
+        );
+        self::assertTrue($this->context->hasExtra(SortersConfigExtra::NAME));
+        $this->assertConfig(
+            [],
+            $this->context->get(SortersConfigExtra::NAME)
+        );
+        $this->assertConfig(
+            [],
+            $this->context->get('test_section')
         );
     }
 }

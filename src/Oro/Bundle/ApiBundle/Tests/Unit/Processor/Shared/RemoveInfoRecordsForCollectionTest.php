@@ -5,8 +5,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
+use Oro\Bundle\ApiBundle\Metadata\TargetMetadataAccessorInterface;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Shared\RemoveInfoRecordsForCollection;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class RemoveInfoRecordsForCollectionTest extends GetListProcessorTestCase
 {
@@ -143,6 +146,63 @@ class RemoveInfoRecordsForCollectionTest extends GetListProcessorTestCase
         ];
 
         $this->context->addInfoRecord('someMetaInfo', 123);
+        $this->context->setResult($data);
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+        self::assertEquals($expectedData, $this->context->getResult());
+        self::assertEquals($expectedInfoRecords, $this->context->getInfoRecords());
+    }
+
+    public function testProcessForMultiTargetAssociation()
+    {
+        $targetMetadataAccessor = $this->createMock(TargetMetadataAccessorInterface::class);
+        $metadata = new EntityMetadata();
+        $metadata->setTargetMetadataAccessor($targetMetadataAccessor);
+        $metadata->setClassName(EntityIdentifier::class);
+        $metadata->addField(new FieldMetadata('id'));
+        $typedMetadata = new EntityMetadata();
+        $typedMetadata->setTargetMetadataAccessor($targetMetadataAccessor);
+        $typedMetadata->addField(new FieldMetadata('id'));
+        $usersAssociation = $typedMetadata->addAssociation($this->createAssociationMetadata('users', true));
+        $usersAssociation->setTargetMetadataAccessor($targetMetadataAccessor);
+        $usersAssociation->setAssociationPath('users');
+        $usersAssociation->setTargetClassName(EntityIdentifier::class);
+        $user = new EntityMetadata();
+        $user->setTargetMetadataAccessor($targetMetadataAccessor);
+        $user->addField(new FieldMetadata('id'));
+        $rolesAssociation = $user->addAssociation($this->createAssociationMetadata('roles', true));
+        $rolesAssociation->setTargetMetadataAccessor($targetMetadataAccessor);
+        $rolesAssociation->setAssociationPath('users.roles');
+
+        $targetMetadataAccessor->expects(self::exactly(2))
+            ->method('getTargetMetadata')
+            ->willReturnMap([
+                ['Test\Company', null, $typedMetadata],
+                ['Test\User', 'users', $user]
+            ]);
+
+        $data = [
+            [
+                ConfigUtil::CLASS_NAME => 'Test\Company',
+                'id'                   => 1,
+                'users'                => [
+                    [
+                        ConfigUtil::CLASS_NAME => 'Test\User',
+                        'id'                   => 10,
+                        'roles'                => [
+                            101,
+                            '_' => ['path' => '0.users.0.roles']
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $expectedData = $data;
+        unset($expectedData[0]['users'][0]['roles']['_']);
+        $expectedInfoRecords = [
+            '0.users.0.roles' => ['path' => '0.users.0.roles']
+        ];
+
         $this->context->setResult($data);
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);

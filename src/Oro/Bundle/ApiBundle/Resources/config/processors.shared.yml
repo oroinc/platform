@@ -841,6 +841,7 @@ services:
             - '@oro_api.object_normalizer'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_data, priority: -10 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_data, collection: false, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_data, collection: false, priority: -10 }
             - { name: oro.api.processor, action: delete_subresource, group: normalize_data, collection: false, priority: -10 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_data, collection: false, priority: -10 }
@@ -852,6 +853,7 @@ services:
             - '@oro_api.object_normalizer'
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_data, priority: -10 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_data, collection: true, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_data, collection: true, priority: -10 }
             - { name: oro.api.processor, action: delete_subresource, group: normalize_data, collection: true, priority: -10 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_data, collection: true, priority: -10 }

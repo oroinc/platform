@@ -84,39 +84,57 @@ class CompleteFilters extends CompleteSection
         $filtersFields = $filters->getFields();
         foreach ($filtersFields as $fieldName => $filter) {
             if ($filter->hasType()) {
+                if (!$filter->hasExcluded()) {
+                    $filter->setExcluded(false);
+                }
                 continue;
             }
-            if (!$filter->hasPropertyPath()) {
-                $field = $definition->getField($fieldName);
-                if (null !== $field) {
-                    $propertyPath = $field->getPropertyPath();
-                    if (null !== $propertyPath) {
-                        $filter->setPropertyPath($propertyPath);
-                    }
-                    if (!$filter->hasDataType()) {
-                        $dataType = $field->getDataType();
-                        if ($dataType) {
-                            $filter->setDataType($dataType);
-                        }
-                    }
-                }
-            }
-            $propertyPath = $filter->getPropertyPath($fieldName);
-            if (!$filter->hasDataType()) {
-                $dataType = $this->getFieldDataType($metadata, $propertyPath);
-                if ($dataType) {
-                    $filter->setDataType($dataType);
-                }
-            }
-            if (!$filter->hasCollection()
-                && $propertyPath !== $fieldName
-                && $this->isCollectionValuedAssociation($metadata, $propertyPath)
-            ) {
-                $filter->setIsCollection(true);
-            }
-            $this->setFilterArrayAllowed($filter);
-            $this->setFilterRangeAllowed($filter);
+            $this->completePreConfiguredFilter($fieldName, $filter, $metadata, $definition);
         }
+    }
+
+    /**
+     * @param string                 $fieldName
+     * @param FilterFieldConfig      $filter
+     * @param ClassMetadata          $metadata
+     * @param EntityDefinitionConfig $definition
+     */
+    protected function completePreConfiguredFilter(
+        string $fieldName,
+        FilterFieldConfig $filter,
+        ClassMetadata $metadata,
+        EntityDefinitionConfig $definition
+    ) {
+        if (!$filter->hasPropertyPath()) {
+            $field = $definition->getField($fieldName);
+            if (null !== $field) {
+                $propertyPath = $field->getPropertyPath();
+                if (null !== $propertyPath) {
+                    $filter->setPropertyPath($propertyPath);
+                }
+                if (!$filter->hasDataType()) {
+                    $dataType = $field->getDataType();
+                    if ($dataType) {
+                        $filter->setDataType($dataType);
+                    }
+                }
+            }
+        }
+        $propertyPath = $filter->getPropertyPath($fieldName);
+        if (!$filter->hasDataType()) {
+            $dataType = $this->getFieldDataType($metadata, $propertyPath);
+            if ($dataType) {
+                $filter->setDataType($dataType);
+            }
+        }
+        if (!$filter->hasCollection()
+            && $propertyPath !== $fieldName
+            && $this->isCollectionValuedAssociation($metadata, $propertyPath)
+        ) {
+            $filter->setIsCollection(true);
+        }
+        $this->setFilterArrayAllowed($filter);
+        $this->setFilterRangeAllowed($filter);
     }
 
     /**

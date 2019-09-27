@@ -13,10 +13,6 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  * using the minimum possible number of queries and converts entities to an array
  * bases on a specified configuration.
  *
- * Things that can be improved:
- *  * by default the value of identifier field should be used
- *    for related entities (now it should be configured manually in serialization rules)
- *
  * Example of serialization rules used in the $config parameter of
  * {@see serialize}, {@see serializeEntities} and {@see prepareQuery} methods:
  *
@@ -116,6 +112,30 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  *      'type' => ['property_path' => '__discriminator__']
  *  ]
  *
+ * The top level algorithm of the entity serializer:
+ * - load primary entities
+ * - iterate through the loaded entities and serialize each entity:
+ *     - call value transformer for each field
+ *     - serialize each to-one association
+ *       and do the following for each association that should be expanded:
+ *         - for each to-many association:
+ *             - load IDs of target entities
+ *             - if target entities should be expanded:
+ *                 - load target entities and serialize each target entity
+ *             - call "postSerialize" for each target entity
+ *             - call "postSerializeCollection" for the collection of target entities
+ *         - call "postSerialize" for the target entity
+ *         - call "postSerializeCollection" for the target entity
+ *     - do nothing for to-many association
+ * - for each to-many association:
+ *     - load IDs of target entities
+ *     - if target entities should be expanded:
+ *         - load target entities and serialize each target entity
+ *     - call "postSerialize" for each target entity
+ *     - call "postSerializeCollection" for the collection of target entities
+ * - call "postSerialize" for each primary entity
+ * - call "postSerializeCollection" for the collection of primary entities
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntitySerializer
@@ -189,11 +209,16 @@ class EntitySerializer
      * @param QueryBuilder       $qb      A query builder is used to get data
      * @param EntityConfig|array $config  Serialization rules
      * @param array              $context Options post serializers and data transformers have access to
+     * @param bool               $skipPostSerializationForPrimaryEntities
      *
      * @return array
      */
-    public function serialize(QueryBuilder $qb, $config, array $context = [])
-    {
+    public function serialize(
+        QueryBuilder $qb,
+        $config,
+        array $context = [],
+        bool $skipPostSerializationForPrimaryEntities = false
+    ): array {
         $entityConfig = $this->normalizeConfig($config);
 
         $this->updateQuery($qb, $entityConfig);
@@ -204,7 +229,8 @@ class EntitySerializer
             (array)$data,
             $this->doctrineHelper->getRootEntityClass($qb),
             $entityConfig,
-            $context
+            $context,
+            $skipPostSerializationForPrimaryEntities
         );
         if ($hasMore) {
             $data[ConfigUtil::INFO_RECORD_KEY] = [ConfigUtil::HAS_MORE => true];
@@ -218,14 +244,26 @@ class EntitySerializer
      * @param string             $entityClass The entity class name
      * @param EntityConfig|array $config      Serialization rules
      * @param array              $context     Options post serializers and data transformers have access to
+     * @param bool               $skipPostSerializationForPrimaryEntities
      *
      * @return array
      */
-    public function serializeEntities(array $entities, $entityClass, $config, array $context = [])
-    {
+    public function serializeEntities(
+        array $entities,
+        string $entityClass,
+        $config,
+        array $context = [],
+        bool $skipPostSerializationForPrimaryEntities = false
+    ): array {
         $entityConfig = $this->normalizeConfig($config);
 
-        $data = $this->serializeItems($entities, $entityClass, $entityConfig, $context);
+        $data = $this->serializeItems(
+            $entities,
+            $entityClass,
+            $entityConfig,
+            $context,
+            $skipPostSerializationForPrimaryEntities
+        );
 
         return $this->dataNormalizer->normalizeData($data, $entityConfig);
     }
@@ -279,6 +317,7 @@ class EntitySerializer
      * @param EntityConfig $config      Serialization rules
      * @param array        $context     Options post serializers and data transformers have access to
      * @param bool         $useIdAsKey  Defines whether the entity id should be used as a key of the result array
+     * @param bool         $skipPostSerializationForPrimaryEntities
      *
      * @return array
      */
@@ -287,7 +326,8 @@ class EntitySerializer
         $entityClass,
         EntityConfig $config,
         array $context,
-        $useIdAsKey = false
+        $useIdAsKey = false,
+        bool $skipPostSerializationForPrimaryEntities = false
     ) {
         if (empty($entities)) {
             return [];
@@ -314,7 +354,11 @@ class EntitySerializer
             $context
         );
 
-        return $this->serializationHelper->processPostSerializeItems($result, $config, $context);
+        if (!$skipPostSerializationForPrimaryEntities) {
+            $result = $this->serializationHelper->processPostSerializeItems($result, $config, $context);
+        }
+
+        return $result;
     }
 
     /**

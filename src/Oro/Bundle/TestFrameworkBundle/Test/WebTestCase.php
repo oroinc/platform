@@ -508,8 +508,9 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         $executor = new DataFixturesExecutor($this->getDataFixturesExecutorEntityManager());
-        $this->doLoadFixtures($executor, $loader);
         self::$referenceRepository = $executor->getReferenceRepository();
+        $this->preFixtureLoad();
+        $this->doLoadFixtures($executor, $loader);
         $this->postFixtureLoad();
     }
 
@@ -647,6 +648,13 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return self::$referenceRepository;
+    }
+
+    /**
+     * Callback function to be executed before fixture load.
+     */
+    protected function preFixtureLoad()
+    {
     }
 
     /**

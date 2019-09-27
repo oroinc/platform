@@ -73,12 +73,22 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->hasExtra('test'));
         self::assertFalse($this->context->has('test'));
 
-        $extras = [new TestConfigExtra('test', ['test_attr' => true])];
+        $extras = [
+            new TestConfigExtra('test', ['test_attr' => true]),
+            new TestConfigExtra('test1')
+        ];
         $this->context->setExtras($extras);
         self::assertEquals($extras, $this->context->getExtras());
-        self::assertEquals(['test'], $this->context->get(ConfigContext::EXTRA));
+        self::assertSame(['test', 'test1'], $this->context->get(ConfigContext::EXTRA));
         self::assertTrue($this->context->hasExtra('test'));
         self::assertTrue($this->context->has('test_attr'));
+        self::assertTrue($this->context->hasExtra('test1'));
+
+        $this->context->removeExtra('test');
+        self::assertEquals([$extras[1]], $this->context->getExtras());
+        self::assertSame(['test1'], $this->context->get(ConfigContext::EXTRA));
+        self::assertFalse($this->context->hasExtra('test'));
+        self::assertTrue($this->context->hasExtra('test1'));
 
         $this->context->setExtras([]);
         self::assertSame([], $this->context->getExtras());

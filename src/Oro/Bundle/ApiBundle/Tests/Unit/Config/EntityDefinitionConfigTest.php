@@ -371,6 +371,41 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($config->isEmpty());
     }
 
+    public function testIsIdentifierOnlyRequested()
+    {
+        $config = new EntityDefinitionConfig();
+        self::assertFalse($config->isIdentifierOnlyRequested());
+
+        $config->setIdentifierFieldNames(['id']);
+        $config->addField('id');
+        self::assertTrue($config->isIdentifierOnlyRequested());
+
+        $config->addField('name');
+        self::assertFalse($config->isIdentifierOnlyRequested());
+
+        $config->removeField('id');
+        self::assertFalse($config->isIdentifierOnlyRequested());
+    }
+
+    public function testIsIdentifierOnlyRequestedWithCompositeIdentifier()
+    {
+        $config = new EntityDefinitionConfig();
+
+        $config->setIdentifierFieldNames(['id1', 'id2']);
+        $config->addField('id1');
+        $config->addField('id2');
+        self::assertTrue($config->isIdentifierOnlyRequested());
+
+        $config->addField('name');
+        self::assertFalse($config->isIdentifierOnlyRequested());
+
+        $config->removeField('id1');
+        self::assertFalse($config->isIdentifierOnlyRequested());
+
+        $config->removeField('id2');
+        self::assertFalse($config->isIdentifierOnlyRequested());
+    }
+
     public function testCollapsed()
     {
         $config = new EntityDefinitionConfig();
