@@ -11,4 +11,8 @@ oro:
         owner.label: Owner
         organization.label: Organization
 
+        entity_config.attachment.field.items.use_dam:
+            label: Use DAM
+            tooltip: Enable use of the Digital Asset Manager for this field
+
     attachment.file.digital_asset.label: Digital Asset
