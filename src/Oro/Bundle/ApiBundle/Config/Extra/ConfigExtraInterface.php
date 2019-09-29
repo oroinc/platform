@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Extra;
 
-use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 
 /**
  * Provides an interface for different kind requests for configuration data.

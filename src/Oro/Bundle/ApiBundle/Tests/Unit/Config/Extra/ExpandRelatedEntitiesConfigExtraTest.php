@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Extra;
 
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
-use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 
 class ExpandRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
 {

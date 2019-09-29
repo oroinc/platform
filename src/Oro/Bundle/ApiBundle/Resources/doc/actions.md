@@ -745,9 +745,9 @@ As example of a processor used to modify the loaded data: [MapPrimaryField](../.
 
 This action retrieves a configuration of an entity.
 
-The context class: [ConfigContext](../../Processor/Config/ConfigContext.php).
+The context class: [ConfigContext](../../Processor/GetConfig/ConfigContext.php).
 
-The main processor class: [ConfigProcessor](../../Processor/Config/ConfigProcessor.php).
+The main processor class: [ConfigProcessor](../../Processor/GetConfig/ConfigProcessor.php).
 
 Existing worker processors: [processors.get_config.yml](../../Resources/config/processors.get_config.yml). Run `php bin/console oro:api:debug get_config` to see the list of processors.
 

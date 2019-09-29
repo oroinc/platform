@@ -3,7 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Api;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared\CompleteDefinition\CompleteDefinitionHelperTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\CompleteDefinition\CompleteDefinitionHelperTestCase;
 use Oro\Bundle\LocaleBundle\Api\LocalizedFallbackValueCompleter;
 
 class LocalizedFallbackValueCompleterTest extends CompleteDefinitionHelperTestCase

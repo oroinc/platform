@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraSectionInterface;
-use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 
 class TestConfigSection implements ConfigExtraSectionInterface
 {

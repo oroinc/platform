@@ -276,15 +276,15 @@ Consider checking out the list of other classes below as they can provide insigh
 - [MetaPropertyFilter](../../Filter/MetaPropertyFilter.php) - a filter that is used to request meta properties.
 - [AddMetaPropertyFilter](../../Processor/Shared/AddMetaPropertyFilter.php) - a processor that adds "meta" filter that is used to request meta properties.
 - [HandleMetaPropertyFilter](../../Processor/Shared/HandleMetaPropertyFilter.php) - a processor that handles "meta" filter.
-- [AddMetaProperties](../../Processor/Config/GetConfig/AddMetaProperties.php) - a processor that adds configuration of meta properties requested via "meta" filter.
+- [AddMetaProperties](../../Processor/GetConfig/AddMetaProperties.php) - a processor that adds configuration of meta properties requested via "meta" filter.
 - [FieldsFilter](../../Filter/FieldsFilter.php) - a filter that is used to filter entity fields.
 - [AddFieldsFilter](../../Processor/Shared/AddFieldsFilter.php) - a processor that adds "fields" filters that are used to filter entity fields.
 - [HandleFieldsFilter](../../Processor/Shared/HandleFieldsFilter.php) - a processor that handles "fields" filters.
-- [FilterFieldsByExtra](../../Processor/Config/Shared/FilterFieldsByExtra.php) - a processor that modifies configuration of entities according to "fields" filters.
+- [FilterFieldsByExtra](../../Processor/GetConfig/FilterFieldsByExtra.php) - a processor that modifies configuration of entities according to "fields" filters.
 - [IncludeFilter](../../Filter/IncludeFilter.php) - a filter that is used to request information about related entities.
 - [AddIncludeFilter](../../Processor/Shared/AddIncludeFilter.php) - a processor that adds "include" filter that is used to request information about related entities.
 - [HandleIncludeFilter](../../Processor/Shared/HandleIncludeFilter.php) - a processor that handles "include" filter.
-- [ExpandRelatedEntities](../../Processor/Config/Shared/ExpandRelatedEntities.php) - a processor that adds configuration of related entities requested via "include" filter.
+- [ExpandRelatedEntities](../../Processor/GetConfig/ExpandRelatedEntities.php) - a processor that adds configuration of related entities requested via "include" filter.
 - [BuildCriteria](../../Processor/Shared/BuildCriteria.php) - a processor that applies all requested filters to the Criteria object.
 - [NormalizeFilterValues](../../Processor/Shared/NormalizeFilterValues.php) - a processor that converts values of all requested filters according to the type of the filters and validates that all requested filters are supported.
 - [RegisterConfiguredFilters](../../Processor/Shared/RegisterConfiguredFilters.php) - a processor that registers filters according to the [filters](./configuration.md#filters-configuration-section) configuration section.

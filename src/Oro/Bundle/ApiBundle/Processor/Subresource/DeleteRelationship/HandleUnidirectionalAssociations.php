@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship;
 
 use Oro\Bundle\ApiBundle\Form\Handler\UnidirectionalAssociationHandler;
-use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\UnidirectionalAssociationCompleter;
+use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\UnidirectionalAssociationCompleter;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
