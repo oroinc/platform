@@ -5,3 +5,8 @@ services:
         public: true
         arguments:
             - '@oro_config.manager'
+
+    oro_digital_asset.acl.voter.digital_asset_deletion:
+        class: Oro\Bundle\DigitalAssetBundle\Acl\Voter\DigitalAssetDeleteVoter
+        tags:
+            - { name: security.voter }
