@@ -5,17 +5,21 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\Extra\CustomizeLoadedDataConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\DataTransformersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\RootPathConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\SortersConfigExtra;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * A helper class that can be used to build configuration extras
  * to get a configuration of an association target entity.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class TargetConfigExtraBuilder
 {
@@ -122,6 +126,84 @@ class TargetConfigExtraBuilder
     }
 
     /**
+     * Builds configuration extras to get a configuration of the target entity
+     * for "get_list" action for the given association.
+     *
+     * @param ConfigExtraInterface[] $parentConfigExtras
+     * @param string                 $associationName
+     * @param string                 $associationTargetEntityType
+     * @param string[]               $associationTargetEntityIdentifierFieldNames
+     *
+     * @return ConfigExtraInterface[]
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public static function buildGetListConfigExtras(
+        array $parentConfigExtras,
+        string $associationName,
+        string $associationTargetEntityType,
+        array $associationTargetEntityIdentifierFieldNames
+    ): array {
+        $result = [];
+        $filterFieldsExtra = null;
+        $expandRelatedEntitiesExtra = null;
+        $hasFiltersExtra = false;
+        $hasSortersExtra = false;
+        foreach ($parentConfigExtras as $extra) {
+            if ($extra instanceof EntityDefinitionConfigExtra) {
+                $result[] = new EntityDefinitionConfigExtra(ApiAction::GET_LIST, true);
+            } elseif ($extra instanceof FilterFieldsConfigExtra) {
+                $filterFieldsExtra = $extra;
+            } elseif ($extra instanceof ExpandRelatedEntitiesConfigExtra) {
+                $expandRelatedEntitiesExtra = $extra;
+            } elseif ($extra instanceof FiltersConfigExtra) {
+                $hasFiltersExtra = true;
+                $result[] = $extra;
+            } elseif ($extra instanceof SortersConfigExtra) {
+                $hasSortersExtra = true;
+                $result[] = $extra;
+            } else {
+                $result[] = $extra;
+            }
+        }
+
+        $isExpandProductsRequested = false;
+        if (null !== $expandRelatedEntitiesExtra) {
+            if ($expandRelatedEntitiesExtra->isExpandRequested($associationName)) {
+                $isExpandProductsRequested = true;
+            }
+            $productsExpandRelatedEntitiesExtra = self::buildExpandRelatedEntitiesConfigExtra(
+                $expandRelatedEntitiesExtra,
+                $associationName
+            );
+            if (null !== $productsExpandRelatedEntitiesExtra) {
+                $result[] = $productsExpandRelatedEntitiesExtra;
+            }
+        }
+
+        if (!$isExpandProductsRequested) {
+            $fieldFilters = null !== $filterFieldsExtra
+                ? $filterFieldsExtra->getFieldFilters()
+                : [];
+            $fieldFilters[$associationTargetEntityType] = $associationTargetEntityIdentifierFieldNames;
+            $filterFieldsExtra = new FilterFieldsConfigExtra($fieldFilters);
+        }
+        if (null !== $filterFieldsExtra) {
+            $result[] = $filterFieldsExtra;
+        }
+
+        if (!$hasFiltersExtra) {
+            $result[] = new FiltersConfigExtra();
+        }
+        if (!$hasSortersExtra) {
+            $result[] = new SortersConfigExtra();
+        }
+
+        return $result;
+    }
+
+    /**
      * Makes sure that the configuration of the given parent entity
      * is ready to be used to load the given association data.
      *
@@ -166,7 +248,7 @@ class TargetConfigExtraBuilder
      *
      * @return ExpandRelatedEntitiesConfigExtra|null
      */
-    private static function buildExpandRelatedEntitiesConfigExtra(
+    public static function buildExpandRelatedEntitiesConfigExtra(
         ExpandRelatedEntitiesConfigExtra $extra,
         ?string $associationPath
     ): ?ExpandRelatedEntitiesConfigExtra {
@@ -194,7 +276,7 @@ class TargetConfigExtraBuilder
      *
      * @return ExpandRelatedEntitiesConfigExtra
      */
-    private static function buildParentExpandRelatedEntitiesConfigExtra(
+    public static function buildParentExpandRelatedEntitiesConfigExtra(
         ExpandRelatedEntitiesConfigExtra $extra,
         string $associationName
     ): ExpandRelatedEntitiesConfigExtra {

@@ -284,7 +284,7 @@ The **data_type** attribute can serve to specify a data type of a field. However
 | unidirectionalAssociation:targetAssociationName | Helps configure unidirectional associations. For details, see [Configure an Unidirectional Association](./how_to.md#configure-an-unidirectional-association). |
 
 **Note:** To add a new special type of a field that requires an additional configuration of a field or an entity,
-create a class that implements [CustomDataTypeCompleterInterface](../../Processor/Config/Shared/CompleteDefinition/CustomDataTypeCompleterInterface.php)
+create a class that implements [CustomDataTypeCompleterInterface](../../Processor/GetConfig/CompleteDefinition/CustomDataTypeCompleterInterface.php)
 and register this class in the dependency injection container with `oro.api.custom_data_type_completer` tag.
 The `requestType` tag attribute can be used to register a converter only for specific request types.
 

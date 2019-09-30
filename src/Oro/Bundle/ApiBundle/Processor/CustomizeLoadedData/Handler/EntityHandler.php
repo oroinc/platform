@@ -87,7 +87,7 @@ class EntityHandler
         $this->adjustPropertyPath($customizationContext);
         $customizationContext->setResult($data);
         $customizationContext->setIdentifierOnly(
-            $this->isIdentifierOnly($customizationContext->getConfig())
+            $this->isIdentifierOnlyRequested($customizationContext->getConfig())
         );
         $customizationContext->setSharedData($context['sharedData']);
 
@@ -188,28 +188,10 @@ class EntityHandler
      *
      * @return bool
      */
-    private function isIdentifierOnly(?EntityDefinitionConfig $config): bool
+    private function isIdentifierOnlyRequested(?EntityDefinitionConfig $config): bool
     {
-        if (null === $config) {
-            return false;
-        }
-        $idFieldNames = $config->getIdentifierFieldNames();
-        if (empty($idFieldNames)) {
-            return false;
-        }
-        $fields = $config->getFields();
-        if (\count($fields) !== \count($idFieldNames)) {
-            return false;
-        }
-
-        $isIdentifierOnly = true;
-        foreach ($idFieldNames as $idFieldName) {
-            if (!isset($fields[$idFieldName])) {
-                $isIdentifierOnly = false;
-                break;
-            }
-        }
-
-        return $isIdentifierOnly;
+        return
+            null !== $config
+            && $config->isIdentifierOnlyRequested();
     }
 }

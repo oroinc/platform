@@ -20,7 +20,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
             [
                 [
                     'id_0'   => 1,
-                    'name_1' => 'group_name',
+                    'name_1' => 'group_name'
                 ]
             ],
             [1 => 1],
@@ -35,8 +35,8 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                     'id'      => null,
                     'newName' => [
                         'property_path' => 'name'
-                    ],
-                ],
+                    ]
+                ]
             ]
         );
 
@@ -44,7 +44,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
             [
                 [
                     'id'      => 1,
-                    'newName' => 'group_name',
+                    'newName' => 'group_name'
                 ]
             ],
             $result
@@ -73,7 +73,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                     'name_2'          => 'user_name',
                     'category_name_3' => 'product_category_name',
                     'owner_id_4'      => 10,
-                    'category_name_5' => 'user_category_name',
+                    'category_name_5' => 'user_category_name'
                 ]
             ],
             [1 => 1],
@@ -90,7 +90,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                         'fields'           => [
                             'newName' => [
                                 'property_path' => 'name'
-                            ],
+                            ]
                         ]
                     ]
                 ]
@@ -137,8 +137,8 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                     'id'     => null,
                     'entity' => [
                         'property_path' => '__class__'
-                    ],
-                ],
+                    ]
+                ]
             ]
         );
 
@@ -146,7 +146,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
             [
                 [
                     'id'     => 1,
-                    'entity' => Entity\Group::class,
+                    'entity' => Entity\Group::class
                 ]
             ],
             $result
@@ -177,7 +177,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                     'name_2'          => 'user_name',
                     'category_name_3' => 'product_category_name',
                     'owner_id_4'      => 10,
-                    'category_name_5' => 'user_category_name',
+                    'category_name_5' => 'user_category_name'
                 ]
             ],
             [1 => 1],
@@ -192,7 +192,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
             [
                 [
                     'name_1'  => 'user_category_name',
-                    'label_2' => 'user_category_label',
+                    'label_2' => 'user_category_label'
                 ]
             ],
             [1 => 'user_category_name'],
@@ -256,7 +256,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                     'label_5'         => 'category_label',
                     'category_name_6' => 'category_name',
                     'owner_id_7'      => 10,
-                    'category_name_8' => 'category_name',
+                    'category_name_8' => 'category_name'
                 ]
             ],
             [1 => 1],
@@ -284,7 +284,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                             ]
                         ]
                     ]
-                ],
+                ]
             ]
         );
 
@@ -296,7 +296,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                     'ownerName' => 'user_name',
                     'category'  => [
                         'name' => 'category_label'
-                    ],
+                    ]
                 ]
             ],
             $result
@@ -325,7 +325,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                     'name_2'          => 'user_name',
                     'category_name_3' => 'product_category_name',
                     'owner_id_4'      => 10,
-                    'category_name_5' => 'user_category_name',
+                    'category_name_5' => 'user_category_name'
                 ]
             ],
             [1 => 1],
@@ -388,7 +388,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                     'name_2'          => 'user_name',
                     'category_name_3' => 'product_category_name',
                     'owner_id_4'      => 10,
-                    'category_name_5' => 'user_category_name',
+                    'category_name_5' => 'user_category_name'
                 ]
             ],
             [1 => 1],

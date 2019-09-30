@@ -32,7 +32,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                     'id_2'            => 10,
                     'category_name_3' => 'category_name',
                     'owner_id_4'      => 10,
-                    'category_name_5' => 'owner_category_name',
+                    'category_name_5' => 'owner_category_name'
                 ]
             ],
             [1 => 1],
@@ -47,7 +47,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                     'id'    => null,
                     'name'  => null,
                     'owner' => [
-                        'fields' => 'id',
+                        'fields' => 'id'
                     ]
                 ]
             ]
@@ -88,7 +88,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                     'id_2'            => 10,
                     'category_name_3' => 'category_name',
                     'owner_id_4'      => 10,
-                    'category_name_5' => 'owner_category_name',
+                    'category_name_5' => 'owner_category_name'
                 ]
             ],
             [1 => 1],
@@ -103,7 +103,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                     'id'    => null,
                     'name'  => null,
                     'owner' => [
-                        'fields' => 'id',
+                        'fields' => 'id'
                     ]
                 ]
             ]
@@ -144,7 +144,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                     'id_2'            => 10,
                     'category_name_3' => 'category_name',
                     'owner_id_4'      => 10,
-                    'category_name_5' => 'owner_category_name',
+                    'category_name_5' => 'owner_category_name'
                 ]
             ],
             [1 => 1],
@@ -159,7 +159,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                     'id'    => null,
                     'name'  => null,
                     'owner' => [
-                        'fields' => 'id',
+                        'fields' => 'id'
                     ]
                 ]
             ]
@@ -233,7 +233,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id_0'     => 1,
                     'label_1'  => 'test_label',
-                    'public_2' => 1,
+                    'public_2' => 1
                 ]
             ],
             [1 => 1],
@@ -245,7 +245,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             [
                 'fields' => [
                     'name'        => ['exclude' => true],
-                    'isException' => ['exclude' => true],
+                    'isException' => ['exclude' => true]
                 ]
             ]
         );
@@ -276,7 +276,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             [
                 [
                     'id_0'   => 1,
-                    'name_1' => 'test_name',
+                    'name_1' => 'test_name'
                 ]
             ],
             [1 => 1],
@@ -290,7 +290,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 'fields'           => [
                     'id'           => null,
                     'name'         => null,
-                    'computedName' => null,
+                    'computedName' => null
                 ]
             ]
         );
@@ -300,7 +300,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'           => 1,
                     'name'         => 'test_name',
-                    'computedName' => 'test_name (COMPUTED)',
+                    'computedName' => 'test_name (COMPUTED)'
                 ]
             ],
             $result
@@ -389,8 +389,8 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             [
                 'fields' => [
                     'id'   => null,
-                    'name' => null,
-                ],
+                    'name' => null
+                ]
             ]
         );
 
@@ -422,7 +422,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             [
                 [
                     'id_0'   => 1,
-                    'name_1' => 'test_name',
+                    'name_1' => 'test_name'
                 ]
             ],
             [1 => 1],
@@ -435,8 +435,8 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'id'   => null,
-                    'name' => null,
-                ],
+                    'name' => null
+                ]
             ]
         );
 
@@ -444,7 +444,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             [
                 [
                     'id'   => 1,
-                    'name' => 'test_name',
+                    'name' => 'test_name'
                 ]
             ],
             $result
@@ -464,7 +464,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             . ' WHERE g0_.id = ?',
             [
                 [
-                    'id_0' => 1,
+                    'id_0' => 1
                 ]
             ],
             [1 => 1],
@@ -479,15 +479,15 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                     'id'   => null,
                     'name' => [
                         'exclude' => true
-                    ],
-                ],
+                    ]
+                ]
             ]
         );
 
         $this->assertArrayEquals(
             [
                 [
-                    'id' => 1,
+                    'id' => 1
                 ]
             ],
             $result
@@ -666,7 +666,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                     'id_0'            => 1,
                     'name_1'          => 'product_name',
                     'category_name_2' => 'category_name',
-                    'owner_id_3'      => 10,
+                    'owner_id_3'      => 10
                 ]
             ],
             [1 => 1],
@@ -729,7 +729,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             1,
             'SELECT u0_.id AS id_0, p1_.name AS name_1, p1_.id AS id_2'
             . ' FROM product_table p1_'
-            . ' INNER JOIN user_table u0_ ON (p1_.owner_id = u0_.id)'
+            . ' INNER JOIN user_table u0_ ON p1_.owner_id = u0_.id'
             . ' WHERE u0_.id = ?',
             [
                 [
@@ -757,7 +757,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                             'renamedLabel' => [
                                 'property_path' => 'label'
                             ]
-                        ],
+                        ]
                     ],
                     'products'    => [
                         'exclusion_policy' => 'all',
@@ -765,8 +765,8 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                             'renamedName' => [
                                 'property_path' => 'name'
                             ]
-                        ],
-                    ],
+                        ]
+                    ]
                 ]
             ]
         );
@@ -774,12 +774,12 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->assertArrayEquals(
             [
                 [
-                    'id'              => 1,
-                    'renamedName'     => 'user_name',
-                    'category'        => [
+                    'id'          => 1,
+                    'renamedName' => 'user_name',
+                    'category'    => [
                         'renamedLabel' => 'category_label'
                     ],
-                    'products' => [
+                    'products'    => [
                         ['renamedName' => 'product_name']
                     ]
                 ]

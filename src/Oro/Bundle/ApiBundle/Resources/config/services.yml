@@ -191,20 +191,6 @@ services:
         class: Oro\Bundle\ApiBundle\Normalizer\SearchItemNormalizer
         public: false
 
-    oro_api.customize_loaded_data.processor:
-        class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor
-        public: false
-        arguments:
-            - '@oro_api.processor_bag'
-            - customize_loaded_data
-
-    oro_api.customize_form_data.processor:
-        class: Oro\Bundle\ApiBundle\Processor\CustomizeFormDataProcessor
-        public: false
-        arguments:
-            - '@oro_api.processor_bag'
-            - customize_form_data
-
     oro_api.entity_alias.cache_warmer:
         class: Oro\Component\Config\Cache\ConfigCacheWarmer
         public: false

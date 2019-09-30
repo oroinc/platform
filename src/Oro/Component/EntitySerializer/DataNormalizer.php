@@ -32,7 +32,7 @@ class DataNormalizer
     protected function normalizeRows(array &$rows, EntityConfig $config)
     {
         foreach ($rows as $key => &$row) {
-            if (ConfigUtil::INFO_RECORD_KEY !== $key && is_array($row)) {
+            if (ConfigUtil::INFO_RECORD_KEY !== $key && \is_array($row)) {
                 $this->normalizeRow($row, $config);
             }
         }
@@ -51,10 +51,10 @@ class DataNormalizer
             }
 
             $targetConfig = $fieldConfig->getTargetEntity();
-            if (null !== $targetConfig && !empty($row[$field]) && is_array($row[$field])) {
+            if (null !== $targetConfig && !empty($row[$field]) && \is_array($row[$field])) {
                 if ($fieldConfig->isCollapsed() && $targetConfig->get(ConfigUtil::COLLAPSE_FIELD)) {
                     $this->normalizeCollapsed($row, $field, $targetConfig->get(ConfigUtil::COLLAPSE_FIELD));
-                } elseif (array_key_exists(0, $row[$field])) {
+                } elseif (\array_key_exists(0, $row[$field])) {
                     $this->normalizeRows($row[$field], $targetConfig);
                 } else {
                     $this->normalizeRow($row[$field], $targetConfig);
@@ -71,13 +71,13 @@ class DataNormalizer
      */
     protected function normalizeCollapsed(array &$row, $field, $targetField)
     {
-        if (array_key_exists(0, $row[$field])) {
+        if (\array_key_exists(0, $row[$field])) {
             // to-many association
             $values = [];
             foreach ($row[$field] as $key => $value) {
                 if (ConfigUtil::INFO_RECORD_KEY !== $key
-                    && is_array($value)
-                    && array_key_exists($targetField, $value)
+                    && \is_array($value)
+                    && \array_key_exists($targetField, $value)
                 ) {
                     $value = $value[$targetField];
                 }
@@ -86,7 +86,7 @@ class DataNormalizer
             $row[$field] = $values;
         } else {
             // to-one association
-            if (array_key_exists($targetField, $row[$field])) {
+            if (\array_key_exists($targetField, $row[$field])) {
                 $row[$field] = $row[$field][$targetField];
             }
         }
