@@ -111,7 +111,7 @@
         "npm-asset/xregexp": "3.2.*",
         "robloach/component-installer": "0.2.*",
         "jms/cg": "1.2.*",
-        "oro/redis-config": "4.0.x-dev",
+        "oro/redis-config": "4.1.x-dev",
         "brick/math": "0.8.*",
         "bower-asset/fuse": "3.2.*",
         "phpdocumentor/reflection-docblock": "4.3.*",
