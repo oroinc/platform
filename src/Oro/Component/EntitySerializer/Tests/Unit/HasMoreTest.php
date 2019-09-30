@@ -173,28 +173,25 @@ class HasMoreTest extends EntitySerializerTestCase
             $conn,
             1,
             'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId'
-            . ' FROM ('
-            . '(SELECT u0_.id AS id_0, g1_.id AS id_1 FROM group_table g1_'
-            . ' INNER JOIN user_table u0_ ON (EXISTS ('
-            . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
-            . ')) WHERE u0_.id = 123 LIMIT 3)'
-            . ' UNION ALL'
-            . ' (SELECT u0_.id AS id_0, g1_.id AS id_1 FROM group_table g1_'
-            . ' INNER JOIN user_table u0_ ON (EXISTS ('
-            . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
-            . ')) WHERE u0_.id = 456 LIMIT 3)'
-            . ' UNION ALL'
-            . ' (SELECT u0_.id AS id_0, g1_.id AS id_1 FROM group_table g1_'
-            . ' INNER JOIN user_table u0_ ON (EXISTS ('
-            . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
-            . ')) WHERE u0_.id = 789 LIMIT 3)'
-            . ') entity',
+            . ' FROM (('
+            . 'SELECT u0_.id AS id_0, g1_.id AS id_1'
+            . ' FROM user_table u0_'
+            . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
+            . ' INNER JOIN group_table g1_ ON g1_.id = r2_.user_group_id'
+            . ' WHERE u0_.id = 123 LIMIT 3'
+            . ') UNION ALL ('
+            . 'SELECT u0_.id AS id_0, g1_.id AS id_1'
+            . ' FROM user_table u0_'
+            . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
+            . ' INNER JOIN group_table g1_ ON g1_.id = r2_.user_group_id'
+            . ' WHERE u0_.id = 456 LIMIT 3'
+            . ') UNION ALL ('
+            . 'SELECT u0_.id AS id_0, g1_.id AS id_1'
+            . ' FROM user_table u0_'
+            . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
+            . ' INNER JOIN group_table g1_ ON g1_.id = r2_.user_group_id'
+            . ' WHERE u0_.id = 789 LIMIT 3'
+            . ')) entity',
             [
                 ['entityId' => 123, 'relatedEntityId' => 11],
                 ['entityId' => 123, 'relatedEntityId' => 12],
@@ -311,28 +308,25 @@ class HasMoreTest extends EntitySerializerTestCase
             $conn,
             1,
             'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId'
-            . ' FROM ('
-            . '(SELECT u0_.id AS id_0, g1_.id AS id_1 FROM group_table g1_'
-            . ' INNER JOIN user_table u0_ ON (EXISTS ('
-            . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
-            . ')) WHERE u0_.id = 123 LIMIT 3)'
-            . ' UNION ALL'
-            . ' (SELECT u0_.id AS id_0, g1_.id AS id_1 FROM group_table g1_'
-            . ' INNER JOIN user_table u0_ ON (EXISTS ('
-            . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
-            . ')) WHERE u0_.id = 456 LIMIT 3)'
-            . ' UNION ALL'
-            . ' (SELECT u0_.id AS id_0, g1_.id AS id_1 FROM group_table g1_'
-            . ' INNER JOIN user_table u0_ ON (EXISTS ('
-            . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
-            . ')) WHERE u0_.id = 789 LIMIT 3)'
-            . ') entity',
+            . ' FROM (('
+            . 'SELECT u0_.id AS id_0, g1_.id AS id_1'
+            . ' FROM user_table u0_'
+            . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
+            . ' INNER JOIN group_table g1_ ON g1_.id = r2_.user_group_id'
+            . ' WHERE u0_.id = 123 LIMIT 3'
+            . ') UNION ALL ('
+            . 'SELECT u0_.id AS id_0, g1_.id AS id_1'
+            . ' FROM user_table u0_'
+            . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
+            . ' INNER JOIN group_table g1_ ON g1_.id = r2_.user_group_id'
+            . ' WHERE u0_.id = 456 LIMIT 3'
+            . ') UNION ALL ('
+            . 'SELECT u0_.id AS id_0, g1_.id AS id_1'
+            . ' FROM user_table u0_'
+            . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
+            . ' INNER JOIN group_table g1_ ON g1_.id = r2_.user_group_id'
+            . ' WHERE u0_.id = 789 LIMIT 3'
+            . ')) entity',
             [
                 ['entityId' => 123, 'relatedEntityId' => 11],
                 ['entityId' => 123, 'relatedEntityId' => 12],
@@ -424,21 +418,19 @@ class HasMoreTest extends EntitySerializerTestCase
             $conn,
             1,
             'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId'
-            . ' FROM ('
-            . '(SELECT u0_.id AS id_0, g1_.id AS id_1 FROM group_table g1_'
-            . ' INNER JOIN user_table u0_ ON (EXISTS ('
-            . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
-            . ')) WHERE u0_.id = 123 LIMIT 3)'
-            . ' UNION ALL'
-            . ' (SELECT u0_.id AS id_0, g1_.id AS id_1 FROM group_table g1_'
-            . ' INNER JOIN user_table u0_ ON (EXISTS ('
-            . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
-            . ')) WHERE u0_.id = 456 LIMIT 3)'
-            . ') entity',
+            . ' FROM (('
+            . 'SELECT u0_.id AS id_0, g1_.id AS id_1'
+            . ' FROM user_table u0_'
+            . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
+            . ' INNER JOIN group_table g1_ ON g1_.id = r2_.user_group_id'
+            . ' WHERE u0_.id = 123 LIMIT 3'
+            . ') UNION ALL ('
+            . 'SELECT u0_.id AS id_0, g1_.id AS id_1'
+            . ' FROM user_table u0_'
+            . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
+            . ' INNER JOIN group_table g1_ ON g1_.id = r2_.user_group_id'
+            . ' WHERE u0_.id = 456 LIMIT 3'
+            . ')) entity',
             [
                 ['entityId' => 123, 'relatedEntityId' => 11],
                 ['entityId' => 123, 'relatedEntityId' => 12],
@@ -533,12 +525,9 @@ class HasMoreTest extends EntitySerializerTestCase
             $conn,
             1,
             'SELECT u0_.id AS id_0, g1_.id AS id_1, g1_.label AS label_2'
-            . ' FROM group_table g1_'
-            . ' INNER JOIN user_table u0_ ON (EXISTS ('
-            . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
-            . '))'
+            . ' FROM user_table u0_'
+            . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
+            . ' INNER JOIN group_table g1_ ON g1_.id = r2_.user_group_id'
             . ' WHERE u0_.id IN (?, ?)',
             [
                 ['id_0' => 123, 'id_1' => 11, 'label_2' => 'group11'],

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -40,6 +41,8 @@ class LoadTestResourceWithoutIdentifierData implements ProcessorInterface
             }
         }
 
-        $context->setResult(['name' => $resultName]);
+        $entity = new TestResourceWithoutIdentifier();
+        $entity->setName($resultName);
+        $context->setResult($entity);
     }
 }

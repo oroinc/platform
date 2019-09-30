@@ -80,8 +80,13 @@ class ConfigNormalizer
                     if (null === $field->getAssociationQuery()) {
                         $toRemove[] = $fieldName;
                     }
-                } elseif (false === strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
-                    $renamedFields[$propertyPath] = $fieldName;
+                } else {
+                    if (false === \strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
+                        $renamedFields[$propertyPath] = $fieldName;
+                    }
+                    if (!$field->isExcluded()) {
+                        $this->processDependentFields($config, [$propertyPath]);
+                    }
                 }
             }
             if ($field->getDependsOn() && !$field->isExcluded()) {
@@ -158,9 +163,9 @@ class ConfigNormalizer
                 $this->processDependentFields($config, $dependsOn);
             }
         }
-        if (count($dependsOnPropertyPath) > 1) {
+        if (\count($dependsOnPropertyPath) > 1) {
             $targetConfig = $dependsOnField->getOrCreateTargetEntity();
-            $this->processDependentField($targetConfig, array_slice($dependsOnPropertyPath, 1));
+            $this->processDependentField($targetConfig, \array_slice($dependsOnPropertyPath, 1));
         }
     }
 }

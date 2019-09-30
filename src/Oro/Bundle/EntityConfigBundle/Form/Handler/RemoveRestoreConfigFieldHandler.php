@@ -134,6 +134,8 @@ class RemoveRestoreConfigFieldHandler
         $this->configManager->persist($entityConfig);
         $this->configManager->flush();
 
+        $this->session->getFlashBag()->add('success', $successMessage);
+
         return new JsonResponse(['message' => $successMessage, 'successful' => true], JsonResponse::HTTP_OK);
     }
 }

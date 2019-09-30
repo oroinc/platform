@@ -5,7 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Api;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
-use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CustomDataTypeCompleterInterface;
+use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CustomDataTypeCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;

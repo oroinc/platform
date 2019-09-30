@@ -70,7 +70,13 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             }
         }
 
-        self::assertNotFalse($found, 'Sent emails bodies don\'t contain expected text.');
+        self::assertNotFalse(
+            $found,
+            sprintf(
+                'Sent emails bodies don\'t contain expected text. The following messages has been sent: %s',
+                print_r($this->getSentMessagesData($mailer->getSentMessages()), true)
+            )
+        );
     }
 
     /**
@@ -124,23 +130,32 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             }
         }
 
-        if (!$found) {
-            $messagesData = [];
-            foreach ($mailer->getSentMessages() as $message) {
-                $item = [];
-                foreach ($expectedRows as $expectedContent) {
-                    $item[$expectedContent['field']] = $this->getMessageData($message, $expectedContent['field']);
-                }
-                $messagesData[] = $item;
-            }
+        self::assertNotFalse(
+            $found,
+            sprintf(
+                'Sent emails bodies don\'t contain expected data. The following messages has been sent: %s',
+                print_r($this->getSentMessagesData($mailer->getSentMessages()), true)
+            )
+        );
+    }
 
-            self::fail(
-                sprintf(
-                    'Sent emails don\'t contain expected data. The following messages has been sent: %s',
-                    print_r($messagesData, true)
-                )
-            );
+    /**
+     * @param array $messages
+     *
+     * @return array
+     */
+    private function getSentMessagesData(array $messages): array
+    {
+        $messagesData = [];
+        foreach ($messages as $message) {
+            $item = [];
+            foreach (['From', 'To', 'Cc', 'Bcc', 'Subject', 'Body'] as $field) {
+                $item[$field] = $this->getMessageData($message, $field);
+            }
+            $messagesData[] = $item;
         }
+
+        return $messagesData;
     }
 
     /**
@@ -194,23 +209,13 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             }
         }
 
-        if ($found) {
-            $messagesData = [];
-            foreach ($mailer->getSentMessages() as $message) {
-                $item = [];
-                foreach ($expectedRows as $expectedContent) {
-                    $item[$expectedContent['field']] = $this->getMessageData($message, $expectedContent['field']);
-                }
-                $messagesData[] = $item;
-            }
-
-            self::fail(
-                sprintf(
-                    'Sent emails contains extra data. The following messages has been sent: %s',
-                    print_r($messagesData, true)
-                )
-            );
-        }
+        self::assertFalse(
+            $found,
+            sprintf(
+                'Sent emails contains extra data. The following messages has been sent: %s',
+                print_r($this->getSentMessagesData($mailer->getSentMessages()), true)
+            )
+        );
     }
 
     /**
@@ -450,7 +455,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
                 break;
         }
 
-        $messageData = \is_array($data) ? implode(' ', $data) : $data;
+        $messageData = implode(' ', (array) $data);
 
         return trim(html_entity_decode(strip_tags($messageData), ENT_QUOTES));
     }
@@ -495,6 +500,25 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             return;
         }
 
+        $url = $this->getLinkUrlFromEmail($linkCaption);
+
+        self::assertNotNull($url, sprintf('"%s" link not found in the email', $linkCaption));
+
+        $this->visitPath($url);
+    }
+
+    /**
+     * @param string $linkCaption
+     *
+     * @return string|null
+     */
+    public function getLinkUrlFromEmail(string $linkCaption): ?string
+    {
+        $mailer = $this->getMailer();
+        if (!$mailer instanceof DirectMailerDecorator) {
+            return null;
+        }
+
         $pattern = sprintf('/<a.*href\s*=\s*"(?P<url>[^"]+)".*>\s*%s\s*<\/a>/s', $linkCaption);
         $url = $this->spin(function () use ($mailer, $pattern) {
             $matches = [];
@@ -509,11 +533,9 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
                 }
             }
 
-            return false;
+            return null;
         });
 
-        self::assertNotNull($url, sprintf('"%s" link not found in the email', $linkCaption));
-
-        $this->visitPath($url);
+        return $url;
     }
 }

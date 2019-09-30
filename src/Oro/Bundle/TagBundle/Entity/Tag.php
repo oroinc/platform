@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TagBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -12,7 +13,7 @@ use Oro\Bundle\TagBundle\Model\ExtendTag;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * Tag
+ * Tag entity
  *
  * @ORM\Table(
  *     name="oro_tag_tag",
@@ -78,12 +79,13 @@ class Tag extends ExtendTag
 
     /**
      * @var string
+     *
      * @ORM\Column(name="name", type="string", length=50)
      */
     protected $name;
 
     /**
-     * @var \Datetime $created
+     * @var \Datetime
      *
      * @ORM\Column(type="datetime")
      * @ConfigField(
@@ -97,7 +99,7 @@ class Tag extends ExtendTag
     protected $created;
 
     /**
-     * @var \Datetime $updated
+     * @var \Datetime
      *
      * @ORM\Column(type="datetime")
      * @ConfigField(
@@ -111,11 +113,15 @@ class Tag extends ExtendTag
     protected $updated;
 
     /**
+     * @var Collection
+     *
      * @ORM\OneToMany(targetEntity="Tagging", mappedBy="tag", fetch="EXTRA_LAZY")
      */
     protected $tagging;
 
     /**
+     * @var Taxonomy
+     *
      * @ORM\ManyToOne(targetEntity="Taxonomy", inversedBy="tags", fetch="LAZY")
      * @ORM\JoinColumn(name="taxonomy_id", referencedColumnName="id", onDelete="SET NULL")
      */

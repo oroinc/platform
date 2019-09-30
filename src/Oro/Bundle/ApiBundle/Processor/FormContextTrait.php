@@ -32,7 +32,7 @@ trait FormContextTrait
     private $form;
 
     /** @var bool */
-    protected $skipFormValidation = false;
+    private $skipFormValidation = false;
 
     /**
      * Returns request data.

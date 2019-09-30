@@ -22,6 +22,9 @@ oro_behat_extension:
     ImportModalImportFileButton:
       selector: "#import_button"
 
+    MainExportFileButton:
+      selector: ".export-btn"
+
     ImportErrors:
       selector: 'div.import-errors'
 

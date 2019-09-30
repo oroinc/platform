@@ -111,7 +111,7 @@ Delete a collection of note records.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 ### message
 
@@ -119,7 +119,7 @@ Delete a collection of note records.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
@@ -137,7 +137,7 @@ A records to which the note record associated with.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 ## SUBRESOURCES
 

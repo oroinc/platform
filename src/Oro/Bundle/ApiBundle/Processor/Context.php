@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraCollection;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\HateoasConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
@@ -40,18 +41,6 @@ class Context extends NormalizeResultContext implements ContextInterface
 {
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
-
-    /** a prefix for all configuration sections */
-    const CONFIG_PREFIX = 'config_';
-
-    /** metadata of an entity */
-    const METADATA = 'metadata';
-
-    /** a query is used to get result data */
-    const QUERY = 'query';
-
-    /** the Criteria object is used to add additional restrictions to a query is used to get result data */
-    const CRITERIA = 'criteria';
 
     /** the response status code */
     const RESPONSE_STATUS_CODE = 'responseStatusCode';
@@ -92,8 +81,17 @@ class Context extends NormalizeResultContext implements ContextInterface
     /** @var DocumentBuilderInterface|null */
     private $responseDocumentBuilder;
 
+    /** @var EntityDefinitionConfig|null|bool */
+    private $config = false;
+
+    /** @var array */
+    private $configSections = [];
+
     /** @var ConfigExtraCollection */
     private $configExtras;
+
+    /** @var EntityMetadata|null|bool */
+    private $metadata = false;
 
     /** @var MetadataExtraCollection|null */
     private $metadataExtras;
@@ -103,6 +101,12 @@ class Context extends NormalizeResultContext implements ContextInterface
 
     /** @var ParameterBagInterface|null */
     private $sharedData;
+
+    /** @var mixed */
+    private $query;
+
+    /** @var Criteria|null */
+    private $criteria;
 
     /**
      * @param ConfigProvider   $configProvider
@@ -219,7 +223,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     {
         $statusCode = $this->getResponseStatusCode();
 
-        return $statusCode>= 200 && $statusCode < 300;
+        return $statusCode >= 200 && $statusCode < 300;
     }
 
     /**
@@ -316,6 +320,18 @@ class Context extends NormalizeResultContext implements ContextInterface
     public function setHateoas(bool $flag)
     {
         $this->set(self::HATEOAS, $flag);
+        if (!$flag) {
+            $this->configExtras->removeConfigExtra(HateoasConfigExtra::NAME);
+        } elseif (!$this->configExtras->hasConfigExtra(HateoasConfigExtra::NAME)) {
+            $this->configExtras->addConfigExtra(new HateoasConfigExtra());
+        }
+        if (null !== $this->metadataExtras) {
+            if (!$flag) {
+                $this->metadataExtras->removeMetadataExtra(HateoasMetadataExtra::NAME);
+            } elseif (!$this->metadataExtras->hasMetadataExtra(HateoasMetadataExtra::NAME)) {
+                $this->metadataExtras->addMetadataExtra(new HateoasMetadataExtra($this->getFilterValues()));
+            }
+        }
     }
 
     /**
@@ -380,9 +396,25 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
+    public function addAssociationInfoRecords(string $propertyPath, array $infoRecords): void
+    {
+        foreach ($infoRecords as $key => $val) {
+            if ($key) {
+                $this->infoRecords[$propertyPath][$key] = $val;
+            } elseif (\is_array($val)) {
+                foreach ($val as $k => $v) {
+                    $this->infoRecords[$propertyPath][$k] = $v;
+                }
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function hasQuery()
     {
-        return $this->has(self::QUERY);
+        return null !== $this->query;
     }
 
     /**
@@ -390,7 +422,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function getQuery()
     {
-        return $this->get(self::QUERY);
+        return $this->query;
     }
 
     /**
@@ -398,11 +430,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function setQuery($query)
     {
-        if ($query) {
-            $this->set(self::QUERY, $query);
-        } else {
-            $this->remove(self::QUERY);
-        }
+        $this->query = $query;
     }
 
     /**
@@ -410,7 +438,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function getCriteria()
     {
-        return $this->get(self::CRITERIA);
+        return $this->criteria;
     }
 
     /**
@@ -418,11 +446,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function setCriteria(Criteria $criteria = null)
     {
-        if ($criteria) {
-            $this->set(self::CRITERIA, $criteria);
-        } else {
-            $this->remove(self::CRITERIA);
-        }
+        $this->criteria = $criteria;
     }
 
     /**
@@ -439,6 +463,9 @@ class Context extends NormalizeResultContext implements ContextInterface
     public function setConfigExtras(array $extras)
     {
         $this->configExtras->setConfigExtras($extras);
+        if ($this->isHateoasEnabled() && !$this->configExtras->hasConfigExtra(HateoasConfigExtra::NAME)) {
+            $this->configExtras->addConfigExtra(new HateoasConfigExtra());
+        }
     }
 
     /**
@@ -486,7 +513,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function hasConfig()
     {
-        return $this->has($this->getConfigKey());
+        return false !== $this->config;
     }
 
     /**
@@ -494,12 +521,11 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function getConfig()
     {
-        $key = $this->getConfigKey();
-        if (!$this->has($key)) {
+        if (false === $this->config) {
             $this->loadConfig();
         }
 
-        return $this->get($key);
+        return $this->config;
     }
 
     /**
@@ -507,7 +533,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function setConfig(?EntityDefinitionConfig $definition)
     {
-        $this->set($this->getConfigKey(), $definition);
+        $this->config = $definition;
         if (null === $definition) {
             $this->removeAllConfigSections();
         }
@@ -571,7 +597,7 @@ class Context extends NormalizeResultContext implements ContextInterface
             return false;
         }
 
-        return $this->has(self::CONFIG_PREFIX . $configSection);
+        return \array_key_exists($configSection, $this->configSections);
     }
 
     /**
@@ -583,16 +609,15 @@ class Context extends NormalizeResultContext implements ContextInterface
             return null;
         }
 
-        $key = self::CONFIG_PREFIX . $configSection;
-        if (!$this->has($key)) {
-            if (!$this->has($this->getConfigKey())) {
-                $this->loadConfig();
-            } else {
+        if (!\array_key_exists($configSection, $this->configSections)) {
+            if (false !== $this->config) {
                 $this->setConfigOf($configSection, null);
+            } else {
+                $this->loadConfig();
             }
         }
 
-        return $this->get($key);
+        return $this->configSections[$configSection];
     }
 
     /**
@@ -604,24 +629,13 @@ class Context extends NormalizeResultContext implements ContextInterface
             throw new \InvalidArgumentException(sprintf('Undefined configuration section: "%s".', $configSection));
         }
 
-        $this->set(self::CONFIG_PREFIX . $configSection, $config);
+        $this->configSections[$configSection] = $config;
 
         // make sure that all config sections, including a main section, are added to the context
-        $key = $this->getConfigKey();
-        if (!$this->has($key)) {
-            $this->set($key, null);
+        if (false === $this->config) {
+            $this->config = null;
         }
         $this->ensureAllConfigSectionsSet();
-    }
-
-    /**
-     * Gets a key of a main section of an entity configuration.
-     *
-     * @return string
-     */
-    protected function getConfigKey()
-    {
-        return self::CONFIG_PREFIX . ConfigUtil::DEFINITION;
     }
 
     /**
@@ -638,12 +652,6 @@ class Context extends NormalizeResultContext implements ContextInterface
             $this->getRequestType(),
             $extras
         );
-        if ($this->isHateoasEnabled()) {
-            $definition = $config->getDefinition();
-            if (null !== $definition) {
-                $definition->setHasMore(true);
-            }
-        }
 
         return $config;
     }
@@ -680,15 +688,18 @@ class Context extends NormalizeResultContext implements ContextInterface
         // add loaded config sections to the context
         if ($config && !$config->isEmpty()) {
             foreach ($config as $key => $value) {
-                $this->set(self::CONFIG_PREFIX . $key, $value);
+                if (ConfigUtil::DEFINITION === $key) {
+                    $this->config = $value;
+                } else {
+                    $this->configSections[$key] = $value;
+                }
             }
         }
 
         // make sure that all config sections, including a main section, are added to the context
         // even if a section was not returned by the config provider
-        $key = $this->getConfigKey();
-        if (!$this->has($key)) {
-            $this->set($key, null);
+        if (false === $this->config) {
+            $this->config = null;
         }
         $this->ensureAllConfigSectionsSet();
     }
@@ -700,9 +711,8 @@ class Context extends NormalizeResultContext implements ContextInterface
     {
         $configSections = $this->getConfigSections();
         foreach ($configSections as $name) {
-            $key = self::CONFIG_PREFIX . $name;
-            if (!$this->has($key)) {
-                $this->set($key, null);
+            if (!\array_key_exists($name, $this->configSections)) {
+                $this->configSections[$name] = null;
             }
         }
     }
@@ -714,9 +724,8 @@ class Context extends NormalizeResultContext implements ContextInterface
     {
         $configSections = $this->getConfigSections();
         foreach ($configSections as $name) {
-            $key = self::CONFIG_PREFIX . $name;
-            if ($this->has($key)) {
-                $this->remove($key);
+            if (\array_key_exists($name, $this->configSections)) {
+                unset($this->configSections[$name]);
             }
         }
     }
@@ -753,6 +762,9 @@ class Context extends NormalizeResultContext implements ContextInterface
                 $this->metadataExtras = new MetadataExtraCollection();
             }
             $this->metadataExtras->setMetadataExtras($extras);
+            if ($this->isHateoasEnabled() && !$this->metadataExtras->hasMetadataExtra(HateoasMetadataExtra::NAME)) {
+                $this->metadataExtras->addMetadataExtra(new HateoasMetadataExtra($this->getFilterValues()));
+            }
         }
     }
 
@@ -799,7 +811,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function hasMetadata()
     {
-        return $this->has(self::METADATA);
+        return false !== $this->metadata;
     }
 
     /**
@@ -807,11 +819,11 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function getMetadata()
     {
-        if (!$this->has(self::METADATA)) {
+        if (false === $this->metadata) {
             $this->loadMetadata();
         }
 
-        return $this->get(self::METADATA);
+        return $this->metadata;
     }
 
     /**
@@ -820,9 +832,9 @@ class Context extends NormalizeResultContext implements ContextInterface
     public function setMetadata(?EntityMetadata $metadata)
     {
         if ($metadata) {
-            $this->set(self::METADATA, $metadata);
+            $this->metadata = $metadata;
         } else {
-            $this->remove(self::METADATA);
+            $this->metadata = false;
         }
     }
 
@@ -843,6 +855,9 @@ class Context extends NormalizeResultContext implements ContextInterface
         ) {
             $this->metadataExtras->addMetadataExtra(new ActionMetadataExtra($action));
         }
+        if ($this->isHateoasEnabled() && !$this->metadataExtras->hasMetadataExtra(HateoasMetadataExtra::NAME)) {
+            $this->metadataExtras->addMetadataExtra(new HateoasMetadataExtra($this->getFilterValues()));
+        }
     }
 
     /**
@@ -861,16 +876,12 @@ class Context extends NormalizeResultContext implements ContextInterface
             $metadata = null;
             $config = $this->getConfig();
             if (null !== $config) {
-                $extras = $this->getMetadataExtras();
-                if ($this->isHateoasEnabled()) {
-                    $extras[] = new HateoasMetadataExtra($this->getFilterValues());
-                }
                 $metadata = $this->metadataProvider->getMetadata(
                     $entityClass,
                     $this->getVersion(),
                     $this->getRequestType(),
                     $config,
-                    $extras
+                    $this->getMetadataExtras()
                 );
                 $this->initializeMetadata($metadata);
             }
@@ -888,7 +899,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     protected function processLoadedMetadata(?EntityMetadata $metadata)
     {
         // add loaded metadata to the context
-        $this->set(self::METADATA, $metadata);
+        $this->metadata = $metadata;
     }
 
     /**

@@ -24,7 +24,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                     'name_1'          => 'product_name',
                     'name_2'          => 'category_name',
                     'category_name_3' => 'category_name',
-                    'owner_id_4'      => 10,
+                    'owner_id_4'      => 10
                 ]
             ],
             [1 => 1],
@@ -41,7 +41,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                     'category' => [
                         'fields' => 'name'
                     ]
-                ],
+                ]
             ]
         );
 
@@ -50,7 +50,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'       => 1,
                     'name'     => 'product_name',
-                    'category' => 'category_name',
+                    'category' => 'category_name'
                 ]
             ],
             $result
@@ -78,7 +78,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                     'name_2'          => 'category_name',
                     'label_3'         => 'category_label',
                     'category_name_4' => 'category_name',
-                    'owner_id_5'      => 10,
+                    'owner_id_5'      => 10
                 ]
             ],
             [1 => 1],
@@ -95,7 +95,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                     'category' => [
                         'fields' => 'label'
                     ]
-                ],
+                ]
             ]
         );
 
@@ -104,7 +104,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'       => 1,
                     'name'     => 'product_name',
-                    'category' => 'category_label',
+                    'category' => 'category_label'
                 ]
             ],
             $result
@@ -134,7 +134,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                     'name_3'          => 'user_name',
                     'category_name_4' => 'category_name',
                     'owner_id_5'      => 10,
-                    'category_name_6' => 'user_category_name',
+                    'category_name_6' => 'user_category_name'
                 ]
             ],
             [1 => 1],
@@ -155,7 +155,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                             'name' => null
                         ]
                     ]
-                ],
+                ]
             ]
         );
 
@@ -167,7 +167,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                     'owner' => [
                         'id'   => 10,
                         'name' => 'user_name'
-                    ],
+                    ]
                 ]
             ],
             $result
@@ -196,7 +196,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                     'id_2'            => 10,
                     'category_name_3' => 'category_name',
                     'owner_id_4'      => 10,
-                    'category_name_5' => 'user_category_name',
+                    'category_name_5' => 'user_category_name'
                 ]
             ],
             [1 => 1],
@@ -213,7 +213,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                     'owner' => [
                         'fields' => 'id'
                     ]
-                ],
+                ]
             ]
         );
 
@@ -222,7 +222,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'    => 1,
                     'name'  => 'product_name',
-                    'owner' => 10,
+                    'owner' => 10
                 ]
             ],
             $result
@@ -263,7 +263,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                     'name_5'          => 'user_name',
                     'category_name_6' => 'product_category_name',
                     'owner_id_7'      => 10,
-                    'category_name_8' => 'user_category_name',
+                    'category_name_8' => 'user_category_name'
                 ]
             ],
             [1 => 1],
@@ -278,7 +278,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
             [
                 [
                     'name_1'  => 'user_category_name',
-                    'label_2' => 'user_category_label',
+                    'label_2' => 'user_category_label'
                 ]
             ],
             [1 => 'user_category_name'],
@@ -299,7 +299,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                             'category' => ['fields' => 'label']
                         ]
                     ]
-                ],
+                ]
             ]
         );
 
@@ -316,7 +316,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                         'id'       => 10,
                         'name'     => 'user_name',
                         'category' => 'user_category_label'
-                    ],
+                    ]
                 ]
             ],
             $result
@@ -349,7 +349,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                     'name_3'          => 'user_name',
                     'category_name_4' => 'category_name',
                     'owner_id_5'      => 10,
-                    'category_name_6' => 'user_category_name',
+                    'category_name_6' => 'user_category_name'
                 ]
             ],
             [1 => 1],
@@ -359,23 +359,19 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
             $conn,
             1,
             'SELECT u0_.id AS id_0, g1_.id AS id_1'
-            . ' FROM group_table g1_'
-            . ' INNER JOIN user_table u0_ ON (EXISTS ('
-            . 'SELECT 1'
-            . ' FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
-            . '))'
+            . ' FROM user_table u0_'
+            . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
+            . ' INNER JOIN group_table g1_ ON g1_.id = r2_.user_group_id'
             . ' WHERE u0_.id = ?',
             [
                 [
                     'id_0' => 10,
-                    'id_1' => 100,
+                    'id_1' => 100
                 ],
                 [
                     'id_0' => 10,
-                    'id_1' => 101,
-                ],
+                    'id_1' => 101
+                ]
             ],
             [1 => 10],
             [1 => \PDO::PARAM_INT]
@@ -394,11 +390,11 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                             'id'     => null,
                             'name'   => null,
                             'groups' => [
-                                'fields' => 'id',
+                                'fields' => 'id'
                             ]
                         ]
                     ]
-                ],
+                ]
             ]
         );
 
@@ -410,8 +406,8 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                     'owner' => [
                         'id'     => 10,
                         'name'   => 'user_name',
-                        'groups' => [100, 101],
-                    ],
+                        'groups' => [100, 101]
+                    ]
                 ]
             ],
             $result
@@ -447,7 +443,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                     'name_3'          => 'user_name',
                     'category_name_4' => 'category_name',
                     'owner_id_5'      => 10,
-                    'category_name_6' => 'user_category_name',
+                    'category_name_6' => 'user_category_name'
                 ]
             ],
             [1 => 1],
@@ -457,25 +453,21 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
             $conn,
             1,
             'SELECT u0_.id AS id_0, g1_.id AS id_1, g1_.name AS name_2'
-            . ' FROM group_table g1_'
-            . ' INNER JOIN user_table u0_ ON (EXISTS ('
-            . 'SELECT 1'
-            . ' FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
-            . '))'
+            . ' FROM user_table u0_'
+            . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
+            . ' INNER JOIN group_table g1_ ON g1_.id = r2_.user_group_id'
             . ' WHERE u0_.id = ?',
             [
                 [
                     'id_0'   => 10,
                     'id_1'   => 100,
-                    'name_2' => 'owner_group_name1',
+                    'name_2' => 'owner_group_name1'
                 ],
                 [
                     'id_0'   => 10,
                     'id_1'   => 101,
-                    'name_2' => 'owner_group_name2',
-                ],
+                    'name_2' => 'owner_group_name2'
+                ]
             ],
             [1 => 10],
             [1 => \PDO::PARAM_INT]
@@ -497,12 +489,12 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                                 'exclusion_policy' => 'all',
                                 'fields'           => [
                                     'id'   => null,
-                                    'name' => null,
+                                    'name' => null
                                 ]
                             ]
                         ]
                     ]
-                ],
+                ]
             ]
         );
 
@@ -516,9 +508,9 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                         'name'   => 'user_name',
                         'groups' => [
                             ['id' => 100, 'name' => 'owner_group_name1'],
-                            ['id' => 101, 'name' => 'owner_group_name2'],
-                        ],
-                    ],
+                            ['id' => 101, 'name' => 'owner_group_name2']
+                        ]
+                    ]
                 ]
             ],
             $result
@@ -545,7 +537,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                     'name_1'          => 'product_name',
                     'name_2'          => 'category_name',
                     'category_name_3' => 'category_name',
-                    'owner_id_4'      => 10,
+                    'owner_id_4'      => 10
                 ]
             ],
             [1 => 1],
@@ -567,7 +559,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                             ]
                         ]
                     ]
-                ],
+                ]
             ]
         );
 
@@ -578,7 +570,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                     'name'     => 'product_name',
                     'category' => [
                         'id' => 'category_name'
-                    ],
+                    ]
                 ]
             ],
             $result
@@ -605,7 +597,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                     'name_1'          => 'product_name',
                     'name_2'          => 'category_name',
                     'category_name_3' => 'category_name',
-                    'owner_id_4'      => 10,
+                    'owner_id_4'      => 10
                 ]
             ],
             [1 => 1],
@@ -628,7 +620,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                             ]
                         ]
                     ]
-                ],
+                ]
             ]
         );
 
@@ -637,7 +629,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'       => 1,
                     'name'     => 'product_name',
-                    'category' => 'category_name',
+                    'category' => 'category_name'
                 ]
             ],
             $result

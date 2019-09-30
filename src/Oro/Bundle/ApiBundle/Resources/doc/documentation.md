@@ -170,7 +170,7 @@ The created record is returned in the response.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 ```
 
 Use the `{@request}` tag to add documentation depending on the request type. The full signature of this tag is `{@request:expression}some text{@/request}`. The expression can contain the following operators:
@@ -219,5 +219,5 @@ Example:
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 ```

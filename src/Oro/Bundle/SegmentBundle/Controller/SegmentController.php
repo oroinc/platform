@@ -15,10 +15,10 @@ use Oro\Bundle\SegmentBundle\Form\Type\SegmentType;
 use Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 use Oro\Bundle\UIBundle\Route\Router;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**

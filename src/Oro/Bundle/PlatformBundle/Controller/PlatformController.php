@@ -4,9 +4,9 @@ namespace Oro\Bundle\PlatformBundle\Controller;
 
 use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Controller provide information about installed packages

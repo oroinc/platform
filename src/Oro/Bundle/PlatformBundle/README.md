@@ -18,7 +18,7 @@ To use maintenance mode functionality bundle provides `oro_platform.maintenance`
 ``` php
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 
 class AcmeController extends Controller
 {

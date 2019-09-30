@@ -9,12 +9,11 @@ use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Util\ObfuscatedEmailTrait;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Handles request and reset password logic
@@ -29,8 +28,7 @@ class ResetController extends Controller
      * Request reset user password
      *
      * @param Request $request
-     * @Route("/send-email", name="oro_user_reset_send_email")
-     * @Method({"POST"})
+     * @Route("/send-email", name="oro_user_reset_send_email", methods={"POST"})
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -83,8 +81,7 @@ class ResetController extends Controller
     }
 
     /**
-     * @Route("/reset-request", name="oro_user_reset_request")
-     * @Method({"GET"})
+     * @Route("/reset-request", name="oro_user_reset_request", methods={"GET"})
      * @Template
      */
     public function requestAction()
@@ -181,8 +178,7 @@ class ResetController extends Controller
     /**
      * Tell the user to check his email provider
      *
-     * @Route("/check-email", name="oro_user_reset_check_email")
-     * @Method({"GET"})
+     * @Route("/check-email", name="oro_user_reset_check_email", methods={"GET"})
      * @Template
      */
     public function checkEmailAction()
@@ -205,8 +201,7 @@ class ResetController extends Controller
     /**
      * Reset user password
      *
-     * @Route("/reset/{token}", name="oro_user_reset_reset", requirements={"token"="\w+"})
-     * @Method({"GET", "POST"})
+     * @Route("/reset/{token}", name="oro_user_reset_reset", requirements={"token"="\w+"}, methods={"GET", "POST"})
      * @Template
      */
     public function resetAction($token)
@@ -251,8 +246,12 @@ class ResetController extends Controller
     /**
      * Sets user password
      * @AclAncestor("password_management")
-     * @Method({"GET", "POST"})
-     * @Route("/set-password/{id}", name="oro_user_reset_set_password", requirements={"id"="\d+"})
+     * @Route(
+     *     "/set-password/{id}",
+     *     name="oro_user_reset_set_password",
+     *     requirements={"id"="\d+"},
+     *     methods={"GET", "POST"}
+     * )
      * @Template("OroUserBundle:Reset/dialog:update.html.twig")
      * @param Request $request
      * @param User $entity

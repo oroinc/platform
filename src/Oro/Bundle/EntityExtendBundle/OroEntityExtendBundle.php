@@ -3,13 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ConfigLoaderPass;
-use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityExtendPass;
-use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass;
-use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityMetadataBuilderPass;
-use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtensionPass;
-use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\MigrationConfigPass;
-use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\WarmerPass;
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -71,11 +65,11 @@ class OroEntityExtendBundle extends Bundle
 
         $this->ensureInitialized();
 
-        $container->addCompilerPass(new EntityExtendPass());
-        $container->addCompilerPass(new ConfigLoaderPass());
-        $container->addCompilerPass(new EntityManagerPass());
-        $container->addCompilerPass(new EntityMetadataBuilderPass());
-        $container->addCompilerPass(new MigrationConfigPass());
+        $container->addCompilerPass(new Compiler\EntityExtendValidationLoaderPass());
+        $container->addCompilerPass(new Compiler\ConfigLoaderPass());
+        $container->addCompilerPass(new Compiler\EntityManagerPass());
+        $container->addCompilerPass(new Compiler\EntityMetadataBuilderPass());
+        $container->addCompilerPass(new Compiler\MigrationConfigPass());
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createYamlMappingDriver(
                 [
@@ -84,8 +78,8 @@ class OroEntityExtendBundle extends Bundle
                 ]
             )
         );
-        $container->addCompilerPass(new ExtensionPass());
-        $container->addCompilerPass(new WarmerPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new Compiler\ExtensionPass());
+        $container->addCompilerPass(new Compiler\WarmerPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 
     private function ensureInitialized()

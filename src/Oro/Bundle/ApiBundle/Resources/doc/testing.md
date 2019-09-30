@@ -246,5 +246,5 @@ one of the following base classes can be used:
 | [ChangeSubresourceProcessorTestCase](../../Tests/Unit/Processor/Subresource/ChangeSubresourceProcessorTestCase.php) | [update_subresource](./actions.md#update_subresource-action), [add_subresource](./actions.md#add_subresource-action), [delete_subresource](./actions.md#delete_subresource-action) |
 | [ChangeRelationshipProcessorTestCase](../../Tests/Unit/Processor/Subresource/ChangeRelationshipProcessorTestCase.php) | [update_relationship](./actions.md#update_relationship-action), [add_relationship](./actions.md#add_relationship-action), [delete_relationship](./actions.md#delete_relationship-action) |
 | [OptionsProcessorTestCase](../../Tests/Unit/Processor/Options/OptionsProcessorTestCase.php) | [options](./actions.md#options-action) |
-| [ConfigProcessorTestCase](../../Tests/Unit/Processor/Config/ConfigProcessorTestCase.php) | [get_config](./actions.md#get_config-action) |
+| [ConfigProcessorTestCase](../../Tests/Unit/Processor/GetConfig/ConfigProcessorTestCase.php) | [get_config](./actions.md#get_config-action) |
 | [MetadataProcessorTestCase](../../Tests/Unit/Processor/GetMetadata/MetadataProcessorTestCase.php) | [get_metadata](./actions.md#get_metadata-action) |

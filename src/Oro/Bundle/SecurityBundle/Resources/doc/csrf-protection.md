@@ -22,8 +22,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class AjaxController extends Controller
 {
     /**
-     * @Route("/ajax/change-stus/{statusName}", name="acme_ajax_change_status")
-     * @Method("POST")
+     * @Route("/ajax/change-stus/{statusName}", name="acme_ajax_change_status", methods={"POST"})
      */
     public function performAction($statusName)
     {
@@ -42,8 +41,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class AjaxController extends Controller
 {
     /**
-     * @Route("/ajax/change-stus/{statusName}", name="acme_ajax_change_status")
-     * @Method("POST")
+     * @Route("/ajax/change-stus/{statusName}", name="acme_ajax_change_status", methods={"POST"})
      * @CsrfProtection
      */
     public function performAction($statusName)

@@ -120,6 +120,29 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetCriteriaByScopeWithContext()
+    {
+        $scope = new StubScope();
+        $scope->setScopeField('scope_value');
+
+        $contextFieldValue = new \stdClass();
+        $context = [
+            'scopeField' => $contextFieldValue
+        ];
+
+        $this->scopeClassMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $provider = new StubScopeCriteriaProvider('scopeField', new \stdClass(), \stdClass::class);
+
+        $manager = $this->getScopeManager(['testScope' => [$provider]]);
+        $criteriaProperties = $manager->getCriteriaByScope($scope, 'testScope', $context)->toArray();
+        $this->assertCount(1, $criteriaProperties);
+        $this->assertArrayHasKey($provider->getCriteriaField(), $criteriaProperties);
+        $this->assertSame($contextFieldValue, $criteriaProperties[$provider->getCriteriaField()]);
+    }
+
     public function testFind()
     {
         $scope = new Scope();

@@ -14,8 +14,6 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\UIBundle\Route\Router;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,6 +21,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -159,9 +158,9 @@ class ConfigEntityGridController extends AbstractController
      *      "/remove/{id}",
      *      name="oro_entityextend_entity_remove",
      *      requirements={"id"="\d+"},
-     *      defaults={"id"=0}
+     *      defaults={"id"=0},
+     *      methods={"DELETE"}
      * )
-     * @Method("DELETE")
      * @CsrfProtection()
      *
      * @param EntityConfigModel $entity
@@ -195,9 +194,9 @@ class ConfigEntityGridController extends AbstractController
      *      "/unremove/{id}",
      *      name="oro_entityextend_entity_unremove",
      *      requirements={"id"="\d+"},
-     *      defaults={"id"=0}
+     *      defaults={"id"=0},
+     *      methods={"POST"}
      * )
-     * @Method("POST")
      * @CsrfProtection()
      *
      * @param EntityConfigModel $entity

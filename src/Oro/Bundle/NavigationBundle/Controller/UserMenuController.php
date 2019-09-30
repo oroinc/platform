@@ -5,10 +5,10 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 use Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * The controller for the user menu.

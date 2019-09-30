@@ -10,6 +10,9 @@ use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrate
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizationCodeFormatter;
 
+/**
+ * Import strategy for entities which have relations to LocalizedFallbackValue collections.
+ */
 class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrategy
 {
     /** @var string */
@@ -29,22 +32,6 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
     /** {@inheritdoc} */
     protected function beforeProcessEntity($entity)
     {
-        $existingEntity = $this->findExistingEntity($entity);
-        if (!$existingEntity) {
-            return parent::beforeProcessEntity($entity);
-        }
-
-        $fields = $this->fieldHelper->getRelations($this->entityName);
-        foreach ($fields as $field) {
-            if ($this->isLocalizedFallbackValue($field)) {
-                $fieldName = $field['name'];
-                $this->mapCollections(
-                    $this->fieldHelper->getObjectValue($entity, $fieldName),
-                    $this->fieldHelper->getObjectValue($existingEntity, $fieldName)
-                );
-            }
-        }
-
         return parent::beforeProcessEntity($entity);
     }
 
@@ -106,6 +93,46 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
         }
 
         parent::importExistingEntity($entity, $existingEntity, $itemData, $excludedFields);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Adds extra functionality to the base method:
+     * - loads existing collection or LocalizedFallbackValue entities if any
+     */
+    protected function generateSearchContextForRelationsUpdate($entity, $entityName, $fieldName, $isPersistRelation)
+    {
+        $fields = $this->fieldHelper->getRelations($entityName);
+        $existingEntity = $this->findExistingEntity($entity);
+        if ($existingEntity && $this->isLocalizedFallbackValue($fields[$fieldName])) {
+            $searchContext = [];
+            $sourceCollection = $this->fieldHelper->getObjectValue($existingEntity, $fieldName);
+            /** @var LocalizedFallbackValue $sourceValue */
+            foreach ($sourceCollection as $sourceValue) {
+                $localizationCode = LocalizationCodeFormatter::formatKey($sourceValue->getLocalization());
+                $searchContext[$localizationCode] = $sourceValue;
+            }
+
+            return $searchContext;
+        }
+
+        return parent::generateSearchContextForRelationsUpdate($entity, $entityName, $fieldName, $isPersistRelation);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function findExistingEntity($entity, array $searchContext = [])
+    {
+        if (ClassUtils::getClass($entity) === $this->localizedFallbackValueClass) {
+            $localizationCode = LocalizationCodeFormatter::formatKey($entity->getLocalization());
+            if (array_key_exists($localizationCode, $searchContext)) {
+                return $searchContext[$localizationCode];
+            }
+        }
+
+        return parent::findExistingEntity($entity, $searchContext);
     }
 
     /**
@@ -192,39 +219,6 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
         $this->reflectionProperties[$fieldName]->setAccessible(true);
 
         return $this->reflectionProperties[$fieldName];
-    }
-
-    /**
-     * @param Collection $importedCollection
-     * @param Collection $sourceCollection
-     */
-    protected function mapCollections(Collection $importedCollection, Collection $sourceCollection)
-    {
-        if ($importedCollection->isEmpty()) {
-            return;
-        }
-
-        if ($sourceCollection->isEmpty()) {
-            return;
-        }
-
-        $sourceCollectionArray = $sourceCollection->toArray();
-
-        /** @var LocalizedFallbackValue $sourceValue */
-        foreach ($sourceCollectionArray as $sourceValue) {
-            $key = LocalizationCodeFormatter::formatKey($sourceValue->getLocalization());
-            $sourceCollectionArray[$key] = $sourceValue->getId();
-        }
-
-        $importedCollection
-            ->map(
-                function (LocalizedFallbackValue $importedValue) use ($sourceCollectionArray) {
-                    $key = LocalizationCodeFormatter::formatKey($importedValue->getLocalization());
-                    if (array_key_exists($key, $sourceCollectionArray)) {
-                        $this->fieldHelper->setObjectValue($importedValue, 'id', $sourceCollectionArray[$key]);
-                    }
-                }
-            );
     }
 
     /**
