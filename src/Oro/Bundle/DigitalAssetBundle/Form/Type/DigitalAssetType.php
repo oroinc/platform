@@ -11,7 +11,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -104,7 +103,7 @@ class DigitalAssetType extends AbstractType
                         'title' => $this->translator->trans('oro.digitalasset.controller.sections.general.label'),
                     ],
                 ],
-                'validation_groups' => new GroupSequence(['Default', 'DigitalAsset']),
+                'validation_groups' => ['Default', 'DigitalAsset'],
             ]
         );
     }

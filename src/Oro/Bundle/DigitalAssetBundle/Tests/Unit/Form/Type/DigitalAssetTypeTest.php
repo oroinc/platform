@@ -20,7 +20,6 @@ use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -67,7 +66,7 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
                             'title' => $translatedTitle,
                         ],
                     ],
-                    'validation_groups' => new GroupSequence(['Default', 'DigitalAsset']),
+                    'validation_groups' => ['Default', 'DigitalAsset'],
                 ]
             );
 

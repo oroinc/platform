@@ -7,11 +7,20 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Configuration class for OroAttachmentBundle.
+ */
 class Configuration implements ConfigurationInterface
 {
-    private const MAX_FILESIZE_MB = 10; //Represents maximum upload filesize default value
+    /**
+     * Maximum upload file size default value.
+     */
+    private const MAX_FILESIZE_MB = 10;
 
-    const BYTES_MULTIPLIER = 1048576; //Bytes in one MB. Used to calculate exact bytes in certain MB amount.
+    /**
+     * Bytes in one MB. Used to calculate exact bytes in certain MB amount.
+     */
+    public const BYTES_MULTIPLIER = 1048576;
 
     /**
      * {@inheritdoc}

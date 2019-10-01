@@ -24,7 +24,7 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  *          @ORM\Index(name="created_at_idx", columns={"created_at"})
  *     }
  * )
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\DigitalAssetBundle\Entity\Repository\DigitalAssetRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      routeName="oro_digital_asset_index",
