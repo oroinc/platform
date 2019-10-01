@@ -102,6 +102,10 @@ The current file describes significant changes in the code that may affect the u
 * The constant `SCOPE_KEY` in `Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider`
   was replaced with `USER`.
 
+### Removed
+#### EntityExtendBundle
+* Removed *HTML* field type, all HTML fields were converted to Text fields.  
+
 ## 4.0.0 (2019-07-31)
 [Show detailed list of changes](incompatibilities-4-0.md)
 

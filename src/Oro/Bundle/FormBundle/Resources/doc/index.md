@@ -10,4 +10,4 @@ OroFormBundle Documentation
 - [Update Handler](./reference/update_handler.md)
 - [Inline Editable Views](./reference/inline-editable-view-component.md)
 - [Expression editor](./reference/expression-editor.md)
-- [WYSIWYG Form Type](./reference/rich_text_form_type.md)
+- [Rich Text Form Type](./reference/rich_text_form_type.md)
