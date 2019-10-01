@@ -39,7 +39,6 @@ class AuditFieldTypeRegistry
         'simple_array' => 'simplearray',
         'json_array'   => 'jsonarray',
         'collection' => 'text',
-        'html_escaped' => 'text',
         'wysiwyg' => 'text',
     ];
 

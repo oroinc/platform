@@ -25,7 +25,6 @@ class SerializedFieldProvider
         'float',
         'money',
         'percent',
-        'html_escaped',
         'wysiwyg'
     ];
 
