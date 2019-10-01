@@ -1,0 +1,12 @@
+Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset:
+    properties:
+        sourceFile:
+            - Valid: ~
+        titles:
+            - Valid: ~
+
+Oro\Bundle\AttachmentBundle\Entity\File:
+    properties:
+        file:
+            - Oro\Bundle\DigitalAssetBundle\Validator\Constraints\DigitalAssetSourceFile:
+                groups: [DigitalAsset]

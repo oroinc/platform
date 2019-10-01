@@ -52,6 +52,11 @@ datagrids:
             title:
                 type: localized_value
                 data_name: titles
+            update_link:
+                type: url
+                route: oro_digital_asset_update
+                params:
+                    - id
         sorters:
             columns:
                 title:
@@ -82,7 +87,7 @@ datagrids:
                     data_name: file.originalFilename
                 fileSize:
                     type: number
-                    label: oro.attachment.file.file_size.label
+                    label: oro.digitalasset.datagrid.filter.file_size.label
                     data_name: file.fileSize
                 mimeType:
                     type: choice
@@ -106,3 +111,11 @@ datagrids:
                     type: datetime
                     data_name: digitalAsset.updatedAt
                     enabled: false
+        actions:
+            update:
+                type: navigate
+                label: oro.grid.action.update
+                link: update_link
+                icon: edit
+                acl_resource: oro_digital_asset_update
+                rowAction: true

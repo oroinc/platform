@@ -6,7 +6,7 @@ oro:
 
         id.label: Id
         titles.label: Title
-        source_file.label: Source File
+        source_file.label: File
         child_files.label: Child Files
         owner.label: Owner
         organization.label: Organization
@@ -14,5 +14,13 @@ oro:
         entity_config.attachment.field.items.use_dam:
             label: Use DAM
             tooltip: Enable use of the Digital Asset Manager for this field
+
+        controller:
+            saved.message: Digital Asset has been saved
+            sections.general.label: General
+
+        datagrid:
+            filter:
+                file_size.label: File size (bytes)
 
     attachment.file.digital_asset.label: Digital Asset

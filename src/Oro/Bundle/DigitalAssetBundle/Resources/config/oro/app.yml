@@ -1,0 +1,17 @@
+liip_imagine:
+    filter_sets:
+        digital_asset_medium:
+            quality: 95
+            filters:
+                thumbnail:
+                    size: [320, 320]
+                    mode: outbound
+                strip: ~
+
+        digital_asset_large:
+            quality: 95
+            filters:
+                thumbnail:
+                    size: [1024, 768]
+                    mode: outbound
+                strip: ~

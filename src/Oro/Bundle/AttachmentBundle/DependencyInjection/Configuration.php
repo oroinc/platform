@@ -9,6 +9,10 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    private const MAX_FILESIZE_MB = 10; //Represents maximum upload filesize default value
+
+    const BYTES_MULTIPLIER = 1048576; //Bytes in one MB. Used to calculate exact bytes in certain MB amount.
+
     /**
      * {@inheritdoc}
      */
@@ -20,6 +24,10 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->booleanNode('debug_images')
                     ->defaultTrue()
+                ->end()
+                ->integerNode('maxsize')
+                    ->min(1)
+                    ->defaultValue(self::MAX_FILESIZE_MB)
                 ->end()
                 ->arrayNode('upload_file_mime_types')
                     ->prototype('scalar')
@@ -34,7 +42,8 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
-                'upload_file_mime_types'  => ['value' => null],
+                'maxsize' => ['value' => self::MAX_FILESIZE_MB],
+                'upload_file_mime_types' => ['value' => null],
                 'upload_image_mime_types' => ['value' => null]
             ]
         );

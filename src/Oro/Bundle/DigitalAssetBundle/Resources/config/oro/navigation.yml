@@ -17,3 +17,5 @@ navigation:
 
     titles:
         oro_digital_asset_index: ~
+        oro_digital_asset_update: '%title% - oro.ui.edit'
+        oro_digital_asset_create: 'oro.ui.create'

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator;
 
+use Oro\Bundle\AttachmentBundle\DependencyInjection\Configuration as AttachmentConfiguration;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager as Configuration;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -65,7 +66,7 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
                 $this->identicalTo($file),
                 [
                     new FileConstraint([
-                        'maxSize'   => $maxSize * 1024 * 1024,
+                        'maxSize'   => $maxSize * AttachmentConfiguration::BYTES_MULTIPLIER,
                         'mimeTypes' => explode("\n", $mimeTypes)
                     ])
                 ]
@@ -105,7 +106,7 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
                 $this->identicalTo($file),
                 [
                     new FileConstraint([
-                        'maxSize'   => $maxSize * 1024 * 1024,
+                        'maxSize'   => $maxSize * AttachmentConfiguration::BYTES_MULTIPLIER,
                         'mimeTypes' => explode("\n", $mimeTypes)
                     ])
                 ]
@@ -143,7 +144,7 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
                 $this->identicalTo($file),
                 [
                     new FileConstraint([
-                        'maxSize'   => $maxSize * 1024 * 1024,
+                        'maxSize'   => $maxSize * AttachmentConfiguration::BYTES_MULTIPLIER,
                         'mimeTypes' => explode("\n", $fieldMimeTypes)
                     ])
                 ]
@@ -168,11 +169,12 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new Config(
                 new EntityConfigId('attachment', $dataClass)
             ));
-        $this->config->expects($this->exactly(2))
+        $this->config->expects($this->exactly(3))
             ->method('get')
             ->willReturnMap([
                 ['oro_attachment.upload_file_mime_types', false, false, null, $mimeTypes],
-                ['oro_attachment.upload_image_mime_types', false, false, null, $mimeTypes]
+                ['oro_attachment.upload_image_mime_types', false, false, null, $mimeTypes],
+                ['oro_attachment.maxsize', false, false, null, $maxSize = 10]
             ]);
 
         $violationList = $this->createMock(ConstraintViolationList::class);
@@ -182,7 +184,7 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
                 $this->identicalTo($file),
                 [
                     new FileConstraint([
-                        'maxSize'   => null,
+                        'maxSize'   => $maxSize * AttachmentConfiguration::BYTES_MULTIPLIER,
                         'mimeTypes' => explode("\n", $mimeTypes)
                     ])
                 ]
@@ -223,7 +225,7 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
                 $this->identicalTo($file),
                 [
                     new FileConstraint([
-                        'maxSize'   => $maxSize * 1024 * 1024,
+                        'maxSize'   => $maxSize * AttachmentConfiguration::BYTES_MULTIPLIER,
                         'mimeTypes' => explode("\n", $mimeTypes)
                     ])
                 ]
@@ -260,7 +262,7 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
                 $this->identicalTo($file),
                 [
                     new FileConstraint([
-                        'maxSize'   => $maxSize * 1024 * 1024,
+                        'maxSize'   => $maxSize * AttachmentConfiguration::BYTES_MULTIPLIER,
                         'mimeTypes' => explode("\n", $entityMimeTypes)
                     ])
                 ]

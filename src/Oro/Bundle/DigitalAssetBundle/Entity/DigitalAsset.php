@@ -10,6 +10,7 @@ use Oro\Bundle\DigitalAssetBundle\Model\ExtendDigitalAsset;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
@@ -27,6 +28,8 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      routeName="oro_digital_asset_index",
+ *      routeView="oro_digital_asset_view",
+ *      routeUpdate="oro_digital_asset_update",
  *      defaultValues={
  *          "entity"={
  *              "icon"="fa-file"
@@ -110,6 +113,15 @@ class DigitalAsset extends ExtendDigitalAsset implements DatesAwareInterface, Or
      *     orphanRemoval=true
      *  )
      * @ORM\JoinColumn(name="source_file_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
+     *
+     * @ConfigField(
+     *      defaultValues={
+     *          "attachment"={
+     *              "acl_protected"=1,
+     *              "file_applications"={"default"}
+     *          }
+     *      }
+     * )
      */
     protected $sourceFile;
 

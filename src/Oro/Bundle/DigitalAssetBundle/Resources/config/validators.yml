@@ -1,0 +1,9 @@
+services:
+    Oro\Bundle\DigitalAssetBundle\Validator\Constraints\DigitalAssetSourceFileValidator:
+        arguments:
+            - !service
+                class: Symfony\Component\Validator\Constraints\FileValidator
+            - '@oro_config.manager'
+            - '@oro_digital_asset.provider.mime_types'
+        tags:
+            - { name: validator.constraint_validator }

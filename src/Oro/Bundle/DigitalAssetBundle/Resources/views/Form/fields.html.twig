@@ -1,0 +1,18 @@
+{% block _oro_digital_asset_sourceFile_widget %}
+    {{ block('oro_file_widget') }}
+
+    {%- if value is not empty and value.id and oro_type_is_image(value.mimeType) -%}
+        <div class="preview">
+            <a class="view-image no-hash"
+               tabindex="-1"
+               data-gallery="image{{ value.id }}"
+               href="{{ filtered_image_url(value, 'digital_asset_large') }}"
+            >
+                <img class="thumbnail"
+                     src="{{ filtered_image_url(value, 'digital_asset_medium') }}"
+                     alt="{{ value.originalFilename }}"
+                />
+            </a>
+        </div>
+    {%- endif -%}
+{% endblock %}

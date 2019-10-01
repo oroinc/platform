@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Validator;
 
+use Oro\Bundle\AttachmentBundle\DependencyInjection\Configuration as AttachmentConfiguration;
 use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager as Configuration;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -64,8 +65,12 @@ class ConfigFileValidator
         }
 
         $maxFileSize = $config->get('maxsize');
+        if (!$maxFileSize) {
+            $maxFileSize = $this->config->get('oro_attachment.maxsize');
+        }
+
         if (null !== $maxFileSize) {
-            $maxFileSize *= 1024 * 1024;
+            $maxFileSize *= AttachmentConfiguration::BYTES_MULTIPLIER;
         }
 
         return $this->validator->validate(
