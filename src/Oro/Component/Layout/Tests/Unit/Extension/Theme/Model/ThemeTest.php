@@ -79,6 +79,8 @@ class ThemeTest extends \PHPUnit\Framework\TestCase
 
         $this->theme->setGroups(['test']);
         $this->assertSame(['test'], $this->theme->getGroups());
+        $this->assertTrue($this->theme->hasGroup('test'));
+        $this->assertFalse($this->theme->hasGroup('another_test'));
     }
 
     public function testParentThemeMethods()
