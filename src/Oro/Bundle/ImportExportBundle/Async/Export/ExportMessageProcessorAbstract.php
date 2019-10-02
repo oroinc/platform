@@ -1,6 +1,8 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
@@ -10,6 +12,9 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Base abstract export message processor.
+ */
 abstract class ExportMessageProcessorAbstract implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -28,6 +33,11 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
     protected $logger;
 
     /**
+     * @var FileManager
+     */
+    protected $fileManager;
+
+    /**
      * @param JobRunner $jobRunner
      * @param JobStorage $jobStorage
      * @param LoggerInterface $logger
@@ -40,6 +50,14 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
         $this->jobRunner = $jobRunner;
         $this->jobStorage = $jobStorage;
         $this->logger = $logger;
+    }
+
+    /**
+     * @param FileManager $fileManager
+     */
+    public function setFileManager(FileManager $fileManager): void
+    {
+        $this->fileManager = $fileManager;
     }
 
     /**
@@ -89,8 +107,32 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
     protected function saveJobResult(Job $job, array $data)
     {
         $this->jobStorage->saveJob($job, function (Job $job) use ($data) {
+            if (!empty($data['errors'])) {
+                $errorLogFile = $this->saveToStorageErrorLog($data['errors']);
+                if ($errorLogFile) {
+                    $data['errorLogFile'] = $errorLogFile;
+                }
+            }
+
             $job->setData($data);
         });
+    }
+
+    /**
+     * @param array $errors
+     * @return string
+     */
+    protected function saveToStorageErrorLog(array $errors): string
+    {
+        if (!$this->fileManager) {
+            return '';
+        }
+
+        $fileName = str_replace('.', '', uniqid('export', true)) . '.json';
+
+        $this->fileManager->getFileSystem()->write($fileName, json_encode($errors));
+
+        return $fileName;
     }
 
     /**

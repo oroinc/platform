@@ -24,6 +24,8 @@ services:
             - '@oro_message_queue.job.runner'
             - '@oro_message_queue.job.storage'
             - '@logger'
+        calls:
+            - [setFileManager, ['@oro_importexport.file.file_manager']]
 
     oro_importexport.async.export:
         class: 'Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor'
