@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestTemplate;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Stub\ParentEntity;
@@ -333,7 +332,7 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
         self::callTwigFunction(
             $this->extension,
             'oro_image_view',
-            [$environment, $this->file, new TestClass(), 'testField']
+            [$environment, $this->file]
         );
     }
 

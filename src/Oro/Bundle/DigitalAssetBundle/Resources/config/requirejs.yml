@@ -1,0 +1,3 @@
+config:
+    paths:
+        'orodigitalasset/js/app/views/file-with-digital-asset-view': 'bundles/orodigitalasset/js/app/views/file-with-digital-asset-view.js'

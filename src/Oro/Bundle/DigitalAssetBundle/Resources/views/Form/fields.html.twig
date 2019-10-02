@@ -30,5 +30,59 @@
             {% set combinedError = newErrors|join('; ') %}
             <span class="validation-failed"><span><span>{{ combinedError|oro_html_sanitize }}</span></span></span>
         {% endif %}
-    {% endspaceless %}
+    {%- endspaceless -%}
+{% endblock %}
+
+{% block oro_file_with_digital_asset_widget %}
+    {%- spaceless -%}
+        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        <div class="digital-asset-item"
+            {{ UI.renderPageComponentAttributes({
+                module: 'oroui/js/app/components/view-component',
+                options: {
+                    view: 'orodigitalasset/js/app/views/file-with-digital-asset-view',
+                    fieldLabel: form.vars.label|trans,
+                    urlParts: {
+                        widget: {
+                            route: form.vars.dam_widget.route|default('oro_digital_asset_select_widget'),
+                            parameters: form.vars.dam_widget.parameters|default({})
+                        }
+                    },
+                    emptyFileInputSelector: (form.emptyFile is defined ? '#' ~ form.emptyFile.vars.id : null),
+                }
+            })
+        }}>
+            {% if value is not empty and value.id and value.originalFilename is not empty %}
+                <div class="well well-small oro_attachment_file">
+                    <a href="{{ file_url(value, 'download', true) }}" class="no-hash digital-asset-item__filename"
+                       title="{{ value.originalFilename }}">
+                        {% if oro_type_is_image(value.mimeType) %}
+                            <img src="{{ resized_image_url(value) }}" alt="{{ value.originalFilename }}"/>
+                        {% else %}
+                            <i class="{{ oro_attachment_icon(value) ?: 'fa-paperclip'}}"></i>
+                        {% endif %}
+                        {{  value.originalFilename }}
+                    </a>
+                </div>
+
+                <a href="#" role="button" data-role="select-data-asset" class="btn-square-lighter fa-edit"
+                    title="{{ 'oro.digitalasset.dam.form.choose_another_file.label'|trans }}"></a>
+
+                {% if form.emptyFile is defined %}
+                    {{ form_row(form.emptyFile) }}
+
+                    {% if form.vars.allow_delete %}
+                        <a href="#" role="button" data-role="remove" class="btn-square-lighter fa-close"
+                            title="{{ 'oro.digitalasset.dam.form.remove_file.label'|trans }}"></a>
+                    {% endif %}
+                {% endif %}
+            {% else %}
+                <a href="#" class="btn select-data-asset-btn" role="button" data-role="select-data-asset">
+                    {{ 'oro.digitalasset.dam.form.choose_file.label'|trans }}
+                </a>
+            {% endif %}
+        </div>
+
+        {{ form_errors(form.file) }}
+    {%- endspaceless -%}
 {% endblock %}

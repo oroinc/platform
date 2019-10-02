@@ -73,6 +73,14 @@ class DigitalAssetController extends AbstractController
     }
 
     /**
+     * @Route("/widget/select-data-asset", name="oro_digital_asset_select_widget")
+     */
+    public function selectDataAssetWidgetAction()
+    {
+        die('<div class="widget-content">TODO</div>');
+    }
+
+    /**
      * @param DigitalAsset $digitalAsset
      *
      * @return array|RedirectResponse
