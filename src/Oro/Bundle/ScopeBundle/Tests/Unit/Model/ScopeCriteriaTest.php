@@ -52,7 +52,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
                 ['scope.nullField IS NULL'],
                 ['scope.notNullField IS NOT NULL'],
                 ['scope.fieldWithValue = :scope_param_fieldWithValue'],
-                new Expr\Func('scope_multiField.id IN', [':scope_multiField_param_id'])
+                [new Expr\Func('scope_multiField.id IN', [':scope_multiField_param_id'])]
             );
 
         $qb->expects($this->exactly(2))

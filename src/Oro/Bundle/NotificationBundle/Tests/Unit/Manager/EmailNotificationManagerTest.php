@@ -294,7 +294,7 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
             ->method('error')
             ->withConsecutive(
                 ['An error occurred while processing notification', ['exception' => $exception]],
-                $this->matchesRegularExpression('/An error occurred while sending .* notification/')
+                [$this->matchesRegularExpression('/An error occurred while sending .* notification/')]
             );
 
         $this->manager->process([$notification], $logger, []);
