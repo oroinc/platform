@@ -1,4 +1,6 @@
 Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset:
+    constraints:
+        - Oro\Bundle\DigitalAssetBundle\Validator\Constraints\DigitalAssetSourceFileMimeType: ~
     properties:
         sourceFile:
             - Valid: ~

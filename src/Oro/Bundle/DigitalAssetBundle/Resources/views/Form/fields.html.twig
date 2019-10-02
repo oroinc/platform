@@ -16,3 +16,19 @@
         </div>
     {%- endif -%}
 {% endblock %}
+
+{% block _oro_digital_asset_sourceFile_file_errors %}
+    {%- spaceless -%}
+        {% if errors|length > 0 %}
+            {% set combinedError = '' %}
+            {% set newErrors = [] %}
+            {% for error in errors %}
+                {% if error.message not in newErrors %}
+                    {% set newErrors = newErrors|merge([error.message]) %}
+                {% endif %}
+            {% endfor %}
+            {% set combinedError = newErrors|join('; ') %}
+            <span class="validation-failed"><span><span>{{ combinedError|oro_html_sanitize }}</span></span></span>
+        {% endif %}
+    {% endspaceless %}
+{% endblock %}
