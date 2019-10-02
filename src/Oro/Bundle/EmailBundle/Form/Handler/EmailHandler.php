@@ -66,7 +66,8 @@ class EmailHandler
         $this->form->setData($model);
 
         $request = $this->requestStack->getCurrentRequest();
-        if (in_array($request->getMethod(), ['POST', 'PUT'], true) && !$request->get('_widgetInit')) {
+        if (in_array($request->getMethod(), ['POST', 'PUT'], true)
+            && !$request->request->get('_widgetInit')) {
             $this->submitPostPutRequest($this->form, $request);
 
             if ($this->form->isValid()) {

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Behat\Context;
 
+use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -123,5 +124,29 @@ class FeatureContext extends OroFeatureContext implements
         self::assertNotNull($email, "Email with '$emailTitle' title not found");
 
         $email->getElement('ReadUnreadIcon')->click();
+    }
+
+    /**
+     * @When /^(?:|I )attach "(?P<fileName>.*)" file to email$/
+     * @param string $fileName
+     */
+    public function iAttachFileToEmail(string $fileName)
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+
+        // Suppress opening of a choose file dialog
+        $javascipt = <<<JS
+        HTMLInputElement.prototype.click = function() {                     
+            if(this.type !== 'file') HTMLElement.prototype.click.call(this);
+        };                                                               
+JS;
+        $driver->evaluateScript($javascipt);
+
+        $uploadLink = $this->createElement('Upload Email Attachment Link');
+        $uploadLink->click();
+
+        $uploadFile = $this->createElement('Upload Email Attachment File');
+        $uploadFile->setValue($fileName);
     }
 }
