@@ -90,7 +90,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedException \Symfony\Component\Security\Core\Exception\DisabledException
      */
     public function testLoadUserByOAuthShouldReturnExceptionIfUserIsDisabled()
     {

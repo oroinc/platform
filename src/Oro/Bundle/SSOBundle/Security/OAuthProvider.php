@@ -8,11 +8,11 @@ use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
 use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesserInterface;
+use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
 /**
@@ -117,10 +117,10 @@ class OAuthProvider extends HWIOAuthProvider
     {
         $organization = $this->organizationGuesser->guess($user, $token);
         if (null === $organization) {
-            throw new BadCredentialsException('The user does not have active organization assigned to it.');
+            throw new BadUserOrganizationException('The user does not have active organization assigned to it.');
         }
         if (!$user->isBelongToOrganization($organization, true)) {
-            throw new BadCredentialsException(sprintf(
+            throw new BadUserOrganizationException(sprintf(
                 'The user does not have access to organization "%s".',
                 $organization->getName()
             ));

@@ -4,6 +4,7 @@ namespace Oro\Bundle\WsseAuthenticationBundle\Tests\Unit\Security\Core\Authentic
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
@@ -198,7 +199,7 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
             'disabled organization' => [
                 $user,
                 self::TEST_API_KEY,
-                BadCredentialsException::class,
+                BadUserOrganizationException::class,
                 'Organization is not active.',
                 $user->isEnabled(),
                 $user->getAuthStatus()->getId() === $lockedAuthStatus->getId()
