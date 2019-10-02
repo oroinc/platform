@@ -73,7 +73,7 @@ class DirectMailerDecorator extends DirectMailer
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
         $messages = $this->getSentMessages();
-        $messages[] = $message;
+        array_unshift($messages, $message);
 
         $this->cache->save('messages', serialize($messages));
 
