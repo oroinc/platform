@@ -569,7 +569,7 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
                 [
                     'label' => 'label_key',
                     'icon'  => 'testIcon',
-                    'state' => 'Requires update',
+                    'state' => 'Active',
                 ],
                 []
             ],
@@ -578,17 +578,28 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param array                                    $data
-     * @param ConfigModel                              $model
+     * @param FieldConfigModel|ConfigModel             $model
      * @param \PHPUnit\Framework\MockObject\MockObject $form
      * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getFormEvent($data, $model, $form = null)
     {
+        $fieldName = '';
+        if ($model instanceof FieldConfigModel && !$model->getId()) {
+            $fieldName = $model->getFieldName();
+        }
+
         $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
-        $formConfig->expects($this->once())
+        $formConfig->expects($this->any())
             ->method('getOption')
-            ->with('config_model')
-            ->will($this->returnValue($model));
+            ->withConsecutive(
+                ['config_model'],
+                ['field_name']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $model,
+                $fieldName
+            );
 
         if (null === $form) {
             $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');

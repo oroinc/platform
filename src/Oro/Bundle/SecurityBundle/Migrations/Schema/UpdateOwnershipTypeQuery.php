@@ -20,9 +20,9 @@ class UpdateOwnershipTypeQuery extends ParametrizedMigrationQuery
 
     /**
      * @param string $className
-     * @param array  $ownershipData
+     * @param array $ownershipData
      */
-    public function __construct($className, $ownershipData)
+    public function __construct(string $className, array $ownershipData)
     {
         $this->className = $className;
         $this->ownershipData = $ownershipData;

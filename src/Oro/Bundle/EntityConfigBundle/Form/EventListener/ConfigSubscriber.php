@@ -48,10 +48,10 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             FormEvents::POST_SUBMIT  => ['postSubmit', -10],
             FormEvents::PRE_SET_DATA => 'preSetData'
-        );
+        ];
     }
 
     /**
@@ -59,10 +59,14 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     public function preSetData(FormEvent $event)
     {
-        $configModel = $event->getForm()->getConfig()->getOption('config_model');
+        $formConfig = $event->getForm()->getConfig();
+
+        /** @var FieldConfigModel $configModel */
+        $configModel = $formConfig->getOption('config_model');
 
         $event->setData(
             $this->updateTranslatableValues(
+                $formConfig->getOption('field_name'),
                 $configModel,
                 $this->updateDataWithPendingChanges($configModel, $event->getData())
             )
@@ -102,7 +106,10 @@ class ConfigSubscriber implements EventSubscriberInterface
 
                 $translatable = $provider->getPropertyConfig()->getTranslatableValues($configId);
                 foreach ($data[$scope] as $code => $value) {
-                    if (isset($changeSet[$code][static::NEW_PENDING_VALUE_KEY])) {
+                    if ($configModel->getId() &&
+                        $configModel instanceof FieldConfigModel &&
+                        isset($changeSet[$code][static::NEW_PENDING_VALUE_KEY])
+                    ) {
                         // we shouldn't overwrite config's value by data from form,
                         // if it was directly changed earlier by some form's listener or something like that
                         $value = $changeSet[$code][static::NEW_PENDING_VALUE_KEY];
@@ -198,12 +205,13 @@ class ConfigSubscriber implements EventSubscriberInterface
      *  - field name (in case of creating new FieldConfigModel)
      *  - empty string (in case of editing FieldConfigModel)
      *
+     * @param string $fieldName
      * @param ConfigModel $configModel
      * @param array $data
      *
      * @return array
      */
-    protected function updateTranslatableValues(ConfigModel $configModel, array $data)
+    protected function updateTranslatableValues($fieldName, ConfigModel $configModel, array $data)
     {
         foreach ($this->configManager->getProviders() as $provider) {
             $scope = $provider->getScope();
@@ -213,14 +221,7 @@ class ConfigSubscriber implements EventSubscriberInterface
                 $translatable = $provider->getPropertyConfig()->getTranslatableValues($configId);
                 foreach ($data[$scope] as $code => $value) {
                     if (in_array($code, $translatable, true)) {
-                        $translationFallback = !$configModel->getId() && $configModel instanceof FieldConfigModel
-                            ? $configModel->getFieldName()
-                            : '';
-
-                        $data[$scope][$code] = $this->translationHelper->translateWithFallback(
-                            $value,
-                            $translationFallback
-                        );
+                        $data[$scope][$code] = $this->translationHelper->translateWithFallback($value, $fieldName);
                     }
                 }
             }

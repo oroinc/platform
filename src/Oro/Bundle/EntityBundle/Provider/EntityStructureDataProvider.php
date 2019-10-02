@@ -73,7 +73,7 @@ class EntityStructureDataProvider
      */
     public function getEntities()
     {
-        $cacheKey = sprintf('data.%s', $this->translator->getLocale());
+        $cacheKey = $this->getCacheKey();
         $entityStructures = $this->cache->fetch($cacheKey);
         if (false === $entityStructures) {
             $entityStructures = $this->processEntities();
@@ -161,5 +161,13 @@ class EntityStructureDataProvider
             }
             $structure->addField($model);
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCacheKey(): string
+    {
+        return sprintf('data.%s', $this->translator->getLocale());
     }
 }
