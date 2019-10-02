@@ -222,7 +222,7 @@ define(function(require) {
                         changes: {
                             added: [],
                             removed: [],
-                            merged: [{ // some model has been changed
+                            merged: [{// some model has been changed
                                 hasChanged: function() {
                                     return true;
                                 }

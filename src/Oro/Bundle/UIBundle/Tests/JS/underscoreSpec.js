@@ -30,13 +30,10 @@ define([
         });
 
         it('should use custom tags for inner template', function() {
-            _.templateSettings.innerTempStart = '{{#';
-            _.templateSettings.innerTempEnd = '#}}';
-
             var innerTemplate = '{{# ' +
                 '<span>Listed price: <%= listedPrice %></span>' +
                 ' #}}';
-            var template = _.template(innerTemplate);
+            var template = _.template(innerTemplate, {innerTempStart: '{{#', innerTempEnd: '#}}'});
             var result = template({listedPrice: 100});
 
             expect(result).toEqual('<span>Listed price: 100</span>');
