@@ -152,6 +152,8 @@ datagrids:
                 type: twig
                 template: OroEntityConfigBundle:Datagrid:Column/attributeFamilies.html.twig
                 order: 99
+            organization_applicable:
+                renderable: false
         actions:
             update:
                 acl_resource: oro_attribute_update
@@ -341,12 +343,9 @@ datagrids:
                     - attributeGroup.isVisible
                 from:
                     - { table: 'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup', alias: attributeGroup }
-                join:
-                    inner:
-                        - { join: attributeGroup.attributeFamily, alias: attributeFamily }
                 where:
                     and:
-                        - attributeFamily.id = :family_id
+                        - attributeGroup.attributeFamily = :family_id
             bind_parameters:
                 - family_id
         columns:

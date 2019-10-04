@@ -4,9 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Form\FormUtil;
-use Oro\Bundle\ApiBundle\Form\ReflectionUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\Form\ClearableErrorsInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -173,7 +173,10 @@ class MapPrimaryField implements ProcessorInterface
         if (null !== $primaryItemKey && $form->has($this->associationName)) {
             $associationForm = $form->get($this->associationName);
             if ($associationForm->has($primaryItemKey)) {
-                ReflectionUtil::clearFormErrors($associationForm->get($primaryItemKey), true);
+                $primaryItemForm = $associationForm->get($primaryItemKey);
+                if ($primaryItemForm instanceof ClearableErrorsInterface) {
+                    $primaryItemForm->clearErrors(true);
+                }
             }
         }
     }

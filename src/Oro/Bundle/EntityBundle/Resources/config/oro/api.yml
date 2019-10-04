@@ -16,7 +16,7 @@ api:
                 delete: false
 
         Oro\Bundle\EntityBundle\Model\EntityStructure:
-            documentation_resource:  '@OroEntityBundle/Resources/doc/api/entity_structure.md'
+            documentation_resource: '@OroEntityBundle/Resources/doc/api/entity_structure.md'
             disable_meta_properties: true
             identifier_field_names: [id]
             fields:
@@ -56,8 +56,6 @@ api:
                 routes:
                     data_type: array
             actions:
-#            TODO: "Get" should be uncommented after BAP-15804
-#                get: false
                 get_list:
                     page_size: -1 # disable paging
                     disable_sorting: true

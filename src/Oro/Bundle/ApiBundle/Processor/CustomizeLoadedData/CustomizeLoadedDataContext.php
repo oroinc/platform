@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\HateoasConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\CustomizeDataContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -16,6 +17,9 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
 
     /** @var ConfigExtraInterface[] */
     private $configExtras;
+
+    /** @var bool|null */
+    private $isHateoasEnabled;
 
     /**
      * Gets the response data.
@@ -102,7 +106,7 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
     public function getResultFieldValue(string $propertyName, array $data)
     {
         $fieldName = $this->getResultFieldName($propertyName);
-        if (!$fieldName || !array_key_exists($fieldName, $data)) {
+        if (!$fieldName || !\array_key_exists($fieldName, $data)) {
             return null;
         }
 
@@ -145,12 +149,13 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
 
     /**
      * Indicates whether at least one of the given fields is requested to be returned in response data.
-     * @see isFieldRequested
      *
      * @param string[]   $fieldNames The names under which fields should be represented in response data
      * @param array|null $data       Response data
      *
      * @return bool
+     *
+     * @see isFieldRequested
      */
     public function isAtLeastOneFieldRequested(array $fieldNames, array $data = null): bool
     {
@@ -166,12 +171,13 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
     /**
      * Indicates whether the given field is requested to be returned
      * in at least one element of response collection data.
-     * @see isFieldRequested
      *
      * @param string $fieldName The name under which a field should be represented in response data
      * @param array  $data      Response data
      *
      * @return bool
+     *
+     * @see isFieldRequested
      */
     public function isFieldRequestedForCollection(string $fieldName, array $data): bool
     {
@@ -187,12 +193,13 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
     /**
      * Indicates whether at least one of the given fields is requested to be returned
      * in at least one element of response collection data.
-     * @see isAtLeastOneFieldRequested
      *
      * @param string[] $fieldNames The names under which fields should be represented in response data
      * @param array    $data       Response data
      *
      * @return bool
+     *
+     * @see isAtLeastOneFieldRequested
      */
     public function isAtLeastOneFieldRequestedForCollection(array $fieldNames, array $data): bool
     {
@@ -277,5 +284,25 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
     public function setConfigExtras(array $configExtras): void
     {
         $this->configExtras = $configExtras;
+        $this->isHateoasEnabled = null;
+    }
+
+    /**
+     * Indicates whether HATEOAS is enabled.
+     *
+     * @return bool
+     */
+    public function isHateoasEnabled(): bool
+    {
+        if (null === $this->isHateoasEnabled) {
+            $this->isHateoasEnabled = false;
+            foreach ($this->configExtras as $extra) {
+                if ($extra instanceof HateoasConfigExtra) {
+                    $this->isHateoasEnabled = true;
+                }
+            }
+        }
+
+        return $this->isHateoasEnabled;
     }
 }

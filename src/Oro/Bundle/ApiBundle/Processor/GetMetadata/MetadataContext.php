@@ -113,7 +113,7 @@ class MetadataContext extends ApiContext
      */
     public function hasExtra($extraName)
     {
-        return in_array($extraName, $this->get(self::EXTRA), true);
+        return \in_array($extraName, $this->get(self::EXTRA), true);
     }
 
     /**

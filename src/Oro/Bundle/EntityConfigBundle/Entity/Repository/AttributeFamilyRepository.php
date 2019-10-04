@@ -6,6 +6,9 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
+/**
+ * Doctrine repository for AttributeFamily entity
+ */
 class AttributeFamilyRepository extends EntityRepository
 {
     /**

@@ -333,6 +333,7 @@ class DateHelper
         $end   = $dateRange['end'];
 
         if ($dateRange['type'] === AbstractDateFilterType::TYPE_LESS_THAN) {
+            QueryBuilderUtil::checkIdentifier($field);
             $qb = $this->doctrine
                 ->getRepository($entity)
                 ->createQueryBuilder('e')

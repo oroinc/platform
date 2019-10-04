@@ -188,4 +188,26 @@ class FieldConfigModelRepositoryTest extends WebTestCase
         }
         self::assertEquals([], $expectedAttributes);
     }
+
+    public function testGetAllAttributes(): void
+    {
+        $expectedAttributes = [
+            LoadAttributeData::SYSTEM_ATTRIBUTE_1,
+            LoadAttributeData::SYSTEM_ATTRIBUTE_2,
+            LoadAttributeData::REGULAR_ATTRIBUTE_1,
+            LoadAttributeData::REGULAR_ATTRIBUTE_2,
+            LoadAttributeData::NOT_USED_ATTRIBUTE
+        ];
+        $attributes = $this->repository->getAllAttributes();
+
+        // Check only attributes added by this bundle because other bundles may add own attributes
+        foreach ($attributes as $attribute) {
+            self::assertInstanceOf(FieldConfigModel::class, $attribute);
+            $attributeName = $attribute->getFieldName();
+            if (in_array($attributeName, $expectedAttributes, true)) {
+                unset($expectedAttributes[array_search($attributeName, $expectedAttributes, true)]);
+            }
+        }
+        self::assertEquals([], $expectedAttributes);
+    }
 }

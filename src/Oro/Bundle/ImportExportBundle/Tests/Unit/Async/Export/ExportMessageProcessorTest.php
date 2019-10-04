@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -60,6 +61,7 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor = new ExportMessageProcessor(
             $this->createJobRunnerMock(),
             $this->createJobStorageMock(),
+            $this->createMock(FileManager::class),
             $logger
         );
 
@@ -121,6 +123,7 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor = new ExportMessageProcessor(
             $jobRunner,
             $jobStorage,
+            $this->createMock(FileManager::class),
             $logger
         );
         $processor->setDoctrineHelper($doctrineHelper);

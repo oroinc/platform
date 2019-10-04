@@ -110,7 +110,7 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framewor
     }
 
     /**
-     * @expectedException        \Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedException        \Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException
      * @expectedExceptionMessage The user does not have access to organization "Inactive Org".
      */
     public function testBadOrganizationAuthenticate()
@@ -130,7 +130,7 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framewor
     }
 
     /**
-     * @expectedException        \Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedException        \Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException
      * @expectedExceptionMessage The user does not have active organization assigned to it.
      */
     public function testNoAssignedOrganizations()

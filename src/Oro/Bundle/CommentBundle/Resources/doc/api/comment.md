@@ -131,7 +131,7 @@ Delete a collection of comment records.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 ### message
 
@@ -139,7 +139,7 @@ Delete a collection of comment records.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 

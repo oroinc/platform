@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Validator;
 
 use Doctrine\Common\Inflector\Inflector;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -12,6 +12,9 @@ use Oro\Bundle\EntityExtendBundle\Event\ValidateBeforeRemoveFieldEvent;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Provide additional methods for config field name validation
+ */
 class FieldNameValidationHelper
 {
     /** @var ConfigProvider */
@@ -46,7 +49,7 @@ class FieldNameValidationHelper
      *
      * @return bool
      */
-    public function canFieldBeRestored(FieldConfigModel $field)
+    public function canFieldBeRestored(FieldConfigModel $field): bool
     {
         $normalizedFieldName = $this->normalizeFieldName($field->getFieldName());
 
@@ -81,7 +84,7 @@ class FieldNameValidationHelper
      *
      * @return array
      */
-    public function getRemoveFieldValidationErrors(FieldConfigModel $field)
+    public function getRemoveFieldValidationErrors(FieldConfigModel $field): array
     {
         $event = new ValidateBeforeRemoveFieldEvent($field);
         $this->eventDispatcher->dispatch(ValidateBeforeRemoveFieldEvent::NAME, $event);
@@ -95,10 +98,11 @@ class FieldNameValidationHelper
      *
      * @param string $className
      * @param string $fieldName
+     * @param bool $isAttribute
      *
-     * @return Config|null
+     * @return ConfigInterface|null
      */
-    public function findExtendFieldConfig($className, $fieldName)
+    public function findFieldConfig(string $className, string $fieldName, bool $isAttribute = false): ?ConfigInterface
     {
         $fieldConfig = null;
 
@@ -118,12 +122,15 @@ class FieldNameValidationHelper
     /**
      * @param string $className
      * @param string $fieldName
+     * @param bool $isAttribute
      * @return array [<fieldsName>, <fieldType>] will be returned in case field found, empty array otherwise
      */
-    public function getSimilarExistingFieldData($className, $fieldName)
+    public function getSimilarExistingFieldData(string $className, string $fieldName, bool $isAttribute = false): array
     {
-        $fieldConfig = $this->findExtendFieldConfig($className, $fieldName);
-        if ($fieldConfig && $this->hasFieldNameConflict($fieldName, $fieldConfig)) {
+        $fieldConfig = $this->findFieldConfig($className, $fieldName);
+        if ($fieldConfig
+            && $this->hasFieldNameConflict($fieldName, $fieldConfig, $fieldConfig->getId()->getFieldName())
+        ) {
             /** @var FieldConfigId $id */
             $id = $fieldConfig->getId();
 
@@ -165,13 +172,16 @@ class FieldNameValidationHelper
      * Checks whether the name of a new field conflicts with the name of existing field.
      *
      * @param string $newFieldName
-     * @param Config $existingFieldConfig
+     * @param ConfigInterface $existingFieldConfig
+     * @param string $existingFieldName
      *
      * @return bool
      */
-    protected function hasFieldNameConflict($newFieldName, Config $existingFieldConfig)
-    {
-        $existingFieldName = $existingFieldConfig->getId()->getFieldName();
+    protected function hasFieldNameConflict(
+        $newFieldName,
+        ConfigInterface $existingFieldConfig,
+        string $existingFieldName
+    ): bool {
         if (strtolower($newFieldName) === strtolower($existingFieldName)) {
             return true;
         }

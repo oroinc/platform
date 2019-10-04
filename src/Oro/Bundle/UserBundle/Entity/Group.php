@@ -13,6 +13,8 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Model\ExtendGroup;
 
 /**
+ * User group entity
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\GroupRepository")
  * @ORM\Table(
  *      name="oro_access_group",
@@ -72,6 +74,8 @@ class Group extends ExtendGroup
     protected $name;
 
     /**
+     * @var Collection
+     *
      * @ORM\ManyToMany(targetEntity="Role")
      * @ORM\JoinTable(name="oro_user_access_group_role",
      *      joinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")},

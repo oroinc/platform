@@ -1,13 +1,15 @@
 /* @theme: admin.oro; */
 
-#flash-messages .alert.alert-reminder,
-.flash-messages .alert.alert-reminder {
-    background-image: none;
-    padding-left: 0;
+.alert-reminder {
+    background: $alert-info-background;
+    color: $alert-info-color;
+    border-color: $alert-info-border-color;
 
-    i.fa-bell-o {
-        float: left;
-        font-size: 1.4em;
-        padding: 0 9px 0 8px;
+    .close {
+        color: $alert-info-close-color;
+    }
+
+    &.alert-icon:before {
+        content: $fa-var-bell-o;
     }
 }

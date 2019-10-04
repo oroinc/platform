@@ -13,7 +13,7 @@ use Oro\Bundle\ApiBundle\Request\ApiResourceCollection;
 class CollectResourcesContext extends ApiContext
 {
     /** @var string[] */
-    protected $accessibleResources = [];
+    private $accessibleResources = [];
 
     /**
      * {@inheritdoc}

@@ -21,7 +21,7 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
      */
     public function getMigrationVersion()
     {
-        return 'v1_15';
+        return 'v1_16';
     }
 
     /**
@@ -47,7 +47,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
         $this->createOroAttributeGroupTable($schema);
         $this->createOroAttributeGroupLabelTable($schema);
         $this->createOroAttributeGroupRelTable($schema);
-        $this->addOroAttributeFamilyForeignKeys($schema);
         $this->addOroAttributeFamilyLabelForeignKeys($schema);
         $this->addOroAttributeGroupLabelForeignKeys($schema);
         $this->addOroAttributeGroupRelForeignKeys($schema);
@@ -227,7 +226,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
     {
         $table = $schema->createTable('oro_attribute_family');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('code', 'string', ['length' => 255]);
         $table->addColumn('entity_class', 'string', ['length' => 255]);
@@ -235,8 +233,7 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['code']);
-        $table->addIndex(['user_owner_id']);
+        $table->addUniqueIndex(['code', 'organization_id'], 'oro_attribute_family_code_org_uidx');
         $table->addIndex(['organization_id']);
     }
 
@@ -302,22 +299,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['entity_config_field_id', 'attribute_group_id'], 'oro_attribute_group_uidx');
         $table->addIndex(['attribute_group_id']);
-    }
-
-    /**
-     * Add oro_attribute_family foreign keys.
-     *
-     * @param Schema $schema
-     */
-    protected function addOroAttributeFamilyForeignKeys(Schema $schema)
-    {
-        $table = $schema->getTable('oro_attribute_family');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_user'),
-            ['user_owner_id'],
-            ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
-        );
     }
 
     /**

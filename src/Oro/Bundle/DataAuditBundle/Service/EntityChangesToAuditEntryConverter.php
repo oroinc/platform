@@ -11,6 +11,7 @@ use Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper;
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 
 /**
  * This converter is intended to add the data audit records to the database
@@ -201,7 +202,8 @@ class EntityChangesToAuditEntryConverter
 
             $entityClass = $entityChange['entity_class'];
             $entityId = $entityChange['entity_id'];
-            if (!$this->configProvider->isAuditableEntity($entityClass)) {
+            if (\is_a($entityClass, AbstractEnumValue::class, true) ||
+                !$this->configProvider->isAuditableEntity($entityClass)) {
                 continue;
             }
 

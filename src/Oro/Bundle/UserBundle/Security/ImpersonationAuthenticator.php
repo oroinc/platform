@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Security;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesserInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
+use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Event\ImpersonationSuccessEvent;
@@ -15,7 +16,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -156,7 +156,7 @@ class ImpersonationAuthenticator implements AuthenticatorInterface
         $organization = $this->organizationGuesser->guess($user);
 
         if (!$organization) {
-            throw new BadCredentialsException("You don't have active organization assigned.");
+            throw new BadUserOrganizationException("You don't have active organization assigned.");
         }
 
         return $this->tokenFactory->create($user, null, $providerKey, $organization, $user->getRoles());

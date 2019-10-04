@@ -16,8 +16,12 @@ class AclProtectedEntitySerializer extends EntitySerializer
     /**
      * {@inheritdoc}
      */
-    public function serialize(QueryBuilder $qb, $config, array $context = [])
-    {
+    public function serialize(
+        QueryBuilder $qb,
+        $config,
+        array $context = [],
+        bool $skipPostSerializationForPrimaryEntities = false
+    ): array {
         $this->setContext($context);
         try {
             return parent::serialize($qb, $config, $context);
@@ -29,8 +33,13 @@ class AclProtectedEntitySerializer extends EntitySerializer
     /**
      * {@inheritdoc}
      */
-    public function serializeEntities(array $entities, $entityClass, $config, array $context = [])
-    {
+    public function serializeEntities(
+        array $entities,
+        string $entityClass,
+        $config,
+        array $context = [],
+        bool $skipPostSerializationForPrimaryEntities = false
+    ): array {
         $this->setContext($context);
         try {
             return parent::serializeEntities($entities, $entityClass, $config, $context);

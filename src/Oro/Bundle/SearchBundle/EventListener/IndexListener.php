@@ -200,7 +200,7 @@ class IndexListener implements OptionalListenerInterface
 
             foreach ($meta->getAssociationMappings() as $association) {
                 $associationValue = $this->getAssociationValue($entity, $association);
-                if ($associationValue !== false) {
+                if (null !== $associationValue) {
                     if ($associationValue instanceof Collection) {
                         foreach ($associationValue->toArray() as $value) {
                             $entitiesToReindex[spl_object_hash($value)] = $value;
@@ -247,19 +247,19 @@ class IndexListener implements OptionalListenerInterface
      * @param object $entity
      * @param array $association
      *
-     * @return bool|mixed
+     * @return mixed
      */
     protected function getAssociationValue($entity, array $association)
     {
         $relationField = $this->getRelationField($association);
-        if ($relationField === null) {
-            return false;
+        if (null === $relationField) {
+            return null;
         }
 
         $targetClass = $association['targetEntity'];
         $changedIndexedFields = $this->getIntersectChangedIndexedFields($targetClass, [$relationField]);
         if (!$changedIndexedFields) {
-            return false;
+            return null;
         }
 
         return $this->propertyAccessor->getValue($entity, $association['fieldName']);

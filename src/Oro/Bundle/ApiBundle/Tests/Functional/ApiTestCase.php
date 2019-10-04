@@ -9,7 +9,6 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\KernelTerminateHandler;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
@@ -26,27 +25,11 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class ApiTestCase extends WebTestCase
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var ValueNormalizer */
-    protected $valueNormalizer;
-
     /** @var bool */
     private $isKernelRebootDisabled = false;
 
     /** @var bool */
     private $isKernelTerminateHandlerDisabled = false;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        $container = self::getContainer();
-        $this->valueNormalizer = $container->get('oro_api.value_normalizer');
-        $this->doctrineHelper = $container->get('oro_api.doctrine_helper');
-    }
 
     /**
      * Disables clearing the security token and stopping sending messages
@@ -114,7 +97,7 @@ abstract class ApiTestCase extends WebTestCase
     protected function getEntityType($entityClass, $throwException = true)
     {
         return ValueNormalizerUtil::convertToEntityType(
-            $this->valueNormalizer,
+            $this->getValueNormalizer(),
             $entityClass,
             $this->getRequestType(),
             $throwException
@@ -130,11 +113,19 @@ abstract class ApiTestCase extends WebTestCase
     protected function getEntityClass($entityType, $throwException = true)
     {
         return ValueNormalizerUtil::convertToEntityClass(
-            $this->valueNormalizer,
+            $this->getValueNormalizer(),
             $entityType,
             $this->getRequestType(),
             $throwException
         );
+    }
+
+    /**
+     * @return ValueNormalizer
+     */
+    protected function getValueNormalizer()
+    {
+        return self::getContainer()->get('oro_api.value_normalizer');
     }
 
     /**
@@ -436,7 +427,7 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * Asserts response status code equals.
+     * Asserts response status code equals to one of the given status code.
      *
      * @param Response    $response
      * @param int|int[]   $statusCode
@@ -459,6 +450,44 @@ abstract class ApiTestCase extends WebTestCase
                 }
             } else {
                 \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
+            }
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            if ($response->getStatusCode() >= Response::HTTP_BAD_REQUEST
+                && static::isApplicableContentType($response->headers)
+            ) {
+                $e = new \PHPUnit\Framework\ExpectationFailedException(
+                    $e->getMessage() . "\nResponse content: " . $response->getContent(),
+                    $e->getComparisonFailure()
+                );
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Asserts response status code does not equal to any of the given status code.
+     *
+     * @param Response    $response
+     * @param int|int[]   $statusCode
+     * @param string $message
+     */
+    protected static function assertResponseStatusCodeNotEquals(Response $response, $statusCode, string $message = '')
+    {
+        try {
+            if (is_array($statusCode)) {
+                if (in_array($response->getStatusCode(), $statusCode, true)) {
+                    $failureMessage = sprintf(
+                        'Failed asserting that %s is not one of %s',
+                        $response->getStatusCode(),
+                        implode(', ', $statusCode)
+                    );
+                    if (!empty($message)) {
+                        $failureMessage = $message . "\n" . $failureMessage;
+                    }
+                    throw new \PHPUnit\Framework\ExpectationFailedException($failureMessage);
+                }
+            } else {
+                \PHPUnit\Framework\TestCase::assertNotEquals($statusCode, $response->getStatusCode(), $message);
             }
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             if ($response->getStatusCode() >= Response::HTTP_BAD_REQUEST

@@ -23,6 +23,7 @@ services:
         arguments:
             - '@oro_message_queue.job.runner'
             - '@oro_message_queue.job.storage'
+            - '@oro_importexport.file.file_manager'
             - '@logger'
 
     oro_importexport.async.export:

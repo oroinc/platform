@@ -15,6 +15,7 @@ use Oro\Bundle\ApiBundle\Request\ApiAction;
  * * CREATE_MIN_REQUEST_DATA
  * * OWNER_CREATE_MIN_REQUEST_DATA (optional, can be omitted if the owner API resource is read-only)
  * * UNCHANGEABLE_ADDRESS_REF
+ * * OWNER_REF
  * * ANOTHER_OWNER_REF
  * * ANOTHER_OWNER_ADDRESS_2_REF
  * and the following methods:
@@ -328,8 +329,9 @@ trait UnchangeableAddressOwnerTestTrait
         /** @var AbstractAddress $address */
         $address = $this->getReference(self::ANOTHER_OWNER_ADDRESS_2_REF);
         $addressId = $address->getId();
+        $ownerId = $this->getOwner($address)->getId();
         /** @var object $newOwner */
-        $newOwner = $this->getReference(self::ANOTHER_OWNER_REF);
+        $newOwner = $this->getReference(self::OWNER_REF);
         $newOwnerId = $newOwner->getId();
 
         $data = [
@@ -354,18 +356,15 @@ trait UnchangeableAddressOwnerTestTrait
         ];
         $response = $this->patch(
             ['entity' => self::OWNER_ENTITY_TYPE, 'id' => (string)$newOwnerId],
-            $data,
-            [],
-            false
+            $data
         );
 
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'extra fields constraint',
-                'detail' => sprintf('This form should not contain extra fields: "%s".', self::OWNER_RELATIONSHIP),
-                'source' => ['pointer' => '/included/0']
-            ],
-            $response
+        unset($data['included'][0]['meta']);
+        $data['included'][0]['relationships'][self::OWNER_RELATIONSHIP]['data']['id'] = (string)$ownerId;
+        $this->assertResponseContains($data, $response);
+        self::assertSame(
+            $ownerId,
+            $this->getOwner($this->getEntityManager()->find(self::ENTITY_CLASS, $addressId))->getId()
         );
     }
 

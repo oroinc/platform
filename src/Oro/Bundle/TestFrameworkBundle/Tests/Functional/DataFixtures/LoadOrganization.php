@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\InitialFixtureInterface;
 
 /**
@@ -18,7 +19,7 @@ class LoadOrganization extends AbstractFixture implements InitialFixtureInterfac
      */
     public function load(ObjectManager $manager)
     {
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')
+        $organization = $manager->getRepository(Organization::class)
             ->createQueryBuilder('t')
             ->orderBy('t.id')
             ->getQuery()

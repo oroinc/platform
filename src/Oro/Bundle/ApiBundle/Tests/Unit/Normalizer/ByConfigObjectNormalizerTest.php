@@ -897,6 +897,78 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testNormalizeWithComputedField()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'           => null,
+                'computedName' => [
+                    'property_path' => '_',
+                    'depends_on'    => ['name']
+                ],
+                'name'         => [
+                    'exclude' => true
+                ]
+            ],
+            'post_serialize'   => function (array $item) {
+                $item['computedName'] = $item['name'] . ' (computed)';
+
+                return $item;
+            }
+        ];
+
+        $result = $this->normalizeObject(
+            $this->createProductObject(),
+            $this->createConfigObject($config)
+        );
+
+        self::assertEquals(
+            [
+                'id'           => 123,
+                'computedName' => 'product_name (computed)'
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeWithComputedFieldAndSkipPostSerializationForPrimaryObjects()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'           => null,
+                'computedName' => [
+                    'property_path' => '_',
+                    'depends_on'    => ['name']
+                ],
+                'name'         => [
+                    'exclude' => true
+                ]
+            ],
+            'post_serialize'   => function (array $item) {
+                $item['computedName'] = $item['name'] . ' (computed)';
+
+                return $item;
+            }
+        ];
+
+        $normalizedObjects = $this->objectNormalizer->normalizeObjects(
+            [$this->createProductObject()],
+            $this->createConfigObject($config),
+            [],
+            true
+        );
+        $result = reset($normalizedObjects);
+
+        self::assertEquals(
+            [
+                'id' => 123
+            ],
+            $result
+        );
+    }
+
     public function testNormalizeWithDependsOnComputedField()
     {
         $config = [

@@ -1,0 +1,7 @@
+services:
+    kernel.listener.install.event:
+        class: Oro\Bundle\InstallerBundle\EventListener\RequestListener
+        arguments:
+            - '%kernel.debug%'
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onRequest, priority: 10 }

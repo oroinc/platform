@@ -8,12 +8,11 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -96,9 +95,9 @@ class ConfigFieldGridController extends Controller
      *      "/remove/{id}",
      *      name="oro_entityextend_field_remove",
      *      requirements={"id"="\d+"},
-     *      defaults={"id"=0}
+     *      defaults={"id"=0},
+     *      methods={"DELETE"}
      * )
-     * @Method("DELETE")
      * @CsrfProtection()
      * @param FieldConfigModel $field
      * @return Response
@@ -120,9 +119,9 @@ class ConfigFieldGridController extends Controller
      *      "/unremove/{id}",
      *      name="oro_entityextend_field_unremove",
      *      requirements={"id"="\d+"},
-     *      defaults={"id"=0}
+     *      defaults={"id"=0},
+     *      methods={"POST"}
      * )
-     * @Method("POST")
      * @CsrfProtection()
      * @param FieldConfigModel $field
      * @return Response

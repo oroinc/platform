@@ -40,8 +40,6 @@ parameters:
     oro_entity_extend.dictionary_value_list_provider.enum.class: Oro\Bundle\EntityExtendBundle\Provider\EnumValueListProvider
     oro_entity_extend.field_type_provider.class:              Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider
 
-    validator.builder.factory.class: Oro\Bundle\EntityExtendBundle\Validator\Validation
-
 services:
     # the metadata factory for default entity manager
     # it is declared as a service to allow make it as the persistent service for MQ consumer

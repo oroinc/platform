@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActivityListBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\ActivityListBundle\Model\ExtendActivityList;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
@@ -159,6 +160,7 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     protected $organization;
 
     /**
+     * @var Collection
      *
      * @ORM\OneToMany(targetEntity="ActivityOwner", mappedBy="activity",
      *      cascade={"persist", "remove"}, orphanRemoval=true)

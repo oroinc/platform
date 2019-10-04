@@ -836,10 +836,10 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $em->expects($this->exactly(4))
             ->method('persist')
             ->withConsecutive(
-                $newValue1,
-                $newValue2,
-                $newValue3,
-                $newValue4
+                [$newValue1],
+                [$newValue2],
+                [$newValue3],
+                [$newValue4]
             );
 
         $em->expects($this->once())

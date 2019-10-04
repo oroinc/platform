@@ -131,7 +131,7 @@ Delete a set of attachment records.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 ### file
 
@@ -139,7 +139,7 @@ Delete a set of attachment records.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
@@ -157,7 +157,7 @@ A record which the attachment record belongs to.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 ## SUBRESOURCES
 

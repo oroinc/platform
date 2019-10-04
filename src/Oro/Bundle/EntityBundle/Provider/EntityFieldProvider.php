@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
@@ -272,29 +273,12 @@ class EntityFieldProvider
 
         // add regular fields
         $configs = $this->extendConfigProvider->getConfigs($className);
+
+        $configs = $this->filterConfigFields($metadata, $result, $className, $applyExclusions, $configs);
         foreach ($configs as $fieldConfig) {
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $fieldConfig->getId();
             $fieldName = $fieldConfigId->getFieldName();
-
-            $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType());
-            if ($this->fieldTypeHelper->isRelation($underlyingFieldType)) {
-                // skip because this field is relation
-                continue;
-            }
-            if (isset($result[$fieldName])) {
-                // skip because a field with this name is already added, it could be a virtual field
-                continue;
-            }
-            if (!ExtendHelper::isFieldAccessible($fieldConfig)) {
-                continue;
-            }
-            if ($this->isIgnoredField($metadata, $fieldName)) {
-                continue;
-            }
-            if ($applyExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
-                continue;
-            }
 
             $this->addField(
                 $result,
@@ -305,6 +289,52 @@ class EntityFieldProvider
                 $translate
             );
         }
+    }
+
+    /**
+     * @param ClassMetadataInterface $metadata
+     * @param array $result
+     * @param string $className
+     * @param string $applyExclusions
+     * @param array $configs
+     * @return array|[]ConfigInterface
+     */
+    protected function filterConfigFields(
+        ClassMetadataInterface $metadata,
+        array &$result,
+        string $className,
+        string $applyExclusions,
+        array $configs
+    ): array {
+        return \array_filter(
+            $configs,
+            function (ConfigInterface $fieldConfig) use (&$result, $className, $applyExclusions, $metadata) {
+                /** @var FieldConfigId $fieldConfigId */
+                $fieldConfigId = $fieldConfig->getId();
+                $fieldName = $fieldConfigId->getFieldName();
+
+                $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType());
+                if ($this->fieldTypeHelper->isRelation($underlyingFieldType)) {
+                    // skip because this field is relation
+                    return false;
+                }
+                if (isset($result[$fieldName])) {
+                    // skip because a field with this name is already added, it could be a virtual field
+                    return false;
+                }
+                if (!ExtendHelper::isFieldAccessible($fieldConfig)) {
+                    return false;
+                }
+                if ($this->isIgnoredField($metadata, $fieldName)) {
+                    return false;
+                }
+                if ($applyExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
+                    return false;
+                }
+
+                return true;
+            }
+        );
     }
 
     /**

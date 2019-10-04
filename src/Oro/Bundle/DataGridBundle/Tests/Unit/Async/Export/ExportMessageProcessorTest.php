@@ -7,6 +7,7 @@ use Oro\Bundle\DataGridBundle\Async\Topics;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
@@ -62,6 +63,7 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor = new ExportMessageProcessor(
             $this->createJobRunnerMock(),
             $this->createJobStorageMock(),
+            $this->createMock(FileManager::class),
             $logger
         );
 
@@ -91,6 +93,7 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor = new ExportMessageProcessor(
             $this->createJobRunnerMock(),
             $this->createJobStorageMock(),
+            $this->createMock(FileManager::class),
             $logger
         );
         $processor->setWriterChain($writerChain);
@@ -148,6 +151,7 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor = new ExportMessageProcessor(
             $jobRunner,
             $jobStorage,
+            $this->createMock(FileManager::class),
             $logger
         );
         $processor->setWriterChain($writerChain);

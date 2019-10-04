@@ -40,23 +40,23 @@
 
     <div id="{{ rowId }}" class="control-group dashboard-widget-items">
         <label class="control-label">{{ label|trans }}</label>
-        <div class="controls">
-            {{ UI.clientButton({
-                'aCss': 'no-hash add-button',
-                'label': 'oro.dashboard.datagrid.actions.add.label'|trans
-            }) }}
-            {{ UI.clientButton({
-                'aCss': 'no-hash btn-primary add-all-button',
-                'label': 'oro.dashboard.datagrid.actions.add_all.label'|trans
-            }) }}
-        </div>
         <div class="controls items-table-container">
+            <div class="actions-wrap">
+                {{ UI.clientButton({
+                    'aCss': 'no-hash add-button',
+                    'label': 'oro.dashboard.datagrid.actions.add.label'|trans
+                }) }}
+                {{ UI.clientButton({
+                    'aCss': 'no-hash btn-primary add-all-button',
+                    'label': 'oro.dashboard.datagrid.actions.add_all.label'|trans
+                }) }}
+            </div>
             <table id="{{ form.vars.id }}" class="grid table table-bordered table-condensed">
                 <thead>
-                    <tr>
-                        <th><span>{{ form.vars.item_label|trans }}</span></th>
-                        <th class="action-column"><span>{{ 'oro.dashboard.datagrid.columns.actions'|trans }}</span></th>
-                    </tr>
+                <tr>
+                    <th><span>{{ form.vars.item_label|trans }}</span></th>
+                    <th class="action-column"><span>{{ 'oro.dashboard.datagrid.columns.actions'|trans }}</span></th>
+                </tr>
                 </thead>
                 <tbody class="item-container"></tbody>
             </table>

@@ -4,7 +4,7 @@ api:
             documentation_resource: '@OroAttachmentBundle/Resources/doc/api/attachment.md'
             fields:
                 target:
-                    data_type:    association:manyToOne
+                    data_type: association:manyToOne
             actions:
                 create:
                     fields:

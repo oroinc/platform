@@ -3,6 +3,7 @@
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -13,8 +14,10 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * The form type for Organization entity.
+ */
 class OrganizationType extends AbstractType
 {
     /** @var TokenAccessorInterface */
@@ -48,10 +51,7 @@ class OrganizationType extends AbstractType
                 TextType::class,
                 [
                     'required'    => true,
-                    'label'       => 'oro.organization.name.label',
-                    'constraints' => [
-                        new NotBlank()
-                    ]
+                    'label'       => 'oro.organization.name.label'
                 ]
             )
             ->add(
@@ -95,12 +95,10 @@ class OrganizationType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            array(
-                'data_class'         => 'Oro\Bundle\OrganizationBundle\Entity\Organization',
-                'csrf_token_id'      => 'organization',
-            )
-        );
+        $resolver->setDefaults([
+            'data_class'    => Organization::class,
+            'csrf_token_id' => 'organization'
+        ]);
     }
 
     /**

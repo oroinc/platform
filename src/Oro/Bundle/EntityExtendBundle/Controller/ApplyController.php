@@ -3,10 +3,10 @@
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
 use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Apply entity config controller.

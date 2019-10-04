@@ -11,10 +11,10 @@ use Oro\Component\ChainProcessor\Context as BaseContext;
 abstract class ApiContext extends BaseContext
 {
     /** the request type */
-    const REQUEST_TYPE = 'requestType';
+    public const REQUEST_TYPE = 'requestType';
 
     /** API version */
-    const VERSION = 'version';
+    public const VERSION = 'version';
 
     /** @var array[]|null */
     private $processed;
@@ -100,7 +100,7 @@ abstract class ApiContext extends BaseContext
     {
         return
             null !== $this->processed
-            && array_key_exists($operationName, $this->processed)
+            && \array_key_exists($operationName, $this->processed)
             && $this->processed[$operationName];
     }
 }
