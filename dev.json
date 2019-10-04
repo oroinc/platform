@@ -23,7 +23,7 @@
         "symfony/acl-bundle": "1.0.*",
         "symfony/lock": "*",
         "twig/twig": "2.9.*",
-        "doctrine/orm": "2.6.*",
+        "doctrine/orm": "2.6.3",
         "doctrine/doctrine-bundle": "1.9.*",
         "doctrine/dbal": "2.7.*",
         "doctrine/annotations": "1.6.*",
