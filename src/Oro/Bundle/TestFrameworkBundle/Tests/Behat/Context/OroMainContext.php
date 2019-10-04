@@ -553,8 +553,8 @@ class OroMainContext extends MinkContext implements
         $session = $driver->getWebDriverSession();
 
         try {
-            $session->accept_alert();
             $alertMessage = $session->getAlert_text();
+            $session->accept_alert();
         } catch (NoAlertOpenError $e) {
             return;
         }
