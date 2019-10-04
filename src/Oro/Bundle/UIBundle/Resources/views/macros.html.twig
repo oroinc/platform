@@ -228,7 +228,7 @@
 #}
 {% macro renderSwitchableHtmlProperty(title, data) %}
     {% if oro_config_value('oro_form.wysiwyg_enabled') %}
-        {% set data = data|oro_html_sanitize %}
+        {% set data = data|oro_html_sanitize_wysiwyg %}
     {%  else %}
         {% set data = data|striptags|nl2br %}
     {% endif %}
