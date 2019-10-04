@@ -1435,6 +1435,16 @@
     {% endspaceless %}
 {% endmacro %}
 
+{% macro render_birthday(birthday) %}
+    {% if birthday is not empty %}
+        {{ birthday|oro_format_date }}
+        {% set age = birthday|age_string([]) %}
+        {{ age is not empty ? '(' ~ age ~ ')': null }}
+    {% else %}
+        {{ 'N/A'|trans }}
+    {% endif %}
+{% endmacro %}
+
 {% macro badge(label, badgeClass = 'info', iconClass = 'fa-circle') %}
     <span class="badge badge-pill badge-{{ badgeClass }} status-{{ badgeClass }}">
         <i class="icon-status-{{ badgeClass }} {{ iconClass }}" aria-hidden="true"></i>{{ label }}
