@@ -194,7 +194,7 @@ class BuilderChainProvider implements MenuProviderInterface
      */
     protected function buildMenu($alias, array $options)
     {
-        $menu = $this->factory->createItem($alias);
+        $menu = $this->factory->createItem($alias, $options);
 
         /** @var BuilderInterface $builder */
         // try to find builder for the specified menu alias
