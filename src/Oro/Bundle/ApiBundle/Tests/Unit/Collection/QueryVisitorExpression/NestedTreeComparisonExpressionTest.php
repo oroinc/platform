@@ -88,7 +88,7 @@ class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
             $result
         );
         self::assertEquals(
-            [new Parameter($parameterName, $value, 'integer')],
+            [new Parameter($parameterName, $value)],
             $expressionVisitor->getParameters()
         );
     }
@@ -145,7 +145,7 @@ class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
             $result
         );
         self::assertEquals(
-            [new Parameter($parameterName, $value, 'integer')],
+            [new Parameter($parameterName, $value)],
             $expressionVisitor->getParameters()
         );
     }
@@ -206,7 +206,7 @@ class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
             $result
         );
         self::assertEquals(
-            [new Parameter($parameterName, $value, 'integer')],
+            [new Parameter($parameterName, $value)],
             $expressionVisitor->getParameters()
         );
     }
