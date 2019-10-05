@@ -1131,7 +1131,7 @@ enabled contacts. To achieve this:
           arguments:
               - '@oro_api.doctrine_helper'
           tags:
-              - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&definition', class: Acme\Bundle\AppBundle\Entity\Account, priority: -35 }
+              - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only', class: Acme\Bundle\AppBundle\Entity\Account, priority: -35 }
   ```
 
 - Add a processor to register QRM query that should be used to get enabled contacts for
