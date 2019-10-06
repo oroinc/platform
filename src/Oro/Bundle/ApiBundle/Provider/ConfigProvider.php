@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -111,6 +112,14 @@ class ConfigProvider
         if (!empty($extras)) {
             $context->setExtras($extras);
         }
+        $identifierFieldsOnly = false;
+        foreach ($extras as $extra) {
+            if ($extra instanceof FilterIdentifierFieldsConfigExtra) {
+                $identifierFieldsOnly = true;
+                break;
+            }
+        }
+        $context->set(FilterIdentifierFieldsConfigExtra::NAME, $identifierFieldsOnly);
     }
 
     /**
