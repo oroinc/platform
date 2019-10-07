@@ -212,6 +212,15 @@ class Theme
     }
 
     /**
+     * @param string $value
+     * @return bool
+     */
+    public function hasGroup($value)
+    {
+        return in_array($value, $this->groups, true);
+    }
+
+    /**
      * @param array $config
      */
     public function setConfig(array $config)

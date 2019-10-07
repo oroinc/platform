@@ -263,7 +263,6 @@ services:
             - [addExtendTypeMapping, ["percent", Oro\Bundle\FormBundle\Form\Type\OroPercentType]]
             - [addExtendTypeMapping, ["money", Oro\Bundle\FormBundle\Form\Type\OroMoneyType]]
             - [addExtendTypeMapping, ["boolean", Oro\Bundle\FormBundle\Form\Type\OroChoiceType]]
-            - [addExtendTypeMapping, ["html_escaped", Symfony\Component\Form\Extension\Core\Type\TextareaType]]
 
             - [addExtendTypeMapping, ["file", Oro\Bundle\AttachmentBundle\Form\Type\FileType]]
             - [addExtendTypeMapping, ["image", Oro\Bundle\AttachmentBundle\Form\Type\ImageType]]
