@@ -36,7 +36,7 @@ class NeqComparisonExpressionTest extends \PHPUnit\Framework\TestCase
             $result
         );
         self::assertEquals(
-            [new Parameter($parameterName, $value, \PDO::PARAM_STR)],
+            [new Parameter($parameterName, $value)],
             $expressionVisitor->getParameters()
         );
     }

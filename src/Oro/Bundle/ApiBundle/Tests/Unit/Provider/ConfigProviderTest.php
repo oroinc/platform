@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraSectionInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -40,13 +40,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $version = '1.2';
         $requestType = new RequestType(['test_request']);
 
-        $extra = $this->createMock(ConfigExtraInterface::class);
-        $extra->expects(self::any())
-            ->method('getName')
-            ->willReturn('test_extra');
-        $extra->expects(self::any())
-            ->method('getCacheKeyPart')
-            ->willReturn('test_extra_key');
+        $extra = new EntityDefinitionConfigExtra('test');
 
         $sectionExtra = $this->createMock(ConfigExtraSectionInterface::class);
         $sectionExtra->expects(self::any())
@@ -87,7 +81,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
             });
 
         $result = $this->configProvider->getConfig($className, $version, $requestType, [$extra, $sectionExtra]);
-        self::assertEquals('Test\Class|test_extra_key', $result->getDefinition()->getKey());
+        self::assertEquals('Test\Class|definition:test', $result->getDefinition()->getKey());
         self::assertTrue($definition->hasField('test_field'));
         self::assertEquals(['test_section_key' => 'value'], $result->get('test_section_extra'));
         // a clone of definition should be returned
@@ -105,6 +99,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $className = 'Test\Class';
         $version = '1.2';
         $requestType = new RequestType(['test_request']);
+        $extras = [new EntityDefinitionConfigExtra()];
         $context = new ConfigContext();
 
         $this->processor->expects(self::exactly(2))
@@ -114,10 +109,10 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
             ->method('process')
             ->with(self::identicalTo($context));
 
-        $this->configProvider->getConfig($className, $version, $requestType);
+        $this->configProvider->getConfig($className, $version, $requestType, $extras);
 
         $this->configProvider->clearCache();
-        $this->configProvider->getConfig($className, $version, $requestType);
+        $this->configProvider->getConfig($className, $version, $requestType, $extras);
     }
 
     // @codingStandardsIgnoreStart
@@ -131,6 +126,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $className = 'Test\Class';
         $version = '1.2';
         $requestType = new RequestType(['test_request']);
+        $extras = [new EntityDefinitionConfigExtra()];
 
         $context = new ConfigContext();
 
@@ -140,10 +136,10 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->processor->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(function (ConfigContext $context) use ($className, $version, $requestType) {
-                $this->configProvider->getConfig($className, $version, $requestType);
+            ->willReturnCallback(function (ConfigContext $context) use ($className, $version, $requestType, $extras) {
+                $this->configProvider->getConfig($className, $version, $requestType, $extras);
             });
 
-        $this->configProvider->getConfig($className, $version, $requestType);
+        $this->configProvider->getConfig($className, $version, $requestType, $extras);
     }
 }

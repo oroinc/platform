@@ -27,14 +27,7 @@
     <div class="row-fluid form-horizontal">
         <div class="responsive-block">
             {{ ui.renderProperty('oro.user.username.label'|trans, entity.username) }}
-
-            {% set birthday_string %}
-                {{ entity.birthday is empty ? 'N/A'|trans : entity.birthday|oro_format_date }}
-                {% if entity.birthday is not empty %}
-                    ({{ entity.birthday|age_string({'default': 'N/A'}) }})
-                {% endif %}
-            {% endset %}
-            {{ ui.renderProperty('oro.user.birthday.label'|trans, birthday_string) }}
+            {{ ui.renderProperty('oro.user.birthday.label'|trans, ui.render_birthday(entity.birthday)) }}
 
             {% set emails = [userInfo.renderEmail(entity.email, true, entity)] %}
             {% for emailEntity in entity.emails %}
