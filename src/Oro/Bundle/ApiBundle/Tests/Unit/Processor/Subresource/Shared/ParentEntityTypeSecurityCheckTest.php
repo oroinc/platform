@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorTestCase
@@ -13,11 +15,25 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
     private $authorizationChecker;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
+    private $aclGroupProvider;
+
     protected function setUp()
     {
         parent::setUp();
 
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->aclGroupProvider = $this->createMock(AclGroupProviderInterface::class);
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getManageableEntityClass')
+            ->willReturnCallback(function ($className) {
+                return $className;
+            });
     }
 
     /**
@@ -29,6 +45,8 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorTestCase
     {
         return new ParentEntityTypeSecurityCheck(
             $this->authorizationChecker,
+            $this->doctrineHelper,
+            $this->aclGroupProvider,
             'VIEW',
             $forcePermissionUsage
         );
@@ -41,7 +59,7 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorTestCase
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', $parentClassName)
+            ->with('VIEW', 'entity:' . $parentClassName)
             ->willReturn(true);
 
         $this->context->setParentClassName($parentClassName);
@@ -59,7 +77,7 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorTestCase
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', $parentClassName)
+            ->with('VIEW', 'entity:' . $parentClassName)
             ->willReturn(false);
 
         $this->context->setParentClassName($parentClassName);
@@ -112,7 +130,7 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorTestCase
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', $parentClassName)
+            ->with('VIEW', 'entity:' . $parentClassName)
             ->willReturn(true);
 
         $this->context->setParentClassName($parentClassName);
