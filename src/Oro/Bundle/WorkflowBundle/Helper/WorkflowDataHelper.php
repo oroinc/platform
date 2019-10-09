@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -30,22 +32,28 @@ class WorkflowDataHelper
     /** @var UrlGeneratorInterface */
     protected $router;
 
+    /** @var AclGroupProviderInterface */
+    private $aclGroupProvider;
+
     /**
      * @param WorkflowManager               $workflowManager
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param TranslatorInterface           $translator
      * @param UrlGeneratorInterface         $router
+     * @param AclGroupProviderInterface     $aclGroupProvider
      */
     public function __construct(
         WorkflowManager $workflowManager,
         AuthorizationCheckerInterface $authorizationChecker,
         TranslatorInterface $translator,
-        UrlGeneratorInterface $router
+        UrlGeneratorInterface $router,
+        AclGroupProviderInterface $aclGroupProvider
     ) {
         $this->workflowManager = $workflowManager;
         $this->authorizationChecker = $authorizationChecker;
         $this->translator = $translator;
         $this->router = $router;
+        $this->aclGroupProvider = $aclGroupProvider;
     }
 
     /**
@@ -309,8 +317,18 @@ class WorkflowDataHelper
      */
     protected function isWorkflowPermissionGranted($permission, $workflowName, $entity)
     {
-        $domainObject = new DomainObjectWrapper($entity, new ObjectIdentity('workflow', $workflowName));
-
-        return $this->authorizationChecker->isGranted($permission, $domainObject);
+        return $this->authorizationChecker->isGranted(
+            $permission,
+            new DomainObjectWrapper(
+                $entity,
+                new ObjectIdentity(
+                    'workflow',
+                    ObjectIdentityHelper::buildType(
+                        $workflowName,
+                        $this->aclGroupProvider->getGroup()
+                    )
+                )
+            )
+        );
     }
 }

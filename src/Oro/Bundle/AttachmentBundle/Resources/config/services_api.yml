@@ -19,6 +19,6 @@ services:
     oro_attachment.api.file_view_security_check:
         class: Oro\Bundle\AttachmentBundle\Api\Processor\FileViewSecurityCheck
         arguments:
-            - '@oro_api.security.authorization_checker'
+            - '@security.authorization_checker'
         tags:
             - { name: oro.api.processor, action: get, group: data_security_check, class: Oro\Bundle\AttachmentBundle\Entity\File, priority: 10 }

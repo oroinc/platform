@@ -44,13 +44,15 @@ class FormProviderTest extends \PHPUnit\Framework\TestCase
         $reflection->setAccessible(true);
         $reflection->setValue($formView, [FormProvider::CSRF_TOKEN_FIELD => $tokenView]);
 
+        $operation->expects($this->once())
+            ->method('getName')
+            ->willReturn('test_operation');
         $form->expects($this->once())
             ->method('createView')
             ->willReturn($formView);
 
-        $options = ['csrf_token_id' => '_test_key'];
-        $this->formFactory
-            ->expects($this->once())
+        $options = ['csrf_token_id' => 'test_operation'];
+        $this->formFactory->expects($this->once())
             ->method('create')
             ->with($this->formType, $operation, $options)
             ->willReturn($form);
@@ -64,9 +66,13 @@ class FormProviderTest extends \PHPUnit\Framework\TestCase
         $actionData = new ActionData([ActionData::OPERATION_TOKEN => 'test_key']);
         $operation = $this->createMock(Operation::class);
         $form = $this->createMock(FormInterface::class);
-        $options = ['csrf_token_id' => '_test_key'];
-        $this->formFactory
-            ->expects($this->once())
+
+        $operation->expects($this->once())
+            ->method('getName')
+            ->willReturn('test_operation');
+
+        $options = ['csrf_token_id' => 'test_operation'];
+        $this->formFactory->expects($this->once())
             ->method('create')
             ->with($this->formType, $operation, $options)
             ->willReturn($form);

@@ -173,8 +173,16 @@ JS;
                 return false;
             }
             
-            if (document.querySelector('script[src*="js/oro.min.js"]') !== null
-                && (typeof(jQuery) === 'undefined' || jQuery == null || jQuery.active)
+            // Require should be available at this point.
+            // Require is absent on lightweight pages like login, forgot password, embedded forms, etc.
+            // Next checks are valid only for pages where require is loaded.
+            if (typeof require === 'undefined') {
+                return true;
+            }
+
+            if ((document.querySelector('script[src*="js/oro.min.js"]') !== null
+                && (typeof(jQuery) === 'undefined' || jQuery == null))
+                || (typeof(jQuery) !== 'undefined' && jQuery.active)
             ) {
                 return false;
             }
@@ -225,8 +233,9 @@ JS;
             }
             
             try {
-                if (document.querySelector('script[src*="js/oro.min.js"]') !== null
-                    && (typeof(jQuery) === 'undefined' || jQuery == null || jQuery.active)
+                if ((document.querySelector('script[src*="js/oro.min.js"]') !== null
+                    && (typeof(jQuery) === 'undefined' || jQuery == null))
+                    || (typeof(jQuery) !== 'undefined' && jQuery.active)
                 ) {
                     return false;
                 }
@@ -237,7 +246,7 @@ JS;
                 
                 var isInAction = window.mediatorCachedForSelenium.execute('isInAction')
                 
-                if (isInAction !== false || jQuery.active) {
+                if (isInAction !== false) {
                     return false;
                 }
             } catch (e) {
