@@ -16,7 +16,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
  */
 class RemoveEntity extends AbstractAction
 {
-    const NAME = 'remove_entity';
+    public const NAME = 'remove_entity';
 
     /**
      * @var mixed
@@ -49,7 +49,7 @@ class RemoveEntity extends AbstractAction
             throw new InvalidParameterException(
                 sprintf(
                     'Action "%s" expects reference to entity as parameter, %s is given.',
-                    self::NAME,
+                    static::NAME,
                     gettype($value)
                 )
             );
@@ -69,7 +69,7 @@ class RemoveEntity extends AbstractAction
             throw new InvalidParameterException(
                 sprintf(
                     'Parameters of "%s" action must have 1 element, but %d given',
-                    self::NAME,
+                    static::NAME,
                     count($options)
                 )
             );
