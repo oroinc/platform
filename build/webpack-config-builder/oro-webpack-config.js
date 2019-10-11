@@ -17,6 +17,7 @@ class ConfigBuilder {
         this._publicPath = 'public/';
         this._adminTheme = 'admin.oro';
         this._enableLayoutThemes = false;
+        this.layoutThemes = null;
     }
 
     /**
@@ -59,7 +60,10 @@ class ConfigBuilder {
      * Enable build of Layout themes. To learn more see
      * {@link https://github.com/oroinc/platform/blob/3.1/src/Oro/Bundle/LayoutBundle/Resources/doc/theme_definition.md}
      */
-    enableLayoutThemes() {
+    enableLayoutThemes(themes) {
+        if (themes) {
+            this.layoutThemes = themes;
+        }
         this._enableLayoutThemes = true;
         return this;
     }
@@ -104,8 +108,12 @@ class ConfigBuilder {
                     modules: [
                         resolvedPublicPath,
                         resolvedPublicPath + '/bundles',
-                        path.join(__dirname, '../node_modules'),
+                        path.join(__dirname, '../node_modules')
                     ],
+                    extensions: ['*', '.css', '.scss', '.js'],
+                    alias: {
+                        'node_modules':  resolvedPublicPath + '/bundles/npmassets'
+                    },
                     symlinks: false
                 },
                 resolveLoader: {
@@ -151,7 +159,6 @@ class ConfigBuilder {
                                     includePaths: [
                                         resolvedPublicPath + '/bundles',
                                         path.resolve(__dirname, '../node_modules'),
-
                                     ],
                                     sourceMap: true
                                 }
@@ -255,9 +262,22 @@ class ConfigBuilder {
             const layoutStyleLoader = new LayoutStyleLoader(layoutConfigLoader, entryPointFileWriter);
             if (selectedTheme === undefined) {
                 // build all layout themes
-                for (let theme in layoutConfigLoader.themes) {
+                let themes = {};
+                if (this.layoutThemes) {
+                    themes = Object.keys(layoutConfigLoader.themes)
+                        .filter(key => this.layoutThemes.includes(key))
+                        .reduce((obj, key) => {
+                            obj[key] = layoutConfigLoader.themes[key];
+                            return obj;
+                        }, {});
+                } else {
+                    themes = layoutConfigLoader.themes;
+                }
+
+                for (let theme in themes) {
                     entryPoints = Object.assign({}, entryPoints, layoutStyleLoader.getThemeEntryPoints(theme));
                 }
+
             } else if (layoutThemes.indexOf(selectedTheme) !== -1) {
                 // build single layout theme
                 entryPoints = Object.assign({}, entryPoints, layoutStyleLoader.getThemeEntryPoints(selectedTheme));

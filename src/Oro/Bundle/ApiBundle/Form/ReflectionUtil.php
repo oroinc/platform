@@ -60,31 +60,6 @@ class ReflectionUtil
     }
 
     /**
-     * Removes all errors of the given form.
-     *
-     * @param FormInterface $form The form
-     * @param bool          $deep Whether to clear errors of child forms as well
-     */
-    public static function clearFormErrors(FormInterface $form, bool $deep = false): void
-    {
-        if ($form instanceof Form && \count($form->getErrors()) > 0) {
-            $clearClosure = \Closure::bind(
-                function ($form) {
-                    $form->errors = [];
-                },
-                null,
-                $form
-            );
-            $clearClosure($form);
-        }
-        if ($deep) {
-            foreach ($form as $child) {
-                self::clearFormErrors($child, $deep);
-            }
-        }
-    }
-
-    /**
      * Marks all children of the given form as submitted.
      *
      * @param FormInterface             $form

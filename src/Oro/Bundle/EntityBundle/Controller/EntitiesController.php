@@ -10,13 +10,12 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -308,9 +307,9 @@ class EntitiesController extends Controller
      *
      * @Route(
      *      "/delete/{entityName}/item/{id}",
-     *      name="oro_entity_delete"
+     *      name="oro_entity_delete",
+     *      methods={"DELETE"}
      * )
-     * @Method("DELETE")
      * @CsrfProtection()
      */
     public function deleteAction($entityName, $id)

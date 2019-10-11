@@ -96,6 +96,7 @@ class OroSyncExtension extends Extension
             ]
         );
 
+        $bundles = $container->getParameter('kernel.bundles');
         if (isset($bundles['MonologBundle'])) {
             $this->configureLogger($container);
         }

@@ -10,6 +10,10 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 
+/**
+ * Process custom entities and fields. If entity or field marked as searchable - config of this custom
+ * entity or field will be added to the main search map.
+ */
 class BeforeMapObjectSearchListener
 {
     const TITLE_FIELDS_PATH = 'title_fields';
@@ -31,7 +35,6 @@ class BeforeMapObjectSearchListener
         'float'                    => 'decimal',
         'decimal'                  => 'decimal',
         'boolean'                  => 'integer',
-        'html_escaped'             => 'text',
         RelationType::ONE_TO_MANY  => Indexer::RELATION_ONE_TO_MANY,
         RelationType::MANY_TO_ONE  => Indexer::RELATION_MANY_TO_ONE,
         RelationType::MANY_TO_MANY => Indexer::RELATION_MANY_TO_MANY,

@@ -4,7 +4,11 @@ namespace Oro\Bundle\DataAuditBundle\Provider;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 
+/**
+ * Checks whatever field or entity is auditable depending on EntityConfig
+ */
 class AuditConfigProvider
 {
     const DATA_AUDIT_SCOPE = 'dataaudit';
@@ -29,6 +33,10 @@ class AuditConfigProvider
      */
     public function isAuditableEntity($entityClass)
     {
+        if (\is_a($entityClass, AbstractEnumValue::class, true)) {
+            return true;
+        }
+
         return
             $this->configManager->hasConfig($entityClass)
             && $this->isAuditable(

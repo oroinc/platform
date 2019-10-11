@@ -256,6 +256,14 @@ interface ContextInterface extends ComponentContextInterface
     public function addInfoRecord(string $key, $value): void;
 
     /**
+     * Adds records that contain an additional information about a collection valued association.
+     *
+     * @param string $propertyPath
+     * @param array  $infoRecords
+     */
+    public function addAssociationInfoRecords(string $propertyPath, array $infoRecords): void;
+
+    /**
      * Checks whether a query is used to get result data exists.
      *
      * @return bool

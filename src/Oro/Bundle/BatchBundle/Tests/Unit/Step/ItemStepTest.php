@@ -91,6 +91,17 @@ class ItemStepTest extends \PHPUnit\Framework\TestCase
         $this->itemStep->execute($stepExecution);
     }
 
+    public function testGetBatchSize(): void
+    {
+        $this->assertNull($this->itemStep->getBatchSize());
+
+        $batchSize = 100;
+
+        $this->itemStep->setBatchSize($batchSize);
+
+        $this->assertSame($batchSize, $this->itemStep->getBatchSize());
+    }
+
     /**
      * Assert the entity tested
      *

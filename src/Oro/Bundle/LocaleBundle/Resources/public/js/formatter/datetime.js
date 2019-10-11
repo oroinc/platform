@@ -236,7 +236,7 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          * @returns {string}
          */
         formatDate: function(value) {
-            return this.getMomentForBackendDate(value).tz(this.timezone)
+            return this.getMomentForBackendDate(value)
                 .format(this.getDateFormat());
         },
 

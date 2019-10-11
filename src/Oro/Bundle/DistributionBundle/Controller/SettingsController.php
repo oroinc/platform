@@ -4,10 +4,10 @@ namespace Oro\Bundle\DistributionBundle\Controller;
 
 use Oro\Bundle\DistributionBundle\Entity\Composer\Config;
 use Oro\Bundle\DistributionBundle\Form\Type\Composer\ConfigType;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * The package manager settings controller.

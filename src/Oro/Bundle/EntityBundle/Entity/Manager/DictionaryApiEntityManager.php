@@ -119,6 +119,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
         $qb = $this->getListQueryBuilder(10, 1, [], null, []);
         if (!empty($searchQuery)) {
             foreach ($searchFields as $searchField) {
+                QueryBuilderUtil::checkIdentifier($searchField);
                 $qb->orWhere('e.' . $searchField . ' LIKE :translated_title');
             }
             $qb->setParameter('translated_title', '%' . $searchQuery . '%');

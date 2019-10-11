@@ -11,6 +11,8 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
+ * Abstract implementation of workflow data storage.
+ *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Countable
@@ -67,7 +69,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      * @param string $name
      * @param mixed $value
      * @param bool $changeModified
-     * @return AbstractStorage
+     * @return $this
      */
     public function set($name, $value, $changeModified = true)
     {

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Form\Handler;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -101,20 +102,7 @@ class CreateUpdateConfigFieldHandler
         list($fieldName, $fieldType) = $this->sessionStorage->getFieldInfo($entityConfigModel);
 
         $extendEntityConfig = $this->configHelper->getEntityConfig($entityConfigModel, 'extend');
-
-        list($fieldType, $fieldOptions) = $this->configHelper->createFieldOptions(
-            $extendEntityConfig,
-            $fieldType,
-            $additionalFieldOptions
-        );
-
-        $newFieldModel = $this->configManager->createConfigFieldModel(
-            $entityConfigModel->getClassName(),
-            $fieldName,
-            $fieldType
-        );
-
-        $this->configHelper->updateFieldConfigs($newFieldModel, $fieldOptions);
+        $newFieldModel = $this->createFieldModel($fieldName, $fieldType, $extendEntityConfig, $additionalFieldOptions);
 
         $form = $this->configHelperHandler->createSecondStepFieldForm($newFieldModel);
 
@@ -131,5 +119,36 @@ class CreateUpdateConfigFieldHandler
         }
 
         return $this->configHelperHandler->constructConfigResponse($newFieldModel, $form, $formAction);
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string $fieldType
+     * @param ConfigInterface $extendEntityConfig
+     * @param array $additionalFieldOptions
+     *
+     * @return FieldConfigModel
+     */
+    protected function createFieldModel(
+        $fieldName,
+        $fieldType,
+        ConfigInterface $extendEntityConfig,
+        array $additionalFieldOptions = []
+    ): FieldConfigModel {
+        list($fieldType, $fieldOptions) = $this->configHelper->createFieldOptions(
+            $extendEntityConfig,
+            $fieldType,
+            $additionalFieldOptions
+        );
+
+        $newFieldModel = $this->configManager->createConfigFieldModel(
+            $extendEntityConfig->getId()->getClassName(),
+            $fieldName,
+            $fieldType
+        );
+
+        $this->configHelper->updateFieldConfigs($newFieldModel, $fieldOptions);
+
+        return $newFieldModel;
     }
 }

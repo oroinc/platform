@@ -15,6 +15,9 @@ use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryBuilderRegistry;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Provides useful methods to work with Segment entities.
+ */
 class SegmentManager
 {
     const PER_PAGE = 20;
@@ -275,6 +278,7 @@ class SegmentManager
         $queryBuilder = null;
         $cacheKey = $this->getQBCacheKey($segment);
         if ($this->cache->contains($cacheKey)) {
+            /** @var QueryBuilder $queryBuilder */
             $queryBuilder = clone $this->cache->fetch($cacheKey);
         }
 

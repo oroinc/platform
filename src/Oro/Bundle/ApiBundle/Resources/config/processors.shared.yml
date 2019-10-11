@@ -485,7 +485,9 @@ services:
     oro_api.get.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - '@oro_api.security.authorization_checker'
+            - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.acl.group_provider.chain'
             - VIEW
         tags:
             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
@@ -494,7 +496,9 @@ services:
     oro_api.delete.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - '@oro_api.security.authorization_checker'
+            - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.acl.group_provider.chain'
             - DELETE
         tags:
             - { name: oro.api.processor, action: delete, group: security_check, priority: 10 }
@@ -508,7 +512,9 @@ services:
     oro_api.entity_type_security_check.view:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - '@oro_api.security.authorization_checker'
+            - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.acl.group_provider.chain'
             - VIEW
             - true
         tags:
@@ -522,7 +528,9 @@ services:
     oro_api.subresource.parent_entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
         arguments:
-            - '@oro_api.security.authorization_checker'
+            - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.acl.group_provider.chain'
             - VIEW
         tags:
             - { name: oro.api.processor, action: get_relationship, group: security_check, priority: 10 }
@@ -531,7 +539,9 @@ services:
     oro_api.subresource.parent_entity_type_security_check.edit:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
         arguments:
-            - '@oro_api.security.authorization_checker'
+            - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.acl.group_provider.chain'
             - EDIT
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: security_check, priority: 10 }
@@ -545,7 +555,9 @@ services:
     oro_api.subresource.parent_entity_type_security_check.view:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
         arguments:
-            - '@oro_api.security.authorization_checker'
+            - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.acl.group_provider.chain'
             - VIEW
             - true
         tags:
@@ -809,7 +821,7 @@ services:
     oro_api.subresource.parent_entity_object_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityObjectSecurityCheck
         arguments:
-            - '@oro_api.security.authorization_checker'
+            - '@security.authorization_checker'
             - EDIT
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: data_security_check, priority: 10 }
@@ -841,6 +853,7 @@ services:
             - '@oro_api.object_normalizer'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_data, priority: -10 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_data, collection: false, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_data, collection: false, priority: -10 }
             - { name: oro.api.processor, action: delete_subresource, group: normalize_data, collection: false, priority: -10 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_data, collection: false, priority: -10 }
@@ -852,6 +865,7 @@ services:
             - '@oro_api.object_normalizer'
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_data, priority: -10 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_data, collection: true, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_data, collection: true, priority: -10 }
             - { name: oro.api.processor, action: delete_subresource, group: normalize_data, collection: true, priority: -10 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_data, collection: true, priority: -10 }

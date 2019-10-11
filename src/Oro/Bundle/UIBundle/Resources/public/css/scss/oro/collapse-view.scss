@@ -1,0 +1,25 @@
+/* @theme: admin.oro; */
+
+.collapse-view {
+    &__container {
+        display: none;
+    }
+
+    &.expanded {
+        .collapse-view {
+            &__trigger {
+                &.hide-on-expand {
+                    display: none;
+                }
+            }
+
+            &__container {
+                display: block;
+
+                &--inline {
+                    display: inline;
+                }
+            }
+        }
+    }
+}

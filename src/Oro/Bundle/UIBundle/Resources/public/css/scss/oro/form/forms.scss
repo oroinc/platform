@@ -54,7 +54,11 @@
             margin-#{$start}: $form-horizontal-control-margin-start;
             text-align: #{$start};
             flex-grow: 1;
-            min-width: 0;
+            min-width: $field-width;
+
+            & .controls {
+                min-width: 0;
+            }
 
             &:first-child {
                 margin-#{$start}: $form-horizontal-control-label-width + $form-horizontal-control-margin-start;
@@ -107,6 +111,10 @@
                 padding-top: $form-horizontal-control-label-offset;
                 max-width: $field-width;
             }
+
+            .ui-dialog-resized & {
+                min-width: $field-width + $dialog-content-inner-offset;
+            }
         }
 
         &.control-group-datetime {
@@ -129,12 +137,6 @@
         &.control-group-choice {
             .choice-widget-expanded {
                 padding-top: $control-group-choice-choice-widget-offset-top;
-            }
-
-            .select2 {
-                + input {
-                    margin-top: $input-outer-offset-bottom;
-                }
             }
         }
 
@@ -242,8 +244,9 @@ label {
             font-size: 21px;
             font-style: normal;
             position: absolute;
-            top: -2px;
-            #{$end}: -11px;
+
+            margin-top: -2px;
+            margin-#{$start}: 4px;
         }
     }
 

@@ -1,6 +1,7 @@
 You must select at least {{ limit }} role:  You must select at least {{ limit }} role.|You must select at least {{ limit }} roles.
 "The password fields must match.": "The password fields must match."
 "This value cannot be in the future.": "This value cannot be in the future."
+"The birth date cannot be in the future.": "The birth date cannot be in the future."
 
 oro:
     user:

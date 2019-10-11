@@ -131,8 +131,8 @@ define([
             if (this.options.confirmRemove) {
                 var confirmRemoveView = this.subview('confirmRemoveView');
 
-                if (!confirmRemoveView) {
-                    var confirmRemoveView = new this.confirmRemoveComponent(this.confirmRemoveMessages);
+                if (confirmRemoveView === void 0 || confirmRemoveView.disposed) {
+                    confirmRemoveView = new this.confirmRemoveComponent(this.confirmRemoveMessages);
                     this.subview('confirmRemoveView', confirmRemoveView);
                 } else {
                     confirmRemoveView.off('ok');

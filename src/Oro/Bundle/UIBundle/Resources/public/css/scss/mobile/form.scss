@@ -101,6 +101,7 @@
 
         .controls {
             margin-#{$start}: $form-horizontal-controls-offset-left;
+            min-width: 0;
 
             &:first-child {
                 margin-#{$start}: $form-horizontal-controls-offset-left;

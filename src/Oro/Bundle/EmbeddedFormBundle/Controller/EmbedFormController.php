@@ -11,12 +11,12 @@ use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Routing\Annotation\Route;
 
 class EmbedFormController extends Controller
 {

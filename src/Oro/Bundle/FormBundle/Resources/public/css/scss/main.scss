@@ -1,6 +1,7 @@
 /* @theme: admin.oro; */
 
 @import "oroui/css/scss/variables";
+@import "oroui/css/scss/oro/variables";
 @import "oroui/css/scss/mixins";
 
 @import "variables";
@@ -9,7 +10,9 @@
 @import "inline-editing";
 @import "inline-editing-validation";
 @import "form";
+@import "form-layout";
 @import "inline-editable-wrapper";
 @import "expression-editor";
 
+@import "desktop/main";
 @import "mobile/main";

@@ -107,7 +107,7 @@ Delete a collection of user group records.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 ### name
 
@@ -115,7 +115,7 @@ Delete a collection of user group records.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 

@@ -38,7 +38,7 @@ class MediaCacheManagerRegistryTest extends \PHPUnit\Framework\TestCase
     {
         $this->fileAccessControlChecker
             ->method('isCoveredByAcl')
-            ->withConsecutive($file1 = new File(), $file2 = new File())
+            ->withConsecutive([$file1 = new File()], [$file2 = new File()])
             ->willReturnOnConsecutiveCalls(true, false);
 
         self::assertSame(

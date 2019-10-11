@@ -1,0 +1,26 @@
+/* @theme: admin.oro; */
+
+$oro-form-selectors: (
+    'inputs': (
+        'textarea',
+        'input[type="text"]',
+        'input[type="password"]',
+        'input[type="datetime"]',
+        'input[type="datetime-local"]',
+        'input[type="date"]',
+        'input[type="month"]',
+        'input[type="time"]',
+        'input[type="week"]',
+        'input[type="number"]',
+        'input[type="email"]',
+        'input[type="url"]',
+        'input[type="search"]',
+        'input[type="tel"]',
+        'input[type="color"]',
+        '.uneditable-input',
+        '.selector'
+    ),
+    'select2-append': '.input-append .select2-container',
+    'select2-prepend': '.input-prepend .select2-container',
+    'select2-add-entity-enabled': '.entity-create-enabled .select2-container',
+);

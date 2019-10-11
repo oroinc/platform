@@ -149,6 +149,7 @@
                         'currentSegmentId': entity.id|default(null),
                         'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE'),
                         'metadata': metadata,
+                        'fieldConditionOptions': form.vars.field_condition_options
                     })
                 ]
             },

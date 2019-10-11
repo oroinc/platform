@@ -163,14 +163,14 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
      *
      * @return string
      */
-    public function getAgeAsString($date, $options)
+    public function getAgeAsString($date, $options = [])
     {
         if (!$date) {
             return '';
         }
         $dateDiff = $this->getDateDiff($date, $options);
         if ($dateDiff->invert) {
-            return isset($options['default']) ? $options['default'] : '';
+            return $options['default'] ?? '';
         }
 
         $age = $dateDiff->y;

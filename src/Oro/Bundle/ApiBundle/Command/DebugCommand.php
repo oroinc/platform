@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Component\ChainProcessor\AbstractMatcher as Matcher;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\Debug\TraceableProcessor;
@@ -405,6 +407,28 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
                 $rows[] = $this->formatProcessorAttribute('group', $group, true);
             }
             unset($attributes['group']);
+        }
+        if ('get_config' === $action && array_key_exists(FilterIdentifierFieldsConfigExtra::NAME, $attributes)) {
+            $identifierFieldsOnly = $attributes[FilterIdentifierFieldsConfigExtra::NAME];
+            if (array_key_exists('extra', $attributes)) {
+                $extra = $attributes['extra'];
+                if (is_string($extra) || key($extra) === Matcher::OPERATOR_NOT) {
+                    $extra = [Matcher::OPERATOR_AND => [$extra]];
+                }
+                if ($identifierFieldsOnly) {
+                    $extra[Matcher::OPERATOR_AND][] = FilterIdentifierFieldsConfigExtra::NAME;
+                } else {
+                    $extra[Matcher::OPERATOR_AND][] = [
+                        Matcher::OPERATOR_NOT => FilterIdentifierFieldsConfigExtra::NAME
+                    ];
+                }
+            } elseif ($identifierFieldsOnly) {
+                $extra = FilterIdentifierFieldsConfigExtra::NAME;
+            } else {
+                $extra = [Matcher::OPERATOR_NOT => FilterIdentifierFieldsConfigExtra::NAME];
+            }
+            $attributes['extra'] = $extra;
+            unset($attributes[FilterIdentifierFieldsConfigExtra::NAME]);
         }
 
         foreach ($attributes as $key => $val) {

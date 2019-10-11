@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WsseAuthenticationBundle\Security\Core\Authentication\Provider;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 use Oro\Bundle\UserBundle\Security\UserApiKeyInterface;
 use Oro\Bundle\WsseAuthenticationBundle\Exception\NonceExpiredException;
@@ -160,7 +161,7 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
 
             if ($isSecretValid) {
                 if (!$userApi->getOrganization()->isEnabled()) {
-                    throw new BadCredentialsException('Organization is not active.');
+                    throw new BadUserOrganizationException('Organization is not active.');
                 }
                 if (!$userApi->isEnabled()) {
                     throw new BadCredentialsException('Wrong API key.');

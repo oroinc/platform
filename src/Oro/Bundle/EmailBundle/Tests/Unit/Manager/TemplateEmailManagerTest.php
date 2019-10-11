@@ -199,18 +199,18 @@ class TemplateEmailManagerTest extends \PHPUnit\Framework\TestCase
             ->expects($this->exactly(2))
             ->method('processEmbeddedImages')
             ->withConsecutive(
-                $this->assertMessageCallback(
+                [$this->assertMessageCallback(
                     self::EMAIL_SUBJECT,
                     self::EMAIL_BODY,
                     EmailTemplate::CONTENT_TYPE_HTML,
                     ['no-reply@mail.com' => 'SenderName']
-                ),
-                $this->assertMessageCallback(
+                )],
+                [$this->assertMessageCallback(
                     self::EMAIL_SUBJECT_GERMAN,
                     self::EMAIL_BODY_GERMAN,
-                    EmailTemplate::CONTENT_TYPE_HTML,
+                    EmailTemplate::CONTENT_TYPE_TEXT,
                     ['no-reply@mail.com' => 'SenderName']
-                )
+                )]
             );
 
         $this->mailer
@@ -261,7 +261,7 @@ class TemplateEmailManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getTemplateContent')
             ->withConsecutive(
                 [$emailTemplateCriteria, self::LANGUAGE, self::TEMPLATE_PARAMS],
-                [ $emailTemplateCriteria, self::LANGUAGE_GERMAN, self::TEMPLATE_PARAMS]
+                [$emailTemplateCriteria, self::LANGUAGE_GERMAN, self::TEMPLATE_PARAMS]
             )
             ->willReturnOnConsecutiveCalls($emailTemplate, $germanEmailTemplate);
 

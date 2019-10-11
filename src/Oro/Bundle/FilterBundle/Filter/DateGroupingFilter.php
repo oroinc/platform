@@ -75,8 +75,10 @@ class DateGroupingFilter extends ChoiceFilter
         }
 
         /** @var OrmFilterDatasourceAdapter $ds */
+        /** @var QueryBuilder $qb */
         $qb = $ds->getQueryBuilder();
         $columnName = $this->get(self::COLUMN_NAME);
+        QueryBuilderUtil::checkField($columnName);
 
         switch ($data['value']) {
             case self::TYPE_DAY:

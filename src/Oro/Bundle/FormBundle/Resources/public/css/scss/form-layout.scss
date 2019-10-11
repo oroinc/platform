@@ -1,0 +1,26 @@
+/* @theme: admin.oro; */
+
+.form-layout {
+    margin-bottom: -$content-padding-medium;
+    min-width: $field-width;
+
+    &__row {
+        display: inline-flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        max-width: 100%;
+        padding-bottom: $content-padding-medium;
+    }
+
+    &__part {
+        display: inline-flex;
+        flex-wrap: wrap;
+        max-width: 100%;
+        // Override Flexbox 'auto' property with introduced as the initial value of min-width
+        min-width: 0;
+
+        .fields-row-error {
+            width: 100%;
+        }
+    }
+}

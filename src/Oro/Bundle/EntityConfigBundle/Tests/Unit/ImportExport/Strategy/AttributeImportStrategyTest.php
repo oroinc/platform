@@ -3,7 +3,9 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\ImportExport\Strategy;
 
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Strategy\AttributeImportStrategy;
@@ -91,11 +93,13 @@ class AttributeImportStrategyTest extends \PHPUnit\Framework\TestCase
         $entityModel = new EntityConfigModel(\stdClass::class);
         $entity = new FieldConfigModel('testFieldName', 'integer');
         $entity->setEntity($entityModel);
+        $className = $entityModel->getClassName();
+        $fieldName = $entity->getFieldName();
 
         $this->validationHelper->expects($this->once())
-            ->method('findExtendFieldConfig')
-            ->with($entityModel->getClassName(), $entity->getFieldName())
-            ->willReturn($isNew ? null: []);
+            ->method('findFieldConfig')
+            ->with($className, $fieldName)
+            ->willReturn($isNew ? null: new Config(new FieldConfigId('extend', $className, $fieldName), []));
 
         $this->fieldTypeProvider->expects($this->once())
             ->method('getSupportedFieldTypes')

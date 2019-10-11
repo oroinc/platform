@@ -117,6 +117,8 @@ oro_form:
             details: ~
             dfn: ~
             figure: ~
+            figcaption: ~
+            picture: ~
             footer: ~
             header: ~
             hr: ~
@@ -142,7 +144,10 @@ oro_form:
             samp: ~
             section: ~
             small: ~
-            source: ~
+            source:
+                attributes:
+                    - srcset
+                    - media
             style:
                 attributes:
                     - media

@@ -15,4 +15,17 @@ class GridFilterChoiceTree extends GridFilterStringItem
         $input = $this->getElement('GridFilterChoiceTreeValueInput');
         $input->setValue($value);
     }
+
+    /**
+     * Check that the item exists/not exists in grid filter options
+     *
+     * @param string $value
+     * @param bool $isShouldSee
+     */
+    public function checkValue(string $value, bool $isShouldSee): void
+    {
+        /** @var ChoiceTreeInput $input */
+        $input = $this->getElement('GridFilterChoiceTreeValueInput');
+        $input->checkValue($value, $isShouldSee);
+    }
 }

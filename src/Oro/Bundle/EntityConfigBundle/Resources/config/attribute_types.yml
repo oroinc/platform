@@ -68,14 +68,6 @@ services:
         tags:
              - { name: oro_entity_config.attribute_type }
 
-    oro_entity_config.attribute_type.html_escaped:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\HTMLAttributeType'
-        public: false
-        arguments:
-            - '@oro_ui.html_tag_helper'
-        tags:
-             - { name: oro_entity_config.attribute_type }
-
     oro_entity_config.attribute_type.image:
         class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\FileAttributeType'
         public: false

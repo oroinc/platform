@@ -9,6 +9,7 @@ use Oro\Bundle\SSOBundle\Security\Core\Exception\EmailDomainNotAllowedException;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use RuntimeException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\DisabledException;
 
 /**
  * OAuth user provider
@@ -69,7 +70,7 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
         }
 
         if (!$user || !$user->isEnabled()) {
-            throw new BadCredentialsException('Bad credentials.');
+            throw new DisabledException('Bad credentials.');
         }
 
         return $user;

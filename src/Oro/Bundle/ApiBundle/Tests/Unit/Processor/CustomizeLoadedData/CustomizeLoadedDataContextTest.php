@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\HateoasConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -511,5 +512,17 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($configExtra, $this->context->getConfigExtra('test'));
         self::assertFalse($this->context->hasConfigExtra('another'));
         self::assertNull($this->context->getConfigExtra('another'));
+    }
+
+    public function testHateoas()
+    {
+        $this->context->setConfigExtras([]);
+        self::assertFalse($this->context->isHateoasEnabled());
+
+        $this->context->setConfigExtras([new TestConfigExtra('test'), new HateoasConfigExtra()]);
+        self::assertTrue($this->context->isHateoasEnabled());
+
+        $this->context->setConfigExtras([new TestConfigExtra('test')]);
+        self::assertFalse($this->context->isHateoasEnabled());
     }
 }

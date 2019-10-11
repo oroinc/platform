@@ -109,7 +109,7 @@ define(['underscore', 'asap'], function(_, asap) {
         var offsetDelta = 0;
 
         var escapeText = function(text) {
-            return text.replace(/\&lt\;\%/g, '&amp;lt;%').replace(/<%/g, '&lt;%').replace(/%>/g, '%&gt;');
+            return text.replace(/&lt;%/g, '&amp;lt;%').replace(/<%/g, '&lt;%').replace(/%>/g, '%&gt;');
         };
 
         text.replace(innerTempEvaluate, function(match, open, close, offset) {
@@ -132,10 +132,10 @@ define(['underscore', 'asap'], function(_, asap) {
             // Adobe VMs need the match returned to produce the correct offset.
             return match;
         });
-        arguments[1] = _.trim(escapedText);
-
-        var func = original.apply(this, _.rest(arguments));
-        func._source = arguments[1];
+        var args = _.rest(arguments);
+        args[0] = _.trim(escapedText);
+        var func = original.apply(this, args);
+        func._source = args[0];
         return func;
     });
 

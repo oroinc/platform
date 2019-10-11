@@ -77,6 +77,13 @@ oro_behat_extension:
         type: xpath
         locator: '//img[@alt="Blue dot"][@src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAAEklEQVR42mNkYPj/nwEKGHFyAIbuBf4sIeHsAAAAAElFTkSuQmCC"]'
 
+    Upload Email Attachment Link:
+      selector: 'a.upload-new'
+
+    Upload Email Attachment File:
+      selector: '[name^="oro_email_email[attachments]"][type="file"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\FileField
+
   pages:
     User Emails:
       class: Oro\Bundle\EmailBundle\Tests\Behat\Page\UserEmails

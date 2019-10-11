@@ -16,6 +16,8 @@ use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -525,6 +527,45 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->factory->create(SegmentFilterBuilderType::class, $existingEntity, $options);
 
         $this->assertTrue($isCalled);
+    }
+
+    public function testBuildView()
+    {
+        $formView = new FormView();
+
+        /** @var FormInterface $form */
+        $form = $this->createMock(FormInterface::class);
+
+        $conditionBuilderValidation = [
+            'condition-item' =>  [
+                'NotBlank' => ['message' => 'Condition should not be blank'],
+            ],
+        ];
+
+        $fieldConditionOptions = [
+            'fieldChoice' => [
+                'exclude' => [
+                    ['name' => 'FieldName', 'type' => 'enum', 'entityClassName' => \stdClass::class]
+                ]
+            ]
+        ];
+
+        $options = [
+            'condition_builder_validation' => $conditionBuilderValidation,
+            'field_condition_options' => $fieldConditionOptions
+        ];
+
+        $this->formType->buildView($formView, $form, $options);
+
+        $this->assertArrayHasKey('condition_builder_options', $formView->vars);
+        $this->assertArrayHasKey('field_condition_options', $formView->vars);
+
+        $this->assertEquals(
+            ['validation' => $conditionBuilderValidation],
+            $formView->vars['condition_builder_options']
+        );
+
+        $this->assertEquals($fieldConditionOptions, $formView->vars['field_condition_options']);
     }
 
     /**

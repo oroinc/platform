@@ -1,0 +1,72 @@
+/* @theme: admin.oro; */
+
+.form-layout {
+    margin-#{$end}: -$content-padding-medium / 2;
+    margin-#{$start}: -$content-padding-medium / 2;
+
+    &__row {
+        padding-#{$end}: $content-padding-medium / 2;
+        padding-#{$start}: $content-padding-medium / 2;
+    }
+
+    &__part {
+        &.is-label {
+            justify-content: flex-end;
+            padding-top: $form-horizontal-control-label-offset;
+            padding-#{$end}: $content-padding;
+
+            line-height: $form-horizontal-control-label-line-height;
+            text-align: #{$end};
+        }
+
+        &.is-group {
+            width: 100%;
+
+            .form-layout__part {
+                &:nth-child(odd) {
+                    padding-#{$end}: $content-padding-small / 2;
+                }
+
+                &:nth-child(even) {
+                    padding-#{$start}: $content-padding-small / 2;
+                }
+
+                &:only-child {
+                    padding-#{$start}: 0;
+                    padding-#{$end}: 0;
+                }
+            }
+        }
+
+        &.is-fields {
+            width: $field-width;
+        }
+
+        &.length-28 {
+            width: 28%;
+        }
+
+        &.length-72 {
+            width: 72%;
+        }
+
+        &.short {
+            width: 90px;
+            min-width: 90px;
+        }
+    }
+
+    // Update static widths in form fields
+    #{map_get($oro-form-selectors, 'inputs')} {
+        width: 100%;
+    }
+
+    #{map_get($oro-form-selectors, 'select2-append'),
+              map_get($oro-form-selectors, 'select2-prepend')} {
+        width: calc(100% - #{$btn-icon-width + $add-on-append-offset-left});
+    }
+
+    #{map_get($oro-form-selectors, 'select2-add-entity-enabled')} {
+        width: calc(100% - #{$btn-icon-width * 2} - #{$add-on-append-outer-offset-left + $add-on-append-offset-left});
+    }
+}

@@ -3,24 +3,27 @@
 namespace Oro\Component\ChainProcessor;
 
 /**
- * A base implementation of an execution context for processors.
+ * The base implementation of an execution context for processors.
  */
 class Context extends ParameterBag implements ContextInterface
 {
     /** action name */
-    const ACTION = 'action';
-
-    /** result data */
-    const RESULT = 'result';
+    public const ACTION = 'action';
 
     /** @var string|null */
-    protected $firstGroup;
+    private $firstGroup;
 
     /** @var string|null */
-    protected $lastGroup;
+    private $lastGroup;
 
     /** @var string[] */
-    protected $skippedGroups = [];
+    private $skippedGroups = [];
+
+    /** @var mixed */
+    private $result;
+
+    /** @var bool */
+    private $resultExists = false;
 
     /**
      * {@inheritdoc}
@@ -113,7 +116,7 @@ class Context extends ParameterBag implements ContextInterface
      */
     public function hasResult()
     {
-        return $this->has(self::RESULT);
+        return $this->resultExists;
     }
 
     /**
@@ -121,7 +124,7 @@ class Context extends ParameterBag implements ContextInterface
      */
     public function getResult()
     {
-        return $this->get(self::RESULT);
+        return $this->result;
     }
 
     /**
@@ -129,7 +132,8 @@ class Context extends ParameterBag implements ContextInterface
      */
     public function setResult($data)
     {
-        $this->set(self::RESULT, $data);
+        $this->result = $data;
+        $this->resultExists = true;
     }
 
     /**
@@ -137,6 +141,7 @@ class Context extends ParameterBag implements ContextInterface
      */
     public function removeResult()
     {
-        $this->remove(self::RESULT);
+        $this->result = null;
+        $this->resultExists = false;
     }
 }
