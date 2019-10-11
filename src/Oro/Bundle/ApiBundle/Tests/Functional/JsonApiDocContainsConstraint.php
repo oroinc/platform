@@ -38,26 +38,31 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
         ) {
             // test the primary data collection count and order
             $expectedData = $this->expected[JsonApiDoc::DATA];
-            if (is_array($expectedData) && isset($expectedData[0][JsonApiDoc::TYPE])) {
-                $expectedItems = $this->getDataItems($expectedData);
-                $actualItems = $this->getDataItems($other[JsonApiDoc::DATA]);
-                if (!$this->strictPrimaryData) {
-                    ArrayUtil::sortBy($expectedItems, false, JsonApiDoc::ID, SORT_STRING);
-                    ArrayUtil::sortBy($actualItems, false, JsonApiDoc::ID, SORT_STRING);
+            if (is_array($expectedData)) {
+                if (empty($expectedData)) {
+                    \PHPUnit\Framework\Assert::assertSame($this->expected, $other);
                 }
-                try {
-                    \PHPUnit\Framework\Assert::assertSame(
-                        $expectedItems,
-                        $actualItems,
-                        sprintf(
-                            'Failed asserting the primary data collection items count%s.',
-                            $this->strictPrimaryData ? ' and order' : ''
-                        )
-                    );
-                } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-                    $this->errors[] = [[JsonApiDoc::DATA], $e->getMessage()];
+                if (isset($expectedData[0][JsonApiDoc::TYPE])) {
+                    $expectedItems = $this->getDataItems($expectedData);
+                    $actualItems = $this->getDataItems($other[JsonApiDoc::DATA]);
+                    if (!$this->strictPrimaryData) {
+                        ArrayUtil::sortBy($expectedItems, false, JsonApiDoc::ID, SORT_STRING);
+                        ArrayUtil::sortBy($actualItems, false, JsonApiDoc::ID, SORT_STRING);
+                    }
+                    try {
+                        \PHPUnit\Framework\Assert::assertSame(
+                            $expectedItems,
+                            $actualItems,
+                            sprintf(
+                                'Failed asserting the primary data collection items count%s.',
+                                $this->strictPrimaryData ? ' and order' : ''
+                            )
+                        );
+                    } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+                        $this->errors[] = [[JsonApiDoc::DATA], $e->getMessage()];
 
-                    return false;
+                        return false;
+                    }
                 }
             }
         }

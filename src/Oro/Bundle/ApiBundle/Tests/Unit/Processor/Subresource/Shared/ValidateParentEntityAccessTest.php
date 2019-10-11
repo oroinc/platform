@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityAccess
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
-use Oro\Component\EntitySerializer\QueryFactory;
+use Oro\Bundle\ApiBundle\Util\QueryAclHelper;
 
 class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
 {
@@ -20,8 +20,8 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdHelper */
     private $entityIdHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryFactory */
-    private $queryFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryAclHelper */
+    private $queryAclHelper;
 
     /** @var ValidateParentEntityAccess */
     private $processor;
@@ -32,12 +32,12 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->entityIdHelper = $this->createMock(EntityIdHelper::class);
-        $this->queryFactory = $this->createMock(QueryFactory::class);
+        $this->queryAclHelper = $this->createMock(QueryAclHelper::class);
 
         $this->processor = new ValidateParentEntityAccess(
             $this->doctrineHelper,
             $this->entityIdHelper,
-            $this->queryFactory
+            $this->queryAclHelper
         );
     }
 
@@ -104,9 +104,9 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
             ->with(self::identicalTo($qb), $parentId, self::identicalTo($parentMetadata));
 
         $query = $this->createMock(AbstractQuery::class);
-        $this->queryFactory->expects(self::once())
-            ->method('getQuery')
-            ->with(self::identicalTo($qb), self::identicalTo($parentConfig))
+        $this->queryAclHelper->expects(self::once())
+            ->method('protectQuery')
+            ->with(self::identicalTo($qb), self::identicalTo($parentConfig), $this->context->getRequestType())
             ->willReturn($query);
         $query->expects(self::once())
             ->method('getOneOrNullResult')
@@ -154,9 +154,9 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
             ->with(self::identicalTo($qb), $parentId, self::identicalTo($parentMetadata));
 
         $query = $this->createMock(AbstractQuery::class);
-        $this->queryFactory->expects(self::once())
-            ->method('getQuery')
-            ->with(self::identicalTo($qb), self::identicalTo($parentConfig))
+        $this->queryAclHelper->expects(self::once())
+            ->method('protectQuery')
+            ->with(self::identicalTo($qb), self::identicalTo($parentConfig), $this->context->getRequestType())
             ->willReturn($query);
         $query->expects(self::once())
             ->method('getOneOrNullResult')
@@ -213,9 +213,9 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
             ->with(self::identicalTo($qb), $parentId, self::identicalTo($parentMetadata));
 
         $query = $this->createMock(AbstractQuery::class);
-        $this->queryFactory->expects(self::once())
-            ->method('getQuery')
-            ->with(self::identicalTo($qb), self::identicalTo($parentConfig))
+        $this->queryAclHelper->expects(self::once())
+            ->method('protectQuery')
+            ->with(self::identicalTo($qb), self::identicalTo($parentConfig), $this->context->getRequestType())
             ->willReturn($query);
         $query->expects(self::once())
             ->method('getOneOrNullResult')
@@ -269,9 +269,9 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
             ->with(self::identicalTo($qb), $parentId, self::identicalTo($parentMetadata));
 
         $query = $this->createMock(AbstractQuery::class);
-        $this->queryFactory->expects(self::once())
-            ->method('getQuery')
-            ->with(self::identicalTo($qb), self::identicalTo($parentConfig))
+        $this->queryAclHelper->expects(self::once())
+            ->method('protectQuery')
+            ->with(self::identicalTo($qb), self::identicalTo($parentConfig), $this->context->getRequestType())
             ->willReturn($query);
         $query->expects(self::once())
             ->method('getOneOrNullResult')

@@ -686,7 +686,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_id_helper'
-            - '@oro_api.entity_serializer.query_factory'
+            - '@oro_api.query_acl_helper'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: load_data, priority: 100 }
             - { name: oro.api.processor, action: get_relationship, group: load_data, priority: 100 }
@@ -738,7 +738,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_id_helper'
-            - '@oro_api.entity_serializer.query_factory'
+            - '@oro_api.query_acl_helper'
         tags:
             - { name: oro.api.processor, action: delete, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: update, group: load_data, priority: -10 }
@@ -748,7 +748,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_id_helper'
-            - '@oro_api.entity_serializer.query_factory'
+            - '@oro_api.query_acl_helper'
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: add_subresource, group: load_data, priority: -10 }

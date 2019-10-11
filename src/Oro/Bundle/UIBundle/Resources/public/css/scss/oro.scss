@@ -327,6 +327,10 @@ textarea {
 
 .top-messages {
     margin-bottom: 0;
+
+    .ui-dialog-content & {
+        margin-bottom: 16px;
+    }
 }
 
 /* custom form elements */
