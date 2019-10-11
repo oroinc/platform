@@ -378,6 +378,12 @@ services:
             - '@service_container'
             - '@oro_api.request_expression_matcher'
 
+    oro_api.query_acl_helper:
+        class: Oro\Bundle\ApiBundle\Util\QueryAclHelper
+        public: false
+        arguments:
+            - '@oro_api.entity_serializer.query_factory'
+
     oro_api.entity_serializer.field_filter:
         class: Oro\Bundle\SecurityBundle\Filter\EntitySerializerFieldFilter
         arguments:
@@ -413,6 +419,7 @@ services:
         arguments:
             - '@oro_api.entity_serializer.data_transformer'
 
+    # do not use this service directly, use "oro_api.query_acl_helper" instead
     oro_api.entity_serializer.query_factory:
         class: Oro\Bundle\ApiBundle\Util\AclProtectedQueryFactory
         public: false

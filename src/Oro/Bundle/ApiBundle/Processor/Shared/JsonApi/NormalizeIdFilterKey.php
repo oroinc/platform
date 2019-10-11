@@ -42,8 +42,11 @@ class NormalizeIdFilterKey implements ProcessorInterface
             foreach ($filters as $filterKey => $filter) {
                 if ($filter instanceof ComparisonFilter && $filter->getField() === $idFieldName) {
                     $filter->setDescription(self::ID_FILTER_DESCRIPTION);
-                    $filterCollection->remove($filterKey);
-                    $filterCollection->add(JsonApiDoc::ID, $filter);
+                    if (JsonApiDoc::ID !== $filterKey) {
+                        $filterCollection->remove($filterKey);
+                        $filterCollection->add(JsonApiDoc::ID, $filter);
+                    }
+                    break;
                 }
             }
         }
