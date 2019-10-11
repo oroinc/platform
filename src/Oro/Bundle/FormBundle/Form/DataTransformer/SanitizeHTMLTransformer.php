@@ -67,10 +67,6 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
             return $value;
         }
 
-        if (!$this->htmlTagProvider->isPurificationNeeded()) {
-            return $value;
-        }
-
         if (!$this->htmlPurifier) {
             $html5Config = \HTMLPurifier_HTML5Config::createDefault();
             $config = \HTMLPurifier_Config::create($html5Config);

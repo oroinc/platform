@@ -33,21 +33,21 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'scope' => 'app'
                     ]
                 ],
-                'purifier' => [
+                'html_purifier_modes' => [
                     'scope_1' => [
-                        'html_purifier_mode' => 'strict',
+                        'extends' => null,
                         'html_purifier_iframe_domains' => [],
                         'html_purifier_uri_schemes' => [],
                         'html_allowed_elements' => [],
                     ],
                     'scope_2' => [
-                        'html_purifier_mode' => 'disabled',
+                        'extends' => 'scope_1',
                         'html_purifier_iframe_domains' => [],
                         'html_purifier_uri_schemes' => [],
                         'html_allowed_elements' => [],
                     ],
                     'scope_3' => [
-                        'html_purifier_mode' => 'extended',
+                        'extends' => null,
                         'html_purifier_iframe_domains' => [],
                         'html_purifier_uri_schemes' => [],
                         'html_allowed_elements' => [
@@ -60,13 +60,12 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             $processor->processConfiguration(new Configuration(), [[
-                'purifier' => [
+                'html_purifier_modes' => [
                     'scope_1' => [],
                     'scope_2' => [
-                        'html_purifier_mode' => 'disabled'
+                        'extends' => 'scope_1'
                     ],
                     'scope_3' => [
-                        'html_purifier_mode' => 'extended',
                         'html_allowed_elements' => [
                             'table' => [
                                 'attributes' => ['cellspacing', 'cellpadding']
@@ -91,7 +90,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'scope' => 'app'
                     ]
                 ],
-                'purifier' => []
+                'html_purifier_modes' => []
             ],
             $processor->processConfiguration(new Configuration(), [])
         );

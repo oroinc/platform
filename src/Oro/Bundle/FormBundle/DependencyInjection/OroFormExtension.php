@@ -23,29 +23,22 @@ class OroFormExtension extends Extension
         $loader->load('importexport.yml');
         $loader->load('services.yml');
 
-        if (isset($config['purifier']['default']['html_allowed_elements'])) {
+        if (isset($config['html_purifier_modes']['default']['html_allowed_elements'])) {
             $definition = $container->getDefinition('oro_form.provider.html_tag_provider');
-            $definition->replaceArgument(0, $config['purifier']['default']['html_allowed_elements']);
+            $definition->replaceArgument(0, $config['html_purifier_modes']['default']['html_allowed_elements']);
         }
 
-        if (isset($config['purifier']['default']['html_purifier_mode'])) {
-            $container->setParameter(
-                'oro_form.html_purifier_mode',
-                $config['purifier']['default']['html_purifier_mode']
-            );
-        }
-
-        if (isset($config['purifier']['default']['html_purifier_iframe_domains'])) {
+        if (isset($config['html_purifier_modes']['default']['html_purifier_iframe_domains'])) {
             $container->setParameter(
                 'oro_form.html_purifier_iframe_domains',
-                $config['purifier']['default']['html_purifier_iframe_domains']
+                $config['html_purifier_modes']['default']['html_purifier_iframe_domains']
             );
         }
 
-        if (isset($config['purifier']['default']['html_purifier_uri_schemes'])) {
+        if (isset($config['html_purifier_modes']['default']['html_purifier_uri_schemes'])) {
             $container->setParameter(
                 'oro_form.html_purifier_uri_schemes',
-                $config['purifier']['default']['html_purifier_uri_schemes']
+                $config['html_purifier_modes']['default']['html_purifier_uri_schemes']
             );
         }
 

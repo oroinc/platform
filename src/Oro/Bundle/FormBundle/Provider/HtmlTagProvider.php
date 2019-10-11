@@ -8,18 +8,8 @@ namespace Oro\Bundle\FormBundle\Provider;
  */
 class HtmlTagProvider
 {
-    const HTML_PURIFIER_MODE_STRICT = 'strict';
-    const HTML_PURIFIER_MODE_EXTENDED = 'extended';
-    const HTML_PURIFIER_MODE_DISABLED = 'disabled';
-
-    /** elements forbidden in strict mode */
-    const STRICT_ELEMENTS = ['iframe', 'style'];
-
     /** @var array */
     protected $elements = [];
-
-    /** @var string */
-    private $htmlPurifierMode;
 
     /** @var array */
     private $iframeDomains;
@@ -29,22 +19,17 @@ class HtmlTagProvider
 
     /**
      * @param array $elements
-     * @param string $htmlPurifierMode
      * @param array $iframeDomains
      * @param array $uriSchemes
      */
     public function __construct(
         array $elements,
-        $htmlPurifierMode = self::HTML_PURIFIER_MODE_STRICT,
         $iframeDomains = [],
         $uriSchemes = []
     ) {
         $this->elements = $elements;
-        $this->htmlPurifierMode = $htmlPurifierMode;
         $this->iframeDomains = $iframeDomains;
         $this->uriSchemes = $uriSchemes;
-
-        $this->filterElementsForStrictMode($this->elements);
     }
 
     /**
@@ -87,35 +72,6 @@ class HtmlTagProvider
         }
 
         return $allowedTags;
-    }
-
-    private function filterElementsForStrictMode(array &$allowedElements)
-    {
-        if ($this->htmlPurifierMode === self::HTML_PURIFIER_MODE_STRICT) {
-            $allowedElements = array_filter(
-                $allowedElements,
-                function ($allowedElement) {
-                    return !in_array($allowedElement, self::STRICT_ELEMENTS);
-                },
-                ARRAY_FILTER_USE_KEY
-            );
-        }
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPurificationNeeded()
-    {
-        return $this->htmlPurifierMode !== self::HTML_PURIFIER_MODE_DISABLED;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isExtendedPurification()
-    {
-        return $this->htmlPurifierMode === self::HTML_PURIFIER_MODE_EXTENDED;
     }
 
     /**

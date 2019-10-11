@@ -39,62 +39,20 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetAllowedElementsDefault()
     {
         $allowedElements = $this->htmlTagProvider->getAllowedElements();
-        $this->assertEquals(['@[style|class]', 'p', 'span[id]', 'br'], $allowedElements);
-    }
-
-    public function testGetAllowedExtended()
-    {
-        $htmlTagProvider = new HtmlTagProvider($this->elements, HtmlTagProvider::HTML_PURIFIER_MODE_EXTENDED);
-        $allowedElements = $htmlTagProvider->getAllowedElements();
-        $this->assertEquals(
-            ['@[style|class]', 'p', 'span[id]', 'br', 'style[media|type]', 'iframe[allowfullscreen]'],
-            $allowedElements
-        );
+        $this->assertEquals([
+            '@[style|class]', 'p', 'span[id]', 'br', 'style[media|type]', 'iframe[allowfullscreen]'
+        ], $allowedElements);
     }
 
     public function testGetAllowedTags()
     {
         $allowedTags = $this->htmlTagProvider->getAllowedTags();
-        $this->assertEquals('<p></p><span></span><br>', $allowedTags);
-    }
-
-    public function testIsPurificationNeededDefault()
-    {
-        $this->assertTrue($this->htmlTagProvider->isPurificationNeeded());
-    }
-
-    public function testIsPurificationNeededStrict()
-    {
-        $htmlTagProvider = new HtmlTagProvider([], HtmlTagProvider::HTML_PURIFIER_MODE_STRICT);
-        $this->assertTrue($htmlTagProvider->isPurificationNeeded());
-    }
-
-    public function testIsPurificationNeededExtended()
-    {
-        $htmlTagProvider = new HtmlTagProvider([], HtmlTagProvider::HTML_PURIFIER_MODE_EXTENDED);
-        $this->assertTrue($htmlTagProvider->isPurificationNeeded());
-    }
-
-    public function testIsPurificationNeededDisabled()
-    {
-        $htmlTagProvider = new HtmlTagProvider([], HtmlTagProvider::HTML_PURIFIER_MODE_DISABLED);
-        $this->assertFalse($htmlTagProvider->isPurificationNeeded());
-    }
-
-    public function testIsExtendedPurificationDefault()
-    {
-        $this->assertFalse($this->htmlTagProvider->isExtendedPurification());
-    }
-
-    public function testIsExtendedPurificationExtended()
-    {
-        $htmlTagProvider = new HtmlTagProvider([], HtmlTagProvider::HTML_PURIFIER_MODE_EXTENDED);
-        $this->assertTrue($htmlTagProvider->isExtendedPurification());
+        $this->assertEquals('<p></p><span></span><br><style></style><iframe></iframe>', $allowedTags);
     }
 
     public function testGetIframeRegexp()
     {
-        $htmlTagProvider = new HtmlTagProvider([], HtmlTagProvider::HTML_PURIFIER_MODE_EXTENDED, [
+        $htmlTagProvider = new HtmlTagProvider([], [
             'youtube.com/embed/',
             'player.vimeo.com/video/',
         ]);
@@ -110,7 +68,7 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
         $scamUri = 'https://www.scam.com/embed/XWyzuVHRe0A?bypass=https://www.youtube.com/embed/XWyzuVHRe0A';
         $allowedUri = 'https://www.youtube.com/embed/XWyzuVHRe0A';
 
-        $htmlTagProvider = new HtmlTagProvider([], HtmlTagProvider::HTML_PURIFIER_MODE_EXTENDED, [
+        $htmlTagProvider = new HtmlTagProvider([], [
             'youtube.com/embed/',
             'player.vimeo.com/video/',
         ]);
@@ -121,14 +79,14 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetIframeRegexpEmpty()
     {
-        $htmlTagProvider = new HtmlTagProvider([], HtmlTagProvider::HTML_PURIFIER_MODE_EXTENDED);
+        $htmlTagProvider = new HtmlTagProvider([]);
 
         $this->assertEquals('', $htmlTagProvider->getIframeRegexp());
     }
 
     public function testGetUriSchemes()
     {
-        $htmlTagProvider = new HtmlTagProvider([], HtmlTagProvider::HTML_PURIFIER_MODE_EXTENDED, [], [
+        $htmlTagProvider = new HtmlTagProvider([], [], [
             'http',
             'https',
             'ftp',
@@ -146,7 +104,7 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUriSchemesEmpty()
     {
-        $htmlTagProvider = new HtmlTagProvider([], HtmlTagProvider::HTML_PURIFIER_MODE_EXTENDED);
+        $htmlTagProvider = new HtmlTagProvider([]);
 
         $this->assertEquals([], $htmlTagProvider->getUriSchemes());
     }

@@ -69,11 +69,6 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testHtmlPurify()
     {
-        $this->htmlTagProvider->expects($this->never())
-            ->method('isExtendedPurification');
-        $this->htmlTagProvider->expects($this->once())
-            ->method('isPurificationNeeded')
-            ->willReturn(true);
         $this->htmlTagProvider->expects($this->once())
             ->method('getUriSchemes')
             ->willReturn(['http' => true, 'https' => true]);
@@ -105,36 +100,6 @@ same linesame line2
 STR;
 
         $this->assertEquals($expected, $this->helper->purify($testString));
-    }
-
-    public function testHtmlPurifyDisabledPurification()
-    {
-        $this->htmlTagProvider->expects($this->never())
-            ->method('isExtendedPurification');
-        $this->htmlTagProvider->expects($this->once())
-            ->method('isPurificationNeeded')
-            ->willReturn(false);
-
-        $testString = <<<STR
-<html dir="ltr">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="GENERATOR" content="MSHTML 10.00.9200.17228">
-<style id="owaParaStyle">P {
-	MARGIN-BOTTOM: 0px; MARGIN-TOP: 0px
-}
-</style>
-</head>
-<body fPStyle="1" ocsi="0">
-<div style="direction: ltr;font-family: Tahoma;color: #000000;font-size: 10pt;">no subject</div>
-<div style="direction: ltr;font-family: Tahoma;color: #000000;font-size: 10pt;">no subject2</div>
-<span>same line</span><span>same line2</span>
-<p>same line</p><p>same line2</p>
-</body>
-</html>
-STR;
-
-        $this->assertEquals($testString, $this->helper->purify($testString));
     }
 
     public function testEscape()

@@ -34,7 +34,6 @@ services:
         class: '%oro_form.provider.html_tag_provider.class%'
         arguments:
             - []
-            - '%oro_form.html_purifier_mode%'
             - '%oro_form.html_purifier_iframe_domains%'
             - '%oro_form.html_purifier_uri_schemes%'
 

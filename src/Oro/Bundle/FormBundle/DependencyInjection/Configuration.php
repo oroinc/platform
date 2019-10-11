@@ -25,32 +25,29 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->arrayNode('purifier')
+                ->arrayNode('html_purifier_modes')
+                    ->info('Describes scopes and scope rules for HTMLPurifier')
+                    ->useAttributeAsKey('default')
                     ->arrayPrototype()
                         ->info('Collection of scopes that defines the rules for HTMLPurifier')
                         ->children()
-                            ->enumNode('html_purifier_mode')
-                                ->values(['strict', 'extended', 'disabled'])
-                                ->defaultValue('strict')
-                                ->info(
-                                    "\"strict\" - filter html elements and attributes by white list. " .
-                                    "Style and iframe elements are not allowed\n" .
-                                    "\"extended\" - same as strict but style and iframe elements are allowed\n" .
-                                    "\"disabled\" - HTML Purifier is disabled completely"
-                                )
+                            ->scalarNode('extends')
+                                ->info('Extends configuration from selected scope')
+                                ->example('default')
+                                ->defaultNull()
                             ->end()
                             ->arrayNode('html_purifier_iframe_domains')
-                                ->scalarPrototype()->end()
                                 ->info(
                                     'Only these domains will be allowed in iframes ' .
-                                    '(in case iframes are enabled in extended mode)'
+                                    '(in case iframes are enabled in allowed elements)'
                                 )
                                 ->example(['youtube.com/embed/', 'player.vimeo.com/video/'])
+                                ->scalarPrototype()->end()
                             ->end()
                             ->arrayNode('html_purifier_uri_schemes')
-                                ->scalarPrototype()->end()
                                 ->info('Allowed URI schemes for HTMLPurifier')
                                 ->example(['http', 'https', 'mailto', 'ftp', 'data', 'tel'])
+                                ->scalarPrototype()->end()
                             ->end()
                             ->arrayNode('html_allowed_elements')
                                 ->info('Allowed elements and attributes for HTMLPurifier')

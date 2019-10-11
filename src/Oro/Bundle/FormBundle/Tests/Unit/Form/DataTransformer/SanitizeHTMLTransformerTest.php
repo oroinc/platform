@@ -18,9 +18,6 @@ class SanitizeHTMLTransformerTest extends \PHPUnit\Framework\TestCase
     {
         /** @var HtmlTagProvider|\PHPUnit\Framework\MockObject\MockObject $htmlTagProvider */
         $htmlTagProvider = $this->createMock(HtmlTagProvider::class);
-        $htmlTagProvider->expects($this->exactly(2))
-            ->method('isPurificationNeeded')
-            ->willReturn(true);
         $htmlTagProvider->expects($this->once())
             ->method('getIframeRegexp')
             ->willReturn('<^https?://(www.)?(youtube.com/embed/|player.vimeo.com/video/)>');
@@ -38,28 +35,6 @@ class SanitizeHTMLTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             $expected,
             $transformer->reverseTransform($value)
-        );
-    }
-
-    public function testTransformPurifierDisabled()
-    {
-        /** @var HtmlTagProvider|\PHPUnit\Framework\MockObject\MockObject $htmlTagProvider */
-        $htmlTagProvider = $this->createMock(HtmlTagProvider::class);
-        $htmlTagProvider->expects($this->exactly(2))
-            ->method('isPurificationNeeded')
-            ->willReturn(false);
-
-        $allowableTags = 'a';
-        $transformer = new SanitizeHTMLTransformer($htmlTagProvider, $allowableTags);
-
-        $this->assertEquals(
-            '<p>sometext</p>',
-            $transformer->transform('<p>sometext</p>')
-        );
-
-        $this->assertEquals(
-            '<p>sometext</p>',
-            $transformer->reverseTransform('<p>sometext</p>')
         );
     }
 

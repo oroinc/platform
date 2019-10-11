@@ -1,19 +1,6 @@
 oro_form:
-    purifier:
+    html_purifier_modes:
         default:
-            # strict - filter html elements and attributes by white list.
-            #          Style and iframe elements are not allowed
-            # extended - same as strict but style and iframe elements are allowed
-            # disabled - HTML Purifier is disabled completely
-            html_purifier_mode: strict
-
-            # only these domains will be allowed in iframes
-            # (in case iframes are enabled in extended mode)
-            html_purifier_iframe_domains:
-                - 'youtube.com/embed/'
-                - 'player.vimeo.com/video/'
-
-            # allowed URI schemes for HTMLPurifier
             html_purifier_uri_schemes:
                 - 'http'
                 - 'https'
@@ -123,18 +110,6 @@ oro_form:
                 footer: ~
                 header: ~
                 hr: ~
-                iframe:
-                    attributes:
-                        - id
-                        - allowfullscreen
-                        - frameborder
-                        - height
-                        - marginheight
-                        - marginwidth
-                        - name
-                        - scrolling
-                        - src
-                        - width
                 ins: ~
                 kbd: ~
                 mark: ~
@@ -149,10 +124,6 @@ oro_form:
                     attributes:
                         - srcset
                         - media
-                style:
-                    attributes:
-                        - media
-                        - type
                 sub: ~
                 sup: ~
                 time: ~
