@@ -1,0 +1,9 @@
+oro:
+    draft:
+        draftproject:
+            entity_label: Project
+            entity_plural_label: Projects
+            id.label: ID
+            organization.label: Organization
+            owner.label: Owner
+            title.label: Title
