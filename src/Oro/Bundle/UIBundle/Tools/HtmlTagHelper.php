@@ -44,7 +44,7 @@ class HtmlTagHelper
     {
         $transformer = new SanitizeHTMLTransformer(
             $this->htmlTagProvider,
-            implode(',', $this->htmlTagProvider->getAllowedElements()),
+            implode(',', $this->htmlTagProvider->getAllowedElements('default')),
             $this->cacheDir
         );
 
@@ -82,7 +82,7 @@ class HtmlTagHelper
         $string = str_replace('>', '> ', $string);
 
         if ($uiAllowedTags) {
-            return strip_tags($string, $this->htmlTagProvider->getAllowedTags());
+            return strip_tags($string, $this->htmlTagProvider->getAllowedTags('default'));
         }
 
         $result = trim(strip_tags($string));

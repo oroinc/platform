@@ -8,47 +8,43 @@ namespace Oro\Bundle\FormBundle\Provider;
  */
 class HtmlTagProvider
 {
-    /** @var array */
-    protected $elements = [];
+    private const HTML_ALLOWED_ELEMENTS = 'html_allowed_elements';
+    private const HTML_PURIFIER_IFRAME_DOMAINS = 'html_purifier_iframe_domains';
+    private const HTML_PURIFIER_URI_SCHEMES = 'html_purifier_uri_schemes';
 
     /** @var array */
-    private $iframeDomains;
-
-    /** @var array */
-    private $uriSchemes;
+    private $purifierConfig = [];
 
     /**
-     * @param array $elements
-     * @param array $iframeDomains
-     * @param array $uriSchemes
+     * @param array $purifierConfig
      */
-    public function __construct(
-        array $elements,
-        $iframeDomains = [],
-        $uriSchemes = []
-    ) {
-        $this->elements = $elements;
-        $this->iframeDomains = $iframeDomains;
-        $this->uriSchemes = $uriSchemes;
+    public function __construct(array $purifierConfig)
+    {
+        $this->purifierConfig = $purifierConfig;
     }
 
     /**
-     * Returns array of allowed elements to use in TinyMCE plugin
+     * Returns array of allowed elements
      *
+     * @param string $scope
      * @return array
      */
-    public function getAllowedElements()
+    public function getAllowedElements(string $scope): array
     {
         $allowedElements = ['@[style|class]'];
 
-        foreach ($this->elements as $name => $data) {
-            $allowedElement = $name;
-            if (!empty($data['attributes'])) {
-                $allowedElement .= '[' . implode('|', $data['attributes']) . ']';
-            }
+        if (array_key_exists($scope, $this->purifierConfig)
+            && array_key_exists(self::HTML_ALLOWED_ELEMENTS, $this->purifierConfig[$scope])) {
+            foreach ($this->purifierConfig[$scope][self::HTML_ALLOWED_ELEMENTS] as $name => $data) {
+                $allowedElement = $name;
+                if (!empty($data['attributes'])) {
+                    $allowedElement .= '[' . implode('|', $data['attributes']) . ']';
+                }
 
-            $allowedElements[] = $allowedElement;
+                $allowedElements[] = $allowedElement;
+            }
         }
+
 
         return $allowedElements;
     }
@@ -56,45 +52,60 @@ class HtmlTagProvider
     /**
      * Returns string consisted from allowed tags
      *
+     * @param string $scope
      * @return string
      */
-    public function getAllowedTags()
+    public function getAllowedTags(string $scope): string
     {
         $allowedTags = '';
 
-        foreach ($this->elements as $name => $data) {
-            $allowedTag = '<' . $name . '>';
-            if (!array_key_exists('hasClosingTag', $data) || $data['hasClosingTag']) {
-                $allowedTag .= '</' . $name . '>';
-            }
+        if (array_key_exists($scope, $this->purifierConfig)
+            && array_key_exists(self::HTML_ALLOWED_ELEMENTS, $this->purifierConfig[$scope])) {
+            foreach ($this->purifierConfig[$scope][self::HTML_ALLOWED_ELEMENTS] as $name => $data) {
+                $allowedTag = '<' . $name . '>';
+                if (!is_array($data) || !array_key_exists('hasClosingTag', $data) || $data['hasClosingTag']) {
+                    $allowedTag .= '</' . $name . '>';
+                }
 
-            $allowedTags .= $allowedTag;
+                $allowedTags .= $allowedTag;
+            }
         }
 
         return $allowedTags;
     }
 
     /**
+     * @param string $scope
      * @return string
      */
-    public function getIframeRegexp()
+    public function getIframeRegexp(string $scope): string
     {
-        if (!$this->iframeDomains) {
-            return '';
+        if (array_key_exists($scope, $this->purifierConfig)
+            && array_key_exists(self::HTML_PURIFIER_IFRAME_DOMAINS, $this->purifierConfig[$scope])) {
+            $iframeDomains = $this->purifierConfig[$scope][self::HTML_PURIFIER_IFRAME_DOMAINS];
+
+            if (!$iframeDomains) {
+                return '';
+            }
+
+            return sprintf('<^https?://(www.)?(%s)>', implode('|', $iframeDomains));
         }
 
-        return sprintf('<^https?://(www.)?(%s)>', implode('|', $this->iframeDomains));
+        return '';
     }
 
     /**
+     * @param string $scope
      * @return array
      */
-    public function getUriSchemes()
+    public function getUriSchemes(string $scope): array
     {
         $result = [];
-
-        foreach ($this->uriSchemes as $scheme) {
-            $result[$scheme] = true;
+        if (array_key_exists($scope, $this->purifierConfig)
+            && array_key_exists(self::HTML_PURIFIER_URI_SCHEMES, $this->purifierConfig[$scope])) {
+            foreach ($this->purifierConfig[$scope][self::HTML_PURIFIER_URI_SCHEMES] as $scheme) {
+                $result[$scheme] = true;
+            }
         }
 
         return $result;

@@ -23,23 +23,9 @@ class OroFormExtension extends Extension
         $loader->load('importexport.yml');
         $loader->load('services.yml');
 
-        if (isset($config['html_purifier_modes']['default']['html_allowed_elements'])) {
+        if (isset($config['html_purifier_modes'])) {
             $definition = $container->getDefinition('oro_form.provider.html_tag_provider');
-            $definition->replaceArgument(0, $config['html_purifier_modes']['default']['html_allowed_elements']);
-        }
-
-        if (isset($config['html_purifier_modes']['default']['html_purifier_iframe_domains'])) {
-            $container->setParameter(
-                'oro_form.html_purifier_iframe_domains',
-                $config['html_purifier_modes']['default']['html_purifier_iframe_domains']
-            );
-        }
-
-        if (isset($config['html_purifier_modes']['default']['html_purifier_uri_schemes'])) {
-            $container->setParameter(
-                'oro_form.html_purifier_uri_schemes',
-                $config['html_purifier_modes']['default']['html_purifier_uri_schemes']
-            );
+            $definition->replaceArgument(0, $config['html_purifier_modes']);
         }
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));

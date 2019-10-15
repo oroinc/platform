@@ -1,0 +1,22 @@
+default:
+    html_allowed_elements:
+        p: ~
+        span:
+            attributes:
+                - id
+        br:
+            hasClosingTag: false
+        style:
+            attributes:
+                - media
+                - type
+        iframe:
+            attributes:
+                - allowfullscreen
+    html_purifier_iframe_domains:
+        - 'youtube.com/embed/'
+        - 'player.vimeo.com/video/'
+    html_purifier_uri_schemes:
+        - 'http'
+        - 'https'
+        - 'ftp'

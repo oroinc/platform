@@ -123,7 +123,7 @@ class OroRichTextType extends AbstractType
             'plugins'            => self::$defaultPlugins,
             'toolbar_type'       => self::TOOLBAR_DEFAULT,
             'skin_url'           => $assetsBaseUrl . 'bundles/oroform/css/tinymce',
-            'valid_elements'     => implode(',', $this->htmlTagProvider->getAllowedElements()),
+            'valid_elements'     => implode(',', $this->htmlTagProvider->getAllowedElements('default')),
             'menubar'            => false,
             'statusbar'          => false,
             'relative_urls'      => false,

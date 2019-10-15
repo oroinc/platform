@@ -75,11 +75,11 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
             $config->set('HTML.DefinitionRev', self::HTMLPURIFIER_CONFIG_REVISION);
 
             // add inline data support
-            $config->set('URI.AllowedSchemes', $this->htmlTagProvider->getUriSchemes());
+            $config->set('URI.AllowedSchemes', $this->htmlTagProvider->getUriSchemes('default'));
             $config->set('Attr.EnableID', true);
             $config->set('Attr.AllowedFrameTargets', ['_blank']);
             $config->set('HTML.SafeIframe', true);
-            $config->set('URI.SafeIframeRegexp', $this->htmlTagProvider->getIframeRegexp());
+            $config->set('URI.SafeIframeRegexp', $this->htmlTagProvider->getIframeRegexp('default'));
             $config->set('Filter.ExtractStyleBlocks.TidyImpl', false);
             $config->set('CSS.AllowImportant', true);
             $config->set('CSS.AllowTricky', true);
