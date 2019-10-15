@@ -45,8 +45,7 @@ class FormProvider
      */
     public function getOperationExecutionForm(Operation $operation, ActionData $actionData): FormInterface
     {
-        $tokenId = $this->getTokenId($operation, $actionData->getOperationToken());
-        $options = ['csrf_token_id' => $tokenId];
+        $options = ['csrf_token_id' => $operation->getName()];
 
         try {
             return $this->formFactory->create($this->formTypeClass, $operation, $options);
@@ -67,23 +66,11 @@ class FormProvider
      */
     public function createTokenData(Operation $operation, ActionData $actionData): array
     {
-        $tokenId  = $this->getTokenId($operation, $actionData->getOperationToken());
-        $options  = ['csrf_token_id'   => $tokenId];
+        $options  = ['csrf_token_id'   => $operation->getName()];
         $form = $this->formFactory->create($this->formTypeClass, $operation, $options);
         $formView = $form->createView();
         $token    = $formView->children[self::CSRF_TOKEN_FIELD];
 
         return [OperationExecutionType::NAME => [self::CSRF_TOKEN_FIELD => $token->vars['value']]];
-    }
-
-    /**
-     * @param Operation $operation
-     * @param string    $actionKey
-     *
-     * @return string
-     */
-    protected function getTokenId(Operation $operation, string $actionKey): string
-    {
-        return sprintf('%s_%s', $operation->getName(), $actionKey);
     }
 }

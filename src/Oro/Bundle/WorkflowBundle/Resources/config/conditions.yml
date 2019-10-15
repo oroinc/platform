@@ -12,6 +12,7 @@ services:
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
             - '@oro_workflow.manager'
+            - '@oro_security.acl.group_provider.chain'
         tags:
             - { name: oro_action.condition, alias: 'is_granted_workflow_transition' }
 
