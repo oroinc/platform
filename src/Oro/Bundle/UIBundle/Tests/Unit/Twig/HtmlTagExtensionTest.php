@@ -50,6 +50,22 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testHtmlSanitizeWYSIWYG()
+    {
+        $html = '<html>HTML</html>';
+
+        $this->htmlTagHelper
+            ->expects($this->once())
+            ->method('sanitizeWysiwyg')
+            ->with($html)
+            ->willReturn('HTML');
+
+        $this->assertEquals(
+            'HTML',
+            self::callTwigFilter($this->extension, 'oro_html_sanitize_wysiwyg', [$html])
+        );
+    }
+
     public function testHtmlStripTags()
     {
         $html = '<html>HTML</html>';

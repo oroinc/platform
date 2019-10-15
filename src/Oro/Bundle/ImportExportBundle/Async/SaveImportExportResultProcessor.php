@@ -88,6 +88,7 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
             ProcessorRegistry::TYPE_IMPORT_VALIDATION,
         ]);
         $optionResolver->setDefined('userId')->setDefault('userId', null);
+        $optionResolver->setDefined('notifyEmail')->setDefault('notifyEmail', null);
         $optionResolver->setDefined('options')
             ->setAllowedTypes('options', ['array'])
             ->setDefault('options', []);

@@ -79,7 +79,18 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->currentJob);
 
         $expectedMessage = new Message();
-        $expectedMessage->setBody(['jobId' => 1, 'attempts' => 1, 'fileName' => '']);
+        $expectedMessage->setBody(
+            [
+                'jobId' => 1,
+                'attempts' => 1,
+                'fileName' => '',
+                'options' => [
+                    'attempts' => 1,
+                    'max_attempts' => PostponedRowsHandler::MAX_ATTEMPTS,
+                    'incremented_read' => false,
+                ],
+            ]
+        );
         $expectedMessage->setDelay(PostponedRowsHandler::DELAY_SECONDS);
         $this->messageProducer->expects($this->once())
             ->method('send')
@@ -135,12 +146,18 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->currentJob);
 
         $expectedMessage = new Message();
-        $expectedMessage->setBody([
-            'jobId' => 1,
-            'attempts' => 1,
-            'fileName' => '',
-            'options' => ['incremented_read' => false]
-        ]);
+        $expectedMessage->setBody(
+            [
+                'jobId' => 1,
+                'attempts' => 1,
+                'fileName' => '',
+                'options' => [
+                    'incremented_read' => false,
+                    'attempts' => 1,
+                    'max_attempts' => PostponedRowsHandler::MAX_ATTEMPTS,
+                ],
+            ]
+        );
         $expectedMessage->setDelay(PostponedRowsHandler::DELAY_SECONDS);
         $this->messageProducer->expects($this->once())
             ->method('send')
@@ -163,12 +180,18 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
 
         $topic = 'custom_topic';
         $expectedMessage = new Message();
-        $expectedMessage->setBody([
-            'jobId' => 1,
-            'attempts' => 1,
-            'fileName' => '',
-            'options' => ['incremented_read' => false]
-        ]);
+        $expectedMessage->setBody(
+            [
+                'jobId' => 1,
+                'attempts' => 1,
+                'fileName' => '',
+                'options' => [
+                    'incremented_read' => false,
+                    'attempts' => 1,
+                    'max_attempts' => PostponedRowsHandler::MAX_ATTEMPTS,
+                ],
+            ]
+        );
         $expectedMessage->setDelay(PostponedRowsHandler::DELAY_SECONDS);
         $this->messageProducer->expects($this->once())
             ->method('send')

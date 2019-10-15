@@ -121,12 +121,12 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 
     /**
      * @param object $entity
-     * @param null $existingEntity
+     * @param object|null $existingEntity
      * @param array|null $itemData
      */
     protected function checkEntityAcl($entity, $existingEntity = null, $itemData = null)
     {
-        $this->strategyHelper->checkEntityFieldsAcl($this->context, $entity, $existingEntity);
+        $this->strategyHelper->checkImportedEntityFieldsAcl($this->context, $entity, $existingEntity, $itemData);
         $this->strategyHelper->checkEntityOwnerPermissions($this->context, $entity);
     }
 

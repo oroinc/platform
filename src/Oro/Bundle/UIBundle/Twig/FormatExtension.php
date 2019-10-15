@@ -6,6 +6,16 @@ use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Provides Twig functions to render files:
+ *   - asset_path
+ *   - oro_format_filename
+ *
+ * Provides Twig filters for content formatting:
+ *   - oro_format
+ *   - age
+ *   - age_string
+ */
 class FormatExtension extends \Twig_Extension
 {
     /** @var ContainerInterface */
@@ -155,7 +165,7 @@ class FormatExtension extends \Twig_Extension
         }
         $dateDiff = $this->getDateDiff($date, $options);
         if ($dateDiff->invert) {
-            return isset($options['default']) ? $options['default'] : '';
+            return $options['default'] ?? '';
         }
 
         $age = $dateDiff->y;

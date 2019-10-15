@@ -157,6 +157,7 @@ services:
 
     oro_imap.form.google_imap_config_handler:
         class: Oro\Bundle\ImapBundle\Form\Handler\GoogleImapConfigHandler
+        public: true
         arguments:
             - '@doctrine'
             - '@oro_imap.imap_email_google_oauth2_manager'

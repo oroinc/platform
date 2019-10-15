@@ -387,6 +387,16 @@ define(function(require) {
                 this._bindDialogEvents();
                 this.widget.html(this.$el).dialog(dialogOptions);
                 this.getLayoutElement().attr('data-layout', 'separate');
+
+                var minWidth = this.widget.dialog('option', 'minWidth');
+                var maxWidth = this.widget.dialog('option', 'maxWidth');
+
+                if (minWidth || maxWidth) {
+                    this.widget.dialog('instance').element.css({
+                        minWidth: minWidth,
+                        maxWidth: maxWidth
+                    });
+                }
             } else {
                 if (this.widget.dialog('instance') !== void 0 && !this.widget.dialog('isOpen')) {
                     this.widget.dialog('open');
@@ -666,6 +676,7 @@ define(function(require) {
         },
 
         onResizeStart: function(event) {
+            this.widget.dialog('widget').addClass('ui-dialog-resized');
             this.$el.css({overflow: 'hidden'});
             this.forEachComponent(function(component) {
                 component.trigger('parentResizeStart', event, this);

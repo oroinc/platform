@@ -52,7 +52,7 @@ oro:
                 access_denied_entity: Access denied to entity "%entity_name%"
                 access_denied_property_entity: Access denied to property %property_name% of entity "%entity_name%"
                 wrong_owner: You have no access to set given owner
-            postponed_rows: "There were %postponedRows% rows that could not be proccessed."
+            postponed_rows: "%postponedRows% rows could not be processed."
             success.message: "Import started successfully. You will receive an email notification upon completion."
             validate:
                 success.message: "Validation started successfully. You will receive an email notification upon completion."

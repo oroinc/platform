@@ -51,6 +51,16 @@ class HtmlTagHelper
     }
 
     /**
+     * @param string $string
+     *
+     * @return string
+     */
+    public function sanitizeWysiwyg($string)
+    {
+        return $this->sanitize($string);
+    }
+
+    /**
      * Remove all html elements but leave new lines
      *
      * @param string $string

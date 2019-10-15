@@ -16,6 +16,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -25,6 +26,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Helper methods for import strategies.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ImportStrategyHelper
 {
@@ -54,6 +57,9 @@ class ImportStrategyHelper
 
     /** @var OwnerChecker */
     protected $ownerChecker;
+
+    /** @var array */
+    protected $isGrantedCache = [];
 
     /**
      * @param ManagerRegistry $managerRegistry
@@ -179,6 +185,54 @@ class ImportStrategyHelper
     }
 
     /**
+     * @param ContextInterface $context
+     * @param object $entity
+     * @param object|null $existingEntity
+     * @param array|null $itemData
+     *
+     * @return bool
+     */
+    public function checkImportedEntityFieldsAcl(
+        ContextInterface $context,
+        $entity,
+        $existingEntity = null,
+        $itemData = null
+    ): bool {
+        $entityName = ClassUtils::getClass($entity);
+        $fields = $this->fieldHelper->getFields($entityName, true);
+        $action = $existingEntity ? 'EDIT' : 'CREATE';
+        $checkEntity = $existingEntity ?: new ObjectIdentity('entity', $entityName);
+        $isValid = true;
+
+        foreach ($fields as $field) {
+            if ($itemData && !array_key_exists($field['name'], (array) $itemData)) {
+                // Skips ACL check because field is not present in import.
+                continue;
+            }
+
+            if (!$this->isGranted($action, $checkEntity, $field['name'])) {
+                $error = $this->translator->trans(
+                    'oro.importexport.import.errors.access_denied_property_entity',
+                    [
+                        '%property_name%' => $field['name'],
+                        '%entity_name%' => $entityName,
+                    ]
+                );
+                $isValid = false;
+                $context->addError($error);
+                if ($existingEntity) {
+                    $existingValue = $this->fieldHelper->getObjectValue($existingEntity, $field['name']);
+                    $this->fieldHelper->setObjectValue($entity, $field['name'], $existingValue);
+                } else {
+                    $this->fieldHelper->setObjectValue($entity, $field['name'], null);
+                }
+            }
+        }
+
+        return $isValid;
+    }
+
+    /**
      * Checks if an access to a resource is granted to the caller
      *
      * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id,
@@ -195,16 +249,42 @@ class ImportStrategyHelper
         if (!$this->tokenAccessor->hasUser()) {
             return true;
         }
+
+        $cacheKey = $this->getIsGrantedCacheKey($attributes, $obj, $property);
+        if (array_key_exists($cacheKey, $this->isGrantedCache)) {
+            return $this->isGrantedCache[$cacheKey];
+        }
+
         if ($property && !($obj instanceof FieldVote)) {
             $obj = new FieldVote($obj, $property);
         }
 
         try {
-            return $this->authorizationChecker->isGranted($attributes, $obj);
+            $this->isGrantedCache[$cacheKey] = $this->authorizationChecker->isGranted($attributes, $obj);
         } catch (InvalidDomainObjectException $exception) {
             // if object do not have identity we skipp check
-            return true;
+            $this->isGrantedCache[$cacheKey] = true;
         }
+
+        return $this->isGrantedCache[$cacheKey];
+    }
+
+    /**
+     * @param string|string[] $attributes
+     * @param object|string $obj
+     * @param string|null $property
+     *
+     * @return string
+     */
+    private function getIsGrantedCacheKey($attributes, $obj, $property = null): string
+    {
+        if ($obj instanceof ObjectIdentityInterface) {
+            $oid = sprintf('%s:%s', $obj->getIdentifier(), $obj->getType());
+        } else {
+            $oid = is_object($obj) ? \spl_object_hash($obj) : $obj;
+        }
+
+        return sprintf('%s:%s:%s', $oid, implode('_', (array) $attributes), (string) $property);
     }
 
     /**
@@ -292,22 +372,11 @@ class ImportStrategyHelper
      */
     public function addValidationErrors(array $validationErrors, ContextInterface $context, $errorPrefix = null)
     {
-        $batchSize = null;
-        $batchNumber = null;
-        if ($context instanceof BatchContextInterface) {
-            $batchSize = $context->getBatchSize();
-            $batchNumber = $context->getBatchNumber();
-        }
-
         if (null === $errorPrefix) {
-            $rowNumber = $context->getReadOffset();
-            if ($batchNumber && $batchSize) {
-                $rowNumber += --$batchNumber * $batchSize;
-            }
             $errorPrefix = $this->translator->trans(
                 'oro.importexport.import.error %number%',
                 [
-                    '%number%' => $rowNumber
+                    '%number%' => $this->getCurrentRowNumber($context),
                 ]
             );
         }
@@ -370,5 +439,27 @@ class ImportStrategyHelper
             $entityMetadata->getFieldNames(),
             $entityMetadata->getAssociationNames()
         );
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
+     * @return int
+     */
+    public function getCurrentRowNumber(ContextInterface $context): int
+    {
+        $batchSize = null;
+        $batchNumber = null;
+        if ($context instanceof BatchContextInterface) {
+            $batchSize = (int) $context->getBatchSize();
+            $batchNumber = (int) $context->getBatchNumber();
+        }
+
+        $rowNumber = (int) $context->getReadOffset();
+        if ($batchNumber && $batchSize) {
+            $rowNumber += --$batchNumber * $batchSize;
+        }
+
+        return $rowNumber;
     }
 }

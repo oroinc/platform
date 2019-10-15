@@ -33,6 +33,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInterface
 {
+    private const BATCH_SIZE = 100;
+
     /** @var MessageProducerInterface */
     private $messageProducer;
 
@@ -149,22 +151,27 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
 
         $em = $eventArgs->getEntityManager();
         try {
-            $body = $this->auditMessageBodyProvider->prepareMessageBody(
-                $this->processInsertions($em),
-                $this->processUpdates($em),
-                $this->processDeletions($em),
-                $this->processCollectionUpdates($em),
-                $this->getSecurityToken($em)
-            );
+            $insertions = $this->processInsertions($em);
+            $updates = $this->processUpdates($em);
+            $deletes = $this->processDeletions($em);
+            $collectionUpdates = $this->processCollectionUpdates($em);
 
-            if (empty($body)) {
-                return;
-            }
+            do {
+                $body = $this->auditMessageBodyProvider->prepareMessageBody(
+                    array_splice($insertions, 0, self::BATCH_SIZE),
+                    array_splice($updates, 0, self::BATCH_SIZE),
+                    array_splice($deletes, 0, self::BATCH_SIZE),
+                    array_splice($collectionUpdates, 0, self::BATCH_SIZE),
+                    $this->getSecurityToken($em)
+                );
 
-            $this->messageProducer->send(
-                Topics::ENTITIES_CHANGED,
-                new Message($body, MessagePriority::VERY_LOW)
-            );
+                if (!empty($body)) {
+                    $this->messageProducer->send(
+                        Topics::ENTITIES_CHANGED,
+                        new Message($body, MessagePriority::VERY_LOW)
+                    );
+                }
+            } while ($body);
         } finally {
             $this->allInsertions->detach($em);
             $this->allUpdates->detach($em);
@@ -352,15 +359,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
      */
     private function processUpdates(EntityManager $em)
     {
-        $updates = [];
-        if ($this->allUpdates->contains($em)) {
-            foreach ($this->allUpdates[$em] as $entity) {
-                $update = $this->processUpdate($em, $entity, $this->allUpdates[$em][$entity]);
-                if ($update) {
-                    $updates[] = $update;
-                }
-            }
-        }
+        $updates = $this->getUpdates($em);
 
         if ($this->additionalEntityChangesStorage->hasEntityUpdates($em)) {
             $additionalUpdates = $this->additionalEntityChangesStorage->getEntityUpdates($em);
@@ -383,6 +382,26 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
                 }
             }
             $this->additionalEntityChangesStorage->clear($em);
+        }
+
+        return $updates;
+    }
+
+    /**
+     * @param EntityManager $em
+     *
+     * @return array
+     */
+    private function getUpdates(EntityManager $em): array
+    {
+        $updates = [];
+        if ($this->allUpdates->contains($em)) {
+            foreach ($this->allUpdates[$em] as $entity) {
+                $update = $this->processUpdate($em, $entity, $this->allUpdates[$em][$entity]);
+                if ($update) {
+                    $updates[] = $update;
+                }
+            }
         }
 
         return $updates;

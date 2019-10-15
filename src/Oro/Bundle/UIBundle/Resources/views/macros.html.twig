@@ -228,7 +228,7 @@
 #}
 {% macro renderSwitchableHtmlProperty(title, data) %}
     {% if oro_config_value('oro_form.wysiwyg_enabled') %}
-        {% set data = data|oro_html_sanitize %}
+        {% set data = data|oro_html_sanitize_wysiwyg %}
     {%  else %}
         {% set data = data|striptags|nl2br %}
     {% endif %}
@@ -1433,6 +1433,16 @@
         {{ form_widget(form) }}
     </tr>
     {% endspaceless %}
+{% endmacro %}
+
+{% macro render_birthday(birthday) %}
+    {% if birthday is not empty %}
+        {{ birthday|oro_format_date }}
+        {% set age = birthday|age_string([]) %}
+        {{ age is not empty ? '(' ~ age ~ ')': null }}
+    {% else %}
+        {{ 'N/A'|trans }}
+    {% endif %}
 {% endmacro %}
 
 {% macro badge(label, badgeClass = 'info', iconClass = 'fa-circle') %}

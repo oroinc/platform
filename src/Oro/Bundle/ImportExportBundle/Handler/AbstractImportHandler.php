@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
+use Oro\Bundle\BatchBundle\Step\ItemStep;
+use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
@@ -49,14 +51,22 @@ abstract class AbstractImportHandler extends AbstractHandler
      */
     public function splitImportFile($jobName, $processorType, FileStreamWriter $writer)
     {
-        $reader = $this->getJobReader($jobName, $processorType);
+        $step = $this->getJobStep($jobName, $processorType);
+        $reader = $step->getReader();
 
         if (! $reader instanceof AbstractFileReader) {
             throw new LogicException('Reader must be instance of AbstractFileReader');
         }
         $this->batchFileManager->setReader($reader);
         $this->batchFileManager->setWriter($writer);
-        $this->batchFileManager->setConfigurationOptions($this->configurationOptions);
+
+        $options = [];
+        $batchSize = $step instanceof ItemStep ? $step->getBatchSize() : null;
+        if ($batchSize) {
+            $options[Context::OPTION_BATCH_SIZE] = $batchSize;
+        }
+
+        $this->batchFileManager->setConfigurationOptions(array_merge($this->configurationOptions, $options));
 
         return $this->batchFileManager->splitFile($this->getImportingFileName());
     }

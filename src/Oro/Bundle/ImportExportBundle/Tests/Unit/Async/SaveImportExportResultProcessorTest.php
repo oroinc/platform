@@ -61,7 +61,8 @@ class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
                 'jobId' => '1',
                 'type' => ProcessorRegistry::TYPE_EXPORT,
                 'entity' => 'Acme',
-                'options' => $options
+                'options' => $options,
+                'notifyEmail' => 'email@email.com',
             ]));
 
         $this->eventDispatcher

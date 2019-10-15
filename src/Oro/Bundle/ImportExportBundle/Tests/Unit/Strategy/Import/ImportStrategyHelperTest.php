@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\ImportExportBundle\Context\BatchContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
@@ -370,6 +371,127 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    /**
+     * @dataProvider isGrantedWhenUsingCacheDataProvider
+     *
+     * @param bool $isGranted
+     * @param string|string[] $attributes
+     * @param object|string $object
+     */
+    public function testIsGrantedWhenUsingCache(bool $isGranted, $attributes, $object)
+    {
+        $this->tokenAccessor->expects($this->any())
+            ->method('hasUser')
+            ->willReturn(true);
+
+        $this->authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with($attributes, $object)
+            ->willReturn($isGranted);
+
+        $this->assertEquals($isGranted, $this->helper->isGranted($attributes, $object));
+
+        // Ensures that we get same result while authorizationChecker::isGranted is not called again.
+        $this->assertEquals($isGranted, $this->helper->isGranted($attributes, $object));
+    }
+
+    /**
+     * @return array
+     */
+    public function isGrantedWhenUsingCacheDataProvider(): array
+    {
+        return [
+            [
+                'isGranted' => true,
+                'attributes' => 'CREATE',
+                'object' => new \stdClass(),
+            ],
+            [
+                'isGranted' => false,
+                'attributes' => 'CREATE',
+                'object' => 'entity:\stdClass',
+            ],
+            [
+                'isGranted' => true,
+                'attributes' => ['CREATE', 'EDIT'],
+                'object' => 'entity:\stdClass',
+            ],
+            [
+                'isGranted' => false,
+                'attributes' => ['CREATE', 'EDIT'],
+                'object' => new \stdClass(),
+            ],
+            [
+                'isGranted' => true,
+                'attributes' => 'CREATE',
+                'object' => new FieldVote(new \stdClass(), 'testField'),
+            ],
+            [
+                'isGranted' => false,
+                'attributes' => ['CREATE', 'EDIT'],
+                'object' => new FieldVote(new \stdClass(), 'testField'),
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider isGrantedForPropertyWhenUsingCacheDataProvider
+     *
+     * @param bool $isGranted
+     * @param string|string[] $attributes
+     * @param object|string $object
+     * @param string|null $property
+     */
+    public function testIsGrantedForPropertyWhenUsingCache(bool $isGranted, $attributes, $object, $property)
+    {
+        $this->tokenAccessor->expects($this->any())
+            ->method('hasUser')
+            ->willReturn(true);
+
+        $this->authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with($attributes, new FieldVote($object, $property))
+            ->willReturn($isGranted);
+
+        $this->assertEquals($isGranted, $this->helper->isGranted($attributes, $object, $property));
+
+        // Ensures that we get same result while authorizationChecker::isGranted is not called again.
+        $this->assertEquals($isGranted, $this->helper->isGranted($attributes, $object, $property));
+    }
+
+    /**
+     * @return array
+     */
+    public function isGrantedForPropertyWhenUsingCacheDataProvider(): array
+    {
+        return [
+            [
+                'isGranted' => true,
+                'attributes' => 'CREATE',
+                'object' => new \stdClass(),
+                'property' => 'testField',
+            ],
+            [
+                'isGranted' => false,
+                'attributes' => 'CREATE',
+                'object' => 'entity:\stdClass',
+                'property' => 'testField',
+            ],
+            [
+                'isGranted' => true,
+                'attributes' => ['CREATE', 'EDIT'],
+                'object' => 'entity:\stdClass',
+                'property' => 'testField',
+            ],
+            [
+                'isGranted' => false,
+                'attributes' => ['CREATE', 'EDIT'],
+                'object' => new \stdClass(),
+                'property' => 'testField',
+            ],
+        ];
+    }
+
     public function testCheckPermissionGrantedForEntity()
     {
         /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
@@ -412,6 +534,10 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
     {
         /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
+        $context
+            ->method('getReadOffset')
+            ->willReturn(1);
+
         $entity = new \stdClass();
 
         $this->ownerChecker->expects($this->once())
@@ -557,6 +683,128 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->helper->checkEntityFieldsAcl($context, $entity, $existingEntity));
     }
 
+    public function testCheckImportedEntityFieldsAclGrantedForNewEntity()
+    {
+        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
+        $context = $this->createMock(ContextInterface::class);
+        $entity = new \stdClass();
+        $existingEntity = null;
+
+        $this->fieldHelper->expects($this->once())
+            ->method('getFields')
+            ->willReturn([
+                ['name' => 'testField']
+            ]);
+
+        $context->expects($this->never())
+            ->method('addError');
+
+        $this->assertIsGrantedCall(true, 'CREATE', new ObjectIdentity('entity', 'stdClass'), 'testField');
+
+        $this->assertTrue(
+            $this->helper->checkImportedEntityFieldsAcl($context, $entity, $existingEntity, ['testField' => 'TEST'])
+        );
+    }
+
+    public function testCheckImportedEntityFieldsAclGrantedForExistingEntity()
+    {
+        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
+        $context = $this->createMock(ContextInterface::class);
+        $entity = new \stdClass();
+        $existingEntity = new \stdClass();
+
+        $this->fieldHelper->expects($this->once())
+            ->method('getFields')
+            ->willReturn([
+                ['name' => 'testField']
+            ]);
+
+        $context->expects($this->never())
+            ->method('addError');
+
+        $this->assertIsGrantedCall(true, 'EDIT', $existingEntity, 'testField');
+
+        $this->assertTrue(
+            $this->helper->checkImportedEntityFieldsAcl($context, $entity, $existingEntity, ['testField' => 'TEST'])
+        );
+    }
+
+    public function testCheckImportedEntityFieldsAclNotGrantedForExistingEntityNoValue()
+    {
+        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
+        $context = $this->createMock(ContextInterface::class);
+        $entity = new \stdClass();
+        $existingEntity = new \stdClass();
+
+        $this->fieldHelper->expects($this->once())
+            ->method('getFields')
+            ->willReturn([
+                ['name' => 'testField']
+            ]);
+
+        $context->expects($this->never())
+            ->method('addError');
+
+        $this->authorizationChecker->expects($this->never())
+            ->method('isGranted');
+
+        $this->assertTrue(
+            $this->helper->checkImportedEntityFieldsAcl($context, $entity, $existingEntity, ['anotherField' => 'TEST'])
+        );
+    }
+
+    public function testCheckImportedEntityFieldsAclAccessDeniedNewEntity()
+    {
+        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
+        $context = $this->createMock(ContextInterface::class);
+        $entity = new \stdClass();
+        $existingEntity = null;
+
+        $this->fieldHelper->expects($this->once())
+            ->method('getFields')
+            ->willReturn([
+                ['name' => 'testField']
+            ]);
+        $this->fieldHelper->expects($this->once())
+            ->method('setObjectValue')
+            ->with($entity, 'testField', null);
+
+        $this->assertAddError($context, 'oro.importexport.import.errors.access_denied_property_entity');
+        $this->assertIsGrantedCall(false, 'CREATE', new ObjectIdentity('entity', 'stdClass'), 'testField');
+
+        $this->assertFalse(
+            $this->helper->checkImportedEntityFieldsAcl($context, $entity, $existingEntity, ['testField' => 'TEST'])
+        );
+    }
+
+    public function testCheckImportedEntityFieldsAclAccessDeniedExistingEntity()
+    {
+        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
+        $context = $this->createMock(ContextInterface::class);
+        $entity = new \stdClass();
+        $existingEntity = new \stdClass();
+
+        $this->fieldHelper->expects($this->once())
+            ->method('getFields')
+            ->willReturn([
+                ['name' => 'testField']
+            ]);
+        $this->fieldHelper->expects($this->once())
+            ->method('getObjectValue')
+            ->with($existingEntity, 'testField')
+            ->willReturn('OLD');
+        $this->fieldHelper->expects($this->once())
+            ->method('setObjectValue')
+            ->with($entity, 'testField', 'OLD');
+
+        $this->assertAddError($context, 'oro.importexport.import.errors.access_denied_property_entity');
+        $this->assertIsGrantedCall(false, 'EDIT', $existingEntity, 'testField');
+
+        $this->assertFalse(
+            $this->helper->checkImportedEntityFieldsAcl($context, $entity, $existingEntity, ['testField' => 'TEST'])
+        );
+    }
+
     /**
      * @param array $fieldNames
      *
@@ -628,5 +876,38 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $context->expects($this->once())
             ->method('addError')
             ->with($msg . ' TR');
+    }
+
+    public function testGetCurrentRowNumber(): void
+    {
+        $context = $this->createMock(ContextInterface::class);
+        $context
+            ->expects($this->once())
+            ->method('getReadOffset')
+            ->willReturn($rowNumber = 10);
+
+        $this->assertEquals($rowNumber, $this->helper->getCurrentRowNumber($context));
+    }
+
+    public function testGetCurrentRowNumberWhenBatchContextInterface(): void
+    {
+        /** @var ContextInterface|BatchContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
+        $context = $this->getMockBuilder([ContextInterface::class, BatchContextInterface::class])->getMock();
+        $context
+            ->expects($this->once())
+            ->method('getReadOffset')
+            ->willReturn(10);
+
+        $context
+            ->expects($this->once())
+            ->method('getBatchSize')
+            ->willReturn(100);
+
+        $context
+            ->expects($this->once())
+            ->method('getBatchNumber')
+            ->willReturn(2);
+
+        $this->assertEquals(110, $this->helper->getCurrentRowNumber($context));
     }
 }
