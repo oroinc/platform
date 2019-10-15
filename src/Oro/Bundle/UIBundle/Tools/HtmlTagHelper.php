@@ -2,53 +2,107 @@
 
 namespace Oro\Bundle\UIBundle\Tools;
 
-use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
+use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * This class helps format HTML
  */
 class HtmlTagHelper
 {
+    const SUB_DIR = 'ezyang';
+    const MODE = 0775;
+
     const MAX_STRING_LENGTH = 256;
 
-    /** @var HtmlTagProvider */
-    protected $htmlTagProvider;
+    const HTMLPURIFIER_CONFIG_REVISION = 2019072301;
 
-    /** @var string */
-    protected $cacheDir;
+    /**
+     * @var \HtmlPurifier|null
+     */
+    private $htmlPurifier;
 
-    /** @var SanitizeHTMLTransformer|null */
-    protected $purifyTransformer;
+    /**
+     * @var HtmlTagProvider
+     */
+    private $htmlTagProvider;
+
+    /**
+     * @var string
+     */
+    private $cacheDir;
+
+    /**
+     * @var string
+     */
+    private $scope;
 
     /**
      * @param HtmlTagProvider $htmlTagProvider
      * @param string|null $cacheDir
+     * @param string $scope
      */
     public function __construct(
         HtmlTagProvider $htmlTagProvider,
-        $cacheDir = null
+        $cacheDir = null,
+        $scope = 'default'
     ) {
         $this->htmlTagProvider = $htmlTagProvider;
         $this->cacheDir = $cacheDir;
+        $this->scope = $scope;
     }
 
     /**
-     * Remove html elements except allowed
-     *
-     * @param string $string
-     *
+     * @param string $value
+     * @param string $scope
      * @return string
      */
-    public function sanitize($string)
+    public function sanitize($value, $scope = 'default')
     {
-        $transformer = new SanitizeHTMLTransformer(
-            $this->htmlTagProvider,
-            implode(',', $this->htmlTagProvider->getAllowedElements('default')),
-            $this->cacheDir
-        );
+        if (!$value) {
+            return $value;
+        }
 
-        return $transformer->transform($string);
+        if (!$this->htmlPurifier) {
+            $html5Config = \HTMLPurifier_HTML5Config::createDefault();
+            $config = \HTMLPurifier_Config::create($html5Config);
+
+            $config->set('HTML.DefinitionID', __CLASS__);
+            $config->set('HTML.DefinitionRev', self::HTMLPURIFIER_CONFIG_REVISION);
+
+            // add inline data support
+            $config->set('URI.AllowedSchemes', $this->htmlTagProvider->getUriSchemes($scope));
+            $config->set('Attr.EnableID', true);
+            $config->set('Attr.AllowedFrameTargets', ['_blank']);
+            $config->set('HTML.SafeIframe', true);
+            $config->set('URI.SafeIframeRegexp', $this->htmlTagProvider->getIframeRegexp($scope));
+            $config->set('Filter.ExtractStyleBlocks.TidyImpl', false);
+            $config->set('CSS.AllowImportant', true);
+            $config->set('CSS.AllowTricky', true);
+            $config->set('CSS.Proprietary', true);
+            $config->set('CSS.Trusted', true);
+
+            $this->fillAllowedElementsConfig($config, $scope);
+            $this->fillCacheConfig($config);
+
+            if ($def = $config->maybeGetRawHTMLDefinition()) {
+                $def->addElement(
+                    'style',
+                    'Block',
+                    'Flow',
+                    'Common',
+                    [
+                        'type' => 'Enum#text/css',
+                        'media' => 'CDATA',
+                    ]
+                );
+            }
+
+            $this->htmlPurifier = new \HTMLPurifier($config);
+        }
+
+        return $this->htmlPurifier->purify($value);
     }
 
     /**
@@ -59,15 +113,7 @@ class HtmlTagHelper
      */
     public function purify($string)
     {
-        if (!$this->purifyTransformer) {
-            $this->purifyTransformer = new SanitizeHTMLTransformer(
-                $this->htmlTagProvider,
-                null,
-                $this->cacheDir
-            );
-        }
-
-        return trim($this->purifyTransformer->transform($string));
+        return trim($this->sanitize($string));
     }
 
     /**
@@ -147,5 +193,53 @@ class HtmlTagHelper
         );
 
         return implode(' ', $words);
+    }
+
+    /**
+     * Configure cache
+     *
+     * @param \HTMLPurifier_Config $config
+     */
+    private function fillCacheConfig($config)
+    {
+        if ($this->cacheDir) {
+            $cacheDir = $this->cacheDir . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . self::SUB_DIR;
+            $this->touchCacheDir($cacheDir);
+            $config->set('Cache.SerializerPath', $cacheDir);
+            $config->set('Cache.SerializerPermissions', self::MODE);
+        } else {
+            $config->set('Cache.DefinitionImpl', null);
+        }
+    }
+
+    /**
+     * Configure allowed tags
+     *
+     * @param \HTMLPurifier_Config $config
+     * @param string $scope
+     */
+    private function fillAllowedElementsConfig($config, $scope)
+    {
+        $converter = new TagDefinitionConverter();
+        $allowedElements = implode(',', $this->htmlTagProvider->getAllowedElements($scope));
+        if ($allowedElements) {
+            $config->set('HTML.AllowedElements', $converter->getElements($allowedElements));
+            $config->set('HTML.AllowedAttributes', $converter->getAttributes($allowedElements));
+        } else {
+            $config->set('HTML.Allowed', '');
+        }
+    }
+
+    /**
+     * Create cache dir if need
+     *
+     * @param string $cacheDir
+     */
+    private function touchCacheDir($cacheDir)
+    {
+        $fs = new Filesystem();
+        if (!$fs->exists($cacheDir)) {
+            $fs->mkdir($cacheDir, self::MODE);
+        }
     }
 }

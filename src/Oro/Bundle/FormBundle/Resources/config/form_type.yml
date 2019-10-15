@@ -161,7 +161,7 @@ services:
             - '@oro_config.user'
             - '@oro_form.provider.html_tag_provider'
             - '@assets.context'
-            - '%kernel.cache_dir%'
+            - '@oro_ui.html_tag_helper'
         calls:
             - [setAssetHelper, ['@assets.packages']]
         tags:

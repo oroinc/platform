@@ -5,6 +5,7 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Component\Form\AbstractType;
@@ -35,8 +36,8 @@ class OroRichTextType extends AbstractType
     /** @var ContextInterface */
     protected $context;
 
-    /** @var string */
-    protected $cacheDir;
+    /** @var HtmlTagHelper */
+    private $htmlTagHelper;
 
     /**
      * @url http://www.tinymce.com/wiki.php/Configuration:toolbar
@@ -65,18 +66,18 @@ class OroRichTextType extends AbstractType
      * @param ConfigManager $configManager
      * @param HtmlTagProvider $htmlTagProvider
      * @param ContextInterface $context
-     * @param string $cacheDir
+     * @param HtmlTagHelper $htmlTagHelper
      */
     public function __construct(
         ConfigManager $configManager,
         HtmlTagProvider $htmlTagProvider,
         ContextInterface $context,
-        $cacheDir = null
+        HtmlTagHelper $htmlTagHelper
     ) {
         $this->configManager   = $configManager;
         $this->htmlTagProvider = $htmlTagProvider;
         $this->context         = $context;
-        $this->cacheDir        = $cacheDir;
+        $this->htmlTagHelper   = $htmlTagHelper;
     }
 
     /**
@@ -93,11 +94,7 @@ class OroRichTextType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (null !== $options['wysiwyg_options']['valid_elements']) {
-            $builder->addModelTransformer(new SanitizeHTMLTransformer(
-                $this->htmlTagProvider,
-                $options['wysiwyg_options']['valid_elements'],
-                $this->cacheDir
-            ));
+            $builder->addModelTransformer(new SanitizeHTMLTransformer($this->htmlTagHelper));
         }
     }
 
