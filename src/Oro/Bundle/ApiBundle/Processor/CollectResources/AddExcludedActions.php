@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 
 use Oro\Bundle\ApiBundle\Config\ActionsConfig;
 use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeActionConfigHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -20,21 +21,27 @@ class AddExcludedActions implements ProcessorInterface
     public const ACTIONS_CONFIG_KEY = 'actions_config';
 
     /** @var ConfigLoaderFactory */
-    protected $configLoaderFactory;
+    private $configLoaderFactory;
 
     /** @var ConfigBagRegistry */
-    protected $configBagRegistry;
+    private $configBagRegistry;
+
+    /** @var MergeActionConfigHelper */
+    private $mergeActionConfigHelper;
 
     /**
-     * @param ConfigLoaderFactory $configLoaderFactory
-     * @param ConfigBagRegistry   $configBagRegistry
+     * @param ConfigLoaderFactory     $configLoaderFactory
+     * @param ConfigBagRegistry       $configBagRegistry
+     * @param MergeActionConfigHelper $mergeActionConfigHelper
      */
     public function __construct(
         ConfigLoaderFactory $configLoaderFactory,
-        ConfigBagRegistry $configBagRegistry
+        ConfigBagRegistry $configBagRegistry,
+        MergeActionConfigHelper $mergeActionConfigHelper
     ) {
         $this->configLoaderFactory = $configLoaderFactory;
         $this->configBagRegistry = $configBagRegistry;
+        $this->mergeActionConfigHelper = $mergeActionConfigHelper;
     }
 
     /**
@@ -67,19 +74,20 @@ class AddExcludedActions implements ProcessorInterface
     /**
      * Loads configuration from the "actions" section from "Resources/config/oro/api.yml"
      *
-     * @param string $entityClass
-     * @param string $version
+     * @param string      $entityClass
+     * @param string      $version
      * @param RequestType $requestType
      *
      * @return ActionsConfig|null
      */
-    protected function getActionsConfig($entityClass, $version, RequestType $requestType)
+    private function getActionsConfig(string $entityClass, string $version, RequestType $requestType): ?ActionsConfig
     {
         $actions = null;
-        $config = $this->configBagRegistry->getConfigBag($requestType)->getConfig($entityClass, $version);
-        if (null !== $config && !empty($config[ConfigUtil::ACTIONS])) {
-            $actionsLoader = $this->configLoaderFactory->getLoader(ConfigUtil::ACTIONS);
-            $actions = $actionsLoader->load($config[ConfigUtil::ACTIONS]);
+        $configs = $this->mergeActionConfigs(
+            $this->getConfigs($entityClass, $version, $requestType)
+        );
+        if ($configs) {
+            $actions = $this->configLoaderFactory->getLoader(ConfigUtil::ACTIONS)->load($configs);
         }
 
         return $actions;
@@ -90,7 +98,7 @@ class AddExcludedActions implements ProcessorInterface
      *
      * @return string[]
      */
-    protected function getExcludedActions(ActionsConfig $actions)
+    private function getExcludedActions(ActionsConfig $actions): array
     {
         $result = [];
 
@@ -98,6 +106,98 @@ class AddExcludedActions implements ProcessorInterface
         foreach ($items as $actionName => $action) {
             if ($action->isExcluded()) {
                 $result[] = $actionName;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string      $entityClass
+     * @param string      $version
+     * @param RequestType $requestType
+     *
+     * @return array
+     */
+    private function getConfigs(string $entityClass, string $version, RequestType $requestType): array
+    {
+        $configs = [];
+        $config = $this->getConfig($entityClass, $version, $requestType);
+        if ($config) {
+            $configs[] = $config;
+        }
+        if ($this->isInherit($config)) {
+            $parentClass = (new \ReflectionClass($entityClass))->getParentClass();
+            while ($parentClass) {
+                $config = $this->getConfig($parentClass->getName(), $version, $requestType);
+                if ($config) {
+                    $configs[] = $config;
+                }
+                if (!$this->isInherit($config)) {
+                    break;
+                }
+                $parentClass = $parentClass->getParentClass();
+            }
+        }
+
+        return $configs;
+    }
+
+    /**
+     * @param string      $entityClass
+     * @param string      $version
+     * @param RequestType $requestType
+     *
+     * @return array|null
+     */
+    private function getConfig(string $entityClass, string $version, RequestType $requestType): ?array
+    {
+        return $this->configBagRegistry->getConfigBag($requestType)->getConfig($entityClass, $version);
+    }
+
+    /**
+     * @param array|null $config
+     *
+     * @return bool
+     */
+    private function isInherit(?array $config): bool
+    {
+        if (null !== $config && array_key_exists(ConfigUtil::INHERIT, $config)) {
+            return $config[ConfigUtil::INHERIT];
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array $configs
+     *
+     * @return array
+     */
+    private function mergeActionConfigs(array $configs): array
+    {
+        $result = [];
+        $configs = array_reverse($configs);
+        foreach ($configs as $config) {
+            if (empty($config[ConfigUtil::ACTIONS])) {
+                continue;
+            }
+            $actionConfigs = $config[ConfigUtil::ACTIONS];
+            foreach ($actionConfigs as $action => $actionConfig) {
+                if ($actionConfig) {
+                    if (isset($result[$action])) {
+                        $result[$action] = $this->mergeActionConfigHelper->mergeActionConfig(
+                            $result[$action],
+                            $actionConfig,
+                            false
+                        );
+                        if (isset($actionConfig[ConfigUtil::EXCLUDE])) {
+                            $result[$action][ConfigUtil::EXCLUDE] = $actionConfig[ConfigUtil::EXCLUDE];
+                        }
+                    } else {
+                        $result[$action] = $actionConfig;
+                    }
+                }
             }
         }
 

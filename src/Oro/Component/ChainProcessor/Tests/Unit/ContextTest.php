@@ -127,12 +127,13 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $context->setResult('test');
         $this->assertTrue($context->hasResult());
         $this->assertEquals('test', $context->getResult());
-        $this->assertEquals('test', $context->get(Context::RESULT));
 
         $context->setResult(null);
         $this->assertTrue($context->hasResult());
+        $this->assertNull($context->getResult());
 
         $context->removeResult();
         $this->assertFalse($context->hasResult());
+        $this->assertNull($context->getResult());
     }
 }

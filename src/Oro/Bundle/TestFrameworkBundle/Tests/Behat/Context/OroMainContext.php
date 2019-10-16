@@ -553,8 +553,8 @@ class OroMainContext extends MinkContext implements
         $session = $driver->getWebDriverSession();
 
         try {
-            $session->accept_alert();
             $alertMessage = $session->getAlert_text();
+            $session->accept_alert();
         } catch (NoAlertOpenError $e) {
             return;
         }
@@ -733,6 +733,22 @@ class OroMainContext extends MinkContext implements
         $sidebarMenu = $this->createElement('SidebarMenu');
         self::assertTrue($sidebarMenu->isValid());
         $sidebarMenu->clickLink($needle);
+    }
+
+    /**
+     * Example: When I click "Users" in "sidebar menu" element
+     *
+     * @Given /^(?:|I )click "(?P<needle>(?:[^"]|\\")*)" in "(?P<element>(?:[^"]|\\")*)" element$/
+     *
+     * @param string $needle
+     * @param string $element
+     */
+    public function iClickOnSmthInElement(string $needle, string $element)
+    {
+        $element = $this->createElement($element);
+        self::assertTrue($element->isValid());
+
+        $element->clickOrPress($needle);
     }
 
     /**

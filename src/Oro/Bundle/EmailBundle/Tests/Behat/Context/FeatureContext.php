@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Behat\Context;
 
+use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -9,6 +10,9 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
+/**
+ * The execution context for test manipulations with email notifications
+ */
 class FeatureContext extends OroFeatureContext implements
     OroPageObjectAware,
     FixtureLoaderAwareInterface
@@ -123,5 +127,45 @@ class FeatureContext extends OroFeatureContext implements
         self::assertNotNull($email, "Email with '$emailTitle' title not found");
 
         $email->getElement('ReadUnreadIcon')->click();
+    }
+
+    /**
+     * @When /^(?:|I )attach "(?P<fileName>.*)" file to email$/
+     * @param string $fileName
+     */
+    public function iAttachFileToEmail(string $fileName)
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+
+        // Suppress opening of a choose file dialog
+        $javascipt = <<<JS
+        HTMLInputElement.prototype.click = function() {                     
+            if(this.type !== 'file') HTMLElement.prototype.click.call(this);
+        };                                                               
+JS;
+        $driver->evaluateScript($javascipt);
+
+        $uploadLink = $this->createElement('Upload Email Attachment Link');
+        $uploadLink->click();
+
+        $uploadFile = $this->createElement('Upload Email Attachment File');
+        $uploadFile->setValue($fileName);
+    }
+
+    /**
+     * Example: I follow "Reply All" on "Merry Christmas" email notification
+     *
+     * @Given /^I follow "(?P<locator>[^"]+)" on "(?P<emailTitle>[^"]+)" email notification$/
+     *
+     * @param string $locator
+     * @param string $emailTitle
+     */
+    public function iFollowLinkOnEmailNotification(string $locator, string $emailTitle): void
+    {
+        $email = $this->createElement('ShortEmailList')->findElementContains('EmailListItem', $emailTitle);
+        self::assertNotNull($email, "Email with '$emailTitle' title not found");
+
+        $email->clickLink($locator);
     }
 }

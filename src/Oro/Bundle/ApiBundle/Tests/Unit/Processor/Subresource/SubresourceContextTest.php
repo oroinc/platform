@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\HateoasConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\Extra\HateoasMetadataExtra;
@@ -120,6 +121,22 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
             [new EntityDefinitionConfigExtra('get_list')],
             $this->context->getParentConfigExtras()
         );
+    }
+
+    public function testSetParentConfigExtrasForHateoas()
+    {
+        $this->context->setHateoas(true);
+        $configExtra = new TestConfigExtra('test');
+
+        $this->context->setParentConfigExtras([$configExtra]);
+        self::assertEquals(
+            [$configExtra, new HateoasConfigExtra()],
+            $this->context->getParentConfigExtras()
+        );
+
+        $configExtras = [new HateoasConfigExtra(), $configExtra];
+        $this->context->setParentConfigExtras($configExtras);
+        self::assertEquals($configExtras, $this->context->getParentConfigExtras());
     }
 
     public function testRemoveParentConfigExtras()
@@ -394,6 +411,37 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testSetParentMetadataExtrasForHateoas()
+    {
+        $this->context->setHateoas(true);
+        $metadataExtra = new TestMetadataExtra('test');
+
+        $this->context->setParentMetadataExtras([$metadataExtra]);
+        self::assertEquals(
+            [$metadataExtra, new HateoasMetadataExtra($this->context->getFilterValues())],
+            $this->context->getParentMetadataExtras()
+        );
+
+        $metadataExtras = [new HateoasMetadataExtra($this->context->getFilterValues()), $metadataExtra];
+        $this->context->setParentMetadataExtras($metadataExtras);
+        self::assertEquals($metadataExtras, $this->context->getParentMetadataExtras());
+    }
+
+    public function testGetParentMetadataExtrasForHateoas()
+    {
+        $this->context->setHateoas(true);
+
+        self::assertEquals(
+            [new HateoasMetadataExtra($this->context->getFilterValues())],
+            $this->context->getParentMetadataExtras()
+        );
+    }
+
+    public function testGetParentMetadataExtrasForNoHateoas()
+    {
+        self::assertEquals([], $this->context->getParentMetadataExtras());
+    }
+
     public function testRemoveParentMetadataExtras()
     {
         $this->context->setParentMetadataExtras([]);
@@ -504,7 +552,8 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
                     new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
                     new FilterFieldsConfigExtra(
                         [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
-                    )
+                    ),
+                    new HateoasConfigExtra()
                 ]
             )
             ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
@@ -627,5 +676,92 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         // test remove metadata
         $this->context->setParentMetadata(null);
         self::assertFalse($this->context->hasParentMetadata());
+    }
+
+    public function testHateoas()
+    {
+        self::assertFalse($this->context->isHateoasEnabled());
+        self::assertFalse($this->context->get('hateoas'));
+
+        $this->context->setHateoas(true);
+        self::assertTrue($this->context->isHateoasEnabled());
+        self::assertTrue($this->context->get('hateoas'));
+
+        $this->context->setHateoas(false);
+        self::assertFalse($this->context->isHateoasEnabled());
+        self::assertFalse($this->context->get('hateoas'));
+    }
+
+    public function testHateoasForConfigExtras()
+    {
+        $this->context->setHateoas(true);
+        self::assertEquals([new HateoasConfigExtra()], $this->context->getConfigExtras());
+
+        $this->context->setHateoas(false);
+        self::assertEquals([], $this->context->getConfigExtras());
+    }
+
+    public function testHateoasForMetadataExtras()
+    {
+        // make sure that metadata extras are initialized
+        $this->context->getMetadataExtras();
+
+        $this->context->setHateoas(true);
+        self::assertEquals(
+            [new HateoasMetadataExtra($this->context->getFilterValues())],
+            $this->context->getMetadataExtras()
+        );
+
+        $this->context->setHateoas(false);
+        self::assertEquals([], $this->context->getMetadataExtras());
+    }
+
+    public function testHateoasForParentConfigExtras()
+    {
+        $this->context->setAction('action');
+        $this->context->setParentClassName('Test\ParentEntity');
+        $this->context->setAssociationName('test');
+
+        $this->context->setHateoas(true);
+        self::assertEquals(
+            [
+                new EntityDefinitionConfigExtra('action', false, 'Test\ParentEntity', 'test'),
+                new FilterFieldsConfigExtra(['Test\ParentEntity' => ['test']]),
+                new HateoasConfigExtra()
+            ],
+            $this->context->getParentConfigExtras()
+        );
+
+        $this->context->setHateoas(false);
+        self::assertEquals(
+            [
+                new EntityDefinitionConfigExtra('action', false, 'Test\ParentEntity', 'test'),
+                new FilterFieldsConfigExtra(['Test\ParentEntity' => ['test']])
+            ],
+            $this->context->getParentConfigExtras()
+        );
+    }
+
+    public function testHateoasForParentMetadataExtras()
+    {
+        $this->context->setAction('action');
+
+        // make sure that metadata extras are initialized
+        $this->context->getParentMetadataExtras();
+
+        $this->context->setHateoas(true);
+        self::assertEquals(
+            [
+                new ActionMetadataExtra('action'),
+                new HateoasMetadataExtra($this->context->getFilterValues())
+            ],
+            $this->context->getParentMetadataExtras()
+        );
+
+        $this->context->setHateoas(false);
+        self::assertEquals(
+            [new ActionMetadataExtra('action')],
+            $this->context->getParentMetadataExtras()
+        );
     }
 }

@@ -592,7 +592,6 @@ services:
                 - image
                 - enum
                 - multiEnum
-                - html_escaped
             -
                 #BAP-5875
                 #- oneToOne
@@ -710,3 +709,11 @@ services:
             - '@oro_entity_config.provider.attribute'
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.attribute_field }
+
+    oro_entity_extend.migration.update_html_escaped_type.pre.listener:
+        class:  Oro\Bundle\EntityExtendBundle\EventListener\UpdateHtmlEscapedTypePreMigrationListener
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp }

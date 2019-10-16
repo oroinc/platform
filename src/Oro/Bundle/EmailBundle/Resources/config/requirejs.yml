@@ -22,6 +22,7 @@ config:
         'oroemail/js/app/views/unread-emails-counter-view': 'bundles/oroemail/js/app/views/unread-emails-counter-view.js'
         'oroemail/js/app/views/check-smtp-connection-view': 'bundles/oroemail/js/app/views/check-smtp-connection-view.js'
         'oroemail/js/app/views/email-template-editor-view': 'bundles/oroemail/js/app/views/email-template-editor-view.js'
+        'oroemail/js/app/views/email-template-localization-view': 'bundles/oroemail/js/app/views/email-template-localization-view.js'
         'oroemail/js/app/views/email-field-condition-view': 'bundles/oroemail/js/app/views/email-field-condition-view.js'
 
         'oroemail/js/app/views/mailbox-update-view': 'bundles/oroemail/js/app/views/mailbox-update-view.js'

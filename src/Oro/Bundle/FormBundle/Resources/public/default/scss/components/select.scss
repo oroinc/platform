@@ -29,5 +29,10 @@
 
     @include element-state('error') {
         box-shadow: $select-box-shadow-error-state;
-    };
+    }
+
+    @include element-state('disabled') {
+        background-color: get-color('additional', 'base');
+        pointer-events: none;
+    }
 }

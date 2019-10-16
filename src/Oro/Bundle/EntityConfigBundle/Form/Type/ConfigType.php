@@ -13,8 +13,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form for entity and entity field configuration options.
+ */
 class ConfigType extends AbstractType
 {
     /** @var ConfigTranslationHelper */
@@ -47,7 +51,7 @@ class ConfigType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $configModel = $options['config_model'];
-        $data        = array();
+        $data        = [];
 
         if ($configModel instanceof FieldConfigModel) {
             $className  = $configModel->getEntity()->getClassName();
@@ -61,23 +65,23 @@ class ConfigType extends AbstractType
             $builder->add(
                 'fieldName',
                 TextType::class,
-                array(
+                [
                     'label'     => 'oro.entity_config.form.name.label',
                     'block'     => 'general',
                     'disabled'  => true,
                     'data'      => $fieldName,
-                )
+                ]
             );
             $builder->add(
                 'type',
                 ChoiceType::class,
-                array(
+                [
                     'label'       => 'oro.entity_config.form.type.label',
                     'choices'     => [],
                     'block'       => 'general',
                     'disabled'    => true,
                     'placeholder' => 'oro.entity_extend.form.data_type.' . $fieldType
-                )
+                ]
             );
         } else {
             $className  = $configModel->getClassName();
@@ -93,13 +97,13 @@ class ConfigType extends AbstractType
                 $builder->add(
                     $provider->getScope(),
                     ConfigScopeType::class,
-                    array(
+                    [
                         'items' => $provider->getPropertyConfig()->getFormItems($configType, $fieldType),
                         'config' => $config,
                         'config_model' => $configModel,
                         'config_manager' => $this->configManager,
                         'block_config' => $this->getFormBlockConfig($provider, $configType)
-                    )
+                    ]
                 );
                 $data[$provider->getScope()] = $config->all();
             }
@@ -121,9 +125,17 @@ class ConfigType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(array('config_model'));
-
+        $resolver->setRequired(['config_model']);
         $resolver->setAllowedTypes('config_model', 'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel');
+        $resolver->setDefault('field_name', function (Options $options) {
+            $configModel = $options['config_model'];
+            if ($configModel instanceof FieldConfigModel && !$configModel->getId()) {
+                return $configModel->getFieldName();
+            }
+
+            return '';
+        });
+        $resolver->setAllowedTypes('field_name', ['string', 'null']);
     }
 
     /**

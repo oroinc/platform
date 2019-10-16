@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Mailer;
 
-use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
@@ -21,9 +21,9 @@ class UserTemplateEmailSenderTest extends \PHPUnit\Framework\TestCase
     private $notificationSettingsModel;
 
     /**
-     * @var TemplateEmailManager|MockObject
+     * @var EmailTemplateManager|MockObject
      */
-    private $templateEmailManager;
+    private $emailTemplateManager;
 
     /**
      * @var UserTemplateEmailSender
@@ -33,9 +33,9 @@ class UserTemplateEmailSenderTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->notificationSettingsModel = $this->createMock(NotificationSettings::class);
-        $this->templateEmailManager = $this->createMock(TemplateEmailManager::class);
+        $this->emailTemplateManager = $this->createMock(EmailTemplateManager::class);
 
-        $this->sender = new UserTemplateEmailSender($this->notificationSettingsModel, $this->templateEmailManager);
+        $this->sender = new UserTemplateEmailSender($this->notificationSettingsModel, $this->emailTemplateManager);
     }
 
     public function testSendUserTemplateEmailWithoutScope(): void
@@ -49,7 +49,7 @@ class UserTemplateEmailSenderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($sender);
 
         $returnValue = 1;
-        $this->templateEmailManager
+        $this->emailTemplateManager
             ->expects($this->once())
             ->method('sendTemplateEmail')
             ->with(
@@ -79,7 +79,7 @@ class UserTemplateEmailSenderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($sender);
 
         $returnValue = 1;
-        $this->templateEmailManager
+        $this->emailTemplateManager
             ->expects($this->once())
             ->method('sendTemplateEmail')
             ->with(

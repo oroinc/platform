@@ -14,10 +14,10 @@ use Oro\Bundle\ApiBundle\Request\ApiResourceSubresourcesCollection;
 class CollectSubresourcesContext extends ApiContext
 {
     /** @var ApiResource[] [entity class => ApiResource, ... ] */
-    protected $resources = [];
+    private $resources = [];
 
     /** @var string[] */
-    protected $accessibleResources = [];
+    private $accessibleResources = [];
 
     /**
      * {@inheritdoc}
@@ -49,9 +49,7 @@ class CollectSubresourcesContext extends ApiContext
      */
     public function getResource($entityClass)
     {
-        return isset($this->resources[$entityClass])
-            ? $this->resources[$entityClass]
-            : null;
+        return $this->resources[$entityClass] ?? null;
     }
 
     /**

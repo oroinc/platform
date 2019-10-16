@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender;
 
-use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSenderInterface;
@@ -19,20 +19,20 @@ class EmailNotificationSender implements NotificationSenderInterface
     private $notificationSettingsModel;
 
     /**
-     * @var TemplateEmailManager
+     * @var EmailTemplateManager
      */
-    private $templateEmailManager;
+    private $emailTemplateManager;
 
     /**
      * @param NotificationSettings $notificationSettingsModel
-     * @param TemplateEmailManager $templateEmailManager
+     * @param EmailTemplateManager $emailTemplateManager
      */
     public function __construct(
         NotificationSettings $notificationSettingsModel,
-        TemplateEmailManager $templateEmailManager
+        EmailTemplateManager $emailTemplateManager
     ) {
         $this->notificationSettingsModel = $notificationSettingsModel;
-        $this->templateEmailManager = $templateEmailManager;
+        $this->emailTemplateManager = $emailTemplateManager;
     }
 
     /**
@@ -54,7 +54,7 @@ class EmailNotificationSender implements NotificationSenderInterface
             'host' => $emailOrigin->getImapHost()
         ];
 
-        $this->templateEmailManager->sendTemplateEmail(
+        $this->emailTemplateManager->sendTemplateEmail(
             $this->notificationSettingsModel->getSender(),
             [$sendTo],
             new EmailTemplateCriteria($templateName),

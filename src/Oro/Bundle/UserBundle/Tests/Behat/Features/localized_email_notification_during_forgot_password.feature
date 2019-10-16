@@ -41,12 +41,16 @@ Feature: Localized email notification during forgot password
       | Content | English Forgot Password Body    |
     And I click "French"
     And fill "Email Template Form" with:
-      | Subject | French Forgot Password Subject |
-      | Content | French Forgot Password Body    |
+      | Subject Fallback | false                          |
+      | Content Fallback | false                          |
+      | Subject          | French Forgot Password Subject |
+      | Content          | French Forgot Password Body    |
     And I click "German"
     And fill "Email Template Form" with:
-      | Subject | German Forgot Password Subject |
-      | Content | German Forgot Password Body    |
+      | Subject Fallback | false                          |
+      | Content Fallback | false                          |
+      | Subject          | German Forgot Password Subject |
+      | Content          | German Forgot Password Body    |
     And I submit form
     Then I should see "Template saved" flash message
     And I click Logout in user menu

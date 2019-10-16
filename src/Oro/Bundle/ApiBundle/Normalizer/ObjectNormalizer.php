@@ -71,33 +71,56 @@ class ObjectNormalizer
      * @param array                       $objects The list of objects to be normalized
      * @param EntityDefinitionConfig|null $config  Normalization rules
      * @param array                       $context Options post serializers and data transformers have access to
+     * @param bool                        $skipPostSerializationForPrimaryObjects
      *
      * @return array
      */
     public function normalizeObjects(
         array $objects,
         EntityDefinitionConfig $config = null,
-        array $context = []
+        array $context = [],
+        bool $skipPostSerializationForPrimaryObjects = false
     ): array {
         $normalizedObjects = [];
         if ($objects) {
-            if (null !== $config) {
-                $normalizedConfig = clone $config;
-                $this->configNormalizer->normalizeConfig($normalizedConfig);
-                $config = $normalizedConfig;
-            }
-            foreach ($objects as $key => $object) {
-                $object = $this->normalizeValue($object, 1, $context, $config);
-                if (null !== $config) {
-                    $data = $this->dataNormalizer->normalizeData([$object], $config);
-                    $object = reset($data);
+            if (null === $config) {
+                foreach ($objects as $key => $object) {
+                    $normalizedObjects[$key] = $this->normalizeValue($object, 1, $context, $config);
                 }
-                $normalizedObjects[$key] = $object;
+            } else {
+                $config = $this->getNormalizedConfig($config);
+                $processedObjects = [];
+                foreach ($objects as $key => $object) {
+                    $processedObjects[$key] = $this->normalizeObjectByConfig($object, 1, $config, $context);
+                }
+                if (!$skipPostSerializationForPrimaryObjects) {
+                    $processedObjects = $this->serializationHelper->processPostSerializeItems(
+                        $processedObjects,
+                        $config,
+                        $context
+                    );
+                }
+                foreach ($processedObjects as $key => $object) {
+                    $data = $this->dataNormalizer->normalizeData([$object], $config);
+                    $normalizedObjects[$key] = reset($data);
+                }
             }
-            $normalizedObjects = $this->postSerializeCollection($normalizedObjects, $config, $context);
         }
 
         return $normalizedObjects;
+    }
+
+    /**
+     * @param EntityDefinitionConfig $config
+     *
+     * @return EntityDefinitionConfig
+     */
+    private function getNormalizedConfig(EntityDefinitionConfig $config): EntityDefinitionConfig
+    {
+        $normalizedConfig = clone $config;
+        $this->configNormalizer->normalizeConfig($normalizedConfig);
+
+        return $normalizedConfig;
     }
 
     /**
@@ -184,6 +207,10 @@ class ObjectNormalizer
         $entityClass = $this->getEntityClass($object);
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
+            if ($field->isExcluded()) {
+                continue;
+            }
+
             $propertyPath = $field->getPropertyPath($fieldName);
 
             if (null === $field->getAssociationQuery()
@@ -219,7 +246,7 @@ class ObjectNormalizer
             $result = $this->handleFieldsReferencedToChildFields($result, $object, $referenceFields);
         }
 
-        return $this->postSerializeItem($result, $config, $context);
+        return $result;
     }
 
     /**
@@ -280,7 +307,11 @@ class ObjectNormalizer
                 }
                 $value = $this->postSerializeCollection($normalizedValues, $config, $context);
             } elseif (null !== $config) {
-                $value = $this->normalizeObjectByConfig($value, $level, $config, $context);
+                $value = $this->serializationHelper->postSerializeItem(
+                    $this->normalizeObjectByConfig($value, $level, $config, $context),
+                    $config,
+                    $context
+                );
             } elseif ($this->doctrineHelper->isManageableEntity($value)) {
                 if ($level <= self::MAX_NESTING_LEVEL) {
                     $value = $this->normalizeEntity($value, $level, $context);
@@ -411,22 +442,6 @@ class ObjectNormalizer
         $map = array_flip($metadata->discriminatorMap);
 
         return $map[$entityClass];
-    }
-
-    /**
-     * @param array                       $item
-     * @param EntityDefinitionConfig|null $config
-     * @param array                       $context
-     *
-     * @return array
-     */
-    private function postSerializeItem(array $item, ?EntityDefinitionConfig $config, array $context): array
-    {
-        if (null === $config) {
-            return $item;
-        }
-
-        return $this->serializationHelper->postSerializeItem($item, $config, $context);
     }
 
     /**

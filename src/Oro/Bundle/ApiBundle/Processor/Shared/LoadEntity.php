@@ -7,11 +7,12 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityIdMetadataInterface;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
+use Oro\Bundle\ApiBundle\Util\QueryAclHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\EntitySerializer\QueryFactory;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -25,22 +26,22 @@ class LoadEntity implements ProcessorInterface
     /** @var EntityIdHelper */
     private $entityIdHelper;
 
-    /** @var QueryFactory */
-    private $queryFactory;
+    /** @var QueryAclHelper */
+    private $queryAclHelper;
 
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param EntityIdHelper $entityIdHelper
-     * @param QueryFactory   $queryFactory
+     * @param QueryAclHelper $queryAclHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityIdHelper $entityIdHelper,
-        QueryFactory $queryFactory
+        QueryAclHelper $queryAclHelper
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityIdHelper = $entityIdHelper;
-        $this->queryFactory = $queryFactory;
+        $this->queryAclHelper = $queryAclHelper;
     }
 
     /**
@@ -77,7 +78,8 @@ class LoadEntity implements ProcessorInterface
             $entityClass,
             $context->getId(),
             $config,
-            $metadata
+            $metadata,
+            $context->getRequestType()
         );
         if (null !== $entity) {
             $context->setResult($entity);
@@ -89,6 +91,7 @@ class LoadEntity implements ProcessorInterface
      * @param mixed                     $entityId
      * @param EntityDefinitionConfig    $config
      * @param EntityIdMetadataInterface $metadata
+     * @param RequestType               $requestType
      *
      * @return object|null
      */
@@ -96,11 +99,16 @@ class LoadEntity implements ProcessorInterface
         string $entityClass,
         $entityId,
         EntityDefinitionConfig $config,
-        EntityIdMetadataInterface $metadata
+        EntityIdMetadataInterface $metadata,
+        RequestType $requestType
     ) {
         // try to load an entity by ACL protected query
-        $entity = $this->queryFactory
-            ->getQuery($this->getQueryBuilder($entityClass, $entityId, $metadata), $config)
+        $entity = $this->queryAclHelper
+            ->protectQuery(
+                $this->getQueryBuilder($entityClass, $entityId, $metadata),
+                $config,
+                $requestType
+            )
             ->getOneOrNullResult();
         if (null === $entity) {
             // use a query without ACL protection to check if an entity exists in DB

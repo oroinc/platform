@@ -55,7 +55,7 @@ class MemberOfComparisonExpressionTest extends OrmRelatedTestCase
             $result
         );
         self::assertEquals(
-            [new Parameter($parameterName, $value, 'integer')],
+            [new Parameter($parameterName, $value)],
             $expressionVisitor->getParameters()
         );
     }
@@ -104,8 +104,8 @@ class MemberOfComparisonExpressionTest extends OrmRelatedTestCase
         );
         self::assertEquals(
             [
-                new Parameter('groups_1_from', $fromValue, 'integer'),
-                new Parameter('groups_1_to', $toValue, 'integer')
+                new Parameter('groups_1_from', $fromValue),
+                new Parameter('groups_1_to', $toValue)
             ],
             $expressionVisitor->getParameters()
         );
@@ -152,7 +152,7 @@ class MemberOfComparisonExpressionTest extends OrmRelatedTestCase
             $result
         );
         self::assertEquals(
-            [new Parameter($parameterName, $value, 'integer')],
+            [new Parameter($parameterName, $value)],
             $expressionVisitor->getParameters()
         );
     }
@@ -201,8 +201,8 @@ class MemberOfComparisonExpressionTest extends OrmRelatedTestCase
         );
         self::assertEquals(
             [
-                new Parameter('groups_1_from', $fromValue, 'integer'),
-                new Parameter('groups_1_to', $toValue, 'integer')
+                new Parameter('groups_1_from', $fromValue),
+                new Parameter('groups_1_to', $toValue)
             ],
             $expressionVisitor->getParameters()
         );

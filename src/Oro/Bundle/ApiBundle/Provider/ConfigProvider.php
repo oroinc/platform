@@ -5,8 +5,10 @@ namespace Oro\Bundle\ApiBundle\Provider;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraSectionInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
-use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
@@ -110,6 +112,14 @@ class ConfigProvider
         if (!empty($extras)) {
             $context->setExtras($extras);
         }
+        $identifierFieldsOnly = false;
+        foreach ($extras as $extra) {
+            if ($extra instanceof FilterIdentifierFieldsConfigExtra) {
+                $identifierFieldsOnly = true;
+                break;
+            }
+        }
+        $context->set(FilterIdentifierFieldsConfigExtra::NAME, $identifierFieldsOnly);
     }
 
     /**
@@ -126,12 +136,23 @@ class ConfigProvider
         RequestType $requestType,
         array $extras
     ): string {
+        $hasDefinitionExtra = false;
         $cacheKey = (string)$requestType . '|' . $version . '|' . $className;
         foreach ($extras as $extra) {
             $part = $extra->getCacheKeyPart();
             if (!empty($part)) {
                 $cacheKey .= '|' . $part;
             }
+            if (!$hasDefinitionExtra && $extra instanceof EntityDefinitionConfigExtra) {
+                $hasDefinitionExtra = true;
+            }
+        }
+        if (!$hasDefinitionExtra) {
+            throw new \LogicException(sprintf(
+                'The "%s" config extra must be specified. Class Name: %s.',
+                EntityDefinitionConfigExtra::class,
+                $className
+            ));
         }
 
         return $cacheKey;

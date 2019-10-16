@@ -1065,9 +1065,9 @@ enabled contacts. To achieve this:
 - Add a processor to register QRM query that should be used to get enabled contacts for [get](./actions.md#get-action)
   and [get_list](./actions.md#get_list-action) actions
 
-  **Note:** Aliases `e` and `r` are reserved and both must exist in the query. Alias `e` must be a root alias
-  and it must correspond to the entity that is the owner of the association. Alias `r` must correspond to
-  the target entity of the association.
+  **Note:** Aliases `e` and `r` are reserved and both must exist in the query.
+  The alias `e` must correspond to the owning entity of the association.
+  The alias `r` must correspond to the target entity of the association.
 
   ```php
   <?php
@@ -1076,7 +1076,7 @@ enabled contacts. To achieve this:
 
   use Acme\Bundle\AppBundle\Entity\Account;
   use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-  use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+  use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
   use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
   use Oro\Component\ChainProcessor\ContextInterface;
   use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -1131,7 +1131,7 @@ enabled contacts. To achieve this:
           arguments:
               - '@oro_api.doctrine_helper'
           tags:
-              - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&definition', class: Acme\Bundle\AppBundle\Entity\Account, priority: -35 }
+              - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only', class: Acme\Bundle\AppBundle\Entity\Account, priority: -35 }
   ```
 
 - Add a processor to register QRM query that should be used to get enabled contacts for
@@ -1198,8 +1198,8 @@ enabled contacts. To achieve this:
           arguments:
               - '@oro_api.doctrine_helper'
           tags:
-              - { name: oro.api.processor, action: get_subresource, group: build_query, class: Acme\Bundle\AppBundle\Entity\Account, association: contacts, priority: -90 }
-              - { name: oro.api.processor, action: get_relationship, group: build_query, class: Acme\Bundle\AppBundle\Entity\Account, association: contacts, priority: -90 }
+              - { name: oro.api.processor, action: get_subresource, group: build_query, parentClass: Acme\Bundle\AppBundle\Entity\Account, association: contacts, priority: -90 }
+              - { name: oro.api.processor, action: get_relationship, group: build_query, parentClass: Acme\Bundle\AppBundle\Entity\Account, association: contacts, priority: -90 }
   ```
 
 ## Disable HATEOAS

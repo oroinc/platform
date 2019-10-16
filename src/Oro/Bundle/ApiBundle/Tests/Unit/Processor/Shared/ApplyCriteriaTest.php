@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Doctrine\Common\Collections\Criteria as CommonCriteria;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Processor\Shared\ApplyCriteria;
@@ -43,10 +44,26 @@ class ApplyCriteriaTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcess()
+    public function testProcessWithCriteria()
     {
         $query = $this->createMock(QueryBuilder::class);
         $criteria = $this->createMock(Criteria::class);
+
+        $this->criteriaConnector->expects(self::once())
+            ->method('applyCriteria')
+            ->with(self::identicalTo($query), self::identicalTo($criteria));
+
+        $this->context->setQuery($query);
+        $this->context->setCriteria($criteria);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getCriteria());
+    }
+
+    public function testProcessWithCommonCriteria()
+    {
+        $query = $this->createMock(QueryBuilder::class);
+        $criteria = $this->createMock(CommonCriteria::class);
 
         $this->criteriaConnector->expects(self::once())
             ->method('applyCriteria')

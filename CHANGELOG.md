@@ -66,6 +66,13 @@ The current file describes significant changes in the code that may affect the u
     - MetadataExtraCollection
     - ActionMetadataExtra
     - HateoasMetadataExtra
+* All processors from `Oro\Bundle\ApiBundle\Processor\Config\GetConfig`
+  and `Oro\Bundle\ApiBundle\Processor\Config\Shared` namespaces were moved
+  to `Oro\Bundle\ApiBundle\Processor\GetConfig` namespace.
+* The class `ConfigProcessor` was moved from `Oro\Bundle\ApiBundle\Processor\Config` namespace
+  to `Oro\Bundle\ApiBundle\Processor\GetConfig` namespace.
+* The class `ConfigContext` was moved from `Oro\Bundle\ApiBundle\Processor\Config` namespace
+  to `Oro\Bundle\ApiBundle\Processor\GetConfig` namespace.
 
 #### AssetBundle
 * The new feature, [Hot Module Replacement (HMR or Hot Reload) enabled for SCSS](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#hot-module-replacement-hmr-or-hot-reload-for-scss). To enable HMR for custom CSS links, please [follow the documentation](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#enable-for-css-links).
@@ -101,6 +108,10 @@ The current file describes significant changes in the code that may affect the u
 #### UserBundle
 * The constant `SCOPE_KEY` in `Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider`
   was replaced with `USER`.
+
+### Removed
+#### EntityExtendBundle
+* Removed *HTML* field type, all HTML fields were converted to Text fields.  
 
 ## 4.0.0 (2019-07-31)
 [Show detailed list of changes](incompatibilities-4-0.md)

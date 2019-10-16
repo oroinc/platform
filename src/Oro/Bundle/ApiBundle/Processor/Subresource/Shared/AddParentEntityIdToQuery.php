@@ -16,8 +16,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
- * Adds restriction by the primary entity identifier to the ORM QueryBuilder
+ * Adds a restriction by the primary entity identifier to the ORM QueryBuilder
  * that is used to load data.
+ * Also checks that this restriction was added to the ORM QueryBuilder for computed associations.
  */
 class AddParentEntityIdToQuery implements ProcessorInterface
 {

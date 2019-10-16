@@ -149,8 +149,8 @@ class OroRichTextType extends AbstractType
             'page-component'  => [
                 'module'  => 'oroui/js/app/components/view-component',
                 'options' => [
-                    'view'        => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-                    'content_css' => $assetsBaseUrl . 'bundles/oroform/css/wysiwyg-editor.css',
+                    'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
+                    'content_css' => $assetsBaseUrl . 'bundles/oroform/css/wysiwyg-editor.css'
                 ]
             ],
         ];

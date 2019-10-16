@@ -7,6 +7,9 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * Validates default relation field.
+ */
 class DefaultRelationFieldValidator extends AbstractFieldValidator
 {
     const ALIAS = 'oro_entity_extend.validator.default_relation_field';
@@ -27,7 +30,7 @@ class DefaultRelationFieldValidator extends AbstractFieldValidator
             $guessedName = substr($fieldName, strlen(trim(ExtendConfigDumper::DEFAULT_PREFIX, '_')));
             if (!empty($guessedName)) {
                 // note, that we cant create ONE_TO_MANY & MANY_TO_MANY fields via CSV import, so next search is enough
-                $fieldConfig = $this->validationHelper->findExtendFieldConfig($className, $guessedName);
+                $fieldConfig = $this->validationHelper->findFieldConfig($className, $guessedName);
                 if ($fieldConfig
                     && in_array(
                         $fieldConfig->getId()->getFieldType(),

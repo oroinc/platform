@@ -9,7 +9,6 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\KernelTerminateHandler;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
@@ -26,27 +25,11 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class ApiTestCase extends WebTestCase
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var ValueNormalizer */
-    protected $valueNormalizer;
-
     /** @var bool */
     private $isKernelRebootDisabled = false;
 
     /** @var bool */
     private $isKernelTerminateHandlerDisabled = false;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        $container = self::getContainer();
-        $this->valueNormalizer = $container->get('oro_api.value_normalizer');
-        $this->doctrineHelper = $container->get('oro_api.doctrine_helper');
-    }
 
     /**
      * Disables clearing the security token and stopping sending messages
@@ -114,7 +97,7 @@ abstract class ApiTestCase extends WebTestCase
     protected function getEntityType($entityClass, $throwException = true)
     {
         return ValueNormalizerUtil::convertToEntityType(
-            $this->valueNormalizer,
+            $this->getValueNormalizer(),
             $entityClass,
             $this->getRequestType(),
             $throwException
@@ -130,11 +113,19 @@ abstract class ApiTestCase extends WebTestCase
     protected function getEntityClass($entityType, $throwException = true)
     {
         return ValueNormalizerUtil::convertToEntityClass(
-            $this->valueNormalizer,
+            $this->getValueNormalizer(),
             $entityType,
             $this->getRequestType(),
             $throwException
         );
+    }
+
+    /**
+     * @return ValueNormalizer
+     */
+    protected function getValueNormalizer()
+    {
+        return self::getContainer()->get('oro_api.value_normalizer');
     }
 
     /**

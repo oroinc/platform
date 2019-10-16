@@ -31,6 +31,9 @@ oro_behat_extension:
     Clone Report Button:
       selector: 'a[title="Clone Report"]'
 
+    Column Names:
+      selector: 'div#select2-drop ul.select2-results'
+
   suites:
     OroReportBundle:
       contexts:

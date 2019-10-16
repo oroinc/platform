@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\Value;
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query\Expr as QueryExpr;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
@@ -182,9 +181,9 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
         self::assertEquals(
             [
-                new Parameter('e_test', 1, 'integer'),
-                new Parameter('e_id', 12, 'integer'),
-                new Parameter('e_id_2', 25, 'integer')
+                new Parameter('e_test', 1),
+                new Parameter('e_id', 12),
+                new Parameter('e_id_2', 25)
             ],
             $expressionVisitor->getParameters()
         );
@@ -224,7 +223,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
         self::assertEquals(
             [
-                new Parameter('e_test', [1, 2, 3], Connection::PARAM_INT_ARRAY)
+                new Parameter('e_test', [1, 2, 3])
             ],
             $expressionVisitor->getParameters()
         );
@@ -281,9 +280,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
             $result
         );
         self::assertEquals(
-            [
-                new Parameter('e_test', 'test value', \PDO::PARAM_STR)
-            ],
+            [new Parameter('e_test', 'test value')],
             $expressionVisitor->getParameters()
         );
     }

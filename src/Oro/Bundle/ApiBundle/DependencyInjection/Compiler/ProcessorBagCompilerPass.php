@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
-use Oro\Component\ChainProcessor\AbstractMatcher;
+use Oro\Component\ChainProcessor\AbstractMatcher as Matcher;
 use Oro\Component\ChainProcessor\DependencyInjection\ProcessorsLoader;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -21,16 +22,23 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
  *   the attribute is removed.
  * * By performance reasons "customize_form_data" processors are grouped by event.
  *   The "event attribute is removed.
+ * * By performance reasons "identifier_fields_only" config extra for "get_config" processors
+ *   is moved to "identifier_fields_only" attribute.
  *
  * @see \Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler\EntityHandler
  * @see \Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ProcessorBagCompilerPass implements CompilerPassInterface
 {
     private const PROCESSOR_BAG_CONFIG_PROVIDER_SERVICE_ID = 'oro_api.processor_bag_config_provider';
     private const CUSTOMIZE_LOADED_DATA_ACTION             = 'customize_loaded_data';
     private const CUSTOMIZE_FORM_DATA_ACTION               = 'customize_form_data';
+    private const GET_CONFIG_ACTION                        = 'get_config';
+    private const GET_METADATA_ACTION                      = 'get_metadata';
     private const IDENTIFIER_ONLY_ATTRIBUTE                = 'identifier_only';
+    private const EXTRA_ATTRIBUTE                          = 'extra';
     private const GROUP_ATTRIBUTE                          = 'group';
     private const COLLECTION_ATTRIBUTE                     = 'collection';
     private const EVENT_ATTRIBUTE                          = 'event';
@@ -83,6 +91,16 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
             $allProcessors[self::CUSTOMIZE_FORM_DATA_ACTION] = $this->normalizeCustomizeFormDataProcessors(
                 $allProcessors[self::CUSTOMIZE_FORM_DATA_ACTION],
                 array_keys($allGroups[self::CUSTOMIZE_FORM_DATA_ACTION])
+            );
+        }
+        if (!empty($allProcessors[self::GET_CONFIG_ACTION])) {
+            $allProcessors[self::GET_CONFIG_ACTION] = $this->normalizeGetConfigProcessors(
+                $allProcessors[self::GET_CONFIG_ACTION]
+            );
+        }
+        if (!empty($allProcessors[self::GET_METADATA_ACTION])) {
+            $allProcessors[self::GET_METADATA_ACTION] = $this->normalizeGetMetadataProcessors(
+                $allProcessors[self::GET_METADATA_ACTION]
             );
         }
 
@@ -181,6 +199,78 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
     }
 
     /**
+     * Normalizes processors for "get_config" action.
+     * Moves "identifier_fields_only" config extra to "identifier_fields_only" attribute.
+     *
+     * @param array $processors
+     *
+     * @return array
+     */
+    private function normalizeGetConfigProcessors(array $processors): array
+    {
+        foreach ($processors as $key => $item) {
+            $this->assertExtraAttribute($item[0], $item[1]);
+            if (array_key_exists(self::EXTRA_ATTRIBUTE, $item[1])) {
+                $identifierFieldsOnly = null;
+                if (is_array($item[1][self::EXTRA_ATTRIBUTE])) {
+                    if (Matcher::OPERATOR_AND === key($item[1][self::EXTRA_ATTRIBUTE])) {
+                        foreach (current($item[1][self::EXTRA_ATTRIBUTE]) as $k => $v) {
+                            if (is_array($v)) {
+                                if (FilterIdentifierFieldsConfigExtra::NAME === current($v)) {
+                                    $identifierFieldsOnly = false;
+                                }
+                            } elseif (FilterIdentifierFieldsConfigExtra::NAME === $v) {
+                                $identifierFieldsOnly = true;
+                            }
+                            if (null !== $identifierFieldsOnly) {
+                                unset($item[1][self::EXTRA_ATTRIBUTE][Matcher::OPERATOR_AND][$k]);
+                                if (count($item[1][self::EXTRA_ATTRIBUTE][Matcher::OPERATOR_AND]) === 1) {
+                                    $processors[$key][1][self::EXTRA_ATTRIBUTE] = reset(
+                                        $item[1][self::EXTRA_ATTRIBUTE][Matcher::OPERATOR_AND]
+                                    );
+                                } else {
+                                    $processors[$key][1][self::EXTRA_ATTRIBUTE] = [
+                                        Matcher::OPERATOR_AND => array_values(
+                                            $item[1][self::EXTRA_ATTRIBUTE][Matcher::OPERATOR_AND]
+                                        )
+                                    ];
+                                }
+                                break;
+                            }
+                        }
+                    } elseif (FilterIdentifierFieldsConfigExtra::NAME === current($item[1][self::EXTRA_ATTRIBUTE])) {
+                        $identifierFieldsOnly = false;
+                        unset($processors[$key][1][self::EXTRA_ATTRIBUTE]);
+                    }
+                } elseif (FilterIdentifierFieldsConfigExtra::NAME === $item[1][self::EXTRA_ATTRIBUTE]) {
+                    $identifierFieldsOnly = true;
+                }
+                if (null !== $identifierFieldsOnly) {
+                    $processors[$key][1][FilterIdentifierFieldsConfigExtra::NAME] = $identifierFieldsOnly;
+                }
+            }
+        }
+
+        return $processors;
+    }
+
+    /**
+     * Normalizes processors for "get_metadata" action.
+     *
+     * @param array $processors
+     *
+     * @return array
+     */
+    private function normalizeGetMetadataProcessors(array $processors): array
+    {
+        foreach ($processors as $item) {
+            $this->assertExtraAttribute($item[0], $item[1]);
+        }
+
+        return $processors;
+    }
+
+    /**
      * @param string $processorId
      * @param array  $attributes
      * @param string $action
@@ -205,6 +295,28 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
     }
 
     /**
+     * @param string $processorId
+     * @param array  $attributes
+     */
+    private function assertExtraAttribute(string $processorId, array $attributes): void
+    {
+        if (array_key_exists(self::EXTRA_ATTRIBUTE, $attributes)
+            && is_array($attributes[self::EXTRA_ATTRIBUTE])
+            && Matcher::OPERATOR_OR === key($attributes[self::EXTRA_ATTRIBUTE])
+        ) {
+            throw new LogicException(sprintf(
+                'The "%s" processor uses the "%s" tag attribute with "%s" operator that is not allowed.'
+                . ' Only "%s" and "%s" operators are allowed for this attribute.',
+                $processorId,
+                self::EXTRA_ATTRIBUTE,
+                Matcher::OPERATOR_OR,
+                Matcher::OPERATOR_AND,
+                Matcher::OPERATOR_NOT
+            ));
+        }
+    }
+
+    /**
      * @param string   $processorId
      * @param array    $attributes
      * @param string[] $allEvents
@@ -223,7 +335,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
         $value = $attributes[self::EVENT_ATTRIBUTE];
         if (is_string($value)) {
             $events = [$value];
-        } elseif (is_array($value) && key($value) === AbstractMatcher::OPERATOR_OR) {
+        } elseif (is_array($value) && key($value) === Matcher::OPERATOR_OR) {
             $events = reset($value);
             foreach ($events as $event) {
                 if (!is_string($event)) {
@@ -265,7 +377,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
             $processorId,
             self::EVENT_ATTRIBUTE,
             self::CUSTOMIZE_FORM_DATA_ACTION,
-            AbstractMatcher::OPERATOR_OR
+            Matcher::OPERATOR_OR
         ));
     }
 }
