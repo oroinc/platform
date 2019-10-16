@@ -8,7 +8,6 @@ parameters:
     oro_email.form.type.emailtemplate.class:              Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType
     oro_email.form.type.emailtemplate_select.class:       Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType
     oro_email.form.type.system_emailtemplate_select.class: Oro\Bundle\EmailBundle\Form\Type\SystemEmailTemplateSelectType
-    oro_email.form.type.emailtemplate_translation.class:  Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType
     oro_email.form.handler.emailtemplate.class:           Oro\Bundle\EmailBundle\Form\Handler\EmailTemplateHandler
     oro_email.form.type.emailtemplate.api.class:          Oro\Bundle\EmailBundle\Form\Type\EmailTemplateApiType
     oro_email.form.handler.email.class:                   Oro\Bundle\EmailBundle\Form\Handler\EmailHandler
@@ -53,7 +52,6 @@ services:
         arguments:
             - '@oro_config.global'
             - '@oro_config.user'
-            - '@oro_locale.settings'
             - '@doctrine'
             - '@oro_locale.manager.localization'
         tags:
@@ -85,19 +83,17 @@ services:
         class: '%oro_email.form.type.emailtemplate.class%'
         arguments:
             - '@oro_config.user'
-            - '@oro_locale.settings'
-        calls:
-            - [setLocalizationManager, ['@oro_locale.manager.localization']]
+            - '@oro_locale.manager.localization'
         tags:
             - { name: form.type, alias: oro_email_emailtemplate }
 
-    oro_email.form.type.emailtemplate_translation:
-        class: '%oro_email.form.type.emailtemplate_translation.class%'
+    oro_email.form.email_template_localization_type:
+        class: 'Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType'
         arguments:
-            - '@oro_config.user'
-            - 'Oro\Bundle\TranslationBundle\Form\Type\GedmoTranslationsType'
+            - '@translator'
+            - '@oro_locale.manager.localization'
         tags:
-            - { name: form.type, alias: oro_email_emailtemplate_translatation }
+            - { name: form.type }
 
     oro_email.form.type.emailtemplate_rich_text:
         class: Oro\Bundle\EmailBundle\Form\Type\EmailTemplateRichTextType
@@ -125,8 +121,6 @@ services:
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
             - '@translator'
-        calls:
-            - [setDefaultLocale, ['%stof_doctrine_extensions.default_locale%']]
 
     oro_email.form.handler.email:
         class: '%oro_email.form.handler.email.class%'

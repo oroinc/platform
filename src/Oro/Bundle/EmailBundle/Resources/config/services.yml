@@ -160,11 +160,9 @@ services:
         public: true
 
     oro_email.email_body_loader_selector:
-        public: false
         class: '%oro_email.email_body_loader_selector.class%'
 
     oro_email.email_flag_manager_loader_selector:
-        public: false
         class: '%oro_email.email_flag_manager_loader_selector.class%'
 
     oro_email.email_address.entity_manager:
@@ -185,17 +183,14 @@ services:
             - [setEntityManagerLink, ['@oro_email.link.email_address.entity_manager']]
 
     oro_email.email.owner.provider.storage:
-        public: false
         class: '%oro_email.email.owner.provider.storage.class%'
 
     oro_email.email.owner.provider:
-        public: false
         class: '%oro_email.email.owner.provider.class%'
         arguments:
             - '@oro_email.email.owner.provider.storage'
 
     oro_email.email.owner.manager:
-        public: false
         class: '%oro_email.email.owner.manager.class%'
         arguments:
             - '@oro_email.email.owner.provider.storage'
@@ -255,7 +250,6 @@ services:
 
     oro_email.email.entity.batch_processor:
         class: '%oro_email.email.entity.batch_processor.class%'
-        public: false
         shared: false
         arguments:
             - '@oro_email.email.address.manager'
@@ -290,7 +284,6 @@ services:
 
     oro_email.listener.auto_response_listener:
         class: '%oro_email.listener.auto_response_listener.class%'
-        public: false
         arguments:
             - '@Psr\Container\ContainerInterface'
         tags:
@@ -482,7 +475,6 @@ services:
 
     oro_email.email_renderer_configuration:
         class: Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProvider
-        public: false
         arguments:
             - '@oro_email.emailtemplate.variable_provider'
             - '@oro_email.cache'
@@ -490,7 +482,6 @@ services:
 
     oro_email.twig.email_security_policy:
         class: Twig_Sandbox_SecurityPolicy
-        public: false
         arguments:
             # tags
             - [ 'app', 'for', 'if', 'spaceless' ]
@@ -505,18 +496,15 @@ services:
 
     oro_email.twig.email_sandbox:
         class: Twig_Extension_Sandbox
-        public: false
         arguments:
             - '@oro_email.twig.email_security_policy'
             - true # use sandbox globally in instance
 
     oro_email.twig.string_loader:
         class: Twig\Loader\ArrayLoader
-        public: false
 
     oro_email.twig.email_environment:
         class: Twig_Environment
-        public: false
         arguments:
             - '@oro_email.twig.string_loader'
             - { strict_variables: true }
@@ -535,7 +523,6 @@ services:
 
     oro_email.emailtemplate.variable_provider.entity:
         class: Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider
-        public: false
         arguments:
             - '@translator'
             - '@oro_entity_config.config_manager'
@@ -546,7 +533,6 @@ services:
 
     oro_email.emailtemplate.variable_provider.entity_routes:
         class: Oro\Bundle\EmailBundle\Provider\EntityRouteVariablesProvider
-        public: false
         arguments:
             - '@translator'
             - '@oro_entity_config.config_manager'
@@ -556,7 +542,6 @@ services:
 
     oro_email.emailtemplate.variable_provider.system:
         class: Oro\Bundle\EmailBundle\Provider\SystemVariablesProvider
-        public: false
         arguments:
             - '@translator'
             - '@oro_config.user'
@@ -566,7 +551,6 @@ services:
 
     oro_email.emailtemplate.variable_provider.user:
         class: Oro\Bundle\EmailBundle\Provider\LoggedUserVariablesProvider
-        public: false
         arguments:
             - '@translator'
             - '@oro_security.token_accessor'
@@ -577,10 +561,9 @@ services:
 
     oro_email.validator.email_template_syntax:
         class: Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator
-        public: false
         arguments:
             - '@oro_email.email_renderer'
-            - '@oro_locale.settings'
+            - '@oro_locale.manager.localization'
             - '@oro_entity_config.provider.entity'
             - '@translator'
         tags:
@@ -588,7 +571,6 @@ services:
 
     oro_email.validator.email_address_validator:
         class: Oro\Bundle\EmailBundle\Validator\EmailAddressValidator
-        public: false
         arguments:
             - '@oro_email.email.address.helper'
         tags:
@@ -596,13 +578,11 @@ services:
 
     oro_email.validator.email_recipients:
         class: Oro\Bundle\EmailBundle\Validator\EmailRecipientsValidator
-        public: false
         tags:
             - { name: validator.constraint_validator, alias: oro_email.email_recipients_validator }
 
     oro_email.validator.mailbox_origin:
         class: Oro\Bundle\EmailBundle\Validator\MailboxOriginValidator
-        public: false
         arguments:
             - '@translator'
         tags:
@@ -647,7 +627,6 @@ services:
 
     oro_email_filter.filter_origin_folder:
         class: Oro\Bundle\EmailBundle\Filter\ChoiceOriginFolderFilter
-        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
@@ -656,7 +635,6 @@ services:
 
     oro_email_filter.filter_massage_type:
         class: Oro\Bundle\EmailBundle\Filter\ChoiceMessageTypeFilter
-        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
@@ -666,7 +644,6 @@ services:
 
     oro_email_filter.filter_email_string:
         class: Oro\Bundle\EmailBundle\Filter\EmailStringFilter
-        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
@@ -706,13 +683,12 @@ services:
             - '@oro_email.mailer.processor'
             - '@oro_email.email.address.helper'
             - '@oro_entity.entity_name_resolver'
-            - '@oro_email.email_renderer'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@validator'
+            - '@oro_email.provider.localized_template'
             - '@oro_email.tools.email_origin_helper'
         calls:
             - [setLogger, ['@logger']]
-            - [setPreferredLanguageProvider, ['@oro_locale.provider.chain_preferred_language_provider']]
         tags:
             - { name: oro_action.action, alias: send_email_template }
 
@@ -730,7 +706,6 @@ services:
 
     oro_email.email_grid_result_helper:
         class: Oro\Bundle\EmailBundle\Datagrid\EmailGridResultHelper
-        public: false
         arguments:
             - '@doctrine'
             - '@oro_email.email.owner.provider.storage'
@@ -739,7 +714,6 @@ services:
 
     oro_email.email_grid_mailbox_name_helper:
         class: Oro\Bundle\EmailBundle\Datagrid\MailboxNameHelper
-        public: false
         arguments:
             - '@translator'
 
@@ -797,7 +771,6 @@ services:
 
     oro_email.known_email_address_checker_factory:
         class: '%oro_email.known_email_address_checker_factory.class%'
-        public: false
         shared: false
         arguments:
             - '@doctrine'
@@ -844,7 +817,6 @@ services:
 
     oro_email.twig.extension.email:
         class: Oro\Bundle\EmailBundle\Twig\EmailExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -1026,7 +998,6 @@ services:
 
     oro_email.entity_alias_provider:
         class: Oro\Bundle\EmailBundle\Provider\EmailEntityAliasProvider
-        public: false
         arguments:
             - '@oro_email.email.address.manager'
         tags:
@@ -1089,7 +1060,6 @@ services:
             - [setLogger, ['@logger']]
 
     oro_email.internal_email.flag_manager_loader:
-        public: false
         class: Oro\Bundle\EmailBundle\Provider\InternalEmailFlagManagerLoader
         tags:
             - { name: oro_email.email_flag_manager_loader }
@@ -1150,13 +1120,11 @@ services:
 
     oro_email.email_user.provider.email_user_entity_name_provider:
         class: Oro\Bundle\EmailBundle\Provider\EmailUserEntityNameProvider
-        public: false
         tags:
             - { name: oro_entity.name_provider, priority: 0 }
 
     oro_email.email_body_entity_name_provider:
         class: Oro\Bundle\EmailBundle\Provider\EmailBodyEntityNameProvider
-        public: false
         tags:
             - { name: oro_entity.name_provider, priority: 0 }
 
@@ -1374,13 +1342,11 @@ services:
 
     oro_email.emailtemplate.variable_processor:
         class: Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorRegistry
-        public: false
         arguments:
             - ~ # processors. Set by Oro\Bundle\EmailBundle\DependencyInjection\Compiler\VariableProcessorPass
 
     oro_email.emailtemplate.variable_processor.entity_routes:
         class: Oro\Bundle\EmailBundle\Processor\EntityRouteVariableProcessor
-        public: false
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_email.provider.url_provider'
@@ -1410,7 +1376,6 @@ services:
 
     oro_email.acl.voter.email_template_voter:
         class: Oro\Bundle\EmailBundle\Acl\Voter\EmailTemplateVoter
-        public: false
         arguments:
             - '@oro_entity.doctrine_helper'
         calls:
@@ -1419,34 +1384,39 @@ services:
             - { name: security.voter }
 
     oro_email.manager.template_email:
-        class: Oro\Bundle\EmailBundle\Manager\TemplateEmailManager
+        class: Oro\Bundle\EmailBundle\Manager\EmailTemplateManager
+        public: true
         arguments:
             - '@oro_email.direct_mailer'
-            - '@oro_locale.provider.chain_preferred_language_provider'
             - '@oro_email.mailer.processor'
-            - '@oro_email.provider.email_template_content_provider'
+            - '@oro_email.provider.localized_template'
 
     oro_email.async.template_email_message_sender:
         class: 'Oro\Bundle\EmailBundle\Async\TemplateEmailMessageSender'
-        public: false
         arguments:
             - '@oro_email.manager.template_email'
             - '@oro_entity.doctrine_helper'
 
     oro_email.entity_name_provider:
         class: 'Oro\Bundle\EmailBundle\Provider\EmailEntityNameProvider'
-        public: false
         arguments:
             - '@property_accessor'
         tags:
             - { name: oro_entity.name_provider, priority: -80 }
 
+    oro_email.provider.localized_template:
+        class: 'Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider'
+        arguments:
+            - '@oro_locale.provider.preferred_localization_provider'
+            - '@oro_email.provider.email_template_content_provider'
+
     oro_email.provider.email_template_content_provider:
         class: 'Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider'
-        public: false
+        public: true
         arguments:
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
             - '@oro_email.email_renderer'
+            - '@property_accessor'
             - '@logger'
 
     oro_email.provider.url_provider:
@@ -1462,7 +1432,6 @@ services:
 
     oro_email.validator.connection_configuration.smtp:
         class: 'Oro\Bundle\EmailBundle\Validator\SmtpConnectionConfigurationValidator'
-        public: false
         arguments:
             - '@oro_email.mailer.checker.smtp_settings'
             - '@oro_email.smtp_settings_factory'

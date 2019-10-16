@@ -11,16 +11,18 @@ use Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Error\SyntaxError;
 
 class EmailTemplateSyntaxValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    private const TEST_SUBJECT       = '{{entity.subject}}';
+    private const TEST_SUBJECT = '{{entity.subject}}';
     private const TEST_TRANS_SUBJECT = '{{entity.trans.subject}}';
-    private const TEST_CONTENT       = '{{entity.content}}';
+    private const TEST_CONTENT = '{{entity.content}}';
 
     /** @var EmailTemplateSyntax */
     private $constraint;
@@ -28,30 +30,30 @@ class EmailTemplateSyntaxValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var EmailTemplate */
     private $template;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject */
     private $emailRenderer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $context;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
+    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $localizationManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $entityConfigProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new EmailTemplateSyntax();
         $this->emailRenderer = $this->createMock(EmailRenderer::class);
         $this->context = $this->createMock(ExecutionContextInterface::class);
-        $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->localizationManager = $this->createMock(LocalizationManager::class);
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->template = new EmailTemplate();
     }
 
-    public function testValidateNoErrors()
+    public function testValidateNoErrors(): void
     {
         $this->emailRenderer->expects($this->at(0))
             ->method('validateTemplate')
@@ -67,14 +69,29 @@ class EmailTemplateSyntaxValidatorTest extends \PHPUnit\Framework\TestCase
         $validator->validate($this->template, $this->constraint);
     }
 
-    public function testValidateSandboxErrors()
+    public function testValidateSandboxErrors(): void
     {
-        $trans = new EmailTemplateTranslation();
-        $trans
-            ->setField('subject')
-            ->setLocale('fr')
-            ->setContent(self::TEST_TRANS_SUBJECT);
-        $this->template->getTranslations()->add($trans);
+        $defaultLocalization = new Localization();
+        $defaultLocalization->addTitle(
+            (new LocalizedFallbackValue())
+                ->setLocalization($defaultLocalization)
+                ->setString('English')
+        );
+
+        $frenchLocalization = new Localization();
+        $frenchLocalization->addTitle(
+            (new LocalizedFallbackValue())
+                ->setLocalization($defaultLocalization)
+                ->setString('French')
+        );
+
+        $this->template->addTranslation(
+            (new EmailTemplateTranslation())
+                ->setLocalization($frenchLocalization)
+                ->setSubject(self::TEST_TRANS_SUBJECT)
+                ->setSubjectFallback(false)
+                ->setContentFallback(true)
+        );
 
         $this->emailRenderer->expects($this->exactly(3))
             ->method('validateTemplate')
@@ -82,63 +99,48 @@ class EmailTemplateSyntaxValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->entityConfigProvider->expects($this->exactly(3))
             ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [get_class($this->template), 'subject', true],
-                        [get_class($this->template), 'content', false],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [get_class($this->template), 'subject', true],
+                [get_class($this->template), 'content', false],
+            ]);
+
         $subjectConfig = new Config(new FieldConfigId('entity', get_class($this->template), 'subject', 'string'));
         $subjectConfig->set('label', 'subject.label');
         $this->entityConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
             ->with(get_class($this->template), 'subject')
-            ->will($this->returnValue($subjectConfig));
+            ->willReturn($subjectConfig);
 
-        $this->localeSettings->expects($this->exactly(3))
-            ->method('getLanguage')
-            ->will($this->returnValue('en'));
-        $this->localeSettings->expects($this->exactly(3))
-            ->method('getLocalesByCodes')
-            ->will(
-                $this->returnValueMap(
+        $this->localizationManager->expects($this->once())
+            ->method('getDefaultLocalization')
+            ->willReturn($defaultLocalization);
+
+        $this->context->expects($this->exactly(3))
+            ->method('addViolation')
+            ->withConsecutive(
+                [
+                    $this->constraint->message,
                     [
-                        [['en'], 'en', ['en' => 'English']],
-                        [['fr'], 'en', ['fr' => 'French']],
-                    ]
-                )
-            );
-
-        $this->context->expects($this->at(0))
-            ->method('addViolation')
-            ->with(
-                $this->constraint->message,
+                        '{{ field }}' => 'subject.label',
+                        '{{ locale }}' => 'English',
+                        '{{ error }}' => 'message',
+                    ],
+                ],
                 [
-                    '{{ field }}'  => 'subject.label',
-                    '{{ locale }}' => 'English',
-                    '{{ error }}'  => 'message',
-                ]
-            );
-        $this->context->expects($this->at(1))
-            ->method('addViolation')
-            ->with(
-                $this->constraint->message,
+                    $this->constraint->message,
+                    [
+                        '{{ field }}' => 'content',
+                        '{{ locale }}' => 'English',
+                        '{{ error }}' => 'message',
+                    ],
+                ],
                 [
-                    '{{ field }}'  => 'content',
-                    '{{ locale }}' => 'English',
-                    '{{ error }}'  => 'message',
-                ]
-            );
-        $this->context->expects($this->at(2))
-            ->method('addViolation')
-            ->with(
-                $this->constraint->message,
-                [
-                    '{{ field }}'  => 'subject.label',
-                    '{{ locale }}' => 'French',
-                    '{{ error }}'  => 'message',
+                    $this->constraint->message,
+                    [
+                        '{{ field }}' => 'subject.label',
+                        '{{ locale }}' => 'French',
+                        '{{ error }}' => 'message',
+                    ],
                 ]
             );
 
@@ -150,13 +152,14 @@ class EmailTemplateSyntaxValidatorTest extends \PHPUnit\Framework\TestCase
      * @param string $className
      * @return EmailTemplateSyntaxValidator
      */
-    private function getValidator($className)
+    private function getValidator($className): EmailTemplateSyntaxValidator
     {
         $this->template
             ->setContent(self::TEST_CONTENT)
             ->setSubject(self::TEST_SUBJECT)
             ->setEntityName($className);
 
+        /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
@@ -164,7 +167,7 @@ class EmailTemplateSyntaxValidatorTest extends \PHPUnit\Framework\TestCase
 
         $validator = new EmailTemplateSyntaxValidator(
             $this->emailRenderer,
-            $this->localeSettings,
+            $this->localizationManager,
             $this->entityConfigProvider,
             $translator
         );

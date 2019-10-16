@@ -7,7 +7,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSyntax;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -21,8 +21,8 @@ class EmailTemplateSyntaxValidator extends ConstraintValidator
     /** @var EmailRenderer */
     private $emailRenderer;
 
-    /** @var LocaleSettings */
-    private $localeSettings;
+    /** @var LocalizationManager */
+    private $localizationManager;
 
     /** @var ConfigProvider */
     private $entityConfigProvider;
@@ -31,25 +31,25 @@ class EmailTemplateSyntaxValidator extends ConstraintValidator
     private $translator;
 
     /**
-     * @param EmailRenderer       $emailRenderer
-     * @param LocaleSettings      $localeSettings
-     * @param ConfigProvider      $entityConfigProvider
+     * @param EmailRenderer $emailRenderer
+     * @param LocalizationManager $localizationManager
+     * @param ConfigProvider $entityConfigProvider
      * @param TranslatorInterface $translator
      */
     public function __construct(
         EmailRenderer $emailRenderer,
-        LocaleSettings $localeSettings,
+        LocalizationManager $localizationManager,
         ConfigProvider $entityConfigProvider,
         TranslatorInterface $translator
     ) {
         $this->emailRenderer = $emailRenderer;
-        $this->localeSettings = $localeSettings;
+        $this->localizationManager = $localizationManager;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->translator = $translator;
     }
 
     /**
-     * @param EmailTemplate                  $value
+     * @param EmailTemplate $value
      * @param Constraint|EmailTemplateSyntax $constraint
      */
     public function validate($value, Constraint $constraint)
@@ -59,13 +59,21 @@ class EmailTemplateSyntaxValidator extends ConstraintValidator
             ['field' => 'subject', 'locale' => null, 'template' => $value->getSubject()],
             ['field' => 'content', 'locale' => null, 'template' => $value->getContent()],
         ];
-        $translations = $value->getTranslations();
-        foreach ($translations as $trans) {
-            if (in_array($trans->getField(), ['subject', 'content'], true)) {
+
+        foreach ($value->getTranslations() as $templateTranslation) {
+            if (!$templateTranslation->isSubjectFallback()) {
                 $itemsToValidate[] = [
-                    'field'    => $trans->getField(),
-                    'locale'   => $trans->getLocale(),
-                    'template' => $trans->getContent()
+                    'field' => 'subject',
+                    'locale' => $templateTranslation->getLocalization(),
+                    'template' => $templateTranslation->getSubject(),
+                ];
+            }
+
+            if (!$templateTranslation->isContentFallback()) {
+                $itemsToValidate[] = [
+                    'field' => 'content',
+                    'locale' => $templateTranslation->getLocalization(),
+                    'template' => $templateTranslation->getContent(),
                 ];
             }
         }
@@ -80,22 +88,24 @@ class EmailTemplateSyntaxValidator extends ConstraintValidator
                 $this->emailRenderer->validateTemplate($item['template']);
             } catch (SyntaxError $e) {
                 $errors[] = [
-                    'field'  => $item['field'],
+                    'field' => $item['field'],
                     'locale' => $item['locale'],
-                    'error'  => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ];
             }
         }
 
         // add violations for found errors
         if (!empty($errors)) {
+            $defaultLocalization = $this->localizationManager->getDefaultLocalization();
             foreach ($errors as $error) {
+                $localization = $error['locale'] ?? $defaultLocalization;
                 $this->context->addViolation(
                     $constraint->message,
                     [
-                        '{{ field }}'  => $this->getFieldLabel(ClassUtils::getClass($value), $error['field']),
-                        '{{ locale }}' => $this->getLocaleName($error['locale']),
-                        '{{ error }}'  => $error['error']
+                        '{{ field }}' => $this->getFieldLabel(ClassUtils::getClass($value), $error['field']),
+                        '{{ locale }}' => (string)$localization->getTitle($defaultLocalization),
+                        '{{ error }}' => $error['error'],
                     ]
                 );
             }
@@ -119,24 +129,5 @@ class EmailTemplateSyntaxValidator extends ConstraintValidator
         $fieldLabel = $this->entityConfigProvider->getConfig($className, $fieldName)->get('label');
 
         return $this->translator->trans($fieldLabel);
-    }
-
-    /**
-     * Gets translated locale name by its code
-     *
-     * @param string|null $locale The locale code. NULL means default locale
-     *
-     * @return string
-     */
-    private function getLocaleName($locale)
-    {
-        $currentLang = $this->localeSettings->getLanguage();
-        if (!$locale) {
-            $locale = $currentLang;
-        }
-
-        $localeNames = $this->localeSettings->getLocalesByCodes([$locale], $currentLang);
-
-        return $localeNames[$locale];
     }
 }

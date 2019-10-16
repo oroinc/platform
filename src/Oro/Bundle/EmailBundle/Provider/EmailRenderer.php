@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRenderer;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface;
@@ -22,10 +20,11 @@ class EmailRenderer extends TemplateRenderer
     private $translator;
 
     /**
-     * @param Environment                             $environment
+     * @param Environment $environment
      * @param TemplateRendererConfigProviderInterface $configProvider
-     * @param VariableProcessorRegistry               $variableProcessors
-     * @param TranslatorInterface                     $translator
+     * @param VariableProcessorRegistry $variableProcessors
+     * @param EmailTemplateContentProvider $contentProvider
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         Environment $environment,
@@ -41,7 +40,7 @@ class EmailRenderer extends TemplateRenderer
      * Compiles the given email template.
      *
      * @param EmailTemplateInterface $template
-     * @param array                  $templateParams
+     * @param array $templateParams
      *
      * @return array [email subject, email body]
      *
@@ -61,30 +60,19 @@ class EmailRenderer extends TemplateRenderer
     /**
      * Compiles the given email template for the preview purposes.
      *
-     * @param EmailTemplate $template
-     * @param string|null   $locale
+     * @param EmailTemplateInterface $template
      *
      * @return string
      *
      * @throws \Twig\Error\Error if the given template cannot be compiled
      */
-    public function compilePreview(EmailTemplate $template, string $locale = null): string
+    public function compilePreview(EmailTemplateInterface $template): string
     {
         $this->ensureSandboxConfigured();
 
-        $content = $template->getContent();
-        if ($locale) {
-            foreach ($template->getTranslations() as $translation) {
-                /** @var EmailTemplateTranslation $translation */
-                if ($translation->getLocale() === $locale && $translation->getField() === 'content') {
-                    $content = $translation->getContent();
-                }
-            }
-        }
-
-        $templateWrapper = $this->environment->createTemplate('{% verbatim %}' . $content . '{% endverbatim %}');
-
-        return $templateWrapper->render();
+        return $this->environment
+            ->createTemplate('{% verbatim %}' . $template->getContent() . '{% endverbatim %}')
+            ->render();
     }
 
     /**

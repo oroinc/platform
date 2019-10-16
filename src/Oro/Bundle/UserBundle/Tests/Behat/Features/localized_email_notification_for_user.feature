@@ -41,12 +41,16 @@ Feature: Localized email notification for user
       | Content | English Invite Body    |
     And I click "French"
     And fill "Email Template Form" with:
-      | Subject | French Invite Subject |
-      | Content | French Invite Body    |
+      | Subject Fallback | false                 |
+      | Content Fallback | false                 |
+      | Subject          | French Invite Subject |
+      | Content          | French Invite Body    |
     And I click "German"
     And fill "Email Template Form" with:
-      | Subject | German Invite Subject |
-      | Content | German Invite Body    |
+      | Subject Fallback | false                 |
+      | Content Fallback | false                 |
+      | Subject          | German Invite Subject |
+      | Content          | German Invite Body    |
     And I submit form
     Then I should see "Template saved" flash message
     When I go to System / User Management / Users
@@ -75,12 +79,16 @@ Feature: Localized email notification for user
       | Content | English Change Password Body    |
     And I click "French"
     And fill "Email Template Form" with:
-      | Subject | French Change Password Subject |
-      | Content | French Change Password Body    |
+      | Subject Fallback | false                          |
+      | Content Fallback | false                          |
+      | Subject          | French Change Password Subject |
+      | Content          | French Change Password Body    |
     And I click "German"
     And fill "Email Template Form" with:
-      | Subject | German Change Password Subject |
-      | Content | German Change Password Body    |
+      | Subject Fallback | false                          |
+      | Content Fallback | false                          |
+      | Subject          | German Change Password Subject |
+      | Content          | German Change Password Body    |
     And I submit form
     Then I should see "Template saved" flash message
     When I go to System / User Management / Users
@@ -104,12 +112,16 @@ Feature: Localized email notification for user
       | Content | English Reset Password Body    |
     And I click "French"
     And fill "Email Template Form" with:
-      | Subject | French Reset Password Subject |
-      | Content | French Reset Password Body    |
+      | Subject Fallback | false                         |
+      | Content Fallback | false                         |
+      | Subject          | French Reset Password Subject |
+      | Content          | French Reset Password Body    |
     And I click "German"
     And fill "Email Template Form" with:
-      | Subject | German Reset Password Subject |
-      | Content | German Reset Password Body    |
+      | Subject Fallback | false                         |
+      | Content Fallback | false                         |
+      | Subject          | German Reset Password Subject |
+      | Content          | German Reset Password Body    |
     And I submit form
     Then I should see "Template saved" flash message
     When I go to System / User Management / Users

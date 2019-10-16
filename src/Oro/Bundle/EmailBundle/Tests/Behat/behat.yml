@@ -13,6 +13,7 @@ oro_behat_extension:
         - OroActivityListBundle::ActivityContext
         - OroConfigBundle::FeatureContext
         - OroSecurityBundle::ACLContext
+        - OroEmailBundle::EmailContext
       paths:
         - '@OroEmailBundle/Tests/Behat/Features'
   elements:
@@ -38,9 +39,15 @@ oro_behat_extension:
           Subject:
             type: 'css'
             locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__subject"]'
+          Subject Fallback:
+            type: 'css'
+            locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__subject-fallback"]'
           Content:
             type: 'css'
             locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__content"]'
+          Content Fallback:
+            type: 'css'
+            locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__content-fallback"]'
 
     EmailNotificationLink:
       selector: 'a.email-notification-icon'

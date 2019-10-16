@@ -58,7 +58,6 @@ services:
         alias: oro_user.manager
 
     oro_user.manager.mailer_processor_link:
-        public: false
         tags:
             - { name: oro_service_link, service: oro_user.mailer.processor }
 
@@ -92,14 +91,12 @@ services:
 
     oro_user.security.user_loader:
         class: Oro\Bundle\UserBundle\Security\UserLoader
-        public: false
         arguments:
             - '@doctrine'
             - '@oro_config.manager'
 
     oro_user.security.provider:
         class: '%oro_user.security.provider.class%'
-        public: false
         arguments:
             - '@oro_user.security.user_loader'
             - '@doctrine'
@@ -133,7 +130,6 @@ services:
 
     oro_user.twig.user_extension:
         class: Oro\Bundle\UserBundle\Twig\OroUserExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -388,7 +384,6 @@ services:
 
     oro_user.mailer.processor:
         class: Oro\Bundle\UserBundle\Mailer\Processor
-        public: false
         arguments:
             - '@oro_user.mailer.user_template_email_sender'
 
@@ -429,7 +424,6 @@ services:
 
     oro_user.provider.role_entity_name:
         class: Oro\Bundle\UserBundle\Provider\RoleEntityNameProvider
-        public: false
         tags:
             - { name: oro_entity.name_provider, priority: 100 }
 
@@ -580,7 +574,6 @@ services:
         class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordExtension
         calls:
             - [setRequestStack, ["@request_stack"]]
-        public: false
         shared: false
         tags:
             - { name: oro_datagrid.extension }
@@ -596,7 +589,6 @@ services:
 
     oro_user.scope_criteria_provider.user:
         class: Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider
-        public: false
         arguments:
             - "@security.token_storage"
 
@@ -634,11 +626,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: security.authentication.failure, method: onAuthenticationFailure, priority: -255 }
 
-    oro_user.provider.user_preferred_language_provider:
-        class: Oro\Bundle\UserBundle\Provider\UserPreferredLanguageProvider
-        public: false
+    oro_user.provider.user_preferred_localization_provider:
+        class: Oro\Bundle\UserBundle\Provider\UserPreferredLocalizationProvider
         arguments:
             - '@oro_config.user'
-            - '@oro_locale.settings'
+            - '@oro_locale.manager.localization'
         tags:
-            - { name: oro_locale.preferred_language_provider }
+            - { name: oro_locale.preferred_localization_provider }
+
