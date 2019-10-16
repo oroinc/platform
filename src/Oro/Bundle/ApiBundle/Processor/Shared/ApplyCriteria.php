@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -33,7 +32,7 @@ class ApplyCriteria implements ProcessorInterface
         /** @var Context $context */
 
         $criteria = $context->getCriteria();
-        if ($criteria instanceof Criteria) {
+        if (null !== $criteria) {
             $query = $context->getQuery();
             if ($query instanceof QueryBuilder) {
                 $this->criteriaConnector->applyCriteria($query, $criteria);

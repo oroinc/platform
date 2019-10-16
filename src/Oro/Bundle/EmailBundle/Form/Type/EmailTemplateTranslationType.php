@@ -2,109 +2,170 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Form type for email templates with multilocales option
+ * Form type for EmailTemplateTranslation entity
  */
 class EmailTemplateTranslationType extends AbstractType
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var string Check content on wysiwyg empty formatting */
+    private const EMPTY_REGEX = '#^(\r*\n*)*'
+        . '\<!DOCTYPE html\>(\r*\n*)*'
+        . '\<html\>(\r*\n*)*'
+        . '\<head\>(\r*\n*)*\</head\>(\r*\n*)*'
+        . '\<body\>(\r*\n*)*\</body\>(\r*\n*)*'
+        . '\</html\>(\r*\n*)*$#';
 
-    /** @var string */
-    protected $parentClass;
+    /** @var TranslatorInterface */
+    private $translator;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param string $parentClass
-     */
-    public function __construct(ConfigManager $configManager, string $parentClass)
-    {
-        $this->configManager = $configManager;
-        $this->parentClass = $parentClass;
-    }
+    /** @var LocalizationManager */
+    private $localizationManager;
 
     /**
-     * Set labels for translation widget tabs
-     *
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
+     * @param TranslatorInterface $translator
+     * @param LocalizationManager $localizationManager
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function __construct(TranslatorInterface $translator, LocalizationManager $localizationManager)
     {
-        $view->vars['labels'] = $options['labels'];
+        $this->translator = $translator;
+        $this->localizationManager = $localizationManager;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $isWysiwygEnabled = $this->configManager->get('oro_form.wysiwyg_enabled');
+        $builder
+            ->add('subject', TextType::class, [
+                'attr' => [
+                    'maxlength' => 255,
+                ],
+                'required' => false,
+            ])
+            ->add('content', EmailTemplateRichTextType::class, [
+                'attr' => [
+                    'class' => 'template-editor',
+                    'data-wysiwyg-enabled' => $options['wysiwyg_enabled'],
+                ],
+                'required' => false,
+                'wysiwyg_options' => $options['wysiwyg_options'],
+            ]);
 
-        $resolver->setDefaults(
-            [
-                'translatable_class'   => 'Oro\\Bundle\\EmailBundle\\Entity\\EmailTemplate',
-                'csrf_token_id'        => 'emailtemplate_translation',
-                'labels'               => [],
-                'content_options'      => [],
-                'subject_options'      => [],
-                'fields'               => function (Options $options) use ($isWysiwygEnabled) {
-                    return [
-                        'subject' => array_merge_recursive(
-                            [
-                                'field_type' => TextType::class
-                            ],
-                            $options['subject_options']
+        if ($options['localization']) {
+            $fallbackLabel = $options['localization']->getParentLocalization()
+                ? $this->translator->trans(
+                    'oro.email.emailtemplatetranslation.form.use_parent_localization',
+                    [
+                        '%name%' => $options['localization']->getParentLocalization()->getTitle(
+                            $this->localizationManager->getDefaultLocalization()
                         ),
-                        'content' => array_merge_recursive(
-                            [
-                                'field_type'      => EmailTemplateRichTextType::class,
-                                'attr'            => [
-                                    'class'                => 'template-editor',
-                                    'data-wysiwyg-enabled' => $isWysiwygEnabled,
-                                ],
-                                'wysiwyg_options' => [
-                                    'height'     => '250px'
-                                ]
-                            ],
-                            $options['content_options']
-                        )
-                    ];
+                    ]
+                )
+                : $this->translator->trans(
+                    'oro.email.emailtemplatetranslation.form.use_default_localization'
+                );
+
+            $builder
+                ->add('subjectFallback', CheckboxType::class, [
+                    'label' => $fallbackLabel,
+                    'required' => false,
+                    'block_name' => 'fallback_checkbox',
+                ])
+                ->add('contentFallback', CheckboxType::class, [
+                    'label' => $fallbackLabel,
+                    'required' => false,
+                    'block_name' => 'fallback_checkbox',
+                ]);
+        }
+
+        $builder->addViewTransformer(
+            new CallbackTransformer(
+                static function ($data) use ($options) {
+                    // Create localized template for localization
+                    if (!$data) {
+                        $data = new EmailTemplateTranslation();
+                        $data->setLocalization($options['localization']);
+                    }
+
+                    return $data;
                 },
-            ]
+                static function ($data) {
+                    // Clear empty input
+                    if ($data instanceof EmailTemplateTranslation) {
+                        if (!trim($data->getSubject())) {
+                            $data->setSubject(null);
+                        }
+
+                        if (preg_match(self::EMPTY_REGEX, trim($data->getContent()))) {
+                            $data->setContent(null);
+                        }
+                    }
+
+                    return $data;
+                }
+            )
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
-        return $this->parentClass;
+        $view->vars['localization_id'] = null;
+        $view->vars['localization_title'] = null;
+        $view->vars['localization_parent_id'] = null;
+
+        if (isset($options['localization'])) {
+            $view->vars['localization_id'] = $options['localization']->getId();
+            $view->vars['localization_title'] = $options['localization']->getTitle(
+                $this->localizationManager->getDefaultLocalization()
+            );
+
+            if ($options['localization']->getParentLocalization()) {
+                $view->vars['localization_parent_id'] = $options['localization']->getParentLocalization()->getId();
+            }
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        return $this->getBlockPrefix();
+        $resolver->setDefaults([
+            'data_class' => EmailTemplateTranslation::class,
+            'allow_extra_fields' => true,
+            'localization' => null,
+            'wysiwyg_enabled' => false,
+            'wysiwyg_options' => [],
+        ]);
+
+        $resolver->setRequired('allow_extra_fields');
+        $resolver->setAllowedTypes('localization', ['null', Localization::class]);
+        $resolver->setAllowedTypes('wysiwyg_enabled', ['bool']);
+        $resolver->setAllowedTypes('wysiwyg_options', ['array']);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
-        return 'oro_email_emailtemplate_translatation';
+        return 'oro_email_emailtemplate_localization';
     }
 }

@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\NotificationBundle\Manager;
 
-use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Model\SenderAwareInterface;
-use Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider;
-use Oro\Bundle\LocaleBundle\Provider\PreferredLanguageProviderInterface;
+use Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider;
 use Oro\Bundle\NotificationBundle\Exception\NotificationSendException;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
@@ -17,44 +15,30 @@ use Psr\Log\LoggerInterface;
  */
 class EmailNotificationManager
 {
-    /**
-     * @var LoggerInterface
-     */
+    /** @var EmailNotificationSender */
+    private $emailNotificationSender;
+
+    /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @var PreferredLanguageProviderInterface
-     */
-    private $languageProvider;
-
-    /**
-     * @var EmailTemplateContentProvider
-     */
-    private $emailTemplateContentProvider;
-
-    /**
-     * @var EmailNotificationSender
-     */
-    private $emailNotificationSender;
+    /** @var LocalizedTemplateProvider */
+    private $localizedTemplateProvider;
 
     /**
      * EmailNotificationManager constructor.
      *
      * @param EmailNotificationSender $emailNotificationSender
      * @param LoggerInterface $logger
-     * @param EmailTemplateContentProvider $emailTemplateContentProvider
-     * @param PreferredLanguageProviderInterface $languageProvider
+     * @param LocalizedTemplateProvider $localizedTemplateProvider
      */
     public function __construct(
         EmailNotificationSender $emailNotificationSender,
         LoggerInterface $logger,
-        EmailTemplateContentProvider $emailTemplateContentProvider,
-        PreferredLanguageProviderInterface $languageProvider
+        LocalizedTemplateProvider $localizedTemplateProvider
     ) {
         $this->emailNotificationSender = $emailNotificationSender;
         $this->logger = $logger;
-        $this->emailTemplateContentProvider = $emailTemplateContentProvider;
-        $this->languageProvider = $languageProvider;
+        $this->localizedTemplateProvider = $localizedTemplateProvider;
     }
 
     /**
@@ -98,24 +82,34 @@ class EmailNotificationManager
         LoggerInterface $logger = null
     ): void {
         try {
-            $recipientsGroups = $this->groupRecipientsByLanguage($notification->getRecipients());
-            foreach ($recipientsGroups as $language => $recipients) {
-                $emailTemplateModel = $this->emailTemplateContentProvider->getTemplateContent(
+            $sender = $notification instanceof SenderAwareInterface
+                ? $notification->getSender()
+                : null;
+
+            $templateCollection = $this->localizedTemplateProvider->getAggregated(
+                $notification->getRecipients(),
+                $notification->getTemplateCriteria(),
+                ['entity' => $notification->getEntity()] + $params
+            );
+
+            foreach ($templateCollection as $localizedTemplateDTO) {
+                $languageNotification = new TemplateEmailNotification(
                     $notification->getTemplateCriteria(),
-                    $language,
-                    ['entity' => $notification->getEntity()] + $params
+                    $localizedTemplateDTO->getRecipients(),
+                    $notification->getEntity(),
+                    $sender
                 );
 
-                $languageNotification = $this->createLanguageNotification($notification, $recipients);
+                $emailTemplate = $localizedTemplateDTO->getEmailTemplate();
 
                 if ($notification instanceof TemplateMassNotification) {
                     if ($notification->getSubject()) {
-                        $emailTemplateModel->setSubject($notification->getSubject());
+                        $emailTemplate->setSubject($notification->getSubject());
                     }
 
-                    $this->emailNotificationSender->sendMass($languageNotification, $emailTemplateModel);
+                    $this->emailNotificationSender->sendMass($languageNotification, $emailTemplate);
                 } else {
-                    $this->emailNotificationSender->send($languageNotification, $emailTemplateModel);
+                    $this->emailNotificationSender->send($languageNotification, $emailTemplate);
                 }
             }
         } catch (\Exception $exception) {
@@ -124,42 +118,5 @@ class EmailNotificationManager
 
             throw new NotificationSendException($notification);
         }
-    }
-
-    /**
-     * @param array|EmailHolderInterface[] $recipients
-     * @return array|EmailHolderInterface[]
-     */
-    private function groupRecipientsByLanguage(array $recipients): array
-    {
-        $groupedRecipients = [];
-        foreach ($recipients as $recipient) {
-            $groupedRecipients[$this->languageProvider->getPreferredLanguage($recipient)][] = $recipient;
-        }
-
-        return $groupedRecipients;
-    }
-
-    /**
-     * @param TemplateEmailNotificationInterface $notification
-     * @param iterable $recipients
-     * @return TemplateEmailNotification
-     */
-    private function createLanguageNotification(
-        TemplateEmailNotificationInterface $notification,
-        iterable $recipients
-    ): TemplateEmailNotification {
-        $sender = $notification instanceof SenderAwareInterface
-            ? $notification->getSender()
-            : null;
-
-        $languageNotification = new TemplateEmailNotification(
-            $notification->getTemplateCriteria(),
-            $recipients,
-            $notification->getEntity(),
-            $sender
-        );
-
-        return $languageNotification;
     }
 }

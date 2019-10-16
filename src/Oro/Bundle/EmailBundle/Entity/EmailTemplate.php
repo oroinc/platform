@@ -3,11 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
-use Gedmo\Translatable\Translatable;
 use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+use Oro\Bundle\EmailBundle\Model\ExtendEmailTemplate;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -22,7 +22,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Index(name="email_is_system_idx", columns={"isSystem"}),
  * @ORM\Index(name="email_entity_name_idx", columns={"entityName"})})
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository")
- * @Gedmo\TranslationEntity(class="Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation")
  * @Config(
  *      defaultValues={
  *          "ownership"={
@@ -50,7 +49,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * )
  * @JMS\ExclusionPolicy("ALL")
  */
-class EmailTemplate implements EmailTemplateInterface, Translatable
+class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterface
 {
     public const TYPE_HTML = 'html';
     public const TYPE_TEXT = 'txt';
@@ -114,7 +113,6 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * @var string
      *
      * @ORM\Column(name="subject", type="string", length=255, nullable=true)
-     * @Gedmo\Translatable
      * @JMS\Type("string")
      * @JMS\Expose
      */
@@ -124,7 +122,6 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * @var string
      *
      * @ORM\Column(name="content", type="text", nullable=true)
-     * @Gedmo\Translatable
      * @JMS\Type("string")
      * @JMS\Expose
      */
@@ -153,17 +150,11 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     protected $type = 'html';
 
     /**
-     * @var string
-     *
-     * @Gedmo\Locale()
-     */
-    protected $locale;
-
-    /**
      * @ORM\OneToMany(
-     *     targetEntity="Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation",
-     *     mappedBy="object",
-     *     cascade={"persist", "remove"}
+     *     targetEntity="EmailTemplateTranslation",
+     *     mappedBy="template",
+     *     cascade={"persist", "remove"},
+     *     fetch="EXTRA_LAZY"
      * )
      * @Assert\Valid()
      */
@@ -187,7 +178,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * @param        $name
      * @param string $content
      * @param string $type
-     * @param bool   $isSystem
+     * @param bool $isSystem
      */
     public function __construct($name = '', $content = '', $type = 'html', $isSystem = false)
     {
@@ -208,9 +199,11 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
             $this->isEditable = true;
         }
 
-        $this->type         = $type;
-        $this->content      = $parsedContent['content'];
+        $this->type = $type;
+        $this->content = $parsedContent['content'];
         $this->translations = new ArrayCollection();
+
+        parent::__construct();
     }
 
     /**
@@ -407,30 +400,6 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     }
 
     /**
-     * Set locale
-     *
-     * @param string $locale
-     *
-     * @return EmailTemplate
-     */
-    public function setLocale($locale)
-    {
-        $this->locale = $locale;
-
-        return $this;
-    }
-
-    /**
-     * Get locale
-     *
-     * @return string
-     */
-    public function getLocale()
-    {
-        return $this->locale;
-    }
-
-    /**
      * Set template type
      *
      * @param string $type
@@ -455,32 +424,56 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     }
 
     /**
-     * Set translations
-     *
-     * @param ArrayCollection $translations
-     *
+     * @param Collection $translations
      * @return EmailTemplate
      */
-    public function setTranslations($translations)
+    public function setTranslations(iterable $translations): self
     {
-        /** @var EmailTemplateTranslation $translation */
-        foreach ($translations as $translation) {
-            $translation->setObject($this);
+        foreach ($this->translations as $translation) {
+            $this->removeTranslation($translation);
         }
 
-        $this->translations = $translations;
+        foreach ($translations as $translation) {
+            $this->addTranslation($translation);
+        }
 
         return $this;
     }
 
     /**
-     * Get translations
-     *
-     * @return ArrayCollection|EmailTemplateTranslation[]
+     * @return Collection|EmailTemplateTranslation[]
      */
-    public function getTranslations()
+    public function getTranslations(): Collection
     {
         return $this->translations;
+    }
+
+    /**
+     * @param EmailTemplateTranslation $translation
+     * @return EmailTemplate
+     */
+    public function addTranslation(EmailTemplateTranslation $translation): self
+    {
+        if (!$this->translations->contains($translation)) {
+            $this->translations->add($translation);
+            $translation->setTemplate($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param EmailTemplateTranslation $translation
+     * @return EmailTemplate
+     */
+    public function removeTranslation(EmailTemplateTranslation $translation): self
+    {
+        if ($this->translations->contains($translation)) {
+            $this->translations->removeElement($translation);
+            $translation->setTemplate(null);
+        }
+
+        return $this;
     }
 
     /**
@@ -533,17 +526,16 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     public function __clone()
     {
         // cloned entity will be child
-        $this->parent     = $this->id;
-        $this->id         = null;
-        $this->isSystem   = false;
+        $this->parent = $this->id;
+        $this->id = null;
+        $this->isSystem = false;
         $this->isEditable = true;
 
-        if ($this->getTranslations() instanceof ArrayCollection) {
-            $clonedTranslations = new ArrayCollection();
-            foreach ($this->getTranslations() as $translation) {
-                $clonedTranslations->add(clone $translation);
-            }
-            $this->setTranslations($clonedTranslations);
+        $originalTranslations = $this->getTranslations();
+
+        $this->translations = new ArrayCollection();
+        foreach ($originalTranslations as $translation) {
+            $this->addTranslation(clone $translation);
         }
     }
 
@@ -566,8 +558,8 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     {
         $params = [];
 
-        $boolParams     = array('isSystem', 'isEditable');
-        $templateParams = array('name', 'subject', 'entityName', 'isSystem', 'isEditable');
+        $boolParams = ['isSystem', 'isEditable'];
+        $templateParams = ['name', 'subject', 'entityName', 'isSystem', 'isEditable'];
         foreach ($templateParams as $templateParam) {
             if (preg_match('#@' . $templateParam . '\s?=\s?(.*)\n#i', $content, $match)) {
                 $val = trim($match[1]);
@@ -575,13 +567,13 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
                     $val = (bool)$val;
                 }
                 $params[$templateParam] = $val;
-                $content                = trim(str_replace($match[0], '', $content));
+                $content = trim(str_replace($match[0], '', $content));
             }
         }
 
         return [
             'content' => $content,
-            'params'  => $params,
+            'params' => $params,
         ];
     }
 }

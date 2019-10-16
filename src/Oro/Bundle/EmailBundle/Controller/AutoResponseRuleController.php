@@ -119,7 +119,7 @@ class AutoResponseRuleController extends AbstractController
 
         return [
             'form'  => $form->createView(),
-            'saved' => $form->isValid(),
+            'saved' => $form->isSubmitted() && $form->isValid(),
             'emailEntityData' => $entity,
             'metadata' => $this->get(Manager::class)->getMetadata('string')
         ];

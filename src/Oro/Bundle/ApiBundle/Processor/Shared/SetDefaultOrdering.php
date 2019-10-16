@@ -10,7 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Sets ordering be entity identifier to the Criteria object from the context
- * for ORM entities if an ordering is not set yet.
+ * if the ordering is not set yet.
  */
 class SetDefaultOrdering implements ProcessorInterface
 {
@@ -38,17 +38,26 @@ class SetDefaultOrdering implements ProcessorInterface
             return;
         }
 
+        $idFieldNames = [];
         $entityClass = $context->getManageableEntityClass($this->doctrineHelper);
-        if (!$entityClass) {
-            // only manageable entities or resources based on manageable entities are supported
-            return;
+        if ($entityClass) {
+            $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
+        } else {
+            $config = $context->getConfig();
+            if (null !== $config && $config->isSortingEnabled()) {
+                $fieldNames = $config->getIdentifierFieldNames();
+                foreach ($fieldNames as $fieldName) {
+                    $idFieldNames[] = $config->getField($fieldName)->getPropertyPath($fieldName);
+                }
+            }
         }
 
-        $ordering = [];
-        $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
-        foreach ($idFieldNames as $propertyPath) {
-            $ordering[$propertyPath] = Criteria::ASC;
+        if ($idFieldNames) {
+            $ordering = [];
+            foreach ($idFieldNames as $propertyPath) {
+                $ordering[$propertyPath] = Criteria::ASC;
+            }
+            $criteria->orderBy($ordering);
         }
-        $criteria->orderBy($ordering);
     }
 }

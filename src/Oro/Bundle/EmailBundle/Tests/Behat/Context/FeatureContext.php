@@ -10,6 +10,9 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
+/**
+ * The execution context for test manipulations with email notifications
+ */
 class FeatureContext extends OroFeatureContext implements
     OroPageObjectAware,
     FixtureLoaderAwareInterface
@@ -148,5 +151,21 @@ JS;
 
         $uploadFile = $this->createElement('Upload Email Attachment File');
         $uploadFile->setValue($fileName);
+    }
+
+    /**
+     * Example: I follow "Reply All" on "Merry Christmas" email notification
+     *
+     * @Given /^I follow "(?P<locator>[^"]+)" on "(?P<emailTitle>[^"]+)" email notification$/
+     *
+     * @param string $locator
+     * @param string $emailTitle
+     */
+    public function iFollowLinkOnEmailNotification(string $locator, string $emailTitle): void
+    {
+        $email = $this->createElement('ShortEmailList')->findElementContains('EmailListItem', $emailTitle);
+        self::assertNotNull($email, "Email with '$emailTitle' title not found");
+
+        $email->clickLink($locator);
     }
 }

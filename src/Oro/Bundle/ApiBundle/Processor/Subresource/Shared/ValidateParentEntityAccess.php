@@ -7,16 +7,17 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityIdMetadataInterface;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
+use Oro\Bundle\ApiBundle\Util\QueryAclHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\EntitySerializer\QueryFactory;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
- * Loads the parent entity from the database and checks whether an VIEW access to it is granted.
+ * Checks whether an VIEW access to the parent entity is granted.
  */
 class ValidateParentEntityAccess implements ProcessorInterface
 {
@@ -28,22 +29,22 @@ class ValidateParentEntityAccess implements ProcessorInterface
     /** @var EntityIdHelper */
     private $entityIdHelper;
 
-    /** @var QueryFactory */
-    private $queryFactory;
+    /** @var QueryAclHelper */
+    private $queryAclHelper;
 
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param EntityIdHelper $entityIdHelper
-     * @param QueryFactory   $queryFactory
+     * @param QueryAclHelper $queryAclHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityIdHelper $entityIdHelper,
-        QueryFactory $queryFactory
+        QueryAclHelper $queryAclHelper
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityIdHelper = $entityIdHelper;
-        $this->queryFactory = $queryFactory;
+        $this->queryAclHelper = $queryAclHelper;
     }
 
     /**
@@ -85,7 +86,8 @@ class ValidateParentEntityAccess implements ProcessorInterface
             $parentEntityClass,
             $context->getParentId(),
             $parentConfig,
-            $parentMetadata
+            $parentMetadata,
+            $context->getRequestType()
         );
 
         $context->setProcessed(self::OPERATION_NAME);
@@ -96,16 +98,22 @@ class ValidateParentEntityAccess implements ProcessorInterface
      * @param mixed                     $parentEntityId
      * @param EntityDefinitionConfig    $parentConfig
      * @param EntityIdMetadataInterface $parentMetadata
+     * @param RequestType               $requestType
      */
     private function checkParentEntityAccess(
         string $parentEntityClass,
         $parentEntityId,
         EntityDefinitionConfig $parentConfig,
-        EntityIdMetadataInterface $parentMetadata
+        EntityIdMetadataInterface $parentMetadata,
+        RequestType $requestType
     ): void {
         // try to get an entity by ACL protected query
-        $data = $this->queryFactory
-            ->getQuery($this->getQueryBuilder($parentEntityClass, $parentEntityId, $parentMetadata), $parentConfig)
+        $data = $this->queryAclHelper
+            ->protectQuery(
+                $this->getQueryBuilder($parentEntityClass, $parentEntityId, $parentMetadata),
+                $parentConfig,
+                $requestType
+            )
             ->getOneOrNullResult(Query::HYDRATE_ARRAY);
         if (!$data) {
             // use a query without ACL protection to check if an entity exists in DB

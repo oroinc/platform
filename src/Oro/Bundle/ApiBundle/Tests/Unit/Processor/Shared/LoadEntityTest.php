@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
-use Oro\Component\EntitySerializer\QueryFactory;
+use Oro\Bundle\ApiBundle\Util\QueryAclHelper;
 
 class LoadEntityTest extends GetProcessorTestCase
 {
@@ -22,8 +22,8 @@ class LoadEntityTest extends GetProcessorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdHelper */
     private $entityIdHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryFactory */
-    private $queryFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryAclHelper */
+    private $queryAclHelper;
 
     /** @var LoadEntity */
     private $processor;
@@ -34,12 +34,12 @@ class LoadEntityTest extends GetProcessorTestCase
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->entityIdHelper = $this->createMock(EntityIdHelper::class);
-        $this->queryFactory = $this->createMock(QueryFactory::class);
+        $this->queryAclHelper = $this->createMock(QueryAclHelper::class);
 
         $this->processor = new LoadEntity(
             $this->doctrineHelper,
             $this->entityIdHelper,
-            $this->queryFactory
+            $this->queryAclHelper
         );
     }
 
@@ -95,9 +95,9 @@ class LoadEntityTest extends GetProcessorTestCase
             ->with(self::identicalTo($qb), $entityId, self::identicalTo($metadata));
 
         $query = $this->createMock(AbstractQuery::class);
-        $this->queryFactory->expects(self::once())
-            ->method('getQuery')
-            ->with(self::identicalTo($qb), self::identicalTo($config))
+        $this->queryAclHelper->expects(self::once())
+            ->method('protectQuery')
+            ->with(self::identicalTo($qb), self::identicalTo($config), $this->context->getRequestType())
             ->willReturn($query);
         $query->expects(self::once())
             ->method('getOneOrNullResult')
@@ -139,9 +139,9 @@ class LoadEntityTest extends GetProcessorTestCase
             ->with(self::identicalTo($qb), $entityId, self::identicalTo($metadata));
 
         $query = $this->createMock(AbstractQuery::class);
-        $this->queryFactory->expects(self::once())
-            ->method('getQuery')
-            ->with(self::identicalTo($qb), self::identicalTo($config))
+        $this->queryAclHelper->expects(self::once())
+            ->method('protectQuery')
+            ->with(self::identicalTo($qb), self::identicalTo($config), $this->context->getRequestType())
             ->willReturn($query);
         $query->expects(self::once())
             ->method('getOneOrNullResult')
@@ -196,9 +196,9 @@ class LoadEntityTest extends GetProcessorTestCase
             ->with(self::identicalTo($qb), $entityId, self::identicalTo($metadata));
 
         $query = $this->createMock(AbstractQuery::class);
-        $this->queryFactory->expects(self::once())
-            ->method('getQuery')
-            ->with(self::identicalTo($qb), self::identicalTo($config))
+        $this->queryAclHelper->expects(self::once())
+            ->method('protectQuery')
+            ->with(self::identicalTo($qb), self::identicalTo($config), $this->context->getRequestType())
             ->willReturn($query);
         $query->expects(self::once())
             ->method('getOneOrNullResult')
@@ -248,9 +248,9 @@ class LoadEntityTest extends GetProcessorTestCase
             ->with(self::identicalTo($qb), $entityId, self::identicalTo($metadata));
 
         $query = $this->createMock(AbstractQuery::class);
-        $this->queryFactory->expects(self::once())
-            ->method('getQuery')
-            ->with(self::identicalTo($qb), self::identicalTo($config))
+        $this->queryAclHelper->expects(self::once())
+            ->method('protectQuery')
+            ->with(self::identicalTo($qb), self::identicalTo($config), $this->context->getRequestType())
             ->willReturn($query);
         $query->expects(self::once())
             ->method('getOneOrNullResult')

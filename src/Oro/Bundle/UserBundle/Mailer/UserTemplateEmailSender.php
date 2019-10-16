@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Mailer;
 
-use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
@@ -18,20 +18,20 @@ class UserTemplateEmailSender
     private $notificationSettingsModel;
 
     /**
-     * @var TemplateEmailManager
+     * @var EmailTemplateManager
      */
-    private $templateEmailManager;
+    private $emailTemplateManager;
 
     /**
      * @param NotificationSettings $notificationSettingsModel
-     * @param TemplateEmailManager $templateEmailManager
+     * @param EmailTemplateManager $emailTemplateManager
      */
     public function __construct(
         NotificationSettings $notificationSettingsModel,
-        TemplateEmailManager $templateEmailManager
+        EmailTemplateManager $emailTemplateManager
     ) {
         $this->notificationSettingsModel = $notificationSettingsModel;
-        $this->templateEmailManager = $templateEmailManager;
+        $this->emailTemplateManager = $emailTemplateManager;
     }
 
     /**
@@ -51,7 +51,7 @@ class UserTemplateEmailSender
             ? $this->notificationSettingsModel->getSenderByScopeEntity($scopeEntity)
             : $this->notificationSettingsModel->getSender();
 
-        return $this->templateEmailManager->sendTemplateEmail(
+        return $this->emailTemplateManager->sendTemplateEmail(
             $from,
             [$user],
             new EmailTemplateCriteria($emailTemplateName),

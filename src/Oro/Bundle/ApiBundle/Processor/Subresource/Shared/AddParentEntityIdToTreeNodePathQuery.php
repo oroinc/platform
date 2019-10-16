@@ -23,6 +23,9 @@ class AddParentEntityIdToTreeNodePathQuery implements ProcessorInterface
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
+    /** @var string|null */
+    private $sourceEntityClass;
+
     /**
      * @param TreeListener   $treeListener
      * @param DoctrineHelper $doctrineHelper
@@ -31,6 +34,14 @@ class AddParentEntityIdToTreeNodePathQuery implements ProcessorInterface
     {
         $this->treeListener = $treeListener;
         $this->doctrineHelper = $doctrineHelper;
+    }
+
+    /**
+     * @param string $sourceEntityClass
+     */
+    public function setSourceEntityClass(string $sourceEntityClass): void
+    {
+        $this->sourceEntityClass = $sourceEntityClass;
     }
 
     /**
@@ -47,7 +58,7 @@ class AddParentEntityIdToTreeNodePathQuery implements ProcessorInterface
         }
 
         $entityClass = $this->doctrineHelper->getManageableEntityClass(
-            $context->getClassName(),
+            $this->sourceEntityClass ?? $context->getClassName(),
             $context->getConfig()
         );
         $treeConfig = $this->treeListener->getConfiguration(

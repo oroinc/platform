@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Async;
 
-use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
@@ -15,9 +15,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 class TemplateEmailMessageSender
 {
     /**
-     * @var TemplateEmailManager
+     * @var EmailTemplateManager
      */
-    private $templateEmailManager;
+    private $emailTemplateManager;
 
     /**
      * @var DoctrineHelper
@@ -25,12 +25,12 @@ class TemplateEmailMessageSender
     private $doctrineHelper;
 
     /**
-     * @param TemplateEmailManager $templateEmailManager
+     * @param EmailTemplateManager $emailTemplateManager
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(TemplateEmailManager $templateEmailManager, DoctrineHelper $doctrineHelper)
+    public function __construct(EmailTemplateManager $emailTemplateManager, DoctrineHelper $doctrineHelper)
     {
-        $this->templateEmailManager = $templateEmailManager;
+        $this->emailTemplateManager = $emailTemplateManager;
         $this->doctrineHelper = $doctrineHelper;
     }
 
@@ -46,7 +46,7 @@ class TemplateEmailMessageSender
             throw new \LogicException(sprintf('The %s message is not translatable', print_r($message, true)));
         }
 
-        return $this->templateEmailManager
+        return $this->emailTemplateManager
             ->sendTemplateEmail(
                 From::fromArray($message['sender']),
                 [$this->getRecipient($message)],
