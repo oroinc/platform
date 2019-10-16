@@ -26,6 +26,7 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_29\OroEmailBundle as OroEmailBun
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_3\OroEmailBundle as OroEmailBundle13;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_31\OroEmailBundle as OroEmailBundle131;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_32\IncreaseEmailNameLength as OroEmailBundle132;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_34\EmailTemplatePerLocalization as OroEmailBundle134;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_4\OroEmailBundle as OroEmailBundle14;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_7\OroEmailBundle as OroEmailBundle17;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_8\OroEmailBundle as OroEmailBundle18;
@@ -45,7 +46,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_33';
+        return 'v1_34';
     }
 
     /**
@@ -65,7 +66,6 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle11::oroEmailToFolderRelationTable($schema);
 
         OroEmailBundle::oroEmailTemplateTable($schema);
-        OroEmailBundle::oroEmailTemplateTranslationTable($schema);
 
         OroEmailBundle::oroEmailForeignKeys($schema, false);
         OroEmailBundle::oroEmailAttachmentForeignKeys($schema);
@@ -73,8 +73,6 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle::oroEmailBodyForeignKeys($schema);
         OroEmailBundle::oroEmailFolderForeignKeys($schema);
         OroEmailBundle::oroEmailRecipientForeignKeys($schema);
-
-        OroEmailBundle::oroEmailTemplateTranslationForeignKeys($schema);
 
         OroEmailBundle13::addOrganization($schema);
 
@@ -129,5 +127,8 @@ class OroEmailBundleInstaller implements Installation
 
         OroEmailBundle132::changeEmailFromNameColumnLength($schema);
         OroEmailBundle132::changeEmailRecipientNameColumnLength($schema);
+
+        OroEmailBundle134::oroEmailTemplateLocalizedTable($schema);
+        OroEmailBundle134::oroEmailTemplateLocalizedForeignKeys($schema);
     }
 }

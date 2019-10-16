@@ -66,15 +66,28 @@ class EditEmailTemplateQuery extends ParametrizedMigrationQuery
             $this->connection->executeUpdate($query, $params, $types);
         }
 
-        $query = 'UPDATE oro_email_template_translation 
-          SET content=REPLACE(content, :from, :to)
-          WHERE field=:field AND object_id = (SELECT id FROM oro_email_template WHERE name=:name LIMIT 1)';
-        $params['field'] = 'content';
-        $types['field'] = 'string';
+        try {
+            $query = 'UPDATE oro_email_template_localized 
+              SET content=REPLACE(content, :from, :to)
+              WHERE template_id = (SELECT id FROM oro_email_template WHERE name=:name LIMIT 1)';
+            $this->logQuery($logger, $query, $params, $types);
 
-        $this->logQuery($logger, $query, $params, $types);
-        if (!$dryRun) {
-            $this->connection->executeUpdate($query, $params, $types);
+            if (!$dryRun) {
+                $this->connection->executeUpdate($query, $params, $types);
+            }
+        } catch (\Exception $e) {
+            // When we not have tabele `oro_email_template_localized`
+            // trying apply migration to `oro_email_template_translation`
+            $query = 'UPDATE oro_email_template_translation 
+              SET content=REPLACE(content, :from, :to)
+              WHERE field=:field AND object_id = (SELECT id FROM oro_email_template WHERE name=:name LIMIT 1)';
+            $params['field'] = 'content';
+            $types['field'] = 'string';
+
+            $this->logQuery($logger, $query, $params, $types);
+            if (!$dryRun) {
+                $this->connection->executeUpdate($query, $params, $types);
+            }
         }
     }
 }

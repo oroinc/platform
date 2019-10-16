@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\OriginSyncCredentials\NotificationSender;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
-use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -16,8 +16,8 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailNotificationSender */
     private $sender;
 
-    /** @var TemplateEmailManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $templateEmailManager;
+    /** @var EmailTemplateManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailTemplateManager;
 
     /** @var NotificationSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $notificationSettingsModel;
@@ -25,9 +25,9 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->notificationSettingsModel = $this->createMock(NotificationSettings::class);
-        $this->templateEmailManager = $this->createMock(TemplateEmailManager::class);
+        $this->emailTemplateManager = $this->createMock(EmailTemplateManager::class);
 
-        $this->sender = new EmailNotificationSender($this->notificationSettingsModel, $this->templateEmailManager);
+        $this->sender = new EmailNotificationSender($this->notificationSettingsModel, $this->emailTemplateManager);
     }
 
     public function testSendNotificationForSystemOrigin(): void
@@ -45,7 +45,7 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
             ->method('getSender')
             ->willReturn($sender);
 
-        $this->templateEmailManager->expects($this->once())
+        $this->emailTemplateManager->expects($this->once())
             ->method('sendTemplateEmail')
             ->with(
                 $sender,
@@ -76,7 +76,7 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
             ->method('getSender')
             ->willReturn($sender);
 
-        $this->templateEmailManager
+        $this->emailTemplateManager
             ->expects($this->once())
             ->method('sendTemplateEmail')
             ->with(

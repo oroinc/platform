@@ -2,122 +2,48 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 
-use Oro\Bundle\EmailBundle\Exception\EmailTemplateException;
-use Oro\Bundle\EmailBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
-use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
+use Oro\Bundle\EmailBundle\Model\DTO\LocalizedTemplateDTO;
 use Oro\Bundle\EmailBundle\Model\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
-use Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider;
-use Oro\Bundle\LocaleBundle\Provider\PreferredLanguageProviderInterface;
+use Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class TemplateEmailManagerTest extends \PHPUnit\Framework\TestCase
+class EmailTemplateManagerTest extends \PHPUnit\Framework\TestCase
 {
-    private const LANGUAGE = 'en_US';
     private const EMAIL_SUBJECT = 'Subject';
     private const EMAIL_BODY = 'Body';
-    private const LANGUAGE_GERMAN = 'de_DE';
     private const EMAIL_SUBJECT_GERMAN = 'Subject German';
     private const EMAIL_BODY_GERMAN = 'Body German';
     private const EMAIL_TEMPLATE_NAME = 'template_name';
     private const EMAIL_TEMPLATE_ENTITY_NAME = 'Template\Entity';
     private const TEMPLATE_PARAMS = ['param' => 'value'];
 
-    /**
-     * @var \Swift_Mailer|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \Swift_Mailer|\PHPUnit\Framework\MockObject\MockObject */
     private $mailer;
 
-    /**
-     * @var PreferredLanguageProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $languageProvider;
-
-    /**
-     * @var Processor|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Processor|\PHPUnit\Framework\MockObject\MockObject */
     private $processor;
 
-    /**
-     * @var EmailTemplateContentProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $emailTemplateContentProvider;
+    /** @var LocalizedTemplateProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $localizedTemplateProvider;
 
-    /**
-     * @var TemplateEmailManager
-     */
+    /** @var EmailTemplateManager */
     private $manager;
 
     protected function setUp()
     {
         $this->mailer = $this->createMock(\Swift_Mailer::class);
-        $this->languageProvider = $this->createMock(PreferredLanguageProviderInterface::class);
         $this->processor = $this->createMock(Processor::class);
-        $this->emailTemplateContentProvider = $this->createMock(EmailTemplateContentProvider::class);
+        $this->localizedTemplateProvider = $this->createMock(LocalizedTemplateProvider::class);
 
-        $this->manager = new TemplateEmailManager(
+        $this->manager = new EmailTemplateManager(
             $this->mailer,
-            $this->languageProvider,
             $this->processor,
-            $this->emailTemplateContentProvider
-        );
-    }
-
-    public function testSendTemplateEmailWithInvalidRecipientObject(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'recipients should be array of EmailHolderInterface values, "stdClass" type in array given.'
-        );
-
-        $this->manager->sendTemplateEmail(
-            From::emailAddress('no-reply@mail.com'),
-            [new \stdClass()],
-            new EmailTemplateCriteria(self::EMAIL_TEMPLATE_NAME)
-        );
-    }
-
-    public function testSendTemplateEmailWithInvalidRecipientType(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'recipients should be array of EmailHolderInterface values, "boolean" type in array given.'
-        );
-
-        $this->manager->sendTemplateEmail(
-            From::emailAddress('no-reply@mail.com'),
-            [true],
-            new EmailTemplateCriteria(self::EMAIL_TEMPLATE_NAME)
-        );
-    }
-
-    public function testSendTemplateEmailWhenGetTemplateRaisesException(): void
-    {
-        $this->expectException(EmailTemplateException::class);
-
-        $recipient = new EmailAddressWithContext('to@mail.com');
-        $this->languageProvider
-            ->expects($this->any())
-            ->method('getPreferredLanguage')
-            ->willReturnMap([
-                [$recipient, self::LANGUAGE]
-            ]);
-
-        $exception = new EmailTemplateException();
-        $emailTemplateCriteria = new EmailTemplateCriteria(self::EMAIL_TEMPLATE_NAME);
-        $this->emailTemplateContentProvider
-            ->expects($this->once())
-            ->method('getTemplateContent')
-            ->with($emailTemplateCriteria, self::LANGUAGE, [])
-            ->willThrowException($exception);
-
-        $this->manager->sendTemplateEmail(
-            From::emailAddress('no-reply@mail.com'),
-            [$recipient],
-            $emailTemplateCriteria
+            $this->localizedTemplateProvider
         );
     }
 
@@ -153,22 +79,22 @@ class TemplateEmailManagerTest extends \PHPUnit\Framework\TestCase
             });
 
         $recipient = new EmailAddressWithContext('to@mail.com');
-        $this->languageProvider
-            ->expects($this->any())
-            ->method('getPreferredLanguage')
-            ->willReturnMap([
-                [$recipient, self::LANGUAGE]
-            ]);
 
         $emailTemplateCriteria = new EmailTemplateCriteria(self::EMAIL_TEMPLATE_NAME, self::EMAIL_TEMPLATE_ENTITY_NAME);
 
-        $this->emailTemplateContentProvider
-            ->expects($this->once())
-            ->method('getTemplateContent')
-            ->with($emailTemplateCriteria, self::LANGUAGE, [])
-            ->willReturn($emailTemplateModel);
+        $this->localizedTemplateProvider->expects($this->once())
+            ->method('getAggregated')
+            ->with(
+                [$recipient],
+                $emailTemplateCriteria,
+                []
+            )
+            ->willReturn([
+                (new LocalizedTemplateDTO($emailTemplateModel))->addRecipient($recipient),
+            ]);
 
         $failedRecipients = [];
+
         self::assertEquals(
             0,
             $this->manager->sendTemplateEmail(
@@ -245,25 +171,23 @@ class TemplateEmailManagerTest extends \PHPUnit\Framework\TestCase
         $userRecipient2 = new EmailAddressWithContext('user2@mail.com');
         $userRecipient3 = new EmailAddressWithContext('other_user@mail.com', new User());
 
-        $this->languageProvider
-            ->expects($this->any())
-            ->method('getPreferredLanguage')
-            ->willReturnMap([
-                [$userRecipient1, self::LANGUAGE],
-                [$userRecipient2, self::LANGUAGE_GERMAN],
-                [$userRecipient3, self::LANGUAGE]
-            ]);
-
         $emailTemplateCriteria = new EmailTemplateCriteria(self::EMAIL_TEMPLATE_NAME, self::EMAIL_TEMPLATE_ENTITY_NAME);
 
-        $this->emailTemplateContentProvider
-            ->expects($this->exactly(2))
-            ->method('getTemplateContent')
-            ->withConsecutive(
-                [$emailTemplateCriteria, self::LANGUAGE, self::TEMPLATE_PARAMS],
-                [$emailTemplateCriteria, self::LANGUAGE_GERMAN, self::TEMPLATE_PARAMS]
+        $this->localizedTemplateProvider->expects($this->once())
+            ->method('getAggregated')
+            ->with(
+                [$userRecipient1, $userRecipient2, $userRecipient3],
+                $emailTemplateCriteria,
+                self::TEMPLATE_PARAMS
             )
-            ->willReturnOnConsecutiveCalls($emailTemplate, $germanEmailTemplate);
+            ->willReturn([
+                (new LocalizedTemplateDTO($emailTemplate))
+                    ->addRecipient($userRecipient1)
+                    ->addRecipient($userRecipient3),
+
+                (new LocalizedTemplateDTO($germanEmailTemplate))
+                    ->addRecipient($userRecipient2),
+            ]);
 
         self::assertEquals(
             3,
