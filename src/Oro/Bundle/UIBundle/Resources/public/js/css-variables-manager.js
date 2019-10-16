@@ -81,6 +81,7 @@ define(function(require) {
 
             if (content === 'none') {
                 mediator.trigger('css:breakpoints:fetched', breakpoint);
+                defer.resolve(breakpoint);
                 return;
             }
 
