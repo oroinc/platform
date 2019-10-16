@@ -1,3 +1,8 @@
 config:
+  map:
+    '*':
+      'orodigitalasset/templates/digital-asset-choose-form/preview.html': 'orodigitalasset/templates/digital-asset-choose-form/preview.html'
+      'orodigitalasset/templates/digital-asset-choose-form/choose.html': 'orodigitalasset/templates/digital-asset-choose-form/choose.html'
     paths:
-        'orodigitalasset/js/app/views/file-with-digital-asset-view': 'bundles/orodigitalasset/js/app/views/file-with-digital-asset-view.js'
+      'orodigitalasset/js/app/views/digital-asset-choose-form-view': 'bundles/orodigitalasset/js/app/views/digital-asset-choose-form-view.js'
+      'orodigitalasset/js/widget/digital-asset-dialog-widget': 'bundles/orodigitalasset/js/widget/digital-asset-dialog-widget.js'

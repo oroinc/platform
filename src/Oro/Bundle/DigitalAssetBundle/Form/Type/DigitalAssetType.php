@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Form\Type;
 
-use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
@@ -36,8 +35,6 @@ class DigitalAssetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        parent::buildForm($builder, $options);
-
         $builder
             ->add(
                 'titles',
@@ -70,24 +67,6 @@ class DigitalAssetType extends AbstractType
                 );
             }
         );
-
-        // Changes updatedAt of DigitalAsset::$sourceFile when new file is uploaded.
-        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
-    }
-
-    /**
-     * @param FormEvent $event
-     */
-    public function postSubmit(FormEvent $event): void
-    {
-        /** @var File $sourceFile */
-        $sourceFile = $event->getData()->getSourceFile();
-
-        // Property File::$file is filled only when new file is uploaded.
-        if ($sourceFile->getFile()) {
-            // Makes doctrine update File entity to enforce triggering of FileListener which uploads an image.
-            $sourceFile->setUpdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
-        }
     }
 
     /**

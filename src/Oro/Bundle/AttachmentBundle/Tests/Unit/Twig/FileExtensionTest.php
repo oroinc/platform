@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestTemplate;
@@ -14,6 +15,7 @@ use Oro\Bundle\AttachmentBundle\Twig\FileExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -41,6 +43,9 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
+    /** @var FileTitleProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $fileTitleProvider;
+
     /** @var TestFile */
     private $file;
 
@@ -54,12 +59,14 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->attachmentConfigProvider = $this->createMock(ConfigProvider::class));
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
+        $this->fileTitleProvider = $this->createMock(FileTitleProviderInterface::class);
 
         $serviceLocator = self::getContainerBuilder()
             ->add(AttachmentManager::class, $this->attachmentManager)
             ->add(ConfigManager::class, $configManager)
             ->add(ManagerRegistry::class, $this->doctrine)
             ->add(PropertyAccessorInterface::class, $this->propertyAccessor)
+            ->add(FileTitleProviderInterface::class, $this->fileTitleProvider)
             ->getContainer($this);
 
         $this->extension = new FileExtension($serviceLocator);
@@ -363,5 +370,34 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getFileIcons');
 
         self::callTwigFunction($this->extension, 'oro_file_icons_config', []);
+    }
+
+    public function testGetTitle(): void
+    {
+        $this->fileTitleProvider
+            ->expects(self::once())
+            ->method('getTitle')
+            ->with($this->file, $localization = $this->createMock(Localization::class));
+
+        self::callTwigFunction($this->extension, 'oro_file_title', [$this->file, $localization]);
+    }
+
+    public function testGetTitleWhenNullFile(): void
+    {
+        $this->fileTitleProvider
+            ->expects(self::never())
+            ->method('getTitle');
+
+        self::callTwigFunction($this->extension, 'oro_file_title', [null]);
+    }
+
+    public function testGetTitleWhenNoLozalization(): void
+    {
+        $this->fileTitleProvider
+            ->expects(self::once())
+            ->method('getTitle')
+            ->with($this->file);
+
+        self::callTwigFunction($this->extension, 'oro_file_title', [$this->file]);
     }
 }

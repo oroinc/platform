@@ -10,5 +10,5 @@ Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset:
 Oro\Bundle\AttachmentBundle\Entity\File:
     properties:
         file:
-            - Oro\Bundle\DigitalAssetBundle\Validator\Constraints\DigitalAssetSourceFile:
+            - Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromSystemConfig:
                 groups: [DigitalAsset]

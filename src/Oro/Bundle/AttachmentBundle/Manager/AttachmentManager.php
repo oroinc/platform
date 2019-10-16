@@ -163,7 +163,7 @@ class AttachmentManager
      */
     public function getAttachmentIconClass(FileExtensionInterface $entity): string
     {
-        return $this->fileIconProvider->getAttachmentIconClass($entity);
+        return $this->fileIconProvider->getExtensionIconClass($entity);
     }
 
     /**

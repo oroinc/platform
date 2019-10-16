@@ -2,7 +2,7 @@ entity_config:
     attachment:
         field:
             items:
-                # indicates whether to use DAM to attachments loading
+                # Tells whether or not to use DAM for file uploading.
                 use_dam:
                     options:
                         value_type: boolean

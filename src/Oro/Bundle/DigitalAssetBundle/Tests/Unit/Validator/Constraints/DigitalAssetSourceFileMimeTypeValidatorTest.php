@@ -65,8 +65,6 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\Tes
         $this->context = $this->createMock(ExecutionContextInterface::class);
 
         $this->setUpLoggerMock($this->validator);
-
-        parent::setUp();
     }
 
     public function testValidateWhenNotDigitalAsset(): void

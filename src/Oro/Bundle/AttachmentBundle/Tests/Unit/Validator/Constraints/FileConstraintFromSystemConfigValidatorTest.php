@@ -1,46 +1,38 @@
 <?php
 
-namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\Validator\Constraints;
+namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator\Constraints;
 
-use Oro\Bundle\AttachmentBundle\DependencyInjection\Configuration;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\DigitalAssetBundle\Provider\MimeTypesProvider;
-use Oro\Bundle\DigitalAssetBundle\Validator\Constraints\DigitalAssetSourceFileValidator;
+use Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider;
+use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromSystemConfigValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\FileValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class DigitalAssetSourceFileValidatorTest extends \PHPUnit\Framework\TestCase
+class FileConstraintFromSystemConfigValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    private const MAX_SIZE = 10;
+    private const MAX_SIZE = 1024;
+    private const MAX_SIZE2 = 2048;
     private const MIME_TYPES = ['mime/type1'];
     private const MIME_TYPES2 = ['mime/type2'];
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $systemConfigManager;
-
-    /** @var MimeTypesProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $mimeTypesProvider;
+    /** @var FileConstraintsProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $fileConstraintsProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|FileValidator */
     private $fileValidator;
 
-    /** @var DigitalAssetSourceFileValidator */
+    /** @var FileConstraintFromSystemConfigValidator */
     private $validator;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->fileValidator = $this->createMock(FileValidator::class);
-        $this->systemConfigManager = $this->createMock(ConfigManager::class);
-        $this->mimeTypesProvider = $this->createMock(MimeTypesProvider::class);
+        $this->fileConstraintsProvider = $this->createMock(FileConstraintsProvider::class);
 
-        $this->validator = new DigitalAssetSourceFileValidator(
+        $this->validator = new FileConstraintFromSystemConfigValidator(
             $this->fileValidator,
-            $this->systemConfigManager,
-            $this->mimeTypesProvider
+            $this->fileConstraintsProvider
         );
     }
 
@@ -63,12 +55,11 @@ class DigitalAssetSourceFileValidatorTest extends \PHPUnit\Framework\TestCase
      */
     public function testValidate(Constraint $constraint, int $expectedMaxSize, array $expectedMimeTypes): void
     {
-        $this->systemConfigManager
-            ->method('get')
-            ->with('oro_attachment.maxsize')
+        $this->fileConstraintsProvider
+            ->method('getMaxSize')
             ->willReturn(self::MAX_SIZE);
 
-        $this->mimeTypesProvider
+        $this->fileConstraintsProvider
             ->method('getMimeTypes')
             ->willReturn(self::MIME_TYPES);
 
@@ -89,20 +80,24 @@ class DigitalAssetSourceFileValidatorTest extends \PHPUnit\Framework\TestCase
     public function validateDataProvider(): array
     {
         return [
-            'maxsize and mime types fetched from config' => [
+            'maxsize and mime types are not specified in constraint' => [
                 new File(),
-                self::MAX_SIZE * Configuration::BYTES_MULTIPLIER,
+                self::MAX_SIZE,
                 self::MIME_TYPES,
             ],
-            'mime types only fetched from config' => [new File(['maxSize' => 1024]), 1024, self::MIME_TYPES],
-            'nothing fetched from config' => [
-                new File(['maxSize' => 1024, 'mimeTypes' => self::MIME_TYPES2]),
-                1024,
+            'maxSize is specified in constraint' => [
+                new File(['maxSize' => self::MAX_SIZE2]),
+                self::MAX_SIZE2,
+                self::MIME_TYPES,
+            ],
+            'maxSize, mimeTypes are specified in constraint' => [
+                new File(['maxSize' => self::MAX_SIZE2, 'mimeTypes' => self::MIME_TYPES2]),
+                self::MAX_SIZE2,
                 self::MIME_TYPES2,
             ],
-            'maxsize only fetched from config' => [
+            'mimeTypes is specified in constraint' => [
                 new File(['mimeTypes' => self::MIME_TYPES2]),
-                self::MAX_SIZE * Configuration::BYTES_MULTIPLIER,
+                self::MAX_SIZE,
                 self::MIME_TYPES2,
             ],
         ];

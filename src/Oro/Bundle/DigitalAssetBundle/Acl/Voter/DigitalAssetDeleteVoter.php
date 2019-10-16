@@ -7,7 +7,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
- * Checks if DigitalAsset can be deleted depending of exisiting child files
+ * Checks if DigitalAsset can be deleted depending on existing child files.
  */
 class DigitalAssetDeleteVoter implements VoterInterface
 {

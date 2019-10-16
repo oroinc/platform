@@ -6,6 +6,7 @@ datagrids:
             query:
                 select:
                     - digitalAsset
+                    - file
                     - digitalAsset.id
                     - file.originalFilename
                     - file.mimeType
@@ -17,7 +18,6 @@ datagrids:
                     - { table: 'Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset', alias: digitalAsset }
                 join:
                     left:
-                        - { join: digitalAsset.titles, alias: localizedTitles }
                         - { join: digitalAsset.sourceFile, alias: file }
                         - { join: digitalAsset.owner, alias: owner }
         columns:
@@ -30,6 +30,7 @@ datagrids:
                 label: oro.attachment.file.filename.label
                 frontend_type: html
                 template: 'OroDigitalAssetBundle:DigitalAsset/Datagrid/Property:sourceFileLink.html.twig'
+                data_name: sourceFile
             fileSize:
                 label: oro.attachment.file.file_size.label
                 type: twig
@@ -52,7 +53,7 @@ datagrids:
             title:
                 type: localized_value
                 data_name: titles
-            update_link:
+            updateLink:
                 type: url
                 route: oro_digital_asset_update
                 params:
@@ -96,10 +97,11 @@ datagrids:
                     options:
                         field_options:
                             multiple: true
-                            choices: '@oro_digital_asset.provider.mime_types->getMimeTypesAsChoices'
+                            choices: '@oro_digital_asset.provider.file_constraints->getMimeTypesAsChoices'
                             translatable_options: false
                 owner:
                     type: choice-tree
+                    label: oro.digitalasset.datagrid.column.owner.label
                     data_name: owner
                     autocomplete_alias: assigned_to_organization_users
                     renderedPropertyName: fullName
@@ -115,7 +117,82 @@ datagrids:
             update:
                 type: navigate
                 label: oro.grid.action.update
-                link: update_link
+                link: updateLink
                 icon: edit
                 acl_resource: oro_digital_asset_update
                 rowAction: true
+
+    digital-asset-select-file-grid:
+        extends: digital-asset-grid
+        options:
+            entityHint: oro.digitalasset.datagrid.entity_hint.files
+        source:
+            query:
+                where:
+                    and:
+                        - file.fileSize < :max_file_size
+                        - file.mimeType IN (:mime_types)
+            bind_parameters:
+                - mime_types
+                - max_file_size
+        properties:
+            previewMetadata:
+                type: callback
+                callable: ['@oro_digital_asset.provider.preview_metadata', 'getMetadata']
+                params: ['sourceFile']
+                frontend_type: row_array
+        columns:
+            originalFilename:
+                label: oro.digitalasset.datagrid.column.original_filename.label
+                order: 20
+            title:
+                order: 30
+            fileSize:
+                order: 40
+                renderable: false
+            mimeType:
+                order: 50
+                renderable: false
+            owner:
+                label: oro.digitalasset.datagrid.column.owner.label
+                order: 60
+            createdAt:
+                order: 70
+            updatedAt:
+                renderable: false
+        filters:
+            columns:
+                fileSize:
+                    enabled: false
+                mimeType:
+                    enabled: false
+        action_configuration:
+            update: false
+            delete: true
+
+    digital-asset-select-image-grid:
+        extends: digital-asset-select-file-grid
+        options:
+            entityHint: oro.digitalasset.datagrid.entity_hint.images
+        columns:
+            file:
+                type: twig
+                label: oro.digitalasset.datagrid.column.file.label
+                frontend_type: html
+                template: 'OroDigitalAssetBundle:DigitalAsset/Datagrid/Property:image.html.twig'
+                data_name: sourceFile
+                order: 10
+            originalFilename:
+                order: 20
+            title:
+                order: 30
+            fileSize:
+                order: 40
+            mimeType:
+                order: 50
+            owner:
+                order: 60
+            createdAt:
+                order: 70
+            updatedAt:
+                renderable: false

@@ -13,8 +13,6 @@ class DigitalAssetSourceFileMimeTypeTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->constraint = new DigitalAssetSourceFileMimeType();
-
-        parent::setUp();
     }
 
     public function testProperties(): void

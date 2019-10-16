@@ -1,5 +1,21 @@
 liip_imagine:
     filter_sets:
+        digital_asset_icon:
+            quality: 95
+            filters:
+                thumbnail:
+                    size: [16, 16]
+                    mode: outbound
+                strip: ~
+
+        digital_asset_in_dialog:
+            quality: 95
+            filters:
+                thumbnail:
+                    size: [50, 50]
+                    mode: outbound
+                strip: ~
+
         digital_asset_medium:
             quality: 95
             filters:

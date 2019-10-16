@@ -1,10 +1,8 @@
 <?php
 
-namespace Oro\Bundle\DigitalAssetBundle\Validator\Constraints;
+namespace Oro\Bundle\AttachmentBundle\Validator\Constraints;
 
-use Oro\Bundle\AttachmentBundle\DependencyInjection\Configuration;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager as SystemConfigManager;
-use Oro\Bundle\DigitalAssetBundle\Provider\MimeTypesProvider;
+use Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\FileValidator;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -14,30 +12,24 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  * Decorates FileValidator with the following:
  * - fetches mime types and max file size from system config if they are not specified explicitly in validation.yml
  */
-class DigitalAssetSourceFileValidator extends ConstraintValidator
+class FileConstraintFromSystemConfigValidator extends ConstraintValidator
 {
     /** @var FileValidator */
     private $fileValidator;
 
-    /** @var SystemConfigManager */
-    private $systemConfigManager;
-
-    /** @var MimeTypesProvider */
-    private $mimeTypesProvider;
+    /** @var FileConstraintsProvider */
+    private $fileConstraintsProvider;
 
     /**
      * @param FileValidator $fileValidator
-     * @param SystemConfigManager $systemConfigManager
-     * @param MimeTypesProvider $mimeTypesProvider
+     * @param FileConstraintsProvider $mimeTypesProvider
      */
     public function __construct(
         FileValidator $fileValidator,
-        SystemConfigManager $systemConfigManager,
-        MimeTypesProvider $mimeTypesProvider
+        FileConstraintsProvider $mimeTypesProvider
     ) {
         $this->fileValidator = $fileValidator;
-        $this->systemConfigManager = $systemConfigManager;
-        $this->mimeTypesProvider = $mimeTypesProvider;
+        $this->fileConstraintsProvider = $mimeTypesProvider;
     }
 
     /**
@@ -56,12 +48,11 @@ class DigitalAssetSourceFileValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint): void
     {
         if (empty($constraint->mimeTypes)) {
-            $constraint->mimeTypes = $this->mimeTypesProvider->getMimeTypes();
+            $constraint->mimeTypes = $this->fileConstraintsProvider->getMimeTypes();
         }
 
         if (empty($constraint->maxSize)) {
-            $constraint->maxSize =
-                $this->systemConfigManager->get('oro_attachment.maxsize') * Configuration::BYTES_MULTIPLIER;
+            $constraint->maxSize = $this->fileConstraintsProvider->getMaxSize();
         }
 
         $this->fileValidator->validate($value, $constraint);

@@ -5,7 +5,10 @@ oro:
         entity_description: Digital Asset represents a file asset which can be used as upload file for other entities.
 
         id.label: Id
-        titles.label: Title
+        titles:
+            label: Title
+            tooltip_file: 'Title for file'
+            tooltip_image: '"Alt" text for image'
         source_file.label: File
         child_files.label: Child Files
         owner.label: Owner
@@ -20,13 +23,33 @@ oro:
             sections.general.label: General
 
         datagrid:
+            entity_hint:
+                images: Images
+                files: Files
+            column:
+                file.label: Image
+                owner.label: Uploaded By
+                original_filename.label: Name
             filter:
                 file_size.label: File size (bytes)
 
         dam:
             form:
                 choose_file.label: Choose File
-                choose_another_file.label: Choose another file
-                remove_file.label: Remove
+                choose_image.label: Choose Image
+                choose_another.label: Choose another
+                remove.label: Remove
+
+            dialog:
+                datagrid_title:
+                    images: Images
+                    files: Files
+                uploaded.message: Digital Asset has been uploaded
+                select_file: Select File
+                select_image: Select Image
+                clear.label: Clear
+                upload.label: Upload
+                file.label: File
+                image.label: Picture
 
     attachment.file.digital_asset.label: Digital Asset

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\Entity;
+namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;

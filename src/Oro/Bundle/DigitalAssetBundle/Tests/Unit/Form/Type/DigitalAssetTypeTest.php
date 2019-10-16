@@ -17,7 +17,6 @@ use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Validation;
@@ -71,47 +70,6 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
             );
 
         $this->formType->configureOptions($resolver);
-    }
-
-    public function testPostSubmitWhenNoFile(): void
-    {
-        $formEvent = $this->createMock(FormEvent::class);
-        $formEvent
-            ->method('getData')
-            ->willReturn($digitalAsset = $this->createMock(DigitalAsset::class));
-
-        $digitalAsset
-            ->method('getSourceFile')
-            ->willReturn($sourceFile = $this->createMock(File::class));
-
-        $sourceFile
-            ->expects($this->never())
-            ->method('setUpdatedAt');
-
-        $this->formType->postSubmit($formEvent);
-    }
-
-    public function testPostSubmitWhenFile(): void
-    {
-        $formEvent = $this->createMock(FormEvent::class);
-        $formEvent
-            ->method('getData')
-            ->willReturn($digitalAsset = $this->createMock(DigitalAsset::class));
-
-        $digitalAsset
-            ->method('getSourceFile')
-            ->willReturn($sourceFile = $this->createMock(File::class));
-
-        $sourceFile
-            ->method('getFile')
-            ->willReturn($this->createMock(SymfonyFile::class));
-
-        $sourceFile
-            ->expects($this->once())
-            ->method('setUpdatedAt')
-            ->with($this->isInstanceOf(\DateTime::class));
-
-        $this->formType->postSubmit($formEvent);
     }
 
     /**
