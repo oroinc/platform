@@ -54,8 +54,27 @@
             {% set gridParams = gridParams|merge({'display_sql_query': true}) %}
         {% endif %}
         {% set params = params|default({})|merge(gridParams) %}
-        {{ dataGrid.renderGrid(gridName, params, renderParams) }}
-    {% else %}
+        <div id="async-datagrid">
+            {% include "OroUIBundle::view_loading.html.twig" %}
+        </div>
+
+        <script type="text/javascript">
+
+          require(['jquery', 'oroui/js/app/components/component-manager'],
+            function ($, ComponentManager) {
+              var $asyncDatagrid = $('#async-datagrid')
+
+              $.get('{{ path('oro_datagrid_widget', {gridName: gridName} ) }}', {
+                  params: {{ params | json_encode|raw }},
+                  renderParams: {{ renderParams |json_encode |raw }}
+                },
+                function (data) {
+                  $asyncDatagrid.html(data)
+                  var manager = new ComponentManager($asyncDatagrid)
+                  manager.init()
+                })
+            })
+        </script>    {% else %}
         <div class="container-fluid">
             <div class="grid-container">
                 <div class="no-data">
