@@ -34,11 +34,6 @@ class HtmlTagHelper
     private $cacheDir;
 
     /**
-     * @var string
-     */
-    private $scope;
-
-    /**
      * @var \HTMLPurifier_ErrorCollector
      */
     private $lastErrorCollector;
@@ -46,16 +41,11 @@ class HtmlTagHelper
     /**
      * @param HtmlTagProvider $htmlTagProvider
      * @param string|null $cacheDir
-     * @param string $scope
      */
-    public function __construct(
-        HtmlTagProvider $htmlTagProvider,
-        $cacheDir = null,
-        $scope = 'default'
-    ) {
+    public function __construct(HtmlTagProvider $htmlTagProvider, $cacheDir = null)
+    {
         $this->htmlTagProvider = $htmlTagProvider;
         $this->cacheDir = $cacheDir;
-        $this->scope = $scope;
     }
 
     /**
@@ -90,13 +80,17 @@ class HtmlTagHelper
             $config->set('URI.AllowedSchemes', $this->htmlTagProvider->getUriSchemes($scope));
             $config->set('Attr.EnableID', true);
             $config->set('Attr.AllowedFrameTargets', ['_blank']);
-            $config->set('HTML.SafeIframe', true);
-            $config->set('URI.SafeIframeRegexp', $this->htmlTagProvider->getIframeRegexp($scope));
             $config->set('Filter.ExtractStyleBlocks.TidyImpl', false);
             $config->set('CSS.AllowImportant', true);
             $config->set('CSS.AllowTricky', true);
             $config->set('CSS.Proprietary', true);
             $config->set('CSS.Trusted', true);
+
+            $allowedTags = $this->htmlTagProvider->getAllowedTags($scope);
+            if (strpos($allowedTags, '<iframe>') !== false) {
+                $config->set('HTML.SafeIframe', true);
+                $config->set('URI.SafeIframeRegexp', $this->htmlTagProvider->getIframeRegexp($scope));
+            }
 
             $this->fillAllowedElementsConfig($config, $scope);
             $this->fillCacheConfig($config);

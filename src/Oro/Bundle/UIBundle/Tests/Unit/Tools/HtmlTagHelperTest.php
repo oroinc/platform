@@ -42,6 +42,28 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testSanitize($value, $allowableTags, $expected): void
     {
+        $this->htmlTagProvider->expects($this->never())
+            ->method('getIframeRegexp');
+        $this->htmlTagProvider->expects($this->once())
+            ->method('getUriSchemes')
+            ->willReturn(['http' => true, 'https' => true]);
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn($allowableTags);
+
+        $this->assertEquals($expected, $this->helper->sanitize($value));
+    }
+
+    /**
+     * @dataProvider iframeDataProvider
+     *
+     * @param string $value
+     * @param array $allowedElements
+     * @param string $allowedTags
+     * @param param string $expected
+     */
+    public function testSanitizeIframe($value, array $allowedElements, $allowedTags, $expected)
+    {
         $this->htmlTagProvider->expects($this->once())
             ->method('getIframeRegexp')
             ->willReturn('<^https?://(www.)?(youtube.com/embed/|player.vimeo.com/video/)>');
@@ -49,8 +71,11 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getUriSchemes')
             ->willReturn(['http' => true, 'https' => true]);
         $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedTags')
+            ->willReturn($allowedTags);
+        $this->htmlTagProvider->expects($this->any())
             ->method('getAllowedElements')
-            ->willReturn($allowableTags);
+            ->willReturn($allowedElements);
 
         $this->assertEquals($expected, $this->helper->sanitize($value));
     }
@@ -110,6 +135,38 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @return array
+     */
+    public function iframeDataProvider()
+    {
+        return [
+            'iframe allowed' => [
+                'value' => '<iframe id="video-iframe" allowfullscreen="" src="https://www.youtube.com/embed/' .
+                    'XWyzuVHRe0A?rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
+                'allowedElements' => ['iframe[id|allowfullscreen|src]'],
+                'allowedTags' => '<iframe></iframe>',
+                'expectedResult' => '<iframe id="video-iframe" allowfullscreen src="https://www.youtube.com/embed/'.
+                    'XWyzuVHRe0A?rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>'
+            ],
+            'iframe invalid src' => [
+                'value' => '<iframe id="video-iframe" allowfullscreen="" src="https://www.scam.com/embed/' .
+                    'XWyzuVHRe0A?rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
+                'allowedElements' => ['iframe[id|allowfullscreen|src]'],
+                'allowedTags' => '<iframe></iframe>',
+                'expectedResult' => '<iframe id="video-iframe" allowfullscreen></iframe>'
+            ],
+            'iframe bypass src' => [
+                'value' => '<iframe id="video-iframe" allowfullscreen="" src="https://www.scam.com/embed/' .
+                    'XWyzuVHRe0A?bypass=https://www.youtube.com/embed/XWyzuVHRe0A' .
+                    'rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
+                'allowedElements' => ['iframe[id|allowfullscreen|src]'],
+                'allowedTags' => '<iframe></iframe>',
+                'expectedResult' => '<iframe id="video-iframe" allowfullscreen></iframe>'
+            ],
+        ];
+    }
+
+    /**
      * @link https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet
      *
      * @return array
@@ -156,26 +213,6 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
                 '<div id="test" data-id="test2">sometext</div>',
                 ['div[id]'],
                 '<div id="test">sometext</div>'
-            ],
-            'iframe allowed' => [
-                '<iframe id="video-iframe" allowfullscreen="" src="https://www.youtube.com/embed/XWyzuVHRe0A?' .
-                'rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
-                ['iframe[id|allowfullscreen|src]'],
-                '<iframe id="video-iframe" allowfullscreen src="https://www.youtube.com/embed/XWyzuVHRe0A?'.
-                'rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>'
-            ],
-            'iframe invalid src' => [
-                '<iframe id="video-iframe" allowfullscreen="" src="https://www.scam.com/embed/XWyzuVHRe0A?' .
-                'rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
-                ['iframe[id|allowfullscreen|src]'],
-                '<iframe id="video-iframe" allowfullscreen></iframe>'
-            ],
-            'iframe bypass src' => [
-                '<iframe id="video-iframe" allowfullscreen="" src="https://www.scam.com/embed/XWyzuVHRe0A' .
-                '?bypass=https://www.youtube.com/embed/XWyzuVHRe0A' .
-                'rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
-                ['iframe[id|allowfullscreen|src]'],
-                '<iframe id="video-iframe" allowfullscreen></iframe>'
             ],
         ];
     }
