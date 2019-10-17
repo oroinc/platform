@@ -40,7 +40,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider dataProvider
      */
-    public function testSanitize($value, $allowableTags, $expected)
+    public function testSanitize($value, $allowableTags, $expected): void
     {
         $this->htmlTagProvider->expects($this->once())
             ->method('getIframeRegexp')
@@ -56,11 +56,57 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @dataProvider errorCollectorDataProvider
+     *
+     * @param string $htmlValue
+     * @param array $allowedElements
+     * @param array $expectedResult
+     */
+    public function testGetLastErrorCollector($htmlValue, array $allowedElements, array $expectedResult): void
+    {
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn($allowedElements);
+
+        $this->helper->sanitize($htmlValue);
+
+        $this->assertNotNull($this->helper->getLastErrorCollector());
+        $this->assertEquals($expectedResult, $this->helper->getLastErrorCollector()->getRaw());
+    }
+
+    public function testGetLastErrorCollectorEmpty(): void
+    {
+        $this->assertNull($this->helper->getLastErrorCollector());
+    }
+
+    /**
      * @return array
      */
-    public function dataProvider()
+    public function dataProvider(): array
     {
         return array_merge($this->sanitizeDataProvider(), $this->xssDataProvider());
+    }
+
+    /**
+     * @return array
+     */
+    public function errorCollectorDataProvider(): array
+    {
+        return [
+            'without errors' => [
+                'htmlValue' => '<div><h1>Hello World!</h1></div>',
+                'allowedElements' => ['div', 'h1'],
+                'expectedResult' => []
+            ],
+            'with errors' => [
+                'htmlValue' => '<div><h1>Hello World!</h1></div>',
+                'allowedElements' => ['div'],
+                'expectedResult' => [
+                    [1, 1, 'Unrecognized <h1> tag removed', []],
+                    [1, 1, 'Unrecognized </h1> tag removed', []],
+                ]
+            ]
+        ];
     }
 
     /**
@@ -68,7 +114,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @return array
      */
-    protected function xssDataProvider()
+    protected function xssDataProvider(): array
     {
         $str = '<IMG SRC=&#x6A&#x61&#x76&#x61&#x73&#x63&#x72&#x69&#x70&#x74&#x3A&#x61&#x6C&#x65&#x72&#x74&#x28&#x27&' .
             '#x58&#x53&#x53&#x27&#x29>';
@@ -84,7 +130,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    protected function sanitizeDataProvider()
+    protected function sanitizeDataProvider(): array
     {
         return [
             'default' => ['sometext', [], 'sometext'],

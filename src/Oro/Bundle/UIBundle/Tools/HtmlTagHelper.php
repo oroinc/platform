@@ -19,9 +19,9 @@ class HtmlTagHelper
     const HTMLPURIFIER_CONFIG_REVISION = 2019072301;
 
     /**
-     * @var \HtmlPurifier|null
+     * @var \HtmlPurifier[]
      */
-    private $htmlPurifier;
+    private $htmlPurifiers = [];
 
     /**
      * @var HtmlTagProvider
@@ -39,6 +39,11 @@ class HtmlTagHelper
     private $scope;
 
     /**
+     * @var \HTMLPurifier_ErrorCollector
+     */
+    private $lastErrorCollector;
+
+    /**
      * @param HtmlTagProvider $htmlTagProvider
      * @param string|null $cacheDir
      * @param string $scope
@@ -54,6 +59,14 @@ class HtmlTagHelper
     }
 
     /**
+     * @return \HTMLPurifier_ErrorCollector
+     */
+    public function getLastErrorCollector()
+    {
+        return $this->lastErrorCollector;
+    }
+
+    /**
      * @param string $value
      * @param string $scope
      * @return string
@@ -64,9 +77,11 @@ class HtmlTagHelper
             return $value;
         }
 
-        if (!$this->htmlPurifier) {
+        if (!array_key_exists($scope, $this->htmlPurifiers)) {
             $html5Config = \HTMLPurifier_HTML5Config::createDefault();
             $config = \HTMLPurifier_Config::create($html5Config);
+
+            $config->set('Core.CollectErrors', true);
 
             $config->set('HTML.DefinitionID', __CLASS__);
             $config->set('HTML.DefinitionRev', self::HTMLPURIFIER_CONFIG_REVISION);
@@ -86,7 +101,8 @@ class HtmlTagHelper
             $this->fillAllowedElementsConfig($config, $scope);
             $this->fillCacheConfig($config);
 
-            if ($def = $config->maybeGetRawHTMLDefinition()) {
+            $def = $config->maybeGetRawHTMLDefinition();
+            if ($def) {
                 $def->addElement(
                     'style',
                     'Block',
@@ -99,10 +115,13 @@ class HtmlTagHelper
                 );
             }
 
-            $this->htmlPurifier = new \HTMLPurifier($config);
+            $this->htmlPurifiers[$scope] = new \HTMLPurifier($config);
         }
 
-        return $this->htmlPurifier->purify($value);
+        $result = $this->htmlPurifiers[$scope]->purify($value);
+        $this->lastErrorCollector = $this->htmlPurifiers[$scope]->context->get('ErrorCollector');
+
+        return $result;
     }
 
     /**
