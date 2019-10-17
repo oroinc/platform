@@ -12,7 +12,7 @@ class ImpersonationSearchHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ImpersonationSearchHandler */
     private $searchHandler;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     protected function setUp()

@@ -1,5 +1,6 @@
 <?php
-namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
+
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Async;
 
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesRelationsProcessor;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
@@ -25,9 +26,10 @@ class AuditUpdatedRelationsTest extends WebTestCase
     {
         $message = $this->createDummyMessage([
             'collections_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => 123
+                    'entity_id' => 123,
+                    'change_set' => [],
                 ]
             ],
         ]);
@@ -61,12 +63,14 @@ class AuditUpdatedRelationsTest extends WebTestCase
             'timestamp' => $expectedLoggedAt->getTimestamp(),
             'transaction_id' => 'theTransactionId',
             'collections_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
                         'childrenManyToMany' => [
-                            null,
+                            [
+                                'deleted' => [],
+                            ],
                             [
                                 'inserted' => [
                                     [
@@ -74,7 +78,6 @@ class AuditUpdatedRelationsTest extends WebTestCase
                                         'entity_id' => 321,
                                     ]
                                 ],
-                                'deleted' => [],
                                 'changed' => [],
                             ]
                         ]
@@ -106,12 +109,14 @@ class AuditUpdatedRelationsTest extends WebTestCase
             'timestamp' => $expectedLoggedAt->getTimestamp(),
             'transaction_id' => 'theTransactionId',
             'collections_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
                         'childrenManyToMany' => [
-                            null,
+                            [
+                                'deleted' => [],
+                            ],
                             [
                                 'inserted' => [
                                     [
@@ -119,7 +124,6 @@ class AuditUpdatedRelationsTest extends WebTestCase
                                         'entity_id' => 321,
                                     ]
                                 ],
-                                'deleted' => [],
                                 'changed' => [],
                             ]
                         ]
@@ -152,12 +156,11 @@ class AuditUpdatedRelationsTest extends WebTestCase
     {
         $message = $this->createDummyMessage([
             'collections_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
                         'childrenManyToMany' => [
-                            null,
                             [
                                 'deleted' => [
                                     [
@@ -165,6 +168,8 @@ class AuditUpdatedRelationsTest extends WebTestCase
                                         'entity_id' => 321,
                                     ]
                                 ],
+                            ],
+                            [
                                 'inserted' => [],
                                 'changed' => [],
                             ]
@@ -190,20 +195,19 @@ class AuditUpdatedRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('childrenManyToMany', $auditField->getField());
-        $this->assertEquals("\nRemoved: TestAuditDataChild::321", $auditField->getNewValue());
-        $this->assertEquals(null, $auditField->getOldValue());
+        $this->assertEquals("Removed: TestAuditDataChild::321", $auditField->getOldValue());
+        $this->assertEquals(null, $auditField->getNewValue());
     }
 
     public function testShouldCreateAuditForDeletedAndInsertedEntitiesFromManyToManyCollection()
     {
         $message = $this->createDummyMessage([
             'collections_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
                         'childrenManyToMany' => [
-                            null,
                             [
                                 'deleted' => [
                                     [
@@ -211,6 +215,8 @@ class AuditUpdatedRelationsTest extends WebTestCase
                                         'entity_id' => 321,
                                     ]
                                 ],
+                            ],
+                            [
                                 'inserted' => [
                                     [
                                         'entity_class' => TestAuditDataChild::class,
@@ -241,23 +247,19 @@ class AuditUpdatedRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('childrenManyToMany', $auditField->getField());
-        $this->assertEquals(
-            "Added: TestAuditDataChild::567\nRemoved: TestAuditDataChild::321",
-            $auditField->getNewValue()
-        );
-        $this->assertEquals(null, $auditField->getOldValue());
+        $this->assertEquals("Added: TestAuditDataChild::567", $auditField->getNewValue());
+        $this->assertEquals("Removed: TestAuditDataChild::321", $auditField->getOldValue());
     }
 
     public function testShouldCreateAuditForDeletedEntityFromManyToOneCollection()
     {
         $message = $this->createDummyMessage([
             'collections_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => 123,
                     'change_set' => [
                         'ownerManyToOne' => [
-                            null,
                             [
                                 'deleted' => [
                                     [
@@ -265,6 +267,8 @@ class AuditUpdatedRelationsTest extends WebTestCase
                                         'entity_id' => 321,
                                     ]
                                 ],
+                            ],
+                            [
                                 'inserted' => [],
                                 'changed' => [],
                             ]
@@ -290,20 +294,19 @@ class AuditUpdatedRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('ownerManyToOne', $auditField->getField());
-        $this->assertEquals("\nRemoved: TestAuditDataOwner::321", $auditField->getNewValue());
-        $this->assertEquals(null, $auditField->getOldValue());
+        $this->assertEquals("Removed: TestAuditDataOwner::321", $auditField->getOldValue());
+        $this->assertEquals(null, $auditField->getNewValue());
     }
 
     public function testShouldCreateAuditForDeletedAndInsertedEntitiesFromManyToOneCollection()
     {
         $message = $this->createDummyMessage([
             'collections_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => 123,
                     'change_set' => [
                         'ownerManyToOne' => [
-                            null,
                             [
                                 'deleted' => [
                                     [
@@ -311,6 +314,8 @@ class AuditUpdatedRelationsTest extends WebTestCase
                                         'entity_id' => 321,
                                     ]
                                 ],
+                            ],
+                            [
                                 'inserted' => [
                                     [
                                         'entity_class' => TestAuditDataOwner::class,
@@ -341,10 +346,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('ownerManyToOne', $auditField->getField());
-        $this->assertEquals(
-            "Added: TestAuditDataOwner::567\nRemoved: TestAuditDataOwner::321",
-            $auditField->getNewValue()
-        );
-        $this->assertEquals(null, $auditField->getOldValue());
+        $this->assertEquals("Added: TestAuditDataOwner::567", $auditField->getNewValue());
+        $this->assertEquals("Removed: TestAuditDataOwner::321", $auditField->getOldValue());
     }
 }

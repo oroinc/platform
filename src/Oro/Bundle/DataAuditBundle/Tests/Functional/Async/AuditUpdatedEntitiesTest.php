@@ -1,5 +1,6 @@
 <?php
-namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
+
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Async;
 
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesProcessor;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
@@ -15,29 +16,26 @@ use Oro\Component\MessageQueue\Transport\Null\NullSession;
 /**
  * @dbIsolationPerTest
  */
-class AuditInsertedEntitiesTest extends WebTestCase
+class AuditUpdatedEntitiesTest extends WebTestCase
 {
     use AuditChangedEntitiesExtensionTrait;
-    
+
+    /**
+     * @dbIsolationPerTest
+     */
     protected function setUp()
     {
         $this->initClient();
     }
 
-    public function provideScalarProperties()
-    {
-        return [
-            'stringProperty' => ['stringProperty', null, '']
-        ];
-    }
-
-    public function testShouldNotCreateAuditEntityForInsertedEntityWithoutChanges()
+    public function testShouldNotCreateAuditEntityForUpdatedEntityWithoutChanges()
     {
         $message = $this->createDummyMessage([
-            'entities_inserted' => [
-                [
+            'entities_updated' => [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => 123
+                    'entity_id' => 123,
+                    'change_set' => [],
                 ]
             ],
         ]);
@@ -50,8 +48,7 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $this->assertStoredAuditCount(0);
     }
 
-
-    public function testShouldCreateAuditForInsertedEntity()
+    public function testShouldCreateAuditForUpdatedEntity()
     {
         $expectedLoggedAt = new \DateTime('2012-02-01 03:02:01+0000');
 
@@ -59,8 +56,8 @@ class AuditInsertedEntitiesTest extends WebTestCase
             'timestamp' => $expectedLoggedAt->getTimestamp(),
             'transaction_id' => 'theTransactionId',
             'owner_description' => 'Some Owner Description',
-            'entities_inserted' => [
-                [
+            'entities_updated' => [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -80,7 +77,7 @@ class AuditInsertedEntitiesTest extends WebTestCase
 
         $this->assertNotNull($audit->getId());
         $this->assertEquals(123, $audit->getObjectId());
-        $this->assertEquals(Audit::ACTION_CREATE, $audit->getAction());
+        $this->assertEquals(Audit::ACTION_UPDATE, $audit->getAction());
         $this->assertEquals(TestAuditDataOwner::class, $audit->getObjectClass());
         $this->assertEquals('TestAuditDataOwner::123', $audit->getObjectName());
         $this->assertEquals(1, $audit->getVersion());
@@ -91,11 +88,11 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $this->assertNull($audit->getOrganization());
     }
 
-    public function testShouldSkipAuditCreationForInsertedNotAuditableEntity()
+    public function testShouldSkipAuditCreationForUpdatedNotAuditableEntity()
     {
         $message = $this->createDummyMessage([
-            'entities_inserted' => [
-                [
+            'entities_updated' => [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => Status::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -113,18 +110,18 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $this->assertStoredAuditCount(0);
     }
 
-    public function testShouldCreateAuditsForInsertedEntities()
+    public function testShouldCreateAuditsForUpdatedEntities()
     {
         $message = $this->createDummyMessage([
-            'entities_inserted' => [
-                [
+            'entities_updated' => [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
                         'stringProperty' => [null, 'aNewValue'],
                     ],
                 ],
-                [
+                '000000007ec8f22f00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 321,
                     'change_set' => [
@@ -142,15 +139,16 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $this->assertStoredAuditCount(2);
     }
 
-    public function testShouldCreateAuditForInsertedEntityAndSetUserIfPresent()
+    public function testShouldCreateAuditForUpdatedEntityAndSetUserIfPresent()
     {
         $user = $this->findAdmin();
 
         $message = $this->createDummyMessage([
+            'timestamp' => time(),
             'user_id' => $user->getId(),
             'user_class' => User::class,
-            'entities_inserted' => [
-                [
+            'entities_updated' => [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -172,7 +170,7 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $this->assertSame($user->getId(), $audit->getUser()->getId());
     }
 
-    public function testShouldCreateAuditForInsertedEntityAndSetOrganizationIfPresent()
+    public function testShouldCreateAuditForUpdatedEntityAndSetOrganizationIfPresent()
     {
         $organization = new Organization();
         $organization->setName('anOrganizationName');
@@ -182,8 +180,8 @@ class AuditInsertedEntitiesTest extends WebTestCase
 
         $message = $this->createDummyMessage([
             'organization_id' => $organization->getId(),
-            'entities_inserted' => [
-                [
+            'entities_updated' => [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -205,16 +203,15 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $this->assertSame($organization->getId(), $audit->getOrganization()->getId());
     }
 
-    public function testShouldCreateAuditEntityForInsertedEntityWithStringPropertyChanged()
+    public function testShouldCreateAuditEntityForUpdatedEntityWithStringPropertyChanged()
     {
         $message = $this->createDummyMessage([
-            'transaction_id' => 'aTransactionId',
-            'entities_inserted' => [
-                [
+            'entities_updated' => [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
-                        'stringProperty' => [null, 'theNewValue'],
+                        'stringProperty' => ['theOldValue', 'theNewValue'],
                     ],
                 ]
             ],
@@ -229,7 +226,7 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $audit = $this->findLastStoredAudit();
 
         $this->assertNotNull($audit->getId());
-        $this->assertEquals(Audit::ACTION_CREATE, $audit->getAction());
+        $this->assertEquals(Audit::ACTION_UPDATE, $audit->getAction());
 
         $this->assertCount(1, $audit->getFields());
 
@@ -240,18 +237,18 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('stringProperty', $auditField->getField());
         $this->assertSame('theNewValue', $auditField->getNewValue());
-        $this->assertSame(null, $auditField->getOldValue());
+        $this->assertSame('theOldValue', $auditField->getOldValue());
     }
 
-    public function testShouldCreateAuditEntityForInsertedEntityWithIntPropertyChanged()
+    public function testShouldCreateAuditEntityForUpdatedEntityWithIntegerPropertyChanged()
     {
         $message = $this->createDummyMessage([
-            'entities_inserted' => [
-                [
+            'entities_updated' => [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
-                        'intProperty' => [null, 123],
+                        'integerProperty' => [333, 123],
                     ],
                 ]
             ],
@@ -266,31 +263,31 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $audit = $this->findLastStoredAudit();
 
         $this->assertNotNull($audit->getId());
-        $this->assertEquals(Audit::ACTION_CREATE, $audit->getAction());
+        $this->assertEquals(Audit::ACTION_UPDATE, $audit->getAction());
 
         $this->assertCount(1, $audit->getFields());
 
-        $auditField = $audit->getField('intProperty');
+        $auditField = $audit->getField('integerProperty');
         $this->assertInstanceOf(AuditField::class, $auditField);
 
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('integer', $auditField->getDataType());
-        $this->assertSame('intProperty', $auditField->getField());
+        $this->assertSame('integerProperty', $auditField->getField());
         $this->assertSame(123, $auditField->getNewValue());
-        $this->assertSame(null, $auditField->getOldValue());
+        $this->assertSame(333, $auditField->getOldValue());
     }
 
-    public function testShouldCreateAuditEntityForInsertedEntityWithSerializedPropertyChanged()
+    public function testShouldCreateAuditEntityForUpdatedEntityWithObjectPropertyChanged()
     {
         $expectedNewVal = serialize(['foo' => 'bar']);
 
         $message = $this->createDummyMessage([
-            'entities_inserted' => [
-                [
+            'entities_updated' => [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
-                        'serializedProperty' => [null, $expectedNewVal],
+                        'objectProperty' => ['theOldValue', $expectedNewVal],
                     ],
                 ]
             ],
@@ -305,31 +302,31 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $audit = $this->findLastStoredAudit();
 
         $this->assertNotNull($audit->getId());
-        $this->assertEquals(Audit::ACTION_CREATE, $audit->getAction());
+        $this->assertEquals(Audit::ACTION_UPDATE, $audit->getAction());
 
         $this->assertCount(1, $audit->getFields());
 
-        $auditField = $audit->getField('serializedProperty');
+        $auditField = $audit->getField('objectProperty');
         $this->assertInstanceOf(AuditField::class, $auditField);
 
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('object', $auditField->getDataType());
-        $this->assertSame('serializedProperty', $auditField->getField());
+        $this->assertSame('objectProperty', $auditField->getField());
         $this->assertSame($expectedNewVal, $auditField->getNewValue());
-        $this->assertSame(null, $auditField->getOldValue());
+        $this->assertSame('theOldValue', $auditField->getOldValue());
     }
 
-    public function testShouldCreateAuditEntityForInsertedEntityWithJsonPropertyChanged()
+    public function testShouldCreateAuditEntityForUpdatedEntityWithJsonArrayPropertyChanged()
     {
         $expectedNewVal = json_encode(['foo' => 'bar']);
 
         $message = $this->createDummyMessage([
-            'entities_inserted' => [
-                [
+            'entities_updated' => [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
-                        'jsonProperty' => [null, $expectedNewVal],
+                        'jsonArrayProperty' => ['theOldValue', $expectedNewVal],
                     ],
                 ]
             ],
@@ -344,31 +341,35 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $audit = $this->findLastStoredAudit();
 
         $this->assertNotNull($audit->getId());
-        $this->assertEquals(Audit::ACTION_CREATE, $audit->getAction());
+        $this->assertEquals(Audit::ACTION_UPDATE, $audit->getAction());
 
         $this->assertCount(1, $audit->getFields());
 
-        $auditField = $audit->getField('jsonProperty');
+        $auditField = $audit->getField('jsonArrayProperty');
         $this->assertInstanceOf(AuditField::class, $auditField);
 
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('jsonarray', $auditField->getDataType());
-        $this->assertSame('jsonProperty', $auditField->getField());
+        $this->assertSame('jsonArrayProperty', $auditField->getField());
         $this->assertSame($expectedNewVal, $auditField->getNewValue());
-        $this->assertSame(null, $auditField->getOldValue());
+        $this->assertSame('theOldValue', $auditField->getOldValue());
     }
 
-    public function testShouldCreateAuditEntityForInsertedEntityWithDateTimePropertyChanged()
+    public function testShouldCreateAuditEntityForUpdatedEntityWithDateTimePropertyChanged()
     {
         $expectedNewVal = new \DateTime('2015-04-03 09:08:07+0000');
+        $expectedOldVal = new \DateTime('2016-09-08 01:02:03+0000');
 
         $message = $this->createDummyMessage([
-            'entities_inserted' => [
-                [
+            'entities_updated' => [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
-                        'dateProperty' => [null, $expectedNewVal->format(DATE_ISO8601)],
+                        'dateProperty' => [
+                            $expectedOldVal->format(\DateTime::ISO8601),
+                            $expectedNewVal->format(\DateTime::ISO8601)
+                        ],
                     ],
                 ]
             ],
@@ -383,7 +384,7 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $audit = $this->findLastStoredAudit();
 
         $this->assertNotNull($audit->getId());
-        $this->assertEquals(Audit::ACTION_CREATE, $audit->getAction());
+        $this->assertEquals(Audit::ACTION_UPDATE, $audit->getAction());
 
         $this->assertCount(1, $audit->getFields());
 
@@ -391,21 +392,21 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $this->assertInstanceOf(AuditField::class, $auditField);
 
         $this->assertSame($audit, $auditField->getAudit());
-        $this->assertSame('datetime', $auditField->getDataType());
+        $this->assertSame('date', $auditField->getDataType());
         $this->assertSame('dateProperty', $auditField->getField());
         $this->assertEquals($expectedNewVal, $auditField->getNewValue());
-        $this->assertSame(null, $auditField->getOldValue());
+        $this->assertEquals($expectedOldVal, $auditField->getOldValue());
     }
 
-    public function testShouldNotCreateAuditEntityForInsertedEntityIfOnlyNotAuditableFieldChangedButEntityAuditable()
+    public function testShouldNotCreateAuditEntityForUpdatedEntityIfOnlyNotAuditableFieldChangedButEntityAuditable()
     {
         $message = $this->createDummyMessage([
-            'entities_inserted' => [
-                [
+            'entities_updated' => [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
-                        'notAuditableProperty' => [null, 'aNewVal'],
+                        'notAuditableProperty' => ['anOldVal', 'aNewVal'],
                     ],
                 ]
             ],
@@ -419,17 +420,17 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $this->assertStoredAuditCount(0);
     }
 
-    public function testShouldCreateAuditEntityForInsertedEntityIgnoringNotAuditableFields()
+    public function testShouldCreateAuditEntityForUpdatedEntityIgnoringNotAuditableFields()
     {
         $message = $this->createDummyMessage([
             'transaction_id' => 'aTransactionId',
-            'entities_inserted' => [
-                [
+            'entities_updated' => [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
-                        'stringProperty' => [null, 'theNewValue'],
-                        'notAuditableProperty' => [null, 'aNewVal'],
+                        'stringProperty' => ['anOldVal', 'theNewValue'],
+                        'notAuditableProperty' => ['anOldVal', 'aNewVal'],
                     ],
                 ]
             ],
@@ -446,19 +447,22 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $this->assertCount(1, $audit->getFields());
     }
 
-    public function testShouldCreateAuditEntityForInsertedEntityWithOneToOneRelationChanged()
+    public function testShouldCreateAuditEntityForUpdatedEntityWithOneToOneRelationChanged()
     {
         $message = $this->createDummyMessage([
-            'entities_inserted' => [
-                [
+            'entities_updated' => [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
                         'child' => [
-                            null,
                             [
                                 'entity_class' => TestAuditDataChild::class,
-                                'entity_id' => 54321,
+                                'entity_id' => 2345,
+                            ],
+                            [
+                                'entity_class' => TestAuditDataChild::class,
+                                'entity_id' => 4567,
                             ]
                         ],
                     ],
@@ -475,7 +479,7 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $audit = $this->findLastStoredAudit();
 
         $this->assertNotNull($audit->getId());
-        $this->assertEquals(Audit::ACTION_CREATE, $audit->getAction());
+        $this->assertEquals(Audit::ACTION_UPDATE, $audit->getAction());
 
         $this->assertCount(1, $audit->getFields());
 
@@ -485,7 +489,7 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('child', $auditField->getField());
-        $this->assertEquals('TestAuditDataChild::54321', $auditField->getNewValue());
-        $this->assertSame(null, $auditField->getOldValue());
+        $this->assertEquals('Added: TestAuditDataChild::4567', $auditField->getNewValue());
+        $this->assertSame('Removed: TestAuditDataChild::2345', $auditField->getOldValue());
     }
 }

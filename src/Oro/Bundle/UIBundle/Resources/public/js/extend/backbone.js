@@ -6,6 +6,7 @@ define(function(require) {
     var Backbone = require('backbone');
     var componentContainerMixin = require('oroui/js/app/components/base/component-container-mixin');
     var tools = require('oroui/js/tools');
+    var pageVisibilityTracker = require('oroui/js/tools/page-visibility-tracker');
 
     var console = window.console;
 
@@ -176,7 +177,7 @@ define(function(require) {
         }
         this.deferredRender = $.Deferred();
         this.deferredRender.timeoutID =
-            setTimeout(function() {
+            pageVisibilityTracker.setTimeout(function() {
                 var xpath = tools.getElementXPath(this.el);
                 var error = new Error('Rendering timeout for view of element: "' + xpath + '"');
                 this._rejectDeferredRender(error);
@@ -192,7 +193,7 @@ define(function(require) {
         if (this.deferredRender) {
             var promises = [];
             var resolve = _.bind(function() {
-                clearTimeout(this.deferredRender.timeoutID);
+                pageVisibilityTracker.clearTimeout(this.deferredRender.timeoutID);
                 this.deferredRender.resolve(this);
                 delete this.deferredRender;
             }, this);

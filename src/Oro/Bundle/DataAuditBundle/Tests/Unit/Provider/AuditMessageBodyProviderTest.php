@@ -145,19 +145,18 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
 
         $user = $this->getEntity(AbstractUserStub::class, ['id' => 23]);
 
-        $securityToken->expects(self::once())
+        $securityToken->expects(self::atLeastOnce())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->entityNameResolver->expects(self::once())
+        $this->entityNameResolver->expects(self::atLeastOnce())
             ->method('getName')
             ->with($user, 'email')
             ->willReturn('user@name.com');
 
-        $securityToken->expects(self::exactly(2))
+        $securityToken->expects(self::any())
             ->method('hasAttribute')
-            ->withConsecutive(['IMPERSONATION'], ['owner_description'])
-            ->willReturnOnConsecutiveCalls(false, false);
+            ->willReturn(false);
 
         $body = $provider->prepareMessageBody(
             [],
@@ -184,6 +183,20 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
         self::assertArrayNotHasKey('impersonation_id', $body);
         self::assertArrayHasKey('owner_description', $body);
         self::assertEquals('user@name.com', $body['owner_description']);
+
+        // assert same transaction id on second call
+        $transactionId = $body['transaction_id'];
+
+        $body = $provider->prepareMessageBody(
+            [],
+            [],
+            ['deletions'],
+            [],
+            $securityToken
+        );
+
+        self::assertNotEmpty($body['transaction_id']);
+        self::assertEquals($transactionId, $body['transaction_id']);
     }
 
     public function testPrepareMessageBodyEmptyUserNoImpersonationAttributeNoOwnerAttributeOrganizationToken()

@@ -12,16 +12,16 @@ use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 
 class AuditGridOrganizationListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     /** @var AuditGridOrganizationListener */
     private $listener;
 
-    /** @var DatagridInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $datagrid;
 
-    /** @var OrganizationRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OrganizationRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
 
     protected function setUp()

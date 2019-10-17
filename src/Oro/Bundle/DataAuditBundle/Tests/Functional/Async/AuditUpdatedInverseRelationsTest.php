@@ -1,5 +1,6 @@
 <?php
-namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
+
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Async;
 
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseRelationsProcessor;
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
@@ -24,7 +25,7 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
     {
         $message = $this->createDummyMessage([
             'entities_inserted' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -39,7 +40,7 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
                 ]
             ],
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000136823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 125,
                     'change_set' => [
@@ -54,7 +55,7 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
                 ]
             ],
             'entities_deleted' => [
-                [
+                '000000007ec8f22c00000000136823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 124,
                     'change_set' => [
@@ -75,14 +76,14 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         $processor->process($message, new NullSession());
 
-        $this->assertStoredAuditCount(3);
+        $this->assertStoredAuditCount(6);
     }
 
     public function testShouldCreateAuditForAddedInverseSideEntityOnOneToOneRelation()
     {
         $message = $this->createDummyMessage([
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -103,7 +104,7 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         $processor->process($message, new NullSession());
 
-        $this->assertStoredAuditCount(1);
+        $this->assertStoredAuditCount(2);
 
         $audit = $this->findLastStoredAudit();
         $this->assertCount(1, $audit->getFields());
@@ -116,15 +117,15 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('owner', $auditField->getField());
-        $this->assertEquals('TestAuditDataOwner::123', $auditField->getNewValue());
         $this->assertEquals(null, $auditField->getOldValue());
+        $this->assertEquals('Added: TestAuditDataOwner::123', $auditField->getNewValue());
     }
 
     public function testShouldCreateAuditForDeletedInverseSideEntityOnOneToOneRelation()
     {
         $message = $this->createDummyMessage([
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -145,7 +146,7 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         $processor->process($message, new NullSession());
 
-        $this->assertStoredAuditCount(1);
+        $this->assertStoredAuditCount(2);
 
         $audit = $this->findLastStoredAudit();
         $this->assertCount(1, $audit->getFields());
@@ -158,15 +159,15 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('owner', $auditField->getField());
+        $this->assertEquals('Removed: TestAuditDataOwner::123', $auditField->getOldValue());
         $this->assertEquals(null, $auditField->getNewValue());
-        $this->assertEquals('TestAuditDataOwner::123', $auditField->getOldValue());
     }
 
     public function testShouldCreateAuditForReplacedInverseSideEntityOnOneToOneRelation()
     {
         $message = $this->createDummyMessage([
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -190,7 +191,7 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         $processor->process($message, new NullSession());
 
-        $this->assertStoredAuditCount(2);
+        $this->assertStoredAuditCount(3);
 
         $audits = $this->findStoredAudits();
 
@@ -205,8 +206,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('owner', $auditField->getField());
-        $this->assertEquals('TestAuditDataOwner::123', $auditField->getNewValue());
         $this->assertEquals(null, $auditField->getOldValue());
+        $this->assertEquals('Added: TestAuditDataOwner::123', $auditField->getNewValue());
 
         $audit = $audits[1];
         $this->assertCount(1, $audit->getFields());
@@ -219,15 +220,15 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('owner', $auditField->getField());
+        $this->assertEquals('Removed: TestAuditDataOwner::123', $auditField->getOldValue());
         $this->assertEquals(null, $auditField->getNewValue());
-        $this->assertEquals('TestAuditDataOwner::123', $auditField->getOldValue());
     }
 
     public function testShouldCreateAuditForSwappedEntitiesOnOneToOneRelation()
     {
         $message = $this->createDummyMessage([
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -243,7 +244,7 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
                         ]
                     ]
                 ],
-                [
+                '000000007ec8f22c00000000136823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 124,
                     'change_set' => [
@@ -267,7 +268,7 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         $processor->process($message, new NullSession());
 
-        $this->assertStoredAuditCount(2);
+        $this->assertStoredAuditCount(4);
 
         $audits = $this->findStoredAudits();
 
@@ -282,8 +283,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('owner', $auditField->getField());
-        $this->assertEquals('TestAuditDataOwner::123', $auditField->getNewValue());
-        $this->assertEquals('TestAuditDataOwner::124', $auditField->getOldValue());
+        $this->assertEquals('Removed: TestAuditDataOwner::124', $auditField->getOldValue());
+        $this->assertEquals('Added: TestAuditDataOwner::123', $auditField->getNewValue());
 
         $audit = $audits[1];
         $this->assertCount(1, $audit->getFields());
@@ -296,15 +297,15 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('owner', $auditField->getField());
-        $this->assertEquals('TestAuditDataOwner::124', $auditField->getNewValue());
-        $this->assertEquals('TestAuditDataOwner::123', $auditField->getOldValue());
+        $this->assertEquals('Removed: TestAuditDataOwner::123', $auditField->getOldValue());
+        $this->assertEquals('Added: TestAuditDataOwner::124', $auditField->getNewValue());
     }
 
     public function testShouldCreateAuditForAddedInverseSideEntityOnManyToOneRelation()
     {
         $message = $this->createDummyMessage([
             'collections_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -346,7 +347,7 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
     {
         $message = $this->createDummyMessage([
             'collections_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -380,15 +381,15 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('childrenOneToMany', $auditField->getField());
-        $this->assertEquals("\nRemoved: TestAuditDataChild::123", $auditField->getNewValue());
-        $this->assertEquals(null, $auditField->getOldValue());
+        $this->assertEquals("Removed: TestAuditDataChild::123", $auditField->getOldValue());
+        $this->assertEquals(null, $auditField->getNewValue());
     }
 
     public function testShouldCreateAuditForSwappedEntitiesOnManyToOneRelation()
     {
         $message = $this->createDummyMessage([
             'collections_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -404,7 +405,7 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
                         ]
                     ]
                 ],
-                [
+                '000000007ec8f22c00000000136823d4' => [
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => 124,
                     'change_set' => [
@@ -439,15 +440,12 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertInstanceOf(AuditField::class, $auditField);
 
         $this->assertEquals(TestAuditDataOwner::class, $audit->getObjectClass());
-        $this->assertEquals(131, $audit->getObjectId());
+        $this->assertEquals(130, $audit->getObjectId());
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('childrenOneToMany', $auditField->getField());
-        $this->assertEquals(
-            "Added: TestAuditDataChild::123\nRemoved: TestAuditDataChild::124",
-            $auditField->getNewValue()
-        );
-        $this->assertEquals(null, $auditField->getOldValue());
+        $this->assertEquals("Removed: TestAuditDataChild::123", $auditField->getOldValue());
+        $this->assertEquals("Added: TestAuditDataChild::124", $auditField->getNewValue());
 
         $audit = $audits[1];
         $this->assertCount(1, $audit->getFields());
@@ -456,29 +454,27 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertInstanceOf(AuditField::class, $auditField);
 
         $this->assertEquals(TestAuditDataOwner::class, $audit->getObjectClass());
-        $this->assertEquals(130, $audit->getObjectId());
+        $this->assertEquals(131, $audit->getObjectId());
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('childrenOneToMany', $auditField->getField());
-        $this->assertEquals(
-            "Added: TestAuditDataChild::124\nRemoved: TestAuditDataChild::123",
-            $auditField->getNewValue()
-        );
-        $this->assertEquals(null, $auditField->getOldValue());
+        $this->assertEquals("Removed: TestAuditDataChild::124", $auditField->getOldValue());
+        $this->assertEquals("Added: TestAuditDataChild::123", $auditField->getNewValue());
     }
 
     public function testShouldCreateAuditForAddedInverseSideEntityOnManyToManyRelation()
     {
         $message = $this->createDummyMessage([
             'collections_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
                         'childrenManyToMany' => [
-                            null,
                             [
                                 'deleted' => [],
+                            ],
+                            [
                                 'inserted' => [
                                     [
                                         'entity_class' => TestAuditDataChild::class,
@@ -519,12 +515,11 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
     {
         $message = $this->createDummyMessage([
             'collections_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
                         'childrenManyToMany' => [
-                            null,
                             [
                                 'deleted' => [
                                     [
@@ -532,6 +527,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
                                         'entity_id' => 124,
                                     ]
                                 ],
+                            ],
+                            [
                                 'inserted' => [],
                                 'changed' => [],
                             ]
@@ -559,20 +556,19 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('owners', $auditField->getField());
-        $this->assertEquals("\nRemoved: TestAuditDataOwner::123", $auditField->getNewValue());
-        $this->assertEquals(null, $auditField->getOldValue());
+        $this->assertEquals("Removed: TestAuditDataOwner::123", $auditField->getOldValue());
+        $this->assertEquals(null, $auditField->getNewValue());
     }
 
     public function testShouldCreateAuditForSwappedEntitiesOnManyToManyRelation()
     {
         $message = $this->createDummyMessage([
             'collections_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
                         'childrenManyToMany' => [
-                            null,
                             [
                                 'deleted' => [
                                     [
@@ -580,6 +576,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
                                         'entity_id' => 130,
                                     ]
                                 ],
+                            ],
+                            [
                                 'inserted' => [
                                     [
                                         'entity_class' => TestAuditDataChild::class,
@@ -591,12 +589,11 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
                         ]
                     ]
                 ],
-                [
+                '000000007ec8f22c00000000136823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 124,
                     'change_set' => [
                         'childrenManyToMany' => [
-                            null,
                             [
                                 'deleted' => [
                                     [
@@ -604,6 +601,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
                                         'entity_id' => 131,
                                     ]
                                 ],
+                            ],
+                            [
                                 'inserted' => [
                                     [
                                         'entity_class' => TestAuditDataChild::class,
@@ -638,11 +637,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('owners', $auditField->getField());
-        $this->assertEquals(
-            "Added: TestAuditDataOwner::124\nRemoved: TestAuditDataOwner::123",
-            $auditField->getNewValue()
-        );
-        $this->assertEquals(null, $auditField->getOldValue());
+        $this->assertEquals("Added: TestAuditDataOwner::124", $auditField->getNewValue());
+        $this->assertEquals("Removed: TestAuditDataOwner::123", $auditField->getOldValue());
 
         $audit = $audits[1];
         $this->assertCount(1, $audit->getFields());
@@ -655,11 +651,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('owners', $auditField->getField());
-        $this->assertEquals(
-            "Added: TestAuditDataOwner::123\nRemoved: TestAuditDataOwner::124",
-            $auditField->getNewValue()
-        );
-        $this->assertEquals(null, $auditField->getOldValue());
+        $this->assertEquals("Added: TestAuditDataOwner::123", $auditField->getNewValue());
+        $this->assertEquals("Removed: TestAuditDataOwner::124", $auditField->getOldValue());
     }
 
     public function testShouldTrackChangedEntityIfPartOfCollection()
@@ -673,7 +666,51 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         $message = $this->createDummyMessage([
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
+                    'entity_class' => TestAuditDataChild::class,
+                    'entity_id' => $child->getId(),
+                    'change_set' => [
+                        'stringProperty' => [null, 'foo'],
+                    ]
+                ]
+            ],
+        ]);
+
+        /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
+        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+
+        $processor->process($message, new NullSession());
+
+        $this->assertStoredAuditCount(2);
+
+        $audit = $this->findLastStoredAudit();
+        $this->assertSame(TestAuditDataOwner::class, $audit->getObjectClass());
+        $this->assertEquals($owner->getId(), $audit->getObjectId());
+        $this->assertCount(1, $audit->getFields());
+
+        $auditField = $audit->getField('childrenOneToMany');
+        $this->assertInstanceOf(AuditField::class, $auditField);
+
+        $this->assertSame($audit, $auditField->getAudit());
+        $this->assertSame('text', $auditField->getDataType());
+        $this->assertSame('childrenOneToMany', $auditField->getField());
+        $this->assertEquals(
+            "\nChanged: Item #" . $child->getId(),
+            $auditField->getNewValue()
+        );
+        $this->assertEquals(null, $auditField->getOldValue());
+    }
+
+    public function testShouldTrackChangedEntityWhichPartOfCollectionIfSourceEntityNoLongerExist()
+    {
+        $child = $this->createChild();
+
+        //gurad
+        $this->assertNull($child->getOwnerManyToOne());
+
+        $message = $this->createDummyMessage([
+            'entities_updated' => [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => $child->getId(),
                     'change_set' => [
@@ -691,55 +728,25 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertStoredAuditCount(1);
 
         $audit = $this->findLastStoredAudit();
-        $this->assertSame(TestAuditDataOwner::class, $audit->getObjectClass());
-        $this->assertSame($owner->getId(), $audit->getObjectId());
+        $this->assertSame(TestAuditDataChild::class, $audit->getObjectClass());
+        $this->assertEquals($child->getId(), $audit->getObjectId());
         $this->assertCount(1, $audit->getFields());
 
-        $auditField = $audit->getField('childrenOneToMany');
+        $auditField = $audit->getField('stringProperty');
         $this->assertInstanceOf(AuditField::class, $auditField);
 
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
-        $this->assertSame('childrenOneToMany', $auditField->getField());
-        $this->assertEquals(
-            "\nChanged: Item #" . $child->getId(),
-            $auditField->getNewValue()
-        );
+        $this->assertSame('stringProperty', $auditField->getField());
         $this->assertEquals(null, $auditField->getOldValue());
+        $this->assertEquals('foo', $auditField->getNewValue());
     }
 
-    public function testShouldNotTrackChangedEntityWhichPartOfCollectionIfSourceEntityNoLongerExist()
-    {
-        $child = $this->createChild();
-
-        //gurad
-        $this->assertNull($child->getOwnerManyToOne());
-
-        $message = $this->createDummyMessage([
-            'entities_updated' => [
-                [
-                    'entity_class' => TestAuditDataChild::class,
-                    'entity_id' => $child->getId(),
-                    'change_set' => [
-                        'stringProperty' => [null, 'foo'],
-                    ]
-                ]
-            ],
-        ]);
-
-        /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
-        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
-
-        $processor->process($message, new NullSession());
-
-        $this->assertStoredAuditCount(0);
-    }
-
-    public function testShouldNotTrackChangedEntityWhichIsNotPartOfCollection()
+    public function testShouldTrackChangedEntityWhichIsNotPartOfCollection()
     {
         $message = $this->createDummyMessage([
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -754,6 +761,20 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         $processor->process($message, new NullSession());
 
-        $this->assertStoredAuditCount(0);
+        $this->assertStoredAuditCount(1);
+
+        $audit = $this->findLastStoredAudit();
+        $this->assertSame(TestAuditDataChild::class, $audit->getObjectClass());
+        $this->assertEquals(123, $audit->getObjectId());
+        $this->assertCount(1, $audit->getFields());
+
+        $auditField = $audit->getField('stringProperty');
+        $this->assertInstanceOf(AuditField::class, $auditField);
+
+        $this->assertSame($audit, $auditField->getAudit());
+        $this->assertSame('text', $auditField->getDataType());
+        $this->assertSame('stringProperty', $auditField->getField());
+        $this->assertEquals(null, $auditField->getOldValue());
+        $this->assertEquals('foo', $auditField->getNewValue());
     }
 }
