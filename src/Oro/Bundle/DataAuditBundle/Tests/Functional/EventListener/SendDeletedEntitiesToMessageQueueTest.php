@@ -1,5 +1,6 @@
 <?php
-namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
+
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional\EventListener;
 
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
@@ -42,7 +43,13 @@ class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
         $owner = $this->createOwner();
         $ownerId = $owner->getId();
 
+        $owner->setStringProperty('aString');
+        $owner->setIntegerProperty(1234);
+
         $em = $this->getEntityManager();
+        $em->flush();
+        self::getMessageCollector()->clear();
+
         $em->remove($owner);
         $em->flush();
 
@@ -51,18 +58,28 @@ class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(0, $message);
         $this->assertCollectionsUpdatedInMessageCount(0, $message);
-        
-        $deletedEntity = $message->getBody()['entities_deleted'][0];
+
+        $deletedEntity = $message->getBody()['entities_deleted'][spl_object_hash($owner)];
 
         $this->assertEquals(TestAuditDataOwner::class, $deletedEntity['entity_class']);
         $this->assertEquals($ownerId, $deletedEntity['entity_id']);
-        $this->assertArrayNotHasKey('change_set', $deletedEntity);
+        $this->assertEquals(
+            [
+                'stringProperty' => [$owner->getStringProperty(), null],
+                'integerProperty' => [$owner->getIntegerProperty(), null],
+                'id' => [$ownerId, null],
+            ],
+            $deletedEntity['change_set']
+        );
     }
 
     public function testShouldSendDeletedProxyEntity()
     {
         $owner = $this->createOwnerProxy();
         $ownerId = $owner->getId();
+        $owner->setBooleanProperty(false);
+        $owner->setStringProperty('string');
+        $owner = $this->getEntityManager()->getReference(TestAuditDataOwner::class, $owner->getId());
 
         $em = $this->getEntityManager();
         $em->remove($owner);
@@ -74,11 +91,20 @@ class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesUpdatedInMessageCount(0, $message);
         $this->assertCollectionsUpdatedInMessageCount(0, $message);
 
-        $deletedEntity = $message->getBody()['entities_deleted'][0];
+        $deletedEntity = $message->getBody()['entities_deleted'][spl_object_hash($owner)];
 
         $this->assertEquals(TestAuditDataOwner::class, $deletedEntity['entity_class']);
         $this->assertEquals($ownerId, $deletedEntity['entity_id']);
-        $this->assertArrayNotHasKey('change_set', $deletedEntity);
+        $this->assertEquals(
+            [
+                'id' => [$ownerId, null],
+                'booleanProperty' => [false, null],
+                'stringProperty' => ['string', null],
+                'jsonArrayProperty' => [[], null],
+                'simpleArrayProperty' => [[], null],
+            ],
+            $deletedEntity['change_set']
+        );
     }
 
     public function testShouldSendDeletedEntityFromManyToOneRelation()
@@ -103,18 +129,19 @@ class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesUpdatedInMessageCount(0, $message);
         $this->assertCollectionsUpdatedInMessageCount(0, $message);
 
-        $deletedEntity = $message->getBody()['entities_deleted'][0];
+        $deletedEntity = $message->getBody()['entities_deleted'][spl_object_hash($child)];
 
         $this->assertEquals(TestAuditDataChild::class, $deletedEntity['entity_class']);
         $this->assertEquals($childId, $deletedEntity['entity_id']);
-        $this->assertEquals(
-            [
-                'ownerManyToOne' => [
-                    ['entity_class' => TestAuditDataOwner::class, 'entity_id' => $ownerId],
-                    null
-                ]
+        $this->assertEquals([
+            'ownerManyToOne' => [
+                [
+                    'entity_id' => $ownerId,
+                    'entity_class' => TestAuditDataOwner::class,
+                ],
+                null
             ],
-            $deletedEntity['change_set']
-        );
+            'id' => [$childId, null],
+        ], $deletedEntity['change_set']);
     }
 }

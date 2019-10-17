@@ -9,6 +9,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Audits list and audit history actions
+ */
 class AuditController extends Controller
 {
     /**
@@ -20,6 +23,8 @@ class AuditController extends Controller
      * )
      * @Template
      * @AclAncestor("oro_dataaudit_view")
+     * @param Request $request
+     * @return array
      */
     public function indexAction(Request $request)
     {
@@ -30,7 +35,7 @@ class AuditController extends Controller
      * @Route(
      *      "/history/{entity}/{id}/{_format}",
      *      name="oro_dataaudit_history",
-     *      requirements={"entity"="[a-zA-Z0-9_]+", "id"="\d+"},
+     *      requirements={"entity"="[a-zA-Z0-9_]+", "id"="[a-zA-Z0-9_-]+"},
      *      defaults={"entity"="entity", "id"=0, "_format" = "html"}
      * )
      * @Template
@@ -40,13 +45,16 @@ class AuditController extends Controller
      *      class="OroDataAuditBundle:AbstractAudit",
      *      permission="VIEW"
      * )
+     * @param string $entity
+     * @param string|int $id
+     * @return array
      */
     public function historyAction($entity, $id)
     {
         return array(
-            'gridName'     => 'audit-history-grid',
-            'entityClass'  => $entity,
-            'entityId'     => $id,
+            'gridName' => 'audit-history-grid',
+            'entityClass' => $entity,
+            'entityId' => $id,
         );
     }
 }

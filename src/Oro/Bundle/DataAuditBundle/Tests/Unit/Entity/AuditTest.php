@@ -21,6 +21,26 @@ class AuditTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($audit->getUser());
     }
 
+    public function testObjectIdEntityId()
+    {
+        $audit = new Audit();
+
+        $this->assertNull($audit->getObjectId());
+        $this->assertNull($audit->getEntityId());
+
+        $audit->setObjectId(42);
+
+        $this->assertAttributeEquals(42, 'objectId', $audit);
+        $this->assertEquals(42, $audit->getObjectId());
+        $this->assertEquals(42, $audit->getEntityId());
+
+        $audit->setEntityId('string_id');
+
+        $this->assertAttributeEmpty('objectId', $audit);
+        $this->assertEquals('string_id', $audit->getObjectId());
+        $this->assertEquals('string_id', $audit->getEntityId());
+    }
+
     public function testObjectName()
     {
         $audit = new Audit();

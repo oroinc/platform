@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\DataAuditBundle\Service;
 
 use Doctrine\Common\Util\ClassUtils;
@@ -7,6 +8,9 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 
+/**
+ * Increment audit version, made by query because of async processing
+ */
 class SetNewAuditVersionService
 {
     const MAX_ATTEMPTS_LIMIT = 100;
@@ -58,11 +62,12 @@ class SetNewAuditVersionService
             "UPDATE $tableName SET version = (
                 SELECT v FROM (
                     SELECT COALESCE(MAX(version) + 1, 1) AS v FROM $tableName
-                    WHERE object_id = :objectId AND object_class = :objectClass limit 1
+                    WHERE (object_id = :objectId OR entity_id = :entityId) AND object_class = :objectClass limit 1
                 ) AS x
             ) WHERE id = :auditId"
         );
-        $statement->bindValue('objectId', $audit->getObjectId(), Type::INTEGER);
+        $statement->bindValue('objectId', (int) $audit->getObjectId(), Type::INTEGER);
+        $statement->bindValue('entityId', (string) $audit->getObjectId(), Type::STRING);
         $statement->bindValue('objectClass', $audit->getObjectClass(), Type::STRING);
         $statement->bindValue('auditId', $audit->getId(), Type::INTEGER);
 

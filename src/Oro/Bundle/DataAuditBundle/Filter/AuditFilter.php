@@ -14,6 +14,9 @@ use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * Audit filter.
+ */
 class AuditFilter extends EntityFilter
 {
     const TYPE_CHANGED = 'changed';
@@ -106,7 +109,17 @@ class AuditFilter extends EntityFilter
         $auditQb
             ->select('1')
             ->andWhere(sprintf('%s.objectClass = :%s', $this->auditAlias, $this->objectClassParam))
-            ->andWhere(sprintf('%s.objectId = %s.%s', $this->auditAlias, $objectAlias, $identifier))
+            ->andWhere(
+                sprintf(
+                    '%s.objectId = %s.%s OR %s.entityId = %s.%s',
+                    $this->auditAlias,
+                    $objectAlias,
+                    (int) $identifier,
+                    $this->auditAlias,
+                    $objectAlias,
+                    (string) $identifier
+                )
+            )
             ->setParameter($this->objectClassParam, $objectClass)
             ->setMaxResults(1);
 
