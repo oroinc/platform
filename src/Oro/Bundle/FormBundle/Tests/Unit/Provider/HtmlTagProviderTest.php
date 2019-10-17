@@ -23,34 +23,39 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
         $this->htmlTagProvider = new HtmlTagProvider($this->purifierConfig);
     }
 
-    public function testGetAllowedElementsDefault()
+    /**
+     * @dataProvider allowedElementsDataProvider
+     *
+     * @param string $scope
+     * @param array $expectedResult
+     */
+    public function testGetAllowedElements($scope, array $expectedResult): void
     {
-        $allowedElements = $this->htmlTagProvider->getAllowedElements('default');
-        $this->assertEquals(
-            [
-                '@[style|class]',
-                'p',
-                'span[id]',
-                'br',
-                'style[media|type]',
-                'iframe[allowfullscreen]'
-            ],
-            $allowedElements
-        );
+        $allowedElements = $this->htmlTagProvider->getAllowedElements($scope);
+        $this->assertEquals($expectedResult, $allowedElements);
     }
 
-    public function testGetAllowedTags()
+    /**
+     * @dataProvider allowedTagsDataProvider
+     *
+     * @param string $scope
+     * @param string $expectedResult
+     */
+    public function testGetAllowedTags($scope, $expectedResult): void
     {
-        $allowedTags = $this->htmlTagProvider->getAllowedTags('default');
-        $this->assertEquals('<p></p><span></span><br><style></style><iframe></iframe>', $allowedTags);
+        $allowedTags = $this->htmlTagProvider->getAllowedTags($scope);
+        $this->assertEquals($expectedResult, $allowedTags);
     }
 
-    public function testGetIframeRegexp()
+    /**
+     * @dataProvider iframeRegexpDataProvider
+     *
+     * @param string $scope
+     * @param string $expectedResult
+     */
+    public function testGetIframeRegexp($scope, $expectedResult): void
     {
-        $this->assertEquals(
-            '<^https?://(www.)?(youtube.com/embed/|player.vimeo.com/video/)>',
-            $this->htmlTagProvider->getIframeRegexp('default')
-        );
+        $this->assertEquals($expectedResult, $this->htmlTagProvider->getIframeRegexp($scope));
     }
 
     public function testGetIframeRegexpBypass()
@@ -62,15 +67,138 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(1, preg_match($this->htmlTagProvider->getIframeRegexp('default'), $allowedUri));
     }
 
-    public function testGetUriSchemes()
+    /**
+     * @dataProvider uriSchemesDataProvider
+     *
+     * @param string $scope
+     * @param array $expectedResult
+     */
+    public function testGetUriSchemes($scope, array $expectedResult): void
     {
-        $this->assertEquals(
-            [
-                'http' => true,
-                'https' => true,
-                'ftp' => true,
+        $this->assertEquals($expectedResult, $this->htmlTagProvider->getUriSchemes($scope));
+    }
+
+    /**
+     * @return array
+     */
+    public function allowedElementsDataProvider(): array
+    {
+        return [
+            'default scope' => [
+                'scope' => 'default',
+                'expectedResult' => [
+                    '@[style|class]',
+                    'p',
+                    'span[id]',
+                    'br',
+                    'style[media|type]',
+                    'iframe[allowfullscreen]'
+                ]
             ],
-            $this->htmlTagProvider->getUriSchemes('default')
-        );
+            'additional scope' => [
+                'scope' => 'additional',
+                'expectedResult' => [
+                    '@[style|class]',
+                    'p',
+                    'span[id]',
+                    'br',
+                    'style[media|type]',
+                    'iframe[allowfullscreen]',
+                    'div'
+                ]
+            ],
+            'extra scope' => [
+                'scope' => 'extra',
+                'expectedResult' => [
+                    '@[style|class]',
+                    'p',
+                    'span[id]',
+                    'br',
+                    'style[media|type]',
+                    'iframe[allowfullscreen]',
+                    'div',
+                    'img'
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function allowedTagsDataProvider(): array
+    {
+        return [
+            'default scope' => [
+                'scope' => 'default',
+                'expectedResult' => '<p></p><span></span><br><style></style><iframe></iframe>'
+            ],
+            'additional scope' => [
+                'scope' => 'additional',
+                'expectedResult' => '<p></p><span></span><br><style></style><iframe></iframe><div></div>'
+            ],
+            'extra scope' => [
+                'scope' => 'extra',
+                'expectedResult' => '<p></p><span></span><br><style></style><iframe></iframe><div></div><img>'
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function iframeRegexpDataProvider(): array
+    {
+        return [
+            'default scope' => [
+                'scope' => 'default',
+                'expectedResult' => '<^https?://(www.)?(youtube.com/embed/|player.vimeo.com/video/)>'
+            ],
+            'additional scope' => [
+                'scope' => 'additional',
+                'expectedResult' => '<^https?://(www.)?(youtube.com/embed/|player.vimeo.com/video/|maps.google.com)>'
+            ],
+            'extra scope' => [
+                'scope' => 'extra',
+                'expectedResult' =>
+                    '<^https?://(www.)?(youtube.com/embed/|player.vimeo.com/video/|maps.google.com|example.com)>'
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function uriSchemesDataProvider(): array
+    {
+        return [
+            'default scope' => [
+                'scope' => 'default',
+                'expectedResult' => [
+                    'http' => true,
+                    'https' => true,
+                    'ftp' => true,
+                ]
+            ],
+            'additional scope' => [
+                'scope' => 'additional',
+                'expectedResult' => [
+                    'http' => true,
+                    'https' => true,
+                    'ftp' => true,
+                    'tel' => true,
+                ]
+            ],
+            'extra scope' => [
+                'scope' => 'extra',
+                'expectedResult' => [
+                    'http' => true,
+                    'https' => true,
+                    'ftp' => true,
+                    'tel' => true,
+                    'mailto' => true,
+                ]
+            ]
+        ];
     }
 }

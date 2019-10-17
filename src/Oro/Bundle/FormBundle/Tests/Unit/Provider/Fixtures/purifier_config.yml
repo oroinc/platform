@@ -20,3 +20,22 @@ default:
         - 'http'
         - 'https'
         - 'ftp'
+
+additional:
+    extends: default
+    html_allowed_elements:
+        div: ~
+    html_purifier_iframe_domains:
+        - 'maps.google.com'
+    html_purifier_uri_schemes:
+        - 'tel'
+
+extra:
+    extends: additional
+    html_allowed_elements:
+        img:
+            hasClosingTag: false
+    html_purifier_iframe_domains:
+        - 'example.com'
+    html_purifier_uri_schemes:
+        - 'mailto'

@@ -8,6 +8,7 @@ namespace Oro\Bundle\FormBundle\Provider;
  */
 class HtmlTagProvider
 {
+    private const EXTEND_KEY = 'extends';
     private const HTML_ALLOWED_ELEMENTS = 'html_allowed_elements';
     private const HTML_PURIFIER_IFRAME_DOMAINS = 'html_purifier_iframe_domains';
     private const HTML_PURIFIER_URI_SCHEMES = 'html_purifier_uri_schemes';
@@ -32,19 +33,14 @@ class HtmlTagProvider
     public function getAllowedElements(string $scope): array
     {
         $allowedElements = ['@[style|class]'];
-
-        if (array_key_exists($scope, $this->purifierConfig)
-            && array_key_exists(self::HTML_ALLOWED_ELEMENTS, $this->purifierConfig[$scope])) {
-            foreach ($this->purifierConfig[$scope][self::HTML_ALLOWED_ELEMENTS] as $name => $data) {
-                $allowedElement = $name;
-                if (!empty($data['attributes'])) {
-                    $allowedElement .= '[' . implode('|', $data['attributes']) . ']';
-                }
-
-                $allowedElements[] = $allowedElement;
+        foreach ($this->getPurifierConfigByKey($scope, self::HTML_ALLOWED_ELEMENTS) as $name => $data) {
+            $allowedElement = $name;
+            if (!empty($data['attributes'])) {
+                $allowedElement .= '[' . implode('|', $data['attributes']) . ']';
             }
-        }
 
+            $allowedElements[] = $allowedElement;
+        }
 
         return $allowedElements;
     }
@@ -58,17 +54,13 @@ class HtmlTagProvider
     public function getAllowedTags(string $scope): string
     {
         $allowedTags = '';
-
-        if (array_key_exists($scope, $this->purifierConfig)
-            && array_key_exists(self::HTML_ALLOWED_ELEMENTS, $this->purifierConfig[$scope])) {
-            foreach ($this->purifierConfig[$scope][self::HTML_ALLOWED_ELEMENTS] as $name => $data) {
-                $allowedTag = '<' . $name . '>';
-                if (!is_array($data) || !array_key_exists('hasClosingTag', $data) || $data['hasClosingTag']) {
-                    $allowedTag .= '</' . $name . '>';
-                }
-
-                $allowedTags .= $allowedTag;
+        foreach ($this->getPurifierConfigByKey($scope, self::HTML_ALLOWED_ELEMENTS) as $name => $data) {
+            $allowedTag = '<' . $name . '>';
+            if (!is_array($data) || !array_key_exists('hasClosingTag', $data) || $data['hasClosingTag']) {
+                $allowedTag .= '</' . $name . '>';
             }
+
+            $allowedTags .= $allowedTag;
         }
 
         return $allowedTags;
@@ -80,18 +72,12 @@ class HtmlTagProvider
      */
     public function getIframeRegexp(string $scope): string
     {
-        if (array_key_exists($scope, $this->purifierConfig)
-            && array_key_exists(self::HTML_PURIFIER_IFRAME_DOMAINS, $this->purifierConfig[$scope])) {
-            $iframeDomains = $this->purifierConfig[$scope][self::HTML_PURIFIER_IFRAME_DOMAINS];
-
-            if (!$iframeDomains) {
-                return '';
-            }
-
-            return sprintf('<^https?://(www.)?(%s)>', implode('|', $iframeDomains));
+        $iframeDomains = $this->getPurifierConfigByKey($scope, self::HTML_PURIFIER_IFRAME_DOMAINS);
+        if (!$iframeDomains) {
+            return '';
         }
 
-        return '';
+        return sprintf('<^https?://(www.)?(%s)>', implode('|', $iframeDomains));
     }
 
     /**
@@ -101,13 +87,43 @@ class HtmlTagProvider
     public function getUriSchemes(string $scope): array
     {
         $result = [];
-        if (array_key_exists($scope, $this->purifierConfig)
-            && array_key_exists(self::HTML_PURIFIER_URI_SCHEMES, $this->purifierConfig[$scope])) {
-            foreach ($this->purifierConfig[$scope][self::HTML_PURIFIER_URI_SCHEMES] as $scheme) {
-                $result[$scheme] = true;
-            }
+        foreach ($this->getPurifierConfigByKey($scope, self::HTML_PURIFIER_URI_SCHEMES) as $scheme) {
+            $result[$scheme] = true;
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $scope
+     * @param string $key
+     * @return array
+     */
+    private function getPurifierConfigByKey($scope, $key): array
+    {
+        $purifierConfig = [
+            self::HTML_ALLOWED_ELEMENTS => [],
+            self::HTML_PURIFIER_IFRAME_DOMAINS => [],
+            self::HTML_PURIFIER_URI_SCHEMES => [],
+        ];
+
+        if (array_key_exists($scope, $this->purifierConfig)) {
+            $purifierConfigByKey = $purifierConfig[$key];
+
+            if (array_key_exists(self::EXTEND_KEY, $this->purifierConfig[$scope])) {
+                $purifierConfigByKey = array_merge(
+                    $purifierConfigByKey,
+                    $this->getPurifierConfigByKey($this->purifierConfig[$scope][self::EXTEND_KEY], $key)
+                );
+            }
+
+            if (array_key_exists($key, $this->purifierConfig[$scope])) {
+                $purifierConfigByKey = array_merge($purifierConfigByKey, $this->purifierConfig[$scope][$key]);
+            }
+
+            $purifierConfig[$key] = $purifierConfigByKey;
+        }
+
+        return $purifierConfig[$key];
     }
 }
