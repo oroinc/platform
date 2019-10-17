@@ -1,21 +1,26 @@
-{% import 'OroDataAuditBundle::macros.html.twig' as dataAudit %}
+{%- import 'OroDataAuditBundle::macros.html.twig' as dataAudit -%}
 
 <ul>
-{% for fieldKey, fieldValue in value %}
-    {% if fieldKey == 'auditData' %}
-        {% if fieldValue.new|length %}
-        {% for collKey, collValue in fieldValue.new %}
+    {%- for fieldKey, fieldValue in value -%}
+        {%- if fieldKey == 'auditData' -%}
+            {%- if fieldValue.new|length -%}
+                {%- for collKey, collValue in fieldValue.new -%}
+                    <li>
+                        <b>{{- oro_field_config_value(record.getValue('objectClass'), collKey, 'label')|default(collKey)|trans -}}&nbsp;</b>
+                        {{- collValue -}}
+                    </li>
+                {%- endfor -%}
+            {%- endif -%}
+        {%- elseif fieldValue.collectionDiffs is defined and fieldValue.collectionDiffs is not empty -%}
             <li>
-                <b>{{ oro_field_config_value(record.getValue('objectClass'), collKey, 'label')|default(collKey)|trans }}:</b>
-                {{ collValue }}
+                <b>{{- dataAudit.renderFieldName(record.getValue('objectClass'), fieldKey, fieldValue) -}}&nbsp;</b>
+                {{- dataAudit.renderCollection(record.getValue('objectClass'), fieldKey, fieldValue, ['added', 'changed']) -}}
             </li>
-        {% endfor %}
-        {% endif %}
-    {% else %}
-        <li>
-            <b>{{ dataAudit.renderFieldName(record.getValue('objectClass'), fieldKey, fieldValue) }}</b>
-            {{ dataAudit.renderFieldValue(fieldValue.new, fieldValue) }}
-        </li>
-    {% endif %}
-{% endfor %}
+        {%- else -%}
+            <li>
+                <b>{{- dataAudit.renderFieldName(record.getValue('objectClass'), fieldKey, fieldValue) -}}&nbsp;</b>
+                {{- dataAudit.renderFieldValue(fieldValue.new, fieldValue) -}}
+            </li>
+        {%- endif -%}
+    {%- endfor -%}
 </ul>

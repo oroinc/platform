@@ -1,8 +1,10 @@
 <?php
-namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
+
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Async;
 
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesProcessor;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -31,9 +33,12 @@ class AuditDeletedEntitiesTest extends WebTestCase
             'transaction_id' => 'theTransactionId',
             'owner_description' => 'Some Owner Description',
             'entities_deleted' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
+                    'change_set' => [
+                        'stringProperty' => ['anOldValue', null],
+                    ],
                 ]
             ],
         ]);
@@ -57,6 +62,13 @@ class AuditDeletedEntitiesTest extends WebTestCase
         $this->assertEquals('Some Owner Description', $audit->getOwnerDescription());
         $this->assertNull($audit->getUser());
         $this->assertNull($audit->getOrganization());
+
+        $this->assertEquals(1, $audit->getFields()->count());
+
+        /** @var AuditField $field */
+        $field = $audit->getFields()->first();
+        $this->assertEquals(null, $field->getNewValue());
+        $this->assertEquals('anOldValue', $field->getOldValue());
     }
 
     public function testShouldSkipAuditCreationForDeletedNotAuditableEntity()
@@ -64,9 +76,12 @@ class AuditDeletedEntitiesTest extends WebTestCase
         $message = $this->createDummyMessage([
             'timestamp' => time(),
             'entities_deleted' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => Status::class,
                     'entity_id' => 123,
+                    'change_set' => [
+                        'stringProperty' => ['anOldValue', null],
+                    ],
                 ]
             ],
         ]);
@@ -83,13 +98,19 @@ class AuditDeletedEntitiesTest extends WebTestCase
     {
         $message = $this->createDummyMessage([
             'entities_deleted' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 111,
+                    'change_set' => [
+                        'stringProperty' => ['anOldValue', null],
+                    ],
                 ],
-                [
+                '000000007ec8f22f00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 333,
+                    'change_set' => [
+                        'stringProperty' => ['anOldValue2', null],
+                    ],
                 ]
             ],
         ]);
@@ -111,9 +132,12 @@ class AuditDeletedEntitiesTest extends WebTestCase
             'user_class' => User::class,
             'transaction_id' => 'aTransactionId',
             'entities_deleted' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
+                    'change_set' => [
+                        'stringProperty' => ['anOldValue', null],
+                    ],
                 ],
             ],
         ]);
@@ -142,9 +166,12 @@ class AuditDeletedEntitiesTest extends WebTestCase
             'timestamp' => time(),
             'organization_id' => $organization->getId(),
             'entities_deleted' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
+                    'change_set' => [
+                        'stringProperty' => ['anOldValue', null],
+                    ],
                 ],
             ],
         ]);

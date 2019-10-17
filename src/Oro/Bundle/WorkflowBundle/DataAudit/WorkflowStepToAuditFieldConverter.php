@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\DataAudit;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAuditField;
+use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 use Oro\Bundle\DataAuditBundle\Service\ChangeSetToAuditFieldsConverterInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowStepRepository;
@@ -107,7 +108,7 @@ class WorkflowStepToAuditFieldConverter implements ChangeSetToAuditFieldsConvert
         $oldValue = null
     ) {
         /** @var AbstractAuditField $auditFieldEntity */
-        $auditFieldEntity = new $auditFieldClass($field, 'string', $newValue, $oldValue);
+        $auditFieldEntity = new $auditFieldClass($field, AuditFieldTypeRegistry::TYPE_STRING, $newValue, $oldValue);
         $auditFieldEntity->setTranslationDomain('workflows');
 
         return $auditFieldEntity;

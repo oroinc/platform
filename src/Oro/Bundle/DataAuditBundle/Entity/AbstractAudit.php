@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -80,7 +81,7 @@ abstract class AbstractAudit
     /**
      * @var string $objectId
      *
-     * @ORM\Column(name="object_id", type="integer", nullable=true)
+     * @ORM\Column(name="object_id", type="string", length=255, nullable=true)
      */
     protected $objectId;
 
@@ -384,7 +385,7 @@ abstract class AbstractAudit
      */
     public function setObjectId($objectId)
     {
-        $this->objectId = $objectId;
+        $this->objectId = (string) $objectId;
     }
 
     /**
