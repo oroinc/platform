@@ -33,7 +33,7 @@ class GridController extends Controller
      *      name="oro_datagrid_widget",
      *      requirements={"gridName"="[\w\:-]+"}
      * )
-     * @Template
+     * @Template("OroDataGridBundle:Grid/widget:widget.html.twig")
      * @param Request $request
      * @param string $gridName
      *
