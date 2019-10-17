@@ -54,12 +54,41 @@ class DraftSourceListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->loadClassMetadata($this->event);
     }
 
+    public function testHasAssociationDraftSource(): void
+    {
+        $metadata = $this->createMock(ClassMetadataInfo::class);
+        $metadata->expects($this->once())
+            ->method('getReflectionClass')
+            ->willReturn(new \ReflectionClass(new DraftableEntityStub()));
+        $metadata->expects($this->once())
+            ->method('hasAssociation')
+            ->with('draftSource')
+            ->willReturn(true);
+        $metadata->expects($this->never())
+            ->method('getName');
+        $metadata->expects($this->never())
+            ->method('getIdentifier');
+        $metadata->expects($this->never())
+            ->method('mapManyToOne');
+
+        $this->event
+            ->expects($this->once())
+            ->method('getClassMetadata')
+            ->willReturn($metadata);
+
+        $this->listener->loadClassMetadata($this->event);
+    }
+
     public function testMapManyToOne(): void
     {
         $metadata = $this->createMock(ClassMetadataInfo::class);
         $metadata->expects($this->once())
             ->method('getReflectionClass')
             ->willReturn(new \ReflectionClass(new DraftableEntityStub()));
+        $metadata->expects($this->once())
+            ->method('hasAssociation')
+            ->with('draftSource')
+            ->willReturn(false);
         $metadata->expects($this->once())
             ->method('getName')
             ->willReturn(DraftableEntityStub::class);

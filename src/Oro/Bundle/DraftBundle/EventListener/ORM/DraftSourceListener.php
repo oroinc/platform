@@ -49,6 +49,10 @@ class DraftSourceListener
             return;
         }
 
+        if ($metadata->hasAssociation(self::FIELD_NAME_ENTITY)) {
+            return;
+        }
+
         $draftSourceMetadata = $this->getPropertyMetadata($metadata);
         $metadata->mapManyToOne($draftSourceMetadata);
     }
