@@ -102,7 +102,7 @@ datagrids:
                 owner:
                     type: choice-tree
                     label: oro.digitalasset.datagrid.column.owner.label
-                    data_name: owner
+                    data_name: digitalAsset.owner
                     autocomplete_alias: assigned_to_organization_users
                     renderedPropertyName: fullName
                     className: 'Oro\Bundle\UserBundle\Entity\User'
