@@ -84,6 +84,14 @@ services:
         arguments:
             - [] # a list of service ids of column options guessers
 
+    oro_datagrid.datagrid.primary_key_column_options_guesser:
+        class: 'Oro\Bundle\DataGridBundle\Datagrid\PrimaryKeyColumnOptionsGuesser'
+        public: true
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: oro_datagrid.column_options_guesser }
+
     oro_datagrid.datagrid.column_options_guesser:
         class: '%oro_datagrid.datagrid.column_options_guesser.class%'
         public: true
