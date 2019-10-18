@@ -26,9 +26,8 @@ class AuditFieldRepository extends EntityRepository
 
         $qb = $this->createQueryBuilder('f');
         $qb
-            ->select('IDENTITY(f.audit) as audit', 'f as field')
+            ->select('IDENTITY(f.audit) as audit', 'f as field', 'f.visible as visible')
             ->where($qb->expr()->in('IDENTITY(f.audit)', ':ids'))
-            ->andWhere($qb->expr()->eq('f.visible', $qb->expr()->literal(true)))
             ->setParameter('ids', $ids);
 
         $fields = $qb
@@ -38,6 +37,10 @@ class AuditFieldRepository extends EntityRepository
 
         $fieldsByAudits = [];
         foreach ($fields as $field) {
+            if (empty($field['visible'])) {
+                continue;
+            }
+
             $fieldsByAudits[$field['audit']][] = $field['field'];
         }
 
