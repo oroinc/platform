@@ -2083,6 +2083,11 @@ class DataAuditTest extends WebTestCase
         $this->markTestSkipped('BAP-18750');
     }
 
+    public function testWysiwygProperties()
+    {
+        $this->markTestSkipped('BAP-18750');
+    }
+
     /**
      * <ul>
      *      <li>
