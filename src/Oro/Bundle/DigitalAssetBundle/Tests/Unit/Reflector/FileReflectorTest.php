@@ -44,31 +44,6 @@ class FileReflectorTest extends \PHPUnit\Framework\TestCase
         $this->reflector->reflectFromDigitalAsset($this->file, $this->createMock(DigitalAsset::class));
     }
 
-    public function testReflectFromDigitalAssetWhenSameFilename(): void
-    {
-        $digitalAsset = $this->createMock(DigitalAsset::class);
-
-        $digitalAsset
-            ->expects($this->once())
-            ->method('getSourceFile')
-            ->willReturn($sourceFile = new File());
-
-        $sourceFile
-            ->setFilename($filename = 'sample/filename')
-            ->setOriginalFilename('sample/original/filename')
-            ->setMimeType('sample/type1')
-            ->setFileSize(1024)
-            ->setExtension('sampleext');
-
-        $this->file->setFilename($filename);
-
-        $this->propertyAccessor
-            ->expects($this->never())
-            ->method('setValue');
-
-        $this->reflector->reflectFromDigitalAsset($this->file, $digitalAsset);
-    }
-
     public function testReflectFromDigitalAsset(): void
     {
         $digitalAsset = $this->createMock(DigitalAsset::class);
@@ -87,6 +62,27 @@ class FileReflectorTest extends \PHPUnit\Framework\TestCase
 
         $fileReflector = new FileReflector(new PropertyAccessor());
         $fileReflector->reflectFromDigitalAsset($this->file, $digitalAsset);
+
+        $this->assertEquals($this->file->getFilename(), $sourceFile->getFilename());
+        $this->assertEquals($this->file->getOriginalFilename(), $sourceFile->getOriginalFilename());
+        $this->assertEquals($this->file->getMimeType(), $sourceFile->getMimeType());
+        $this->assertEquals($this->file->getFileSize(), $sourceFile->getFileSize());
+        $this->assertEquals($this->file->getExtension(), $sourceFile->getExtension());
+    }
+
+    public function testReflectFromFile(): void
+    {
+        $sourceFile = new File();
+
+        $sourceFile
+            ->setFilename('sample/filename')
+            ->setOriginalFilename('sample/original/filename')
+            ->setMimeType('sample/type1')
+            ->setFileSize(1024)
+            ->setExtension('sampleext');
+
+        $fileReflector = new FileReflector(new PropertyAccessor());
+        $fileReflector->reflectFromFile($this->file, $sourceFile);
 
         $this->assertEquals($this->file->getFilename(), $sourceFile->getFilename());
         $this->assertEquals($this->file->getOriginalFilename(), $sourceFile->getOriginalFilename());

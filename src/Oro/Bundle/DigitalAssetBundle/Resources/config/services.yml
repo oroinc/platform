@@ -34,7 +34,7 @@ services:
     oro_digital_asset.listener.source_changed_listener:
         class: Oro\Bundle\DigitalAssetBundle\EventListener\DigitalAssetSourceChangedListener
         arguments:
-            - '@property_accessor'
+            - '@oro_digital_asset.reflector.file_reflector'
         tags:
             - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postUpdate }
 

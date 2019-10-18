@@ -87,7 +87,7 @@ class DigitalAssetController extends AbstractController
     /**
      * @Route("/widget/choose/{parentEntityClass}/{parentEntityFieldName}", name="oro_digital_asset_widget_choose")
      * @Template("@OroDigitalAsset/DigitalAsset/widget/choose.html.twig")
-     * @AclAncestor("oro_digital_asset_view")
+     * @AclAncestor("oro_digital_asset_create")
      *
      * @param string $parentEntityClass
      * @param string $parentEntityFieldName
@@ -114,13 +114,30 @@ class DigitalAssetController extends AbstractController
         }
 
         $isImageType = $this->isImageType($attachmentEntityFieldConfig);
+        $mimeTypes = $this->get(FileConstraintsProvider::class)
+            ->getAllowedMimeTypesForEntityField($resolvedParentEntityClass, $parentEntityFieldName);
+        $maxFileSize = $this->get(FileConstraintsProvider::class)
+            ->getMaxSizeForEntityField($resolvedParentEntityClass, $parentEntityFieldName);
+
+        return $this->handleChooseForm($isImageType, $mimeTypes, $maxFileSize);
+    }
+
+    /**
+     * @param bool $isImageType
+     * @param array $mimeTypes
+     * @param int $maxFileSize
+     *
+     * @return array|RedirectResponse
+     */
+    protected function handleChooseForm(bool $isImageType, array $mimeTypes, int $maxFileSize)
+    {
         $form = $this->createForm(
             DigitalAssetInDialogType::class,
             new DigitalAsset(),
             [
                 'is_image_type' => $isImageType,
-                'parent_entity_class' => $resolvedParentEntityClass,
-                'parent_entity_field_name' => $parentEntityFieldName,
+                'mime_types' => $mimeTypes,
+                'max_file_size' => $maxFileSize,
             ]
         );
 
@@ -131,27 +148,14 @@ class DigitalAssetController extends AbstractController
                 '',
                 null,
                 null,
-                function (
-                    $entity,
-                    FormInterface $form,
-                    Request $request
-                ) use (
-                    $resolvedParentEntityClass,
-                    $parentEntityFieldName,
-                    $isImageType
-                ) {
+                function ($entity, FormInterface $form, Request $request) use ($mimeTypes, $maxFileSize, $isImageType) {
                     return [
                         'saved' => $form->isSubmitted() && $form->isValid(),
                         'is_image_type' => $isImageType,
                         'grid_name' => $isImageType
                             ? 'digital-asset-select-image-grid'
                             : 'digital-asset-select-file-grid',
-                        'grid_params' => [
-                            'mime_types' => $this->get(FileConstraintsProvider::class)
-                                ->getAllowedMimeTypesForEntityField($resolvedParentEntityClass, $parentEntityFieldName),
-                            'max_file_size' => $this->get(FileConstraintsProvider::class)
-                                ->getMaxSizeForEntityField($resolvedParentEntityClass, $parentEntityFieldName),
-                        ],
+                        'grid_params' => ['mime_types' => $mimeTypes, 'max_file_size' => $maxFileSize],
                         'form' => $form->createView(),
                     ];
                 }
@@ -163,7 +167,7 @@ class DigitalAssetController extends AbstractController
      *
      * @return bool
      */
-    private function isImageType(ConfigInterface $entityFieldConfig): bool
+    protected function isImageType(ConfigInterface $entityFieldConfig): bool
     {
         /** @var FieldConfigId $fieldConfigId */
         $fieldConfigId = $entityFieldConfig->getId();
@@ -177,7 +181,7 @@ class DigitalAssetController extends AbstractController
      *
      * @return ConfigInterface|null
      */
-    private function getAttachmentEntityFieldConfig(
+    protected function getAttachmentEntityFieldConfig(
         string $parentEntityClass,
         string $parentEntityFieldName
     ): ?ConfigInterface {

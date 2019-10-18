@@ -46,18 +46,10 @@
                     isImageType: dam_widget.is_image_type,
                     isSet: is_set,
                     widgetOptions: {
-                        alias: 'dam-dialog',
                         title: (dam_widget.is_image_type
                             ? 'oro.digitalasset.dam.dialog.select_image'
                             : 'oro.digitalasset.dam.dialog.select_file')|trans,
                         url: path(dam_widget.route|default('oro_digital_asset_widget_choose'), dam_widget.parameters),
-                        dialogOptions: {
-                            allowMaximize: false,
-                            allowMinimize: false,
-                            modal: true,
-                            maximizedHeightDecreaseBy: 'minimize-bar',
-                            width: 1100
-                        }
                     },
                     selectors: {
                         digitalAssetInput: '#' ~ form.digitalAsset.vars.id,
@@ -101,5 +93,6 @@
         </div>
 
         {{ form_errors(form.file) }}
+        {{ form_errors(form.digitalAsset) }}
     {%- endspaceless -%}
 {% endblock %}

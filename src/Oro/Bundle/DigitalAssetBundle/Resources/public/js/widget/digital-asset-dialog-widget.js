@@ -19,11 +19,13 @@ define(function(require) {
             desktopLoadingBar: true,
             moveAdoptedActions: false,
             dialogOptions: {
+                resizable: true,
+                autoResize: true,
                 allowMaximize: false,
                 allowMinimize: false,
                 modal: true,
                 maximizedHeightDecreaseBy: 'minimize-bar',
-                width: 1100
+                minWidth: 720
             }
         }),
 

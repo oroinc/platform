@@ -4,8 +4,8 @@ namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
-use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromEntityFieldConfig;
-use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromEntityFieldConfigValidator;
+use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromSystemConfig;
+use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromSystemConfigValidator;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Form\Type\DigitalAssetInDialogType;
 use Oro\Bundle\DigitalAssetBundle\Validator\Constraints\DigitalAssetSourceFileMimeTypeValidator;
@@ -31,8 +31,6 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
     use EntityTrait;
 
     private const SAMPLE_TITLE = 'sample title';
-    private const SAMPLE_CLASS = 'SampleClass';
-    private const SAMPLE_FIELD = 'sampleField';
 
     /** @var DigitalAssetInDialogType */
     private $formType;
@@ -60,6 +58,8 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
                     'data_class' => DigitalAsset::class,
                     'validation_groups' => ['Default', 'DigitalAssetInDialog'],
                     'is_image_type' => false,
+                    'mime_types' => [],
+                    'max_file_size' => 0,
                 ]
             );
 
@@ -91,9 +91,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
                     LocalizedFallbackValueCollectionType::class,
                     [
                         'label' => 'oro.digitalasset.titles.label',
-                        'tooltip' => $options['is_image_type']
-                            ? 'oro.digitalasset.titles.tooltip_image'
-                            : 'oro.digitalasset.titles.tooltip_file',
+                        'tooltip' => $expectedTooltip,
                         'required' => true,
                         'entry_options' => ['constraints' => [new NotBlank()]],
                     ],
@@ -102,23 +100,13 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
                     'sourceFile',
                     FileType::class,
                     [
-                        'label' => $options['is_image_type']
-                            ? 'oro.digitalasset.dam.dialog.image.label'
-                            : 'oro.digitalasset.dam.dialog.file.label',
+                        'label' => $expectedLabel,
                         'required' => true,
                         'allowDelete' => false,
                         'addEventSubscriber' => false,
                         'fileOptions' => [
                             'required' => true,
-                            'constraints' => [
-                                new NotBlank(),
-                                new FileConstraintFromEntityFieldConfig(
-                                    [
-                                        'entityClass' => $options['parent_entity_class'],
-                                        'fieldName' => $options['parent_entity_field_name'],
-                                    ]
-                                ),
-                            ],
+                            'constraints' => $expectedConstraints,
                         ],
                     ],
                 ]
@@ -137,17 +125,17 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
             'not image type' => [
                 'options' => [
                     'is_image_type' => false,
-                    'parent_entity_class' => self::SAMPLE_CLASS,
-                    'parent_entity_field_name' => self::SAMPLE_FIELD,
+                    'mime_types' => ['sample/type'],
+                    'max_file_size' => 10,
                 ],
                 'expectedTooltip' => 'oro.digitalasset.titles.tooltip_file',
                 'expectedLabel' => 'oro.digitalasset.dam.dialog.file.label',
                 'expectedConstraints' => [
                     new NotBlank(),
-                    new FileConstraintFromEntityFieldConfig(
+                    new FileConstraintFromSystemConfig(
                         [
-                            'entityClass' => self::SAMPLE_CLASS,
-                            'fieldName' => self::SAMPLE_FIELD,
+                            'mimeTypes' => ['sample/type'],
+                            'maxSize' => 10,
                         ]
                     ),
                 ],
@@ -155,19 +143,14 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
             'image type' => [
                 'options' => [
                     'is_image_type' => true,
-                    'parent_entity_class' => self::SAMPLE_CLASS,
-                    'parent_entity_field_name' => self::SAMPLE_FIELD,
+                    'mime_types' => [],
+                    'max_file_size' => 0,
                 ],
                 'expectedTooltip' => 'oro.digitalasset.titles.tooltip_image',
                 'expectedLabel' => 'oro.digitalasset.dam.dialog.image.label',
                 'expectedConstraints' => [
                     new NotBlank(),
-                    new FileConstraintFromEntityFieldConfig(
-                        [
-                            'entityClass' => self::SAMPLE_CLASS,
-                            'fieldName' => self::SAMPLE_FIELD,
-                        ]
-                    ),
+                    new FileConstraintFromSystemConfig(['mimeTypes' => [], 'maxSize' => 0]),
                 ],
             ],
         ];
@@ -182,15 +165,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
      */
     public function testSubmit(DigitalAsset $defaultData, array $submittedData, DigitalAsset $expectedData): void
     {
-        $form = $this->factory->create(
-            DigitalAssetInDialogType::class,
-            $defaultData,
-            [
-                'parent_entity_class' => self::SAMPLE_CLASS,
-                'parent_entity_field_name' => self::SAMPLE_FIELD,
-                'is_image_type' => false,
-            ]
-        );
+        $form = $this->factory->create(DigitalAssetInDialogType::class, $defaultData);
 
         $this->assertEquals($defaultData, $form->getData());
         $this->assertEquals($defaultData, $form->getViewData());
@@ -229,15 +204,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
 
     public function testSubmitWhenNoFile(): void
     {
-        $form = $this->factory->create(
-            DigitalAssetInDialogType::class,
-            $defaultData = new DigitalAsset(),
-            [
-                'parent_entity_class' => self::SAMPLE_CLASS,
-                'parent_entity_field_name' => self::SAMPLE_FIELD,
-                'is_image_type' => false,
-            ]
-        );
+        $form = $this->factory->create(DigitalAssetInDialogType::class, $defaultData = new DigitalAsset());
 
         $this->assertEquals($defaultData, $form->getData());
         $this->assertEquals($defaultData, $form->getViewData());
@@ -260,8 +227,6 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
             DigitalAssetInDialogType::class,
             $defaultData = new DigitalAsset(),
             [
-                'parent_entity_class' => self::SAMPLE_CLASS,
-                'parent_entity_field_name' => self::SAMPLE_FIELD,
                 'is_image_type' => false,
             ]
         );
@@ -329,10 +294,8 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
      */
     protected function getValidators(): array
     {
-        $digitalAssetSourceFileConfiguredValidator = $this->createMock(
-            FileConstraintFromEntityFieldConfigValidator::class
-        );
-        $digitalAssetSourceFileConfiguredValidator
+        $fileConstraintFromSystemConfigValidator = $this->createMock(FileConstraintFromSystemConfigValidator::class);
+        $fileConstraintFromSystemConfigValidator
             ->method('validate')
             ->willReturn(new ConstraintViolationList());
 
@@ -343,7 +306,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
 
         return [
             NotBlank::class => new NotBlank(),
-            FileConstraintFromEntityFieldConfigValidator::class => $digitalAssetSourceFileConfiguredValidator,
+            FileConstraintFromSystemConfigValidator::class => $fileConstraintFromSystemConfigValidator,
             DigitalAssetSourceFileMimeTypeValidator::class => $digitalAssetSourceFileMimeTypeValidator,
         ];
     }

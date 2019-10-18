@@ -55,10 +55,25 @@ class FileReflector implements LoggerAwareInterface
             return false;
         }
 
-        if ($sourceFile->getFilename() === $file->getFilename()) {
-            return false;
-        }
+        $this->reflectFromFile($file, $sourceFile);
 
+        return true;
+    }
+
+    /**
+     * Populates file with properties from the given source file.
+     * Copies the following properties:
+     * - filename
+     * - originalFilename
+     * - extension
+     * - mimeType
+     * - fileSize
+     *
+     * @param File $file
+     * @param File $sourceFile
+     */
+    public function reflectFromFile(File $file, File $sourceFile): void
+    {
         $propertiesToUpdate = ['filename', 'extension', 'originalFilename', 'mimeType', 'fileSize'];
         foreach ($propertiesToUpdate as $property) {
             $this->propertyAccessor->setValue(
@@ -67,7 +82,5 @@ class FileReflector implements LoggerAwareInterface
                 $this->propertyAccessor->getValue($sourceFile, $property)
             );
         }
-
-        return true;
     }
 }

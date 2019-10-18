@@ -97,7 +97,14 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension implements Logg
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('digitalAsset', HiddenType::class);
+        $builder->add(
+            'digitalAsset',
+            HiddenType::class,
+            [
+                'error_bubbling' => false,
+                'invalid_message' => 'oro.digitalasset.validator.digital_asset.invalid',
+            ]
+        );
         $builder->get('digitalAsset')->addModelTransformer($this->digitalAssetToIdTransformer);
 
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);

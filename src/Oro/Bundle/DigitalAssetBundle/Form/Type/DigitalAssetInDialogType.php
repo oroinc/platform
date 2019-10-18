@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DigitalAssetBundle\Form\Type;
 
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
-use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromEntityFieldConfig;
+use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromSystemConfig;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Symfony\Component\Form\AbstractType;
@@ -49,12 +49,10 @@ class DigitalAssetInDialogType extends AbstractType
                         'required' => true,
                         'constraints' => [
                             new NotBlank(),
-                            new FileConstraintFromEntityFieldConfig(
-                                [
-                                    'entityClass' => $options['parent_entity_class'],
-                                    'fieldName' => $options['parent_entity_field_name'],
-                                ]
-                            ),
+                            new FileConstraintFromSystemConfig([
+                                'mimeTypes' => $options['mime_types'],
+                                'maxSize' => $options['max_file_size']
+                            ]),
                         ],
                     ],
                 ]
@@ -66,10 +64,11 @@ class DigitalAssetInDialogType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired(['parent_entity_class', 'parent_entity_field_name']);
         $resolver->setDefaults(
             [
                 'is_image_type' => false,
+                'mime_types' => [],
+                'max_file_size' => 0,
                 'data_class' => DigitalAsset::class,
                 'validation_groups' => ['Default', 'DigitalAssetInDialog'],
             ]

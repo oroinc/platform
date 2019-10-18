@@ -3,7 +3,6 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
     var DigitalAssetDialogWidget = require('orodigitalasset/js/widget/digital-asset-dialog-widget');
     var BaseView = require('oroui/js/app/views/base/view');
 
@@ -16,22 +15,7 @@ define(function(require) {
         options: _.extend({}, BaseView.prototype.options, {
             isImageType: false,
             isSet: false,
-            widgetOptions: {
-                alias: 'dam-dialog',
-                title: __('oro.digitalasset.dam.dialog.select_file'),
-                url: null,
-                stateEnabled: false,
-                incrementalPosition: true,
-                desktopLoadingBar: true,
-                moveAdoptedActions: false,
-                dialogOptions: {
-                    allowMaximize: false,
-                    allowMinimize: false,
-                    modal: true,
-                    maximizedHeightDecreaseBy: 'minimize-bar',
-                    width: 1100
-                }
-            },
+            widgetOptions: {},
             selectors: {
                 emptyFileInput: null,
                 digitalAssetInput: null,
@@ -102,7 +86,7 @@ define(function(require) {
             this.findElement('digitalAssetInput').val(data.model.get('id'));
             this.toggleControls(true);
             this.setEmptyFile(false);
-            this.dialogWidget.hide();
+            this.dialogWidget.remove();
         },
 
         /**
@@ -131,11 +115,19 @@ define(function(require) {
             if (state) {
                 this.findElement('choose').addClass('hide');
                 this.findElement('controls').removeClass('hide');
+                this.removeValidationErrors();
             } else {
                 this.findElement('choose').removeClass('hide');
                 this.findElement('filename').remove();
                 this.findElement('controls').addClass('hide');
             }
+        },
+
+        removeValidationErrors: function() {
+            var $controlGroup = this.$el.closest('.control-group');
+
+            $controlGroup.find('.validation-failed').remove();
+            $controlGroup.find('.validation-error').removeClass('validation-error');
         },
 
         /**

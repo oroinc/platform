@@ -108,7 +108,11 @@ class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
         $builder
             ->expects($this->once())
             ->method('add')
-            ->with('digitalAsset', HiddenType::class);
+            ->with(
+                'digitalAsset',
+                HiddenType::class,
+                ['error_bubbling' => false, 'invalid_message' => 'oro.digitalasset.validator.digital_asset.invalid']
+            );
 
         $builder
             ->expects($this->once())
