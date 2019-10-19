@@ -4,7 +4,7 @@ define(function(require) {
     var DemoLogoutButtonView;
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl!oroviewswitcher/templates/demo-logout-button.html');
+    var template = require('tpl-loader!oroviewswitcher/templates/demo-logout-button.html');
 
     DemoLogoutButtonView = BaseView.extend({
         keepElement: true,

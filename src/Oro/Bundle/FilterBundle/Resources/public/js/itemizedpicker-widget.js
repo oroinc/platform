@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     var $ = require('jquery');
-    var template = require('tpl!orofilter/templates/filter/date-picker.html');
+    var template = require('tpl-loader!orofilter/templates/filter/date-picker.html');
     require('jquery-ui');
 
     $.widget('orofilter.itemizedPicker', {

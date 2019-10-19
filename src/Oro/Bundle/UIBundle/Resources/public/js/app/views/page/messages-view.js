@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var PageMessagesView;
@@ -6,7 +6,7 @@ define(function(require) {
     var $ = require('jquery');
     var messenger = require('oroui/js/messenger');
     var PageRegionView = require('oroui/js/app/views/base/page-region-view');
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
 
     config = _.extend({
         template: null // default template is defined in messenger module

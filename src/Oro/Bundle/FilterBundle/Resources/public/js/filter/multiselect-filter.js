@@ -5,10 +5,10 @@ define(function(require) {
     var FILTER_EMPTY_VALUE = '';
 
     var MultiSelectFilter;
-    var template = require('tpl!orofilter/templates/filter/multiselect-filter.html');
+    var template = require('tpl-loader!orofilter/templates/filter/multiselect-filter.html');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
-    var SelectFilter = require('./select-filter');
+    var SelectFilter = require('oro/filter/select-filter');
 
     /**
      * Multiple select filter: filter values as multiple select options

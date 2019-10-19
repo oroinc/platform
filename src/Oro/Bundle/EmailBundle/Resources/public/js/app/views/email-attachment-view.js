@@ -29,7 +29,7 @@ define(function(require) {
 
         getTemplateFunction: function() {
             if (!this.template) {
-                this.template = require('tpl!oroemail/templates/email-attachment/email-attachment-item.html');
+                this.template = require('tpl-loader!oroemail/templates/email-attachment/email-attachment-item.html');
             }
 
             return EmailAttachmentView.__super__.getTemplateFunction.call(this);

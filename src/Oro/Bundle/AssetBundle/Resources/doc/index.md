@@ -129,12 +129,12 @@ checkout:                                               # Another entry point na
     <tr>
         <th>Management Console</th>
         <td><code>css</code></td>
-        <td><code>css/themes/oro/oro.css</code></td>
+        <td><code>build/css/oro/oro.css</code></td>
     </tr>
     <tr>
         <th>Store Front</th>
         <td><code>styles</code></td>
-        <td><code>css/layout/[THEME_NAME]/styles.css</code></td>
+        <td><code>layout/[THEME_NAME]/css/styles.css</code></td>
     </tr>        
 </table>
 

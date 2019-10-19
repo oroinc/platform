@@ -1,15 +1,14 @@
-define([
-    'asap',
-    'jquery',
-    'underscore',
-    'chaplin',
-    'orotranslation/js/translator',
-    'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/models/page-model',
-    'module',
-    'oroui/js/error'
-], function(asap, $, _, Chaplin, __, BaseController, PageModel, module, errorHandler) {
+define(function(require, exports, module) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var Chaplin = require('chaplin');
+    var __ = require('orotranslation/js/translator');
+    var BaseController = require('oroui/js/app/controllers/base/controller');
+    var PageModel = require('oroui/js/app/models/page-model');
+    var errorHandler = require('oroui/js/error');
+    var config = require('module-config').default(module.id);
 
     var PageController;
     var document = window.document;
@@ -18,7 +17,6 @@ define([
     var utils = Chaplin.utils;
     var mediator = Chaplin.mediator;
 
-    var config = module.config();
     config = _.extend({
         fullRedirect: false
     }, config);

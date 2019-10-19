@@ -56,9 +56,9 @@ define(function(require) {
         className: 'oro-datagrid',
 
         /** @property */
-        noDataTemplate: require('tpl!orodatagrid/templates/datagrid/no-data.html'),
+        noDataTemplate: require('tpl-loader!orodatagrid/templates/datagrid/no-data.html'),
 
-        noSearchResultsTemplate: require('tpl!orodatagrid/templates/datagrid/no-search-results.html'),
+        noSearchResultsTemplate: require('tpl-loader!orodatagrid/templates/datagrid/no-search-results.html'),
 
         /** @property {Object} */
         noDataTranslations: {
@@ -164,7 +164,7 @@ define(function(require) {
         DEFAULT_COLUMN_START_INDEX: 1000,
 
         /** @property */
-        template: require('tpl!orodatagrid/templates/datagrid/grid.html'),
+        template: require('tpl-loader!orodatagrid/templates/datagrid/grid.html'),
 
         themeOptions: {
             optionPrefix: 'grid'

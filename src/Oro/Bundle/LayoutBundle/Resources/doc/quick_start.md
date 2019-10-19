@@ -16,7 +16,7 @@ See the [theme definition](./theme_definition.md) topic for more details.
 
 ## Use Layout Theme Configuration
 
-Configuration files such as **assets**, **images** or **requirejs** should be placed in the `layout/{theme_name}/config` folder.
+Configuration files such as **assets**, **images** or **jsmodules** should be placed in the `layout/{theme_name}/config` folder.
 
 See the [config definition](./config_definition.md) topic for more details.
 

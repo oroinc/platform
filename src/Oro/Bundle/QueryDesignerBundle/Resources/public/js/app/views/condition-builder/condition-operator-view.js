@@ -3,7 +3,7 @@ define(function(require) {
 
     var ConditionOperatorView;
     var _ = require('underscore');
-    var template = require('tpl!oroquerydesigner/templates/condition-builder/condition-operator.html');
+    var template = require('tpl-loader!oroquerydesigner/templates/condition-builder/condition-operator.html');
     var BaseView = require('oroui/js/app/views/base/view');
 
     require('jquery.select2');

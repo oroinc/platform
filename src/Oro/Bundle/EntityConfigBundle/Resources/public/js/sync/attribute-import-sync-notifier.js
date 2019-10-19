@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var mediator = require('oroui/js/mediator');
@@ -6,7 +6,7 @@ define(function(require) {
     var messenger = require('oroui/js/messenger');
     var __ = require('orotranslation/js/translator');
 
-    var topic = require('module').config().topic;
+    var topic = require('module-config').default(module.id).topic;
 
     var showNotification = function(message) {
         if (message.finished) {

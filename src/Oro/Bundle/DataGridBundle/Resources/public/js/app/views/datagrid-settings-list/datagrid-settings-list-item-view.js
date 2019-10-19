@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     var DatagridSettingsListItemView;
-    var template = require('tpl!orodatagrid/templates/datagrid-settings/datagrid-settings-item.html');
+    var template = require('tpl-loader!orodatagrid/templates/datagrid-settings/datagrid-settings-item.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');

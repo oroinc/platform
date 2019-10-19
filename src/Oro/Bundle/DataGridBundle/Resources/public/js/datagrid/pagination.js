@@ -1,5 +1,5 @@
 define([
-    'tpl!orodatagrid/templates/datagrid/pagination.html',
+    'tpl-loader!orodatagrid/templates/datagrid/pagination.html',
     'jquery',
     'underscore',
     'oroui/js/app/views/base/view'

@@ -2,7 +2,7 @@ define([
     'jquery',
     'underscore',
     'oroui/js/tools',
-    './abstract-filter'
+    'oro/filter/abstract-filter'
 ], function($, _, tools, AbstractFilter) {
     'use strict';
 

@@ -4,7 +4,7 @@ define(function(require) {
     var AbstractConditionView;
     var $ = require('jquery');
     var _ = require('underscore');
-    var conditionTemplate = require('tpl!oroquerydesigner/templates/condition.html');
+    var conditionTemplate = require('tpl-loader!oroquerydesigner/templates/condition.html');
     var BaseView = require('oroui/js/app/views/base/view');
 
     AbstractConditionView = BaseView.extend({

@@ -2,13 +2,15 @@ extends:
   - google
   - "plugin:oro/recommended"
 parserOptions:
-  ecmaVersion: 5
+  ecmaVersion: 6
+  sourceType: module
 env:
   browser: true
+  commonjs: true
   amd: true
   jasmine: true
 globals:
-  requirejs: true
+  Promise: true
 
 rules:
   # turn off ES6 code style check

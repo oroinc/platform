@@ -230,7 +230,7 @@ define([
 
             tools.loadModules(data.module)
                 .then(this._onComponentLoaded.bind(this, initDeferred, data.options))
-                .catch(this._onRequireJsError.bind(this, initDeferred));
+                .catch(this._onComponentLoadError.bind(this, initDeferred));
 
             var initPromise = initDeferred
                 .promise(Object.create({targetData: data}))
@@ -411,9 +411,8 @@ define([
          * @param {Error} error
          * @protected
          */
-        _onRequireJsError: function(initDeferred, error) {
-            var message = 'Cannot load module "' + error.requireModules[0] + '"';
-            this._handleError(message, error);
+        _onComponentLoadError: function(initDeferred, error) {
+            this._handleError(null, error);
             // prevent interface from blocking by loader
             initDeferred.resolve();
         },
@@ -428,13 +427,10 @@ define([
          * @protected
          */
         _handleError: function(message, error) {
-            if (tools.debug) {
-                if (console && console.error) {
-                    console.error.apply(console, _.compact([message, error]));
-                } else {
-                    throw error;
-                }
-            } else if (error) {
+            if (console && console.error) {
+                console.error.apply(console, _.compact([message, error]));
+            }
+            if (!tools.debug) {
                 // if there is unhandled error -- show user message
                 require('chaplin').mediator
                     .execute('showMessage', 'error', __('oro.ui.components.initialization_error'));

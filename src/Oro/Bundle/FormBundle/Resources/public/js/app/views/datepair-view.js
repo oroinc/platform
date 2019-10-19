@@ -1,15 +1,16 @@
-define([
-    'jquery',
-    'underscore',
-    'moment',
-    'oroui/js/app/views/base/view',
-    'jquery.timepicker',
-    'jquery.datepair'
-], function($, _, moment, BaseView) {
+define(function(require) {
     'use strict';
 
     var _ONE_DAY = 86400000;
     var DatepairView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var moment = require('moment');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var Datepair = require('datepair');
+
+    require('jquery.timepicker');
+
     DatepairView = BaseView.extend({
 
         /**
@@ -63,17 +64,15 @@ define([
         },
 
         initDatepair: function() {
-            this.$el.datepair({
-                startClass: this.options.startClass,
-                endClass: this.options.endClass,
-                timeClass: this.options.timeClass,
-                dateClass: this.options.dateClass,
-                parseTime: _.bind(this._parseTime, this),
-                updateTime: _.bind(this._updateTime, this),
-                setMinTime: _.bind(this._setMinTime, this),
-                parseDate: _.bind(this._parseDate, this),
-                updateDate: _.bind(this._updateDate, this)
+            var options = _.extend(_.pick(this.options, 'startClass', 'endClass', 'timeClass', 'dateClass'), {
+                parseTime: this._parseTime.bind(this),
+                updateTime: this._updateTime.bind(this),
+                setMinTime: this._setMinTime.bind(this),
+                parseDate: this._parseDate.bind(this),
+                updateDate: this._updateDate.bind(this)
             });
+
+            this.datepair = new Datepair(this.el, options);
         },
 
         _parseTime: function(input) {

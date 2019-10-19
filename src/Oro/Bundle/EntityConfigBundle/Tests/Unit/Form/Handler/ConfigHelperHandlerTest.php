@@ -288,7 +288,7 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
         $modules = ['somemodule'];
         $this->configHelper
             ->expects($this->once())
-            ->method('getExtendRequireJsModules')
+            ->method('getExtendJsModules')
             ->willReturn($modules);
 
         $nonExtendedEntities = ['first', 'second'];
@@ -303,7 +303,7 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
             'field' => $fieldConfigModel,
             'form' => $formView,
             'formAction' => $formAction,
-            'require_js' => $modules,
+            'jsmodules' => $modules,
             'non_extended_entities_classes' => $nonExtendedEntities,
         ];
 

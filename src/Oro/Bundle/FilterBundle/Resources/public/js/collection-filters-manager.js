@@ -1,7 +1,7 @@
 define([
     'underscore',
     'oroui/js/tools',
-    './filters-manager',
+    'orofilter/js/filters-manager',
     'oroui/js/mediator'
 ], function(_, tools, FiltersManager, mediator) {
     'use strict';

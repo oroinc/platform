@@ -58,9 +58,9 @@
 {% endblock stats%}
 
 {% block content_data %}
-    {% if require_js|length %}
+    {% if jsmodules|length %}
         <script type="text/javascript">
-            require({{ require_js|json_encode|raw }})
+            loadModules({{ jsmodules|json_encode|raw }})
         </script>
     {% endif %}
 

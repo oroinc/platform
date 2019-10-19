@@ -41,7 +41,7 @@ define(function(require) {
 
         active: false,
 
-        template: require('tpl!oroform/templates/floating-error-message.html'),
+        template: require('tpl-loader!oroform/templates/floating-error-message.html'),
 
         /**
          * @inheritDoc

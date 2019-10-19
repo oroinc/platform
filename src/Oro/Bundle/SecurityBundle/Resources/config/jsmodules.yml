@@ -1,0 +1,6 @@
+configs:
+    orosecurity/js/app/components/switch-organization-component: {}
+dynamic-imports:
+    orosecurity:
+        - orosecurity/js/app/components/security-access-levels-component
+        - orosecurity/js/app/components/switch-organization-component

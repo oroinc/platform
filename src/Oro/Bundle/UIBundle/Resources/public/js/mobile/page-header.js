@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var $ = require('jquery');
@@ -6,7 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     require('oroui/js/content-processor/dropdown-button');
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
     var containerSelector = '.navigation.navbar-extra .title-buttons-container';
 
     function hideButtons() {

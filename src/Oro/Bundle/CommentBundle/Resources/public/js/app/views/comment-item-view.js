@@ -4,7 +4,7 @@ define(function(require) {
     var CommentItemView;
     var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('text!orocomment/templates/comment/comment-item-view.html');
+    var template = require('text-loader!orocomment/templates/comment/comment-item-view.html');
     var dateTimeFormatter = require('orolocale/js/formatter/datetime');
 
     CommentItemView = BaseView.extend({

@@ -1,0 +1,3 @@
+dynamic-imports:
+    oroembeddedform:
+        - oroembeddedform/js/embedded-form-watcher

@@ -1,0 +1,3 @@
+dynamic-imports:
+    orocomment:
+        - orocomment/js/app/components/comment-component

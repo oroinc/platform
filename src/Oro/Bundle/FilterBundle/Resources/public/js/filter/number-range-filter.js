@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     var NumberRangeFilter;
-    var template = require('tpl!orofilter/templates/filter/number-range-filter.html');
+    var template = require('tpl-loader!orofilter/templates/filter/number-range-filter.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');

@@ -1,7 +1,11 @@
-define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multiple-entity/model', 'oro/dialog-widget'
-], function(_, routing, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
+define(function(require) {
     'use strict';
 
+    var _ = require('underscore');
+    var routing = require('routing');
+    var Backbone = require('backbone');
+    var EntityView = require('./multiple-entity/view');
+    var DialogWidget = require('oro/dialog-widget');
     var MultipleEntityView;
     var $ = Backbone.$;
 
@@ -11,6 +15,9 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
      * @extends Backbone.View
      */
     MultipleEntityView = Backbone.View.extend({
+        template: require('tpl-loader!oroform/js/multiple-entity/templates/multiple-entities.html'),
+        elementTemplate: require('tpl-loader!oroform/js/multiple-entity/templates/multiple-entity.html'),
+
         options: {
             addedElement: null,
             allowAction: true,
@@ -44,7 +51,12 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-            this.template = _.template(this.options.template);
+            if (typeof this.options.template === 'string') {
+                this.template = _.template(this.options.template);
+            }
+            if (typeof this.options.elementTemplate === 'string') {
+                this.elementTemplate = _.template(this.options.elementTemplate);
+            }
             this.listenTo(this.getCollection(), 'add', this.addEntity);
             this.listenTo(this.getCollection(), 'reset', this._onCollectionReset);
             this.listenTo(this.getCollection(), 'remove', this.removeDefault);
@@ -168,7 +180,7 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
                 model: item,
                 name: this.options.name,
                 hasDefault: this.options.defaultElement,
-                template: this.options.elementTemplate
+                template: this.elementTemplate
             });
             entityView.on('removal', _.bind(this.handleRemove, this));
             this.$entitiesContainer.append(entityView.render().$el);

@@ -1,17 +1,17 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var TextFilter;
-    var wrapperTemplate = require('tpl!orofilter/templates/filter/filter-wrapper.html');
-    var template = require('tpl!orofilter/templates/filter/text-filter.html');
+    var wrapperTemplate = require('tpl-loader!orofilter/templates/filter/filter-wrapper.html');
+    var template = require('tpl-loader!orofilter/templates/filter/text-filter.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
-    var EmptyFilter = require('./empty-filter');
+    var EmptyFilter = require('oro/filter/empty-filter');
     var tools = require('oroui/js/tools');
     var mediator = require('oroui/js/mediator');
 
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
     config = _.extend({
         notAlignCriteria: tools.isMobile()
     }, config);

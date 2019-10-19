@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b6e1506eb432560ff5a651695ffcfaf5",
+    "content-hash": "e8f3fd5656596eed2fe27b16f7425f3b",
     "packages": [
         {
             "name": "akeneo/batch-bundle",
@@ -328,24 +328,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/fat/bean/zipball/0bbb3911ec2bb15333fdcf3a0a7904a1d4f62dea",
                 "reference": "0bbb3911ec2bb15333fdcf3a0a7904a1d4f62dea"
-            },
-            "type": "bower-asset"
-        },
-        {
-            "name": "bower-asset/chaplin",
-            "version": "1.2.0",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:chaplinjs/downloads.git",
-                "reference": "9b52a254842650787341c67e82edc7758220c19f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/chaplinjs/downloads/zipball/9b52a254842650787341c67e82edc7758220c19f",
-                "reference": "9b52a254842650787341c67e82edc7758220c19f"
-            },
-            "require": {
-                "bower-asset/backbone": "dev-1.x|1.x"
             },
             "type": "bower-asset"
         },
@@ -731,24 +713,6 @@
                 "reference": "13dc8a1ff3af6515c23dbca1ae3dcc0b0dc1b0c1"
             },
             "type": "bower-asset"
-        },
-        {
-            "name": "bower-asset/text",
-            "version": "2.0.15",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:requirejs/text.git",
-                "reference": "d04de4ffd7bf5ba6cb80cdca2d40d4f6f52a1b1f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/requirejs/text/zipball/d04de4ffd7bf5ba6cb80cdca2d40d4f6f52a1b1f",
-                "reference": "d04de4ffd7bf5ba6cb80cdca2d40d4f6f52a1b1f"
-            },
-            "type": "bower-asset",
-            "license": [
-                "MIT"
-            ]
         },
         {
             "name": "bower-asset/timepicker",
@@ -4986,6 +4950,18 @@
             "time": "2018-05-29T15:23:46+00:00"
         },
         {
+            "name": "npm-asset/asap",
+            "version": "2.0.6",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/asap/-/asap-2.0.6.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
             "name": "npm-asset/backbone",
             "version": "1.4.0",
             "dist": {
@@ -5088,11 +5064,11 @@
             ]
         },
         {
-            "name": "npm-asset/requirejs",
-            "version": "2.3.3",
+            "name": "npm-asset/scriptjs",
+            "version": "2.5.9",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/requirejs/-/requirejs-2.3.3.tgz"
+                "url": "https://registry.npmjs.org/scriptjs/-/scriptjs-2.5.9.tgz"
             },
             "type": "npm-asset",
             "license": [

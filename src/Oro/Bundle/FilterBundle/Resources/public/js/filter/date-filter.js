@@ -1,15 +1,15 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var DateFilter;
-    var template = require('tpl!orofilter/templates/filter/date-filter.html');
-    var fieldTemplate = require('tpl!orofilter/templates/filter/select-field.html');
-    var dropdownTemplate = require('tpl!orofilter/templates/filter/date-filter-dropdown.html');
+    var template = require('tpl-loader!orofilter/templates/filter/date-filter.html');
+    var fieldTemplate = require('tpl-loader!orofilter/templates/filter/select-field.html');
+    var dropdownTemplate = require('tpl-loader!orofilter/templates/filter/date-filter-dropdown.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
     var __ = require('orotranslation/js/translator');
-    var ChoiceFilter = require('./choice-filter');
+    var ChoiceFilter = require('oro/filter/choice-filter');
     var DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
     var VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
     var DateVariableHelper = require('orofilter/js/date-variable-helper');
@@ -17,7 +17,7 @@ define(function(require) {
     var datetimeFormatter = require('orolocale/js/formatter/datetime');
     var localeSettings = require('orolocale/js/locale-settings');
     var layout = require('oroui/js/layout');
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
 
     config = _.extend({
         inputClass: 'date-visual-element'

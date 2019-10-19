@@ -2,8 +2,8 @@ define(function(require) {
     'use strict';
 
     var GridViewsView;
-    var template = require('tpl!orodatagrid/templates/datagrid/grid-view.html');
-    var titleTemplate = require('tpl!orodatagrid/templates/datagrid/grid-view-label.html');
+    var template = require('tpl-loader!orodatagrid/templates/datagrid/grid-view.html');
+    var titleTemplate = require('tpl-loader!orodatagrid/templates/datagrid/grid-view-label.html');
     var BaseView = require('oroui/js/app/views/base/view');
     var $ = require('jquery');
     var _ = require('underscore');

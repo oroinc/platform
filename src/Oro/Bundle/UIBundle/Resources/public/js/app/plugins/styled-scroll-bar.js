@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var NAME = 'styledScrollBar';
@@ -9,7 +9,7 @@ define(function(require) {
     var BaseClass = require('oroui/js/base-class');
     var error = require('oroui/js/error');
     var OverlayScrollBars = require('overlayScrollbars');
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
 
     var allowedConfig = _.omit(config, 'callbacks');
 

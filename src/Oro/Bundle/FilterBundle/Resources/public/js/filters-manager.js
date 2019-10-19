@@ -1,20 +1,20 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var FiltersManager;
-    var template = require('tpl!orofilter/templates/filters-container.html');
+    var template = require('tpl-loader!orofilter/templates/filters-container.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var tools = require('oroui/js/tools');
     var BaseView = require('oroui/js/app/views/base/view');
-    var MultiselectDecorator = require('./multiselect-decorator');
-    var filterWrapper = require('./datafilter-wrapper');
-    var FiltersStateView = require('./app/views/filters-state-view');
+    var MultiselectDecorator = require('orofilter/js/multiselect-decorator');
+    var filterWrapper = require('orofilter/js/datafilter-wrapper');
+    var FiltersStateView = require('orofilter/js/app/views/filters-state-view');
     var persistentStorage = require('oroui/js/persistent-storage');
     var FilterDialogWidget = require('orofilter/js/app/views/filter-dialog-widget');
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
     var DEFAULT_STORAGE_KEY = 'filters-state';
 
     /**

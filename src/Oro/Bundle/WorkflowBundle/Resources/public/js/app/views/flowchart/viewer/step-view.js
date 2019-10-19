@@ -9,7 +9,7 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
 
     FlowchartViewerStepView = FlowchartJsPlumbBoxView.extend({
-        template: require('tpl!oroworkflow/templates/flowchart/viewer/step.html'),
+        template: require('tpl-loader!oroworkflow/templates/flowchart/viewer/step.html'),
 
         jsPlumbSource: null,
 

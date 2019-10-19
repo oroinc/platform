@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var TabsComponent;
@@ -6,7 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var mediator = require('oroui/js/mediator');
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
 
     config = _.extend({
         useDropdown: true,
@@ -33,7 +33,7 @@ define(function(require) {
             tabLinkClass: 'nav-link',
             dropdownItemClass: '',
             dropdownItemLinkClass: 'dropdown-item',
-            dropdownTemplate: require('tpl!oroui/templates/dropdown-control.html'),
+            dropdownTemplate: require('tpl-loader!oroui/templates/dropdown-control.html'),
             dropdownText: config.dropdownText
         },
 

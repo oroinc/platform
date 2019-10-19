@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var ToolbarMassActionPlugin;
@@ -8,7 +8,7 @@ define(function(require) {
     var ShowComponentAction = require('oro/datagrid/action/show-component-action');
     var ToolbarMassActionComponent = require('orodatagrid/js/app/components/toolbar-mass-action-component');
 
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
     config = _.extend({
         icon: 'ellipsis-h',
         wrapperClassName: 'toolbar-mass-actions',

@@ -5,7 +5,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl!orodatagrid/templates/inline-editing/error-holder.html');
+    var template = require('tpl-loader!orodatagrid/templates/inline-editing/error-holder.html');
 
     /* The same like `getBoundingClientRect` but takes in account all child nodes, i.e. calculates real occupied rect
      *  for case when a child goes beyond its parent

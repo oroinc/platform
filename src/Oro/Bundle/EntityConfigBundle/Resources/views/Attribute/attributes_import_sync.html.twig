@@ -1,12 +1,12 @@
 {% if check_ws() %}
+    {% import '@OroAsset/Asset.html.twig' as Asset %}
+    {{ Asset.js_modules_config({
+        'oroentityconfig/js/sync/attribute-import-sync-notifier': {
+            'topic': data.topic
+        }
+    }) }}
     <script type="text/javascript">
-        require({config: {
-            'oroentityconfig/js/sync/attribute-import-sync-notifier': {
-                'topic': '{{ data.topic }}'
-            }
-        }});
-
-        require(['oroentityconfig/js/sync/attribute-import-sync-notifier'], function(subscribeCallback) {
+        loadModules(['oroentityconfig/js/sync/attribute-import-sync-notifier'], function(subscribeCallback) {
             subscribeCallback();
         });
     </script>

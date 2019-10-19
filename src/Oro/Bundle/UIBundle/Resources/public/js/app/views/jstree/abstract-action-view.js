@@ -12,7 +12,7 @@ define(function(require) {
         options: {
             $tree: '',
             action: '',
-            template: require('tpl!oroui/templates/jstree-action.html'),
+            template: require('tpl-loader!oroui/templates/jstree-action.html'),
             icon: '',
             label: ''
         },

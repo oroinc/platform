@@ -3,7 +3,7 @@ define(function(require) {
 
     var VariableDateTimePickerView;
     var _ = require('underscore');
-    var VariableDatePickerView = require('./variable-datepicker-view');
+    var VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
     var dateTimePickerViewMixin = require('oroui/js/app/views/datepicker/datetimepicker-view-mixin');
     var moment = require('moment');
 

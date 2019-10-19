@@ -13,7 +13,7 @@ define(function(require) {
     var LoadingMask = require('oroui/js/app/views/loading-mask-view');
 
     EmailNotificationCollectionView = BaseCollectionView.extend({
-        template: require('tpl!oroemail/templates/email-notification/email-notification-collection-view.html'),
+        template: require('tpl-loader!oroemail/templates/email-notification/email-notification-collection-view.html'),
         itemView: EmailNotificationView,
         animationDuration: 0,
         listSelector: '.items',

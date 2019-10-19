@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var ComponentShortcutsManager;
@@ -6,7 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var $ = require('jquery');
 
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
     config = _.extend({
         reservedKeys: ['options']
     }, config);

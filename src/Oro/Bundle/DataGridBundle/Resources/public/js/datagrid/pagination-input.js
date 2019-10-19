@@ -1,5 +1,5 @@
 define([
-    'tpl!orodatagrid/templates/datagrid/pagination-input.html',
+    'tpl-loader!orodatagrid/templates/datagrid/pagination-input.html',
     'jquery',
     'underscore',
     './pagination',

@@ -113,7 +113,7 @@ class FieldType extends AbstractType
             ->setRequired(['class_name'])
             ->setDefaults(
                 [
-                    'require_js'   => [],
+                    'jsmodules'   => [],
                     'block_config' => [
                         'general' => [
                             'title'    => $this->translator->trans('oro.entity_config.block_titles.general.label'),

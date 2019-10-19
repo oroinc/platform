@@ -3,7 +3,7 @@ define(function(require) {
 
     var CommentsNoDataView;
     var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('text!orocomment/templates/comment/comments-no-data.html');
+    var template = require('text-loader!orocomment/templates/comment/comments-no-data.html');
 
     CommentsNoDataView = BaseView.extend({
         template: template,

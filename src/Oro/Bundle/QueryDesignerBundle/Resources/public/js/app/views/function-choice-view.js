@@ -4,7 +4,7 @@ define(function(require) {
     var FunctionChoiceView;
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
-    var optionTemplate = require('tpl!oroquerydesigner/templates/function-choice.html');
+    var optionTemplate = require('tpl-loader!oroquerydesigner/templates/function-choice.html');
 
     FunctionChoiceView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat([

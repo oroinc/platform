@@ -63,9 +63,9 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
-    {% if require_js is defined and require_js|length %}
-        <script type="text/javascript">
-            require({{ require_js|json_encode|raw }})
+    {% if jsmodules is defined and jsmodules|length %}
+        <script>
+            loadModules({{ jsmodules|json_encode|raw }})
         </script>
     {% endif %}
 

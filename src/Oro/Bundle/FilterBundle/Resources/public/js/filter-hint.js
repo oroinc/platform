@@ -1,12 +1,12 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var template = require('tpl!orofilter/templates/filter/filter-hint.html');
+    var template = require('tpl-loader!orofilter/templates/filter/filter-hint.html');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
-    var module = require('module');
+    var config = require('module-config').default(module.id);
     var FilterTemplate = require('orofilter/js/filter-template');
-    var config = module.config();
+
     config = _.extend({
         inline: true,
         selectors: {

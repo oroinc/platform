@@ -5,9 +5,9 @@
 {% set pageTitle = 'oro.entity_config.menu.entities_list.label'|trans %}
 
 {% block content %}
-    {% if require_js|length %}
-        <script type="text/javascript">
-            require({{ require_js|json_encode|raw }})
+    {% if jsmodules|length %}
+        <script>
+            loadModules({{ jsmodules|json_encode|raw }})
         </script>
     {% endif %}
     {{ parent() }}

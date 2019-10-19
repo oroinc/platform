@@ -2,8 +2,8 @@ define(function(require) {
     'use strict';
 
     var ManyToManyFilter;
-    var ChoiceFilter = require('./choice-filter');
-    var template = require('tpl!orofilter/templates/filter/many-to-many-filter.html');
+    var ChoiceFilter = require('oro/filter/choice-filter');
+    var template = require('tpl-loader!orofilter/templates/filter/many-to-many-filter.html');
     /**
      * @export  oro/filter/many-to-many-filter
      * @class   oro.filter.ManyToManyFilter

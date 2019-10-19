@@ -4,7 +4,7 @@ define(function(require) {
     var CheckboxInputWidget;
     var AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
     var $ = require('jquery');
-    var defaultTemplate = require('tpl!oroui/templates/checkbox/default-template.html');
+    var defaultTemplate = require('tpl-loader!oroui/templates/checkbox/default-template.html');
 
     CheckboxInputWidget = AbstractInputWidget.extend({
         /**
