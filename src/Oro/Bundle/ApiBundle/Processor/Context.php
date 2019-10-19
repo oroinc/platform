@@ -452,6 +452,14 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getAllEntities(): array
+    {
+        throw new \BadMethodCallException('The method is not implemented for this context.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getConfigExtras()
     {
         return $this->configExtras->getConfigExtras();

@@ -193,4 +193,21 @@ trait FormContextTrait
     {
         $this->skipFormValidation = $skipFormValidation;
     }
+
+    /**
+     * Gets all entities, primary and included ones, that are processing by an action.
+     *
+     * @return object[]
+     */
+    public function getAllEntities(): array
+    {
+        $entity = $this->getResult();
+        $entities = null !== $entity ? [$entity] : [];
+        $includedEntities = $this->getIncludedEntities();
+        if (null !== $includedEntities) {
+            $entities = array_merge($entities, $includedEntities->getAll());
+        }
+
+        return $entities;
+    }
 }

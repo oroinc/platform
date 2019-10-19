@@ -98,7 +98,7 @@ This action has the following processor groups:
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | To add a new processor to this group, include it to the **security_check** group of actions that execute this action. For example, compare with the **security_check** group of the [create](#create-action) or [update](#update-action) actions. |
 | build_query | Building a query required to load the data. | |
-| load_data | Loading of the data. | |
+| load_data | Loading data. | |
 | data_security_check | Checking whether access to the loaded data is granted. | Use the same rules as for **security_check** group to add a new processor to this group. |
 | normalize_data | Converting the loaded data into an array. | In most cases the processors from this group are skipped because most of the entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details, see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php). |
 | finalize | Final validation of loaded data and adding the required response headers. | |
@@ -135,7 +135,7 @@ This action has the following processor groups:
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
 | build_query | Building a query required to load the data. | |
-| load_data | Loading of the data. | |
+| load_data | Loading data. | |
 | data_security_check | Checking whether access to the loaded data is granted. | |
 | normalize_data | Converting the loaded data into an array. | In most cases the processors from this group are skipped because most of the entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details, see [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
 | finalize | Final validation of the loaded data and adding the required response headers. | |
@@ -171,9 +171,9 @@ This action has the following processor groups:
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
-| load_data | Loading an entity that should be deleted and storing it in the `result` property of the context. | |
+| load_data | Loading an entity to be deleted. | |
 | data_security_check | Checking whether access to the loaded data is granted. | |
-| delete_data | Deleting the entity stored in the `result` property of the context. | |
+| delete_data | Deleting an entity. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
@@ -214,9 +214,9 @@ This action has the following processor groups:
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
 | build_query | Building a query that will be used to load an entities list to be deleted. | |
-| load_data | Loading the list of entities to be deleted and storing it in the `result` property of the context. | |
+| load_data | Loading the list of entities to be deleted. | |
 | data_security_check | Checking whether access to the loaded data is granted. | |
-| delete_data | Deleting the entities list stored in the `result` property of the context. | |
+| delete_data | Deleting the list of entities. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
@@ -253,10 +253,10 @@ This action has the following processor groups:
 | load_data | Creating a new entity object. | |
 | data_security_check | Checking whether access to the loaded data is granted. | Use the same rules as for **security_check** group to add a new processor to this group. |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
-| save_data | Validating and persisting an entity. | |
-| normalize_data | Converting created entity into an array. | |
-| finalize | Adding the required response headers. | |
-| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
+| save_data | Persisting an entity. | The processors from this group are not executed for included entities. |
+| normalize_data | Converting created entity into an array. | The processors from this group are not executed for included entities. |
+| finalize | Adding the required response headers. | The processors from this group are not executed for included entities. |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). Also, the processors from this group are not executed for included entities. |
 
 The following diagram shows the main data flow for this action:
 
@@ -291,10 +291,10 @@ This action has the following processor groups:
 | load_data | Loading an entity object to be updated. | |
 | data_security_check | Checking whether access to the loaded data is granted. | Use the same rules as for **security_check** group to add a new processor to this group. |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
-| save_data | Validating and persisting the entity. | |
-| normalize_data | Converting the updated entity into an array. | |
-| finalize | Adding the required response headers. | |
-| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
+| save_data | Persisting an entity. | The processors from this group are not executed for included entities. |
+| normalize_data | Converting the updated entity into an array. | The processors from this group are not executed for included entities. |
+| finalize | Adding the required response headers. | The processors from this group are not executed for included entities. |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). Also, the processors from this group are not executed for included entities. |
 
 The following diagram shows the main data flow for this action:
 
@@ -327,7 +327,7 @@ This action has the following processor groups:
 | normalize_input | Preparing input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
 | build_query | Building a query to use to load data. | |
-| load_data | Loading the data. | |
+| load_data | Loading data. | |
 | data_security_check | Checking whether access to the loaded data is granted. | |
 | normalize_data | Converting loaded data into an array. | In most cases the processors from this group are skipped because most of the entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php) and [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
 | finalize | Final validation of the loaded data and adding the required response headers. | |
@@ -371,7 +371,7 @@ This action has the following processor groups:
 | load_data | Loading an entity object to be updated. | |
 | data_security_check | Checking whether access to the loaded data is granted. | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
-| save_data | Validating and persisting the entity. | |
+| save_data | Persisting an entity. | |
 | normalize_data | Converting the result entity into an array. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
@@ -425,7 +425,7 @@ This action has the following processor groups:
 | load_data | Loading an entity object to be updated. | |
 | data_security_check | Checking whether access to the loaded data is granted. | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
-| save_data | Validating and persisting the entity. | |
+| save_data | Persisting an entity. | |
 | normalize_data | Converting the result entity into an array. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
@@ -479,7 +479,7 @@ This action has the following processor groups:
 | load_data | Loading an entity object to be updated. | |
 | data_security_check | Checking whether access to the loaded data is granted. | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
-| save_data | Validating and persisting the entity. | |
+| save_data | Persisting an entity. | |
 | normalize_data | Converting the result entity into an array. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
@@ -526,7 +526,7 @@ This action has the following processor groups:
 | normalize_input | Preparing input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
 | build_query | Building a query to use to load data. | |
-| load_data | Loading the data. | |
+| load_data | Loading data. | |
 | data_security_check | Checking whether access to the loaded data is granted. | |
 | normalize_data | Converting loaded data into an array. | In most cases the processors from this group are skipped because most of the entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php) and [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
 | finalize | Final validation of the loaded data and adding the required response headers. | |
@@ -565,7 +565,7 @@ This action has the following processor groups:
 | load_data | Loading an entity object to be updated. | |
 | data_security_check | Checking whether access to the loaded data is granted. | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
-| save_data | Validating and persisting the entity. | |
+| save_data | Persisting an entity. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
@@ -602,7 +602,7 @@ This action has the following processor groups:
 | load_data | Loading an entity object to be updated. | |
 | data_security_check | Checking whether access to the loaded data is granted. | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
-| save_data | Validating and persisting the entity. | |
+| save_data | Persisting an entity. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
@@ -639,7 +639,7 @@ This action has the following processor groups:
 | load_data | Loading an entity object to be updated. | |
 | data_security_check | Checking whether access to the loaded data is granted. | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
-| save_data | Validating and persisting the entity. | |
+| save_data | Persisting an entity. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
@@ -899,6 +899,7 @@ General methods:
 - **setQuery(query)** - Sets a query used to get result data.
 - **getCriteria()** - Retrieves the [Criteria](../../Collection/Criteria.php) object that sets additional restrictions to a query used to retrieve the entity data.
 - **setCriteria(criteria)** - Sets the [Criteria](../../Collection/Criteria.php) object that sets additional restrictions to a query used to retrieve the result data.
+- **getAllEntities()** - Gets all entities, primary and included ones, that are processing by an action.
 - **hasErrors()** - Checks whether any error happened during the processing of an action.
 - **getErrors()** - Retrieves all [errors](../../Model/Error.php) happened during the processing of an action.
 - **addError(error)** - Registers an [error](../../Model/Error.php).

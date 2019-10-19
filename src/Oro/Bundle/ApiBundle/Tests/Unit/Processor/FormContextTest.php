@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -103,5 +104,20 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->skipFormValidation(false);
         self::assertFalse($this->context->isFormValidationSkipped());
+    }
+
+    public function testGetAllEntities()
+    {
+        self::assertSame([], $this->context->getAllEntities());
+
+        $entity = new \stdClass();
+        $this->context->setResult($entity);
+        self::assertSame([$entity], $this->context->getAllEntities());
+
+        $includedEntity = new \stdClass();
+        $this->context->setIncludedEntities(new IncludedEntityCollection());
+        $this->context->getIncludedEntities()
+            ->add($includedEntity, \stdClass::class, 1, $this->createMock(IncludedEntityData::class));
+        self::assertSame([$entity, $includedEntity], $this->context->getAllEntities());
     }
 }

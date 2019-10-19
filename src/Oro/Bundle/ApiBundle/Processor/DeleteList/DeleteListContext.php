@@ -9,4 +9,16 @@ use Oro\Bundle\ApiBundle\Processor\ListContext;
  */
 class DeleteListContext extends ListContext
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllEntities(): array
+    {
+        $entities = $this->getResult();
+        if (null === $entities) {
+            return [];
+        }
+
+        return $entities;
+    }
 }

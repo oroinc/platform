@@ -330,8 +330,14 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
         $specifiedAttributes = [];
         foreach ($attributes as $attribute) {
             list($name, $value) = explode(':', $attribute, 2);
-            $context->set($name, $this->getTypedValue($value));
-            $specifiedAttributes[] = $name;
+            $value = $this->getTypedValue($value);
+            if ('group' === $name) {
+                $context->setFirstGroup($value);
+                $context->setLastGroup($value);
+            } else {
+                $context->set($name, $value);
+                $specifiedAttributes[] = $name;
+            }
         }
         $processors = $this->processorBag->getProcessors($context);
 

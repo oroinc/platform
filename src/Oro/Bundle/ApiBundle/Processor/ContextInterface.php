@@ -299,6 +299,13 @@ interface ContextInterface extends ComponentContextInterface
     public function setCriteria(Criteria $criteria = null);
 
     /**
+     * Gets all entities, primary and included ones, that are processing by an action.
+     *
+     * @return object[]
+     */
+    public function getAllEntities(): array;
+
+    /**
      * Whether any error happened during the processing of an action.
      *
      * @return bool
