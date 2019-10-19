@@ -452,9 +452,9 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getAllEntities(): array
+    public function getAllEntities(bool $primaryOnly = false): array
     {
-        throw new \BadMethodCallException('The method is not implemented for this context.');
+        throw new \LogicException('The method is not implemented for this context.');
     }
 
     /**

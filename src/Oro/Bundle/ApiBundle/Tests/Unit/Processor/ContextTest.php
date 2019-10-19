@@ -1293,7 +1293,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \BadMethodCallException
+     * @expectedException \LogicException
      */
     public function testGetAllEntities()
     {

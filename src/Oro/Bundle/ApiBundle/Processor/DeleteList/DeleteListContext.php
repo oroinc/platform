@@ -12,7 +12,7 @@ class DeleteListContext extends ListContext
     /**
      * {@inheritdoc}
      */
-    public function getAllEntities(): array
+    public function getAllEntities(bool $primaryOnly = false): array
     {
         $entities = $this->getResult();
         if (null === $entities) {

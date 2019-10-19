@@ -109,15 +109,18 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
     public function testGetAllEntities()
     {
         self::assertSame([], $this->context->getAllEntities());
+        self::assertSame([], $this->context->getAllEntities(true));
 
         $entity = new \stdClass();
         $this->context->setResult($entity);
         self::assertSame([$entity], $this->context->getAllEntities());
+        self::assertSame([$entity], $this->context->getAllEntities(true));
 
         $includedEntity = new \stdClass();
         $this->context->setIncludedEntities(new IncludedEntityCollection());
         $this->context->getIncludedEntities()
             ->add($includedEntity, \stdClass::class, 1, $this->createMock(IncludedEntityData::class));
         self::assertSame([$entity, $includedEntity], $this->context->getAllEntities());
+        self::assertSame([$entity], $this->context->getAllEntities(true));
     }
 }

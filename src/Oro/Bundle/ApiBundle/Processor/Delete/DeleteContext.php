@@ -12,7 +12,7 @@ class DeleteContext extends SingleItemContext
     /**
      * {@inheritdoc}
      */
-    public function getAllEntities(): array
+    public function getAllEntities(bool $primaryOnly = false): array
     {
         $entity = $this->getResult();
         if (null === $entity) {

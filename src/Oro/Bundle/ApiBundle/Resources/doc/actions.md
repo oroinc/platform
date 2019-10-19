@@ -899,7 +899,7 @@ General methods:
 - **setQuery(query)** - Sets a query used to get result data.
 - **getCriteria()** - Retrieves the [Criteria](../../Collection/Criteria.php) object that sets additional restrictions to a query used to retrieve the entity data.
 - **setCriteria(criteria)** - Sets the [Criteria](../../Collection/Criteria.php) object that sets additional restrictions to a query used to retrieve the result data.
-- **getAllEntities()** - Gets all entities, primary and included ones, that are processing by an action.
+- **getAllEntities(primaryOnly = false)** - Gets all entities, primary and included ones, that are processing by an action.
 - **hasErrors()** - Checks whether any error happened during the processing of an action.
 - **getErrors()** - Retrieves all [errors](../../Model/Error.php) happened during the processing of an action.
 - **addError(error)** - Registers an [error](../../Model/Error.php).

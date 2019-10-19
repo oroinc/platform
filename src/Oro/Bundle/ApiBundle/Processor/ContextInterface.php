@@ -301,9 +301,11 @@ interface ContextInterface extends ComponentContextInterface
     /**
      * Gets all entities, primary and included ones, that are processing by an action.
      *
+     * @param bool $primaryOnly Whether only primary entities or both primary and included entities should be returned
+     *
      * @return object[]
      */
-    public function getAllEntities(): array;
+    public function getAllEntities(bool $primaryOnly = false): array;
 
     /**
      * Whether any error happened during the processing of an action.

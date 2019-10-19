@@ -197,15 +197,19 @@ trait FormContextTrait
     /**
      * Gets all entities, primary and included ones, that are processing by an action.
      *
+     * @param bool $primaryOnly Whether only primary entities or both primary and included entities should be returned
+     *
      * @return object[]
      */
-    public function getAllEntities(): array
+    public function getAllEntities(bool $primaryOnly = false): array
     {
         $entity = $this->getResult();
         $entities = null !== $entity ? [$entity] : [];
-        $includedEntities = $this->getIncludedEntities();
-        if (null !== $includedEntities) {
-            $entities = array_merge($entities, $includedEntities->getAll());
+        if (!$primaryOnly) {
+            $includedEntities = $this->getIncludedEntities();
+            if (null !== $includedEntities) {
+                $entities = array_merge($entities, $includedEntities->getAll());
+            }
         }
 
         return $entities;
