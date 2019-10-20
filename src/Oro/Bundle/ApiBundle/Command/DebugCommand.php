@@ -469,7 +469,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
     private function convertProcessorAttributeValueToString($value)
     {
         if (null === $value) {
-            return '<comment>exists</comment>';
+            return '<comment>!exists</comment>';
         }
 
         if (!is_array($value)) {
@@ -479,7 +479,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
         $items = reset($value);
         if (!is_array($items)) {
             if (null === $items && key($value) === Matcher::OPERATOR_NOT) {
-                return '<comment>!exists</comment>';
+                return '<comment>exists</comment>';
             }
 
             return sprintf('<comment>%s</comment>%s', key($value), $items);
