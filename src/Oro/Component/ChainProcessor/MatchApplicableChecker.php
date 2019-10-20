@@ -42,7 +42,20 @@ class MatchApplicableChecker extends AbstractMatcher implements ApplicableChecke
                 continue;
             }
             $contextValue = $context->get($name);
-            if (null === $contextValue && !$context->has($name)) {
+            if (null === $contextValue) {
+                if (null === $value) {
+                    // "!exists" operator
+                    if ($context->has($name)) {
+                        $result = self::NOT_APPLICABLE;
+                        break;
+                    }
+                } elseif (\is_array($value) && \key($value) === self::OPERATOR_NOT && \current($value) === null) {
+                    // "exists" operator
+                    $result = self::NOT_APPLICABLE;
+                    break;
+                }
+                $result = self::ABSTAIN;
+            } elseif (!$context->has($name)) {
                 $result = self::ABSTAIN;
             } elseif (!$this->isMatch($value, $contextValue, $name)) {
                 $result = self::NOT_APPLICABLE;

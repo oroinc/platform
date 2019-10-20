@@ -21,6 +21,7 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         $context->set('type', 'test');
         $context->set('feature', ['feature1', 'feature3']);
         $context->set('featureObj', new TestArrayObject(['feature1', 'feature3']));
+        $context->set('nullAttr', null);
 
         $processors = [
             [
@@ -211,6 +212,30 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
                 'processor47',
                 ['class' => 'TestCls', 'featureObj' => ['|' => ['feature1', 'feature2']]]
             ],
+            [
+                'processor50',
+                ['feature' => null] // !exists
+            ],
+            [
+                'processor51',
+                ['feature' => ['!' => null]] // exists
+            ],
+            [
+                'processor52',
+                ['notExistAttr' => null] // !exists
+            ],
+            [
+                'processor53',
+                ['notExistAttr' => ['!' => null]] // exists
+            ],
+            [
+                'processor54',
+                ['nullAttr' => null] // !exists
+            ],
+            [
+                'processor55',
+                ['nullAttr' => ['!' => null]] // exists
+            ]
         ];
 
         $iterator = new ProcessorIterator(
@@ -248,6 +273,8 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
             'processor45',
             'processor46',
             'processor47',
+            'processor51',
+            'processor52'
         ];
         $this->assertProcessors($expected, $iterator);
         // test that iterator state is not changed
@@ -368,7 +395,7 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
             [
                 'processor13_disabled',
                 ['disabled' => true, 'class' => 'TestCls', 'type' => 'another', 'another' => 'val']
-            ],
+            ]
         ];
 
         $applicableChecker = $this->getApplicableChecker();
@@ -388,7 +415,7 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
                 'processor4',
                 'processor5',
                 'processor7',
-                'processor10',
+                'processor10'
             ],
             $iterator
         );

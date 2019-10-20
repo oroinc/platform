@@ -182,7 +182,23 @@ For performance reasons, the functionality of [SkipGroupApplicableChecker](../..
 
 ```yaml
     tags:
-        - { name: oro.api.processor, action: get_list, group: initialize, class: 'Oro\Bundle\UserBundle\Entity\AbstractUser' }
+        - { name: oro.api.processor, action: get_list, group: initialize, class: Oro\Bundle\UserBundle\Entity\AbstractUser }
+```
+
+- A processor is executed only when `someAttribute` exists in the context.
+
+```yaml
+    tags:
+        - { name: oro.api.processor, action: get_list, group: initialize, someAttribute: exists }
+```
+
+**Please note** that `exists` operators cannot be used together with `&` (logical AND) and `|` (logical OR) operators.
+
+- A processor is executed only when `someAttribute` does not exist in the context.
+
+```yaml
+    tags:
+        - { name: oro.api.processor, action: get_list, group: initialize, someAttribute: '!exists' }
 ```
 
 For more examples, see the [configuration of existing processors](../config). See `processors.*.yml` files.
