@@ -12,7 +12,7 @@ define(function(require) {
     require('jquery.select2');
 
     RecentEmailsContentView = BaseWidgetSetupView.extend({
-        template: require('tpl!oroemail/templates/sidebar-widget/recent-emails/recent-emails-setup-view.html'),
+        template: require('tpl-loader!oroemail/templates/sidebar-widget/recent-emails/recent-emails-setup-view.html'),
 
         foldersData: null,
 

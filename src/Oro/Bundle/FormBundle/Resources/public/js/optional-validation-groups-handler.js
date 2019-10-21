@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var $ = require('jquery');
+    var moduleRegistry = require('oroui/js/app/services/module-registry');
     var defaultOptionalValidationHandler = require('oroform/js/optional-validation-handler');
 
     return {
@@ -87,7 +88,7 @@ define(function(require) {
              */
             var handler = $group.data('validation-optional-group-handler');
 
-            return handler ? require(handler) : defaultOptionalValidationHandler;
+            return handler ? moduleRegistry.get(handler) : defaultOptionalValidationHandler;
         }
     };
 });

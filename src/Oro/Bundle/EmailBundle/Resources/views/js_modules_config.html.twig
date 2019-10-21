@@ -1,0 +1,15 @@
+{% import '@OroAsset/Asset.html.twig' as Asset %}
+{{ Asset.js_modules_config({
+    'oroemail/js/app/components/new-email-message-component': {
+        wsChannel: oro_get_email_ws_event()
+    },
+    'oroemail/js/app/components/sidebar-recent-emails-component': {
+        wsChannel: oro_get_email_ws_event()
+    },
+    'oroemail/js/app/unread-emails-state-holder': {
+        wsChannel: oro_get_email_ws_event()
+    },
+    'oroemail/js/util/unread-email-count-cache': {
+        unreadEmailsCount: oro_get_unread_emails_count()
+    }
+}) }}

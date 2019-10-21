@@ -6,7 +6,7 @@ define(function(require) {
     var $ = require('jquery');
     var mediator = require('oroui/js/mediator');
     var DialogWidget = require('oro/dialog-widget');
-    var actionsTemplate = require('tpl!orofilter/templates/filters-dialog-actions.html');
+    var actionsTemplate = require('tpl-loader!orofilter/templates/filters-dialog-actions.html');
 
     /**
      * @class FilterDialogWidget

@@ -8,7 +8,7 @@ define(function(require, exports, module) {
     var DeviceSwitcherView = require('oroviewswitcher/js/app/views/device-switcher-view');
     var innerPageModelService = require('oroviewswitcher/js/app/services/inner-page-model-service');
     var tools = require('oroui/js/tools');
-    var config = module.config();
+    var config = require('module-config').default(module.id);
     var pageModel = innerPageModelService.getModel();
 
     pageModel.set({

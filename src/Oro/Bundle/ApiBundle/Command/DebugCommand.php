@@ -330,8 +330,14 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
         $specifiedAttributes = [];
         foreach ($attributes as $attribute) {
             list($name, $value) = explode(':', $attribute, 2);
-            $context->set($name, $this->getTypedValue($value));
-            $specifiedAttributes[] = $name;
+            $value = $this->getTypedValue($value);
+            if ('group' === $name) {
+                $context->setFirstGroup($value);
+                $context->setLastGroup($value);
+            } else {
+                $context->set($name, $value);
+                $specifiedAttributes[] = $name;
+            }
         }
         $processors = $this->processorBag->getProcessors($context);
 
@@ -462,12 +468,20 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      */
     private function convertProcessorAttributeValueToString($value)
     {
+        if (null === $value) {
+            return '<comment>!exists</comment>';
+        }
+
         if (!is_array($value)) {
             return $this->convertValueToString($value);
         }
 
         $items = reset($value);
         if (!is_array($items)) {
+            if (null === $items && key($value) === Matcher::OPERATOR_NOT) {
+                return '<comment>exists</comment>';
+            }
+
             return sprintf('<comment>%s</comment>%s', key($value), $items);
         }
 

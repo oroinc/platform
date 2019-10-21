@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var $ = require('jquery');
@@ -9,8 +9,7 @@ define(function(require) {
     var mapFilterModuleName = require('orofilter/js/map-filter-module-name');
     var FiltersManager = require('orofilter/js/collection-filters-manager');
     var FiltersTogglePlugin = require('orofilter/js/plugins/filters-toggle-plugin');
-    var module = require('module');
-    var config = module.config();
+    var config = require('module-config').default(module.id);
     var cachedFilters = {};
 
     config = _.extend({

@@ -39,9 +39,9 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
  */
 class CellSelectionListener
 {
-    const CELL_SELECTION_OPTION_PATH            = '[options][cellSelection]';
-    const REQUIREJS_MODULES_MODULES_OPTION_PATH = '[options][requireJSModules]';
-    const CELL_SELECTION_JS_MODULE              = 'orodatagrid/js/datagrid/listener/change-editable-cell-listener';
+    const CELL_SELECTION_OPTION_PATH = '[options][cellSelection]';
+    const REQUIRED_MODULES_KEY       = '[options][jsmodules]';
+    const CELL_SELECTION_JS_MODULE   = 'orodatagrid/js/datagrid/listener/change-editable-cell-listener';
 
     /**
      * Required options for selectCell js module
@@ -82,16 +82,16 @@ class CellSelectionListener
         }
 
         // Add frontend module to handle selection
-        $requireJsModules = $config->offsetGetByPath(self::REQUIREJS_MODULES_MODULES_OPTION_PATH, []);
+        $jsModules = $config->offsetGetByPath(self::REQUIRED_MODULES_KEY, []);
 
-        if (!$requireJsModules || !is_array($requireJsModules)) {
-            $requireJsModules = [];
+        if (!$jsModules || !is_array($jsModules)) {
+            $jsModules = [];
         }
 
-        if (!in_array(self::CELL_SELECTION_JS_MODULE, $requireJsModules)) {
-            $requireJsModules[] = self::CELL_SELECTION_JS_MODULE;
+        if (!in_array(self::CELL_SELECTION_JS_MODULE, $jsModules)) {
+            $jsModules[] = self::CELL_SELECTION_JS_MODULE;
         }
 
-        $config->offsetSetByPath(self::REQUIREJS_MODULES_MODULES_OPTION_PATH, $requireJsModules);
+        $config->offsetSetByPath(self::REQUIRED_MODULES_KEY, $jsModules);
     }
 }

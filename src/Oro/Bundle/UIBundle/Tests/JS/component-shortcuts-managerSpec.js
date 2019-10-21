@@ -1,3 +1,4 @@
+/* global requirejs */
 require({
     config: {
         'oroui/js/component-shortcuts-manager': {

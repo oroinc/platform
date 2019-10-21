@@ -60,7 +60,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         return $config;
     }
 
-    public function testGetExtendRequireJsModules()
+    public function testGetExtendJsModules()
     {
         $modules = ['module1'];
 
@@ -74,7 +74,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 
         $propertyConfig
             ->expects($this->once())
-            ->method('getRequireJsModules')
+            ->method('getJsModules')
             ->willReturn($modules);
 
         $configProvider
@@ -88,7 +88,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
             ->with('extend')
             ->willReturn($configProvider);
 
-        $this->assertEquals($modules, $this->configHelper->getExtendRequireJsModules());
+        $this->assertEquals($modules, $this->configHelper->getExtendJsModules());
     }
 
     public function testGetEntityConfigByField()

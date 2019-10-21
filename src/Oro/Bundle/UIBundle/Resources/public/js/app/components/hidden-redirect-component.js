@@ -131,7 +131,7 @@ define(function(require) {
                 okText: __('Save'),
                 className: 'modal modal-primary',
                 cancelText: __('Cancel'),
-                template: require('tpl!oroui/templates/three-buttons-modal.html')
+                template: require('tpl-loader!oroui/templates/three-buttons-modal.html')
             });
         },
 

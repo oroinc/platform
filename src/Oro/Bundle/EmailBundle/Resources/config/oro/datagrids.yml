@@ -71,7 +71,7 @@ datagrids:
         options:
             toolbarOptions:
                 hide: true
-            requireJSModules:
+            jsmodules:
                 - oroemail/js/datagrid/auto-response-rules-extension
 
     base-email-grid:
@@ -489,7 +489,7 @@ datagrids:
             default:
                 receivedAt: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
         options:
-            requireJSModules:
+            jsmodules:
                 - oroemail/js/datagrid/listen-to-read-email-extension
 
     email-templates:

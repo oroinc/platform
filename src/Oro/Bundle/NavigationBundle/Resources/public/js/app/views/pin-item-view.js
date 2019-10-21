@@ -9,7 +9,7 @@ define(function(require) {
     PinItemView = BookmarkItemView.extend({
         className: 'pin-holder',
 
-        template: require('tpl!oronavigation/templates/pin-item.html'),
+        template: require('tpl-loader!oronavigation/templates/pin-item.html'),
 
         listen: {
             'change:url model': 'render',

@@ -52,7 +52,7 @@
         {% set options  = {
             el: '#' ~ gridId,
             gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
-            builders: metaData.requireJSModules|merge(renderParams.requireJSModules|default([])),
+            builders: metaData.jsmodules|merge(renderParams.jsmodules|default([])),
             metadata: metaData,
             data: data,
             enableFilters: enableFilters,

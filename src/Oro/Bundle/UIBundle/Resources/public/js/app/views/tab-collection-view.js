@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var TabCollectionView;
@@ -6,8 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var module = require('module');
-    var config = module.config();
+    var config = require('module-config').default(module.id);
     var TabItemView = require('./tab-item-view');
 
     config = _.extend({
@@ -26,7 +25,7 @@ define(function(require) {
             'change collection': 'onChange'
         },
 
-        template: require('tpl!oroui/templates/tab-collection-container.html'),
+        template: require('tpl-loader!oroui/templates/tab-collection-container.html'),
 
         /**
          * @inheritDoc

@@ -1,4 +1,0 @@
-config:
-    paths:
-        'ororeminder/js/reminder-handler': 'bundles/ororeminder/js/reminder-handler.js'
-        'ororeminder/js/app/components/reminder-show-component': 'bundles/ororeminder/js/app/components/reminder-show-component.js'

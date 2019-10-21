@@ -1,14 +1,14 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var FlashMessageView;
     var BaseView = require('oroui/js/app/views/base/view');
     var messenger = require('oroui/js/messenger');
     var _ = require('underscore');
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
 
     config = _.extend({
-        template: require('tpl!oroui/templates/message-item.html') // default admin template
+        template: require('tpl-loader!oroui/templates/message-item.html') // default admin template
     }, config);
 
     FlashMessageView = BaseView.extend({

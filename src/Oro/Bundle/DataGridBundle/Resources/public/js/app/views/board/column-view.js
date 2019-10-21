@@ -22,7 +22,7 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        template: require('tpl!../../../../templates/board/column-view.html'),
+        template: require('tpl-loader!../../../../templates/board/column-view.html'),
 
         /**
          * @inheritDoc

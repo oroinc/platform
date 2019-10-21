@@ -81,7 +81,7 @@ define(function(require) {
             _.each(options.builders, function(module) {
                 var built = $.Deferred();
                 optionsProcessedPromises.push(built.promise());
-                require([module], function(impl) {
+                tools.loadModules(module, function(impl) {
                     builderImpl.push(impl);
                     if (!_.has(impl, 'processDatagridOptions')) {
                         built.resolve();

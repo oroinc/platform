@@ -31,7 +31,7 @@ styles:
         - 'bundles/oroui/blank/scss/reset.scss'
         - 'bundles/oroui/blank/vendors/font-awesome/font-awesome.scss'
         - 'bundles/oroui/blank/scss/styles.scss'
-    output: 'css/layout/blank/styles.css'
+    output: 'css/styles.css'
 
 stylebook_styles:
     inputs:

@@ -1,8 +1,8 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var HighlighterFavicon;
-    var module = require('module');
+    var config = require('module-config').default(module.id);
     var _ = require('underscore');
     var BaseClass = require('oroui/js/base-class');
 
@@ -36,7 +36,7 @@ define(function(require) {
          */
         initialize: function(options) {
             var names = _.keys(defaults);
-            _.extend(this, defaults, _.pick(module.config(), names), _.pick(options, names));
+            _.extend(this, defaults, _.pick(config, names), _.pick(options, names));
             this.favicon = document.querySelector(this.faviconSelector);
 
             HighlighterFavicon.__super__.initialize.call(this, options);

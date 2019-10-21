@@ -122,7 +122,7 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
                         'rowSelection' => [
                             'columnName' => 'foo'
                         ],
-                        'requireJSModules' => [
+                        'jsmodules' => [
                             'orodatagrid/js/datagrid/listener/column-form-listener'
                         ],
                     ],
@@ -163,7 +163,7 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
                         'rowSelection' => [
                             'columnName' => 'foo'
                         ],
-                        'requireJSModules' => [
+                        'jsmodules' => [
                             'orodatagrid/js/datagrid/listener/column-form-listener'
                         ],
                     ],
@@ -197,7 +197,7 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
                         'rowSelection' => [
                             'columnName' => 'foo'
                         ],
-                        'requireJSModules' => [
+                        'jsmodules' => [
                             'some-module'
                         ],
                     ],
@@ -207,7 +207,7 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
                         'rowSelection' => [
                             'columnName' => 'foo'
                         ],
-                        'requireJSModules' => [
+                        'jsmodules' => [
                             'some-module',
                             'orodatagrid/js/datagrid/listener/column-form-listener'
                         ],
@@ -237,7 +237,7 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
                         'rowSelection' => [
                             'columnName' => 'foo'
                         ],
-                        'requireJSModules' => [
+                        'jsmodules' => [
                             'orodatagrid/js/datagrid/listener/column-form-listener'
                         ],
                     ],
@@ -247,7 +247,7 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
                         'rowSelection' => [
                             'columnName' => 'foo'
                         ],
-                        'requireJSModules' => [
+                        'jsmodules' => [
                             'orodatagrid/js/datagrid/listener/column-form-listener'
                         ],
                     ],

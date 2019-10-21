@@ -1,0 +1,14 @@
+{% if app.debug %}
+    {% set translations = path('oro_translation_jstranslation') %}
+{% else %}
+    {% set translations = asset(asset_path('oro_translation_jstranslation'), 'translations') %}
+{% endif %}
+{% import '@OroAsset/Asset.html.twig' as Asset %}
+{{ Asset.js_modules_config({
+    'orotranslation/js/translator': {
+        debugTranslator: oro_translation_debug_translator()
+    },
+    'orotranslation/js/translation-loader': {
+        translationsResources: translations
+    }
+}) }}

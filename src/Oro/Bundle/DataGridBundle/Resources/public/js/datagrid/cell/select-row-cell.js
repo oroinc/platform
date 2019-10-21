@@ -5,7 +5,7 @@ define(function(require) {
     var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
     var Backgrid = require('backgrid');
-    var template = require('tpl!orodatagrid/templates/datagrid/select-row-cell.html');
+    var template = require('tpl-loader!orodatagrid/templates/datagrid/select-row-cell.html');
 
     /**
      * Renders a checkbox for row selection.

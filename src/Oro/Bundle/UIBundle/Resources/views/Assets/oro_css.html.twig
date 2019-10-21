@@ -1,6 +1,6 @@
 {% import '@OroAsset/Asset.html.twig' as Asset %}
 
-{{ Asset.css('css/themes/oro/oro.css', 'media="all"')}}
+{{ Asset.css('build/css/oro/oro.css', 'media="all"')}}
 {% if 'Trident' in app.request.headers.get('User-Agent') %}
-    {{ Asset.css('css/themes/oro/oro-ie.css', 'media="all"')}}
+    {{ Asset.css('build/css/oro/oro-ie.css', 'media="all"')}}
 {% endif %}

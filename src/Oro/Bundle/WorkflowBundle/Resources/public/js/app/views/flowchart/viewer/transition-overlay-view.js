@@ -5,7 +5,7 @@ define(function(require) {
     var FlowchartJsPlumbOverlayView = require('../jsplumb/overlay-view');
 
     FlowchartViewerTransitionOverlayView = FlowchartJsPlumbOverlayView.extend({
-        template: require('tpl!oroworkflow/templates/flowchart/viewer/transition.html'),
+        template: require('tpl-loader!oroworkflow/templates/flowchart/viewer/transition.html'),
 
         /**
          * @inheritDoc

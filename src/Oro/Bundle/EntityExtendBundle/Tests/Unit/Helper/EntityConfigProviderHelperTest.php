@@ -61,7 +61,7 @@ class EntityConfigProviderHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($actions);
 
         $propertyConfig->expects($this->once())
-            ->method('getRequireJsModules')
+            ->method('getJsModules')
             ->willReturn([]);
 
         $entity = new EntityConfigModel();
@@ -81,10 +81,10 @@ class EntityConfigProviderHelperTest extends \PHPUnit\Framework\TestCase
             ->with('SomeClass')
             ->willReturn($config);
 
-        list($result, $requireJs) = $this->helper->getLayoutParams($entity, $displayOnly);
+        list($result, $jsModules) = $this->helper->getLayoutParams($entity, $displayOnly);
 
         $this->assertEquals($expected, $result);
-        $this->assertEquals([], $requireJs);
+        $this->assertEquals([], $jsModules);
     }
 
     /**

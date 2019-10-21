@@ -18,7 +18,7 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        template: require('tpl!../../../../templates/board/column-header-view.html'),
+        template: require('tpl-loader!../../../../templates/board/column-header-view.html'),
 
         events: {
             mouseenter: 'onMouseEnter',

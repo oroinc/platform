@@ -41,7 +41,7 @@ define(function(require) {
             if (!this.loadModulePromise) {
                 this.loadModulePromise = tools.loadModules([this.get('module')])
                     .then(this.createController.bind(this))
-                    .fail(this.onWidgetLoadError.bind(this));
+                    .catch(this.onWidgetLoadError.bind(this));
             }
             return this.loadModulePromise;
         },

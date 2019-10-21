@@ -1,8 +1,8 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var viewportManager;
-    var module = require('module');
+    var config = require('module-config').default(module.id);
     var mediator = require('oroui/js/mediator');
     var _ = require('underscore');
     var error = require('oroui/js/error');
@@ -209,8 +209,8 @@ define(function(require) {
         _getModuleScreenMaps: function() {
             var arr = [];
 
-            if (!_.isUndefined(module.config().screenMap)) {
-                arr = module.config().screenMap;
+            if (!_.isUndefined(config.screenMap)) {
+                arr = config.screenMap;
             }
 
             return arr;

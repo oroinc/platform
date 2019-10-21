@@ -1,14 +1,13 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var $ = require('jquery');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
     var mediator = require('oroui/js/mediator');
-    var module = require('module');
+    var config = require('module-config').default(module.id);
     require('jquery-ui');
 
-    var config = module.config();
     config = _.extend({
         scrollableContainerSelector: 'html'
     }, config);

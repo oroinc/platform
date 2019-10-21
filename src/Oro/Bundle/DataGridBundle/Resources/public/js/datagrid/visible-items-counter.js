@@ -2,7 +2,7 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'tpl!orodatagrid/templates/datagrid/visible-items-counter.html'
+    'tpl-loader!orodatagrid/templates/datagrid/visible-items-counter.html'
 ], function($, _, Backbone, template) {
     'use strict';
 

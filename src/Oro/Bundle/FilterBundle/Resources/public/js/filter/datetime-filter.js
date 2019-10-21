@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var DatetimeFilter;
@@ -8,9 +8,9 @@ define(function(require) {
     var datetimeFormatter = require('orolocale/js/formatter/datetime');
     var DateTimePickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
     var VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view');
-    var DateFilter = require('./date-filter');
+    var DateFilter = require('oro/filter/date-filter');
     var tools = require('oroui/js/tools');
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
 
     config = _.extend({
         inputClass: 'datetime-visual-element',

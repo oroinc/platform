@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var AddressRegionView;
@@ -6,8 +6,8 @@ define(function(require) {
     var $ = require('jquery');
     var RegionCollection = require('oroaddress/js/region/collection');
     var Backbone = require('backbone');
-    var module = require('module');
-    var config = _.defaults(module.config(), {
+    var config = require('module-config').default(module.id);
+    config = _.defaults({}, config, {
         switchState: false
     });
     require('jquery.select2');

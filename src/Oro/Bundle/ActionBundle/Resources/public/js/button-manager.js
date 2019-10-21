@@ -9,7 +9,6 @@ define(function(require) {
     var widgetManager = require('oroui/js/widget-manager');
     var Backbone = require('backbone');
     var tools = require('oroui/js/tools');
-    require('oroui/js/standart-confirmation'); // preload default confirmation dialog module
 
     var ButtonManager = function(options) {
         this.initialize(options);
@@ -51,21 +50,22 @@ define(function(require) {
         confirmModal: null,
 
         /**
-         * @type {String}
-         */
-        confirmComponent: 'oroui/js/standart-confirmation',
-
-        /**
          * @type {Function}
          */
-        confirmModalConstructor: null,
+        confirmModalConstructor: require('oroui/js/standart-confirmation'),
+
+        confirmModalModulePromise: null,
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
             this.options = _.defaults(_.pick(options, _.identity) || {}, this.options);
-            this.confirmModalConstructor = require(this.options.confirmation.component || this.confirmComponent);
+
+            if (this.options.confirmation.component) {
+                this.confirmModalConstructor = null;
+                this.confirmModalModulePromise = tools.loadModule(this.options.confirmation.component);
+            }
         },
 
         /**
@@ -73,7 +73,19 @@ define(function(require) {
          */
         execute: function(e) {
             if (this.hasConfirmDialog()) {
-                this.showConfirmDialog(_.bind(this.doExecute, this, e));
+                if (this.confirmModalModulePromise) {
+                    this.confirmModalModulePromise.then(function(confirmModalConstructor) {
+                        if (this.disposed) {
+                            return;
+                        }
+
+                        this.confirmModalConstructor = confirmModalConstructor;
+                        this.showConfirmDialog(this.doExecute.bind(this, e));
+                        this.confirmModalModulePromise = null;
+                    }.bind(this));
+                } else {
+                    this.showConfirmDialog(this.doExecute.bind(this, e));
+                }
             } else {
                 this.doExecute(e);
             }

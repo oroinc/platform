@@ -29,7 +29,7 @@ class Indexer
 
     const SEARCH_ENTITY_PERMISSION = 'VIEW';
 
-    /** @var EngineInterface */
+    /** @var ExtendedEngineInterface */
     protected $engine;
 
     /** @var ObjectMapper */
@@ -45,13 +45,13 @@ class Indexer
     protected $isAllowedApplyAcl = true;
 
     /**
-     * @param EngineInterface  $engine
-     * @param ObjectMapper     $mapper
-     * @param SecurityProvider $securityProvider
-     * @param AclHelper        $searchAclHelper
+     * @param ExtendedEngineInterface  $engine
+     * @param ObjectMapper             $mapper
+     * @param SecurityProvider         $securityProvider
+     * @param AclHelper                $searchAclHelper
      */
     public function __construct(
-        EngineInterface $engine,
+        ExtendedEngineInterface $engine,
         ObjectMapper $mapper,
         SecurityProvider $securityProvider,
         AclHelper $searchAclHelper
@@ -169,6 +169,27 @@ class Indexer
         $query = $this->getSimpleSearchQuery($searchString, $offset, $maxResults, $from, $page);
 
         return $this->query($query);
+    }
+
+    /**
+     *
+     * @param string|null $searchString
+     * @param null        $from
+     *
+     * @return array
+     * [
+     *  <EntityFQCN> => <DocumentsCount>
+     * ]
+     */
+    public function getDocumentsCountGroupByEntityFQCN(
+        ?string $searchString,
+        $from = null
+    ): array {
+        $query = $this->getSimpleSearchQuery($searchString, 0, 0, $from, 0);
+
+        $this->prepareQuery($query);
+
+        return $this->engine->getDocumentsCountGroupByEntityFQCN($query);
     }
 
     /**

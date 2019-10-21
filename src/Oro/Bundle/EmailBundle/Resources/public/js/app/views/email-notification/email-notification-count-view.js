@@ -11,7 +11,7 @@ define(function(require) {
             'change:unreadEmailsCount model': 'render'
         },
 
-        template: require('tpl!oroemail/templates/email-notification/email-notification-icon-view.html'),
+        template: require('tpl-loader!oroemail/templates/email-notification/email-notification-icon-view.html'),
 
         /**
          * @inheritDoc

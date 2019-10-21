@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     var _ = require('underscore');
-    var AbstractFormatter = require('./abstract-formatter');
+    var AbstractFormatter = require('orofilter/js/formatter/abstract-formatter');
     var formatter = require('orolocale/js/formatter/number');
 
     /**

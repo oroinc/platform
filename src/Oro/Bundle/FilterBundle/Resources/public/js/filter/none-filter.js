@@ -2,11 +2,11 @@ define(function(require) {
     'use strict';
 
     var NoneFilter;
-    var wrapperTemplate = require('tpl!orofilter/templates/filter/filter-wrapper.html');
-    var template = require('tpl!orofilter/templates/filter/none-filter.html');
+    var wrapperTemplate = require('tpl-loader!orofilter/templates/filter/filter-wrapper.html');
+    var template = require('tpl-loader!orofilter/templates/filter/none-filter.html');
     var $ = require('jquery');
     var _ = require('underscore');
-    var AbstractFilter = require('./abstract-filter');
+    var AbstractFilter = require('oro/filter/abstract-filter');
 
     /**
      * None filter: an empty filter implements 'null object' pattern

@@ -10,7 +10,7 @@
 
 ## Overview
 
-If you want to use a different configuration for your **theme**, such as **assets**, **images**, **requirejs** or **page_templates**, you need to put it to the `layout/{theme_name}/config` folder.
+If you want to use a different configuration for your **theme**, such as **assets**, **images**, **jsmodules** or **page_templates**, you need to put it to the `layout/{theme_name}/config` folder.
 
 ## Assets
 

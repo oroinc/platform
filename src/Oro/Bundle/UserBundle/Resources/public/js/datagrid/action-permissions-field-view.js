@@ -13,7 +13,7 @@ define(function(require) {
 
         className: 'field-permission-container',
 
-        template: require('tpl!orouser/templates/datagrid/action-permissions-field-view.html'),
+        template: require('tpl-loader!orouser/templates/datagrid/action-permissions-field-view.html'),
 
         permissionView: PermissionView,
 

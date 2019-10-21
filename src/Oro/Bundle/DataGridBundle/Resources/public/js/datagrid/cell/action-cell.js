@@ -1,13 +1,12 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var Backgrid = require('backgrid');
-    var module = require('module');
+    var config = require('module-config').default(module.id);
 
-    var config = module.config();
     config = _.extend({
         showCloseButton: false
     }, config);

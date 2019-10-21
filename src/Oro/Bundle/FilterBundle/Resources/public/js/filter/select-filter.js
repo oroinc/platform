@@ -1,18 +1,18 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var SelectFilter;
-    var template = require('tpl!orofilter/templates/filter/select-filter.html');
+    var template = require('tpl-loader!orofilter/templates/filter/select-filter.html');
     var $ = require('jquery');
     var _ = require('underscore');
-    var AbstractFilter = require('./abstract-filter');
+    var AbstractFilter = require('oro/filter/abstract-filter');
     var MultiselectDecorator = require('orofilter/js/multiselect-decorator');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-    var module = require('module');
+    var config = require('module-config').default(module.id);
 
-    var config = _.extend({
+    config = _.extend({
         populateDefault: true
-    }, module.config());
+    }, config);
 
     /**
      * Select filter: filter value as select option

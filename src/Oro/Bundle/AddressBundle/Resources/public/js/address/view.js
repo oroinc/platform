@@ -1,15 +1,15 @@
-define([
-    'jquery',
-    'underscore',
-    'oroui/js/app/views/base/view',
-    'oroui/js/mediator',
-    'orolocale/js/formatter/address',
-    'oroui/js/delete-confirmation',
-    'orotranslation/js/translator'
-], function($, _, BaseView, mediator, addressFormatter, deleteConfirmation, __) {
+define(function(require) {
     'use strict';
 
     var AddressView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var mediator = require('oroui/js/mediator');
+    var addressFormatter = require('orolocale/js/formatter/address');
+    var deleteConfirmation = require('oroui/js/delete-confirmation');
+    var __ = require('orotranslation/js/translator');
+    var tools = require('oroui/js/tools');
 
     /**
      * @export  oroaddress/js/address/view
@@ -79,9 +79,10 @@ define([
             this.options = _.defaults(options || {}, this.options);
             this.mapping = _.extend({}, this.defaultMapping, this.options.map || {});
             if (this.options.confirmRemoveComponent) {
-                this.confirmRemoveComponent = this.options.confirmRemoveComponent;
-                if (_.isString(this.confirmRemoveComponent)) {
-                    this.confirmRemoveComponent = require(this.confirmRemoveComponent);
+                if (_.isString(this.options.confirmRemoveComponent)) {
+                    this.confirmRemoveComponentPromise = tools.loadModule(this.options.confirmRemoveComponent);
+                } else {
+                    this.confirmRemoveComponent = this.options.confirmRemoveComponent;
                 }
             }
 
@@ -129,17 +130,33 @@ define([
 
         confirmClose: function(callback) {
             if (this.options.confirmRemove) {
-                var confirmRemoveView = this.subview('confirmRemoveView');
+                if (this.confirmRemoveComponentPromise) {
+                    this.confirmRemoveComponentPromise.then(function(confirmRemoveComponent) {
+                        if (this.disposed) {
+                            return;
+                        }
 
-                if (confirmRemoveView === void 0 || confirmRemoveView.disposed) {
-                    confirmRemoveView = new this.confirmRemoveComponent(this.confirmRemoveMessages);
-                    this.subview('confirmRemoveView', confirmRemoveView);
+                        var confirmRemoveView = new this.confirmRemoveComponent(this.confirmRemoveMessages);
+
+                        this.subview('confirmRemoveView', confirmRemoveView);
+                        confirmRemoveView.on('ok', callback)
+                            .open();
+                        this.confirmRemoveComponent = confirmRemoveComponent;
+                        delete this.confirmRemoveComponentPromise;
+                    }.bind(this));
                 } else {
-                    confirmRemoveView.off('ok');
-                }
+                    var confirmRemoveView = this.subview('confirmRemoveView');
 
-                confirmRemoveView.on('ok', callback)
-                    .open();
+                    if (confirmRemoveView === void 0 || confirmRemoveView.disposed) {
+                        confirmRemoveView = new this.confirmRemoveComponent(this.confirmRemoveMessages);
+                        this.subview('confirmRemoveView', confirmRemoveView);
+                    } else {
+                        confirmRemoveView.off('ok');
+                    }
+
+                    confirmRemoveView.on('ok', callback)
+                        .open();
+                }
             } else {
                 callback();
             }
