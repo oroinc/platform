@@ -23,6 +23,8 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  * Abstract DB driver used to run search queries for ORM search engine
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 abstract class BaseDriver implements DBALPersisterInterface
 {
@@ -211,6 +213,42 @@ abstract class BaseDriver implements DBALPersisterInterface
     }
 
     /**
+     * @param Query $query
+     *
+     * @return array
+     * [
+     *      <entityFQCN> => <documentsCount>
+     * ]
+     */
+    public function getDocumentsCountGroupByEntityFQCN(Query $query): array
+    {
+        $qb = $this->getRequestQB($query, false);
+
+        /**
+         * Prepare query builder for getting aggregation data
+         */
+        $qb->resetDQLPart('select');
+        $qb->resetDQLPart('groupBy');
+        $qb->setFirstResult(null);
+        $qb->setMaxResults(null);
+
+        $qb->select([
+            'search.entity',
+            sprintf('%s as count', $qb->expr()->count('search.entity'))
+        ]);
+        $qb->groupBy('search.entity');
+
+        $result = $qb->getQuery()->getArrayResult();
+
+        return \array_combine(
+            \array_column($result, 'entity'),
+            \array_column($result, 'count')
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
      * @param Query $query
      * @return array
      */

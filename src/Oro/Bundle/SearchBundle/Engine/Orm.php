@@ -5,6 +5,7 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
+use Oro\Bundle\SearchBundle\Event\BeforeSearchEvent;
 use Oro\Bundle\SearchBundle\Query\LazyResult;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
@@ -83,6 +84,18 @@ class Orm extends AbstractEngine
             'records_count' => $recordsCountCallback,
             'aggregated_data' => $aggregatedDataCallback,
         ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDocumentsCountGroupByEntityFQCN(Query $query): array
+    {
+        $event = new BeforeSearchEvent($query);
+        $this->eventDispatcher->dispatch(BeforeSearchEvent::EVENT_NAME, $event);
+        $query = $event->getQuery();
+
+        return $this->getIndexRepository()->getDocumentsCountGroupByEntityFQCN($query);
     }
 
     /**
