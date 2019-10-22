@@ -54,27 +54,20 @@
             {% set gridParams = gridParams|merge({'display_sql_query': true}) %}
         {% endif %}
         {% set params = params|default({})|merge(gridParams) %}
-        <div id="async-datagrid">
-            {% include "OroUIBundle::view_loading.html.twig" %}
-        </div>
-
+        <div id="segment-datagrid-container"></div>
         <script type="text/javascript">
+          require(['oroui/js/widget-manager', 'oro/block-widget'],
+            function(widgetManager, BlockWidget ) {
+              var blockWidget = new BlockWidget({
+                loadingElement: '#segment-datagrid-container',
+                container: '#segment-datagrid-container',
+                url: '{{  path('oro_datagrid_widget', {gridName: gridName, params: params, renderParams : renderParams} ) }}',
+              });
+              blockWidget.render();
+            });
+        </script>
 
-          require(['jquery', 'oroui/js/app/components/component-manager'],
-            function ($, ComponentManager) {
-              var $asyncDatagrid = $('#async-datagrid')
-
-              $.get('{{ path('oro_datagrid_widget', {gridName: gridName} ) }}', {
-                  params: {{ params | json_encode|raw }},
-                  renderParams: {{ renderParams |json_encode |raw }}
-                },
-                function (data) {
-                  $asyncDatagrid.html(data)
-                  var manager = new ComponentManager($asyncDatagrid)
-                  manager.init()
-                })
-            })
-        </script>    {% else %}
+{% else %}
         <div class="container-fluid">
             <div class="grid-container">
                 <div class="no-data">
