@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var $ = require('jquery.validate');
@@ -8,7 +8,7 @@ define(function(require) {
     var logger = require('oroui/js/tools/logger');
     var validationHandler = require('oroform/js/optional-validation-groups-handler');
     var error = require('oroui/js/error');
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
     var validateTopmostLabelMixin = config.useTopmostLabelMixin
         ? require('oroform/js/validate-topmost-label-mixin') : null;
 

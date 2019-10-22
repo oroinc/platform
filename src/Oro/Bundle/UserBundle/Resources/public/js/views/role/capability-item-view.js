@@ -10,7 +10,7 @@ define(function(require) {
     CapabilityItemView = BaseView.extend({
         className: 'role-capability__item',
 
-        template: require('tpl!orouser/templates/role/capability-item.html'),
+        template: require('tpl-loader!orouser/templates/role/capability-item.html'),
 
         autoRender: true,
 

@@ -6,7 +6,7 @@ define(function(require) {
     var tools = require('oroui/js/tools');
     var AbstractConditionContainerView =
         require('oroquerydesigner/js/app/views/condition-builder/abstract-condition-container-view');
-    var template = require('tpl!oroquerydesigner/templates/condition-builder/conditions-group.html');
+    var template = require('tpl-loader!oroquerydesigner/templates/condition-builder/conditions-group.html');
 
     ConditionsGroupView = AbstractConditionContainerView.extend({
         template: template,

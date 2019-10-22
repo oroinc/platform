@@ -5,7 +5,7 @@ define(function(require) {
     var FlowchartViewerStepView = require('../viewer/step-view');
 
     FlowchartEditorStepView = FlowchartViewerStepView.extend({
-        template: require('tpl!oroworkflow/templates/flowchart/editor/step.html'),
+        template: require('tpl-loader!oroworkflow/templates/flowchart/editor/step.html'),
 
         className: function() {
             var classNames = [FlowchartEditorStepView.__super__.className.call(this)];

@@ -116,7 +116,7 @@ class SearchController extends AbstractController
 
         /** @var $resultProvider ResultStatisticsProvider */
         $resultProvider = $this->get(ResultStatisticsProvider::class);
-        $groupedResults = $resultProvider->getGroupedResults($string);
+        $groupedResults = $resultProvider->getGroupedResultsBySearchQuery($string);
         $selectedResult = null;
 
         foreach ($groupedResults as $alias => $type) {

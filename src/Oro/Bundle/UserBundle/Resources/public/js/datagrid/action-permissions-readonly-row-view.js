@@ -19,7 +19,7 @@ define(function(require) {
 
         animationDuration: 0,
 
-        template: require('tpl!orouser/templates/datagrid/action-permissions-row-view.html'),
+        template: require('tpl-loader!orouser/templates/datagrid/action-permissions-row-view.html'),
 
         permissionItemView: PermissionReadOnlyView,
 

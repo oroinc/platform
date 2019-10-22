@@ -6,7 +6,7 @@ define(function(require) {
 
     // TODO: will be removed after https://magecore.atlassian.net/browse/BAP-11905
     TextEditorView = BaseView.extend({
-        template: require('tpl!../../../../templates/text-editor.html'),
+        template: require('tpl-loader!../../../../templates/text-editor.html'),
 
         events: {
             'change [name=value]': 'onChange',

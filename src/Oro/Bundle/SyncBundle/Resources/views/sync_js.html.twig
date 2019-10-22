@@ -1,6 +1,6 @@
 {% if check_ws() %}
 <script type="text/javascript">
-    require(['jquery', 'orosync/js/sync', 'orosync/js/sync/wamp', 'routing'],
+    loadModules(['jquery', 'orosync/js/sync', 'orosync/js/sync/wamp', 'routing'],
     function($, sync, Wamp, routing){
         $(document).on('click.action.data-api', '[data-action=sync-connect]', function (e) {
             sync.reconnect();

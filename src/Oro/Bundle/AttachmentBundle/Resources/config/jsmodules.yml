@@ -1,0 +1,3 @@
+dynamic-imports:
+    oroattachment:
+        - oroattachment/js/app/views/attachment-view

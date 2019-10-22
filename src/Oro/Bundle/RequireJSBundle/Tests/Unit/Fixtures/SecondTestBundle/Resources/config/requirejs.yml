@@ -1,3 +1,0 @@
-config:
-    paths:
-        'oro/test': 'bundles/orosecondtest/js/second-test.js'

@@ -9,7 +9,7 @@ define(function(require) {
      * @class
      */
     var InlineEditorWrapperView = BaseView.extend({
-        template: require('tpl!oroform/templates/inline-editable-wrapper-view.html'),
+        template: require('tpl-loader!oroform/templates/inline-editable-wrapper-view.html'),
 
         events: {
             'dblclick': 'onInlineEditingStart',

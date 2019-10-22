@@ -2,9 +2,8 @@
 {% for role in app.user.roles %}
     {% set roles = roles|merge([role.role]) %}
 {% endfor %}
-
 <script type="text/javascript">
-    require(['orosync/js/sync', 'oroui/js/modal', 'oroui/js/mediator', 'oroui/js/messenger', 'orotranslation/js/translator'],
+    loadModules(['orosync/js/sync', 'oroui/js/modal', 'oroui/js/mediator', 'oroui/js/messenger', 'orotranslation/js/translator'],
     function(sync, Modal, mediator, messenger, __) {
         var notifier = null;
         var sendNotification = true;

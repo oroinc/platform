@@ -13,7 +13,7 @@ define(function(require) {
 
         autoRender: true,
 
-        template: require('tpl!orouser/templates/datagrid/role-permissions-action-view.html'),
+        template: require('tpl-loader!orouser/templates/datagrid/role-permissions-action-view.html'),
 
         /**
          * @type {AccessLevelsCollection}

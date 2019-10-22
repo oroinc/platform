@@ -18,7 +18,7 @@ define(function(require) {
         },
 
         /** @property */
-        template: require('tpl!../templates/tag-list.html'),
+        template: require('tpl-loader!../templates/tag-list.html'),
 
         /**
          * @inheritDoc

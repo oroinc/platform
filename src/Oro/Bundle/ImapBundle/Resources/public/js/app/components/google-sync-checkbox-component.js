@@ -3,6 +3,7 @@ define(function(require) {
     'use strict';
 
     var _ = require('underscore');
+    var scriptjs = require('scriptjs');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var GoogleSyncCheckboxView = require('oroimap/js/app/views/google-sync-checkbox-view');
     var GoogleSyncCheckbox;
@@ -37,9 +38,9 @@ define(function(require) {
                 googleWarningMessage: options.googleWarningMessage
             });
 
-            require(['//apis.google.com/js/client.js?onload=checkAuth'], _.bind(function() {
+            scriptjs('//apis.google.com/js/client.js?onload=checkAuth', function() {
                 this.listenTo(this.view, 'requestToken', this.requestToken);
-            }, this));
+            }.bind(this));
         },
 
         requestToken: function() {

@@ -3,7 +3,7 @@
 {% block widget_content %}
     {% set renderParams = renderParams|merge({
         routerEnabled: false,
-        requireJSModules: ['orodatagrid/js/row-select-for-widget/builder'],
+        jsmodules: ['orodatagrid/js/row-select-for-widget/builder'],
         gridBuildersOptions: {
             rowSelectForWidget: {
                 wid: app.request.get('_wid'),

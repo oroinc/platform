@@ -41,7 +41,11 @@ define(function(require) {
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-            this.template = _.template(this.options.template);
+            if (typeof this.options.template === 'string') {
+                this.template = _.template(this.options.template);
+            } else {
+                this.template = this.options.template;
+            }
             this.listenTo(this.model, 'destroy', this.remove);
             if (this.options.defaultRequired) {
                 this.listenTo(this.model, 'change:isDefault', this.toggleDefault);

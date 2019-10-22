@@ -184,6 +184,91 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testProcessorWithExistsOperatorInConditions()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
+        $processorBagConfigBuilder = new Definition(ProcessorBagConfigBuilder::class, [[], []]);
+
+        $processor1 = new Definition('Test\Processor1');
+        $processor1->addTag('processor', ['action' => 'action1', 'test_attr' => 'exists']);
+        $processor1->addTag('processor', ['action' => 'action2', 'test_attr' => '!exists']);
+
+        $container->addDefinitions([
+            'processor_bag_config_builder' => $processorBagConfigBuilder,
+            'processor1'                   => $processor1
+        ]);
+
+        $compilerPass = new LoadProcessorsCompilerPass('processor_bag_config_builder', 'processor');
+
+        $compilerPass->process($container);
+
+        self::assertEquals(
+            [
+                'action1' => [
+                    0 => [
+                        ['processor1', ['test_attr' => ['!' => null]]]
+                    ]
+                ],
+                'action2' => [
+                    0 => [
+                        ['processor1', ['test_attr' => null]]
+                    ]
+                ]
+            ],
+            $processorBagConfigBuilder->getArgument(1)
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The operator "exists" cannot be used together with "&" operator.
+     */
+    public function testProcessorWithExistsOperatorInAndExpression()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
+        $processorBagConfigBuilder = new Definition(ProcessorBagConfigBuilder::class, [[], []]);
+
+        $processor1 = new Definition('Test\Processor1');
+        $processor1->addTag('processor', ['action' => 'action1', 'test_attr' => 'exists&test2']);
+
+        $container->addDefinitions([
+            'processor_bag_config_builder' => $processorBagConfigBuilder,
+            'processor1'                   => $processor1
+        ]);
+
+        $compilerPass = new LoadProcessorsCompilerPass('processor_bag_config_builder', 'processor');
+
+        $compilerPass->process($container);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The operator "!exists" cannot be used together with "|" operator.
+     */
+    public function testProcessorWithExistsOperatorInOrExpression()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
+        $processorBagConfigBuilder = new Definition(ProcessorBagConfigBuilder::class, [[], []]);
+
+        $processor1 = new Definition('Test\Processor1');
+        $processor1->addTag('processor', ['action' => 'action3', 'test_attr' => '!exists|test2']);
+
+        $container->addDefinitions([
+            'processor_bag_config_builder' => $processorBagConfigBuilder,
+            'processor1'                   => $processor1
+        ]);
+
+        $compilerPass = new LoadProcessorsCompilerPass('processor_bag_config_builder', 'processor');
+
+        $compilerPass->process($container);
+    }
+
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \InvalidArgumentException

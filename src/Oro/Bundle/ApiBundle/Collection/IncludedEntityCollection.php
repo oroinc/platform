@@ -220,6 +220,16 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     }
 
     /**
+     * Gets all entities from the collection.
+     *
+     * @return object[]
+     */
+    public function getAll()
+    {
+        return array_values($this->collection->getAll());
+    }
+
+    /**
      * Gets an iterator to get all objects from the collection.
      *
      * @return \Traversable

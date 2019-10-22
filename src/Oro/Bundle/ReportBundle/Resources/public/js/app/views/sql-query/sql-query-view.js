@@ -19,7 +19,7 @@ define(function(require) {
             copy_not_successful: 'oro.datagrid.view_sql.messages.copy_not_successful'
         },
 
-        template: require('tpl!../../../../templates/sql-query-view.html'),
+        template: require('tpl-loader!../../../../templates/sql-query-view.html'),
 
         /**
          * @inheritDoc

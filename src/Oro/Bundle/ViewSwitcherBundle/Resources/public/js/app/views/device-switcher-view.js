@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var DeviceSwitcherView;
@@ -13,7 +13,7 @@ define(function(require) {
     var DeviceInnerPageView = require('oroviewswitcher/js/app/views/device-inner-page-view');
     var LoadingBarView = require('oroui/js/app/views/loading-bar-view');
     var persistentStorage = require('oroui/js/persistent-storage');
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
     var stateDefault = {
         items: [{
             name: 'desktop',
@@ -180,41 +180,52 @@ define(function(require) {
                         updateFavicon();
                     }
                     // add mobile scroll emulation if necessary
-                    if (iframe.document.querySelectorAll('.mobile-version').length) {
-                        if (iframe.require) {
-                            iframe.require(['bowerassets/jquery.nicescroll/dist/jquery.nicescroll.min'], function() {
-                                iframe.$('.mobile-version').first().niceScroll({
-                                    cursorcolor: 'rgba(0, 0, 0, 0.5)',
-                                    cursorborder: 'none',
-                                    touchbehavior: true,
-                                    zindex: 10000
-                                });
-                            });
+                    if (iframe.document.querySelector('.mobile-version')) {
+                        if (iframe.jQuery) {
+                            this.loadScriptInFrame(
+                                '/bundles/bowerassets/jquery.nicescroll/jquery.nicescroll.min.js',
+                                function(iframe) {
+                                    iframe.jQuery('.mobile-version').first().niceScroll({
+                                        cursorcolor: 'rgba(0, 0, 0, 0.5)',
+                                        cursorborder: 'none',
+                                        touchbehavior: true,
+                                        zindex: 10000
+                                    });
+                                }.bind(this, iframe)
+                            );
                         } else {
                             // In case when page has no other third-part libraries use OverlayScrollbars since it has no dependencies
-                            var script = iframe.document.createElement('script');
-                            var bodyElement = htmlElement.querySelector('body');
-                            htmlElement.querySelector('head').appendChild(script);
-                            script.addEventListener('load', _.bind(function() {
-                                new iframe.OverlayScrollbars(bodyElement, {
-                                    className: 'os-theme-dark',
-                                    resize: 'none',
-                                    scrollbars: {
-                                        autoHideDelay: 400,
-                                        autoHide: 'scroll'
-                                    },
-                                    overflowBehavior: {
-                                        x: 'hidden'
-                                    }
-                                });
-                            }, this));
-                            script.src = '/bundles/npmassets/overlayscrollbars/js/OverlayScrollbars.js';
+                            this.loadScriptInFrame(
+                                '/bundles/npmassets/overlayscrollbars/js/OverlayScrollbars.js',
+                                function(iframe, bodyElement) {
+                                    new iframe.OverlayScrollbars(bodyElement, {
+                                        className: 'os-theme-dark',
+                                        resize: 'none',
+                                        scrollbars: {
+                                            autoHideDelay: 400,
+                                            autoHide: 'scroll'
+                                        },
+                                        overflowBehavior: {
+                                            x: 'hidden'
+                                        }
+                                    });
+                                }.bind(this, iframe, htmlElement.querySelector('body'))
+                            );
                         }
                     }
                 }
             }, this), true);
             this.initLoadingView();
             DeviceSwitcherView.__super__.initialize.apply(this, arguments);
+        },
+
+        loadScriptInFrame: function(url, callback) {
+            var iframe = this.getFrameWindow();
+            var script = iframe.document.createElement('script');
+
+            iframe.document.querySelector('head').appendChild(script);
+            script.addEventListener('load', _.debounce(callback, 0));
+            script.src = url;
         },
 
         /**
@@ -322,12 +333,13 @@ define(function(require) {
          */
         startTrackUrlChanges: function() {
             var frameWindow = this.getFrameWindow();
-            // requirejs can be absent on a page (e.i. login page)
-            if (frameWindow.require) {
-                frameWindow.require(['oroui/js/mediator'], function(appMediator) {
+
+            if (frameWindow.loadModules) {
+                frameWindow.loadModules(['oroui/js/mediator'], function(appMediator) {
                     this.listenTo(appMediator, 'page:afterChange route:change', function() {
                         this.updateUrl(appMediator.execute('currentUrl'));
                     });
+                    this.appMediator = appMediator;
                 }.bind(this));
             }
         },
@@ -336,9 +348,8 @@ define(function(require) {
          * Stops listening to app events
          */
         stopTrackingUrlChanges: function() {
-            var require = this.getFrameWindow().require;
-            if (require) {
-                this.stopListening(require('oroui/js/mediator'));
+            if (this.appMediator) {
+                this.stopListening(this.appMediator);
             }
         },
 

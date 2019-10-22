@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var DialogWidget;
@@ -24,7 +24,7 @@ define(function(require) {
         messengerContainerClass: '',
         mobileLoadingBar: true,
         desktopLoadingBar: false
-    }, require('module').config());
+    }, require('module-config').default(module.id));
 
     /**
      * @export  oro/dialog-widget

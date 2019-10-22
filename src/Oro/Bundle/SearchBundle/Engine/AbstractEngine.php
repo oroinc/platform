@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * Abstract standard search engine
  */
-abstract class AbstractEngine implements EngineInterface
+abstract class AbstractEngine implements ExtendedEngineInterface
 {
     /** @var ManagerRegistry */
     protected $registry;
@@ -57,6 +57,33 @@ abstract class AbstractEngine implements EngineInterface
      * @return array
      */
     abstract protected function doSearch(Query $query);
+
+    /**
+     * @param Query $query
+     *
+     * @return array
+     * [
+     *  <EntityFQCN> => <DocumentsCount>
+     * ]
+     */
+    abstract protected function doGetDocumentsCountGroupByEntityFQCN(Query $query): array;
+
+    /**
+     * @param Query $query
+     *
+     * @return array
+     * [
+     *  <EntityFQCN> => <DocumentsCount>
+     * ]
+     */
+    public function getDocumentsCountGroupByEntityFQCN(Query $query): array
+    {
+        $event = new BeforeSearchEvent($query);
+        $this->eventDispatcher->dispatch(BeforeSearchEvent::EVENT_NAME, $event);
+        $query = $event->getQuery();
+
+        return $this->doGetDocumentsCountGroupByEntityFQCN($query);
+    }
 
     /**
      * {@inheritdoc}

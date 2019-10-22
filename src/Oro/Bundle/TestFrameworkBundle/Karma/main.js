@@ -1,3 +1,4 @@
+/* global requirejs */
 (function(files, callback) {
     'use strict';
     var file;

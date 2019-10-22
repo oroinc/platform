@@ -63,13 +63,13 @@ class ConfigController extends AbstractController
 
             $modules = array_merge(
                 $modules,
-                $provider->getPropertyConfig()->getRequireJsModules()
+                $provider->getPropertyConfig()->getJsModules()
             );
         }
 
         return [
             'buttonConfig' => $actions,
-            'require_js'   => $modules,
+            'jsmodules'   => $modules,
         ];
     }
 
@@ -140,7 +140,7 @@ class ConfigController extends AbstractController
         $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
 
         list(, $entityName) = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
-        list($layoutActions, $requireJsModules) = $this->getConfigProviderHelper()->getLayoutParams($entity);
+        list($layoutActions, $jsModules) = $this->getConfigProviderHelper()->getLayoutParams($entity);
 
         return [
             'entity'        => $entity,
@@ -150,7 +150,7 @@ class ConfigController extends AbstractController
             'link'          => $this->getRowCountLink($entity),
             'entity_name'   => $entityName,
             'button_config' => $layoutActions,
-            'require_js'    => $requireJsModules,
+            'jsmodules'    => $jsModules,
         ];
     }
 
@@ -170,13 +170,13 @@ class ConfigController extends AbstractController
             ->getRepository('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
             ->find($id);
 
-        list($layoutActions, $requireJsModules) = $this->getConfigProviderHelper()->getLayoutParams($entity);
+        list($layoutActions, $jsModules) = $this->getConfigProviderHelper()->getLayoutParams($entity);
 
         return [
             'buttonConfig' => $layoutActions,
             'entity_id'    => $id,
             'entity_name'  => $entity->getClassName(),
-            'require_js'   => $requireJsModules,
+            'jsmodules'   => $jsModules,
         ];
     }
 

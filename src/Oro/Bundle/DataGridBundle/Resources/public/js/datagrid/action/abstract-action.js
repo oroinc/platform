@@ -232,10 +232,10 @@ define(function(require) {
             this.frontend_options = this.frontend_options || {};
             this.frontend_options.url = this.getLinkWithParameters();
             this.frontend_options.title = this.frontend_options.title || this.label;
-            require(['oro/' + this.frontend_handle + '-widget'], _.bind(function(WidgetType) {
+            tools.loadModules('oro/' + this.frontend_handle + '-widget', function(WidgetType) {
                 var widget = new WidgetType(this.frontend_options);
                 widget.render();
-            }, this));
+            }.bind(this));
         },
 
         _handleRedirect: function() {

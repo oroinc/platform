@@ -1,4 +1,4 @@
-/* global $, bootbox, Util */
+/* global $, bootbox */
 // eslint-disable-next-line no-unused-vars
 function Util(rootMessagesElements) {
     'use strict';

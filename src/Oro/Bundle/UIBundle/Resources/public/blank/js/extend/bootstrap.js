@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    require('oroui/js/extend/polyfill');
     require('oroui/js/extend/bootstrap/bootstrap-dropdown');
     require('oroui/js/extend/bootstrap/bootstrap-modal');
     require('oroui/js/extend/bootstrap/bootstrap-popover');

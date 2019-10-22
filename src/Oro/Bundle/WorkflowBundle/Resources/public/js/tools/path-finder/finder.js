@@ -1,13 +1,13 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var settings = require('oroworkflow/js/tools/path-finder/settings');
     var Path = require('oroworkflow/js/tools/path-finder/path');
     var directions = require('oroworkflow/js/tools/path-finder/directions');
     var ComplexityError = require('oroworkflow/js/tools/path-finder/complexity-error');
-    var module = require('module');
+    var config = require('module-config').default(module.id);
 
-    var MAX_COMPLEXITY_NUMBER = module.config().MAX_COMPLEXITY_NUMBER || 80000;
+    var MAX_COMPLEXITY_NUMBER = config.MAX_COMPLEXITY_NUMBER || 80000;
 
     var directionIds = [
         directions.BOTTOM_TO_TOP.id,

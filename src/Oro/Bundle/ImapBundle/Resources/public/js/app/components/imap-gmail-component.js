@@ -7,6 +7,7 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
+    var scriptjs = require('scriptjs');
     var ImapGmailView = require('oroimap/js/app/views/imap-gmail-view');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var routing = require('routing');
@@ -43,9 +44,9 @@ define(function(require) {
 
             this.listenTo(this.view, 'getFolders', this.onGetFolders);
 
-            require(['//apis.google.com/js/client.js?onload=checkAuth'], _.bind(function() {
+            scriptjs('//apis.google.com/js/client.js?onload=checkAuth', function() {
                 this.listenTo(this.view, 'checkConnection', this.onCheckConnection);
-            }, this));
+            }.bind(this));
         },
 
         /**

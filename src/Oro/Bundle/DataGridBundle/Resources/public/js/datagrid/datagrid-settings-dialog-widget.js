@@ -4,7 +4,7 @@ define(function(require) {
     var DatagridSettingsDialogWidget;
     var _ = require('underscore');
     var DialogWidget = require('oro/dialog-widget');
-    var actionsTemplate = require('tpl!orodatagrid/templates/datagrid-settings/datagrid-settings-dialog-widget-actions.html');
+    var actionsTemplate = require('tpl-loader!orodatagrid/templates/datagrid-settings/datagrid-settings-dialog-widget-actions.html');
     var mediator = require('oroui/js/mediator');
 
     /**

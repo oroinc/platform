@@ -11,7 +11,7 @@ define(function(require) {
 
         className: 'action-permissions__item dropdown',
 
-        template: require('tpl!orouser/templates/datagrid/permission/permission-view.html'),
+        template: require('tpl-loader!orouser/templates/datagrid/permission/permission-view.html'),
 
         events: {
             'shown.bs.dropdown': 'onDropdownOpen',

@@ -7,7 +7,7 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
     var TabCollectionView = require('oroui/js/app/views/tab-collection-view');
     var BaseCollection = require('oroui/js/app/models/base/collection');
-    var template = require('tpl!orodatagrid/templates/datagrid/grid-settings.html');
+    var template = require('tpl-loader!orodatagrid/templates/datagrid/grid-settings.html');
     var mediator = require('oroui/js/mediator');
 
     /**

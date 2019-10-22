@@ -2,8 +2,8 @@ define(function(require) {
     'use strict';
 
     var DictionaryFilter;
-    var template = require('tpl!orofilter/templates/filter/dictionary-filter.html');
-    var fieldTemplate = require('tpl!orofilter/templates/filter/select-field.html');
+    var template = require('tpl-loader!orofilter/templates/filter/dictionary-filter.html');
+    var fieldTemplate = require('tpl-loader!orofilter/templates/filter/select-field.html');
     var $ = require('jquery');
     var routing = require('routing');
     var _ = require('underscore');

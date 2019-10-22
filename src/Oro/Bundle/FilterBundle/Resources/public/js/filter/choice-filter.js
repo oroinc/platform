@@ -2,11 +2,11 @@ define(function(require) {
     'use strict';
 
     var ChoiceFilter;
-    var template = require('tpl!orofilter/templates/filter/choice-filter.html');
+    var template = require('tpl-loader!orofilter/templates/filter/choice-filter.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
-    var TextFilter = require('./text-filter');
+    var TextFilter = require('oro/filter/text-filter');
 
     /**
      * Choice filter: filter type as option + filter value as string

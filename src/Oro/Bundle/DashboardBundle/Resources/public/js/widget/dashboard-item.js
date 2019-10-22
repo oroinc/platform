@@ -5,7 +5,7 @@ define([
     'oroui/js/mediator',
     'oro/block-widget',
     'oroui/js/delete-confirmation',
-    'tpl!orodashboard/templates/widget/dashboard-item.html'
+    'tpl-loader!orodashboard/templates/widget/dashboard-item.html'
 ], function(_, Backbone, __, mediator, BlockWidget, DeleteConfirmation, dashboardItemTpl) {
     'use strict';
 

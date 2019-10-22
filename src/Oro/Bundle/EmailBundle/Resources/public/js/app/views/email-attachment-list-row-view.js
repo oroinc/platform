@@ -7,6 +7,7 @@ define(function(require) {
     var numeral = require('numeral');
     var EmailAttachmentModel = require('oroemail/js/app/models/email-attachment-model');
     var BaseView = require('oroui/js/app/views/base/view');
+    var template = require('tpl-loader!oroemail/templates/email-attachment/email-attachment-list-row-view.html');
 
     EmailAttachmentListRowView = BaseView.extend({
         model: EmailAttachmentModel,
@@ -38,7 +39,7 @@ define(function(require) {
 
         getTemplateFunction: function() {
             if (!this.template) {
-                this.template = require('tpl!oroemail/templates/email-attachment/email-attachment-list-row-view.html');
+                this.template = template;
             }
 
             return EmailAttachmentListRowView.__super__.getTemplateFunction.call(this);

@@ -8,7 +8,7 @@ define(function(require) {
     var routing = require('routing');
     var mediator = require('oroui/js/mediator');
     var Modal = require('oroui/js/modal');
-    var widgetPickerModalTemplate = require('tpl!oroui/templates/widget-picker/widget-picker-modal-template.html');
+    var widgetPickerModalTemplate = require('tpl-loader!oroui/templates/widget-picker/widget-picker-modal-template.html');
 
     var BaseCollection = require('oroui/js/app/models/base/collection');
     var WidgetPickerModel = require('oroui/js/app/models/widget-picker/widget-picker-model');

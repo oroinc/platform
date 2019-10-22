@@ -1,7 +1,7 @@
 define([
     'underscore',
     'backbone',
-    './select-filter'
+    'oro/filter/select-filter'
 ], function(_, Backbone, SelectFilter) {
     'use strict';
 

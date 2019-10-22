@@ -5,7 +5,7 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
 
     WidgetContainerIconView = BaseView.extend({
-        template: require('tpl!orosidebar/templates/sidebar-widget-container/widget-container-icon.html'),
+        template: require('tpl-loader!orosidebar/templates/sidebar-widget-container/widget-container-icon.html'),
 
         listen: {
             'change model': 'render'

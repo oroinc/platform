@@ -267,6 +267,13 @@ class LayoutDataCollector extends DataCollector
      */
     public function setNotAppliedActions(array $notAppliedActions)
     {
+        foreach ($notAppliedActions as &$action) {
+            if (array_key_exists('options', $action)) {
+                $action['options'] = $this->prepareOptions($action['options']);
+            }
+        }
+        unset($action);
+
         $this->notAppliedActions = $notAppliedActions;
 
         return $this;

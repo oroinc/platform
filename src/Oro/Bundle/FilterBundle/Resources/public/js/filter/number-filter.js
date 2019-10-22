@@ -5,7 +5,7 @@ define(function(require) {
 
     var _ = require('underscore');
     var $ = require('jquery');
-    var ChoiceFilter = require('./choice-filter');
+    var ChoiceFilter = require('oro/filter/choice-filter');
     var NumberFormatter = require('orofilter/js/formatter/number-formatter');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');

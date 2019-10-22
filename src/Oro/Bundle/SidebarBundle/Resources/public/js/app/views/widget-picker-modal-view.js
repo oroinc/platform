@@ -5,7 +5,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
-    var widgetPickerModalTemplate = require('text!oroui/templates/widget-picker/widget-picker-modal-template.html');
+    var widgetPickerModalTemplate = require('text-loader!oroui/templates/widget-picker/widget-picker-modal-template.html');
     var WidgetContainerModel = require('orosidebar/js/app/models/sidebar-widget-container-model');
     var BaseCollection = require('oroui/js/app/models/base/collection');
     var WidgetPickerModel = require('oroui/js/app/models/widget-picker/widget-picker-model');

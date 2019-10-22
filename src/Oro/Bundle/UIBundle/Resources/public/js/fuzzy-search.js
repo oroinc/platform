@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var FuzzySearch;
@@ -10,7 +10,7 @@ define(function(require) {
         engineOptions: {
             includeScore: true
         }
-    }, require('module').config() || {});
+    }, require('module-config').default(module.id) || {});
 
     FuzzySearch = {
         engineOptions: config.engineOptions,

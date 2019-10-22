@@ -3,7 +3,7 @@ define(function(require) {
 
     var HintView;
     var BaseView = require('oroui/js/app/views/base/view');
-    var hintTemplate = require('tpl!orodatagrid/templates/hint/hint-view-template.html');
+    var hintTemplate = require('tpl-loader!orodatagrid/templates/hint/hint-view-template.html');
     var _ = require('underscore');
     var $ = require('jquery');
 

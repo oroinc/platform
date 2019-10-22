@@ -3,7 +3,7 @@ define(function(require) {
 
     var ClearableInputWidgetView;
     var $ = require('jquery');
-    var template = require('tpl!oroui/templates/clearable.html');
+    var template = require('tpl-loader!oroui/templates/clearable.html');
     var AbstractInputWidgetView = require('oroui/js/app/views/input-widget/abstract');
 
     ClearableInputWidgetView = AbstractInputWidgetView.extend({

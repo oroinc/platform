@@ -4,7 +4,7 @@ define(function(require) {
     var BaseChartComponent;
     var _ = require('underscore');
     var $ = require('jquery');
-    var chartTemplate = require('text!orochart/js/templates/base-chart-template.html');
+    var chartTemplate = require('text-loader!orochart/js/templates/base-chart-template.html');
     var BaseComponent = require('oroui/js/app/components/base/component');
 
     /**

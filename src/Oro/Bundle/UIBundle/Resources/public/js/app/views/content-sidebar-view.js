@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var ContentSidebarView;
@@ -9,7 +9,7 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var ResizableAreaPlugin = require('oroui/js/app/plugins/plugin-resizable-area');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
 
     config = _.extend({
         autoRender: true,

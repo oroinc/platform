@@ -13,7 +13,7 @@ define(function(require) {
             items: null
         },
 
-        template: require('tpl!oroform/templates/multi-checkbox-view.html'),
+        template: require('tpl-loader!oroform/templates/multi-checkbox-view.html'),
 
         events: {
             'change input[type=checkbox]': 'onCheckboxToggle'
