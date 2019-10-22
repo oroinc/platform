@@ -9,7 +9,7 @@ define(function(require) {
     var DigitalAssetChooseFormView;
 
     DigitalAssetChooseFormView = BaseView.extend({
-        previewElementTemplate: require('tpl!orodigitalasset/templates/digital-asset-choose-form/preview.html'),
+        previewElementTemplate: require('tpl-loader!orodigitalasset/templates/digital-asset-choose-form/preview.html'),
         autoRender: true,
 
         options: _.extend({}, BaseView.prototype.options, {
