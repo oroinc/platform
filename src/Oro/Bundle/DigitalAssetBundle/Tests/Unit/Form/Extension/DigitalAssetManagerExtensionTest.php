@@ -543,6 +543,11 @@ class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getData')
             ->willReturn($file = $this->createMock(File::class));
 
+        $file
+            ->expects($this->once())
+            ->method('getFilename')
+            ->willReturn('sample/filename');
+
         $this->previewMetadataProvider
             ->expects($this->once())
             ->method('getMetadata')
