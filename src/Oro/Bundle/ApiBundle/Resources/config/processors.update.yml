@@ -48,6 +48,9 @@ services:
         arguments:
             - '@oro_api.security.authorization_checker'
             - EDIT
+        calls:
+            - [setDoctrineHelper, ['@oro_api.doctrine_helper']]
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: update, group: security_check, priority: 10 }
 

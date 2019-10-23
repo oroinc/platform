@@ -3,18 +3,27 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Voter;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Model\AclProviderInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Acl\Permission\PermissionMapInterface;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AclVoterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|PermissionMapInterface */
@@ -356,6 +365,192 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             AclVoter::ACCESS_DENIED,
             $this->voter->vote($this->securityToken, $object, ['test'])
+        );
+    }
+
+    public function testVoteForDomainObjectWrapperObject()
+    {
+        $object = new DomainObjectWrapper(new CmsAddress(), new ObjectIdentity('stdClass', 'entity'));
+
+        $this->extensionSelector->expects(self::once())
+            ->method('select')
+            ->with(self::identicalTo($object))
+            ->willReturn($this->extension);
+
+        $this->groupProvider->expects(self::once())
+            ->method('getGroup')
+            ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
+        $this->extension->expects(self::once())
+            ->method('getPermissions')
+            ->with(null, false, true)
+            ->willReturn(['test']);
+
+        $this->permissionMap->expects(self::exactly(2))
+            ->method('contains')
+            ->with('test')
+            ->willReturn(true);
+        $this->permissionMap->expects(self::once())
+            ->method('getMasks')
+            ->willReturn(1);
+
+        self::assertEquals(
+            AclVoter::ACCESS_GRANTED,
+            $this->voter->vote($this->securityToken, $object, ['test'])
+        );
+    }
+
+    public function testVoteForDomainObjectWrapperObjectWhenObjectGroupIsNotEqualCurrentGroup()
+    {
+        $object = new DomainObjectWrapper(new CmsAddress(), new ObjectIdentity('stdClass', 'test_group@entity'));
+
+        $this->extensionSelector->expects(self::once())
+            ->method('select')
+            ->with(self::identicalTo($object))
+            ->willReturn($this->extension);
+
+        $this->groupProvider->expects(self::once())
+            ->method('getGroup')
+            ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
+        $this->extension->expects(self::never())
+            ->method('getPermissions');
+
+        $this->permissionMap->expects(self::never())
+            ->method('contains');
+        $this->permissionMap->expects(self::never())
+            ->method('getMasks');
+
+        self::assertEquals(
+            AclVoter::ACCESS_DENIED,
+            $this->voter->vote($this->securityToken, $object, ['test'])
+        );
+    }
+
+    public function testVoteForDomainObjectWrapperObjectWhenObjectGroupIsEqualCurrentGroup()
+    {
+        $object = new DomainObjectWrapper(new CmsAddress(), new ObjectIdentity('stdClass', 'test_group@entity'));
+
+        $this->extensionSelector->expects(self::once())
+            ->method('select')
+            ->with(self::identicalTo($object))
+            ->willReturn($this->extension);
+
+        $this->groupProvider->expects(self::once())
+            ->method('getGroup')
+            ->willReturn('test_group');
+        $this->extension->expects(self::once())
+            ->method('getPermissions')
+            ->with(null, false, true)
+            ->willReturn(['test']);
+
+        $this->permissionMap->expects(self::exactly(2))
+            ->method('contains')
+            ->with('test')
+            ->willReturn(true);
+        $this->permissionMap->expects(self::once())
+            ->method('getMasks')
+            ->willReturn(1);
+
+        self::assertEquals(
+            AclVoter::ACCESS_GRANTED,
+            $this->voter->vote($this->securityToken, $object, ['test'])
+        );
+    }
+
+    public function testVoteForDomainObjectWrapperObjectWhenExtensionDoesNotSupportGivenPermission()
+    {
+        $object = new DomainObjectWrapper(new CmsAddress(), new ObjectIdentity('stdClass', 'entity'));
+
+        $this->extensionSelector->expects(self::once())
+            ->method('select')
+            ->with(self::identicalTo($object))
+            ->willReturn($this->extension);
+
+        $this->groupProvider->expects(self::once())
+            ->method('getGroup')
+            ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
+        $this->extension->expects(self::once())
+            ->method('getPermissions')
+            ->with(null, false, true)
+            ->willReturn(['test1']);
+
+        $this->permissionMap->expects(self::once())
+            ->method('contains')
+            ->with('test')
+            ->willReturn(true);
+        $this->permissionMap->expects(self::never())
+            ->method('getMasks');
+
+        self::assertEquals(
+            AclVoter::ACCESS_DENIED,
+            $this->voter->vote($this->securityToken, $object, ['test'])
+        );
+    }
+
+    public function testVoteForFieldVoteWithObjectAsDomainObject()
+    {
+        $domainObject = new CmsAddress();
+        $object = new FieldVote($domainObject, 'testField');
+
+        $this->extensionSelector->expects(self::once())
+            ->method('select')
+            ->with(self::identicalTo($object))
+            ->willReturn($this->extension);
+        $this->permissionMap->expects(self::once())
+            ->method('contains')
+            ->with('test')
+            ->willReturn(true);
+        $this->permissionMap->expects(self::once())
+            ->method('getMasks')
+            ->willReturn(1);
+
+        self::assertEquals(
+            AclVoter::ACCESS_GRANTED,
+            $this->voter->vote($this->securityToken, $object, ['test'])
+        );
+    }
+
+    public function testVoteForFieldVoteWithDomainObjectWrapperAsDomainObject()
+    {
+        $address = new CmsAddress();
+        $domainObject = new DomainObjectWrapper($address, new ObjectIdentity('stdClass', 'test_group@entity'));
+        $object = new FieldVote($domainObject, 'testField');
+
+        $strategy = $this->createMock(ObjectIdentityRetrievalStrategyInterface::class);
+
+        $voter = new AclVoter(
+            $this->createMock(AclProviderInterface::class),
+            $strategy,
+            $this->createMock(SecurityIdentityRetrievalStrategyInterface::class),
+            $this->permissionMap
+        );
+        $voter->setAclExtensionSelector($this->extensionSelector);
+        $voter->setAclGroupProvider($this->groupProvider);
+
+        $this->extensionSelector->expects(self::once())
+            ->method('select')
+            ->with(self::identicalTo($object))
+            ->willReturn($this->extension);
+        $this->groupProvider->expects(self::once())
+            ->method('getGroup')
+            ->willReturn('test_group');
+        $this->extension->expects(self::once())
+            ->method('getPermissions')
+            ->with(null, false, true)
+            ->willReturn(['test']);
+        $strategy->expects($this->once())
+            ->method('getObjectIdentity')
+            ->with(new DomainObjectWrapper($address, new ObjectIdentity('stdClass', 'entity')));
+        $this->permissionMap->expects(self::exactly(2))
+            ->method('contains')
+            ->with('test')
+            ->willReturn(true);
+        $this->permissionMap->expects(self::once())
+            ->method('getMasks')
+            ->willReturn(1);
+
+        self::assertEquals(
+            AclVoter::ACCESS_GRANTED,
+            $voter->vote($this->securityToken, $object, ['test'])
         );
     }
 }

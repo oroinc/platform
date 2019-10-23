@@ -7,6 +7,9 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
+/**
+ * Get entity name from entity itself or from the latest audit logs
+ */
 class EntityNameProvider
 {
     /** @var ManagerRegistry */
@@ -61,11 +64,16 @@ class EntityNameProvider
         $rows = $this->getAuditRepository($auditEntryClass)
             ->createQueryBuilder('a')
             ->select('a.objectName')
-            ->where('a.objectClass = :objectClass AND a.objectId = :objectId AND a.version IS NOT NULL')
+            ->where(
+                'a.objectClass = :objectClass',
+                'a.objectId = :objectId OR a.entityId = :entityId',
+                'a.version IS NOT NULL'
+            )
             ->orderBy('a.version', 'DESC')
             ->setMaxResults(1)
             ->setParameter('objectClass', $entityClass)
-            ->setParameter('objectId', $entityId)
+            ->setParameter('objectId', (int) $entityId)
+            ->setParameter('entityId', (string) $entityId)
             ->getQuery()
             ->getArrayResult();
 

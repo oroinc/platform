@@ -5,11 +5,14 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Suite\Suite;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\Exception\FileNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader as AliceLoader;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
+ * Loads fixtures.
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class FixtureLoader
@@ -183,6 +186,17 @@ class FixtureLoader
         $em = $this->getEntityManager();
 
         foreach ($objects as $object) {
+            if (!$em->contains($object)) {
+                $metadata = $em->getClassMetadata(\get_class($object));
+
+                if (count($metadata->getIdentifier()) === 1
+                    && $metadata->getSingleIdReflectionProperty()->getValue($object)
+                ) {
+                    $metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_NONE);
+                    $metadata->setIdGenerator(new \Doctrine\ORM\Id\AssignedGenerator());
+                }
+            }
+
             $em->persist($object);
         }
 

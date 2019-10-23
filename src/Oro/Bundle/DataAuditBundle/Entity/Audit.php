@@ -9,6 +9,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
+ * Audit model
+ *
  * @ORM\Entity()
  * @Config(
  *      defaultValues={
@@ -40,6 +42,13 @@ class Audit extends AbstractAudit
      * @ORM\Column(name="object_id", type="integer", nullable=true)
      */
     protected $objectId;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="entity_id", type="string", length=255, nullable=true)
+     */
+    protected $entityId;
 
     /**
      * @var string $objectClass

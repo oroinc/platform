@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * Abstract standard search engine
  */
-abstract class AbstractEngine implements EngineInterface
+abstract class AbstractEngine implements ExtendedEngineInterface
 {
     /** @var ManagerRegistry */
     protected $registry;

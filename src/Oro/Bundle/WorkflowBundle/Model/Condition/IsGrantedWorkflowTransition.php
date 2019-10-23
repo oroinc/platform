@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Model\Condition;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclExtension;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -42,6 +43,9 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
     /** @var WorkflowManager */
     protected $workflowManager;
 
+    /** @var AclGroupProviderInterface */
+    private $aclGroupProvider;
+
     /**
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param TokenAccessorInterface $tokenAccessor
@@ -55,6 +59,14 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
         $this->workflowManager = $workflowManager;
+    }
+
+    /**
+     * @param AclGroupProviderInterface $aclGroupProvider
+     */
+    public function setAclGroupProvider(AclGroupProviderInterface $aclGroupProvider)
+    {
+        $this->aclGroupProvider = $aclGroupProvider;
     }
 
     /**
@@ -170,9 +182,16 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
                 );
             }
         }
+
         return new DomainObjectWrapper(
             $entity,
-            new ObjectIdentity(WorkflowAclExtension::NAME, $context->getWorkflowName())
+            new ObjectIdentity(
+                WorkflowAclExtension::NAME,
+                ObjectIdentityHelper::buildType(
+                    $context->getWorkflowName(),
+                    $this->aclGroupProvider->getGroup()
+                )
+            )
         );
     }
 }

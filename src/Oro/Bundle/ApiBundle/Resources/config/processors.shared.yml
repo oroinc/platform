@@ -494,6 +494,9 @@ services:
         arguments:
             - '@oro_api.security.authorization_checker'
             - VIEW
+        calls:
+            - [setDoctrineHelper, ['@oro_api.doctrine_helper']]
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: get_list, group: security_check, priority: 10 }
@@ -503,6 +506,9 @@ services:
         arguments:
             - '@oro_api.security.authorization_checker'
             - DELETE
+        calls:
+            - [setDoctrineHelper, ['@oro_api.doctrine_helper']]
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: delete, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: delete_list, group: security_check, priority: 10 }
@@ -518,6 +524,9 @@ services:
             - '@oro_api.security.authorization_checker'
             - VIEW
             - true
+        calls:
+            - [setDoctrineHelper, ['@oro_api.doctrine_helper']]
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: create, group: security_check, priority: 5 }
             - { name: oro.api.processor, action: update, group: security_check, priority: 5 }
@@ -531,6 +540,9 @@ services:
         arguments:
             - '@oro_api.security.authorization_checker'
             - VIEW
+        calls:
+            - [setDoctrineHelper, ['@oro_api.doctrine_helper']]
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: get_relationship, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: get_subresource, group: security_check, priority: 10 }
@@ -540,6 +552,9 @@ services:
         arguments:
             - '@oro_api.security.authorization_checker'
             - EDIT
+        calls:
+            - [setDoctrineHelper, ['@oro_api.doctrine_helper']]
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: add_subresource, group: security_check, priority: 10 }
@@ -555,6 +570,9 @@ services:
             - '@oro_api.security.authorization_checker'
             - VIEW
             - true
+        calls:
+            - [setDoctrineHelper, ['@oro_api.doctrine_helper']]
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: security_check, priority: 5 }
             - { name: oro.api.processor, action: add_subresource, group: security_check, priority: 5 }

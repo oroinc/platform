@@ -3,63 +3,44 @@
 namespace Oro\Bundle\SecurityBundle\Annotation;
 
 /**
+ * The annotation that defines ACL rule for a resource.
+ *
  * @Annotation
  * @Target({"METHOD", "CLASS"})
  */
 class Acl implements \Serializable
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $id;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $ignoreClassAcl;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $type;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $class;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $permission;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $group;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $label;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $description;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $category;
 
     /**
-     * Constructor
+     * @param array $data
      *
-     * @param  array $data
      * @throws \InvalidArgumentException
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function __construct(array $data = null)
     {
@@ -67,27 +48,27 @@ class Acl implements \Serializable
             return;
         }
 
-        $this->id = isset($data['id']) ? $data['id'] : null;
+        $this->id = $data['id'] ?? null;
         if (empty($this->id) || strpos($this->id, ' ') !== false) {
             throw new \InvalidArgumentException('ACL id must not be empty or contain blank spaces.');
         }
 
-        $this->type = isset($data['type']) ? $data['type'] : null;
+        $this->type = $data['type'] ?? null;
         if (empty($this->type)) {
             throw new \InvalidArgumentException(sprintf('ACL type must not be empty. Id: %s.', $this->id));
         }
 
         $this->ignoreClassAcl = isset($data['ignore_class_acl']) ? (bool)$data['ignore_class_acl'] : false;
-        $this->permission     = isset($data['permission']) ? $data['permission'] : '';
-        $this->class          = isset($data['class']) ? $data['class'] : '';
-        $this->group          = isset($data['group_name']) ? $data['group_name'] : '';
-        $this->label          = isset($data['label']) ? $data['label'] : '';
-        $this->description    = isset($data['description']) ? $data['description'] : '';
-        $this->category       = isset($data['category']) ? $data['category'] : '';
+        $this->permission = $data['permission'] ?? '';
+        $this->class = $data['class'] ?? '';
+        $this->group = $data['group_name'] ?? '';
+        $this->label = $data['label'] ?? '';
+        $this->description = $data['description'] ?? '';
+        $this->category = $data['category'] ?? '';
     }
 
     /**
-     * Gets id of this ACL annotation
+     * Gets ID of this ACL annotation.
      *
      * @return string
      */
@@ -111,7 +92,7 @@ class Acl implements \Serializable
     }
 
     /**
-     * Gets ACL extension key
+     * Gets ACL extension key.
      *
      * @return string
      */
@@ -121,7 +102,7 @@ class Acl implements \Serializable
     }
 
     /**
-     * Gets ACL class name
+     * Gets ACL class name.
      *
      * @return string
      */
@@ -131,6 +112,8 @@ class Acl implements \Serializable
     }
 
     /**
+     * Sets ACL class name.
+     *
      * @param string $class
      */
     public function setClass($class)
@@ -139,7 +122,7 @@ class Acl implements \Serializable
     }
 
     /**
-     * Gets ACL permission name
+     * Gets ACL permission name.
      *
      * @return string
      */
@@ -149,7 +132,7 @@ class Acl implements \Serializable
     }
 
     /**
-     * Sets ACL permission name
+     * Sets ACL permission name.
      *
      * @param string $permission
      */
@@ -159,7 +142,7 @@ class Acl implements \Serializable
     }
 
     /**
-     * Gets ACL group name
+     * Gets ACL group name.
      *
      * @return string
      */
@@ -169,7 +152,7 @@ class Acl implements \Serializable
     }
 
     /**
-     * Gets ACL label name
+     * Gets ACL label name.
      *
      * @return string
      */
@@ -179,7 +162,7 @@ class Acl implements \Serializable
     }
 
     /**
-     * Gets ACL description
+     * Gets ACL description.
      *
      * @return string
      */
@@ -189,6 +172,8 @@ class Acl implements \Serializable
     }
 
     /**
+     * Gets ACL category.
+     *
      * @return string
      */
     public function getCategory()
@@ -197,6 +182,8 @@ class Acl implements \Serializable
     }
 
     /**
+     * Sets ACL category.
+     *
      * @param string $category
      */
     public function setCategory($category)
@@ -209,19 +196,17 @@ class Acl implements \Serializable
      */
     public function serialize()
     {
-        return serialize(
-            array(
-                $this->id,
-                $this->type,
-                $this->class,
-                $this->permission,
-                $this->ignoreClassAcl,
-                $this->group,
-                $this->label,
-                $this->description,
-                $this->category
-            )
-        );
+        return serialize([
+            $this->id,
+            $this->type,
+            $this->class,
+            $this->permission,
+            $this->ignoreClassAcl,
+            $this->group,
+            $this->label,
+            $this->description,
+            $this->category
+        ]);
     }
 
     /**
@@ -251,16 +236,16 @@ class Acl implements \Serializable
     // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
-        $result                 = new Acl();
-        $result->id             = $data['id'];
-        $result->type           = $data['type'];
-        $result->class          = $data['class'];
-        $result->permission     = $data['permission'];
+        $result = new Acl();
+        $result->id = $data['id'];
+        $result->type = $data['type'];
+        $result->class = $data['class'];
+        $result->permission = $data['permission'];
         $result->ignoreClassAcl = $data['ignoreClassAcl'];
-        $result->group          = $data['group'];
-        $result->label          = $data['label'];
-        $result->description    = $data['description'];
-        $result->category       = $data['category'];
+        $result->group = $data['group'];
+        $result->label = $data['label'];
+        $result->description = $data['description'];
+        $result->category = $data['category'];
 
         return $result;
     }

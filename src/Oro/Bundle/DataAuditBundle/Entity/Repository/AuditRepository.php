@@ -5,6 +5,9 @@ namespace Oro\Bundle\DataAuditBundle\Entity\Repository;
 use Gedmo\Loggable\Entity\Repository\LogEntryRepository;
 use Gedmo\Tool\Wrapper\EntityWrapper;
 
+/**
+ * Audit repository
+ */
 class AuditRepository extends LogEntryRepository
 {
     /**
@@ -19,9 +22,11 @@ class AuditRepository extends LogEntryRepository
         $objectId    = $wrapped->getIdentifier();
 
         $qb = $this->createQueryBuilder('a')
-            ->where('a.objectId = :objectId AND a.objectClass = :objectClass')
+            ->where('(a.objectId = :objectId OR a.entityId = :entityId) AND a.objectClass = :objectClass')
             ->orderBy('a.loggedAt', 'DESC')
-            ->setParameters(compact('objectId', 'objectClass'));
+            ->setParameter('objectId', (int) $objectId)
+            ->setParameter('entityId', (string) $objectId)
+            ->setParameter('objectClass', $objectClass);
 
         return $qb;
     }

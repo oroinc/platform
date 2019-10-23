@@ -6,7 +6,8 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class EntityTypeSecurityCheckTest extends GetListProcessorTestCase
@@ -14,11 +15,25 @@ class EntityTypeSecurityCheckTest extends GetListProcessorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
     private $authorizationChecker;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
+    private $aclGroupProvider;
+
     protected function setUp()
     {
         parent::setUp();
 
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->aclGroupProvider = $this->createMock(AclGroupProviderInterface::class);
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getManageableEntityClass')
+            ->willReturnCallback(function ($className) {
+                return $className;
+            });
     }
 
     /**
@@ -28,11 +43,15 @@ class EntityTypeSecurityCheckTest extends GetListProcessorTestCase
      */
     private function getProcessor($forcePermissionUsage = false)
     {
-        return new EntityTypeSecurityCheck(
+        $processor = new EntityTypeSecurityCheck(
             $this->authorizationChecker,
             'VIEW',
             $forcePermissionUsage
         );
+        $processor->setDoctrineHelper($this->doctrineHelper);
+        $processor->setAclGroupProvider($this->aclGroupProvider);
+
+        return $processor;
     }
 
     public function testProcessWhenAccessGrantedForManageableEntityWithoutConfigOfAclResource()
@@ -42,7 +61,7 @@ class EntityTypeSecurityCheckTest extends GetListProcessorTestCase
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', $className)
+            ->with('VIEW', 'entity:' . $className)
             ->willReturn(true);
 
         $this->context->setClassName($className);
@@ -60,7 +79,7 @@ class EntityTypeSecurityCheckTest extends GetListProcessorTestCase
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', $className)
+            ->with('VIEW', 'entity:' . $className)
             ->willReturn(false);
 
         $this->context->setClassName($className);
@@ -113,7 +132,7 @@ class EntityTypeSecurityCheckTest extends GetListProcessorTestCase
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', $className)
+            ->with('VIEW', 'entity:' . $className)
             ->willReturn(true);
 
         $this->context->setClassName($className);
