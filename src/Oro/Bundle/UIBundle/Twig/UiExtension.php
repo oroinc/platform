@@ -36,6 +36,7 @@ use Twig\TwigFunction;
  *   - oro_url_add_query
  *   - oro_is_url_local
  *   - skype_button
+ *   - oro_form_additional_data (Returns Additional section data which is used for rendering)
  *
  * Provides Twig filters that expose some common PHP functions:
  *   - oro_js_template_content
@@ -55,6 +56,12 @@ use Twig\TwigFunction;
 class UiExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     const SKYPE_BUTTON_TEMPLATE = 'OroUIBundle::skype_button.html.twig';
+
+    // Big number is set to guarantee Additional section is rendered at the end
+    public const ADDITIONAL_SECTION_PRIORITY = 10000;
+
+    // Represents key which is used for Additional section in array of blocks to identify it and make possible to work
+    public const ADDITIONAL_SECTION_KEY = 'oro_additional_section_key';
 
     /** @var ContainerInterface */
     protected $container;
@@ -170,6 +177,11 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
                 ['needs_environment' => true]
             ),
             new TwigFunction(
+                'oro_form_additional_data',
+                [$this, 'renderAdditionalData'],
+                ['needs_environment' => true]
+            ),
+            new TwigFunction(
                 'oro_view_process',
                 [$this, 'processView'],
                 ['needs_environment' => true]
@@ -243,6 +255,51 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         $this->getEventDispatcher()->dispatch(Events::BEFORE_UPDATE_FORM_RENDER, $event);
 
         return $event->getFormData();
+    }
+
+    /**
+     * @param TwigEnvironment $environment
+     * @param FormView $form
+     * @param string $label
+     * @param array $additionalData
+     *
+     * @return array
+     */
+    public function renderAdditionalData(
+        TwigEnvironment $environment,
+        FormView $form,
+        string $label,
+        array $additionalData = []
+    ): array {
+        foreach ($form->children as $child) {
+            if (empty($child->vars['extra_field'])) {
+                continue;
+            }
+
+            $additionalData[$child->vars['name']] = $environment->render(
+                'OroUIBundle::form_row.html.twig',
+                ['child' => $child]
+            );
+        }
+
+        if ($additionalData) {
+            $additionalData = [
+                self::ADDITIONAL_SECTION_KEY =>
+                    [
+                        'title' => $label,
+                        'priority' => self::ADDITIONAL_SECTION_PRIORITY,
+                        'subblocks' => [
+                            [
+                                'title' => '',
+                                'useSpan' => false,
+                                'data' => $additionalData
+                            ]
+                        ]
+                    ]
+            ];
+        }
+
+        return $additionalData;
     }
 
     /**

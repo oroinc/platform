@@ -695,4 +695,42 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->scrollData->hasBlock(0));
         $this->assertTrue($this->scrollData->hasBlock('named'));
     }
+
+    public function testIsEmptyBlockTrue()
+    {
+        $blocks = [
+            ScrollData::DATA_BLOCKS => [
+                'empty_named_block' => [
+                    ScrollData::TITLE => 'Named',
+                ]
+            ]
+        ];
+
+        $this->scrollData->setData($blocks);
+
+        $this->assertTrue($this->scrollData->isEmptyBlock('empty_named_block'));
+    }
+
+    public function testNotEmptyBlock()
+    {
+        $blocks = [
+            ScrollData::DATA_BLOCKS => [
+                'not_empty_named_block' => [
+                    ScrollData::TITLE => 'Named',
+                    ScrollData::SUB_BLOCKS => [
+                        0 => [
+                            ScrollData::DATA => ['some data']
+                        ],
+                        'namedSubblock' => [
+                            ScrollData::DATA => ['some data']
+                        ],
+                    ]
+                ]
+            ]
+        ];
+
+        $this->scrollData->setData($blocks);
+
+        $this->assertFalse($this->scrollData->isEmptyBlock('not_empty_named_block'));
+    }
 }
