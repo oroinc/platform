@@ -19,6 +19,7 @@ const postcssConfig = path.join(__dirname, '../postcss.config.js');
 const prepareModulesMap = require('./plugin/map/prepare-modules-map');
 const resolve = require('enhanced-resolve');
 const webpackMerge = require('webpack-merge');
+const babelConfig = require('./../babel.config.js');
 
 class ConfigBuilder {
     constructor() {
@@ -237,6 +238,22 @@ class ConfigBuilder {
                     })
                 ]
             };
+
+            if (env && !env.skipJS && !env.skipBabel) {
+                webpackConfig.module.rules.push({
+                    test: /\.js$/,
+                    exclude: [
+                        /\/platform\/build\//,
+                        /bundles\/(?:bowerassets|npmassets|components)\//,
+                        /\/bundles\/.+\/lib\/?/
+                    ],
+                    use: {
+                        loader: 'babel-loader',
+                        options: babelConfig
+                    }
+                });
+            }
+
             if (args.hot) {
                 const https = this._appConfig.devServerOptions.https;
                 const schema = https ? 'https' : 'http';
@@ -257,7 +274,6 @@ class ConfigBuilder {
                 };
                 webpackConfig.output.publicPath = `${schema}://${devServerHost}:${devServerPort}/`;
             }
-
 
             //Additional setting for production mode
             if (this._isProduction) {
@@ -393,8 +409,6 @@ class ConfigBuilder {
         return {
             'app': [
                 'whatwg-fetch',
-                'core-js/fn/promise',
-                'oroui/js/extend/polyfill',
                 'oroui/js/app',
                 'oroui/js/app/services/app-ready-load-modules'
             ]

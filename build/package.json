@@ -11,7 +11,11 @@
     "test-codestyle": "./node_modules/.bin/eslint ../../ -c .eslintrc.yml --ignore-path .eslintignore --quiet"
   },
   "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/plugin-transform-runtime": "^7.6.2",
+    "@babel/preset-env": "^7.6.3",
     "autoprefixer": "9.6.1",
+    "babel-loader": "^8.0.6",
     "css-loader": "^3.1.0",
     "deepmerge": "3.3.0",
     "eslint": "6.0.1",
@@ -54,7 +58,8 @@
     "webpack-merge": "4.2.1"
   },
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
+    "@babel/runtime": "^7.6.3",
+    "core-js": "^3.3.3",
     "whatwg-fetch": "^3.0.0"
   }
 }
