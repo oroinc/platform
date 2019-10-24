@@ -64,9 +64,14 @@ oro.locale:
             description: The text value for the curent localization, can contain html tags
 
     fallback:
+        form:
+            label: 'Inherit Localization'
+            tooltip: 'Choose "Default" or a localization to inherit the contents. Choose "Custom" to override the automatically inherited value with a custom value.'
+
         type:
             parent_localization: 'Parent Localization'
             default: 'Default Value'
+            custom: 'Custom'
 
         value:
             default: 'Default Value'

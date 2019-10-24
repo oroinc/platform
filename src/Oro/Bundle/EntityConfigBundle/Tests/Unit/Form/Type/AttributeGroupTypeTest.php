@@ -8,6 +8,8 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\FormBundle\Tests\Unit\Stub\StripTagsExtensionStub;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
@@ -17,12 +19,12 @@ use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionTypeStub;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AttributeGroupTypeTest extends FormIntegrationTestCase
 {
@@ -36,7 +38,7 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
     /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $attributeManager;
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     protected function setUp()
@@ -72,7 +74,7 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
         $this->attributeManager = $this->createMock(AttributeManager::class);
         $this->attributeManager->expects($this->any())->method('getActiveAttributesByClass')->willReturn([]);
 
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator = $this->createMock(Translator::class);
 
         parent::setUp();
     }
@@ -82,6 +84,9 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider $entityConfigProvider */
+        $entityConfigProvider = $this->createMock(ConfigProvider::class);
+
         return [
             new PreloadedExtension(
                 [
@@ -98,7 +103,12 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
                     FallbackValueType::class => new FallbackValueType(),
                     FallbackPropertyType::class => new FallbackPropertyType($this->translator),
                 ],
-                [FormType::class => [new StripTagsExtensionStub($this->createMock(HtmlTagHelper::class))]]
+                [
+                    FormType::class => [
+                        new StripTagsExtensionStub($this->createMock(HtmlTagHelper::class)),
+                        new TooltipFormExtension($entityConfigProvider, $this->translator),
+                    ]
+                ]
             ),
             $this->getValidatorExtension(true)
         ];

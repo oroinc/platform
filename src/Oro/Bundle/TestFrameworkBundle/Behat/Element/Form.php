@@ -233,6 +233,13 @@ class Form extends Element
                 return $this->elementFactory->wrapElement('Select', $field);
             }
 
+            if ('textarea' === $field->getTagName()) {
+                $wysiwyg = $field->getParent()->find('css', '.grapesjs');
+                if ($wysiwyg) {
+                    return $this->elementFactory->wrapElement('WysiwygField', $field);
+                }
+            }
+
             return $field;
         }
 

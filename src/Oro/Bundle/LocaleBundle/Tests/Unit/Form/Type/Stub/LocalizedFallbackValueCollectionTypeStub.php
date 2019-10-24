@@ -29,6 +29,7 @@ class LocalizedFallbackValueCollectionTypeStub extends AbstractType
             'entry_options' => [],
             'allow_add' => true,
             'allow_delete' => true,
+            'use_tabs' => false,
         ]);
 
         $resolver->setNormalizer('entry_type', function () {
