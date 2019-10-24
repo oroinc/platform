@@ -824,6 +824,7 @@ define(function(require) {
 
             if (_.has(widgetResponse, 'message')) {
                 var message = widgetResponse.message;
+                var messageOptions = widgetResponse.messageOptions || {};
 
                 if (_.isString(message)) {
                     message = {type: 'success', text: message};
@@ -831,10 +832,10 @@ define(function(require) {
 
                 if (_.has(widgetResponse, 'messageAfterPageChange') && widgetResponse.messageAfterPageChange === true) {
                     mediator.once('page:afterChange', function() {
-                        messenger.notificationFlashMessage(message.type, message.text);
+                        messenger.notificationFlashMessage(message.type, message.text, messageOptions);
                     });
                 } else {
-                    messenger.notificationFlashMessage(message.type, message.text);
+                    messenger.notificationFlashMessage(message.type, message.text, messageOptions);
                 }
             }
 

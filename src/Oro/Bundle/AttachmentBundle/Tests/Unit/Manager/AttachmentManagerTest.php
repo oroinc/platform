@@ -180,7 +180,7 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->fileIconProvider
             ->expects(self::once())
-            ->method('getAttachmentIconClass')
+            ->method('getExtensionIconClass')
             ->with($file)
             ->willReturn($icon = 'sample-icon');
 

@@ -88,7 +88,7 @@ entity_config:
                             empty_data:     1
                             tooltip:        oro.attachment.max_size.tooltip
 
-                # the thubnail picture width in pixels
+                # picture thumbnail width in pixels
                 width: # integer
                     options:
                         value_type:         integer
@@ -106,7 +106,7 @@ entity_config:
                             empty_data:     32
                             tooltip:        oro.attachment.thumb_width.tooltip
 
-                # the thubnail picture height in pixels
+                # picture thumbnail height in pixels
                 height: # integer
                     options:
                         value_type:         integer
@@ -126,6 +126,8 @@ entity_config:
 
                 # the list of all allowed MIME types
                 mimetypes: # string (MIME types are delimited by linefeed (\n) symbol)
+                    options:
+                        allowed_type:       [file, image]
                     constraints:
                         - Oro\Bundle\AttachmentBundle\Validator\Constraints\MimeType: ~
                     form:

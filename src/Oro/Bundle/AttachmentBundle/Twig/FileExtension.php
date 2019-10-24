@@ -6,8 +6,10 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Component\PhpUtils\Formatter\BytesFormatter;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
@@ -97,7 +99,8 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
                 'oro_image_view',
                 [$this, 'getImageView'],
                 ['is_safe' => ['html'], 'needs_environment' => true]
-            )
+            ),
+            new TwigFunction('oro_file_title', [$this, 'getFileTitle']),
         ];
     }
 
@@ -230,6 +233,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
                 'url' => $url,
                 'fileName' => $file->getOriginalFilename(),
                 'additional' => $additional,
+                'title' => $this->getFileTitle($file),
             ]
         );
     }
@@ -272,6 +276,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
                     UrlGeneratorInterface::ABSOLUTE_URL
                 ),
                 'fileName' => $file->getOriginalFilename(),
+                'title' => $this->getFileTitle($file),
             ]
         );
     }
@@ -310,6 +315,23 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
     }
 
     /**
+     * Provides file title which can be used, e.g. in title or alt HTML attributes.
+     *
+     * @param File|null $file
+     * @param Localization|null $localization
+     *
+     * @return string|null
+     */
+    public function getFileTitle(?File $file, Localization $localization = null): string
+    {
+        if (!$file) {
+            return '';
+        }
+
+        return $this->container->get(FileTitleProviderInterface::class)->getTitle($file, $localization);
+    }
+
+    /**
      * @param int $id
      *
      * @return File
@@ -337,6 +359,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
             ConfigManager::class,
             ManagerRegistry::class,
             PropertyAccessorInterface::class,
+            FileTitleProviderInterface::class,
         ];
     }
 }

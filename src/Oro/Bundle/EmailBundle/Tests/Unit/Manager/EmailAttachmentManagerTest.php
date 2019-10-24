@@ -18,6 +18,7 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
  * Class EmailAttachmentManagerTest
@@ -158,7 +159,7 @@ class EmailAttachmentManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($file);
         $this->configFileValidator->expects($this->once())
             ->method('validate')
-            ->willReturn($this->createMock('Countable'));
+            ->willReturn($this->createMock(ConstraintViolationList::class));
 
         $this->emailAttachmentManager->linkEmailAttachmentToTargetEntity($emailAttachment, new SomeEntity());
 
@@ -175,7 +176,7 @@ class EmailAttachmentManagerTest extends \PHPUnit\Framework\TestCase
         $file = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Entity\File')
             ->setMethods(['getFilename'])
             ->getMock();
-        $countable = $this->getMockBuilder('Countable')->getMock();
+        $countable = $this->getMockBuilder(ConstraintViolationList::class)->getMock();
         $countable->expects($this->never())
             ->method('count')
             ->will($this->returnValue(2));

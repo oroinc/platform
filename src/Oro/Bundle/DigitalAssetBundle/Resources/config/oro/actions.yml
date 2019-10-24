@@ -1,0 +1,23 @@
+operations:
+    digital_asset_delete:
+        extends: DELETE
+        page_reload: false
+        for_all_entities: false
+        for_all_datagrids: false
+        replace:
+            - datagrids
+            - preconditions
+            - actions
+        datagrids:
+            - digital-asset-select-file-grid
+            - digital-asset-select-image-grid
+        preconditions: []
+        actions:
+            -   '@run_action_group':
+                    action_group: DELETE
+                    parameters_mapping:
+                        data: $.data
+            -   '@refresh_grid':
+                    conditions:
+                        '@not_empty': $.gridName
+                    parameters: [$.gridName]
