@@ -180,7 +180,7 @@ JS;
                 return true;
             }
 
-            if ((document.querySelector('script[src*="js/oro.min.js"]') !== null
+            if ((document.querySelector('script[src*="/app.js"]') !== null
                 && (typeof(jQuery) === 'undefined' || jQuery == null))
                 || (typeof(jQuery) !== 'undefined' && jQuery.active)
             ) {

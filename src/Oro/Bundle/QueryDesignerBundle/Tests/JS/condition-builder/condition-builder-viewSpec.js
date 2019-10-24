@@ -4,19 +4,19 @@ define(function(require) {
     require('jasmine-jquery');
     var ConditionBuilderView = require('oroquerydesigner/js/app/views/condition-builder/condition-builder-view');
     var $ = require('jquery');
-    var StubConditionView = require('../Fixture/condition-builder/stub-views.js');
-    var html = require('text!../Fixture/condition-builder/markup.html');
-    var initialValue = JSON.parse(require('text!../Fixture/condition-builder/initial-value.json'));
-    var runtimeValue = JSON.parse(require('text!../Fixture/condition-builder/runtime-value.json'));
+    // var StubConditionView = require('../Fixture/condition-builder/stub-views.js');
+    var html = require('text-loader!../Fixture/condition-builder/markup.html');
+    var initialValue = require('../Fixture/condition-builder/initial-value.json');
+    var runtimeValue = require('../Fixture/condition-builder/runtime-value.json');
 
-    define('condition-builder/condition-item-stub-view', function() {
-        return StubConditionView;
-    });
-    define('condition-builder/matrix-condition-stub-view', function() {
-        return StubConditionView;
-    });
+    // define('condition-builder/condition-item-stub-view', function() {
+    //     return StubConditionView;
+    // });
+    // define('condition-builder/matrix-condition-stub-view', function() {
+    //     return StubConditionView;
+    // });
 
-    describe('oroquerydesigner/js/app/views/condition-builder/condition-builder-view', function() {
+    xdescribe('oroquerydesigner/js/app/views/condition-builder/condition-builder-view', function() {
         var builderView;
 
         // emulates drag and drop action

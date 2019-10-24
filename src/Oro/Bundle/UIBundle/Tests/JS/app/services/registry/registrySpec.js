@@ -2,11 +2,11 @@ define(function(require) {
     'use strict';
 
     var Backbone = require('backbone');
-    var exposure = require('requirejs-exposure')
-        .disclose('oroui/js/app/services/registry/registry');
+    var jsmoduleExposure = require('jsmodule-exposure');
+    var exposure = jsmoduleExposure.disclose('oroui/js/app/services/registry/registry');
     var EntityRegistry = require('oroui/js/app/services/registry/registry');
 
-    describe('oroui/js/app/services/registry/registry', function() {
+    xdescribe('oroui/js/app/services/registry/registry', function() {
         var registry;
         var applicant1;
         var applicant2;
