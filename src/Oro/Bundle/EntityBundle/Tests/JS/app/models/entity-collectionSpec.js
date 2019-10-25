@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var exposure = require('requirejs-exposure')
-        .disclose('oroentity/js/app/models/entity-collection');
+    var jsmoduleExposure = require('jsmodule-exposure');
+    var exposure = jsmoduleExposure.disclose('oroentity/js/app/models/entity-collection');
     var RegistryMock = require('../../Fixture/app/services/registry/registry-mock');
     var EntityModel = require('oroentity/js/app/models/entity-model');
     var EntityCollection = require('oroentity/js/app/models/entity-collection');
 
-    describe('oroentity/js/app/models/entity-collection', function() {
+    xdescribe('oroentity/js/app/models/entity-collection', function() {
         var registryMock;
 
         beforeEach(function() {

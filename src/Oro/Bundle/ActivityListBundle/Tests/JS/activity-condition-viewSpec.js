@@ -3,13 +3,13 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    var filters = JSON.parse(require('text!./Fixture/filters.json'));
-    var listOptions = require('text!./Fixture/list-options.json');
+    var filters = require('./Fixture/filters.json');
+    var listOptions = JSON.stringify(require('./Fixture/list-options.json'));
     var FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
     var ActivityConditionView = require('oroactivitylist/js/app/views/activity-condition-view');
     require('jasmine-jquery');
 
-    describe('oroactivitylist/js/app/views/activity-condition-view', function() {
+    xdescribe('oroactivitylist/js/app/views/activity-condition-view', function() {
         var activityConditionView;
 
         describe('without initial value', function() {

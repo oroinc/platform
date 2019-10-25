@@ -6,8 +6,8 @@ define(function(require) {
     var ExpressionEditorView = require('oroform/js/app/views/expression-editor-view');
 
     // fixtures
-    var options = JSON.parse(require('text!./Fixture/expression-editor-options.json'));
-    var html = require('text!./Fixture/expression-editor-template.html');
+    var options = require('./Fixture/expression-editor-options.json');
+    var html = require('text-loader!./Fixture/expression-editor-template.html');
 
     // variables
     var expressionEditorUtil = null;

@@ -1,0 +1,8 @@
+oro:
+    digitalasset:
+        validator:
+            mime_type_cannot_be_non_image.message: Cannot upload non-image file "%file_name%" because current digital asset is already used in the image field "%field_name%" of entity "%entity_class%" with id "%entity_id%".
+            mime_type_cannot_be_non_image_in_entity.message: Cannot upload non-image file "%file_name%" because current digital asset is already used in the image field "%field_name%" of this <a href="%entity_url%" target="_blank">entity</a>.
+
+            digital_asset:
+                invalid: The chosen digital asset does not exist or has been deleted

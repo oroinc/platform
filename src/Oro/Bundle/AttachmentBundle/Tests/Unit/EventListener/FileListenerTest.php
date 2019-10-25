@@ -107,26 +107,11 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
         $entity = new File();
         $entity->setEmptyFile(true);
 
-        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $uow->expects($this->once())
-            ->method('getEntityChangeSet')
-            ->with($this->identicalTo($entity))
-            ->willReturn(['filename' => ['test.txt', null]]);
-
-        $this->fileManager->expects($this->once())
-            ->method('upload')
-            ->with($entity);
+        $this->fileManager->expects($this->never())
+            ->method('upload');
         $this->em->expects($this->once())
             ->method('remove')
             ->with($entity);
-        $this->fileManager->expects($this->once())
-            ->method('deleteFile')
-            ->with('test.txt');
 
         $this->listener->postPersist($entity, new LifecycleEventArgs($entity, $this->em));
     }
@@ -135,25 +120,11 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new File();
 
-        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $uow->expects($this->once())
-            ->method('getEntityChangeSet')
-            ->with($this->identicalTo($entity))
-            ->willReturn(['filename' => ['test.txt', null]]);
-
         $this->fileManager->expects($this->once())
             ->method('upload')
             ->with($entity);
         $this->em->expects($this->never())
             ->method('remove');
-        $this->fileManager->expects($this->once())
-            ->method('deleteFile')
-            ->with('test.txt');
 
         $this->listener->postPersist($entity, new LifecycleEventArgs($entity, $this->em));
     }
@@ -164,25 +135,11 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
         $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
 
-        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $uow->expects($this->once())
-            ->method('getEntityChangeSet')
-            ->with($this->identicalTo($entity))
-            ->willReturn(['filename' => ['test1.txt', 'test2.txt']]);
-
         $this->fileManager->expects($this->once())
             ->method('upload')
             ->with($entity);
         $this->em->expects($this->never())
             ->method('remove');
-        $this->fileManager->expects($this->once())
-            ->method('deleteFile')
-            ->with('test1.txt');
 
         $this->listener->postPersist($entity, new LifecycleEventArgs($entity, $this->em));
     }
@@ -192,26 +149,12 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
         $entity = new File();
         $entity->setEmptyFile(true);
 
-        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $uow->expects($this->once())
-            ->method('getEntityChangeSet')
-            ->with($this->identicalTo($entity))
-            ->willReturn(['filename' => ['test.txt', null]]);
-
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects($this->never())
             ->method('upload')
             ->with($entity);
         $this->em->expects($this->once())
             ->method('remove')
             ->with($entity);
-        $this->fileManager->expects($this->once())
-            ->method('deleteFile')
-            ->with('test.txt');
 
         $this->listener->postUpdate($entity, new LifecycleEventArgs($entity, $this->em));
     }
@@ -220,25 +163,11 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new File();
 
-        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $uow->expects($this->once())
-            ->method('getEntityChangeSet')
-            ->with($this->identicalTo($entity))
-            ->willReturn(['filename' => ['test.txt', null]]);
-
         $this->fileManager->expects($this->once())
             ->method('upload')
             ->with($entity);
         $this->em->expects($this->never())
             ->method('remove');
-        $this->fileManager->expects($this->once())
-            ->method('deleteFile')
-            ->with('test.txt');
 
         $this->listener->postUpdate($entity, new LifecycleEventArgs($entity, $this->em));
     }
@@ -249,25 +178,11 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
         $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
 
-        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $uow->expects($this->once())
-            ->method('getEntityChangeSet')
-            ->with($this->identicalTo($entity))
-            ->willReturn(['filename' => ['test1.txt', 'test2.txt']]);
-
         $this->fileManager->expects($this->once())
             ->method('upload')
             ->with($entity);
         $this->em->expects($this->never())
             ->method('remove');
-        $this->fileManager->expects($this->once())
-            ->method('deleteFile')
-            ->with('test1.txt');
 
         $this->listener->postUpdate($entity, new LifecycleEventArgs($entity, $this->em));
     }

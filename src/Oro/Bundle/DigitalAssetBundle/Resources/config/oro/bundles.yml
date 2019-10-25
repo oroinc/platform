@@ -1,0 +1,2 @@
+bundles:
+    - { name: Oro\Bundle\DigitalAssetBundle\OroDigitalAssetBundle, priority: -60 }

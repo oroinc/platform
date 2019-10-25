@@ -19,7 +19,7 @@ define(function(require) {
         /** @property {Object} */
         defaults: _.defaults({
             name: '',
-            label: 'test',
+            label: '',
             sortable: false,
             editable: false,
             cell: ActionCell,
