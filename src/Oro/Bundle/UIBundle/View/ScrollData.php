@@ -6,7 +6,7 @@ namespace Oro\Bundle\UIBundle\View;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  *
- * Provides methods to manipulate with section blocks
+ * Provides methods to manipulate with section blocks. Holds scroll data tree.
  */
 class ScrollData
 {
@@ -53,6 +53,19 @@ class ScrollData
     public function hasBlock($blockId): bool
     {
         return isset($this->data[self::DATA_BLOCKS][$blockId]);
+    }
+
+    /**
+     * @param string|int $blockId
+     * @return array
+     */
+    public function getBlock($blockId): array
+    {
+        if (!$this->hasBlock($blockId)) {
+            throw new \InvalidArgumentException(sprintf('Block with id "%s" has not been found', $blockId));
+        }
+
+        return $this->data[self::DATA_BLOCKS][$blockId];
     }
 
     /**

@@ -733,4 +733,28 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse($this->scrollData->isEmptyBlock('not_empty_named_block'));
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Block with id "someId" has not been found
+     */
+    public function testGetBlockWhenNoBlockExists()
+    {
+        $this->scrollData->setData([ScrollData::DATA_BLOCKS => []]);
+        $this->scrollData->getBlock('someId');
+    }
+
+    public function testGetBlock()
+    {
+        $block = [
+            ScrollData::TITLE => 'test title',
+            ScrollData::PRIORITY => 25,
+            ScrollData::BLOCK_CLASS => 'active',
+            ScrollData::USE_SUB_BLOCK_DIVIDER => false,
+        ];
+
+        $this->scrollData->setData([ScrollData::DATA_BLOCKS => ['someId' => $block]]);
+
+        $this->assertEquals($block, $this->scrollData->getBlock('someId'));
+    }
 }
