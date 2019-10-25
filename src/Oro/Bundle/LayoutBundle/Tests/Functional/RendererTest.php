@@ -270,6 +270,20 @@ class RendererTest extends LayoutTestCase
             ->add('invisible_by_expr_container', 'root', 'head', ['visible' => '=false'])
             ->add('invisible_by_expr_child', 'invisible_by_expr_container', 'meta', ['charset' => 'invisible_by_expr'])
             // test buttons
+            // test 'visible' option when its value gets from provider
+            ->add(
+                'invisible_by_provider',
+                'root',
+                'head',
+                ['visible' => '=data["test"].getFalse()']
+            )
+            // test that child that has invisible parent stay unprocessed
+            ->add(
+                'invisible_by_provider_child_w_exception',
+                'invisible_by_provider',
+                'head',
+                ['visible' => '=data["test"].getChildWithInvisibleParentException()']
+            )
             ->add(
                 'button',
                 'content',
