@@ -16,28 +16,7 @@ define(function(require) {
              *
              * [Default Breakpoints](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/UIBundle/Resources/public/blank/scss/settings/partials/_breakpoints.scss)
              */
-            screenMap: [
-                {
-                    name: 'desktop',
-                    max: Infinity
-                },
-                {
-                    name: 'tablet',
-                    max: 1099
-                },
-                {
-                    name: 'tablet-small',
-                    max: 992
-                },
-                {
-                    name: 'mobile-landscape',
-                    max: 640
-                },
-                {
-                    name: 'mobile',
-                    max: 414
-                }
-            ]
+            screenMap: []
         },
 
         /**
