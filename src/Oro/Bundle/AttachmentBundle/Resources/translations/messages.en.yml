@@ -63,11 +63,12 @@ oro:
                 description:         The field name where this file is stored of the entity to which this file belongs.
 
         config:
+            file_size_settings.label: File Size Settings
             file_size.label:     File size
             thumb_width.label:   Thumbnail width
             thumb_height.label:  Thumbnail height
             attachment.label:    Upload Settings
-            mime_types.label:    MIME types
+            mime_types.label:    MIME Types
             upload_file_mime_types.label:  File MIME types
             upload_file_mime_types.tooltip: List of MIME file types that are permitted for upload.
             upload_image_mime_types.label: Image MIME types

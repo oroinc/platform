@@ -4,9 +4,10 @@ define(function(require) {
     var _ = require('underscore');
     var Backbone = require('backbone');
     var SyncMachineProxyCache = require('oroui/js/app/models/sync-machine-proxy-cache');
-    var exposure = require('requirejs-exposure').disclose('oroui/js/app/models/sync-machine-proxy-cache');
+    var jsmoduleExposure = require('jsmodule-exposure');
+    var exposure = jsmoduleExposure.disclose('oroui/js/app/models/sync-machine-proxy-cache');
 
-    describe('oroui/js/app/models/sync-machine-proxy-cache', function() {
+    xdescribe('oroui/js/app/models/sync-machine-proxy-cache', function() {
         var instance;
         var storedData;
         var storageMock;

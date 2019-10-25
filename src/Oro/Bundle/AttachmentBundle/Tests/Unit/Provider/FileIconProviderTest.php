@@ -26,10 +26,10 @@ class FileIconProviderTest extends \PHPUnit\Framework\TestCase
         $file = new File();
         $file->setExtension(self::JPEG_EXT);
 
-        self::assertSame(self::JPEG_ICON, $this->provider->getAttachmentIconClass($file));
+        self::assertSame(self::JPEG_ICON, $this->provider->getExtensionIconClass($file));
 
         $file->setExtension('not-existing');
-        self::assertSame(self::DEFAULT_ICON, $this->provider->getAttachmentIconClass($file));
+        self::assertSame(self::DEFAULT_ICON, $this->provider->getExtensionIconClass($file));
     }
 
     public function testGetFileIcons(): void

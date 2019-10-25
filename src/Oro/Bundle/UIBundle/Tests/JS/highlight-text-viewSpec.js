@@ -6,7 +6,7 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var HighlightTextView = require('oroui/js/app/views/highlight-text-view');
     // fixtures
-    var html = require('text!./Fixture/highlight-text-view.html');
+    var html = require('text-loader!./Fixture/highlight-text-view.html');
 
     var createView = function(options) {
         if (createView.view) {

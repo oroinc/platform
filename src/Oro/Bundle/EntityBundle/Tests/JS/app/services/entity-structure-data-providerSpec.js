@@ -4,17 +4,17 @@ define(function(require) {
     var Backbone = require('backbone');
     var $ = require('jquery');
     var _ = require('underscore');
-    var exposure = require('requirejs-exposure');
-    var data = JSON.parse(require('text!../../Fixture/app/services/entitystructure-data.json'));
+    var jsmoduleExposure = require('jsmodule-exposure');
+    var data = require('../../Fixture/app/services/entitystructure-data.json');
     var RegistryMock = require('../../Fixture/app/services/registry/registry-mock');
     var EntityModel = require('oroentity/js/app/models/entity-model');
     var EntityStructuresCollection = require('oroentity/js/app/models/entitystructures-collection');
     var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
 
-    var collectionExposure = exposure.disclose('oroentity/js/app/models/entity-collection');
-    var providerExposure = exposure.disclose('oroentity/js/app/services/entity-structure-data-provider');
+    var collectionExposure = jsmoduleExposure.disclose('oroentity/js/app/models/entity-collection');
+    var providerExposure = jsmoduleExposure.disclose('oroentity/js/app/services/entity-structure-data-provider');
 
-    describe('oroentity/js/app/services/entity-structure-data-provider', function() {
+    xdescribe('oroentity/js/app/services/entity-structure-data-provider', function() {
         var applicant1;
         var applicant2;
         var registryMock;
