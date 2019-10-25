@@ -7,6 +7,8 @@ use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ *
+ * Responsible for building {@see Layout}.
  */
 class LayoutBuilder implements LayoutBuilderInterface
 {
@@ -291,6 +293,15 @@ class LayoutBuilder implements LayoutBuilderInterface
         }
 
         $this->buildValueBags($blockView);
+
+        /** Removes child blocks in case parent block is hidden */
+        if (!$blockView->isVisible()) {
+            foreach ($blockView->children as $key => $childView) {
+                unset($blockView->children[$key]);
+            }
+
+            return;
+        }
 
         foreach ($blockView->children as $key => $childView) {
             $this->processBlockViewData($childView, $context, $data, $deferred, $encoding);
