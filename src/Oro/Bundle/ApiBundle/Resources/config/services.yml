@@ -150,6 +150,9 @@ services:
             - '@oro_api.data_transformer_registry'
             - '@oro_api.entity_serializer.data_transformer'
 
+    oro_api.request_data_accessor:
+        class: Oro\Bundle\ApiBundle\Util\RequestDataAccessor
+
     oro_api.query_resolver:
         class: Oro\Bundle\ApiBundle\Util\AclProtectedQueryResolver
         public: false

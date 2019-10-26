@@ -65,9 +65,12 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
     {
         self::assertNull($this->context->getParentId());
 
-        $this->context->setParentId('test');
-        self::assertEquals('test', $this->context->getParentId());
-        self::assertEquals('test', $this->context->get(SubresourceContext::PARENT_ID));
+        $parentId = 'test';
+        $this->context->setParentId($parentId);
+        self::assertEquals($parentId, $this->context->getParentId());
+
+        $this->context->setParentId(null);
+        self::assertNull($this->context->getParentId());
     }
 
     public function testAssociationName()

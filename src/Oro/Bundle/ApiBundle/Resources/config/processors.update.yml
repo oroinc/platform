@@ -32,13 +32,6 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: 90 }
 
-    oro_api.update.normalize_entity_id:
-        class: Oro\Bundle\ApiBundle\Processor\Update\NormalizeEntityId
-        arguments:
-            - '@oro_api.entity_id_transformer_registry'
-        tags:
-            - { name: oro.api.processor, action: update, group: normalize_input, priority: -110 }
-
     #
     # security_check
     #
