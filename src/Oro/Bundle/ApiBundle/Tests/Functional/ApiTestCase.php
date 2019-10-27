@@ -236,6 +236,22 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
+     * @return string
+     */
+    protected function getRequestDataFolderName()
+    {
+        return 'requests';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getResponseDataFolderName()
+    {
+        return 'responses';
+    }
+
+    /**
      * Loads the response content and convert it to an array.
      *
      * @param string $fileName
@@ -277,7 +293,7 @@ abstract class ApiTestCase extends WebTestCase
     protected function loadResponseData($expectedContent)
     {
         if (is_string($expectedContent)) {
-            $expectedContent = $this->loadYamlData($expectedContent, 'responses');
+            $expectedContent = $this->loadYamlData($expectedContent, $this->getResponseDataFolderName());
         }
 
         return self::processTemplateData($expectedContent);
@@ -293,7 +309,7 @@ abstract class ApiTestCase extends WebTestCase
     protected function getRequestData($request)
     {
         if (is_string($request) && $this->isRelativePath($request)) {
-            $request = $this->getTestResourcePath('requests', $request);
+            $request = $this->getTestResourcePath($this->getRequestDataFolderName(), $request);
         }
 
         return self::processTemplateData($request);

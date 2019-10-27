@@ -24,12 +24,23 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
         $this->processor = new SaveParentEntity($this->doctrineHelper);
     }
 
+    public function testProcessWhenParentEntityAlreadySaved()
+    {
+        $this->doctrineHelper->expects(self::never())
+            ->method('getEntityManager');
+
+        $this->context->setProcessed(SaveParentEntity::OPERATION_NAME);
+        $this->context->setParentEntity(new \stdClass());
+        $this->processor->process($this->context);
+    }
+
     public function testProcessWhenNoParentEntity()
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
 
         $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(SaveParentEntity::OPERATION_NAME));
     }
 
     public function testProcessForNotSupportedParentEntity()
@@ -37,8 +48,9 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
 
-        $this->context->setParentEntity([]);
+        $this->context->setParentEntity(null);
         $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(SaveParentEntity::OPERATION_NAME));
     }
 
     public function testProcessForNotManageableParentEntity()
@@ -52,6 +64,7 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
 
         $this->context->setParentEntity($entity);
         $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(SaveParentEntity::OPERATION_NAME));
     }
 
     public function testProcessForManageableParentEntity()
@@ -71,5 +84,6 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
 
         $this->context->setParentEntity($entity);
         $this->processor->process($this->context);
+        self::assertTrue($this->context->isProcessed(SaveParentEntity::OPERATION_NAME));
     }
 }
