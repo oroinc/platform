@@ -1,3 +1,0 @@
-config:
-    paths:
-        'oronotification/js/app/views/email-notification-form-view': 'bundles/oronotification/js/app/views/email-notification-form-view.js'

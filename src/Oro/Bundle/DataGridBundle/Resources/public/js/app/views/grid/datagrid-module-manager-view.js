@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var DatagridModuleManagerView;
@@ -9,8 +9,7 @@ define(function(require) {
     var DatagridSettingsListFilterView = require('orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-filter-view');
     var DatagridSettingsListCollectionView = require('orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-collection-view');
     var DatagridSettingsListView = require('orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-view');
-    var module = require('module');
-    var config = module.config();
+    var config = require('module-config').default(module.id);
 
     config = _.extend({
         enableFilters: true

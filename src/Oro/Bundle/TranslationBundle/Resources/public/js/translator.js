@@ -1,9 +1,9 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var _ = require('underscore');
-    var Translator = require('translator');
-    var module = require('module');
+    var Translator = require('orotranslation/lib/translator');
+    var config = require('module-config').default(module.id);
 
     window.Translator = Translator; // add global variable for translations JSONP-loader Translator.fromJSON({...})
 
@@ -13,7 +13,6 @@ define(function(require) {
     var trans = Translator.trans;
     var transChoice = Translator.transChoice;
     var fromJSON = Translator.fromJSON;
-    var config = module.config();
 
     Translator.placeHolderPrefix = '{{ ';
     Translator.placeHolderSuffix = ' }}';

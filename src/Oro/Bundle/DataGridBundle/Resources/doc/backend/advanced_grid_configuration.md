@@ -209,7 +209,7 @@ datagrids:
 #### Problem:
 *I'm developing some extension for grid, how can I add my frontend builder (some class that should show my widget) ?*
 #### Solution:
-Any builders could be passed under gridconfig[options][requireJSModules] node. Your builder should have method `init`, it will be called when grid-builder finish building grid.
+Any builders could be passed under gridconfig[options][jsmodules] node. Your builder should have method `init`, it will be called when grid-builder finish building grid.
 
 Example:
 ``` yml
@@ -217,7 +217,7 @@ datagrids:
     acme-demo-grid:
         ... # some configuration
         options:
-            requireJSModules:
+            jsmodules:
               - your/builder/amd/module/name
 ```
 

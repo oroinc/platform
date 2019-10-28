@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var FiltersTogglePlugin;
@@ -7,7 +7,7 @@ define(function(require) {
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
     var ToggleFiltersAction = require('orofilter/js/actions/toggle-filters-action');
 
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
     var launcherOptions = _.extend({
         className: 'btn',
         icon: 'filter',

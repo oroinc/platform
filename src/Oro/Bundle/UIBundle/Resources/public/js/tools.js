@@ -3,6 +3,7 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
+    var loadModules = require('oroui/js/app/services/load-modules');
     var tools = {};
     var iOS = /(iPad|iPhone)/.test(navigator.userAgent);
     var edge = /(Edge\/)/.test(navigator.userAgent);
@@ -274,43 +275,10 @@ define(function(require) {
          * @param {Object=} context
          * @return {JQueryPromise}
          */
-        loadModules: function(modules, callback, context) {
-            var requirements;
-            var processModules;
-
-            if (_.isObject(modules) && !_.isArray(modules)) {
-                // if modules is an object of {formal_name: module_name}
-                requirements = _.values(modules);
-                processModules = function(loadedModules) {
-                    // maps loaded modules into original object
-                    _.each(modules, _.partial(function(map, value, key) {
-                        modules[key] = map[value];
-                    }, _.object(requirements, loadedModules)));
-                    return [modules];
-                };
-            } else {
-                // if modules is an array of module_names or single module_name
-                requirements = !_.isArray(modules) ? [modules] : modules;
-                processModules = function(loadedModules) {
-                    return loadedModules;
-                };
-            }
-
-            var deferred = $.Deferred();
-            require(requirements, _.partial(function(processor) {
-                var modules = processor(_.rest(arguments));
-                if (callback) {
-                    callback.apply(context || null, modules);
-                }
-                deferred.resolve.apply(deferred, modules);
-            }, processModules), function(e) {
-                deferred.reject(e);
-            });
-            return deferred.promise();
-        },
+        loadModules: loadModules,
 
         /**
-         * Loads single module through requireJS and returns promise
+         * Loads single module and returns promise
          *
          * @deprecated
          * @param {string} module name
@@ -321,7 +289,7 @@ define(function(require) {
         },
 
         /**
-         * Loads single module through requireJS and replaces the property
+         * Loads single module and replaces the property
          *
          * @param {Object} container where to replace property
          * @param {string} moduleProperty name to replace module ref to concrete realization

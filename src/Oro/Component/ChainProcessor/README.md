@@ -381,6 +381,16 @@ There is a list of existing applicable checkers that are registered in the proce
 - [SkipGroupApplicableChecker](./SkipGroupApplicableChecker.php) - It allows to skip processors included in some groups. To manage skipped groups  you can use `skipGroup` and `undoGroupSkipping` methods of the context.
 - [MatchApplicableChecker](./MatchApplicableChecker.php) - It allows to filter processors based on data stored in the context.
 
+The [ExpressionParser](./ExpressionParser.php) can be used to parse a string representation of expressions.
+This class and [MatchApplicableChecker](./MatchApplicableChecker.php) support the following operators:
+
+| Operator | Description |
+|----------|-------------|
+| `!` | logical NOT |
+| `&` | logical AND |
+| `|` | logical OR |
+| `exists` | checks if an attribute exists in the execution context |
+
 ## Key Classes
 
 Here is a list of key classes:

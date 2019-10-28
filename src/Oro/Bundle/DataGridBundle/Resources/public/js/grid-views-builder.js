@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var $ = require('jquery');
@@ -9,7 +9,7 @@ define(function(require) {
     var GridViewsCollection = require('orodatagrid/js/datagrid/grid-views/collection');
     var gridGridViewsSelector = '.page-title > .navbar-extra .pull-left-extra > .pull-left';
 
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
     config = _.extend({
         GridViewsView: GridViewsView
     }, config);

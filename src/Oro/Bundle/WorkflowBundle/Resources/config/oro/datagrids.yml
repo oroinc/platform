@@ -293,7 +293,7 @@ datagrids:
         filters: ~
         sorters: ~
         options:
-            requireJSModules:
+            jsmodules:
                 - oroworkflow/js/datagrid/workflow-datagrid-builder
             toolbarOptions:
                 placement:

@@ -19,9 +19,13 @@ placeholders:
                 assets_css:
                     order: 100
         head_script: ~
-        requirejs_config_extend:
+        js_modules_config:
             items:
-                ui_requirejs_config:
+                ui_js_modules_config:
+                    order: 10
+        application:
+            items:
+                assets_js:
                     order: 10
         view_navButtons_after:
             items:
@@ -48,8 +52,10 @@ placeholders:
             template: OroUIBundle:Default:user_dots_menu.html.twig
         add_update_delete:
             template: OroUIBundle:Form:buttons.html.twig
-        ui_requirejs_config:
-            template: OroUIBundle::requirejs.config.js.twig
+        ui_js_modules_config:
+            template: OroUIBundle::js_modules_config.html.twig
+        assets_js:
+            template: OroUIBundle:Assets:oro_js.html.twig
         view_buttons:
             template: OroUIBundle::buttons.html.twig
             applicable: "@oro_ui.widget_provider.view_actions->supports($entity$)"

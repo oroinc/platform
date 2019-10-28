@@ -86,6 +86,19 @@ class Orm extends AbstractEngine
     }
 
     /**
+     * @param Query $query
+     *
+     * @return array
+     * [
+     *  <Entity ClassName> => <Documents Count>
+     * ]
+     */
+    protected function doGetDocumentsCountGroupByEntityFQCN(Query $query): array
+    {
+        return $this->getIndexRepository()->getDocumentsCountGroupByEntityFQCN($query);
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function buildResult(Query $query, array $data)

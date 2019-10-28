@@ -1,16 +1,15 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/app/views/base/view',
-    'module',
-    'oroui/js/tools',
-    'orofilter/js/filter-template',
-    'orofilter/js/filter-hint'
-], function($, _, __, BaseView, module, tools, FilterTemplate, FilterHint) {
+define(function(require, exports, module) {
     'use strict';
 
-    var config = module.config();
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var tools = require('oroui/js/tools');
+    var FilterTemplate = require('orofilter/js/filter-template');
+    var FilterHint = require('orofilter/js/filter-hint');
+    var config = require('module-config').default(module.id);
+
     config = _.extend({
         placeholder: __('All'),
         labelPrefix: ''

@@ -5,11 +5,20 @@ namespace Oro\Bundle\SearchBundle\Provider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
-use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Contains methods that provides statistical data
+ */
 class ResultStatisticsProvider
 {
+    private const EMPTY_RESULT_ROW = [
+        'count' => 0,
+        'class' => '',
+        'icon' => '',
+        'label' => ''
+    ];
+
     /**
      * @var Indexer
      */
@@ -26,25 +35,18 @@ class ResultStatisticsProvider
     protected $translator;
 
     /**
-     * @param Indexer             $indexer
-     * @param ConfigManager       $configManager
+     * @param Indexer $indexer
+     * @param ConfigManager $configManager
      * @param TranslatorInterface $translator
      */
-    public function __construct(Indexer $indexer, ConfigManager $configManager, TranslatorInterface $translator)
-    {
+    public function __construct(
+        Indexer $indexer,
+        ConfigManager $configManager,
+        TranslatorInterface $translator
+    ) {
         $this->indexer = $indexer;
         $this->configManager = $configManager;
         $this->translator = $translator;
-    }
-
-    /**
-     *
-     * @param $query
-     * @return \Oro\Bundle\SearchBundle\Query\Result
-     */
-    public function getResults($query)
-    {
-        return $this->indexer->simpleSearch($query);
     }
 
     /**
@@ -53,64 +55,63 @@ class ResultStatisticsProvider
      * @param string $string
      * @return array
      */
-    public function getGroupedResults($string)
+    public function getGroupedResultsBySearchQuery($string): array
     {
-        $search = $this->getResults($string);
+        $docsCountByEntity = $this->indexer->getDocumentsCountGroupByEntityFQCN($string);
 
         // empty key array contains all data
-        $result = array(
-            '' => array(
-                'count'  => 0,
-                'class'  => '',
-                'config' => array(),
-                'icon'   => '',
-                'label'  => ''
-            )
-        );
+        $result = [
+            '' => self::EMPTY_RESULT_ROW
+        ];
 
-        /** @var $item Item */
-        foreach ($search->getElements() as $item) {
-            $config = $item->getEntityConfig();
-            $alias  = $config['alias'];
+        $totalItemsCount = 0;
+        foreach ($docsCountByEntity as $entityFQCN => $documentCount) {
+            $alias = $this->indexer->getEntityAlias($entityFQCN);
+            $group = array_merge(self::EMPTY_RESULT_ROW, [
+                'count' => (int)$documentCount,
+                'class' => $entityFQCN
+            ]);
 
-            if (!isset($result[$alias])) {
-                $group = array(
-                    'count'  => 0,
-                    'class'  => $item->getEntityName(),
-                    'config' => $config,
-                    'icon'   => '',
-                    'label'  => ''
-                );
+            $this->addEntityInformation($entityFQCN, $group);
+            $result[$alias] = $group;
 
-                if (!empty($group['class']) && $this->configManager->hasConfig($group['class'])) {
-                    $entityConfigId = new EntityConfigId('entity', $group['class']);
-                    $entityConfig = $this->configManager->getConfig($entityConfigId);
-                    if ($entityConfig->has('plural_label')) {
-                        $group['label'] = $this->translator->trans($entityConfig->get('plural_label'));
-                    }
-                    if ($entityConfig->has('icon')) {
-                        $group['icon'] = $entityConfig->get('icon');
-                    }
-                }
-
-                $result[$alias] = $group;
-            }
-
-            $result[$alias]['count']++;
-            $result['']['count']++;
+            $totalItemsCount += (int)$documentCount;
         }
-
-        uasort(
-            $result,
-            function ($first, $second) {
-                if ($first['label'] == $second['label']) {
-                    return 0;
-                }
-
-                return $first['label'] > $second['label'] ? 1 : -1;
-            }
-        );
+        $result['']['count'] += $totalItemsCount;
+        $this->sortResult($result);
 
         return $result;
+    }
+
+    /**
+     * @param string $className
+     * @param array $group
+     */
+    private function addEntityInformation(string $className, array &$group): void
+    {
+        if (!$this->configManager->hasConfig($className)) {
+            return;
+        }
+        $entityConfigId = new EntityConfigId('entity', $className);
+        $entityConfig = $this->configManager->getConfig($entityConfigId);
+        if ($entityConfig->has('plural_label')) {
+            $group['label'] = $this->translator->trans($entityConfig->get('plural_label'));
+        }
+        if ($entityConfig->has('icon')) {
+            $group['icon'] = $entityConfig->get('icon');
+        }
+    }
+
+    /**
+     * @param array $result
+     */
+    private function sortResult(array &$result)
+    {
+        uasort(
+            $result,
+            static function ($first, $second) {
+                return $first['label'] <=> $second['label'];
+            }
+        );
     }
 }

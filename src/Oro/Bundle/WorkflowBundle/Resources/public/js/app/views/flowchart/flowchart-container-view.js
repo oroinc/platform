@@ -10,12 +10,12 @@ define(function(require) {
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
     var BaseView = require('oroui/js/app/views/base/view');
     var ComplexityError = require('oroworkflow/js/tools/path-finder/complexity-error');
-    var errorMessageTemplate = require('tpl!oroworkflow/templates/flowchart/flowchart-error-message.html');
+    var errorMessageTemplate = require('tpl-loader!oroworkflow/templates/flowchart/flowchart-error-message.html');
 
     FlowchartContainerView = BaseView.extend({
         autoRender: true,
 
-        template: require('tpl!oroworkflow/templates/flowchart/flowchart-container.html'),
+        template: require('tpl-loader!oroworkflow/templates/flowchart/flowchart-container.html'),
 
         zoomableDefaults: {
             autozoom: true,

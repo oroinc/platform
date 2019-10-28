@@ -499,7 +499,7 @@ datagrids:
         filters: ~
         sorters: ~
         options:
-            requireJSModules:
+            jsmodules:
                 - orouser/js/datagrid/roles-datagrid-builder
             toolbarOptions:
                 placement:

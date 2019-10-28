@@ -1,0 +1,9 @@
+aliases:
+    jquery.dialog.extended$: orowindows/lib/jquery.dialog.extended
+    oro/dialog-widget$: orowindows/js/widget/dialog-widget
+configs:
+    oro/dialog-widget: {}
+dynamic-imports:
+    commons:
+        - oro/dialog-widget
+        - orowindows/js/dialog/state/model

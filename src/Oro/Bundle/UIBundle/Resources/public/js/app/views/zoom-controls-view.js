@@ -7,7 +7,7 @@ define(function(require) {
 
     ZoomControlsView = BaseView.extend({
         autoRender: true,
-        template: require('tpl!../../../templates/zoom-controls.html'),
+        template: require('tpl-loader!../../../templates/zoom-controls.html'),
 
         events: {
             'click .btn-zoom-in': 'onZoomInClick',

@@ -7,8 +7,8 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var DateTimeFilter = require('oro/filter/datetime-filter');
     var ChoiceFilter = require('oro/filter/choice-filter');
-    var choiceTemplate = require('tpl!orofilter/templates/filter/embedded/simple-choice-filter.html');
-    var template = require('tpl!orodataaudit/templates/audit-filter.html');
+    var choiceTemplate = require('tpl-loader!orofilter/templates/filter/embedded/simple-choice-filter.html');
+    var template = require('tpl-loader!orodataaudit/templates/audit-filter.html');
 
     AuditFilter = DateTimeFilter.extend({
         template: template,

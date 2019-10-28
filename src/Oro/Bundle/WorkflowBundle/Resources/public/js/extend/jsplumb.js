@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     var _ = require('underscore');
-    var jsPlumb = require('jsplumb');
+    var jsPlumb = require('jsplumb').jsPlumb;
     var JsPlumb = jsPlumb.constructor;
     var _each;
     var _gel;

@@ -1,12 +1,12 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var SortingDropdown;
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
     var Select2View = require('oroform/js/app/views/select2-view');
-    var module = require('module');
-    var config = _.defaults(module.config(), {
+    var config = require('module-config').default(module.id);
+    config = _.defaults({}, config, {
         hasSortingOrderButton: true,
         inlineSortingLabel: false, // Draws inline label for sorter if soring order button (previous option) is not enabled
         disableNotSelectedOption: false,
@@ -29,7 +29,7 @@ define(function(require) {
         DIRECTIONS: ['ascending', 'descending'],
 
         /** @property */
-        template: require('tpl!orodatagrid/templates/datagrid/sorting-dropdown.html'),
+        template: require('tpl-loader!orodatagrid/templates/datagrid/sorting-dropdown.html'),
 
         /** @property */
         events: {

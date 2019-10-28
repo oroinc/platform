@@ -10,7 +10,7 @@ define(function(require) {
 
         className: 'action-permissions__item dropdown',
 
-        template: require('tpl!orouser/templates/datagrid/permission/permission-readonly-view.html'),
+        template: require('tpl-loader!orouser/templates/datagrid/permission/permission-readonly-view.html'),
 
         /**
          * @inheritDoc

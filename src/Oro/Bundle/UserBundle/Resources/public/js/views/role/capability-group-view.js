@@ -14,7 +14,7 @@ define(function(require) {
 
         className: 'role-capability',
 
-        template: require('tpl!orouser/templates/role/capability-group.html'),
+        template: require('tpl-loader!orouser/templates/role/capability-group.html'),
 
         listSelector: '[data-name="capability-items"]',
 

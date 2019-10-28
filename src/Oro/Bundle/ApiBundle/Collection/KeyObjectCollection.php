@@ -60,9 +60,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
 
         if (isset($this->objects[$key])) {
             $hash = spl_object_hash($this->objects[$key]);
-            unset($this->objects[$key]);
-            unset($this->keys[$hash]);
-            unset($this->data[$hash]);
+            unset($this->objects[$key], $this->keys[$hash], $this->data[$hash]);
         }
     }
 
@@ -80,9 +78,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
         $hash = spl_object_hash($object);
         if (isset($this->keys[$hash])) {
             $key = $this->keys[$hash];
-            unset($this->objects[$key]);
-            unset($this->keys[$hash]);
-            unset($this->data[$hash]);
+            unset($this->objects[$key], $this->keys[$hash], $this->data[$hash]);
         }
     }
 
@@ -161,9 +157,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
     {
         $this->assertKey($key);
 
-        return isset($this->objects[$key])
-            ? $this->objects[$key]
-            : null;
+        return $this->objects[$key] ?? null;
     }
 
     /**
@@ -179,11 +173,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
     {
         $this->assertObject($object);
 
-        $hash = spl_object_hash($object);
-
-        return isset($this->keys[$hash])
-            ? $this->keys[$hash]
-            : null;
+        return $this->keys[spl_object_hash($object)] ?? null;
     }
 
     /**
@@ -199,11 +189,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
     {
         $this->assertObject($object);
 
-        $hash = spl_object_hash($object);
-
-        return isset($this->data[$hash])
-            ? $this->data[$hash]
-            : null;
+        return $this->data[spl_object_hash($object)] ?? null;
     }
 
     /**
@@ -236,7 +222,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
                 sprintf('Expected $key argument of type "scalar", "%s" given.', $this->getValueType($key))
             );
         }
-        if (is_string($key) && '' === trim($key)) {
+        if (\is_string($key) && '' === trim($key)) {
             throw new \InvalidArgumentException('The $key argument should not be a blank string.');
         }
     }
@@ -246,7 +232,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
      */
     private function assertObject($object)
     {
-        if (!is_object($object)) {
+        if (!\is_object($object)) {
             throw new \InvalidArgumentException(
                 sprintf('Expected $object argument of type "object", "%s" given.', $this->getValueType($object))
             );
@@ -260,8 +246,8 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
      */
     private function getValueType($value)
     {
-        return is_object($value)
-            ? get_class($value)
+        return \is_object($value)
+            ? \get_class($value)
             : gettype($value);
     }
 }

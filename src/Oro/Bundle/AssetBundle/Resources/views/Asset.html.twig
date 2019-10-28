@@ -5,3 +5,13 @@
         <link rel="stylesheet" {{ extra_attributes|raw }} href="{{ asset(src) }}"/>
     {% endif %}
 {% endmacro %}
+
+{% macro js(src) %}
+    <script type="text/javascript" src="{{ asset(src) }}"></script>
+{% endmacro %}
+
+{% macro js_modules_config(config) %}
+    <script data-role="config" type="application/json">
+        {{ config|json_encode|raw }}
+    </script>
+{% endmacro %}

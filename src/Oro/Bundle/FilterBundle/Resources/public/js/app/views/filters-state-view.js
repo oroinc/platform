@@ -11,9 +11,9 @@ define(function(require) {
 
         filters: [],
 
-        template: require('tpl!../../../templates/filters-state-view.html'),
+        template: require('tpl-loader!orofilter/templates/filters-state-view.html'),
 
-        popoverTemplate: require('tpl!../../../templates/filters-state-popover.html'),
+        popoverTemplate: require('tpl-loader!orofilter/templates/filters-state-popover.html'),
 
         events: {
             'click .filters-state': 'onClick',

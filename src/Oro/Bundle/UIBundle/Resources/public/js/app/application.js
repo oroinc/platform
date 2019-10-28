@@ -8,7 +8,6 @@ define(function(require) {
     var tools = require('oroui/js/tools');
     var BaseController = require('oroui/js/app/controllers/base/controller');
     var PageLayoutView = require('oroui/js/app/views/page-layout-view');
-    var readyStateTracker = require('oroui/js/app/ready-state-tracker');
 
     Application = Chaplin.Application.extend({
         initialize: function(options) {
@@ -37,10 +36,6 @@ define(function(require) {
                 this.router.changeURL(null, null, route, options);
                 mediator.trigger('route:change');
             }, this);
-
-            mediator.once('dispatcher:dispatch', function() {
-                readyStateTracker.markReady('app');
-            });
         },
 
         /**

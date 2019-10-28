@@ -176,6 +176,18 @@ DESCRIPTION
                 'Reinstall npm dependencies to vendor/oro/platform/build folder, to be used by webpack.'.
                 'Required when "node_modules" folder is corrupted.'
             )
+            ->addOption(
+                'skip-css',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip build of CSS assets.'
+            )
+            ->addOption(
+                'skip-js',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip build of JS assets.'
+            )
             ->addUsage('admin.oro --watch')
             ->addUsage('blank -w')
             ->addUsage('blank --hot')
@@ -234,14 +246,19 @@ DESCRIPTION
         }
         $this->handleSignals($process);
 
+        $io = new SymfonyStyle($input, $output);
         $process->run(
-            function ($type, $buffer) use ($output) {
-                $output->write($buffer);
+            function ($type, $buffer) use ($io) {
+                if ($type === Process::ERR) {
+                    $io->error($buffer);
+                } else {
+                    $io->write($buffer);
+                }
             }
         );
 
         if (!$process->isSuccessful()) {
-            throw new \RuntimeException($process->getErrorOutput());
+            throw new \RuntimeException('Build failed.');
         }
     }
 
@@ -256,12 +273,7 @@ DESCRIPTION
             $command[] = self::BUILD_DIR.'node_modules/webpack-dev-server/bin/webpack-dev-server.js';
             $command[] = '--hot';
 
-            foreach (['key', 'cert', 'cacert', 'pfx', 'pfxPassphrase'] as $optionName) {
-                $optionValue = $input->getOption($optionName);
-                if ($optionValue) {
-                    $command[] = "--{$optionName}={$optionValue}";
-                }
-            }
+            $this->mapSslOptions($input, $command);
         } else {
             $command[] = self::BUILD_DIR.'/node_modules/webpack/bin/webpack.js';
             $command[] = '--hide-modules';
@@ -288,7 +300,28 @@ DESCRIPTION
         $command[] = '--env.symfony='.$input->getOption('env');
         $command[] = '--colors';
 
+        if ($input->getOption('skip-css')) {
+            $command[] = '--env.skipCSS=true';
+        }
+        if ($input->getOption('skip-js')) {
+            $command[] = '--env.skipJS=true';
+        }
+
         return $command;
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param array          $command
+     */
+    protected function mapSslOptions(InputInterface $input, array &$command): void
+    {
+        foreach (['key', 'cert', 'cacert', 'pfx', 'pfxPassphrase'] as $optionName) {
+            $optionValue = $input->getOption($optionName);
+            if ($optionValue) {
+                $command[] = "--{$optionName}={$optionValue}";
+            }
+        }
     }
 
     /**

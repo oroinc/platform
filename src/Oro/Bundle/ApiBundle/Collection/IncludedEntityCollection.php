@@ -180,7 +180,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
      *
      * @param object $object
      *
-     * @return IncludedEntityData
+     * @return IncludedEntityData|null
      */
     public function getData($object)
     {
@@ -198,7 +198,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     {
         $key = $this->collection->getKey($object);
 
-        return null !== $key && array_key_exists($key, $this->keys)
+        return null !== $key && \array_key_exists($key, $this->keys)
             ? $this->keys[$key][0]
             : null;
     }
@@ -214,9 +214,19 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     {
         $key = $this->collection->getKey($object);
 
-        return null !== $key && array_key_exists($key, $this->keys)
+        return null !== $key && \array_key_exists($key, $this->keys)
             ? $this->keys[$key][1]
             : null;
+    }
+
+    /**
+     * Gets all entities from the collection.
+     *
+     * @return object[]
+     */
+    public function getAll()
+    {
+        return array_values($this->collection->getAll());
     }
 
     /**

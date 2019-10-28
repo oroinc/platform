@@ -6,7 +6,7 @@ define(function(require) {
 
     HistoryNavigationView = BaseView.extend({
         autoRender: true,
-        template: require('tpl!oroui/templates/history.html'),
+        template: require('tpl-loader!oroui/templates/history.html'),
         events: {
             'click .undo-btn': 'onUndo',
             'click .redo-btn': 'onRedo'

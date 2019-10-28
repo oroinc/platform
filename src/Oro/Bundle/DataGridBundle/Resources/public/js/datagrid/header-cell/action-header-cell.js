@@ -5,7 +5,7 @@ define(function(require) {
     var Backgrid = require('backgrid');
     var ActionsPanel = require('../actions-panel');
     var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl!orodatagrid/templates/datagrid/action-header-cell.html');
+    var template = require('tpl-loader!orodatagrid/templates/datagrid/action-header-cell.html');
 
     /**
      *

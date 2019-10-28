@@ -18,7 +18,7 @@ class OroDataAuditBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v2_6';
+        return 'v2_7';
     }
 
     /**
@@ -42,7 +42,7 @@ class OroDataAuditBundleInstaller implements Installation
         $auditTable->addColumn('user_id', 'integer', ['notnull' => false]);
         $auditTable->addColumn('action', 'string', ['length' => 8, 'notnull' => false]);
         $auditTable->addColumn('logged_at', 'datetime', ['notnull' => false]);
-        $auditTable->addColumn('object_id', 'integer', ['notnull' => false]);
+        $auditTable->addColumn('object_id', 'string', ['length' => 255, 'notnull' => false]);
         $auditTable->addColumn('object_class', 'string', ['length' => 255]);
         $auditTable->addColumn(
             'object_name',

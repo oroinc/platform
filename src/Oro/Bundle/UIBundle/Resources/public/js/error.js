@@ -1,14 +1,14 @@
-define([
-    'module',
-    'routing',
-    'oroui/js/mediator',
-    'oroui/js/tools',
-    'oroui/js/modal',
-    'underscore'
-], function(module, routing, mediator, tools, Modal, _) {
+define(function(require, exports, module) {
     'use strict';
 
-    var defaults = _.defaults(module.config(), {
+    var routing = require('routing');
+    var mediator = require('oroui/js/mediator');
+    var tools = require('oroui/js/tools');
+    var Modal = require('oroui/js/modal');
+    var _ = require('underscore');
+    var config = require('module-config').default(module.id);
+
+    var defaults = _.defaults(config, {
         headerServerError: _.__('Server error'),
         headerUserError: _.__('User input error'),
         message: _.__('oro.ui.error.performing'),

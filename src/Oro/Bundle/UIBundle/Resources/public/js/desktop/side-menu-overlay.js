@@ -6,7 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
     var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl!oroui/templates/side-menu-overlay.html');
+    var template = require('tpl-loader!oroui/templates/side-menu-overlay.html');
 
     var ESCAPE_KEY_CODE = 27;
 

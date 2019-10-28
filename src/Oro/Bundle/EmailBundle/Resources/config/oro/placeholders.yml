@@ -8,9 +8,9 @@ placeholders:
             items:
                 email_filter_templates:
                     order: 5
-        requirejs_config_extend:
+        js_modules_config:
             items:
-                email_requirejs_config:
+                email_js_modules_config:
                     order: 100
         email_actions:
             items:
@@ -29,8 +29,8 @@ placeholders:
             applicable: "@oro_user.placeholder.filter->isUserApplicable()"
         email_filter_templates:
             template: OroEmailBundle:Js:default_templates.js.twig
-        email_requirejs_config:
-            template: OroEmailBundle::requirejs.config.js.twig
+        email_js_modules_config:
+            template: OroEmailBundle::js_modules_config.html.twig
             applicable: "@oro_user.placeholder.filter->isUserApplicable()"
         oro_email_action_send_email_button:
             applicable: "@oro_email.placeholder.send_email.filter->isApplicable($entity$)"

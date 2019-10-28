@@ -28,12 +28,12 @@ class ConfigHelper
     /**
      * @return array
      */
-    public function getExtendRequireJsModules()
+    public function getExtendJsModules()
     {
         return $this->configManager
             ->getProvider('extend')
             ->getPropertyConfig()
-            ->getRequireJsModules();
+            ->getJsModules();
     }
 
     /**

@@ -1,15 +1,15 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var ChangeOrganizationComponent;
-    var module = require('module');
+    var config = require('module-config').default(module.id);
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var routing = require('routing');
     var toolsRouting = require('oronavigation/js/tools/routing');
-    var modalContentTemplate = require('tpl!orosecurity/templates/organization-modal-content.html');
+    var modalContentTemplate = require('tpl-loader!orosecurity/templates/organization-modal-content.html');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var Modal = require('oroui/js/modal');
     var interWindowMediator = require('oroui/js/app/services/inter-window-mediator');
@@ -66,7 +66,7 @@ define(function(require) {
          */
         initialize: function(options) {
             var names = _.keys(defaults);
-            _.extend(this, defaults, _.pick(module.config(), names),
+            _.extend(this, defaults, _.pick(config, names),
                 _.pick(options, names), _.pick(options, 'currentOrganizationId'));
 
             ChangeOrganizationComponent.__super__.initialize.call(this, options);

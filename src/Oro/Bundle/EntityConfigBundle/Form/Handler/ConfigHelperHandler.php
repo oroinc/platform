@@ -158,7 +158,7 @@ class ConfigHelperHandler
             'field' => $fieldConfigModel,
             'form' => $form->createView(),
             'formAction' => $formAction,
-            'require_js' => $this->configHelper->getExtendRequireJsModules()
+            'jsmodules' => $this->configHelper->getExtendJsModules()
         ];
     }
 

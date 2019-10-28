@@ -1,0 +1,3 @@
+css:
+    inputs:
+        - 'bundles/orodigitalasset/css/scss/main.scss'

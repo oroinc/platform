@@ -6,7 +6,7 @@ define(function(require) {
     var DialogWidget = require('oro/dialog-widget');
     var $ = require('jquery');
 
-    var content = require('text!./Fixture/dialog-widget-content.html');
+    var content = require('text-loader!./Fixture/dialog-widget-content.html');
 
     describe('oro/dialog-widget', function() {
         describe('check focus on dialog content', function() {

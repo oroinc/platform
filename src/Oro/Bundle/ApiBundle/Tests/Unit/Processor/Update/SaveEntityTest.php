@@ -24,12 +24,23 @@ class SaveEntityTest extends FormProcessorTestCase
         $this->processor = new SaveEntity($this->doctrineHelper);
     }
 
+    public function testProcessWhenEntityAlreadySaved()
+    {
+        $this->doctrineHelper->expects(self::never())
+            ->method('getEntityManager');
+
+        $this->context->setProcessed(SaveEntity::OPERATION_NAME);
+        $this->context->setResult(new \stdClass());
+        $this->processor->process($this->context);
+    }
+
     public function testProcessWhenNoEntity()
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
 
         $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
     public function testProcessForNotSupportedEntity()
@@ -39,6 +50,7 @@ class SaveEntityTest extends FormProcessorTestCase
 
         $this->context->setResult([]);
         $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
     public function testProcessForNotManageableEntity()
@@ -52,6 +64,7 @@ class SaveEntityTest extends FormProcessorTestCase
 
         $this->context->setResult($entity);
         $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
     public function testProcessForManageableEntity()
@@ -71,5 +84,6 @@ class SaveEntityTest extends FormProcessorTestCase
 
         $this->context->setResult($entity);
         $this->processor->process($this->context);
+        self::assertTrue($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 }

@@ -1,12 +1,12 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var _ = require('underscore');
     var $ = require('jquery');
     var mediator = require('oroui/js/mediator');
     var cssVars = require('css-vars-ponyfill');
-    var module = require('module');
-    var config = _.defaults(module.config(), {
+    var config = require('module-config').default(module.id);
+    config = _.defaults({}, config, {
         onlyLegacy: false,
         preserveStatic: false,
         updateDOM: false,
@@ -81,6 +81,7 @@ define(function(require) {
 
             if (content === 'none') {
                 mediator.trigger('css:breakpoints:fetched', breakpoint);
+                defer.resolve(breakpoint);
                 return;
             }
 

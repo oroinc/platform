@@ -171,6 +171,18 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->collection->contains($entityClass, $entityId));
     }
 
+    public function testShouldBePossibleToGetAllEntities()
+    {
+        $entity = new \stdClass();
+        $entityClass = 'Test\Class';
+        $entityId = 'testId';
+        $this->collection->add($entity, $entityClass, $entityId, $this->entityData);
+        $entities = $this->collection->getAll();
+        self::assertIsArray($entities);
+        self::assertCount(1, $entities);
+        self::assertSame($entity, $entities[0]);
+    }
+
     public function testShouldBeIterable()
     {
         $entity = new \stdClass();

@@ -63,8 +63,8 @@ class ThemeProvider
     public function getStylesOutput($themeName, $sectionName = 'styles')
     {
         $assets = $this->getTheme($themeName)->getConfigByKey('assets');
-        if ($assets && array_key_exists($sectionName, $assets)) {
-            return array_key_exists('output', $assets[$sectionName]) ? $assets[$sectionName]['output'] : null;
+        if ($assets && array_key_exists($sectionName, $assets) && array_key_exists('output', $assets[$sectionName])) {
+            return sprintf('layout-build/%s/%s', $themeName, $assets[$sectionName]['output']);
         }
 
         $parentTheme = $this->getTheme($themeName)->getParentTheme();

@@ -50,10 +50,10 @@ Detailed information on the mass action extension is available in the [Mass acti
 
 Detailed information on toolbars is available in the [toolbarExtension](./extensions/toolbar.md) and [pagerExtension](./extensions/pager.md) topics.
 
-### requireJSModules
+### jsmodules
 
 ```yaml
-requireJSModules:
+jsmodules:
   - your/builder/amd/module/name
 ```
 

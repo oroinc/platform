@@ -1,5 +1,5 @@
 define([
-    'tpl!orodatagrid/templates/datagrid/page-size.html',
+    'tpl-loader!orodatagrid/templates/datagrid/page-size.html',
     'jquery',
     'underscore',
     'backbone'

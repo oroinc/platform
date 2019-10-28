@@ -2,8 +2,13 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Provider\ResultStatisticsProvider;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ResultStatisticsProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -13,169 +18,223 @@ class ResultStatisticsProviderTest extends \PHPUnit\Framework\TestCase
     protected $target;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject|Indexer
      */
     protected $indexer;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager
      */
     protected $configManager;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
      */
     protected $translator;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * {@inheritdoc}
      */
-    protected $search;
-
     protected function setUp()
     {
-        $this->indexer = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->indexer = $this->createMock(Indexer::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
-        $this->search = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->indexer->expects($this->any())
-            ->method('simpleSearch')
-            ->will($this->returnValue($this->search));
-
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configManager->expects($this->any())->method('hasConfig')->will($this->returnValue(true));
-
-        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translator
+            ->method('trans')
+            ->willReturnCallback(function ($string) {
+                return $string . ' TRANS';
+            });
 
         $this->target = new ResultStatisticsProvider($this->indexer, $this->configManager, $this->translator);
     }
 
-    public function testGetResults()
+    public function testGetGroupedResultsWithNoDocumentsFound()
     {
-        $query = 'test query';
-        $this->indexer->expects($this->once())->method('simpleSearch')->with($query);
-        $this->target->getResults($query);
-    }
+        $searchString = 'product';
 
-    public function testGetGroupedResults()
-    {
-        $expectedString = 'expected';
+        $this->indexer
+            ->expects($this->once())
+            ->method('getDocumentsCountGroupByEntityFQCN')
+            ->with($searchString)
+            ->willReturn([]);
 
-        $firstClass = 'firstClass';
-        $firstConfig = array('alias' => $firstClass);
-        $firstLabel = 'first label';
-        $firstIcon = 'first icon';
-
-        $firstConfigEntity = $this->getConfigEntity($firstLabel, $firstIcon);
-        $first = $this->getSearchResultEntity($firstConfig, $firstClass);
-
-        $secondClass = 'secondClass';
-        $secondConfig = array('alias' => $secondClass);
-        $secondLabel = 'second label';
-        $secondIcon = 'second icon';
-        $second = $this->getSearchResultEntity($secondConfig, $secondClass);
-        $secondConfigEntity = $this->getConfigEntity($secondLabel, $secondIcon);
-        $map = array($firstClass => $firstConfigEntity, $secondClass => $secondConfigEntity);
-        $this->configManager
-            ->expects($this->exactly(2))
-            ->method('getConfig')
-            ->will(
-                $this->returnCallback(
-                    function (EntityConfigId $entityConfigId) use ($map) {
-                        return $map[$entityConfigId->getClassName()];
-                    }
-                )
-            );
-
-        $elements = array($second, $first, $first);
-
-
-        $expected = array(
-            ''           => array(
-                'count'  => 3,
+        $expectedResult = [
+            '' => [
+                'count'  => 0,
                 'class'  => '',
-                'config' => array(),
-                'label'  => '',
-                'icon'   => ''
-            ),
-            $firstClass  => array(
-                'count'  => 2,
-                'class'  => $firstClass,
-                'config' => $firstConfig,
-                'label'  => $firstLabel,
-                'icon'   => $firstIcon
-            ),
-            $secondClass => array(
-                'count'  => 1,
-                'class'  => $secondClass,
-                'config' => $secondConfig,
-                'label'  => $secondLabel,
-                'icon'   => $secondIcon
-            )
-        );
+                'icon'   => '',
+                'label'  => ''
+            ]
+        ];
 
-        $this->search->expects($this->once())
-            ->method('getElements')
-            ->will($this->returnValue($elements));
+        $result = $this->target->getGroupedResultsBySearchQuery($searchString);
 
-        $this->translator->expects($this->exactly(2))
-            ->method('trans')
-            ->will($this->returnArgument(0));
-        $actual = $this->target->getGroupedResults($expectedString);
-
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expectedResult, $result);
     }
 
     /**
-     * @param array $config
-     * @param string $class
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @dataProvider getGroupedResultsBySearchQueryProvider
+     *
+     * @param array $documentsCountToClassName
+     * @param array $entityAliasMaps
+     * @param array $entityConfigMaps
+     * @param array $expectedResult
      */
-    protected function getSearchResultEntity(array $config, $class)
-    {
-        $entity = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result\Item')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entity->expects($this->any())
-            ->method('getEntityConfig')
-            ->will($this->returnValue($config));
-        $entity->expects($this->any())
-            ->method('getEntityName')
-            ->will($this->returnValue($class));
+    public function testGetGroupedResultsBySearchQuery(
+        array $documentsCountToClassName,
+        array $entityAliasMaps,
+        array $entityConfigMaps,
+        array $expectedResult
+    ) {
+        $searchString = 'product';
 
-        return $entity;
+        $this->indexer
+            ->expects($this->once())
+            ->method('getDocumentsCountGroupByEntityFQCN')
+            ->with($searchString)
+            ->willReturn($documentsCountToClassName);
+
+        $this->indexer
+            ->expects($this->exactly(count($documentsCountToClassName)))
+            ->method('getEntityAlias')
+            ->willReturnCallback(function ($entityFQCN) use ($entityAliasMaps) {
+                return $entityAliasMaps[$entityFQCN];
+            });
+
+        $this->configManager
+            ->expects($this->exactly(count($documentsCountToClassName)))
+            ->method('hasConfig')
+            ->willReturnCallback(function ($entityFQCN) use ($entityConfigMaps) {
+                return isset($entityConfigMaps[$entityFQCN]);
+            });
+
+        $this->configManager
+            ->expects($this->exactly(count($entityConfigMaps)))
+            ->method('getConfig')
+            ->willReturnCallback(function (EntityConfigId $configId) use ($entityConfigMaps) {
+                return $entityConfigMaps[$configId->getClassName()];
+            });
+
+        $result = $this->target->getGroupedResultsBySearchQuery($searchString);
+
+        $this->assertEquals($expectedResult, $result);
     }
 
     /**
-     * @param string $label
-     * @param string $icon
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return array
      */
-    protected function getConfigEntity($label, $icon)
+    public function getGroupedResultsBySearchQueryProvider()
     {
-        $configEntity = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $configEntity->expects($this->exactly(2))
-            ->method('has')
-            ->will($this->returnValue(true));
-        $configEntity->expects($this->exactly(2))
-            ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array('plural_label', false, null, $label),
-                        array('icon', false, null, $icon)
-                    )
-                )
-            );
-        return $configEntity;
+        return [
+            'General flow' => [
+                'documentsCountToClassName' => [
+                    'first class' => 3,
+                    'second class' => 5,
+                    'third class' => 6
+                ],
+                'entityAliasMaps' => [
+                    'first class' => 'f_c',
+                    'second class' => 's_c',
+                    'third class' => 't_c'
+                ],
+                'entityConfigMaps' => [
+                    'first class' => $this->getConfigEntity('first class', 'f_c label', 'f_c icon'),
+                    'second class' => $this->getConfigEntity('second class', 's_c label', 's_c icon'),
+                    'third class' => $this->getConfigEntity('third class', 't_c label', 't_c icon')
+                ],
+                'expectedResult' => [
+                    '' => [
+                        'count'  => 14,
+                        'class'  => '',
+                        'icon'   => '',
+                        'label'  => ''
+                    ],
+                    'f_c' => [
+                        'count'  => 3,
+                        'class'  => 'first class',
+                        'icon'   => 'f_c icon',
+                        'label'  => 'f_c label TRANS'
+                    ],
+                    's_c' => [
+                        'count'  => 5,
+                        'class'  => 'second class',
+                        'icon'   => 's_c icon',
+                        'label'  => 's_c label TRANS'
+                    ],
+                    't_c' => [
+                        'count'  => 6,
+                        'class'  => 'third class',
+                        'icon'   => 't_c icon',
+                        'label'  => 't_c label TRANS'
+                    ],
+                ]
+            ],
+            'One class without config flow' => [
+                'documentsCountToClassName' => [
+                    'first class' => 3,
+                    'second class' => 5,
+                    'third class' => 6
+                ],
+                'entityAliasMaps' => [
+                    'first class' => 'f_c',
+                    'second class' => 's_c',
+                    'third class' => 't_c'
+                ],
+                'entityConfigMaps' => [
+                    'first class' => $this->getConfigEntity('first class', 'f_c label'),
+                    'second class' => $this->getConfigEntity('second class', null, 's_c icon'),
+                ],
+                'expectedResult' => [
+                    '' => [
+                        'count'  => 14,
+                        'class'  => '',
+                        'icon'   => '',
+                        'label'  => ''
+                    ],
+                    'f_c' => [
+                        'count'  => 3,
+                        'class'  => 'first class',
+                        'icon'   => '',
+                        'label'  => 'f_c label TRANS'
+                    ],
+                    's_c' => [
+                        'count'  => 5,
+                        'class'  => 'second class',
+                        'icon'   => 's_c icon',
+                        'label'  => ''
+                    ],
+                    't_c' => [
+                        'count'  => 6,
+                        'class'  => 'third class',
+                        'icon'   => '',
+                        'label'  => ''
+                    ],
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @param string      $fqcn
+     * @param string|null $label
+     * @param string|null $icon
+     *
+     * @return ConfigInterface
+     */
+    protected function getConfigEntity(string $fqcn, string $label = null, string $icon = null): ConfigInterface
+    {
+        $values = [];
+        if ($label) {
+            $values['plural_label'] = $label;
+        }
+
+        if ($icon) {
+            $values['icon'] = $icon;
+        }
+
+        $entityConfigId = new EntityConfigId('entity', $fqcn);
+        return new Config($entityConfigId, $values);
     }
 }

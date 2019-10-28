@@ -1,15 +1,13 @@
-define([
-    'module',
-    'backbone',
-    'underscore',
-    'routing',
-    'orotranslation/js/translator',
-    'oroui/js/mediator'
-], function(module, Backbone, _, routing, __, mediator) {
+define(function(require, exports, module) {
     'use strict';
 
     var GridViewsModel;
-    var config = module.config();
+    var Backbone = require('backbone');
+    var _ = require('underscore');
+    var routing = require('routing');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var config = require('module-config').default(module.id);
 
     config = _.extend({
         route: 'oro_datagrid_api_rest_gridview_post'

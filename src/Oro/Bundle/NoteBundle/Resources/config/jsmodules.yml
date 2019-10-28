@@ -1,0 +1,4 @@
+dynamic-imports:
+    oronote:
+        - oronote/js/app/components/note-context-component
+        - oronote/js/app/components/notes-component

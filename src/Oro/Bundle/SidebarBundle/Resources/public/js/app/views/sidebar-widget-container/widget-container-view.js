@@ -9,7 +9,7 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
 
     WidgetContainerView = BaseView.extend({
-        template: require('tpl!orosidebar/templates/sidebar-widget-container/widget-container.html'),
+        template: require('tpl-loader!orosidebar/templates/sidebar-widget-container/widget-container.html'),
 
         className: function() {
             var classes = ['sidebar-widget', this.model.get('cssClass')];

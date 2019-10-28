@@ -1,10 +1,12 @@
-define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
-], function(Wamp, Backbone, requirejsExposure) {
+define(function(require) {
     'use strict';
 
-    var exposure = requirejsExposure.disclose('orosync/js/sync/wamp');
+    var Wamp = require('orosync/js/sync/wamp');
+    var Backbone = require('backbone');
+    var jsmoduleExposure = require('jsmodule-exposure');
+    var exposure = jsmoduleExposure.disclose('orosync/js/sync/wamp');
 
-    describe('orosync/js/sync/wamp', function() {
+    xdescribe('orosync/js/sync/wamp', function() {
         var ab;
         var $;
         var session;

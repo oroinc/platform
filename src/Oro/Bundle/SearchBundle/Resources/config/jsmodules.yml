@@ -1,0 +1,4 @@
+dynamic-imports:
+    orosearch:
+        - orosearch/js/app/views/search-suggestion-view
+        - orosearch/js/filter/search-boolean-filter

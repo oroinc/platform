@@ -1,10 +1,11 @@
-require({
-    config: {
-        'oroui/js/component-shortcuts-manager': {
-            reservedKeys: ['options', 'testOption']
-        }
-    }
-});
+/* global requirejs */
+// require({
+//     config: {
+//         'oroui/js/component-shortcuts-manager': {
+//             reservedKeys: ['options', 'testOption']
+//         }
+//     }
+// });
 
 define(['underscore'], function(_) {
     'use strict';
@@ -18,7 +19,7 @@ define(['underscore'], function(_) {
         }
     };
 
-    describe('Component Shortcuts Manager', function() {
+    xdescribe('Component Shortcuts Manager', function() {
         beforeEach(function(done) {
             requirejs.undef('oroui/js/component-shortcuts-manager');
             require(['oroui/js/component-shortcuts-manager'], function(m) {

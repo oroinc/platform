@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Api\Processor;
 
 use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -27,7 +27,7 @@ class DisableUserByDefault implements ProcessorInterface
         );
 
         if (null !== $enabledFormField && !$enabledFormField->isSubmitted()) {
-            /** @var User $user */
+            /** @var AbstractUser $user */
             $user = $context->getData();
             $user->setEnabled(false);
         }

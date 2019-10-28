@@ -6,9 +6,8 @@
             </div>
         {% endfor %}
     </div>
-
     <script type="text/javascript">
-        require(['jquery', 'oro/dialog-widget', 'orowindows/js/dialog/state/model', 'ready!app'],
+        loadModules(['jquery', 'oro/dialog-widget', 'orowindows/js/dialog/state/model'],
         function($, DialogWidget, StateModel) {
             $(function(){
                 {% for windowState in windowStates if windowState.renderedSuccessfully %}

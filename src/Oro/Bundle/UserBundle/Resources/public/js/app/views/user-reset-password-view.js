@@ -20,9 +20,9 @@ define(function(require) {
             passwordMinLength: 1
         },
 
-        passwordShowHideTemplate: require('tpl!orouser/templates/user-reset-password-show-hide.html'),
+        passwordShowHideTemplate: require('tpl-loader!orouser/templates/user-reset-password-show-hide.html'),
 
-        passwordSuggestionTemplate: require('tpl!orouser/templates/user-reset-password-suggestion.html'),
+        passwordSuggestionTemplate: require('tpl-loader!orouser/templates/user-reset-password-suggestion.html'),
 
         charsets: {
             lower_case: 'abcdefghijklmnopqrstuvwxyz',

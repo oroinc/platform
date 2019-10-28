@@ -20,7 +20,7 @@ define(function(require) {
             'availableWidgets'
         ]),
 
-        template: require('tpl!orosidebar/templates/sidebar.html'),
+        template: require('tpl-loader!orosidebar/templates/sidebar.html'),
 
         itemView: require('orosidebar/js/app/views/sidebar-widget-container/widget-container-view'),
 

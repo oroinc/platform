@@ -122,7 +122,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
         $initialTotalsData = $metadata->offsetGet('initialState');
         $this->assertEquals($totalsData, $initialTotalsData);
         $this->assertEquals($this->config->offsetGetByPath(Configuration::TOTALS_PATH), $totalsData['totals']);
-        $this->assertEquals('orodatagrid/js/totals-builder', $metadata->offsetGet('requireJSModules')[0]);
+        $this->assertEquals('orodatagrid/js/totals-builder', $metadata->offsetGet('jsmodules')[0]);
     }
 
     public function testGetPriority()

@@ -2,11 +2,11 @@ define(function(require) {
     'use strict';
 
     var tools = require('oroui/js/tools');
-    var requirejsExposure = require('requirejs-exposure');
-    var exposure = requirejsExposure.disclose('oroui/js/tools');
+    var jsmoduleExposure = require('jsmodule-exposure');
+    var exposure = jsmoduleExposure.disclose('oroui/js/tools');
     var requireMock = require('./Fixture/requirejs-mock');
 
-    describe('oroui/js/tools', function() {
+    xdescribe('oroui/js/tools', function() {
         describe('loadModules method', function() {
             beforeEach(function() {
                 exposure.substitute('require').by(requireMock);

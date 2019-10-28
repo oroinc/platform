@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     var ActivityConditionView;
-    var choiceTemplate = require('tpl!orofilter/templates/filter/embedded/simple-choice-filter.html');
+    var choiceTemplate = require('tpl-loader!orofilter/templates/filter/embedded/simple-choice-filter.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
@@ -10,7 +10,7 @@ define(function(require) {
     var CustomsetFieldChoiceView = require('oroentity/js/app/views/customset-field-choice-view');
     var ChoiceFilter = require('oro/filter/choice-filter');
     var MultiSelectFilter = require('oro/filter/multiselect-filter');
-    var activityConditionTemplate = require('tpl!oroactivitylist/templates/activity-condition.html');
+    var activityConditionTemplate = require('tpl-loader!oroactivitylist/templates/activity-condition.html');
 
     ActivityConditionView = FieldConditionView.extend({
         TYPE_CHOICE_ENTITY: '$activity',

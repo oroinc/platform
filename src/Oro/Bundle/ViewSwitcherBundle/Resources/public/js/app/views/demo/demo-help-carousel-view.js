@@ -6,7 +6,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('text!oroviewswitcher/templates/demo-help-carousel.html');
+    var template = require('text-loader!oroviewswitcher/templates/demo-help-carousel.html');
     require('slick');
     var slides = [];
 

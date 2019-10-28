@@ -1,11 +1,11 @@
 placeholders:
     placeholders:
-        requirejs_config_extend:
+        js_modules_config:
             items:
-                form_requirejs_config:
+                form_js_modules_config:
                     order: 100
 
     items:
-        form_requirejs_config:
-            template: OroFormBundle::requirejs.config.js.twig
+        form_js_modules_config:
+            template: OroFormBundle::js_modules_config.html.twig
             applicable: "@oro_layout.helper->isTemplateRequest()"

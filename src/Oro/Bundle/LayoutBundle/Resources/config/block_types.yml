@@ -66,13 +66,21 @@ services:
         tags:
              - { name: layout.block_type, alias: page_title }
 
-    oro_layout.block_type.requires:
+    oro_layout.block_type.js_build:
         parent: oro_layout.block_type.abstract_configurable
         calls:
-            - [setOptionsConfig, [{provider_alias: {default: 'oro_requirejs_config_provider'}}]]
-            - [setName, ['requires']]
+            - [setOptionsConfig, [{src: ~ }]]
+            - [setName, ['js_build']]
         tags:
-            - { name: layout.block_type, alias: requires }
+            - { name: layout.block_type, alias: js_build }
+
+    oro_layout.block_type.js_modules_config:
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setOptionsConfig, [{publicPath: ~ }]]
+            - [setName, ['js_modules_config']]
+        tags:
+            - { name: layout.block_type, alias: js_modules_config }
 
     oro_layout.block_type.body:
         parent: oro_layout.block_type.abstract_configurable_container

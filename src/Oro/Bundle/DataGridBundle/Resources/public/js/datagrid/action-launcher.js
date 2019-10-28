@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var ActionLauncher;
@@ -6,9 +6,8 @@ define(function(require) {
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
     var Backbone = require('backbone');
-    var module = require('module');
+    var config = require('module-config').default(module.id);
 
-    var config = module.config();
     config = _.extend({
         iconHideText: true
     }, config);
@@ -68,7 +67,7 @@ define(function(require) {
         runAction: true,
 
         /** @property {function(Object, ?Object=): String} */
-        template: require('tpl!orodatagrid/templates/datagrid/action-launcher.html'),
+        template: require('tpl-loader!orodatagrid/templates/datagrid/action-launcher.html'),
 
         /**
          * @property {Object}

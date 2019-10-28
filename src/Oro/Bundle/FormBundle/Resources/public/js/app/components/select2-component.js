@@ -9,8 +9,8 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
 
     Select2Component = BaseComponent.extend({
-        resultTemplate: require('text!oroui/templates/select2/default-template.html'),
-        selectionTemplate: require('text!oroui/templates/select2/default-template.html'),
+        resultTemplate: require('text-loader!oroui/templates/select2/default-template.html'),
+        selectionTemplate: require('text-loader!oroui/templates/select2/default-template.html'),
         url: '',
         type: 'GET',
         perPage: 10,
