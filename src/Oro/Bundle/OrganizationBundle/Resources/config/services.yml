@@ -95,6 +95,13 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_security.acl.object_id_accessor'
 
+    oro_organization.entity_ownership_associations_setter:
+        class: Oro\Bundle\OrganizationBundle\Ownership\EntityOwnershipAssociationsSetter
+        arguments:
+            - '@property_accessor'
+            - '@oro_security.token_accessor'
+            - '@oro_security.owner.ownership_metadata_provider'
+
     #
     # Twig
     #
@@ -112,8 +119,7 @@ services:
     oro_organization.entity_ownership.listener:
         class: Oro\Bundle\OrganizationBundle\EventListener\RecordOwnerDataListener
         arguments:
-            - '@oro_security.token_accessor'
-            - '@oro_entity_config.provider.ownership'
+            - '@oro_organization.entity_ownership_associations_setter'
         tags:
              - { name: doctrine.event_listener, event: prePersist }
 

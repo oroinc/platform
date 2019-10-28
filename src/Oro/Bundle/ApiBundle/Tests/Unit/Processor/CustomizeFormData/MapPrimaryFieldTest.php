@@ -179,9 +179,19 @@ class MapPrimaryFieldTest extends TypeTestCase
         $form = $formBuilder->getForm();
         $form->setData($data);
         $form->submit($submittedData, false);
-        $this->formValidationHandler->validate($form);
+        $this->validateForm($form);
 
         return $form;
+    }
+
+    /**
+     * @param FormInterface $form
+     */
+    private function validateForm(FormInterface $form)
+    {
+        $this->formValidationHandler->preValidate($form);
+        $this->formValidationHandler->validate($form);
+        $this->formValidationHandler->postValidate($form);
     }
 
     /**
@@ -286,7 +296,7 @@ class MapPrimaryFieldTest extends TypeTestCase
             ],
             false
         );
-        $this->formValidationHandler->validate($form);
+        $this->validateForm($form);
 
         self::assertTrue($form->isSynchronized());
         self::assertTrue($form->isValid());
@@ -312,7 +322,7 @@ class MapPrimaryFieldTest extends TypeTestCase
         $form = $formBuilder->getForm();
         $form->setData($data);
         $form->submit(['enabledRole' => 'role1'], false);
-        $this->formValidationHandler->validate($form);
+        $this->validateForm($form);
 
         self::assertTrue($form->isSynchronized());
         self::assertTrue($form->isValid());

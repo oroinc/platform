@@ -76,12 +76,14 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         ];
     }
 
-    public function testReverseTransform()
+    /**
+     * @dataProvider reverseTransformDataProvider
+     */
+    public function testReverseTransform(array $value)
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getEntityToIdTransformer($metadata);
 
-        $value = ['class' => Group::class, 'id' => 123];
         $entity = new Group();
         $entity->setId($value['id']);
         $entity->setName('test');
@@ -100,6 +102,15 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         );
 
         self::assertEquals($entity, $transformer->reverseTransform($value));
+    }
+
+    public function reverseTransformDataProvider(): array
+    {
+        return [
+            [['class' => Group::class, 'id' => 0]],
+            [['class' => Group::class, 'id' => '0']],
+            [['class' => Group::class, 'id' => 123]],
+        ];
     }
 
     public function testReverseTransformForModelInheritedFromManageableEntity()
@@ -361,5 +372,33 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $value = ['class' => Group::class, 'id' => ['primary' => 1]];
 
         $transformer->reverseTransform($value);
+    }
+
+    /**
+     * @dataProvider reverseTransformWhenIdIsNotAcceptableDataProvider
+     * @param mixed $id
+     *
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage "id" element is expected to be integer, non-empty string or non-empty array.
+     */
+    public function testReverseTransformWhenIdIsNotAcceptable($id)
+    {
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $transformer = $this->getEntityToIdTransformer($metadata);
+        $value = ['class' => Group::class, 'id' => $id];
+        $transformer->reverseTransform($value);
+    }
+
+    /**
+     * @return array
+     */
+    public function reverseTransformWhenIdIsNotAcceptableDataProvider(): array
+    {
+        return [
+            [null],
+            [''],
+            ['  '],
+            [[]],
+        ];
     }
 }

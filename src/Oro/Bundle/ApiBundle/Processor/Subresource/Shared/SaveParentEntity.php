@@ -12,8 +12,10 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SaveParentEntity implements ProcessorInterface
 {
+    public const OPERATION_NAME = 'save_parent_entity';
+
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /**
      * @param DoctrineHelper $doctrineHelper
@@ -30,8 +32,13 @@ class SaveParentEntity implements ProcessorInterface
     {
         /** @var ChangeRelationshipContext $context */
 
+        if ($context->isProcessed(self::OPERATION_NAME)) {
+            // the entity was already saved
+            return;
+        }
+
         $parentEntity = $context->getParentEntity();
-        if (!is_object($parentEntity)) {
+        if (!\is_object($parentEntity)) {
             // the parent entity does not exist
             return;
         }
@@ -43,5 +50,7 @@ class SaveParentEntity implements ProcessorInterface
         }
 
         $em->flush();
+
+        $context->setProcessed(self::OPERATION_NAME);
     }
 }

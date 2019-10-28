@@ -108,7 +108,8 @@ class DeleteEntityByDeleteHandlerTest extends DeleteProcessorTestCase
             ->willReturn($deleteHandler);
         $deleteHandler->expects(self::once())
             ->method('delete')
-            ->with($entity);
+            ->with($entity, self::isTrue())
+            ->willReturn(null);
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($entity);
@@ -138,7 +139,8 @@ class DeleteEntityByDeleteHandlerTest extends DeleteProcessorTestCase
             ->willReturn($deleteHandler);
         $deleteHandler->expects(self::once())
             ->method('delete')
-            ->with($entity);
+            ->with($entity, self::isTrue())
+            ->willReturn(null);
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($entity);
