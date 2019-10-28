@@ -19,13 +19,7 @@ See [Chaplin documentation](http://docs.chaplinjs.org/).
 
 
 ## Application
-Application gets initialized requiring `oroui/js/app` module on a page (it's required from `OroUIBundle:Default:index.html.twig`):
-
-```
-    <script type="text/javascript">
-        require(['oroui/js/app']);
-    </script>
-```
+Application gets initialized by `oroui/js/app` module that is entry point of webpack build
 
 This module exports an instance of `Application` (extend of `Chaplin.Application`), depends on:
 
@@ -44,27 +38,28 @@ Routes module (`oroui/js/app/routes`) it's an array with only one route, which m
 ```
 
 ### Application configuration
-RequireJS [module configuration](http://requirejs.org/docs/api.html#config-moduleconfig) approach is utilized for passing options to application's constructor. Configuration is placed in `OroUIBundle::requirejs.config.js.twig` template and looks something like:
+Macros from `OroAssetBundle:Asset.html.twig` is utilized for passing options to application's constructor. Configuration is placed in `OroUIBundle::js_modules_config.html.twig` template and looks something like:
 
-```
-require({
-    config: {
-        'oroui/js/app': {
-            baseUrl: {{ baseUrl|json_encode|raw }},
-            headerId: {{ navigationHeader()|json_encode|raw }},
-            userName: {{ userName|json_encode|raw }},
-            root: {{ rootUrl|json_encode|raw }} + '\/',
-            debug: Boolean({{ app.debug }}),
-            skipRouting: '[data-nohash=true], .no-hash',
-            controllerPath: 'controllers/',
-            controllerSuffix: '-controller',
-            trailing: null
-        }
+```twig
+{% import '@OroAsset/Asset.html.twig' as Asset %}
+{{ Asset.js_modules_config({
+    'oroui/js/app': {
+        baseUrl: app.request.getSchemeAndHttpHost(),
+        headerId: oro_hash_navigation_header(),
+        userName: app.user ? app.user.username : null,
+        root: app.request.getBaseURL() ~ '\/',
+        publicPath: asset('build/')|split('?', 2)[0],
+        startRouteName: app.request.attributes.get('_master_request_route'),
+        debug: app.debug ? true : false,
+        skipRouting: '[data-nohash=true], .no-hash',
+        controllerPath: 'controllers/',
+        controllerSuffix: '-controller',
+        trailing: null
     }
-});
+}) }}
 ```
 
-It's placed in a twig-template in order to get access to backend variables in runtime. Which is impossible to do in `requirejs.yml` file.
+It's placed in a twig-template in order to get access to backend variables in runtime. Which is impossible to do in `jsmodules.yml` file.
 
 
 ## App Modules
@@ -76,12 +71,11 @@ App modules are atomic parts of general application, responsible for:
 
 App modules export nothing, they are just callback functions that are executed right before the application is started.
 
-App modules are declared in `requirejs.yml` configuration file, in custom section `appmodules`:
+App modules are declared in `jsmodules.yml` configuration file, in custom section `app-modules`:
 
 ```
-config:
-    appmodules:
-        - oroui/js/app/modules/messenger-module
+app-modules:
+    - oroui/js/app/modules/messenger-module
 ```
 
 This approach allows to define in each bundle code which should be executed on the application start.
@@ -90,21 +84,16 @@ This approach allows to define in each bundle code which should be executed on t
 `oroui/js/app/modules/messenger-module` - registers messenger's public methods as handlers in `mediator`
 
 ```javascript
-define(function(require) {
-    'use strict';
-    
-    var mediator = require('oroui/js/mediator');
-    var messenger = require('oroui/js/messenger');
+import mediator from 'oroui/js/mediator';
+import messenger from 'oroui/js/messenger';
 
-    /**
-     * Init messenger's handlers
-     */
-    mediator.setHandler('showMessage',
-        messenger.notificationMessage, messenger);
-    mediator.setHandler('showFlashMessage',
-        messenger.notificationFlashMessage, messenger);
-    /* ... */
-});
+/**
+ * Init messenger's handlers
+ */
+mediator.setHandler('showMessage',
+    messenger.notificationMessage, messenger);
+mediator.setHandler('showFlashMessage',
+    messenger.notificationFlashMessage, messenger);
 ```
 ## Page Layout View
 

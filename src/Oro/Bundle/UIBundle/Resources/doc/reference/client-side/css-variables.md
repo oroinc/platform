@@ -22,15 +22,13 @@ Internet Explorer doesn't support global CSS variables. For enable support for I
 
 Insert in twig file
 ```twig
-<script type="text/javascript">
-    require({
-        config: {
-            'oroui/js/app/modules/css-variable-module': {
-                'updateDOM': true
-            }
-        }
-    });
-</script>
+{% import '@OroAsset/Asset.html.twig' as Asset %}
+{{ Asset.js_modules_config({
+    'oroui/js/app/modules/css-variable-module': {
+        'updateDOM': true
+    }
+}); }}
+
 ```
 
 For more information navigate to official plugin [documentation](https://jhildenbiddle.github.io/css-vars-ponyfill)
