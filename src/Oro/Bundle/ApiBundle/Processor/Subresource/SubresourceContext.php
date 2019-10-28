@@ -30,9 +30,6 @@ class SubresourceContext extends Context
     /** FQCN of the parent entity */
     const PARENT_CLASS_NAME = 'parentClass';
 
-    /** an identifier of the parent entity */
-    const PARENT_ID = 'parentId';
-
     /** the association name the sub-resource represents */
     const ASSOCIATION = 'association';
 
@@ -44,6 +41,9 @@ class SubresourceContext extends Context
 
     /** metadata of the parent entity */
     const PARENT_METADATA = 'parentMetadata';
+
+    /** @var mixed */
+    private $parentId;
 
     /** @var ConfigExtraCollection|null */
     private $parentConfigExtras;
@@ -87,7 +87,7 @@ class SubresourceContext extends Context
      */
     public function getParentId()
     {
-        return $this->get(self::PARENT_ID);
+        return $this->parentId;
     }
 
     /**
@@ -97,7 +97,7 @@ class SubresourceContext extends Context
      */
     public function setParentId($parentId)
     {
-        $this->set(self::PARENT_ID, $parentId);
+        $this->parentId = $parentId;
     }
 
     /**

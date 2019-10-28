@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
@@ -14,6 +15,7 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -24,13 +26,13 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class NormalizeRequestData implements ProcessorInterface
 {
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /** @var EntityIdTransformerRegistry */
-    protected $entityIdTransformerRegistry;
+    private $entityIdTransformerRegistry;
 
     /** @var ChangeRelationshipContext */
-    protected $context;
+    private $context;
 
     /**
      * @param ValueNormalizer             $valueNormalizer
@@ -64,16 +66,18 @@ class NormalizeRequestData implements ProcessorInterface
      *
      * @return array
      */
-    protected function normalizeData(array $data)
+    private function normalizeData(array $data): array
     {
         $associationName = $this->context->getAssociationName();
         $targetMetadata = $this->getAssociationMetadata($associationName)->getTargetMetadata();
-        $dataPointer = $this->buildPointer('', JsonApiDoc::DATA);
+        $path = '';
+        $pointer = $this->buildPointer('', JsonApiDoc::DATA);
         if ($this->context->isCollection()) {
             $associationData = [];
             foreach ($data[JsonApiDoc::DATA] as $key => $value) {
                 $associationData[] = $this->normalizeRelationId(
-                    $this->buildPointer($dataPointer, $key),
+                    $this->buildPath($path, $key),
+                    $this->buildPointer($pointer, $key),
                     $value[JsonApiDoc::TYPE],
                     $value[JsonApiDoc::ID],
                     $targetMetadata
@@ -81,7 +85,8 @@ class NormalizeRequestData implements ProcessorInterface
             }
         } elseif (null !== $data[JsonApiDoc::DATA]) {
             $associationData = $this->normalizeRelationId(
-                $dataPointer,
+                $path,
+                $pointer,
                 $data[JsonApiDoc::DATA][JsonApiDoc::TYPE],
                 $data[JsonApiDoc::DATA][JsonApiDoc::ID],
                 $targetMetadata
@@ -94,24 +99,31 @@ class NormalizeRequestData implements ProcessorInterface
     }
 
     /**
+     * @param string         $path
      * @param string         $pointer
      * @param string         $entityType
      * @param mixed          $entityId
-     * @param EntityMetadata $entityMetadata
+     * @param EntityMetadata $metadata
      *
      * @return array ['class' => entity class, 'id' => entity id]
      */
-    protected function normalizeRelationId($pointer, $entityType, $entityId, EntityMetadata $entityMetadata)
-    {
+    private function normalizeRelationId(
+        string $path,
+        string $pointer,
+        string $entityType,
+        $entityId,
+        EntityMetadata $metadata
+    ): array {
         $entityClass = $this->normalizeEntityClass(
             $this->buildPointer($pointer, JsonApiDoc::TYPE),
             $entityType
         );
         if ($entityClass) {
             $entityId = $this->normalizeEntityId(
+                $this->buildPath($path, JsonApiDoc::ID),
                 $this->buildPointer($pointer, JsonApiDoc::ID),
                 $entityId,
-                $entityMetadata
+                $metadata
             );
         }
 
@@ -122,22 +134,32 @@ class NormalizeRequestData implements ProcessorInterface
     }
 
     /**
+     * @param string         $path
      * @param string         $pointer
      * @param mixed          $entityId
-     * @param EntityMetadata $entityMetadata
+     * @param EntityMetadata $metadata
      *
      * @return mixed
      */
-    protected function normalizeEntityId($pointer, $entityId, EntityMetadata $entityMetadata)
+    private function normalizeEntityId(string $path, string $pointer, $entityId, EntityMetadata $metadata)
     {
         try {
-            return $this->getEntityIdTransformer($this->context->getRequestType())
-                ->reverseTransform($entityId, $entityMetadata);
+            $normalizedId = $this->getEntityIdTransformer($this->context->getRequestType())
+                ->reverseTransform($entityId, $metadata);
+            if (null === $normalizedId) {
+                $this->context->addNotResolvedIdentifier(
+                    'requestData' . ConfigUtil::PATH_DELIMITER . $path,
+                    new NotResolvedIdentifier($entityId, $metadata->getClassName())
+                );
+            }
+
+            return $normalizedId;
         } catch (\Exception $e) {
-            $error = Error::createValidationError(Constraint::ENTITY_ID)
-                ->setInnerException($e)
-                ->setSource(ErrorSource::createByPointer($pointer));
-            $this->context->addError($error);
+            $this->context->addError(
+                Error::createValidationError(Constraint::ENTITY_ID)
+                    ->setInnerException($e)
+                    ->setSource(ErrorSource::createByPointer($pointer))
+            );
         }
 
         return $entityId;
@@ -149,7 +171,7 @@ class NormalizeRequestData implements ProcessorInterface
      *
      * @return string|null
      */
-    protected function normalizeEntityClass($pointer, $entityType)
+    private function normalizeEntityClass(string $pointer, string $entityType): ?string
     {
         try {
             return ValueNormalizerUtil::convertToEntityClass(
@@ -158,10 +180,11 @@ class NormalizeRequestData implements ProcessorInterface
                 $this->context->getRequestType()
             );
         } catch (\Exception $e) {
-            $error = Error::createValidationError(Constraint::ENTITY_TYPE)
-                ->setInnerException($e)
-                ->setSource(ErrorSource::createByPointer($pointer));
-            $this->context->addError($error);
+            $this->context->addError(
+                Error::createValidationError(Constraint::ENTITY_TYPE)
+                    ->setInnerException($e)
+                    ->setSource(ErrorSource::createByPointer($pointer))
+            );
         }
 
         return null;
@@ -172,7 +195,7 @@ class NormalizeRequestData implements ProcessorInterface
      *
      * @return EntityIdTransformerInterface
      */
-    protected function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
+    private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
@@ -183,9 +206,22 @@ class NormalizeRequestData implements ProcessorInterface
      *
      * @return string
      */
-    protected function buildPointer($parentPath, $property)
+    private function buildPath(string $parentPath, string $property): string
     {
-        return $parentPath . '/' . $property;
+        return '' !== $parentPath
+            ? $parentPath . ConfigUtil::PATH_DELIMITER . $property
+            : $property;
+    }
+
+    /**
+     * @param string $parentPointer
+     * @param string $property
+     *
+     * @return string
+     */
+    private function buildPointer(string $parentPointer, string $property): string
+    {
+        return $parentPointer . '/' . $property;
     }
 
     /**
@@ -193,7 +229,7 @@ class NormalizeRequestData implements ProcessorInterface
      *
      * @return AssociationMetadata
      */
-    private function getAssociationMetadata($associationName)
+    private function getAssociationMetadata(string $associationName): AssociationMetadata
     {
         $associationMetadata = $this->context->getParentMetadata()->getAssociation($associationName);
         if (null === $associationMetadata) {

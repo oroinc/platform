@@ -180,14 +180,14 @@ abstract class AbstractBaseRequestDataValidator
     }
 
     /**
-     * @param string $parentPath
+     * @param string $parentPointer
      * @param string $property
      *
      * @return string
      */
-    protected function buildPointer(string $parentPath, string $property): string
+    protected function buildPointer(string $parentPointer, string $property): string
     {
-        return $parentPath . '/' . $property;
+        return $parentPointer . '/' . $property;
     }
 
     /**

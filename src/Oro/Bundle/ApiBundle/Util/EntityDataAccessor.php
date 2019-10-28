@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Util;
 
 use Oro\Component\EntitySerializer\EntityDataAccessor as BaseEntityDataAccessor;
 
+/**
+ * Reads property values from entity objects or arrays.
+ */
 class EntityDataAccessor extends BaseEntityDataAccessor
 {
     /**
