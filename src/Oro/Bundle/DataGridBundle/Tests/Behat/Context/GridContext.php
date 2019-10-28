@@ -2252,7 +2252,11 @@ TEXT;
      */
     private function getGridColumnManager($grid)
     {
-        return $this->createElement($grid->getMappedChildElementName('GridColumnManager'), $grid);
+        /** @var $colunmManager GridColumnManager $colunmManager */
+        $colunmManager =  $this->createElement($grid->getMappedChildElementName('GridColumnManager'), $grid);
+        $colunmManager->setGrid($grid);
+
+        return $colunmManager;
     }
 
     /**
