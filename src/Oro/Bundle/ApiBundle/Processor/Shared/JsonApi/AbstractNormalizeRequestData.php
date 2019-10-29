@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
@@ -13,6 +14,7 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -46,16 +48,17 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
     }
 
     /**
+     * @param string              $path
      * @param string              $pointer
      * @param array               $data
      * @param EntityMetadata|null $metadata
      *
      * @return array
      */
-    protected function normalizeData(string $pointer, array $data, ?EntityMetadata $metadata): array
+    protected function normalizeData(string $path, string $pointer, array $data, ?EntityMetadata $metadata): array
     {
         $relations = \array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)
-            ? $this->normalizeRelationships($pointer, $data[JsonApiDoc::RELATIONSHIPS], $metadata)
+            ? $this->normalizeRelationships($path, $pointer, $data[JsonApiDoc::RELATIONSHIPS], $metadata)
             : [];
 
         return !empty($data[JsonApiDoc::ATTRIBUTES])
@@ -64,17 +67,23 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
     }
 
     /**
+     * @param string              $path
      * @param string              $pointer
      * @param array               $relationships
      * @param EntityMetadata|null $metadata
      *
      * @return array
      */
-    protected function normalizeRelationships(string $pointer, array $relationships, ?EntityMetadata $metadata): array
-    {
+    protected function normalizeRelationships(
+        string $path,
+        string $pointer,
+        array $relationships,
+        ?EntityMetadata $metadata
+    ): array {
         $relations = [];
         $relationshipsPointer = $this->buildPointer($pointer, JsonApiDoc::RELATIONSHIPS);
         foreach ($relationships as $name => $value) {
+            $relationshipsDataItemPath = $this->buildPath($path, $name);
             $relationshipsDataItemPointer = $this->buildPointer(
                 $this->buildPointer($relationshipsPointer, $name),
                 JsonApiDoc::DATA
@@ -93,6 +102,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
                 : null;
             if (ArrayUtil::isAssoc($relationData)) {
                 $relations[$name] = $this->normalizeRelationshipItem(
+                    $relationshipsDataItemPath,
                     $relationshipsDataItemPointer,
                     $relationData,
                     $associationMetadata
@@ -100,6 +110,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
             } else {
                 foreach ($relationData as $key => $collectionItem) {
                     $relations[$name][] = $this->normalizeRelationshipItem(
+                        $this->buildPath($relationshipsDataItemPath, $key),
                         $this->buildPointer($relationshipsDataItemPointer, $key),
                         $collectionItem,
                         $associationMetadata
@@ -112,6 +123,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
     }
 
     /**
+     * @param string                   $path
      * @param string                   $pointer
      * @param array                    $data
      * @param AssociationMetadata|null $associationMetadata
@@ -119,6 +131,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
      * @return array ['class' => entity class, 'id' => entity id]
      */
     protected function normalizeRelationshipItem(
+        string $path,
         string $pointer,
         array $data,
         ?AssociationMetadata $associationMetadata
@@ -135,6 +148,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
                     $targetMetadata = $associationMetadata->getTargetMetadata();
                 }
                 $entityId = $this->normalizeEntityId(
+                    $this->buildPath($path, 'id'),
                     $this->buildPointer($pointer, JsonApiDoc::ID),
                     $entityClass,
                     $entityId,
@@ -195,6 +209,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
     }
 
     /**
+     * @param string              $path
      * @param string              $pointer
      * @param string              $entityClass
      * @param mixed               $entityId
@@ -203,6 +218,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
      * @return mixed
      */
     protected function normalizeEntityId(
+        string $path,
         string $pointer,
         string $entityClass,
         $entityId,
@@ -225,8 +241,16 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         }
 
         try {
-            return $this->getEntityIdTransformer($this->context->getRequestType())
+            $normalizedId = $this->getEntityIdTransformer($this->context->getRequestType())
                 ->reverseTransform($entityId, $metadata);
+            if (null === $normalizedId) {
+                $this->context->addNotResolvedIdentifier(
+                    'requestData' . ConfigUtil::PATH_DELIMITER . $path,
+                    new NotResolvedIdentifier($entityId, $entityClass)
+                );
+            }
+
+            return $normalizedId;
         } catch (\Exception $e) {
             $this->addValidationError(Constraint::ENTITY_ID, $pointer)
                 ->setInnerException($e);
@@ -268,8 +292,21 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
      *
      * @return string
      */
-    protected function buildPointer(string $parentPath, string $property): string
+    protected function buildPath(string $parentPath, string $property): string
     {
-        return $parentPath . '/' . $property;
+        return '' !== $parentPath
+            ? $parentPath . ConfigUtil::PATH_DELIMITER . $property
+            : $property;
+    }
+
+    /**
+     * @param string $parentPointer
+     * @param string $property
+     *
+     * @return string
+     */
+    protected function buildPointer(string $parentPointer, string $property): string
+    {
+        return $parentPointer . '/' . $property;
     }
 }

@@ -240,6 +240,11 @@ class Form extends Element
                 }
             }
 
+            if ('orodigitalasset/js/app/views/digital-asset-choose-form-view'
+                === (string) $field->getParent()->getAttribute('data-bound-view')) {
+                return $this->elementFactory->wrapElement('DigitalAssetManagerField', $field);
+            }
+
             return $field;
         }
 

@@ -1441,7 +1441,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         });
 
         if ($result === null) {
-            $grid->getRowByContent($content)->click();
+            $row = $grid->getRowByContent($content);
+            self::assertNotNull($row, sprintf('Row %s is not found', $content));
+
+            $row->click();
         }
 
         // Keep this check for sure that ajax is finish

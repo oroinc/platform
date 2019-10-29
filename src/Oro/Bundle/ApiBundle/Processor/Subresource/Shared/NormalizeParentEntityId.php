@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
@@ -36,16 +37,21 @@ class NormalizeParentEntityId implements ProcessorInterface
         /** @var SubresourceContext $context */
 
         $parentEntityId = $context->getParentId();
-        if (!is_string($parentEntityId)) {
+        if (!\is_string($parentEntityId)) {
             // the parent entity identifier does not exist or it is already normalized
             return;
         }
 
         try {
-            $context->setParentId(
-                $this->getEntityIdTransformer($context->getRequestType())
-                    ->reverseTransform($parentEntityId, $context->getParentMetadata())
-            );
+            $normalizedParentEntityId = $this->getEntityIdTransformer($context->getRequestType())
+                ->reverseTransform($parentEntityId, $context->getParentMetadata());
+            $context->setParentId($normalizedParentEntityId);
+            if (null === $normalizedParentEntityId) {
+                $context->addNotResolvedIdentifier(
+                    'parentId',
+                    new NotResolvedIdentifier($parentEntityId, $context->getParentClassName())
+                );
+            }
         } catch (\Exception $e) {
             $context->addError(
                 Error::createValidationError(Constraint::ENTITY_ID)->setInnerException($e)

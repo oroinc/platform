@@ -16,9 +16,6 @@ class Label
     /** @var string */
     private $domain;
 
-    /** @var bool Always return translated message even if translation does not exist */
-    private $translateDirectly = false;
-
     /**
      * @param string $name
      * @param string|null $domain
@@ -50,18 +47,6 @@ class Label
     }
 
     /**
-     * @param bool $translateDirectly
-     *
-     * @return Label
-     */
-    public function setTranslateDirectly($translateDirectly)
-    {
-        $this->translateDirectly = $translateDirectly;
-
-        return $this;
-    }
-
-    /**
      * Translates this label.
      *
      * @param TranslatorInterface $translator
@@ -71,10 +56,6 @@ class Label
     public function trans(TranslatorInterface $translator)
     {
         $result = $translator->trans($this->name, [], $this->domain);
-
-        if ($this->translateDirectly) {
-            return $result;
-        }
 
         return $result !== $this->name
             ? $result

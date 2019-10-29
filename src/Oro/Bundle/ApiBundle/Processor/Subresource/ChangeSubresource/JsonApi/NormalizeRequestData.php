@@ -33,18 +33,20 @@ class NormalizeRequestData extends AbstractNormalizeRequestData
                 $metadata = $context->getMetadata();
                 $this->context = $context;
                 try {
+                    $path = '';
                     $pointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::DATA);
                     if ($context->isCollection()) {
                         $normalizedData = [];
                         foreach ($data as $key => $value) {
                             $normalizedData[$key] = $this->normalizeData(
+                                $this->buildPath($path, (string)$key),
                                 $this->buildPointer($pointer, (string)$key),
                                 $value,
                                 $metadata
                             );
                         }
                     } else {
-                        $normalizedData = $this->normalizeData($pointer, $data, $metadata);
+                        $normalizedData = $this->normalizeData($path, $pointer, $data, $metadata);
                     }
                     $context->setRequestData($normalizedData);
                 } finally {

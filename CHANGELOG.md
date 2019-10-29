@@ -73,6 +73,10 @@ The current file describes significant changes in the code that may affect the u
   to `Oro\Bundle\ApiBundle\Processor\GetConfig` namespace.
 * The class `ConfigContext` was moved from `Oro\Bundle\ApiBundle\Processor\Config` namespace
   to `Oro\Bundle\ApiBundle\Processor\GetConfig` namespace.
+* The priority of `oro_api.validate_included_forms` processor was changed from `-70` to `-68`.
+* The priority of `oro_api.validate_form` processor was changed from `-90` to `-70`.
+* The priority of `oro_api.post_validate_included_forms` processor was changed from `-96` to `-78`.
+* The priority of `oro_api.post_validate_form` processor was changed from `-97` to `-80`.
 
 #### AssetBundle
 * The new feature, [Hot Module Replacement (HMR or Hot Reload) enabled for SCSS](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#hot-module-replacement-hmr-or-hot-reload-for-scss). To enable HMR for custom CSS links, please [follow the documentation](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#enable-for-css-links).
