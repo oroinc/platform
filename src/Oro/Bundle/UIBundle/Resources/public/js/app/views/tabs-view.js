@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var DatePickerTabsView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    DatePickerTabsView = BaseView.extend({
+    const DatePickerTabsView = BaseView.extend({
         autoRender: true,
 
         events: {
@@ -15,8 +14,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DatePickerTabsView() {
-            DatePickerTabsView.__super__.constructor.apply(this, arguments);
+        constructor: function DatePickerTabsView(options) {
+            DatePickerTabsView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -24,16 +23,16 @@ define(function(require) {
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['data', 'template']));
-            DatePickerTabsView.__super__.initialize.apply(this, arguments);
+            DatePickerTabsView.__super__.initialize.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         render: function() {
-            var data = this.getTemplateData();
-            var template = this.getTemplateFunction();
-            var html = template(data);
+            const data = this.getTemplateData();
+            const template = this.getTemplateFunction();
+            const html = template(data);
             this.$el.html(html);
         },
 
@@ -66,9 +65,9 @@ define(function(require) {
         },
 
         updateTabsVisibility: function() {
-            var visibleTabShown = false;
+            let visibleTabShown = false;
             _.each(this.data.tabs, function(tab) {
-                var visible = !_.isFunction(tab.isVisible) || tab.isVisible();
+                const visible = !_.isFunction(tab.isVisible) || tab.isVisible();
                 this.setTabVisibility(tab.name, visible);
 
                 if (visible && !visibleTabShown) {
@@ -83,7 +82,7 @@ define(function(require) {
          * @param {Boolean} visible
          */
         setTabVisibility: function(tabName, visible) {
-            var method = visible ? 'show' : 'hide';
+            const method = visible ? 'show' : 'hide';
             this.$('li:has(a.' + tabName + ')')[method]();
         }
     });

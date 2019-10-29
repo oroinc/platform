@@ -1,24 +1,23 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var Backbone = require('backbone');
-    var routing = require('routing');
-    var mediator = require('oroui/js/mediator');
-    var DeleteConfirmation = require('oroui/js/delete-confirmation');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const Backbone = require('backbone');
+    const routing = require('routing');
+    const mediator = require('oroui/js/mediator');
+    const DeleteConfirmation = require('oroui/js/delete-confirmation');
 
-    var EmbeddedFormWatcher;
-    var $formTypeField;
-    var $cssField;
-    var $successMessageField;
+    let $formTypeField;
+    let $cssField;
+    let $successMessageField;
 
-    var rememberedFormType;
-    var rememberedCss;
-    var rememberedSuccessMessage;
+    let rememberedFormType;
+    let rememberedCss;
+    let rememberedSuccessMessage;
 
-    var blockNextRequest;
+    let blockNextRequest;
 
     function isFormStateChanged(currentCss, currentSuccessMessage) {
         return !(currentCss === rememberedCss && currentSuccessMessage === rememberedSuccessMessage);
@@ -29,7 +28,7 @@ define(function(require) {
             blockNextRequest = false;
             return;
         }
-        var currentFormType = $formTypeField.val();
+        const currentFormType = $formTypeField.val();
 
         if (!isFormStateChanged($cssField.val(), $successMessageField.val())) {
             requestDefaultFormTypeData(currentFormType);
@@ -37,7 +36,7 @@ define(function(require) {
             return;
         }
 
-        var confirm = new DeleteConfirmation({
+        const confirm = new DeleteConfirmation({
             title: __('embedded_form.confirm_box.title'),
             okText: __('embedded_form.confirm_box.ok_text'),
             content: __('embedded_form.confirm_box.content')
@@ -58,7 +57,7 @@ define(function(require) {
         }
 
         mediator.execute('showLoading');
-        var url = routing.generate('oro_embedded_form_default_data', {formType: formType});
+        const url = routing.generate('oro_embedded_form_default_data', {formType: formType});
         $.post(url)
             .done(function(data, code, response) {
                 $cssField.val(data.css);
@@ -72,12 +71,12 @@ define(function(require) {
             });
     }
 
-    EmbeddedFormWatcher = Backbone.View.extend({
+    const EmbeddedFormWatcher = Backbone.View.extend({
         /**
          * @inheritDoc
          */
-        constructor: function EmbeddedFormWatcher() {
-            EmbeddedFormWatcher.__super__.constructor.apply(this, arguments);
+        constructor: function EmbeddedFormWatcher(options) {
+            EmbeddedFormWatcher.__super__.constructor.call(this, options);
         },
 
         /**

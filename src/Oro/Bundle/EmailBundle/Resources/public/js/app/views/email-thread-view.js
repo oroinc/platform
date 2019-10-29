@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var EmailTreadView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var routing = require('routing');
-    var tools = require('oroui/js/tools');
-    var EmailItemView = require('./email-item-view');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const routing = require('routing');
+    const tools = require('oroui/js/tools');
+    const EmailItemView = require('./email-item-view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    EmailTreadView = BaseView.extend({
+    const EmailTreadView = BaseView.extend({
         autoRender: true,
 
         events: {
@@ -34,8 +33,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailTreadView() {
-            EmailTreadView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailTreadView(options) {
+            EmailTreadView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -43,7 +42,7 @@ define(function(require) {
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['actionPanelSelector']));
-            EmailTreadView.__super__.initialize.apply(this, arguments);
+            EmailTreadView.__super__.initialize.call(this, options);
             this.listenTo(mediator, 'widget:doRefresh:email-thread', function() {
                 if (options.isBaseView) {
                     mediator.trigger('widget:doRefresh:email-thread-context');
@@ -59,7 +58,7 @@ define(function(require) {
                 this.$actionPanel.find(this.selectors.toggleAll).remove();
                 delete this.$actionPanel;
             }
-            EmailTreadView.__super__.dispose.apply(this, arguments);
+            EmailTreadView.__super__.dispose.call(this);
         },
 
         /**
@@ -76,7 +75,7 @@ define(function(require) {
                     .on('click', _.bind(this.onToggleAllClick, this));
                 this.updateToggleAllAction();
             }
-            EmailTreadView.__super__.render.apply(this, arguments);
+            EmailTreadView.__super__.render.call(this);
 
             this._deferredRender();
             this.initEmailItemViews(this.$(this.selectors.emailItem))
@@ -98,7 +97,7 @@ define(function(require) {
          * Expands or collapses all emails
          */
         toggleAllEmails: function() {
-            var show = this._hasHiddenEmails();
+            const show = this._hasHiddenEmails();
             _.each(this.subviews, function(emailItemView) {
                 emailItemView.toggle(show);
             });
@@ -117,21 +116,21 @@ define(function(require) {
         },
 
         onDetailedInfoOpen: function(e) {
-            var $target = $('>.dropdown-menu', e.currentTarget);
-            var target = $target[0];
-            var parentRect = this.el.getBoundingClientRect();
+            const $target = $('>.dropdown-menu', e.currentTarget);
+            const target = $target[0];
+            const parentRect = this.el.getBoundingClientRect();
             $target.removeAttr('data-uid').removeClass('fixed-width').css({
                 width: '',
                 left: ''
             });
-            var limitWidth = Math.min(target.clientWidth, parentRect.width);
+            const limitWidth = Math.min(target.clientWidth, parentRect.width);
             if (target.scrollWidth > limitWidth) {
                 $target.outerWidth(limitWidth).addClass('fixed-width');
             }
-            var rect = target.getBoundingClientRect();
-            var left = parseInt($target.css('left'));
-            var uid = 'dropdown-menu-' + Date.now();
-            var shift = rect.right - parentRect.right;
+            const rect = target.getBoundingClientRect();
+            const left = parseInt($target.css('left'));
+            const uid = 'dropdown-menu-' + Date.now();
+            const shift = rect.right - parentRect.right;
             if (shift > 0) {
                 $target.css({
                     left: left - shift + 'px'
@@ -151,9 +150,9 @@ define(function(require) {
          * @returns {Promise}
          */
         loadEmails: function() {
-            var url;
-            var promise;
-            var ids = this.$(this.selectors.loadMore).addClass('process').data('emailsItems');
+            let url;
+            let promise;
+            const ids = this.$(this.selectors.loadMore).addClass('process').data('emailsItems');
             if (ids) {
                 url = routing.generate('oro_email_items_view', {ids: ids.join(',')});
                 promise = $.ajax(url)
@@ -174,7 +173,7 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            var $content = $(content);
+            const $content = $(content);
             this.$(this.selectors.loadMore).replaceWith($content);
             this.initEmailItemViews($content.filter(this.selectors.emailItem));
         },
@@ -196,7 +195,7 @@ define(function(require) {
          * @return {Promise}
          */
         initEmailItemViews: function($elems) {
-            var promises = _.map($elems, this._initEmailItemView, this);
+            const promises = _.map($elems, this._initEmailItemView, this);
             return $.when.apply(this, promises);
         },
 
@@ -208,8 +207,7 @@ define(function(require) {
          * @protected
          */
         _initEmailItemView: function(elem) {
-            var emailItemView;
-            emailItemView = new EmailItemView({
+            const emailItemView = new EmailItemView({
                 autoRender: true,
                 el: elem
             });
@@ -239,12 +237,12 @@ define(function(require) {
          * Update toggle all action element
          */
         updateToggleAllAction: function() {
-            var hasMultipleEmails = this.$(this.selectors.emailItem).length > 1;
-            var hasHiddenEmails = this._hasHiddenEmails();
-            var translationPrefix = 'oro.email.thread.' + (hasHiddenEmails ? 'expand_all' : 'collapse_all');
+            const hasMultipleEmails = this.$(this.selectors.emailItem).length > 1;
+            const hasHiddenEmails = this._hasHiddenEmails();
+            const translationPrefix = 'oro.email.thread.' + (hasHiddenEmails ? 'expand_all' : 'collapse_all');
 
             // update action element
-            var $toggleAllAction = this.$actionPanel.find(this.selectors.toggleAll);
+            const $toggleAllAction = this.$actionPanel.find(this.selectors.toggleAll);
             $toggleAllAction.toggle(hasMultipleEmails);
             $toggleAllAction.text(__(translationPrefix + '.label'));
             $toggleAllAction.attr('title', __(translationPrefix + '.tooltip'));
@@ -257,8 +255,8 @@ define(function(require) {
          * @protected
          */
         _hasHiddenEmails: function() {
-            var hasCollapsedEmails = Boolean(this.$(this.selectors.emailItem).not('.in').length);
-            var hasEmailsToLoad = Boolean(this.$(this.selectors.loadMore).length);
+            const hasCollapsedEmails = Boolean(this.$(this.selectors.emailItem).not('.in').length);
+            const hasEmailsToLoad = Boolean(this.$(this.selectors.loadMore).length);
             return hasCollapsedEmails || hasEmailsToLoad;
         },
 

@@ -2,9 +2,9 @@
 define(['jquery'], function($) {
     'use strict';
 
-    var getCookieValue = function(name) {
-        var value = '; ' + document.cookie;
-        var parts = value.split('; ' + name + '=');
+    const getCookieValue = function(name) {
+        const value = '; ' + document.cookie;
+        const parts = value.split('; ' + name + '=');
         if (parts.length === 2) {
             return parts.pop().split(';').shift();
         }
@@ -12,7 +12,7 @@ define(['jquery'], function($) {
     };
 
     $.ajaxPrefilter(function(options, originalOptions, xhr) {
-        var csrfCookie = '';
+        let csrfCookie = '';
         // CSRF tokens for https connection are prefixed with "https-"
         if (location.protocol === 'https:') {
             csrfCookie = getCookieValue('https-_csrf');
@@ -40,7 +40,7 @@ define(['jquery'], function($) {
     };
 
     // Overriden since original `exceptionHook` doesn't take in account regular Error type
-    var rerrorNames = /^\w*Error$/;
+    const rerrorNames = /^\w*Error$/;
 
     $.Deferred.exceptionHook = function(error, stack) {
         // Support: IE 8 - 9 only
@@ -52,21 +52,21 @@ define(['jquery'], function($) {
 
     $.fn.extend({
         focus: (function(originalFocus) {
-            return function() {
-                var $elem = $(this);
-                if (!arguments.length && $elem.attr('data-focusable')) {
+            return function(...args) {
+                const $elem = $(this);
+                if (!args.length && $elem.attr('data-focusable')) {
                     // the element has own implementation to set focus
                     $elem.triggerHandler('set-focus');
                     return $elem;
                 } else {
-                    return originalFocus.apply(this, arguments);
+                    return originalFocus.apply(this, args);
                 }
             };
         })($.fn.focus),
 
         offset: (function(originalOffset) {
-            return function() {
-                if (!arguments.length) {
+            return function(...args) {
+                if (!args.length) {
                     if (this[0] instanceof HTMLDocument) {
                         return originalOffset.call($(this[0].documentElement));
                     }
@@ -74,7 +74,7 @@ define(['jquery'], function($) {
                         return originalOffset.call($(this[0].document.documentElement));
                     }
                 }
-                return originalOffset.apply(this, arguments);
+                return originalOffset.apply(this, args);
             };
         })($.fn.offset),
 
@@ -83,7 +83,7 @@ define(['jquery'], function($) {
          */
         setCursorPosition: function(index) {
             return this.each(function() {
-                var el = this;
+                const el = this;
                 if ('selectionStart' in el) {
                     try {
                         el.selectionEnd = el.selectionStart = index === 'end' ? el.value.length : index;
@@ -105,11 +105,11 @@ define(['jquery'], function($) {
          * Sets focus on first form field
          */
         focusFirstInput: function() {
-            var $input = this.find(':input:visible, [data-focusable]')
+            const $input = this.find(':input:visible, [data-focusable]')
                 .not(':checkbox, :radio, :button, :submit, :disabled, :file');
-            var $autoFocus = $input.filter('[autofocus], [data-autofocus]');
+            const $autoFocus = $input.filter('[autofocus], [data-autofocus]');
             if ($autoFocus.length || $input.length) {
-                var $element = ($autoFocus.length ? $autoFocus : $input).first();
+                const $element = ($autoFocus.length ? $autoFocus : $input).first();
                 if ($element.isInViewPort()) {
                     $element.setCursorToEnd().focus();
                 }
@@ -117,11 +117,11 @@ define(['jquery'], function($) {
         },
 
         isInViewPort: function() {
-            var $element = $(this);
-            var elementTop = $element.offset().top;
-            var elementBottom = elementTop + $element.height();
-            var viewPortTop = $(window).scrollTop();
-            var viewPortBottom = viewPortTop + $(window).height();
+            const $element = $(this);
+            const elementTop = $element.offset().top;
+            const elementBottom = elementTop + $element.height();
+            const viewPortTop = $(window).scrollTop();
+            const viewPortBottom = viewPortTop + $(window).height();
 
             return (
                 (elementTop >= viewPortTop) && (elementBottom <= viewPortBottom)
@@ -132,7 +132,7 @@ define(['jquery'], function($) {
          * source http://stackoverflow.com/questions/13607252/getting-border-width-in-jquery
          */
         getBorders: function(el) {
-            var computed = window.getComputedStyle(el || this[0], null);
+            const computed = window.getComputedStyle(el || this[0], null);
             function convertBorderToPx(cssValue) {
                 switch (cssValue) {
                     case 'thin':
@@ -165,10 +165,10 @@ define(['jquery'], function($) {
          */
         insertAtCursor: function(str) {
             return this.each(function() {
-                var start;
-                var end;
-                var el = this;
-                var value = el.value;
+                let start;
+                let end;
+                const el = this;
+                const value = el.value;
                 if ('selectionStart' in el) {
                     // avoid exeption when use these actions with unsupported input types (email, number etc)
                     try {
@@ -189,8 +189,8 @@ define(['jquery'], function($) {
          * Thanks http://stackoverflow.com/questions/290254/how-to-order-events-bound-with-jquery
          */
         bindFirst: function(eventType, selector, eventData, handler) {
-            var indexOfDot = eventType.indexOf('.');
-            var eventNameSpace = indexOfDot > 0 ? eventType.substring(indexOfDot) : '';
+            const indexOfDot = eventType.indexOf('.');
+            const eventNameSpace = indexOfDot > 0 ? eventType.substring(indexOfDot) : '';
 
             eventType = indexOfDot > 0 ? eventType.substring(0, indexOfDot) : eventType;
             handler = handler !== undefined ? handler : (eventData !== undefined ? eventData : selector);
@@ -198,8 +198,8 @@ define(['jquery'], function($) {
             selector = typeof selector !== 'function' ? selector : undefined;
 
             return this.each(function() {
-                var $this = $(this);
-                var currentAttrListener = this['on' + eventType];
+                const $this = $(this);
+                const currentAttrListener = this['on' + eventType];
 
                 if (currentAttrListener) {
                     $this.bind(eventType, function(e) {
@@ -211,9 +211,9 @@ define(['jquery'], function($) {
 
                 $this.on(eventType + eventNameSpace, selector, eventData, handler);
 
-                var allEvents = $this.data('events') || $._data($this[0], 'events');
-                var typeEvents = allEvents[eventType];
-                var newEvent = typeEvents.pop();
+                const allEvents = $this.data('events') || $._data($this[0], 'events');
+                const typeEvents = allEvents[eventType];
+                const newEvent = typeEvents.pop();
                 typeEvents.unshift(newEvent);
             });
         },
@@ -224,7 +224,7 @@ define(['jquery'], function($) {
         addClassTemporarily: function(className, delay) {
             delay = delay || 0;
             return this.each(function() {
-                var $el = $(this);
+                const $el = $(this);
                 $el.addClass(className);
                 setTimeout(function() {
                     $el.removeClass(className);
@@ -233,7 +233,7 @@ define(['jquery'], function($) {
         },
 
         formFieldValues: function(data) {
-            var els = this.find(':input').get();
+            const els = this.find(':input').get();
 
             if (arguments.length === 0) {
                 // return all data
@@ -254,15 +254,15 @@ define(['jquery'], function($) {
             } else {
                 $.each(els, function() {
                     if (this.name && data[this.name]) {
-                        var names = data[this.name];
-                        var $this = $(this);
+                        let names = data[this.name];
+                        const $this = $(this);
                         if (Object.prototype.toString.call(names) !== '[object Array]') {
                             names = [names]; // backwards compat to old version of this code
                         }
                         if (this.type === 'checkbox' || this.type === 'radio') {
-                            var val = $this.val();
-                            var found = false;
-                            for (var i = 0; i < names.length; i++) {
+                            const val = $this.val();
+                            let found = false;
+                            for (let i = 0; i < names.length; i++) {
                                 if (names[i] === val) {
                                     found = true;
                                     break;

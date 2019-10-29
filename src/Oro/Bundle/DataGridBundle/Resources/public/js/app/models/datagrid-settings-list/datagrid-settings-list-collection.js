@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var DatagridSettingsListCollection;
-    var _ = require('underscore');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
+    const _ = require('underscore');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
 
-    DatagridSettingsListCollection = BaseCollection.extend({
+    const DatagridSettingsListCollection = BaseCollection.extend({
         comparator: 'order',
 
         /**
@@ -18,8 +17,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DatagridSettingsListCollection() {
-            DatagridSettingsListCollection.__super__.constructor.apply(this, arguments);
+        constructor: function DatagridSettingsListCollection(...args) {
+            DatagridSettingsListCollection.__super__.constructor.apply(this, args);
         },
 
         /**
@@ -28,7 +27,7 @@ define(function(require) {
         initialize: function(models, options) {
             _.extend(this, _.pick(options, ['minVisibleColumnsQuantity']));
 
-            DatagridSettingsListCollection.__super__.initialize.apply(this, arguments);
+            DatagridSettingsListCollection.__super__.initialize.call(this, models, options);
 
             this.on({
                 'change:renderable': this.updateVisibilityChange
@@ -38,8 +37,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        reset: function() {
-            DatagridSettingsListCollection.__super__.reset.apply(this, arguments);
+        reset: function(...args) {
+            DatagridSettingsListCollection.__super__.reset.apply(this, args);
 
             this.updateVisibilityChange();
 
@@ -54,11 +53,11 @@ define(function(require) {
          * (disables/enables show/hide column functionality)
          */
         updateVisibilityChange: function() {
-            var visibleColumns = this.where({renderable: true});
-            var disable = visibleColumns.length <= this.minVisibleColumnsQuantity;
+            const visibleColumns = this.where({renderable: true});
+            const disable = visibleColumns.length <= this.minVisibleColumnsQuantity;
 
             this.each(function(column) {
-                var state = Boolean(column.get('renderable') && (disable || column.get('required')));
+                const state = Boolean(column.get('renderable') && (disable || column.get('required')));
                 if (column.get('disabledVisibilityChange') !== state) {
                     column.set('disabledVisibilityChange', state);
                 }

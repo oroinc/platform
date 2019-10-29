@@ -3,7 +3,7 @@ define(['./columns'], function(GridColumns) {
 
     return {
         createFilteredColumnCollection: function(columns) {
-            var filteredColumns = new GridColumns(columns.where({renderable: true}));
+            const filteredColumns = new GridColumns(columns.where({renderable: true}));
 
             filteredColumns.listenTo(columns, 'change:renderable add remove reset', function() {
                 filteredColumns.reset(columns.where({renderable: true}));

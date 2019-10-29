@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
+    const _ = require('underscore');
 
     /**
      * Accepts tree of date variables and helps to manage them
@@ -54,13 +54,12 @@ define(function(require) {
      * @constructor
      */
     function DateVariableHelper(dateVariables) {
-        var variables;
         this.dateVariables = dateVariables;
         // plain object with variable id => variable title
-        variables = _.toArray(this.dateVariables);
+        const variables = _.toArray(this.dateVariables);
         variables.unshift({});
 
-        this.objectIndex = _.chain(_.extend.apply(_, variables))
+        this.objectIndex = _.chain(_.extend(...variables))
             .map(function(name, key) {
                 return {
                     key: key,
@@ -81,14 +80,13 @@ define(function(require) {
          * @returns {boolean}
          */
         isDateVariable: function(value) {
-            var result;
-            var self = this;
+            const self = this;
             // replace -5 +60 modifiers to '', we need clear variable
             value = value.replace(/( *[\-+]+ *(\d+)?)/, '');
 
-            result = _.some(this.objectIndex, function(item) {
-                var regexpVariable = new RegExp('^' + value + '$', 'i');
-                var isShortMonth =
+            const result = _.some(this.objectIndex, function(item) {
+                const regexpVariable = new RegExp('^' + value + '$', 'i');
+                const isShortMonth =
                         !/\s+/.test(item.name) &&
                         regexpVariable.test(item.name.substr(0, 3)) &&
                         self.dateVariables.month[item.key];
@@ -117,10 +115,10 @@ define(function(require) {
          * @returns {string}
          */
         formatRawValue: function(value) {
-            var displayValue = null;
+            let displayValue = null;
             _.each(this.objectIndex, function(item) {
-                var regexpVariable = new RegExp('^' + value + '$', 'i');
-                var isShortMonth =
+                const regexpVariable = new RegExp('^' + value + '$', 'i');
+                const isShortMonth =
                     !/\s+/.test(item.name) &&
                     regexpVariable.test(item.name.substr(0, 3)) &&
                     this.dateVariables.month[item.key];

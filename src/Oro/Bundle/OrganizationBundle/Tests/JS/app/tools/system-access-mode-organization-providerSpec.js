@@ -3,7 +3,7 @@ define([
 ], function(systemAccessModeOrganizationProvider) {
     'use strict';
 
-    var data = [
+    const data = [
         {
             url: 'http://host.com/config/mailbox/create?' +
                 'redirectData%5Bparameters%5D%5BactiveGroup%5D=platform&' +
@@ -29,8 +29,8 @@ define([
 
     describe('oroorganization/js/app/tools/system-access-mode-organization-provider', function() {
         it('should return organization id', function() {
-            var originalProperty = systemAccessModeOrganizationProvider._getCurrentUrl;
-            var currentUrl = null;
+            const originalProperty = systemAccessModeOrganizationProvider._getCurrentUrl;
+            let currentUrl = null;
             systemAccessModeOrganizationProvider._getCurrentUrl = function() {
                 return currentUrl;
             };

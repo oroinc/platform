@@ -1,6 +1,11 @@
 define(function(require) {
     'use strict';
 
+    const TextEditorView = require('./text-editor-view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    require('jquery.select2');
+
     /**
      * Select cell content editor. The cell value should be a value field.
      * The grid will render a corresponding label from the `options.choices` map.
@@ -67,13 +72,7 @@ define(function(require) {
      * @augments [TextEditorView](./text-editor-view.md)
      * @exports SelectEditorView
      */
-    var SelectEditorView;
-    var TextEditorView = require('./text-editor-view');
-    var _ = require('underscore');
-    var $ = require('jquery');
-    require('jquery.select2');
-
-    SelectEditorView = TextEditorView.extend(/** @lends SelectEditorView.prototype */{
+    const SelectEditorView = TextEditorView.extend(/** @lends SelectEditorView.prototype */{
         className: 'select-editor',
 
         SELECTED_ITEMS_H_MARGIN_BETWEEN: 5,
@@ -100,8 +99,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function SelectEditorView() {
-            SelectEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function SelectEditorView(options) {
+            SelectEditorView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
@@ -112,20 +111,20 @@ define(function(require) {
                     this.keyType = 'number';
                 }
             }
-            SelectEditorView.__super__.initialize.apply(this, arguments);
+            SelectEditorView.__super__.initialize.call(this, options);
             this.availableChoices = this.getAvailableOptions(options);
             this.prestine = true;
         },
 
         getAvailableOptions: function(options) {
-            var results;
-            var restrictionExpectation;
-            var choices = this.options.choices;
-            var fieldRestrictions = _.result(this.options, 'fieldRestrictions');
+            let results;
+            let restrictionExpectation;
+            const choices = this.options.choices;
+            const fieldRestrictions = _.result(this.options, 'fieldRestrictions');
             if (fieldRestrictions) {
                 restrictionExpectation = _.result(fieldRestrictions, 'mode') === 'disallow';
                 results = _.map(choices, function(value, label) {
-                    var presentInRestriction = _.indexOf(fieldRestrictions.values, value) !== -1;
+                    const presentInRestriction = _.indexOf(fieldRestrictions.values, value) !== -1;
                     return {
                         id: value,
                         text: label,
@@ -144,10 +143,9 @@ define(function(require) {
         },
 
         render: function() {
-            var select2options;
-            var _this = this;
+            const _this = this;
             SelectEditorView.__super__.render.call(this);
-            select2options = this.getSelect2Options();
+            const select2options = this.getSelect2Options();
             this.$('input[name=value]').inputWidget('create', 'select2', {initializeOptions: select2options});
             // select2 stops propagation of keydown event if key === ENTER or TAB
             // need to restore this functionality
@@ -159,7 +157,7 @@ define(function(require) {
 
             // must prevent selection on TAB
             this.$('input.select2-input').bindFirst('keydown' + this.eventNamespace(), function(e) {
-                var prestine = _this.prestine;
+                const prestine = _this.prestine;
                 _this.prestine = false;
                 switch (e.keyCode) {
                     case _this.ENTER_KEY_CODE:
@@ -236,7 +234,7 @@ define(function(require) {
         },
 
         onSelect2Open: function(e) {
-            var select2 = this.$(e.target).data('select2');
+            const select2 = this.$(e.target).data('select2');
             if (!select2) {
                 return;
             }
@@ -249,7 +247,7 @@ define(function(require) {
         },
 
         onSelect2Close: function(e) {
-            var select2 = this.$(e.target).data('select2');
+            const select2 = this.$(e.target).data('select2');
             if (!select2) {
                 return;
             }
@@ -265,7 +263,7 @@ define(function(require) {
         },
 
         focus: function() {
-            var isFocused = this.isFocused();
+            const isFocused = this.isFocused();
             this.$('input[name=value]').inputWidget('open');
             if (!isFocused) {
                 // trigger custom focus event as select2 doesn't trigger 'select2-focus' when focused manually
@@ -280,7 +278,7 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onFocusout: function(e) {
-            var select2 = this.$('input[name=value]').data('select2');
+            const select2 = this.$('input[name=value]').data('select2');
 
             if (!this._isSelection && !select2 || !select2.opened()) {
                 _.defer(_.bind(function() {
@@ -312,8 +310,8 @@ define(function(require) {
          * @returns {Object}
          */
         getServerUpdateData: function() {
-            var data = {};
-            var value = this.getValue();
+            const data = {};
+            let value = this.getValue();
             switch (this.keyType) {
                 case 'number':
                     value = parseFloat(value);

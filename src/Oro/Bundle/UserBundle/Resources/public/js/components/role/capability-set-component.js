@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var CapabilitySetComponent;
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
-    var PermissionModel = require('orouser/js/models/role/permission-model');
-    var CapabilitiesView = require('orouser/js/views/role/capabilities-view');
-    var accessLevels = require('orouser/js/constants/access-levels');
-    var capabilityCategories = require('orouser/js/constants/capability-categories');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
+    const PermissionModel = require('orouser/js/models/role/permission-model');
+    const CapabilitiesView = require('orouser/js/views/role/capabilities-view');
+    const accessLevels = require('orouser/js/constants/access-levels');
+    const capabilityCategories = require('orouser/js/constants/capability-categories');
 
-    CapabilitySetComponent = BaseComponent.extend({
+    const CapabilitySetComponent = BaseComponent.extend({
         /**
          * @type {Array<string>}
          */
@@ -20,8 +19,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function CapabilitySetComponent() {
-            CapabilitySetComponent.__super__.constructor.apply(this, arguments);
+        constructor: function CapabilitySetComponent(options) {
+            CapabilitySetComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -32,7 +31,7 @@ define(function(require) {
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['tabIds']));
-            var groups = _.map(options.data, function(group) {
+            const groups = _.map(options.data, function(group) {
                 group.items = _.map(group.items, function(item) {
                     item.editable = !options.readonly;
                     return item;
@@ -44,7 +43,7 @@ define(function(require) {
                         return item;
                     });
                 }
-                var itemsCollection = new BaseCollection(group.items, {
+                const itemsCollection = new BaseCollection(group.items, {
                     model: PermissionModel
                 });
                 this.listenTo(itemsCollection, 'change', _.bind(this.onAccessLevelChange, this, group.group));
@@ -62,8 +61,8 @@ define(function(require) {
                 el: options._sourceElement,
                 collection: new BaseCollection(groups),
                 filterer: _.bind(function(model) {
-                    var group = model.get('group');
-                    var currentCategory = this.currentCategory;
+                    const group = model.get('group');
+                    const currentCategory = this.currentCategory;
                     if (currentCategory.id === capabilityCategories.GENERAL) {
                         return group && !_.contains(options.tabIds, group);
                     }
@@ -96,7 +95,7 @@ define(function(require) {
          * @param {PermissionModel} model
          */
         onAccessLevelChange: function(group, model) {
-            var category = group;
+            let category = group;
             if (category && !_.contains(this.tabIds, category)) {
                 category = capabilityCategories.GENERAL;
             }

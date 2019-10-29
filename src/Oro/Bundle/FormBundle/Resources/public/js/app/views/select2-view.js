@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var Select2View;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
     require('jquery.select2');
 
-    Select2View = BaseView.extend({
+    const Select2View = BaseView.extend({
         events: {
             'change': 'onChange',
             'select2-data-loaded': 'onDataLoaded'
@@ -22,8 +21,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function Select2View() {
-            Select2View.__super__.constructor.apply(this, arguments);
+        constructor: function Select2View(options) {
+            Select2View.__super__.constructor.call(this, options);
         },
 
         /**
@@ -34,7 +33,7 @@ define(function(require) {
         initialize: function(options) {
             this.select2Config = _.result(options, 'select2Config') || _.extend({}, this.select2Config);
 
-            var $emptyOption = this.$el.find('option[value=""]');
+            const $emptyOption = this.$el.find('option[value=""]');
             if (this.select2Config.allowClear === undefined && (!this.$el[0].required || $emptyOption.length)) {
                 this.select2Config.allowClear = true;
             }

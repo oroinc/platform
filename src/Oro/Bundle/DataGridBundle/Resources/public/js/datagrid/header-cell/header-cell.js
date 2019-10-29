@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var HeaderCell;
-    var _ = require('underscore');
-    var Backgrid = require('backgrid');
-    var textUtil = require('oroui/js/tools/text-util');
-    var HintView = require('orodatagrid/js/app/views/hint-view');
+    const _ = require('underscore');
+    const Backgrid = require('backgrid');
+    const textUtil = require('oroui/js/tools/text-util');
+    const HintView = require('orodatagrid/js/app/views/hint-view');
 
     /**
      * Datagrid header cell
@@ -14,7 +13,7 @@ define(function(require) {
      * @class   orodatagrid.datagrid.headerCell.HeaderCell
      * @extends Backgrid.HeaderCell
      */
-    HeaderCell = Backgrid.HeaderCell.extend({
+    const HeaderCell = Backgrid.HeaderCell.extend({
 
         /** @property */
         template: _.template(
@@ -47,8 +46,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function HeaderCell() {
-            HeaderCell.__super__.constructor.apply(this, arguments);
+        constructor: function HeaderCell(options) {
+            HeaderCell.__super__.constructor.call(this, options);
         },
 
         /**
@@ -57,9 +56,9 @@ define(function(require) {
          * Add listening "reset" event of collection to able catch situation when
          * header cell should update it's sort state.
          */
-        initialize: function() {
+        initialize: function(options) {
             this.allowNoSorting = this.collection.multipleSorting;
-            HeaderCell.__super__.initialize.apply(this, arguments);
+            HeaderCell.__super__.initialize.call(this, options);
             this._initCellDirection(this.collection);
             this.listenTo(this.collection, 'reset', this._initCellDirection);
         },
@@ -72,7 +71,7 @@ define(function(require) {
                 return;
             }
             delete this.column;
-            HeaderCell.__super__.dispose.apply(this, arguments);
+            HeaderCell.__super__.dispose.call(this);
         },
 
         /**
@@ -90,9 +89,9 @@ define(function(require) {
          */
         _initCellDirection: function(collection) {
             if (collection === this.collection) {
-                var state = collection.state;
-                var direction = null;
-                var columnName = this.column.get('name');
+                const state = collection.state;
+                let direction = null;
+                const columnName = this.column.get('name');
                 if (this.column.get('sortable') && _.has(state.sorters, columnName)) {
                     if (1 === parseInt(state.sorters[columnName], 10)) {
                         direction = 'descending';
@@ -114,7 +113,7 @@ define(function(require) {
         render: function() {
             this.$el.empty();
 
-            var label = this.column.get('label');
+            let label = this.column.get('label');
 
             if (this.column.get('shortenableLabel') !== false) {
                 label = textUtil.abbreviate(label, this.minWordsToAbbreviate);
@@ -134,7 +133,7 @@ define(function(require) {
                 this.$el.width(this.column.get('width'));
             }
 
-            var cell = this.column.get('oldCell') || this.column.get('cell');
+            const cell = this.column.get('oldCell') || this.column.get('cell');
             if (!_.isFunction(cell.prototype.className)) {
                 this.$el.addClass(cell.prototype.className);
             }
@@ -155,11 +154,11 @@ define(function(require) {
         onClick: function(e) {
             e.preventDefault();
 
-            var column = this.column;
-            var collection = this.collection;
-            var event = 'backgrid:sort';
+            const column = this.column;
+            const collection = this.collection;
+            const event = 'backgrid:sort';
 
-            var cycleSort = _.bind(function(header, col) {
+            const cycleSort = _.bind(function(header, col) {
                 if (column.get('direction') === 'ascending') {
                     collection.trigger(event, col, 'descending');
                 } else if (this.allowNoSorting && column.get('direction') === 'descending') {
@@ -169,7 +168,7 @@ define(function(require) {
                 }
             }, this);
 
-            var toggleSort = function(header, col) {
+            const toggleSort = function(header, col) {
                 if (column.get('direction') === 'ascending') {
                     collection.trigger(event, col, 'descending');
                 } else {
@@ -177,9 +176,9 @@ define(function(require) {
                 }
             };
 
-            var sortable = Backgrid.callByNeed(column.sortable(), column, this.collection);
+            const sortable = Backgrid.callByNeed(column.sortable(), column, this.collection);
             if (sortable) {
-                var sortType = column.get('sortType');
+                const sortType = column.get('sortType');
                 if (sortType === 'toggle') {
                     toggleSort(this, column);
                 } else {
@@ -208,7 +207,7 @@ define(function(require) {
             }));
 
             this.hintTimeout = setTimeout(function() {
-                var hint = this.subview('hint');
+                const hint = this.subview('hint');
 
                 if (hint && (this.isLabelAbbreviated || !hint.fullLabelIsVisible())) {
                     this.subview('hint').show();

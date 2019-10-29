@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var DraggableSortingView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
     require('jquery-ui');
 
-    DraggableSortingView = BaseView.extend({
+    const DraggableSortingView = BaseView.extend({
         /**
          * @inheritDoc
          */
-        constructor: function DraggableSortingView() {
-            DraggableSortingView.__super__.constructor.apply(this, arguments);
+        constructor: function DraggableSortingView(options) {
+            DraggableSortingView.__super__.constructor.call(this, options);
         },
 
         render: function() {
@@ -22,7 +21,7 @@ define(function(require) {
         },
 
         reindexValues: function() {
-            var index = 1;
+            let index = 1;
             this.$('[name$="[_position]"]').each(function() {
                 $(this).val(index++);
             });

@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var RecentEmailsContentView;
-    var Backbone = require('backbone');
-    var _ = require('underscore');
-    var constants = require('orosidebar/js/sidebar-constants');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var EmailNotificationComponent = require('oroemail/js/app/components/email-notification-component');
+    const Backbone = require('backbone');
+    const _ = require('underscore');
+    const constants = require('orosidebar/js/sidebar-constants');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const EmailNotificationComponent = require('oroemail/js/app/components/email-notification-component');
 
-    RecentEmailsContentView = BaseView.extend({
+    const RecentEmailsContentView = BaseView.extend({
         component: null,
 
         listen: {
@@ -20,16 +19,16 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function RecentEmailsContentView() {
-            RecentEmailsContentView.__super__.constructor.apply(this, arguments);
+        constructor: function RecentEmailsContentView(options) {
+            RecentEmailsContentView.__super__.constructor.call(this, options);
         },
 
         render: function() {
             if (this.model.notificationComponentInstance) {
                 this.model.notificationComponentInstance.dispose();
             }
-            var settings = this.model.get('settings');
-            var options = {
+            const settings = this.model.get('settings');
+            const options = {
                 _sourceElement: this.$el,
                 collection: this.model.emailNotificationCollection,
                 countModel: this.model.emailNotificationCountModel,
@@ -49,7 +48,7 @@ define(function(require) {
         },
 
         onUpdatePosition: function() {
-            var emailNotificationView = this.model.notificationComponentInstance.view;
+            const emailNotificationView = this.model.notificationComponentInstance.view;
 
             if (this.model.collection.findWhere({state: constants.WIDGET_MAXIMIZED_HOVER}) !== void 0 &&
                 emailNotificationView instanceof Backbone.View &&

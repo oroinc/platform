@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var TransitionCollection;
-    var BaseCollection = require('oroui/js/app/models/base/collection');
-    var TransitionModel = require('./transition-model');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
+    const TransitionModel = require('./transition-model');
 
-    TransitionCollection = BaseCollection.extend({
+    const TransitionCollection = BaseCollection.extend({
         model: TransitionModel,
 
         /**
          * @inheritDoc
          */
-        constructor: function TransitionCollection() {
-            TransitionCollection.__super__.constructor.apply(this, arguments);
+        constructor: function TransitionCollection(...args) {
+            TransitionCollection.__super__.constructor.apply(this, args);
         }
     });
 

@@ -20,7 +20,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
      * from layout.js
      * ============================================================ */
     $(function() {
-        var $pageTitle = $('#page-title');
+        const $pageTitle = $('#page-title');
         if ($pageTitle.length) {
             document.title = $('<div.>').html($('#page-title').text()).text();
         }
@@ -33,12 +33,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             }
         });
 
-        var mainMenu = $('#main-menu');
-        var sideMainMenu = $('#side-menu');
+        const mainMenu = $('#main-menu');
+        const sideMainMenu = $('#side-menu');
 
         // trigger refresh of current page if active menu-item is clicked, despite the Backbone router limitations
         (sideMainMenu.length ? sideMainMenu : mainMenu).on('click', 'li.active a', function(e) {
-            var $target = $(e.target).closest('a');
+            const $target = $(e.target).closest('a');
             if (!$target.hasClass('unclickable') && $target[0] !== undefined && $target[0].pathname !== undefined) {
                 if (mediator.execute('compareUrl', $target[0].pathname)) {
                     mediator.execute('refreshPage');
@@ -65,8 +65,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                     // handle only events triggered with proper NS (omit just any shown events)
                     return;
                 }
-                var $html = $('html');
-                var $dropdownMenu = $('>.dropdown-menu', this);
+                const $html = $('html');
+                const $dropdownMenu = $('>.dropdown-menu', this);
 
                 if ($dropdownMenu.css('position') === 'fixed' && $dropdownMenu.outerWidth() === $html.width()) {
                     scrollHelper.disableBodyTouchScroll();
@@ -79,15 +79,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
 
         // fix + extend bootstrap.collapse functionality
         $(document).on('click.collapse.data-api', '[data-action^="accordion:"]', function(e) {
-            var $elem = $(e.target);
-            var action = $elem.data('action').slice(10);
-            var method = {'expand-all': 'show', 'collapse-all': 'hide'}[action];
-            var $target = $($elem.attr('data-target') || e.preventDefault() || $elem.attr('href'));
+            const $elem = $(e.target);
+            const action = $elem.data('action').slice(10);
+            const method = {'expand-all': 'show', 'collapse-all': 'hide'}[action];
+            const $target = $($elem.attr('data-target') || e.preventDefault() || $elem.attr('href'));
             $target.find('.collapse').collapse({toggle: false}).collapse(method);
         });
         $(document).on('shown.collapse.data-api hidden.collapse.data-api', '.accordion-body', function(e) {
             if (e.target === e.currentTarget) { // prevent processing if an event comes from child element
-                var $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]:first');
+                const $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]:first');
                 $toggle.toggleClass('collapsed', e.type !== 'shown');
             }
         });
@@ -98,7 +98,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
      * ============================================================ */
     // @TODO should be refactored in BAP-4020
     $(function() {
-        var adjustHeight;
+        let adjustHeight;
 
         if (tools.isMobile()) {
             adjustHeight = function() {
@@ -129,7 +129,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
      * from form_buttons.js
      * ============================================================ */
     $(document).on('click', '.action-button', function() {
-        var actionInput = $('input[name = "input_action"]');
+        const actionInput = $('input[name = "input_action"]');
         actionInput.val($(this).attr('data-action'));
     });
 
@@ -138,28 +138,28 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
      * ============================================================ */
     $(function() {
         $(document).on('click', '.remove-button', function(e) {
-            var el = $(this);
+            const el = $(this);
             if (!(el.is('[disabled]') || el.hasClass('disabled'))) {
-                var data = {
+                const data = {
                     content: el.data('message')
                 };
 
-                var okText = el.data('ok-text');
+                const okText = el.data('ok-text');
                 if (okText) {
                     data.okText = okText;
                 }
 
-                var title = el.data('title');
+                const title = el.data('title');
                 if (title) {
                     data.title = title;
                 }
 
-                var cancelText = el.data('cancel-text');
+                const cancelText = el.data('cancel-text');
                 if (cancelText) {
                     data.cancelText = cancelText;
                 }
 
-                var confirm = new DeleteConfirmation(data);
+                const confirm = new DeleteConfirmation(data);
 
                 confirm.on('ok', function() {
                     mediator.execute('showLoading');
@@ -169,7 +169,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                         type: 'DELETE',
                         success: function(data) {
                             el.trigger('removesuccess');
-                            var redirectTo = el.data('redirect');
+                            const redirectTo = el.data('redirect');
                             if (redirectTo) {
                                 mediator.execute('addMessage', 'success', el.data('success-message'));
 
@@ -207,16 +207,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
      * @return {string}
      */
 
-    var generateOroCollectionRows = function($listContainer, rowsCount) {
+    const generateOroCollectionRows = function($listContainer, rowsCount) {
         rowsCount = rowsCount || 1;
 
-        var lastIndex = -1;
-        var $items = $listContainer.children('[data-content]');
+        let lastIndex = -1;
+        const $items = $listContainer.children('[data-content]');
 
         if ($items.length > 0) {
-            var indexes = $items.toArray().map(function(item) {
-                var selector = '[data-content]:not([data-content=""])';
-                var content = $(item).find(selector).addBack(selector).attr('data-content');
+            const indexes = $items.toArray().map(function(item) {
+                const selector = '[data-content]:not([data-content=""])';
+                const content = $(item).find(selector).addBack(selector).attr('data-content');
 
                 if (_.isEmpty(content)) {
                     return -1;
@@ -224,7 +224,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
 
                 // Since `data-content` attribute can contain as full field name with index
                 // as plain index it needs to cover both cases
-                var matches = content.match(/\[(\d+)\]$/) || content.match(/^(\d+)$/);
+                const matches = content.match(/\[(\d+)\]$/) || content.match(/^(\d+)$/);
 
                 return matches ? Number(matches[1]) : -1;
             });
@@ -232,20 +232,20 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             lastIndex = _.max(indexes);
         }
 
-        var rowsHTML = '';
-        var prototypeName = $listContainer.attr('data-prototype-name') || '__name__';
-        var prototypeHtml = $listContainer.attr('data-prototype');
+        let rowsHTML = '';
+        const prototypeName = $listContainer.attr('data-prototype-name') || '__name__';
+        const prototypeHtml = $listContainer.attr('data-prototype');
 
-        for (var i = 1; i <= rowsCount; i++) {
+        for (let i = 1; i <= rowsCount; i++) {
             rowsHTML += prototypeHtml.replace(new RegExp(prototypeName, 'g'), lastIndex + i);
         }
 
         return rowsHTML;
     };
 
-    var validateContainer = function($container) {
-        var $validationField = $container.find('[data-name="collection-validation"]:first');
-        var $form = $validationField.closest('form');
+    const validateContainer = function($container) {
+        const $validationField = $container.find('[data-name="collection-validation"]:first');
+        const $form = $validationField.closest('form');
         if ($form.data('validator')) {
             $form.validate().element($validationField.get(0));
         }
@@ -256,16 +256,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         if ($(this).attr('disabled')) {
             return;
         }
-        var containerSelector = $(this).data('container') || '.collection-fields-list';
-        var $listContainer = $(this).closest('.row-oro').find(containerSelector).first();
-        var rowCountAdd = 1;
+        const containerSelector = $(this).data('container') || '.collection-fields-list';
+        const $listContainer = $(this).closest('.row-oro').find(containerSelector).first();
+        let rowCountAdd = 1;
         if ($(this).data('row-add-only-one')) {
             $(this).removeData('row-add-only-one');
         } else {
             rowCountAdd = $(containerSelector).data('row-count-add') || 1;
         }
 
-        var rowsHtml = generateOroCollectionRows($listContainer, rowCountAdd);
+        const rowsHtml = generateOroCollectionRows($listContainer, rowCountAdd);
 
         $listContainer.append(rowsHtml).trigger('content:changed');
 
@@ -282,9 +282,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         if ($(this).attr('disabled')) {
             return;
         }
-        var $item = $(this).closest('.row-oro').parent();
-        var $listContainer = $item.parent();
-        var nextItemHtml = generateOroCollectionRows($listContainer, 1);
+        const $item = $(this).closest('.row-oro').parent();
+        const $listContainer = $item.parent();
+        const nextItemHtml = generateOroCollectionRows($listContainer, 1);
 
         $item.after(nextItemHtml);
         $listContainer.trigger('content:changed');
@@ -300,13 +300,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             return;
         }
 
-        var item;
-        var closest = '*[data-content]';
+        let closest = '*[data-content]';
         if ($(this).data('closest')) {
             closest = $(this).data('closest');
         }
 
-        item = $(this).closest(closest);
+        const item = $(this).closest(closest);
         item.trigger('content:remove')
             .remove();
     });
@@ -315,8 +314,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
      * Support for [data-focusable] attribute
      */
     $(document).on('click', 'label[for]', function(e) {
-        var forAttribute = $(e.target).attr('for');
-        var labelForElement = $('#' + forAttribute + ':first');
+        const forAttribute = $(e.target).attr('for');
+        const labelForElement = $('#' + forAttribute + ':first');
         if (labelForElement.is('[data-focusable]')) {
             e.preventDefault();
             labelForElement.trigger('set-focus');

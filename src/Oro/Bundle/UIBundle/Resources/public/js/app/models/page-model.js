@@ -5,9 +5,7 @@ define([
 ], function(_, mediator, BaseModel) {
     'use strict';
 
-    var PageModel;
-
-    PageModel = BaseModel.extend({
+    const PageModel = BaseModel.extend({
         defaults: {
             currentRoute: '',
 
@@ -22,8 +20,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function PageModel() {
-            PageModel.__super__.constructor.apply(this, arguments);
+        constructor: function PageModel(attrs, options) {
+            PageModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
@@ -65,7 +63,7 @@ define([
          * @override
          */
         validate: function(attrs, options) {
-            var result;
+            let result;
             if (attrs.redirect) {
                 result = _.pick(attrs, ['redirect', 'fullRedirect', 'location']);
             }
@@ -80,10 +78,9 @@ define([
          * @private
          */
         _extendOptions: function(options) {
-            var headerId;
             options = options || {};
 
-            headerId = mediator.execute('retrieveOption', 'headerId');
+            const headerId = mediator.execute('retrieveOption', 'headerId');
             if (headerId) {
                 options.headers = options.headers || {};
                 options.headers[headerId] = true;

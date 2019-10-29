@@ -3,7 +3,7 @@ define([
 ], function(DateVariableHelper) {
     'use strict';
 
-    var dateVariableHelper = new DateVariableHelper({
+    const dateVariableHelper = new DateVariableHelper({
         value: {
             10: 'current day',
             11: 'current day without year'
@@ -14,7 +14,7 @@ define([
         }
     });
 
-    var data = [
+    const data = [
         {
             value: 'current day-1',
             isDateVariable: true,

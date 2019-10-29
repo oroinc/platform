@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var ActionPermissionsRowView;
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var PermissionView = require('orouser/js/datagrid/permission/permission-view');
-    var RolePermissionsActionView = require('orouser/js/datagrid/role-permissions-action-view');
-    var ActionPermissionsReadonlyRowView = require('./action-permissions-readonly-row-view');
-    var AccessLevelsCollection = require('orouser/js/models/role/access-levels-collection');
-    var FieldView = require('orouser/js/datagrid/action-permissions-field-view');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const PermissionView = require('orouser/js/datagrid/permission/permission-view');
+    const RolePermissionsActionView = require('orouser/js/datagrid/role-permissions-action-view');
+    const ActionPermissionsReadonlyRowView = require('./action-permissions-readonly-row-view');
+    const AccessLevelsCollection = require('orouser/js/models/role/access-levels-collection');
+    const FieldView = require('orouser/js/datagrid/action-permissions-field-view');
 
-    ActionPermissionsRowView = ActionPermissionsReadonlyRowView.extend({
+    const ActionPermissionsRowView = ActionPermissionsReadonlyRowView.extend({
         permissionItemView: PermissionView,
 
         fieldItemView: FieldView,
@@ -18,8 +17,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ActionPermissionsRowView() {
-            ActionPermissionsRowView.__super__.constructor.apply(this, arguments);
+        constructor: function ActionPermissionsRowView(options) {
+            ActionPermissionsRowView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -27,9 +26,9 @@ define(function(require) {
          */
         initialize: function(options) {
             ActionPermissionsRowView.__super__.initialize.call(this, options);
-            var fields = this.model.get('fields');
+            const fields = this.model.get('fields');
             if (fields.length) {
-                var routeName = this.model.get('permissions').accessLevels.getRouteName();
+                const routeName = this.model.get('permissions').accessLevels.getRouteName();
                 _.each(fields, function(field) {
                     field.permissions.each(function(model) {
                         model.accessLevels = new AccessLevelsCollection([], {
@@ -47,7 +46,7 @@ define(function(require) {
 
         render: function() {
             ActionPermissionsRowView.__super__.render.call(this);
-            var rolePermissionsActionView = new RolePermissionsActionView({
+            const rolePermissionsActionView = new RolePermissionsActionView({
                 el: this.$('[data-name=row-action]'),
                 accessLevels: this.model.get('permissions').accessLevels
             });

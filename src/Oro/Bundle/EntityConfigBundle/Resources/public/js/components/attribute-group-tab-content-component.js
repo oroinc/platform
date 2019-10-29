@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var AttributeGroupTabContentComponent;
-    var mediator = require('oroui/js/mediator');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const mediator = require('oroui/js/mediator');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    AttributeGroupTabContentComponent = BaseComponent.extend({
+    const AttributeGroupTabContentComponent = BaseComponent.extend({
         id: 0,
 
         el: null,
@@ -13,8 +12,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AttributeGroupTabContentComponent() {
-            AttributeGroupTabContentComponent.__super__.constructor.apply(this, arguments);
+        constructor: function AttributeGroupTabContentComponent(options) {
+            AttributeGroupTabContentComponent.__super__.constructor.call(this, options);
         },
 
         /**

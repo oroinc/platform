@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var builder = require('orodatagrid/js/row-select-for-widget/builder');
+    const $ = require('jquery');
+    const builder = require('orodatagrid/js/row-select-for-widget/builder');
 
     describe('orodatagrid/js/row-select-for-widget/builder', function() {
         function getOptions(rowSelectForWidgetOptions) {
@@ -17,7 +17,7 @@ define(function(require) {
         }
 
         it('processDatagridOptions() - multiSelect flag set to true', function() {
-            var options = getOptions({multiSelect: true});
+            const options = getOptions({multiSelect: true});
 
             builder.processDatagridOptions($.Deferred(), options);
 
@@ -26,7 +26,7 @@ define(function(require) {
         });
 
         it('processDatagridOptions() - multiSelect flag set to false', function() {
-            var options = getOptions({
+            const options = getOptions({
                 multiSelect: false,
                 wid: '123-345234-2345'
             });
@@ -38,9 +38,9 @@ define(function(require) {
         });
 
         it('processDatagridOptions() - missing wid option ', function() {
-            var options = getOptions({multiSelect: false});
+            const options = getOptions({multiSelect: false});
 
-            var functionThatThrows = function() {
+            const functionThatThrows = function() {
                 return builder.processDatagridOptions($.Deferred(), options);
             };
 

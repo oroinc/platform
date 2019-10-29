@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var DataAuditConditionView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
-    var AuditFilter = require('orodataaudit/js/audit-filter');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
+    const AuditFilter = require('orodataaudit/js/audit-filter');
 
-    DataAuditConditionView = FieldConditionView.extend({
+    const DataAuditConditionView = FieldConditionView.extend({
         /**
          * @inheritDoc
          */
-        constructor: function DataAuditConditionView() {
-            DataAuditConditionView.__super__.constructor.apply(this, arguments);
+        constructor: function DataAuditConditionView(options) {
+            DataAuditConditionView.__super__.constructor.call(this, options);
         },
 
         _ensureAuditFilter: function(auditFilterConfig) {
@@ -22,7 +21,7 @@ define(function(require) {
         },
 
         _renderAuditFilter: function(auditFilterConfig) {
-            var data = $.extend(true, {
+            const data = $.extend(true, {
                 criterion: {
                     data: {
                         auditFilter: _.extend({type: 'changed'}, auditFilterConfig)
@@ -30,7 +29,7 @@ define(function(require) {
                 }
             }, this.getValue());
 
-            var filterOptions = _.findWhere(this.options.filters, {
+            const filterOptions = _.findWhere(this.options.filters, {
                 type: 'datetime'
             });
 
@@ -38,12 +37,12 @@ define(function(require) {
                 throw new Error('Cannot find filter "datetime"');
             }
 
-            var AuditFilterConstructor = AuditFilter.extend(filterOptions);
+            const AuditFilterConstructor = AuditFilter.extend(filterOptions);
             this.auditFilter = new AuditFilterConstructor({
                 auditFilterType: data.criterion.data.auditFilter.type
             });
 
-            var auditFilterValue = _.result(data.criterion.data.auditFilter, 'data');
+            const auditFilterValue = _.result(data.criterion.data.auditFilter, 'data');
             if (auditFilterValue) {
                 this.auditFilter.value = auditFilterValue;
             }
@@ -68,14 +67,14 @@ define(function(require) {
         },
 
         _setAuditTypeState: function(auditType) {
-            var changedToValueMode = auditType === 'changed_to_value';
+            const changedToValueMode = auditType === 'changed_to_value';
             this.$el.removeClass('date-condition-type')
                 .toggleClass('changed-to-value-mode', changedToValueMode)
                 .toggleClass('changed-value-mode', !changedToValueMode);
             this.auditFilter._updateTooltipVisibility(changedToValueMode ? '' : 'value');
             if (changedToValueMode) {
-                var selectedField = this.$('input.select').inputWidget('val');
-                var conditions = this.subview('choice-input').getApplicableConditions(selectedField);
+                const selectedField = this.$('input.select').inputWidget('val');
+                const conditions = this.subview('choice-input').getApplicableConditions(selectedField);
                 if (_.contains(['date', 'datetime'], conditions.type)) {
                     this.$el.addClass('date-condition-type');
                 }
@@ -83,7 +82,7 @@ define(function(require) {
         },
 
         _getFilterCriterion: function() {
-            var filter = {
+            const filter = {
                 filter: this.filter.name,
                 data: this.filter.getValue()
             };
@@ -92,7 +91,7 @@ define(function(require) {
                 filter.params = this.filter.filterParams;
             }
 
-            var auditFilter = {};
+            let auditFilter = {};
             if (this.auditFilter) {
                 auditFilter = {
                     columnName: this.$('input.select').inputWidget('val'),
@@ -114,13 +113,13 @@ define(function(require) {
         },
 
         _appendFilter: function(filter) {
-            var auditFilterConfig;
-            var data = this.getValue();
+            let auditFilterConfig;
+            const data = this.getValue();
             if (data && data.criterion && data.criterion.data.auditFilter) {
                 auditFilterConfig = data.criterion.data.auditFilter;
             }
             if (data && data.criterion && data.criterion.data.filter) {
-                var criterion = $.extend(true, {
+                const criterion = $.extend(true, {
                     columnName: data.columnName
                 }, data.criterion.data.filter);
 
@@ -149,8 +148,8 @@ define(function(require) {
         },
 
         _hasEmptyFilter: function() {
-            var isEmptyFilter = DataAuditConditionView.__super__._hasEmptyFilter.call(this);
-            var isEmptyAuditFilter = !_.result(this.auditFilter, 'value') || this.auditFilter.isEmptyValue();
+            const isEmptyFilter = DataAuditConditionView.__super__._hasEmptyFilter.call(this);
+            const isEmptyAuditFilter = !_.result(this.auditFilter, 'value') || this.auditFilter.isEmptyValue();
             return isEmptyFilter && isEmptyAuditFilter;
         }
     });

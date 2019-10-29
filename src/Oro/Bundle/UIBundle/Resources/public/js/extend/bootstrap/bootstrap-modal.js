@@ -1,18 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const $ = require('jquery');
+    const _ = require('underscore');
     require('bootstrap-modal');
 
-    var NAME = 'modal';
-    var EVENT_KEY = '.bs.modal';
-    var Event = {
+    const NAME = 'modal';
+    const EVENT_KEY = '.bs.modal';
+    const Event = {
         FOCUSIN: 'focusin' + EVENT_KEY
     };
 
-    var Modal = $.fn[NAME].Constructor;
-    var original = _.pick(Modal.prototype, 'dispose');
+    const Modal = $.fn[NAME].Constructor;
+    const original = _.pick(Modal.prototype, 'dispose');
 
     Modal.prototype.dispose = function() {
         this._removeBackdrop();
@@ -25,7 +25,7 @@ define(function(require) {
      * Updated to support two modals on page
      */
     Modal.prototype._enforceFocus = function() {
-        var that = this;
+        const that = this;
 
         $(document).off(Event.FOCUSIN) // Guard against infinite focus loop
             .on(Event.FOCUSIN, function safeSetFocus(event) {

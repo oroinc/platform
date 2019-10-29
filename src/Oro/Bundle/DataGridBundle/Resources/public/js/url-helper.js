@@ -12,14 +12,13 @@ define(function() {
          * @protected
          */
         addUrlParameter: function(url, parameterName, parameterValue) {
-            var urlHash;
-            var cl;
-            var urlParts;
-            var newQueryString;
-            var parameters;
-            var parameterParts;
-            var i;
-            var replaceDuplicates = true;
+            let urlHash;
+            let cl;
+            let newQueryString;
+            let parameters;
+            let parameterParts;
+            let i;
+            const replaceDuplicates = true;
             if (url.indexOf('#') > 0) {
                 cl = url.indexOf('#');
                 urlHash = url.substring(url.indexOf('#'), url.length);
@@ -27,9 +26,9 @@ define(function() {
                 urlHash = '';
                 cl = url.length;
             }
-            var sourceUrl = url.substring(0, cl);
+            const sourceUrl = url.substring(0, cl);
 
-            urlParts = sourceUrl.split('?');
+            const urlParts = sourceUrl.split('?');
             newQueryString = '';
 
             if (urlParts.length > 1) {

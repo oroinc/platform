@@ -2,15 +2,14 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
 ], function(_, Backbone, AbstractWidgetView) {
     'use strict';
 
-    var $ = Backbone.$;
-    var ButtonsWidgetView;
+    const $ = Backbone.$;
 
     /**
      * @export  oro/buttons-widget
      * @class   oro.ButtonsWidgetView
      * @extends oroui.widget.AbstractWidgetView
      */
-    ButtonsWidgetView = AbstractWidgetView.extend({
+    const ButtonsWidgetView = AbstractWidgetView.extend({
         options: _.extend(
             _.extend({}, AbstractWidgetView.prototype.options),
             {
@@ -23,8 +22,8 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
         /**
          * @inheritDoc
          */
-        constructor: function ButtonsWidgetView() {
-            ButtonsWidgetView.__super__.constructor.apply(this, arguments);
+        constructor: function ButtonsWidgetView(options) {
+            ButtonsWidgetView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
@@ -53,13 +52,13 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
                     this._showRemote();
                 }
             }
-            AbstractWidgetView.prototype.show.apply(this);
+            AbstractWidgetView.prototype.show.call(this);
         },
 
         _showStatic: function() {
-            var anchorId = '_widget_anchor-' + this.getWid();
-            var anchorDiv = $('<div id="' + anchorId + '"/>');
-            var parent = this.widget.parent();
+            const anchorId = '_widget_anchor-' + this.getWid();
+            const anchorDiv = $('<div id="' + anchorId + '"/>');
+            const parent = this.widget.parent();
             anchorDiv.insertAfter(parent);
             $('#' + anchorId).replaceWith($(this.widget));
             parent.remove();

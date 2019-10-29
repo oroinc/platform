@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var BarChartComponent;
-    var Flotr = require('flotr2');
-    var numberFormatter = require('orolocale/js/formatter/number');
-    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
+    const Flotr = require('flotr2');
+    const numberFormatter = require('orolocale/js/formatter/number');
+    const BaseChartComponent = require('orochart/js/app/components/base-chart-component');
 
     /**
      * @class orochart.app.components.BarChartComponent
      * @extends orochart.app.components.BaseChartComponent
      * @exports orochart/app/components/horizontal_bar-char-component
      */
-    BarChartComponent = BaseChartComponent.extend({
+    const BarChartComponent = BaseChartComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function BarChartComponent() {
-            BarChartComponent.__super__.constructor.apply(this, arguments);
+        constructor: function BarChartComponent(options) {
+            BarChartComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -25,20 +24,19 @@ define(function(require) {
          * @overrides
          */
         draw: function() {
-            var intValue;
-            var maxValue = 0;
-            var $chart = this.$chart;
-            var data = this.data;
-            var options = this.options;
-            var settings = this.options.settings;
-            var formatter = options.data_schema.value.formatter;
+            let intValue;
+            let maxValue = 0;
+            const $chart = this.$chart;
+            const data = this.data;
+            const options = this.options;
+            const settings = this.options.settings;
+            const formatter = options.data_schema.value.formatter;
 
-            var yNumber = 0;
-            var chartData = [];
-            var yLabels = [];
-            var chartOptions;
+            let yNumber = 0;
+            const chartData = [];
+            const yLabels = [];
 
-            for (var i in data.reverse()) {
+            for (const i in data.reverse()) {
                 if (!data.hasOwnProperty(i)) {
                     continue;
                 }
@@ -48,7 +46,7 @@ define(function(require) {
                 yLabels.push(data[i].label);
             }
 
-            chartOptions = {
+            const chartOptions = {
                 data: chartData,
                 color: settings.chartColors[0],
                 markers: {
@@ -81,7 +79,7 @@ define(function(require) {
                         relative: true,
                         position: 'se',
                         trackFormatter: function(data) {
-                            var xValue;
+                            let xValue;
                             if (formatter) {
                                 xValue = numberFormatter[formatter](data.x);
                                 return numberFormatter[formatter](data.x);
@@ -105,8 +103,8 @@ define(function(require) {
                     },
                     yaxis: {
                         ticks: function() {
-                            var ticks = [];
-                            for (var i in yLabels) {
+                            const ticks = [];
+                            for (const i in yLabels) {
                                 if (yLabels[i]) {
                                     ticks.push([i, yLabels[i]]);
                                 }

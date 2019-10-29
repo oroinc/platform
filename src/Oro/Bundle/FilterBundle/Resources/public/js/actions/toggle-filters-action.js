@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var ToggleFiltersAction;
-    var mediator = require('oroui/js/mediator');
-    var AbstractAction = require('oro/datagrid/action/abstract-action');
-    var FiltersManager = require('orofilter/js/filters-manager');
+    const mediator = require('oroui/js/mediator');
+    const AbstractAction = require('oro/datagrid/action/abstract-action');
+    const FiltersManager = require('orofilter/js/filters-manager');
 
-    ToggleFiltersAction = AbstractAction.extend({
+    const ToggleFiltersAction = AbstractAction.extend({
         initialize: function(options) {
-            var opts = options || {};
+            const opts = options || {};
 
             if (!opts.datagrid) {
                 throw new TypeError('"datagrid" is required');
@@ -19,11 +18,11 @@ define(function(require) {
                 this.listenTo(this.datagrid.filterManager, 'changeViewMode', this.onFilterManagerModeChange);
             });
 
-            ToggleFiltersAction.__super__.initialize.apply(this, arguments);
+            ToggleFiltersAction.__super__.initialize.call(this, options);
         },
 
         execute: function() {
-            var newMode = this.datagrid.filterManager.getViewMode() === FiltersManager.STATE_VIEW_MODE
+            const newMode = this.datagrid.filterManager.getViewMode() === FiltersManager.STATE_VIEW_MODE
                 ? FiltersManager.MANAGE_VIEW_MODE : FiltersManager.STATE_VIEW_MODE;
 
             this.datagrid.filterManager.setViewMode(newMode);

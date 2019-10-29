@@ -1,14 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var DigitalAssetDialogWidget = require('orodigitalasset/js/widget/digital-asset-dialog-widget');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const DigitalAssetDialogWidget = require('orodigitalasset/js/widget/digital-asset-dialog-widget');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    var DigitalAssetChooseFormView;
-
-    DigitalAssetChooseFormView = BaseView.extend({
+    const DigitalAssetChooseFormView = BaseView.extend({
         previewElementTemplate: require('tpl-loader!orodigitalasset/templates/digital-asset-choose-form/preview.html'),
         autoRender: true,
 
@@ -38,15 +36,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DigitalAssetChooseFormView() {
-            DigitalAssetChooseFormView.__super__.constructor.apply(this, arguments);
+        constructor: function DigitalAssetChooseFormView(options) {
+            DigitalAssetChooseFormView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            DigitalAssetChooseFormView.__super__.initialize.apply(this, arguments);
+            DigitalAssetChooseFormView.__super__.initialize.call(this, options);
 
             this.options = $.extend(true, {}, this.options, options);
 
@@ -76,7 +74,7 @@ define(function(require) {
          *  }
          */
         onGridRowSelect: function(data) {
-            var previewMetadata = data.model.get('previewMetadata');
+            const previewMetadata = data.model.get('previewMetadata');
             this.findElement('filename').remove();
             this.findElement('controls').before(this.previewElementTemplate({
                 previewMetadata: previewMetadata,
@@ -124,7 +122,7 @@ define(function(require) {
         },
 
         removeValidationErrors: function() {
-            var $controlGroup = this.$el.closest('.control-group');
+            const $controlGroup = this.$el.closest('.control-group');
 
             $controlGroup.find('.validation-failed').remove();
             $controlGroup.find('.validation-error').removeClass('validation-error');

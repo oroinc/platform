@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var TransitionsShortRowView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    TransitionsShortRowView = BaseView.extend({
+    const TransitionsShortRowView = BaseView.extend({
         tagName: 'li',
 
         events: {
@@ -29,8 +28,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function TransitionsShortRowView() {
-            TransitionsShortRowView.__super__.constructor.apply(this, arguments);
+        constructor: function TransitionsShortRowView(options) {
+            TransitionsShortRowView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -38,7 +37,7 @@ define(function(require) {
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-            var template = this.options.template || $('#transition-row-short-template').html();
+            const template = this.options.template || $('#transition-row-short-template').html();
             this.template = _.template(template);
         },
 
@@ -58,8 +57,8 @@ define(function(require) {
         },
 
         render: function() {
-            var data = this.model.toJSON();
-            var stepTo = this.options.workflow.getStepByName(data.step_to);
+            const data = this.model.toJSON();
+            const stepTo = this.options.workflow.getStepByName(data.step_to);
             data.stepToLabel = stepTo ? stepTo.get('label') : '';
 
             this.$el.html(this.template(data));

@@ -1,30 +1,29 @@
 define(function(require) {
     'use strict';
 
-    var AggregatedFieldConditionView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
 
-    AggregatedFieldConditionView = FieldConditionView.extend({
+    const AggregatedFieldConditionView = FieldConditionView.extend({
         /**
          * @inheritDoc
          */
-        constructor: function AggregatedFieldConditionView() {
-            AggregatedFieldConditionView.__super__.constructor.apply(this, arguments);
+        constructor: function AggregatedFieldConditionView(options) {
+            AggregatedFieldConditionView.__super__.constructor.call(this, options);
         },
 
         getDefaultOptions: function() {
-            var defaultOptions = AggregatedFieldConditionView.__super__.getDefaultOptions.call(this);
+            const defaultOptions = AggregatedFieldConditionView.__super__.getDefaultOptions.call(this);
             return _.extend({}, defaultOptions, {
                 columnsCollection: null
             });
         },
 
         render: function() {
-            var data = this.getValue();
+            const data = this.getValue();
             if (data && data.columnName && data.func) {
-                var column = this._getColumnByNameAndFunc(data.columnName, data.func);
+                const column = this._getColumnByNameAndFunc(data.columnName, data.func);
                 if (column) {
                     this.$('.' + this.options.choiceInputClass).data('data', {
                         id: column.get('name'),
@@ -36,10 +35,10 @@ define(function(require) {
                 select2ResultsCallback: this.fieldChoiceResultsCallback.bind(this),
                 applicableConditionsCallback: this.applicableConditionsCallback.bind(this)
             });
-            var select2Opts = this.options.fieldChoice.select2;
+            const select2Opts = this.options.fieldChoice.select2;
 
             if (select2Opts) {
-                var templateString = select2Opts.formatSelectionTemplate ||
+                const templateString = select2Opts.formatSelectionTemplate ||
                     $(select2Opts.formatSelectionTemplateSelector).text();
                 if (templateString) {
                     this.options.fieldChoice = _.extend({}, this.options.fieldChoice, {
@@ -79,10 +78,10 @@ define(function(require) {
         },
 
         _compileSelectionTpl: function(template) {
-            var compiledTemplate = _.template(template);
+            const compiledTemplate = _.template(template);
             return _.bind(function(data) {
-                var result = compiledTemplate(data);
-                var func = this._getCurrentFunc();
+                let result = compiledTemplate(data);
+                const func = this._getCurrentFunc();
                 if (func && func.name) {
                     result += ' (' + func.name + ')';
                 }
@@ -91,7 +90,7 @@ define(function(require) {
         },
 
         applicableConditionsCallback: function(result, fieldId) {
-            var returnType = _.result(this._getCurrentFunc(), 'return_type');
+            const returnType = _.result(this._getCurrentFunc(), 'return_type');
             if (returnType) {
                 result.type = returnType;
             }
@@ -119,7 +118,7 @@ define(function(require) {
         },
 
         _collectValue: function() {
-            var value = AggregatedFieldConditionView.__super__._collectValue.call(this);
+            const value = AggregatedFieldConditionView.__super__._collectValue.call(this);
             if (!_.isEmpty(value)) {
                 value.func = this._getCurrentFunc();
             }
@@ -131,7 +130,7 @@ define(function(require) {
         },
 
         _getCurrentFunc: function() {
-            var column = this.options.columnsCollection.findWhere({label: this._getColumnLabel()});
+            const column = this.options.columnsCollection.findWhere({label: this._getColumnLabel()});
             if (_.isEmpty(column)) {
                 return;
             }
@@ -150,7 +149,7 @@ define(function(require) {
         },
 
         _getFilterCriterion: function() {
-            var criterion = AggregatedFieldConditionView.__super__._getFilterCriterion.call(this);
+            const criterion = AggregatedFieldConditionView.__super__._getFilterCriterion.call(this);
             $.extend(true, criterion, {
                 data: {
                     params: {
@@ -163,7 +162,7 @@ define(function(require) {
         },
 
         _hasEmptyFilter: function() {
-            var isEmptyFilter = AggregatedFieldConditionView.__super__._hasEmptyFilter.call(this);
+            const isEmptyFilter = AggregatedFieldConditionView.__super__._hasEmptyFilter.call(this);
             return isEmptyFilter || _.isEmpty(this._getCurrentFunc());
         }
     });

@@ -1,12 +1,16 @@
 define(function(require) {
     'use strict';
 
+    const _ = require('underscore');
+    const routing = require('routing');
+    const BaseModel = require('./base/model');
+
     /**
      * Abstraction of route
      *
      * Basic usage:
      * ```javascript
-     * var route = new RouteModel({
+     * const route = new RouteModel({
      *     // route specification
      *     routeName: 'oro_api_comment_get_items',
      *     routeQueryParameterNames: ['page', 'limit'],
@@ -30,12 +34,7 @@ define(function(require) {
      * @augment BaseModel
      * @exports RouteModel
      */
-    var RouteModel;
-    var _ = require('underscore');
-    var routing = require('routing');
-    var BaseModel = require('./base/model');
-
-    RouteModel = BaseModel.extend(/** @lends RouteModel.prototype */{
+    const RouteModel = BaseModel.extend(/** @lends RouteModel.prototype */{
         /**
          * Route name cache prepared for
          *
@@ -53,8 +52,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function RouteModel() {
-            RouteModel.__super__.constructor.apply(this, arguments);
+        constructor: function RouteModel(attrs, options) {
+            RouteModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
@@ -91,11 +90,11 @@ define(function(require) {
                 if (!this.get('routeName')) {
                     throw new Error('routeName must be specified');
                 }
-                var route = routing.getRoute(this.get('routeName'));
-                var variableTokens = _.filter(route.tokens, function(tokenPart) {
+                const route = routing.getRoute(this.get('routeName'));
+                const variableTokens = _.filter(route.tokens, function(tokenPart) {
                     return tokenPart[0] === 'variable';
                 });
-                var routeParameters = _.map(variableTokens, function(tokenPart) {
+                const routeParameters = _.map(variableTokens, function(tokenPart) {
                     return tokenPart[3];
                 });
                 this._requiredParametersCache = _.uniq(routeParameters);
@@ -114,8 +113,8 @@ define(function(require) {
          * @returns {Array.<string>}
          */
         getAcceptableParameters: function() {
-            var routeParameters = this.getRequiredParameters();
-            routeParameters.push.apply(routeParameters, this.get('routeQueryParameterNames'));
+            const routeParameters = this.getRequiredParameters();
+            routeParameters.push(...this.get('routeQueryParameterNames'));
             return _.uniq(routeParameters);
         },
 
@@ -126,8 +125,8 @@ define(function(require) {
          * @returns {string} route url
          */
         getUrl: function(parameters) {
-            var routeParameters = _.extend(this.toJSON(), parameters);
-            var acceptableParameters = this.getAcceptableParameters();
+            const routeParameters = _.extend(this.toJSON(), parameters);
+            const acceptableParameters = this.getAcceptableParameters();
             return routing.generate(this.get('routeName'), _.pick(routeParameters, acceptableParameters));
         },
 
@@ -138,12 +137,12 @@ define(function(require) {
          * @returns {boolean} true, if parameters are valid
          */
         validateParameters: function(parameters) {
-            var routeParameters = _.extend(this.toJSON(), parameters);
-            var requiredParameters = this.getRequiredParameters();
+            const routeParameters = _.extend(this.toJSON(), parameters);
+            const requiredParameters = this.getRequiredParameters();
 
-            for (var i = 0; i < requiredParameters.length; i++) {
-                var parameterName = requiredParameters[i];
-                var parameterValue = routeParameters[parameterName];
+            for (let i = 0; i < requiredParameters.length; i++) {
+                const parameterName = requiredParameters[i];
+                const parameterValue = routeParameters[parameterName];
                 if (_.isString(parameterValue)) {
                     if (parameterValue !== '') {
                         continue;

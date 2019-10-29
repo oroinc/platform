@@ -2,13 +2,12 @@ define(['backbone', './model'
 ], function(Backbone, StateModel) {
     'use strict';
 
-    var WindowsCollection;
     /**
      * @export  orowindows/js/dialog/state/collection
      * @class   orowindows.dialog.state.Collection
      * @extends Backbone.Collection
      */
-    WindowsCollection = Backbone.Collection.extend({
+    const WindowsCollection = Backbone.Collection.extend({
         model: StateModel,
 
         url: function() {
@@ -18,8 +17,8 @@ define(['backbone', './model'
         /**
          * @inheritDoc
          */
-        constructor: function WindowsCollection() {
-            WindowsCollection.__super__.constructor.apply(this, arguments);
+        constructor: function WindowsCollection(...args) {
+            WindowsCollection.__super__.constructor.apply(this, args);
         }
     });
 

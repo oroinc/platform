@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var loadModules = require('oroui/js/app/services/load-modules');
-    var tools = {};
-    var iOS = /(iPad|iPhone)/.test(navigator.userAgent);
-    var edge = /(Edge\/)/.test(navigator.userAgent);
-    var ie11 = /(Trident\/)/.test(navigator.userAgent);
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const tools = {};
+    const iOS = /(iPad|iPhone)/.test(navigator.userAgent);
+    const edge = /(Edge\/)/.test(navigator.userAgent);
+    const ie11 = /(Trident\/)/.test(navigator.userAgent);
 
     /**
      * @export oroui/js/tools
@@ -37,14 +37,14 @@ define(function(require) {
          * @return {String}
          */
         packToQuerySortedString: function(object) {
-            var self = this;
-            var result = [];
-            var add = function(key, value) {
+            const self = this;
+            const result = [];
+            const add = function(key, value) {
                 result[result.length] = encodeURIComponent(key) + '=' +
                     encodeURIComponent(value === null ? '' : value);
             };
 
-            var buildParams = function(pref, obj) {
+            const buildParams = function(pref, obj) {
                 if (self.isArrayLikeObject(obj)) {
                     obj = _.toArray(obj);
                 }
@@ -55,10 +55,10 @@ define(function(require) {
                         buildParams(pref + '[' + (typeof value === 'object' ? key : '') + ']', value);
                     });
                 } else if (typeof obj === 'object') {
-                    var keys = _.keys(obj);
+                    const keys = _.keys(obj);
                     keys.sort();
-                    for (var i = 0; i < keys.length; i++) {
-                        var name = keys[i];
+                    for (let i = 0; i < keys.length; i++) {
+                        const name = keys[i];
                         buildParams(pref + '[' + name + ']', obj[name]);
                     }
                 } else {
@@ -66,10 +66,10 @@ define(function(require) {
                 }
             };
 
-            var keys = _.keys(object);
+            const keys = _.keys(object);
             keys.sort();
-            for (var i = 0; i < keys.length; i++) {
-                var prefix = keys[i];
+            for (let i = 0; i < keys.length; i++) {
+                const prefix = keys[i];
                 buildParams(prefix, object[prefix]);
             }
             return result.join('&');
@@ -85,9 +85,9 @@ define(function(require) {
             if (query.charAt(0) === '?') {
                 query = query.slice(1);
             }
-            var setValue = function(root, path, value) {
+            const setValue = function(root, path, value) {
                 if (path.length > 1) {
-                    var dir = path.shift();
+                    const dir = path.shift();
                     if (typeof root[dir] === 'undefined') {
                         root[dir] = path[0] === '' ? [] : {};
                     }
@@ -100,18 +100,18 @@ define(function(require) {
                     }
                 }
             };
-            var nvp = query.split('&');
-            var data = {};
-            for (var i = 0; i < nvp.length; i++) {
-                var pair = nvp[i].split('=');
+            const nvp = query.split('&');
+            const data = {};
+            for (let i = 0; i < nvp.length; i++) {
+                const pair = nvp[i].split('=');
                 if (pair.length < 2) {
                     continue;
                 }
-                var name = this.decodeUriComponent(pair[0]);
-                var value = this.decodeUriComponent(pair[1]);
+                const name = this.decodeUriComponent(pair[0]);
+                const value = this.decodeUriComponent(pair[1]);
 
-                var path = name.match(/(^[^\[]+)(\[.*\]$)?/);
-                var first = path[1];
+                let path = name.match(/(^[^\[]+)(\[.*\]$)?/);
+                const first = path[1];
                 if (path[2]) {
                     // case of 'array[level1]' || 'array[level1][level2]'
                     path = path[2].match(/(?=\[(.*)\]$)/)[1].split('][');
@@ -134,7 +134,7 @@ define(function(require) {
          * @protected
          */
         decodeUriComponent: function(string) {
-            var result = string.replace(/\+/g, '%20');
+            let result = string.replace(/\+/g, '%20');
             result = decodeURIComponent(result);
             return result;
         },
@@ -152,13 +152,13 @@ define(function(require) {
          * @return {Object}
          */
         invertKeys: function(object, keys) {
-            var result = _.extend({}, object);
-            for (var key in keys) {
+            const result = _.extend({}, object);
+            for (const key in keys) {
                 if (!keys.hasOwnProperty(key)) {
                     continue;
                 }
-                var baseKey = key;
-                var mirrorKey = keys[key];
+                const baseKey = key;
+                const mirrorKey = keys[key];
 
                 if (baseKey in result) {
                     result[mirrorKey] = result[baseKey];
@@ -178,7 +178,7 @@ define(function(require) {
         isEqualsLoosely: function(value1, value2) {
             if (!_.isObject(value1)) {
                 if (_.isNumber(value1) || _.isNumber(value2)) {
-                    var toNumber = function(v) {
+                    const toNumber = function(v) {
                         if (_.isString(v) && v === '') {
                             return NaN;
                         }
@@ -188,15 +188,15 @@ define(function(require) {
                 }
                 return ((value1 || '') === (value2 || ''));
             } else if (_.isObject(value1)) {
-                var valueKeys = _.keys(value1);
+                let valueKeys = _.keys(value1);
 
                 if (_.isObject(value2)) {
                     valueKeys = _.unique(valueKeys.concat(_.keys(value2)));
-                    for (var index in valueKeys) {
+                    for (const index in valueKeys) {
                         if (!valueKeys.hasOwnProperty(index)) {
                             continue;
                         }
-                        var key = valueKeys[index];
+                        const key = valueKeys[index];
                         if (!_.has(value2, key) || !this.isEqualsLoosely(value1[key], value2[key])) {
                             return false;
                         }
@@ -297,7 +297,7 @@ define(function(require) {
          */
         loadModuleAndReplace: function(container, moduleProperty) {
             if (_.isFunction(container[moduleProperty])) {
-                var deferred = $.Deferred();
+                const deferred = $.Deferred();
                 deferred.resolve(container[moduleProperty]);
                 return deferred.promise();
             }
@@ -322,9 +322,8 @@ define(function(require) {
          * @param {string} flags
          */
         safeRegExp: function(str, flags) {
-            var expression;
             str = str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-            expression = new RegExp('(' + str + ')', flags);
+            const expression = new RegExp('(' + str + ')', flags);
             return expression;
         },
 
@@ -334,8 +333,8 @@ define(function(require) {
          */
         createRandomUUID: function() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0;
-                var v = c === 'x' ? r : (r & 0x3 | 0x8);
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
         },
@@ -359,9 +358,9 @@ define(function(require) {
             if (typeof object !== 'object') {
                 return false;
             }
-            var keys = _.keys(object);
-            for (var i = 0; i < keys.length; i++) {
-                var key = keys[i];
+            const keys = _.keys(object);
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
                 if (String(key) !== String(i)) {
                     return false;
                 }
@@ -386,7 +385,7 @@ define(function(require) {
          * @param {string} styles
          */
         addCSSRule: function(selector, styles) {
-            var styleSheet = document.styleSheets[0];
+            const styleSheet = document.styleSheets[0];
             styleSheet.insertRule(selector + '{' + styles + '}', styleSheet.cssRules.length);
         },
 
@@ -394,7 +393,7 @@ define(function(require) {
          * @param {Object} event
          */
         isTargetBlankEvent: function(event) {
-            var mouseMiddleButton = 2;
+            const mouseMiddleButton = 2;
             return event.shiftKey || event.altKey || event.ctrlKey || event.metaKey ||
                 event.which === mouseMiddleButton;
         },
@@ -406,14 +405,14 @@ define(function(require) {
          * @returns {string|null}
          */
         getElementXPath: function(element) {
-            var paths = [];
-            var tagName = element.nodeName.toLowerCase();
+            const paths = [];
+            let tagName = element.nodeName.toLowerCase();
             if (element && element.id) {
                 return '//' + tagName + '[@id="' + element.id + '"]';
             } else {
                 // Use nodeName (instead of localName) so namespace prefix is included (if any).
                 for (; element && element.nodeType === 1; element = element.parentNode) {
-                    var index = 0;
+                    let index = 0;
                     tagName = element.nodeName.toLowerCase();
                     // EXTRA TEST FOR ELEMENT.ID
                     if (element && element.id) {
@@ -421,7 +420,7 @@ define(function(require) {
                         break;
                     }
 
-                    for (var sibling = element.previousSibling; sibling; sibling = sibling.previousSibling) {
+                    for (let sibling = element.previousSibling; sibling; sibling = sibling.previousSibling) {
                         // Ignore document type declaration.
                         if (sibling.nodeType === Node.DOCUMENT_TYPE_NODE) {
                             continue;
@@ -431,8 +430,8 @@ define(function(require) {
                         }
                     }
 
-                    var pathIndex = '[' + (index + 1) + ']';
-                    var classAttr = element.className ? '[@class="' + element.className + '"]' : '';
+                    const pathIndex = '[' + (index + 1) + ']';
+                    const classAttr = element.className ? '[@class="' + element.className + '"]' : '';
                     paths.splice(0, 0, tagName + pathIndex + classAttr);
                 }
 

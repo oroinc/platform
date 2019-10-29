@@ -7,7 +7,7 @@ define(function(require) {
      * @type {Object}
      * @exports defaultEditors
      */
-    var defaultEditors = {
+    const defaultEditors = {
         /**
          * Please see [text-editor-view](../../../../FormBundle/Resources/doc/editor/text-editor-view.md) for details
          *

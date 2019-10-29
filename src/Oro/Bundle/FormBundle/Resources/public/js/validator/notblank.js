@@ -2,7 +2,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate
 ], function($, _, __) {
     'use strict';
 
-    var defaultParam = {
+    const defaultParam = {
         message: 'This value should not be blank.'
     };
 
@@ -11,8 +11,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate
      */
     return [
         'NotBlank',
-        function() {
-            return $.validator.methods.required.apply(this, arguments);
+        function(...args) {
+            return $.validator.methods.required.apply(this, args);
         },
         function(param) {
             param = _.extend({}, defaultParam, param);

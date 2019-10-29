@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var ActivityContextModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
     /**
      * @export  oroactivity/js/app/models/activity-context-model
      */
-    ActivityContextModel = BaseModel.extend({
+    const ActivityContextModel = BaseModel.extend({
         defaults: {
             label: '',
             first: '',
@@ -18,8 +17,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ActivityContextModel() {
-            ActivityContextModel.__super__.constructor.apply(this, arguments);
+        constructor: function ActivityContextModel(...args) {
+            ActivityContextModel.__super__.constructor.apply(this, args);
         }
     });
 

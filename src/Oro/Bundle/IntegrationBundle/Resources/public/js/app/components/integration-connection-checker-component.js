@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
+    const $ = require('jquery');
 
-    var IntegrationConnectionCheckerComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-    var messenger = require('oroui/js/messenger');
-    var systemAccessModeOrganizationProvider = require('oroorganization/js/app/tools/system-access-mode-organization-provider');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const messenger = require('oroui/js/messenger');
+    const systemAccessModeOrganizationProvider = require('oroorganization/js/app/tools/system-access-mode-organization-provider');
 
-    IntegrationConnectionCheckerComponent = BaseComponent.extend({
+    const IntegrationConnectionCheckerComponent = BaseComponent.extend({
         /**
          * @property {jquery} $button
          */
@@ -33,8 +32,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function IntegrationConnectionCheckerComponent() {
-            IntegrationConnectionCheckerComponent.__super__.constructor.apply(this, arguments);
+        constructor: function IntegrationConnectionCheckerComponent(options) {
+            IntegrationConnectionCheckerComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -62,10 +61,10 @@ define(function(require) {
         },
 
         checkConnection: function() {
-            var self = this;
-            var data = this.$form.serialize();
+            const self = this;
+            let data = this.$form.serialize();
 
-            var organizationId = systemAccessModeOrganizationProvider.getOrganizationId();
+            const organizationId = systemAccessModeOrganizationProvider.getOrganizationId();
 
             if (organizationId) {
                 data += '&_sa_org_id=' + organizationId;
@@ -89,7 +88,7 @@ define(function(require) {
          * @param {{success: bool, message: string}} response
          */
         successHandler: function(response) {
-            var type = 'error';
+            let type = 'error';
             if (response.success) {
                 type = 'success';
             }

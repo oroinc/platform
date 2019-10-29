@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var InnerPageModel = require('oroviewswitcher/js/app/models/inner-page-model');
-    var instance;
+    const InnerPageModel = require('oroviewswitcher/js/app/models/inner-page-model');
+    let instance;
 
     return {
         getModel: function() {

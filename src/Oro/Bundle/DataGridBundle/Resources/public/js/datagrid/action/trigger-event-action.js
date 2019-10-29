@@ -4,8 +4,7 @@ define([
 ], function(_, ModelAction) {
     'use strict';
 
-    var TriggerEventAction;
-    var mediator = require('oroui/js/mediator');
+    const mediator = require('oroui/js/mediator');
 
     /**
      * Trigger Event action. Trigger event from options.
@@ -14,26 +13,19 @@ define([
      * @class   oro.datagrid.action.TriggerEventAction
      * @extends oro.datagrid.action.ModelAction
      */
-    TriggerEventAction = ModelAction.extend({
+    const TriggerEventAction = ModelAction.extend({
         /**
          * @inheritDoc
          */
-        constructor: function TriggerEventAction() {
-            TriggerEventAction.__super__.constructor.apply(this, arguments);
-        },
-
-        /**
-         * @inheritDoc
-         */
-        initialize: function() {
-            TriggerEventAction.__super__.initialize.apply(this, arguments);
+        constructor: function TriggerEventAction(options) {
+            TriggerEventAction.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         execute: function() {
-            var scope = this.datagrid.getGridScope();
+            const scope = this.datagrid.getGridScope();
             if (scope) {
                 mediator.trigger(this.event_name + ':' + scope, [this.model.id]);
             }

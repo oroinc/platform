@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var ViewSqlQueryPlugin;
-    var BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    var SqlQueryView = require('../../views/sql-query/sql-query-view');
+    const BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    const SqlQueryView = require('../../views/sql-query/sql-query-view');
 
-    ViewSqlQueryPlugin = BasePlugin.extend({
+    const ViewSqlQueryPlugin = BasePlugin.extend({
         enable: function() {
             this.view = new SqlQueryView({
                 autoRender: true,

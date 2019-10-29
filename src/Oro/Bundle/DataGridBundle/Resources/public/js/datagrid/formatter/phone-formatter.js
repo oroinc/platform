@@ -9,9 +9,9 @@ define(['underscore', 'backgrid'
      * @class   orodatagrid.datagrid.formatter.PhoneFormatter
      * @extends Backgrid.CellFormatter
      */
-    var PhoneFormatter = function(options) {
+    function PhoneFormatter(options) {
         Backgrid.CellFormatter.call(this, options);
-    };
+    }
     PhoneFormatter.prototype = Object.create(Backgrid.CellFormatter);
 
     _.extend(PhoneFormatter.prototype, {
@@ -33,7 +33,7 @@ define(['underscore', 'backgrid'
          * @return {string}
          */
         generateLinkHTML: function(phoneNumber) {
-            var number = phoneNumber.trim();
+            const number = phoneNumber.trim();
             return '<a href="tel:' + _.escape(number) + '" class="nowrap">' + _.escape(number) + '</a>';
         }
     });

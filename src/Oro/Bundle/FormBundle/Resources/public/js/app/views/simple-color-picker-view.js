@@ -2,12 +2,12 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
 ], function(_, BaseSimpleColorPickerView) {
     'use strict';
 
-    var SimpleColorPickerView = BaseSimpleColorPickerView.extend({
+    const SimpleColorPickerView = BaseSimpleColorPickerView.extend({
         /**
          * @inheritDoc
          */
-        constructor: function SimpleColorPickerView() {
-            SimpleColorPickerView.__super__.constructor.apply(this, arguments);
+        constructor: function SimpleColorPickerView(options) {
+            SimpleColorPickerView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -24,8 +24,8 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
         _processOptions: function(options) {
             SimpleColorPickerView.__super__._processOptions.call(this, options);
 
-            var selectedVal = this.$el.val();
-            var customIndex = _.findIndex(options.data, function(item) {
+            const selectedVal = this.$el.val();
+            const customIndex = _.findIndex(options.data, function(item) {
                 return item.class === 'custom-color';
             });
 
@@ -38,7 +38,7 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
                     }
                 } else {
                     // set custom color
-                    var selectedIndex = _.findIndex(options.data, function(item) {
+                    const selectedIndex = _.findIndex(options.data, function(item) {
                         return item.id === selectedVal;
                     });
 

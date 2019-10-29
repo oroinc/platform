@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var sync = require('orosync/js/sync');
-    var jsmoduleExposure = require('jsmodule-exposure');
-    var exposure = jsmoduleExposure.disclose('orosync/js/sync');
+    const sync = require('orosync/js/sync');
+    const jsmoduleExposure = require('jsmodule-exposure');
+    const exposure = jsmoduleExposure.disclose('orosync/js/sync');
 
     xdescribe('orosync/js/sync', function() {
-        var service;
-        var messenger;
+        let service;
+        let messenger;
 
         beforeEach(function() {
             service = jasmine.createSpyObj('service', ['subscribe', 'unsubscribe', 'connect']);
@@ -39,9 +39,9 @@ define(function(require) {
         });
 
         describe('model changes subscription', function() {
-            var model;
-            var subscribeModel;
-            var unsubscribeModel;
+            let model;
+            let subscribeModel;
+            let unsubscribeModel;
 
             beforeEach(function() {
                 subscribeModel = exposure.retrieve('subscribeModel');
@@ -58,13 +58,12 @@ define(function(require) {
             });
 
             it('subscribe existing model', function() {
-                var setModelAttrsCallback;
                 model.id = 1;
                 subscribeModel(model);
                 expect(service.subscribe).toHaveBeenCalledWith(model.url(), jasmine.any(Function));
                 expect(model.on).toHaveBeenCalledWith('remove', unsubscribeModel);
                 // same callback function event
-                setModelAttrsCallback = service.subscribe.calls.mostRecent().args[1];
+                const setModelAttrsCallback = service.subscribe.calls.mostRecent().args[1];
                 subscribeModel(model);
                 expect(service.subscribe.calls.mostRecent().args[1]).toBe(setModelAttrsCallback);
             });
@@ -76,10 +75,9 @@ define(function(require) {
             });
 
             it('unsubscribe existing model', function() {
-                var setModelAttrsCallback;
                 model.id = 1;
                 subscribeModel(model);
-                setModelAttrsCallback = service.subscribe.calls.mostRecent().args[1];
+                const setModelAttrsCallback = service.subscribe.calls.mostRecent().args[1];
                 unsubscribeModel(model);
                 expect(service.unsubscribe).toHaveBeenCalledWith(model.url(), setModelAttrsCallback);
             });
@@ -91,9 +89,9 @@ define(function(require) {
             });
 
             describe('tracking changes', function() {
-                var subscribeModel;
-                var unsubscribeModel;
-                var Backbone = {
+                let subscribeModel;
+                let unsubscribeModel;
+                const Backbone = {
                     Model: function() {},
                     Collection: function() {
                         this.on = jasmine.createSpy('collection.on');
@@ -114,7 +112,7 @@ define(function(require) {
                 });
 
                 it('of any object', function() {
-                    var obj = {};
+                    const obj = {};
                     sync.keepRelevant(obj);
                     expect(subscribeModel).not.toHaveBeenCalled();
                     sync.stopTracking(obj);
@@ -122,7 +120,7 @@ define(function(require) {
                 });
 
                 it('of Backbone.Model', function() {
-                    var model = new Backbone.Model();
+                    const model = new Backbone.Model();
                     sync.keepRelevant(model);
                     expect(subscribeModel.calls.count()).toEqual(1);
                     sync.stopTracking(model);
@@ -130,7 +128,7 @@ define(function(require) {
                 });
 
                 describe('of Backbone.Collection', function() {
-                    var collection;
+                    let collection;
                     beforeEach(function() {
                         collection = new Backbone.Collection();
                         collection.url = 'some/model';
@@ -147,7 +145,7 @@ define(function(require) {
                     });
 
                     describe('consistency of handling events', function() {
-                        var events;
+                        let events;
                         beforeEach(function() {
                             sync.keepRelevant(collection);
                             events = collection.on.calls.mostRecent().args[0];
@@ -165,7 +163,7 @@ define(function(require) {
                         });
 
                         it('collection "reset" event', function() {
-                            var options = {previousModels: collection.models};
+                            const options = {previousModels: collection.models};
                             collection.models = [new Backbone.Model(), new Backbone.Model()];
                             subscribeModel.calls.reset();
                             expect(events.reset).toEqual(jasmine.any(Function));

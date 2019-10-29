@@ -13,8 +13,8 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
          * @param {Object} data
          */
         handleExportResponse: function(data) {
-            var message;
-            var messageType;
+            let message;
+            let messageType;
             if (data.hasOwnProperty('success') && data.success) {
                 message = __('oro.importexport.export.success.message');
                 messageType = 'success';

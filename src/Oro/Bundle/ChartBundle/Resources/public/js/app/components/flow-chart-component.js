@@ -1,27 +1,26 @@
 define(function(require) {
     'use strict';
 
-    var FlowChartComponent;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var Flotr = require('flotr2');
-    var dataFormatter = require('orochart/js/data_formatter');
-    var PieChartComponent = require('orochart/js/app/components/pie-chart-component');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const Flotr = require('flotr2');
+    const dataFormatter = require('orochart/js/data_formatter');
+    const PieChartComponent = require('orochart/js/app/components/pie-chart-component');
     require('orochart/js/flotr2/funnel');
 
-    var valueFormat = 'currency';
+    let valueFormat = 'currency';
 
     /**
      * @class orochart.app.components.FlowChartComponent
      * @extends orochart.app.components.PieChartComponent
      * @exports orochart/app/components/flow-chart-component
      */
-    FlowChartComponent = PieChartComponent.extend({
+    const FlowChartComponent = PieChartComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function FlowChartComponent() {
-            FlowChartComponent.__super__.constructor.apply(this, arguments);
+        constructor: function FlowChartComponent(options) {
+            FlowChartComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -42,14 +41,14 @@ define(function(require) {
          * @protected
          */
         _prepareData: function() {
-            var date = this.date;
+            const date = this.date;
             _.each(this.data, function(item) {
-                var params = {
+                const params = {
                     label: item.label,
                     date: date,
                     value: dataFormatter.formatValue(item.value, valueFormat)
                 };
-                var format = 'oro.chart.flow_chart.label_fromatter.' + (item.isNozzle ? 'nozzle' : 'tick');
+                const format = 'oro.chart.flow_chart.label_fromatter.' + (item.isNozzle ? 'nozzle' : 'tick');
                 item.originalLabel = item.label;
                 item.label = __(format, params);
                 item.data = [item.value];
@@ -62,11 +61,11 @@ define(function(require) {
          * @overrides
          */
         draw: function() {
-            var labelsWidth;
-            var $chart = this.$chart;
-            var $legend = this.$legend;
-            var options = this.options;
-            var hasPlaceForLabels = !this.$container.hasClass('wrapped-chart-legend');
+            let labelsWidth;
+            const $chart = this.$chart;
+            const $legend = this.$legend;
+            const options = this.options;
+            const hasPlaceForLabels = !this.$container.hasClass('wrapped-chart-legend');
 
             if (!$chart.get(0).clientWidth) {
                 return;

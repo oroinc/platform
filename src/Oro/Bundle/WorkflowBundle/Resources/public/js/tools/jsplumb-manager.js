@@ -1,20 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var Matrix = require('./jsplumb-manager/jpm-matrix');
-    var HideStartRule = require('./jsplumb-manager/jpm-hide-start-rule');
-    var CascadeRule = require('./jsplumb-manager/jpm-cascade-rule');
-    var PyramidRule = require('./jsplumb-manager/jpm-pyramid-rule');
-    var TriadaRule = require('./jsplumb-manager/jpm-triada-rule');
-    var CherryRule = require('./jsplumb-manager/jpm-cherry-rule');
-    var mids = {
+    const _ = require('underscore');
+    const Matrix = require('./jsplumb-manager/jpm-matrix');
+    const HideStartRule = require('./jsplumb-manager/jpm-hide-start-rule');
+    const CascadeRule = require('./jsplumb-manager/jpm-cascade-rule');
+    const PyramidRule = require('./jsplumb-manager/jpm-pyramid-rule');
+    const TriadaRule = require('./jsplumb-manager/jpm-triada-rule');
+    const CherryRule = require('./jsplumb-manager/jpm-cherry-rule');
+    const mids = {
         top: [0.5, 0, 0, -1],
         bottom: [0.5, 1, 0, 1],
         left: [0, 0.5, -1, 0],
         right: [1, 0.5, 1, 0]
     };
-    var JsPlumbManager = function(jsPlumbInstance, workflow) {
+    const JsPlumbManager = function(jsPlumbInstance, workflow) {
         this.jsPlumbInstance = jsPlumbInstance;
         this.workflow = workflow;
         this.loopback = {};
@@ -33,23 +33,23 @@ define(function(require) {
 
     _.extend(JsPlumbManager.prototype, {
         organizeBlocks: function() {
-            /* var steps = this.workflow.get('steps').filter(function(item) {
+            /* const steps = this.workflow.get('steps').filter(function(item) {
                 return !item.get('position');
             }); */
-            var matrix = new Matrix({
+            const matrix = new Matrix({
                 workflow: this.workflow
             });
-            var ruleTypes = [
+            const ruleTypes = [
                 HideStartRule,
                 CascadeRule,
                 PyramidRule,
                 TriadaRule,
                 CherryRule
             ];
-            var transforms = [];
+            const transforms = [];
             matrix.forEachCell(function(cell) {
                 _.find(ruleTypes, function(RuleType) {
-                    var rule = new RuleType(matrix);
+                    const rule = new RuleType(matrix);
                     if (rule.match(cell)) {
                         transforms.push(rule);
                         return true;
@@ -63,7 +63,7 @@ define(function(require) {
                 rule.apply();
             });
             matrix.align().forEachCell(_.bind(function(cell) {
-                var increment = cell.step.get('_is_start') ? -15 : 35;
+                const increment = cell.step.get('_is_start') ? -15 : 35;
                 cell.step.set('position', [
                     this.xIncrement * cell.x + this.xPadding,
                     this.yIncrement * cell.y + this.yPadding + increment
@@ -72,11 +72,11 @@ define(function(require) {
         },
 
         getPositionForNew: function() {
-            var step = this.stepForNew;
-            var val = 0;
-            var exist = [];
+            const step = this.stepForNew;
+            let val = 0;
+            const exist = [];
             this.workflow.get('steps').each(function(item) {
-                var pos = item.get('position');
+                const pos = item.get('position');
                 if (pos && pos[0] === pos[1] && pos[0] % step === 0) {
                     exist.push(pos[0]);
                 }
@@ -88,11 +88,11 @@ define(function(require) {
         },
 
         getLoopbackAnchors: function(elId) {
-            var presets = this.loopbackAnchorPreset;
+            const presets = this.loopbackAnchorPreset;
             if (!(elId in this.loopback)) {
                 this.loopback[elId] = [];
             }
-            var preset = presets[this.loopback[elId].length % presets.length];
+            const preset = presets[this.loopback[elId].length % presets.length];
             this.loopback[elId].push(preset);
             return preset;
         },
@@ -101,10 +101,10 @@ define(function(require) {
             if (sEl === tEl) {
                 return this.getLoopbackAnchors(sEl.id);
             }
-            var sp = sEl.getBoundingClientRect();
-            var tp = tEl.getBoundingClientRect();
-            var sa;
-            var ta;
+            const sp = sEl.getBoundingClientRect();
+            const tp = tEl.getBoundingClientRect();
+            let sa;
+            let ta;
             if (sp.right < (tp.left + tp.right) / 2) {
                 sa = mids.right;
                 if (sp.bottom > tp.top) {

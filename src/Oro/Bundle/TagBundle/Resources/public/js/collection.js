@@ -2,21 +2,19 @@ define(['backbone', './model'
 ], function(Backbone, TagModel) {
     'use strict';
 
-    var TagCollection;
-
     /**
      * @export  orotag/js/collection
      * @class   orotag.Collection
      * @extends Backbone.Collection
      */
-    TagCollection = Backbone.Collection.extend({
+    const TagCollection = Backbone.Collection.extend({
         model: TagModel,
 
         /**
          * @inheritDoc
          */
-        constructor: function TagCollection() {
-            TagCollection.__super__.constructor.apply(this, arguments);
+        constructor: function TagCollection(...args) {
+            TagCollection.__super__.constructor.apply(this, args);
         },
 
         /**
@@ -26,7 +24,7 @@ define(['backbone', './model'
          * @returns {oro.tag.Collection}
          */
         getFilteredCollection: function(type) {
-            var filtered = this.filter(function(tag) {
+            const filtered = this.filter(function(tag) {
                 return type === 'owner' ? tag.get('owner') : true;
             });
 
@@ -40,7 +38,7 @@ define(['backbone', './model'
          */
         addItem: function(value) {
             // check if exists tag
-            var exist = this.where({name: value.name});
+            const exist = this.where({name: value.name});
             if (exist.length && exist[0].get('owner') === false) {
                 // adding to owner
                 exist[0].set('owner', true);
@@ -64,7 +62,7 @@ define(['backbone', './model'
          * @param {string} filterState
          */
         removeItem: function(id, filterState) {
-            var model = this.where({id: id});
+            let model = this.where({id: id});
             if (model.length) {
                 model = model[0];
                 if (filterState === 'owner' && model.get('owner') === true && model.get('moreOwners') === true) {

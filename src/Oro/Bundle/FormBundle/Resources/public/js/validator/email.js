@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var emailRegExp = require('oroui/js/tools/patterns').email;
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const emailRegExp = require('oroui/js/tools/patterns').email;
     require('jquery.validate');
 
-    var defaultParam = {
+    const defaultParam = {
         message: 'This value is not a valid email address.'
     };
 
@@ -22,8 +22,8 @@ define(function(require) {
             return this.optional(element) || emailRegExp.test(value);
         },
         function(param, element) {
-            var value = this.elementValue(element);
-            var placeholders = {};
+            const value = this.elementValue(element);
+            const placeholders = {};
             param = _.extend({}, defaultParam, param);
             placeholders.value = value;
             return __(param.message, placeholders);

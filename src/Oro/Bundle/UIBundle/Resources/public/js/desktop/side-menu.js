@@ -1,16 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var $ = require('../side-menu');
-    var mediator = require('../mediator');
-    var persistentStorage = require('oroui/js/persistent-storage');
-    var SideMenuOverlay = require('oroui/js/desktop/side-menu-overlay');
-    var ScrollingOverlay = require('oroui/js/app/views/scrolling-overlay-view');
+    const _ = require('underscore');
+    const $ = require('../side-menu');
+    const mediator = require('../mediator');
+    const persistentStorage = require('oroui/js/persistent-storage');
+    const SideMenuOverlay = require('oroui/js/desktop/side-menu-overlay');
+    const ScrollingOverlay = require('oroui/js/app/views/scrolling-overlay-view');
 
-    var STATE_STORAGE_KEY = 'main-menu-state';
-    var MAXIMIZED_STATE = 'maximized';
-    var MINIMIZED_STATE = 'minimized';
+    const STATE_STORAGE_KEY = 'main-menu-state';
+    const MAXIMIZED_STATE = 'maximized';
+    const MINIMIZED_STATE = 'minimized';
 
     $.widget('oroui.desktopSideMenu', $.oroui.sideMenu, {
         options: {
@@ -64,7 +64,7 @@ define(function(require) {
          * Updates menu's minimized/maximized view
          */
         _update: function() {
-            var isMinimized = this.isMinimized();
+            const isMinimized = this.isMinimized();
 
             this.element.toggleClass('minimized', isMinimized);
 
@@ -117,8 +117,8 @@ define(function(require) {
          * @private
          */
         _attachHandlersFormDocument: function() {
-            var actionInMenu = true;
-            var menuContainer = this.$menu.parent()[0];
+            let actionInMenu = true;
+            const menuContainer = this.$menu.parent()[0];
 
             $(document)
                 .on('click' + this.eventNamespace + ' keydown' + this.eventNamespace, _.debounce(function(e) {
@@ -150,14 +150,14 @@ define(function(require) {
                 return;
             }
 
-            var index = $(event.currentTarget).index();
+            const index = $(event.currentTarget).index();
 
             this.highlightDropdown($(event.currentTarget));
 
             if (this.dropdownIndex === index && this.overlay.isOpen) {
                 this.overlay.close();
             } else {
-                var $menu = $(event.currentTarget).find(this.options.innerMenuSelector);
+                const $menu = $(event.currentTarget).find(this.options.innerMenuSelector);
 
                 if (!$menu.length) {
                     return;
@@ -202,17 +202,17 @@ define(function(require) {
          * @returns {*|jQuery}
          */
         convertToFlatStructure: function($menu) {
-            var self = this;
-            var collection = [];
+            const self = this;
+            const collection = [];
 
-            var createFlatStructure = function($menu, parentIndex, parentGroupIndex) {
-                var $items = $menu.children();
+            const createFlatStructure = function($menu, parentIndex, parentGroupIndex) {
+                const $items = $menu.children();
 
                 $items.each(function(index, menuItem) {
-                    var $menuItem = $(menuItem).clone(true, true);
-                    var $nestedMenuItem = null;
-                    var uniqueIndex = null;
-                    var uniqueGroupIndex = null;
+                    const $menuItem = $(menuItem).clone(true, true);
+                    let $nestedMenuItem = null;
+                    let uniqueIndex = null;
+                    let uniqueGroupIndex = null;
 
                     if (!parentIndex) {
                         uniqueIndex = 'id:' + index;

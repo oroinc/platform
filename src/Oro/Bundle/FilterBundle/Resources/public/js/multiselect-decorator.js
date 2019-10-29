@@ -13,9 +13,9 @@ define([
      * @export orofilter/js/multiselect-decorator
      * @class  orofilter.MultiselectDecorator
      */
-    var MultiselectDecorator = function(options) {
+    function MultiselectDecorator(options) {
         this.initialize(options);
-    };
+    }
 
     MultiselectDecorator.prototype = {
         /**
@@ -55,7 +55,7 @@ define([
             this.multiselect(options.parameters);
 
             if (this.contextSearch) {
-                var multiselectFilterDefaults = {
+                const multiselectFilterDefaults = {
                     label: '',
                     placeholder: '',
                     autoReset: true
@@ -100,7 +100,7 @@ define([
          * @protected
          */
         _setDropdownDesign: function() {
-            var widget = this.getWidget();
+            const widget = this.getWidget();
             widget.addClass('dropdown-menu');
             widget.removeClass('ui-widget-content');
             widget.removeClass('ui-widget');
@@ -124,7 +124,7 @@ define([
          * Action on multiselect widget refresh
          */
         onRefresh: function() {
-            var widget = this.getWidget();
+            const widget = this.getWidget();
             widget.find('.ui-multiselect-checkboxes').addClass('fixed-li');
             widget.inputWidget('seekAndCreate');
         },
@@ -135,11 +135,11 @@ define([
          * @return {Number}
          */
         getMinimumDropdownWidth: function() {
-            var minimumWidth = 0;
+            let minimumWidth = 0;
             this.getWidget().find('.ui-multiselect-checkboxes').removeClass('fixed-li');
-            var elements = this.getWidget().find('.ui-multiselect-checkboxes li');
+            const elements = this.getWidget().find('.ui-multiselect-checkboxes li');
             _.each(elements, function(element) {
-                var width = this._getTextWidth($(element).find('label'));
+                const width = this._getTextWidth($(element).find('label'));
                 if (width > minimumWidth) {
                     minimumWidth = width;
                 }
@@ -156,10 +156,10 @@ define([
          * @protected
          */
         _getTextWidth: function(element) {
-            var htmlOrg = element.html();
-            var htmlCalc = '<span>' + htmlOrg + '</span>';
+            const htmlOrg = element.html();
+            const htmlCalc = '<span>' + htmlOrg + '</span>';
             element.html(htmlCalc);
-            var width = element.outerWidth();
+            const width = element.outerWidth();
             element.html(htmlOrg);
             return width;
         },
@@ -179,9 +179,9 @@ define([
          * @param functionName
          * @return {Object}
          */
-        multiselect: function() {
-            var elem = this.element;
-            return elem.multiselect.apply(elem, arguments);
+        multiselect: function(...args) {
+            const elem = this.element;
+            return elem.multiselect(...args);
         },
 
         /**
@@ -190,9 +190,9 @@ define([
          * @param functionName
          * @return {Object}
          */
-        multiselectfilter: function() {
-            var elem = this.element;
-            return elem.multiselectfilter.apply(elem, arguments);
+        multiselectfilter: function(...args) {
+            const elem = this.element;
+            return elem.multiselectfilter(...args);
         },
 
         /**

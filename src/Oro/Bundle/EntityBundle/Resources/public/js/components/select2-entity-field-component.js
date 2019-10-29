@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var Select2EntityFieldComponent;
-    var _ = require('underscore');
-    var Select2Component = require('oro/select2-component');
+    const _ = require('underscore');
+    const Select2Component = require('oro/select2-component');
 
-    Select2EntityFieldComponent = Select2Component.extend({
+    const Select2EntityFieldComponent = Select2Component.extend({
         util: null,
 
         /**
          * @inheritDoc
          */
-        constructor: function Select2EntityFieldComponent() {
-            Select2EntityFieldComponent.__super__.constructor.apply(this, arguments);
+        constructor: function Select2EntityFieldComponent(options) {
+            Select2EntityFieldComponent.__super__.constructor.call(this, options);
         },
 
         preConfig: function(config) {
-            var that = this;
+            const that = this;
             if (this.util === null) {
                 throw new TypeError('Field "util" should be initialized in a child class.');
             }

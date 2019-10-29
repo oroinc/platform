@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var tools = require('oroui/js/tools');
-    var jsmoduleExposure = require('jsmodule-exposure');
-    var exposure = jsmoduleExposure.disclose('oroui/js/tools');
-    var requireMock = require('./Fixture/requirejs-mock');
+    const tools = require('oroui/js/tools');
+    const jsmoduleExposure = require('jsmodule-exposure');
+    const exposure = jsmoduleExposure.disclose('oroui/js/tools');
+    const requireMock = require('./Fixture/requirejs-mock');
 
     xdescribe('oroui/js/tools', function() {
         describe('loadModules method', function() {
@@ -68,7 +68,7 @@ define(function(require) {
             });
 
             it('load modules map to callback function', function(done) {
-                var modules = {a: 'js/module-a', b: 'js/module-b'};
+                const modules = {a: 'js/module-a', b: 'js/module-b'};
                 tools.loadModules(modules, function(obj) {
                     expect(obj).toBe(modules);
                     expect(obj).toEqual({a: {moduleName: 'a'}, b: {moduleName: 'b'}});
@@ -77,7 +77,7 @@ define(function(require) {
             });
 
             it('load modules map to promise', function(done) {
-                var modules = {a: 'js/module-a', b: 'js/module-b'};
+                const modules = {a: 'js/module-a', b: 'js/module-b'};
                 tools.loadModules(modules).then(function(obj) {
                     expect(obj).toBe(modules);
                     expect(obj).toEqual({a: {moduleName: 'a'}, b: {moduleName: 'b'}});
@@ -86,7 +86,7 @@ define(function(require) {
             });
 
             it('execute load callback with defined context', function(done) {
-                var context = {};
+                const context = {};
                 tools.loadModules('js/module-a', function() {
                     expect(context).toBe(this);
                     done();

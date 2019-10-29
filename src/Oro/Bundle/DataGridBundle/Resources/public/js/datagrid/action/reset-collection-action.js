@@ -3,8 +3,6 @@ define([
 ], function(AbstractAction) {
     'use strict';
 
-    var ResetCollectionAction;
-
     /**
      * Resets collection to initial state
      *
@@ -12,15 +10,15 @@ define([
      * @class   oro.datagrid.action.ResetCollectionAction
      * @extends oro.datagrid.action.AbstractAction
      */
-    ResetCollectionAction = AbstractAction.extend({
+    const ResetCollectionAction = AbstractAction.extend({
         /** @property oro.PageableCollection */
         collection: undefined,
 
         /**
          * @inheritDoc
          */
-        constructor: function ResetCollectionAction() {
-            ResetCollectionAction.__super__.constructor.apply(this, arguments);
+        constructor: function ResetCollectionAction(options) {
+            ResetCollectionAction.__super__.constructor.call(this, options);
         },
 
         /**
@@ -31,14 +29,14 @@ define([
          * @throws {TypeError} If collection is undefined
          */
         initialize: function(options) {
-            var opts = options || {};
+            const opts = options || {};
 
             if (!opts.datagrid) {
                 throw new TypeError('"datagrid" is required');
             }
             this.collection = opts.datagrid.collection;
 
-            ResetCollectionAction.__super__.initialize.apply(this, arguments);
+            ResetCollectionAction.__super__.initialize.call(this, options);
         },
 
         /**

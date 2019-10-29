@@ -7,8 +7,8 @@ define([
 ], function($, _, tools, Chaplin) {
     'use strict';
 
-    var original = {};
-    var utils = Chaplin.utils;
+    const original = {};
+    const utils = Chaplin.utils;
     original.viewDispose = Chaplin.View.prototype.dispose;
     original.collectionViewRender = Chaplin.CollectionView.prototype.render;
 
@@ -43,8 +43,8 @@ define([
      * @override
      */
     Chaplin.Router.prototype.route = function(pathDesc, params, options) {
-        var handler;
-        var path;
+        let handler;
+        let path;
         if (typeof pathDesc === 'object') {
             path = pathDesc.url;
             if (!params && pathDesc.params) {
@@ -91,8 +91,7 @@ define([
      * @override
      */
     Chaplin.Composer.prototype.retrieve = function(name, force) {
-        var active;
-        active = this.compositions[name];
+        const active = this.compositions[name];
         if (active && (force || !active.stale())) {
             return active.item;
         } else {
@@ -100,10 +99,12 @@ define([
         }
     };
 
-    var insertView = function(list, viewEl, position, length, itemSelector) {
-        var children, childrenLength, insertInMiddle, isEnd, method; // eslint-disable-line one-var
-        insertInMiddle = (0 < position && position < length);
-        isEnd = function(length) {
+    const insertView = function(list, viewEl, position, length, itemSelector) {
+        let children;
+        let childrenLength;
+        let method;
+        const insertInMiddle = (0 < position && position < length);
+        const isEnd = function(length) {
             return length === 0 || position >= length;
         };
         if (insertInMiddle || itemSelector) {
@@ -138,8 +139,7 @@ define([
      * @override
      */
     Chaplin.CollectionView.prototype.insertView = function(item, view, position, enableAnimation) {
-        var elem, included, length, list, // eslint-disable-line one-var
-            _this = this;
+        const _this = this;
         if (enableAnimation == null) {
             enableAnimation = true;
         }
@@ -149,8 +149,8 @@ define([
         if (typeof position !== 'number') {
             position = this.collection.indexOf(item);
         }
-        included = typeof this.filterer === 'function' ? this.filterer(item, position) : true;
-        elem = $ ? view.$el : view.el;
+        const included = typeof this.filterer === 'function' ? this.filterer(item, position) : true;
+        const elem = $ ? view.$el : view.el;
         if (included && enableAnimation) {
             if (this.useCssAnimation) {
                 elem.addClass(this.animationStartClass);
@@ -161,8 +161,8 @@ define([
         if (this.filterer) {
             this.filterCallback(view, included);
         }
-        length = this.collection.length;
-        list = $ ? this.$list : this.list;
+        const length = this.collection.length;
+        const list = $ ? this.$list : this.list;
         insertView(list, elem, position, length, this.itemSelector);
         view.trigger('addedToParent');
         this.updateVisibleItems(item, included);
@@ -185,11 +185,11 @@ define([
      */
     if (/(MSIE\s|Trident\/|Edge\/)/.test(window.navigator.userAgent)) {
         Chaplin.CollectionView.prototype.insertView = _.wrap(
-            Chaplin.CollectionView.prototype.insertView, function(func, item, view) {
+            Chaplin.CollectionView.prototype.insertView, function(func, item, view, ...rest) {
                 if (view.el.childNodes.length === 0) {
                     view.render();
                 }
-                return func.apply(this, _.rest(arguments));
+                return func.call(this, item, view, ...rest);
             }
         );
     }
@@ -209,7 +209,7 @@ define([
                 options.fullRedirect = true;
                 Chaplin.mediator.execute('redirectTo', pathDesc, options);
             } else {
-                func.apply(this, _.rest(arguments));
+                func.call(this, pathDesc, params, options);
             }
         } catch (e) {
             if (e instanceof URIError) {
@@ -244,7 +244,7 @@ define([
          * @return {Promise.<Object>}
          */
         ensureSync: function() {
-            var deferred = $.Deferred();
+            const deferred = $.Deferred();
             switch (this.syncState()) {
                 case 'unsynced':
                     this.fetch().then(function() {

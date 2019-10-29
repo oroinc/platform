@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var Select2EntityFieldSelectComponent;
-    var EntityFieldUtil = require('oroentity/js/entity-field-select-util');
-    var Select2EntityFieldComponent = require('oro/select2-entity-field-component');
+    const EntityFieldUtil = require('oroentity/js/entity-field-select-util');
+    const Select2EntityFieldComponent = require('oro/select2-entity-field-component');
 
-    Select2EntityFieldSelectComponent = Select2EntityFieldComponent.extend({
+    const Select2EntityFieldSelectComponent = Select2EntityFieldComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function Select2EntityFieldSelectComponent() {
-            Select2EntityFieldSelectComponent.__super__.constructor.apply(this, arguments);
+        constructor: function Select2EntityFieldSelectComponent(options) {
+            Select2EntityFieldSelectComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -22,7 +21,7 @@ define(function(require) {
         },
 
         preConfig: function(config) {
-            var that = this;
+            const that = this;
             Select2EntityFieldSelectComponent.__super__.preConfig.call(this, config);
             config.collapsibleResults = true;
             config.data = function() {

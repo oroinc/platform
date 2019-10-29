@@ -5,13 +5,11 @@ define([
 ], function($, _, mediator) {
     'use strict';
 
-    var widgetManager;
-
     /**
      * @export oroui/js/widget-manager
      * @name   oro.widgetManager
      */
-    widgetManager = {
+    const widgetManager = {
         widgets: {},
         aliases: {},
 
@@ -75,7 +73,7 @@ define([
          * @param {string} wid unique widget identifier
          */
         removeWidget: function(wid) {
-            var widget = this.widgets[wid];
+            const widget = this.widgets[wid];
             if (widget) {
                 delete this.aliases[widget.getAlias()];
             }

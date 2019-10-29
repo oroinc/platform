@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var util = require('oroworkflow/js/tools/path-finder/util');
+    const util = require('oroworkflow/js/tools/path-finder/util');
 
     describe('oroworkflow/js/tools/path-finder/interval1d', function() {
         it('should correct check between position', function() {

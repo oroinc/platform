@@ -1,6 +1,10 @@
 define(function(require) {
     'use strict';
 
+    const AbstractRelationEditorView = require('./abstract-relation-editor-view');
+    const _ = require('underscore');
+    require('jquery.select2');
+
     /**
      * Select-like cell content editor. This view is applicable when the cell value contains label (not the value).
      * The editor will use `autocomplete_api_accessor` and `value_field_name`. The server will be updated with the value
@@ -84,27 +88,22 @@ define(function(require) {
      * @augments [AbstractRelationEditorView](./abstract-relation-editor-view.md)
      * @exports RelatedIdRelationEditorView
      */
-    var RelatedIdRelationEditorView;
-    var AbstractRelationEditorView = require('./abstract-relation-editor-view');
-    var _ = require('underscore');
-    require('jquery.select2');
-
-    RelatedIdRelationEditorView = AbstractRelationEditorView.extend(/** @lends RelatedIdRelationEditorView.prototype */{
+    const RelatedIdRelationEditorView = AbstractRelationEditorView.extend(/** @lends RelatedIdRelationEditorView.prototype */{
         DEFAULT_ID_PROPERTY: 'id',
         DEFAULT_TEXT_PROPERTY: 'text',
 
         /**
          * @inheritDoc
          */
-        constructor: function RelatedIdRelationEditorView() {
-            RelatedIdRelationEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function RelatedIdRelationEditorView(options) {
+            RelatedIdRelationEditorView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            RelatedIdRelationEditorView.__super__.initialize.apply(this, arguments);
+            RelatedIdRelationEditorView.__super__.initialize.call(this, options);
             if (options.value_field_name || options.ignore_value_field_name) {
                 this.valueFieldName = options.value_field_name;
             } else {
@@ -125,8 +124,8 @@ define(function(require) {
 
         filterInitialResultItem: function(choices) {
             choices = _.clone(choices);
-            var id = String(this.getModelValue());
-            for (var i = 0; i < choices.length; i++) {
+            const id = String(this.getModelValue());
+            for (let i = 0; i < choices.length; i++) {
                 if (String(choices[i].id) === id) {
                     choices.splice(i, 1);
                     break;
@@ -142,8 +141,8 @@ define(function(require) {
         },
 
         getSelect2Options: function() {
-            var _this = this;
-            var options = _.omit(RelatedIdRelationEditorView.__super__.getSelect2Options.call(this), 'data');
+            const _this = this;
+            const options = _.omit(RelatedIdRelationEditorView.__super__.getSelect2Options.call(this), 'data');
 
             return _.extend(options, {
                 allowClear: true,
@@ -163,7 +162,7 @@ define(function(require) {
                         _this.currentRequest.state() !== 'resolved') {
                         _this.currentRequest.abort();
                     }
-                    var autoCompleteUrlParameters = _.extend(_this.model.toJSON(), {
+                    const autoCompleteUrlParameters = _.extend(_this.model.toJSON(), {
                         term: options.term,
                         page: options.page,
                         per_page: _this.perPage
@@ -187,18 +186,18 @@ define(function(require) {
         },
 
         getChoiceLabel: function() {
-            var label = _.result(this.getSelect2Data(), 'label');
+            const label = _.result(this.getSelect2Data(), 'label');
             return label !== void 0 ? label : '';
         },
 
         getServerUpdateData: function() {
-            var data = {};
+            const data = {};
             data[this.valueFieldName] = this.getValue();
             return data;
         },
 
         getModelUpdateData: function() {
-            var data = this.getServerUpdateData();
+            const data = this.getServerUpdateData();
             data[this.fieldName] = this.getChoiceLabel();
             return data;
         }

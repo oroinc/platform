@@ -68,15 +68,14 @@ define(function(require) {
      * @augments [DateEditorView](./date-editor-view.md)
      * @exports DatetimeEditorView
      */
-    var DatetimeEditorView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var datetimeFormatter = require('orolocale/js/formatter/datetime');
-    var DateEditorView = require('./date-editor-view');
-    var DatetimepickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const datetimeFormatter = require('orolocale/js/formatter/datetime');
+    const DateEditorView = require('./date-editor-view');
+    const DatetimepickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
 
-    DatetimeEditorView = DateEditorView.extend(/** @lends DatetimeEditorView.prototype */{
+    const DatetimeEditorView = DateEditorView.extend(/** @lends DatetimeEditorView.prototype */{
         className: 'datetime-editor',
         inputType: 'hidden',
         view: DatetimepickerView,
@@ -120,12 +119,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DatetimeEditorView() {
-            DatetimeEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function DatetimeEditorView(options) {
+            DatetimeEditorView.__super__.constructor.call(this, options);
         },
 
         render: function() {
-            var _this = this;
+            const _this = this;
             DatetimeEditorView.__super__.render.call(this);
             // fix ESCAPE time-picker behaviour
             // must stopPropagation on ESCAPE, if time-picker was visible
@@ -174,7 +173,7 @@ define(function(require) {
         },
 
         parseRawValue: function(value) {
-            var parsed;
+            let parsed;
             try {
                 parsed = datetimeFormatter.getMomentForBackendDateTime(value);
             } catch (e) {
@@ -206,8 +205,8 @@ define(function(require) {
         },
 
         onTimepickerShow: function(e) {
-            var $list = this.view.getTimePickerWidget();
-            var isBelow = !$list.hasClass('ui-timepicker-positioned-top');
+            const $list = this.view.getTimePickerWidget();
+            const isBelow = !$list.hasClass('ui-timepicker-positioned-top');
             this.toggleDropdownBelowClass(isBelow);
             $list.off(this.eventNamespace())
                 .on('mousedown' + this.eventNamespace(), _.bind(function(e) {

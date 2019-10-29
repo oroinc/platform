@@ -2,16 +2,16 @@ define(function(require) {
     'use strict';
 
     require('jasmine-jquery');
-    var Point2d = require('oroworkflow/js/tools/path-finder/point2d');
-    var NodePoint = require('oroworkflow/js/tools/path-finder/node-point');
-    var Connection = require('oroworkflow/js/tools/path-finder/connection');
+    const Point2d = require('oroworkflow/js/tools/path-finder/point2d');
+    const NodePoint = require('oroworkflow/js/tools/path-finder/node-point');
+    const Connection = require('oroworkflow/js/tools/path-finder/connection');
 
     describe('oroworkflow/js/tools/path-finder/node-point', function() {
         beforeEach(function() {
             window.setFixtures('<div class="workflow-flowchart-editor" />');
 
             this.a = new NodePoint(5.5, 7.5);
-            var graph = jasmine.createSpyObj('graph', ['isConnectionUnderRect']);
+            const graph = jasmine.createSpyObj('graph', ['isConnectionUnderRect']);
             this.a.vAxis = {
                 recommendedPosition: 5,
                 graph: graph
@@ -23,7 +23,7 @@ define(function(require) {
         });
 
         it('check node-point creation', function() {
-            var a = new NodePoint(5, 7);
+            const a = new NodePoint(5, 7);
             expect(a.connections).toEqual({});
             expect(a.stale).toBe(false);
             expect(a.used).toBe(false);
@@ -45,7 +45,7 @@ define(function(require) {
         });
 
         it('check recommendedPoint', function() {
-            var a1 = this.a.recommendedPoint;
+            const a1 = this.a.recommendedPoint;
             expect(a1.x).toBe(5);
             expect(a1.y).toBe(7);
         });
@@ -59,15 +59,15 @@ define(function(require) {
             });
 
             it('check connect method', function() {
-                var connection = this.a.connections[this.direction.id];
+                const connection = this.a.connections[this.direction.id];
                 expect(connection).toBeDefined();
                 expect(connection instanceof Connection).toBe(true);
             });
 
             it('check eachConnection method', function() {
-                var callback = jasmine.createSpy('spy');
-                var c = new NodePoint(5, 70);
-                var direction = new Point2d(0, 1);
+                const callback = jasmine.createSpy('spy');
+                const c = new NodePoint(5, 70);
+                const direction = new Point2d(0, 1);
                 this.a.connect(direction, c);
 
                 this.a.eachConnection(callback);
@@ -77,15 +77,15 @@ define(function(require) {
             });
 
             it('check eachTraversableConnection method', function() {
-                var direction = new Point2d(0, -1);
-                var c = new NodePoint(5, 70);
+                const direction = new Point2d(0, -1);
+                const c = new NodePoint(5, 70);
                 c.vAxis = c.hAxis = {
                     graph: jasmine.createSpyObj('graph', ['isConnectionUnderRect'])
                 };
                 c.connect(direction, this.a);
 
-                var connectionFrom = c.connections[direction.id];
-                var callback = jasmine.createSpy('spy');
+                const connectionFrom = c.connections[direction.id];
+                const callback = jasmine.createSpy('spy');
                 this.a.eachTraversableConnection(connectionFrom, callback);
 
                 expect(callback.calls.count()).toBe(1);
@@ -93,7 +93,7 @@ define(function(require) {
             });
 
             it('check nextNode method', function() {
-                var b = this.a.nextNode(this.direction);
+                let b = this.a.nextNode(this.direction);
                 expect(b).toBe(this.b);
 
                 b = this.a.nextNode(new Point2d(-1, -1));
@@ -102,7 +102,7 @@ define(function(require) {
         });
 
         it('check clone method', function() {
-            var b = this.a.clone();
+            const b = this.a.clone();
             expect(b).not.toBe(this.a);
             expect(b instanceof NodePoint).toBe(true);
             expect(b.vAxis).toEqual(this.a.vAxis);

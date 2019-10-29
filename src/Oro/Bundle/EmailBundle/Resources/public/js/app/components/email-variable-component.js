@@ -1,21 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var EmailVariableComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var EmailVariableView = require('oroemail/js/app/views/email-variable-view');
-    var EmailVariableModel = require('oroemail/js/app/models/email-variable-model');
-    var DeleteConfirmation = require('oroui/js/delete-confirmation');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const EmailVariableView = require('oroemail/js/app/views/email-variable-view');
+    const EmailVariableModel = require('oroemail/js/app/models/email-variable-model');
+    const DeleteConfirmation = require('oroui/js/delete-confirmation');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    EmailVariableComponent = BaseComponent.extend({
+    const EmailVariableComponent = BaseComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function EmailVariableComponent() {
-            EmailVariableComponent.__super__.constructor.apply(this, arguments);
+        constructor: function EmailVariableComponent(options) {
+            EmailVariableComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -23,7 +22,7 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var attributes;
+            let attributes;
 
             _.defaults(options, {model: {}, view: {}});
 
@@ -46,13 +45,13 @@ define(function(require) {
         },
 
         onEntityChange: function(e) {
-            var view = this.view;
-            var $el = $(e.currentTarget);
-            var entityName = $el.val();
-            var entityLabel = $el.find(':selected').data('label');
+            const view = this.view;
+            const $el = $(e.currentTarget);
+            const entityName = $el.val();
+            const entityLabel = $el.find(':selected').data('label');
 
             if (!this.view.isEmpty()) {
-                var confirm = new DeleteConfirmation({
+                const confirm = new DeleteConfirmation({
                     title: __('Change Entity Confirmation'),
                     okText: __('Yes'),
                     content: __('oro.email.emailtemplate.change_entity_confirmation')

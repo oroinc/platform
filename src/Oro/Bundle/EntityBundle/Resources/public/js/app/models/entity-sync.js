@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var sync;
-    var _ = require('underscore');
-    var Backbone = require('backbone');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
 
     // Map from CRUD to HTTP for our default `Backbone.sync` implementation.
-    var methodMap = {
+    const methodMap = {
         'create': 'POST',
         'update': 'PATCH',
         'patch': 'PATCH',
@@ -14,11 +13,11 @@ define(function(require) {
         'read': 'GET'
     };
 
-    sync = function(method, model, options) {
+    const sync = function(method, model, options) {
         options.type = methodMap[method];
         options.contentType = 'application/vnd.api+json';
 
-        var urlParams = _.clone(options.urlParams) || {};
+        const urlParams = _.clone(options.urlParams) || {};
 
         if (options.include && _.isArray(options.include)) {
             urlParams.include = options.include.join();

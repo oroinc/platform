@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var StandartConfirmationView;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var ModalView = require('oroui/js/modal');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const ModalView = require('oroui/js/modal');
 
     /**
      * Standart confirmation dialog
@@ -13,7 +12,7 @@ define(function(require) {
      * @class   oroui.StandartConfirmationView
      * @extends oroui.ModalView
      */
-    StandartConfirmationView = ModalView.extend({
+    const StandartConfirmationView = ModalView.extend({
 
         /** @property {String} */
         className: 'modal oro-modal-normal',
@@ -27,8 +26,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function StandartConfirmationView() {
-            StandartConfirmationView.__super__.constructor.apply(this, arguments);
+        constructor: function StandartConfirmationView(options) {
+            StandartConfirmationView.__super__.constructor.call(this, options);
         },
 
         /**

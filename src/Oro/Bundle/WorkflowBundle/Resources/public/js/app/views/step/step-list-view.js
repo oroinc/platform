@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var StepsListView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var StepRowView = require('./step-row-view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const StepRowView = require('./step-row-view');
 
-    StepsListView = BaseView.extend({
+    const StepsListView = BaseView.extend({
         options: {
             listElBodyEl: 'tbody',
             template: null,
@@ -17,8 +16,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function StepsListView() {
-            StepsListView.__super__.constructor.apply(this, arguments);
+        constructor: function StepsListView(options) {
+            StepsListView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -26,7 +25,7 @@ define(function(require) {
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-            var template = this.options.template || $('#step-list-template').html();
+            const template = this.options.template || $('#step-list-template').html();
             this.template = _.template(template);
             this.rowViews = [];
 
@@ -44,7 +43,7 @@ define(function(require) {
         },
 
         addItem: function(item) {
-            var rowView = new StepRowView({
+            const rowView = new StepRowView({
                 model: item,
                 workflow: this.options.workflow
             });

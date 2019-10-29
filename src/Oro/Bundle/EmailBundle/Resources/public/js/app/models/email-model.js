@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var EmailModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
     /**
      * @export  oroemail/js/app/models/email-model
      */
-    EmailModel = BaseModel.extend({
+    const EmailModel = BaseModel.extend({
         defaults: {
             parentEmailId: undefined,
             entityId: undefined,
@@ -18,8 +17,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailModel() {
-            EmailModel.__super__.constructor.apply(this, arguments);
+        constructor: function EmailModel(...args) {
+            EmailModel.__super__.constructor.apply(this, args);
         }
     });
 

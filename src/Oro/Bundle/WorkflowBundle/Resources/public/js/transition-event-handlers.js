@@ -61,7 +61,7 @@ define([
                 }
 
                 element.one('transitions_failure', function() {
-                    var message = __('Could not perform transition');
+                    let message = __('Could not perform transition');
                     if (jqxhr.message !== undefined) {
                         message += ': ' + jqxhr.message;
                     }

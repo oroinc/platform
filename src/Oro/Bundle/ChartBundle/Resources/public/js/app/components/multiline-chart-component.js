@@ -1,27 +1,26 @@
 define(function(require) {
     'use strict';
 
-    var MultilineChartComponent;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var Flotr = require('flotr2');
-    var dataFormatter = require('orochart/js/data_formatter');
-    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const Flotr = require('flotr2');
+    const dataFormatter = require('orochart/js/data_formatter');
+    const BaseChartComponent = require('orochart/js/app/components/base-chart-component');
 
     /**
      * @class orochart.app.components.MultilineChartComponent
      * @extends orochart.app.components.BaseChartComponent
      * @exports orochart/app/components/multiline-chart-component
      */
-    MultilineChartComponent = BaseChartComponent.extend({
+    const MultilineChartComponent = BaseChartComponent.extend({
 
         narrowScreen: false,
 
         /**
          * @inheritDoc
          */
-        constructor: function MultilineChartComponent() {
-            MultilineChartComponent.__super__.constructor.apply(this, arguments);
+        constructor: function MultilineChartComponent(options) {
+            MultilineChartComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -30,18 +29,18 @@ define(function(require) {
          * @overrides
          */
         draw: function() {
-            var options = this.options;
-            var $chart = this.$chart;
-            var xFormat = options.data_schema.label.type;
-            var yFormat = options.data_schema.value.type;
-            var rawData = this.data;
+            const options = this.options;
+            const $chart = this.$chart;
+            const xFormat = options.data_schema.label.type;
+            const yFormat = options.data_schema.value.type;
+            const rawData = this.data;
 
             if (!$chart.get(0).clientWidth) {
                 return;
             }
 
             if (dataFormatter.isValueNumerical(xFormat)) {
-                var sort = function(rawData) {
+                const sort = function(rawData) {
                     rawData.sort(function(first, second) {
                         if (first.label === null || first.label === undefined) {
                             return -1;
@@ -49,8 +48,8 @@ define(function(require) {
                         if (second.label === null || second.label === undefined) {
                             return 1;
                         }
-                        var firstLabel = dataFormatter.parseValue(first.label, xFormat);
-                        var secondLabel = dataFormatter.parseValue(second.label, xFormat);
+                        const firstLabel = dataFormatter.parseValue(first.label, xFormat);
+                        const secondLabel = dataFormatter.parseValue(second.label, xFormat);
                         return firstLabel - secondLabel;
                     });
                 };
@@ -58,16 +57,16 @@ define(function(require) {
                 _.each(rawData, sort);
             }
 
-            var connectDots = options.settings.connect_dots_with_line;
-            var colors = this.config.default_settings.chartColors;
+            const connectDots = options.settings.connect_dots_with_line;
+            const colors = this.config.default_settings.chartColors;
 
-            var count = 0;
-            var charts = [];
+            let count = 0;
+            const charts = [];
 
-            var getXLabel = function(data) {
-                var label = dataFormatter.formatValue(data, xFormat);
+            const getXLabel = function(data) {
+                let label = dataFormatter.formatValue(data, xFormat);
                 if (label === null) {
-                    var number = parseInt(data);
+                    const number = parseInt(data);
                     if (rawData.length > number) {
                         label = rawData[number].label === null
                             ? 'N/A'
@@ -78,10 +77,10 @@ define(function(require) {
                 }
                 return label;
             };
-            var getYLabel = function(data) {
-                var label = dataFormatter.formatValue(data, yFormat);
+            const getYLabel = function(data) {
+                let label = dataFormatter.formatValue(data, yFormat);
                 if (label === null) {
-                    var number = parseInt(data);
+                    const number = parseInt(data);
                     if (rawData.length > number) {
                         label = rawData[data].value === null
                             ? 'N/A'
@@ -93,19 +92,19 @@ define(function(require) {
                 return label;
             };
 
-            var makeChart = function(rawData, count, key) {
-                var chartData = [];
+            const makeChart = function(rawData, count, key) {
+                const chartData = [];
 
-                for (var i in rawData) {
+                for (const i in rawData) {
                     if (!rawData.hasOwnProperty(i)) {
                         continue;
                     }
-                    var yValue = dataFormatter.parseValue(rawData[i].value, yFormat);
+                    let yValue = dataFormatter.parseValue(rawData[i].value, yFormat);
                     yValue = yValue === null ? parseInt(i) : yValue;
-                    var xValue = dataFormatter.parseValue(rawData[i].label, xFormat);
+                    let xValue = dataFormatter.parseValue(rawData[i].label, xFormat);
                     xValue = xValue === null ? parseInt(i) : xValue;
 
-                    var item = [xValue, yValue];
+                    const item = [xValue, yValue];
                     chartData.push(item);
                 }
 
@@ -123,7 +122,7 @@ define(function(require) {
             };
 
             _.each(rawData, function(rawData, key) {
-                var result = makeChart(rawData, count, key);
+                const result = makeChart(rawData, count, key);
                 count++;
 
                 charts.push(result);
@@ -189,7 +188,7 @@ define(function(require) {
             } else {
                 this.aspectRatio = MultilineChartComponent.__super__.aspectRatio;
             }
-            MultilineChartComponent.__super__.update.apply(this, arguments);
+            MultilineChartComponent.__super__.update.call(this);
         }
     });
 

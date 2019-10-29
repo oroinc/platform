@@ -1,9 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var RegistryEntry = require('oroui/js/app/services/registry/registry-entry');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const RegistryEntry = require('oroui/js/app/services/registry/registry-entry');
 
     /** @typedef {(BaseModel|BaseCollection|BaseView|BaseComponent|BaseClass)} RegistryApplicant */
 
@@ -36,7 +36,7 @@ define(function(require) {
          * @param {RegistryApplicant} applicant
          */
         retain: function(instance, applicant) {
-            var obj = this.fetch(instance.globalId, applicant);
+            const obj = this.fetch(instance.globalId, applicant);
             if (!obj) {
                 this.put(instance, applicant);
             }
@@ -49,7 +49,7 @@ define(function(require) {
          * @param {RegistryApplicant} applicant
          */
         relieve: function(instance, applicant) {
-            var entry = this._entries[instance.globalId];
+            const entry = this._entries[instance.globalId];
             if (entry) {
                 entry.removeApplicant(applicant);
             }
@@ -63,7 +63,7 @@ define(function(require) {
          * @return {Object|null}
          */
         fetch: function(globalId, applicant) {
-            var entry = this._entries[globalId];
+            const entry = this._entries[globalId];
             if (entry) {
                 entry.addApplicant(applicant);
             }
@@ -78,20 +78,20 @@ define(function(require) {
          * @throws {Error} invalid instance or instance already exists in registry
          */
         put: function(instance, applicant) {
-            var globalId = instance.globalId;
+            const globalId = instance.globalId;
             if (!globalId) {
                 throw new Error('globalId "' + globalId + '" of instance have not to be empty');
             }
             if (this._entries[globalId]) {
                 throw new Error('Instance with globalId "' + globalId + '" is already registered');
             }
-            var entry = this._entries[globalId] = new RegistryEntry(instance);
+            const entry = this._entries[globalId] = new RegistryEntry(instance);
             entry.addApplicant(applicant);
             this.listenToOnce(instance, 'dispose', function() {
                 this._removeEntry(entry);
             });
             this.listenTo(entry, 'removeApplicant', function(entry) {
-                var instance = entry.instance;
+                const instance = entry.instance;
                 if (!entry.applicants.length || !this._hasExternalRequester(entry)) {
                     this._removeEntry(entry);
                     instance.dispose();
@@ -106,15 +106,15 @@ define(function(require) {
          * @return {boolean}
          */
         _hasExternalRequester: function(entry) {
-            var queue = [entry];
-            var checked = [];
-            var relatedEntry;
-            var currentEntry;
+            const queue = [entry];
+            const checked = [];
+            let relatedEntry;
+            let currentEntry;
 
             do {
                 currentEntry = queue.pop();
                 checked.push(currentEntry);
-                for (var i = 0; currentEntry.applicants.length > i; i++) {
+                for (let i = 0; currentEntry.applicants.length > i; i++) {
                     relatedEntry = this._entries[currentEntry.applicants[i].globalId];
                     if (!relatedEntry) {
                         return true;
@@ -134,7 +134,7 @@ define(function(require) {
          * @protected
          */
         _removeEntry: function(entry) {
-            var globalId = _.findKey(this._entries, entry);
+            const globalId = _.findKey(this._entries, entry);
             this.stopListening(entry);
             entry.dispose();
             delete this._entries[globalId];
