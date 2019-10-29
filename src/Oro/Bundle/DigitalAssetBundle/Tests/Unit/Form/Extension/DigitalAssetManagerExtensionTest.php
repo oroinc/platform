@@ -545,8 +545,8 @@ class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
 
         $file
             ->expects($this->once())
-            ->method('getFilename')
-            ->willReturn('sample/filename');
+            ->method('getId')
+            ->willReturn(1);
 
         $this->previewMetadataProvider
             ->expects($this->once())
