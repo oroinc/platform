@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\AttachmentBundle\Migration\FilteredAttachmentMigrationService;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -21,9 +22,16 @@ class MigrateFilteredAttachments implements FixtureInterface, ContainerAwareInte
      */
     public function load(ObjectManager $manager)
     {
-        $migrationService = $this->container->get('oro_attachment.filtered_attachment_migration');
+        $migrationService = $this->getMigrationService();
+        $migrationService->setManager($manager);
+        $migrationService->migrate(static::PREFIX, static::PREFIX);
+    }
 
-        $fileIds = $migrationService->migrate(self::PREFIX, self::PREFIX);
-        $migrationService->clear(self::PREFIX, $fileIds);
+    /**
+     * @return FilteredAttachmentMigrationService
+     */
+    protected function getMigrationService()
+    {
+        return $this->container->get('oro_attachment.filtered_attachment_migration');
     }
 }

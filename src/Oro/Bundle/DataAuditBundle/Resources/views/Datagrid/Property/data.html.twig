@@ -1,23 +1,31 @@
-{% import 'OroDataAuditBundle::macros.html.twig' as dataAudit %}
+{%- import 'OroDataAuditBundle::macros.html.twig' as dataAudit -%}
 
 <ul>
-{% for fieldKey, fieldValue in value %}
-    {% if fieldKey == 'auditData' %}
-        {% for collKey, collValue in fieldValue.new %}
-        <li>
-            <b>{{ oro_field_config_value(record.getValue('objectClass'), collKey, 'label')|default(collKey)|trans }}:</b>
-            {% if fieldValue.old|length %}
-                <s>{{ fieldValue.old[collKey] }}</s>
-            {% endif %}
-            {{ collValue }}
-        </li>
-        {% endfor %}
-    {% else %}
-        <li>
-            <b>{{ dataAudit.renderFieldName(record.getValue('objectClass'), fieldKey, fieldValue) }}</b>
-            <s>{{ dataAudit.renderFieldValue(fieldValue.old, fieldValue) }}</s>
-            {{ dataAudit.renderFieldValue(fieldValue.new, fieldValue) }}
-        </li>
-    {% endif %}
-{% endfor %}
+    {%- for fieldKey, fieldValue in value -%}
+        {%- if fieldKey == 'auditData' -%}
+            {%- for collKey, collValue in fieldValue.new -%}
+                <li>
+                    {%- if fieldValue.old|length -%}
+                        <b>{{- oro_field_config_value(record.getValue('objectClass'), collKey, 'label')|default(collKey)|trans -}}</b>&nbsp;
+                        <s>{{- fieldValue.old[collKey] -}}</s>&nbsp;
+                        {{- collValue -}}
+                    {%- else -%}
+                        <b>{{- oro_field_config_value(record.getValue('objectClass'), collKey, 'label')|default(collKey)|trans -}}</b>&nbsp;
+                        {{- collValue -}}
+                    {%- endif -%}
+                </li>
+            {%- endfor -%}
+        {%- elseif fieldValue.collectionDiffs is defined and fieldValue.collectionDiffs is not empty -%}
+            <li>
+                <b>{{- dataAudit.renderFieldName(record.getValue('objectClass'), fieldKey, fieldValue) -}}</b>&nbsp;
+                {{- dataAudit.renderCollection(record.getValue('objectClass'), fieldKey, fieldValue, ['added', 'changed', 'removed']) -}}
+            </li>
+        {%- else -%}
+            <li>
+                <b>{{- dataAudit.renderFieldName(record.getValue('objectClass'), fieldKey, fieldValue) -}}</b>&nbsp;
+                <s>{{- dataAudit.renderFieldValue(fieldValue.old, fieldValue) -}}</s>&nbsp;
+                {{- dataAudit.renderFieldValue(fieldValue.new, fieldValue) -}}
+            </li>
+        {%- endif -%}
+    {%- endfor -%}
 </ul>

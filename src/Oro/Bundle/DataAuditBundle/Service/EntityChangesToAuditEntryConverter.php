@@ -272,7 +272,7 @@ class EntityChangesToAuditEntryConverter
      * @param string                 $auditEntryClass
      * @param string                 $transactionId
      * @param string                 $entityClass
-     * @param int                    $entityId
+     * @param string                 $entityId
      * @param \DateTime              $loggedAt
      * @param EntityReference        $user
      * @param EntityReference        $organization
@@ -298,10 +298,15 @@ class EntityChangesToAuditEntryConverter
         $auditEntry = $this->getAuditRepository($auditEntryClass)
             ->createQueryBuilder('a')
             ->select('a')
-            ->where('a.transactionId = :transactionId AND a.objectClass = :objectClass AND a.objectId = :objectId')
+            ->where(
+                'a.transactionId = :transactionId',
+                'a.objectClass = :objectClass',
+                'a.objectId = :objectId OR a.entityId = :entityId'
+            )
             ->setParameter('transactionId', $transactionId)
             ->setParameter('objectClass', $entityClass)
-            ->setParameter('objectId', $entityId)
+            ->setParameter('objectId', (int) $entityId)
+            ->setParameter('entityId', (string) $entityId)
             ->getQuery()
             ->getOneOrNullResult();
 
@@ -310,7 +315,7 @@ class EntityChangesToAuditEntryConverter
             $auditEntry = $auditEntityManager->getClassMetadata($auditEntryClass)->newInstance();
             $auditEntry->setTransactionId($transactionId);
             $auditEntry->setObjectClass($entityClass);
-            $auditEntry->setObjectId($entityId);
+            $auditEntry->setEntityId($entityId);
             $auditEntry->setLoggedAt($loggedAt);
             $auditEntry->setUser($this->getEntityByReference($user));
             $auditEntry->setOrganization($this->getEntityByReference($organization));

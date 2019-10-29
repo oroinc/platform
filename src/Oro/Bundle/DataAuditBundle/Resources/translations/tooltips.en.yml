@@ -1,0 +1,6 @@
+oro.dataaudit:
+    entity_config:
+        field:
+            items:
+                propagate:
+                    tooltip: Use the option to enable reverse side audit for the relations.

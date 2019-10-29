@@ -624,6 +624,7 @@
 {% endmacro %}
 
 {% macro not_applied_actions_tab(actions) %}
+    {% import _self as tree %}
     <table>
         <thead>
         <tr>
@@ -643,7 +644,13 @@
                     {% for argName, argValue in action.args %}
                         <div>
                             <strong>{{ argName }}:</strong>
-                            {{ profiler_dump(argValue) }}
+                            {% if argName == 'options' %}
+                                {% for name, option in argValue %}
+                                    {{ tree.option(name, option, 0) }}
+                                {% endfor %}
+                            {% else %}
+                                <span class="dumped-string">"{{ argValue }}"</span>
+                            {% endif %}
                         </div>
                     {% endfor %}
                 </td>
@@ -651,4 +658,22 @@
         {% endfor %}
         </tbody>
     </table>
+{% endmacro %}
+
+{% macro option(name, value, offset) %}
+    {% import _self as tree %}
+    <div>
+        <strong>{% for i in 1..offset %}&nbsp;{% endfor %}{{ name }}:</strong>
+        {% if value is string %}
+            <span class="dumped-string">"{{ value }}"</span>
+        {% elseif value is expression %}
+            <span title="Layout Expression">{{ highlight_string(value) }}</span>
+        {% elseif value is iterable %}
+            {% for childOptionName, childOptionValue in value %}
+                {{ tree.option(childOptionName, childOptionValue, offset + 4) }}
+            {% endfor %}
+        {% else %}
+            {{ highlight_string(value) }}
+        {% endif %}
+    </div>
 {% endmacro %}

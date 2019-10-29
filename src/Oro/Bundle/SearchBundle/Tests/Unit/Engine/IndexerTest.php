@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
-use Oro\Bundle\SearchBundle\Engine\EngineInterface;
+use Oro\Bundle\SearchBundle\Engine\ExtendedEngineInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
@@ -12,6 +12,7 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class IndexerTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,7 +22,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     /** @var ObjectMapper|\PHPUnit\Framework\MockObject\MockObject */
     protected $mapper;
 
-    /** @var EngineInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ExtendedEngineInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $engine;
 
     /** @var SecurityProvider|\PHPUnit\Framework\MockObject\MockObject */
@@ -32,22 +33,17 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->config        = require rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'searchConfig.php';
-        $this->engine        = $this->createMock(EngineInterface::class);
-        $this->mapper        = new ObjectMapper(
-            $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'),
-            $this->config
-        );
+        $this->config = require rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'searchConfig.php';
+        $this->engine = $this->createMock(ExtendedEngineInterface::class);
+        $this->mapper = new ObjectMapper($this->createMock(EventDispatcherInterface::class), $this->config);
 
         /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
-        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()->getMock();
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
         $mapperProvider = new SearchMappingProvider($eventDispatcher);
         $mapperProvider->setMappingConfig($this->config);
         $this->mapper->setMappingProvider($mapperProvider);
 
-        $this->securityProvider = $this->getMockBuilder('Oro\Bundle\SearchBundle\Security\SecurityProvider')
-            ->disableOriginalConstructor()->getMock();
+        $this->securityProvider = $this->createMock(SecurityProvider::class);
         $this->securityProvider->expects($this->any())
             ->method('isGranted')
             ->will($this->returnValue(true));
@@ -56,9 +52,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue(true));
 
         /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject $searchAclHelper */
-        $searchAclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Search\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $searchAclHelper = $this->createMock(AclHelper::class);
 
         $searchAclHelper->expects($this->any())
             ->method('apply')
@@ -228,7 +222,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
             ' where (name ~ "test string" and integer count > 10 and (decimal price = 10 or integer qty in (2, 5)))' .
             ' order_by name offset 10 max_results 5';
         $expectedQuery = 'from test_product where ((integer qty in (2, 5) or decimal price = 10) '
-            .'and integer count > 10 and text name ~ "test string") order by name ASC limit 5 offset 10';
+            . 'and integer count > 10 and text name ~ "test string") order by name ASC limit 5 offset 10';
 
         $result = $this->indexService->advancedSearch($sourceQuery);
         $actualQuery = $result->getQuery()->getStringQuery();

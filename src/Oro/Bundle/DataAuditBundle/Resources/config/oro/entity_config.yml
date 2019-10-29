@@ -38,7 +38,7 @@ entity_config:
                         value_type:         boolean
                         priority:           60
                         default_value:      false
-                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, array, simple_array, json_array, ref-many, ref-one, html_escaped]
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, oneToMany, oneToOne, manyToOne, manyToMany, array, simple_array, json_array, ref-many, ref-one, html_escaped]
                     grid:
                         type:               boolean
                         label:              oro.dataaudit.entity_config.field.items.auditable
@@ -53,6 +53,35 @@ entity_config:
                             placeholder:    false
                             block:          other
                             label:          oro.dataaudit.entity_config.field.items.auditable
+
+                    # this attribute can be used to prohibit changing the auditable state (no matter whether
+                    # it is enabled or not) for the entity field
+                    # if TRUE than the current state cannot be changed
+                    immutable: # boolean
+                        options:
+                            auditable: false
+
+                propagate:
+                    options:
+                        value_type:         boolean
+                        priority:           70
+                        default_value:      false
+                        allowed_type:       [oneToMany, oneToOne, manyToOne, manyToMany, ref-many, ref-one]
+                        required_property:
+                            config_id:
+                                scope:      dataaudit
+                            code:           auditable
+                            value:          true
+                    form:
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
+                        options:
+                            choices:
+                                No:         0
+                                Yes:        1
+                            placeholder:    false
+                            block:          other
+                            label:          oro.dataaudit.entity_config.field.items.propagate
+                            tooltip:        oro.dataaudit.entity_config.field.items.propagate.tooltip
 
                     # this attribute can be used to prohibit changing the auditable state (no matter whether
                     # it is enabled or not) for the entity field

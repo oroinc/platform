@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -21,10 +22,14 @@ use Oro\Bundle\UserBundle\Entity\Impersonation;
  *         @ORM\Index(name="idx_oro_audit_type", columns={"type"}),
  *         @ORM\Index(name="idx_oro_audit_object_class", columns={"object_class"}),
  *         @ORM\Index(name="idx_oro_audit_obj_by_type", columns={"object_id", "object_class", "type"}),
+ *         @ORM\Index(name="idx_oro_audit_ent_by_type", columns={"entity_id", "object_class", "type"}),
  *         @ORM\Index(name="idx_oro_audit_owner_descr", columns={"owner_description"})
  *     },
  *     uniqueConstraints={
- *         @ORM\UniqueConstraint(name="idx_oro_audit_version", columns={"object_id", "object_class", "version"})
+ *         @ORM\UniqueConstraint(
+ *              name="idx_oro_audit_version",
+ *              columns={"object_id", "entity_id", "object_class", "version"}
+ *         )
  *     }
  * )
  * @ORM\InheritanceType("SINGLE_TABLE")
@@ -84,6 +89,13 @@ abstract class AbstractAudit
      * @ORM\Column(name="object_id", type="integer", nullable=true)
      */
     protected $objectId;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="entity_id", type="string", length=255, nullable=true)
+     */
+    protected $entityId;
 
     /**
      * @var string $objectClass
@@ -375,7 +387,7 @@ abstract class AbstractAudit
      */
     public function getObjectId()
     {
-        return $this->objectId;
+        return $this->entityId ?: $this->objectId;
     }
 
     /**
@@ -385,7 +397,28 @@ abstract class AbstractAudit
      */
     public function setObjectId($objectId)
     {
-        $this->objectId = $objectId;
+        $this->setEntityId($objectId);
+    }
+
+    /**
+     * Get entity id
+     *
+     * @return string
+     */
+    public function getEntityId()
+    {
+        return $this->entityId ?: $this->objectId;
+    }
+
+    /**
+     * Set entity id
+     *
+     * @param string $entityId
+     */
+    public function setEntityId($entityId)
+    {
+        $this->objectId = is_int($entityId) ? $entityId : null;
+        $this->entityId = (string) $entityId;
     }
 
     /**

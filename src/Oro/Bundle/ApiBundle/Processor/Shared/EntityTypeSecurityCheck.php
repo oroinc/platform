@@ -3,9 +3,12 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -25,6 +28,12 @@ class EntityTypeSecurityCheck implements ProcessorInterface
     /** @var bool */
     private $forcePermissionUsage;
 
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
+
+    /** @var AclGroupProviderInterface */
+    private $aclGroupProvider;
+
     /**
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param string                        $permission
@@ -41,6 +50,22 @@ class EntityTypeSecurityCheck implements ProcessorInterface
     }
 
     /**
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function setDoctrineHelper(DoctrineHelper $doctrineHelper)
+    {
+        $this->doctrineHelper = $doctrineHelper;
+    }
+
+    /**
+     * @param AclGroupProviderInterface $aclGroupProvider
+     */
+    public function setAclGroupProvider(AclGroupProviderInterface $aclGroupProvider)
+    {
+        $this->aclGroupProvider = $aclGroupProvider;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function process(ContextInterface $context)
@@ -54,23 +79,43 @@ class EntityTypeSecurityCheck implements ProcessorInterface
             $aclResource = $config->getAclResource();
             if ($aclResource) {
                 if ($this->forcePermissionUsage) {
-                    $isGranted = $this->authorizationChecker->isGranted(
-                        $this->permission,
-                        $context->getClassName()
-                    );
+                    $isGranted = $this->isGrantedForClass($context);
                 } else {
                     $isGranted = $this->authorizationChecker->isGranted($aclResource);
                 }
             }
         } else {
-            $isGranted = $this->authorizationChecker->isGranted(
-                $this->permission,
-                $context->getClassName()
-            );
+            $isGranted = $this->isGrantedForClass($context);
         }
 
         if (!$isGranted) {
-            throw new AccessDeniedException();
+            throw new AccessDeniedException('No access to this type of entities.');
         }
+    }
+
+    /**
+     * @param Context $context
+     *
+     * @return bool
+     */
+    private function isGrantedForClass(Context $context): bool
+    {
+        $isGranted = true;
+
+        $className = $this->doctrineHelper->getManageableEntityClass(
+            $context->getClassName(),
+            $context->getConfig()
+        );
+        if ($className) {
+            $isGranted = $this->authorizationChecker->isGranted(
+                $this->permission,
+                ObjectIdentityHelper::encodeIdentityString(
+                    EntityAclExtension::NAME,
+                    ObjectIdentityHelper::buildType($className, $this->aclGroupProvider->getGroup())
+                )
+            );
+        }
+
+        return $isGranted;
     }
 }

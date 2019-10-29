@@ -13,6 +13,7 @@ datagrids:
                     objectClass: a.objectClass
                     objectName: a.objectName
                     objectId: a.objectId
+                    entityId: a.entityId
                     loggedAt: a.loggedAt
                     author:  a.ownerDescription as author
                     organization: IDENTITY(a.organization) as organization
@@ -36,7 +37,9 @@ datagrids:
                 callable: "@oro_dataaudit.datagrid.entity_type_provider->getEntityType"
             objectId:
                 label: oro.dataaudit.datagrid.entity_id
-                frontend_type: integer
+                type: twig
+                template: OroDataAuditBundle:Datagrid:Property/objectId.html.twig
+                frontend_type: html
             objectName:
                 label: oro.dataaudit.datagrid.entity_name
             data:
@@ -67,7 +70,7 @@ datagrids:
                 objectName:
                     data_name: a.objectName
                 objectId:
-                    data_name: a.objectId
+                    data_name: a.entityId
                 author:
                     data_name: a.ownerDescription
                 loggedAt:
@@ -96,8 +99,8 @@ datagrids:
                           field_options:
                               choices: "@oro_dataaudit.datagrid.entity_type_provider->getEntityTypes"
                 objectId:
-                    type: number-range
-                    data_name: a.objectId
+                    type: string
+                    data_name: a.entityId
                 objectName:
                     type: string
                     data_name: a.objectName
@@ -129,7 +132,7 @@ datagrids:
                     - { table: OroDataAuditBundle:AbstractAudit, alias: a }
                 where:
                     and:
-                        - a.objectClass = :objectClass AND a.objectId = :objectId
+                        - a.objectClass = :objectClass AND (a.objectId = :objectId OR a.entityId = :entityId)
             hints:
                 - HINT_FORCE_PARTIAL_LOAD
         columns:

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataAuditBundle\DependencyInjection;
 
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -38,5 +40,9 @@ class OroDataAuditExtension extends Extension
             ['event' => 'oro_migration.post_up', 'method' => 'onPostUp']
         );
         $container->setDefinition('oro_dataaudit.tests.migration_listener', $testMigrationListenerDef);
+
+        $configFileLoaders = new YamlCumulativeFileLoader('Tests/Functional/Environment/api.yml');
+        $configLoader = new CumulativeConfigLoader('oro_api', $configFileLoaders);
+        $configLoader->load($container);
     }
 }

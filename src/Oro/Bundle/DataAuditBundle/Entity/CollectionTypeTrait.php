@@ -5,6 +5,9 @@ namespace Oro\Bundle\DataAuditBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 
+/**
+ * Add collection support to audit log
+ */
 trait CollectionTypeTrait
 {
     /**
@@ -21,15 +24,27 @@ trait CollectionTypeTrait
      */
     public function addEntityAddedToCollection($entityClass, $entityId, $entityName)
     {
+        $this->addEntityAddedToCollectionWithChangeSet($entityClass, $entityId, $entityName);
+    }
+
+    /**
+     * @param string $entityClass
+     * @param int $entityId
+     * @param string $entityName
+     * @param array $changeSet
+     */
+    public function addEntityAddedToCollectionWithChangeSet($entityClass, $entityId, $entityName, array $changeSet = [])
+    {
         $this->setNewValue(null);
         $this->setOldValue(null);
         $this->dataType = AuditFieldTypeRegistry::getAuditType('collection');
 
         $thisCollectionDiffs = $this->getCollectionDiffs();
-        $thisCollectionDiffs['added'][] = [
+        $thisCollectionDiffs['added'][$entityClass.$entityId] = [
             'entity_class' => $entityClass,
             'entity_id' => $entityId,
             'entity_name' => $entityName,
+            'change_set' => $changeSet,
         ];
 
         $this->collectionDiffs = $thisCollectionDiffs;
@@ -42,15 +57,31 @@ trait CollectionTypeTrait
      */
     public function addEntityRemovedFromCollection($entityClass, $entityId, $entityName)
     {
+        $this->addEntityRemovedFromCollectionWithChangeSet($entityClass, $entityId, $entityName);
+    }
+
+    /**
+     * @param string $entityClass
+     * @param int $entityId
+     * @param string $entityName
+     * @param array $changeSet
+     */
+    public function addEntityRemovedFromCollectionWithChangeSet(
+        $entityClass,
+        $entityId,
+        $entityName,
+        array $changeSet = []
+    ) {
         $this->setNewValue(null);
         $this->setOldValue(null);
         $this->dataType = AuditFieldTypeRegistry::getAuditType('collection');
 
         $thisCollectionDiffs = $this->getCollectionDiffs();
-        $thisCollectionDiffs['removed'][] = [
+        $thisCollectionDiffs['removed'][$entityClass.$entityId] = [
             'entity_class' => $entityClass,
             'entity_id' => $entityId,
             'entity_name' => $entityName,
+            'change_set' => $changeSet,
         ];
 
         $this->collectionDiffs = $thisCollectionDiffs;
@@ -63,15 +94,37 @@ trait CollectionTypeTrait
      */
     public function addEntityChangedInCollection($entityClass, $entityId, $entityName)
     {
+        $this->addEntityChangedInCollectionWithChangeSet($entityClass, $entityId, $entityName);
+    }
+
+    /**
+     * @param string $entityClass
+     * @param int $entityId
+     * @param string $entityName
+     * @param array $changeSet
+     */
+    public function addEntityChangedInCollectionWithChangeSet(
+        $entityClass,
+        $entityId,
+        $entityName,
+        array $changeSet = []
+    ) {
         $this->setNewValue(null);
         $this->setOldValue(null);
         $this->dataType = AuditFieldTypeRegistry::getAuditType('collection');
 
         $thisCollectionDiffs = $this->getCollectionDiffs();
-        $thisCollectionDiffs['changed'][] = [
+
+        $key = 'changed';
+        if (!empty($thisCollectionDiffs['added'][$entityClass.$entityId])) {
+            $key = 'added';
+        }
+
+        $thisCollectionDiffs[$key][$entityClass.$entityId] = [
             'entity_class' => $entityClass,
             'entity_id' => $entityId,
             'entity_name' => $entityName,
+            'change_set' => $changeSet,
         ];
 
         $this->collectionDiffs = $thisCollectionDiffs;
@@ -84,25 +137,47 @@ trait CollectionTypeTrait
     {
         $thisCollectionDiffs = $this->getCollectionDiffs();
 
-        $newValue = '';
+        $newValue = null;
         if ($thisCollectionDiffs['added']) {
-            $newValue .= 'Added: '.implode(', ', array_map(function (array $entityData) {
-                return $entityData['entity_name'];
-            }, $thisCollectionDiffs['added']));
-        }
-        if ($thisCollectionDiffs['removed']) {
-            $newValue .= "\nRemoved: ".implode(', ', array_map(function (array $entityData) {
-                return $entityData['entity_name'];
-            }, $thisCollectionDiffs['removed']));
+            $newValue .= 'Added: '.
+                implode(
+                    ', ',
+                    array_map(
+                        function (array $entityData) {
+                            return $entityData['entity_name'];
+                        },
+                        $thisCollectionDiffs['added']
+                    )
+                );
         }
         if ($thisCollectionDiffs['changed']) {
-            $newValue .= "\nChanged: ".implode(', ', array_map(function (array $entityData) {
-                return $entityData['entity_name'];
-            }, $thisCollectionDiffs['changed']));
+            $newValue .= "\nChanged: ".
+                implode(
+                    ', ',
+                    array_map(
+                        function (array $entityData) {
+                            return $entityData['entity_name'];
+                        },
+                        $thisCollectionDiffs['changed']
+                    )
+                );
         }
-        
         $this->setNewValue($newValue);
-        $this->setOldValue(null);
+
+        $oldValue = null;
+        if ($thisCollectionDiffs['removed']) {
+            $oldValue .= "Removed: ".
+                implode(
+                    ', ',
+                    array_map(
+                        function (array $entityData) {
+                            return $entityData['entity_name'];
+                        },
+                        $thisCollectionDiffs['removed']
+                    )
+                );
+        }
+        $this->setOldValue($oldValue);
     }
 
     /**

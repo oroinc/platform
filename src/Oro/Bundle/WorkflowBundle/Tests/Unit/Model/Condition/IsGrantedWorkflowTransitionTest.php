@@ -3,6 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Condition;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
@@ -39,17 +41,22 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
      */
     protected $condition;
 
+    /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclGroupProvider;
+
     protected function setUp()
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->workflowManager = $this->createMock(WorkflowManager::class);
+        $this->aclGroupProvider = $this->createMock(AclGroupProviderInterface::class);
 
         $this->condition = new IsGrantedWorkflowTransition(
             $this->authorizationChecker,
             $this->tokenAccessor,
             $this->workflowManager
         );
+        $this->condition->setAclGroupProvider($this->aclGroupProvider);
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
@@ -122,6 +129,10 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
             ->method('hasUser')
             ->willReturn(true);
 
+        $this->aclGroupProvider->expects($this->once())
+            ->method('getGroup')
+            ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
+
         $objectWrapper = new DomainObjectWrapper(
             $entity,
             new ObjectIdentity('workflow', 'workflowName')
@@ -155,6 +166,9 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
             ->willReturn(true);
+        $this->aclGroupProvider->expects($this->once())
+            ->method('getGroup')
+            ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
 
         $objectWrapper = new DomainObjectWrapper(
             $entity,
@@ -189,6 +203,9 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
             ->willReturn(true);
+        $this->aclGroupProvider->expects($this->once())
+            ->method('getGroup')
+            ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
 
         $objectWrapper = new DomainObjectWrapper(
             'workflow:workflowName',
@@ -242,10 +259,60 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
             ->willReturn(true);
+        $this->aclGroupProvider->expects($this->once())
+            ->method('getGroup')
+            ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
 
         $objectWrapper = new DomainObjectWrapper(
             $entity,
             new ObjectIdentity('workflow', 'workflowName')
+        );
+
+        $fieldVote = new FieldVote($objectWrapper, 'transition|currentStep|step');
+
+        $this->authorizationChecker->expects($this->exactly(2))
+            ->method('isGranted')
+            ->withConsecutive(
+                ['PERFORM_TRANSITIONS', $objectWrapper],
+                ['PERFORM_TRANSITION', $fieldVote]
+            )
+            ->willReturnOnConsecutiveCalls(
+                true,
+                true
+            );
+
+        $this->assertTrue($this->condition->evaluate($context));
+    }
+
+    public function testEvaluateWithCustomGroup()
+    {
+        $entity = new \stdClass();
+        $context = new WorkflowItem();
+        $context->setEntityClass(\stdClass::class);
+        $context->setWorkflowName('workflowName');
+        $context->setEntity($entity);
+        $context->setEntityId(1);
+
+        $groupName = 'test_group';
+
+        /** @var WorkflowStep|\PHPUnit\Framework\MockObject\MockObject $step */
+        $step = $this->createMock(WorkflowStep::class);
+        $step->expects($this->any())
+            ->method('getName')
+            ->willReturn('currentStep');
+        $context->setCurrentStep($step);
+
+        $this->condition->initialize(['transition', 'step']);
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->willReturn(true);
+        $this->aclGroupProvider->expects($this->once())
+            ->method('getGroup')
+            ->willReturn($groupName);
+
+        $objectWrapper = new DomainObjectWrapper(
+            $entity,
+            new ObjectIdentity('workflow', ObjectIdentityHelper::buildType('workflowName', $groupName))
         );
 
         $fieldVote = new FieldVote($objectWrapper, 'transition|currentStep|step');

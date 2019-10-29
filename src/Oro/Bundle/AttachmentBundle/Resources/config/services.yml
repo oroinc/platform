@@ -379,6 +379,8 @@ services:
             - '@liip_imagine.filter.configuration'
             - '@oro_layout.loader.image_filter'
             - '%oro_attachment.filesystem_name.mediacache%'
+        calls:
+            - ['setWorkingDirectory', ['%kernel.project_dir%/public/%oro_attachment.media_cache_dir%']]
 
     oro_attachment.api.processor.files_view_security_check:
         class: Oro\Bundle\AttachmentBundle\Api\Processor\FilesViewSecurityCheck

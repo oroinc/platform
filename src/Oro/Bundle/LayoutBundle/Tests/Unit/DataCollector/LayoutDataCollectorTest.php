@@ -78,15 +78,36 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
-
-        $this->dataCollector->setNotAppliedActions(['action1', 'action2']);
+        $notAppliedActions =  [
+            [
+                'name' => 'add',
+                'args' => [
+                    'id' => 'customer_sidebar_request',
+                    'parentId' => 'customer_sidebar',
+                    'blockType' => 'link',
+                    'options' => [
+                        'visible' => 'true',
+                        'attr' => ['class'=> 'btn'],
+                    ],
+                    'siblingId' => 'customer_sidebar_sign_out',
+                    'prepend' => true,
+                ],
+            ],
+            [
+                'name' => 'remove',
+                'args' => [
+                    'id' => 'categories_main_menu',
+                ],
+            ]
+        ];
+        $this->dataCollector->setNotAppliedActions($notAppliedActions);
         $this->dataCollector->collect($this->getMockRequest(), $this->getMockResponse());
 
         $this->assertEquals($contextItems, $this->dataCollector->getData()['context']['items']);
         $this->assertArrayHasKey('views', $this->dataCollector->getData());
         $this->assertEquals(0, $this->dataCollector->getData()['count']);
         $this->assertEquals(2, $this->dataCollector->getData()['not_applied_actions_count']);
-        $this->assertEquals(['action1', 'action2'], $this->dataCollector->getData()['not_applied_actions']);
+        $this->assertEquals($notAppliedActions, $this->dataCollector->getData()['not_applied_actions']);
         foreach ($this->dataCollector->getData()['context']['data'] as $datum) {
             $this->assertInstanceOf(Data::class, $datum);
         }

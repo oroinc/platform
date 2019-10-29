@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\Helper;
 
+/**
+ * Manage unidirectional field definition
+ *
+ * \Acme\Bundle\Entity\SomeEntity
+ *      * string - regular field
+ *      * \Acme\Bundle\Entity\SomeEntity::reverseRelation - field defined in SomeEntity that points to SomeEntity
+ */
 class UnidirectionalFieldHelper
 {
     const DELIMITER = '::';

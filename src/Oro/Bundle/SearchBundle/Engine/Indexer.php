@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Oro\Bundle\SearchBundle\Exception\UnsupportedStatisticInterfaceEngineException;
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Expression\Lexer;
 use Oro\Bundle\SearchBundle\Query\Expression\Parser as ExpressionParser;
 use Oro\Bundle\SearchBundle\Query\Mode;
@@ -165,6 +167,33 @@ class Indexer
         $query = $this->getSimpleSearchQuery($searchString, $offset, $maxResults, $from, $page);
 
         return $this->query($query);
+    }
+
+    /**
+     *
+     * @param string|null $searchString
+     * @param null        $from
+     *
+     * @return array
+     * [
+     *  <EntityFQCN> => <DocumentsCount>
+     * ]
+     *
+     * @throws UnsupportedStatisticInterfaceEngineException
+     */
+    public function getDocumentsCountGroupByEntityFQCN(
+        ?string $searchString,
+        $from = null
+    ): array {
+        if (!$this->engine instanceof ExtendedEngineInterface) {
+            throw new UnsupportedStatisticInterfaceEngineException();
+        }
+
+        $query = $this->getSimpleSearchQuery($searchString, 0, 0, $from, 0);
+
+        $this->prepareQuery($query);
+
+        return $this->engine->getDocumentsCountGroupByEntityFQCN($query);
     }
 
     /**
