@@ -109,9 +109,9 @@ types:
 
 ### Configuration
 
-Bundle specific options are defined inside ```jsmodules.yml``` file. For admin console it has to be placed in ```%BundleName%\Resources\config``` folder and `%BundleName%\Resources\views\layouts\{theme_name}\config` folder for frontstore themes.
-It can have six sections ```shim```, ```map```, ```app-modules```, ```dynamic-imports```, ```configs``` and ```aliases```.
-Each bundle's JS module that isn't mentioned in any other JS module and is imported dynamically in runtime (e.g. using option from twig) has to be defined in ```dynamic-imports``` section to be included in webpack build. That section has subsection with build chunk names, it manages to place module to suitable chunk. Also each JS module that has to be configurable has to be added to ```configs``` section where key is module name and value is empty object
+Bundle specific options are defined inside the ```jsmodules.yml``` file. For the admin console, it should be placed in the ```%BundleName%\Resources\config``` folder and the `%BundleName%\Resources\views\layouts\{theme_name}\config` folder for frontstore themes.
+It can have six sections, such as ```shim```, ```map```, ```app-modules```, ```dynamic-imports```, ```configs```, and ```aliases```.
+Each bundle's JS module that isn't mentioned in any other JS module and is imported dynamically at runtime (e.g., using option from twig) should be defined in the ```dynamic-imports``` section to be included in the webpack build. That section has subsection with build chunk names that helps place module to suitable chunk. Also, if a JS module is expected to be configurable, it should be added to the ```configs``` section where the key is a module name and the value is an empty object.
 
 ```yaml    
     aliases:
