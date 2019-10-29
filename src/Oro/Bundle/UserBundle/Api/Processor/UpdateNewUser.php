@@ -1,17 +1,18 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Api\Processor\Create;
+namespace Oro\Bundle\UserBundle\Api\Processor;
 
-use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
+use Oro\Bundle\ApiBundle\Form\FormUtil;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Saves new User entity to the database.
+ * Prepares a new User entity to be saved to the database.
  */
-class SaveUser implements ProcessorInterface
+class UpdateNewUser implements ProcessorInterface
 {
     /** @var UserManager */
     private $userManager;
@@ -29,20 +30,21 @@ class SaveUser implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var CreateContext $context */
+        /** @var CustomizeFormDataContext $context */
 
-        /** @var User $user */
-        $user = $context->getResult();
-        if (!is_object($user)) {
-            // entity does not exist
+        $form = $context->getForm();
+        if (!FormUtil::isSubmittedAndValid($form)) {
             return;
         }
+
+        /** @var User $user */
+        $user = $form->getData();
 
         // generate random secure password for a user
         if (!$user->getPlainPassword()) {
             $user->setPlainPassword($this->userManager->generatePassword());
         }
 
-        $this->userManager->updateUser($user);
+        $this->userManager->updateUser($user, false);
     }
 }

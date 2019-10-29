@@ -8,6 +8,8 @@ oro_behat_extension:
       paths:
         - '@OroDigitalAssetBundle/Tests/Behat/Features'
   elements:
+    DigitalAssetManagerField:
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\DigitalAssetManagerField
     Digital Asset Form:
       selector: 'form[id^="oro_digital_asset"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
@@ -26,3 +28,6 @@ oro_behat_extension:
       selector: '.digital-asset-controls:not([class*="hide"]) a[data-role="digital-asset-remove"]'
     Digital Asset Edit Button:
       selector: '.digital-asset-controls:not([class*="hide"]) a[data-role="digital-asset-update"]'
+    Digital Asset Select Grid:
+      selector: 'div[data-page-component-name^="digital-asset-select-"]'
+      class: Oro\Bundle\FrontendBundle\Tests\Behat\Element\Grid
