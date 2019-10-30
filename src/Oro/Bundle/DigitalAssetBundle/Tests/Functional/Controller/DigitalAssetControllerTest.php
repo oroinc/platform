@@ -9,6 +9,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DigitalAssetControllerTest extends WebTestCase
 {
     use OrganizationTrait;
@@ -265,6 +268,64 @@ class DigitalAssetControllerTest extends WebTestCase
             self::DIGITAL_ASSET_IMAGE_1,
             $this->getUserById($userId)->getAvatar()->getOriginalFilename()
         );
+    }
+
+    public function testChooseImageUpload(): void
+    {
+        $crawler = $this->client->request('GET', $this->getUrl('oro_digital_asset_widget_choose_image'));
+
+        $form = $crawler->selectButton('Upload')->form();
+
+        $form['oro_digital_asset_in_dialog[titles][values][default]'] = self::DIGITAL_ASSET_TITLE_1;
+        $form['oro_digital_asset_in_dialog[sourceFile][file]'] = $this->getFileForUpload(self::DIGITAL_ASSET_IMAGE_1);
+
+        $this->client->followRedirects();
+        $this->client->submit($form);
+
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+
+        /** @var DigitalAsset $digitalAsset */
+        $digitalAsset = current(
+            $this->getContainer()
+                ->get('doctrine')
+                ->getRepository(DigitalAsset::class)
+                ->findBy([], ['id' => 'DESC'], 1)
+        );
+
+        $this->assertInstanceOf(DigitalAsset::class, $digitalAsset);
+        $this->assertEquals(self::DIGITAL_ASSET_TITLE_1, (string)$digitalAsset->getTitle());
+
+        $this->assertInstanceOf(File::class, $digitalAsset->getSourceFile());
+        $this->assertEquals(self::DIGITAL_ASSET_IMAGE_1, $digitalAsset->getSourceFile()->getOriginalFilename());
+    }
+
+    public function testChooseFileUpload(): void
+    {
+        $crawler = $this->client->request('GET', $this->getUrl('oro_digital_asset_widget_choose_file'));
+
+        $form = $crawler->selectButton('Upload')->form();
+
+        $form['oro_digital_asset_in_dialog[titles][values][default]'] = self::DIGITAL_ASSET_TITLE_2;
+        $form['oro_digital_asset_in_dialog[sourceFile][file]'] = $this->getFileForUpload(self::DIGITAL_ASSET_IMAGE_2);
+
+        $this->client->followRedirects();
+        $this->client->submit($form);
+
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+
+        /** @var DigitalAsset $digitalAsset */
+        $digitalAsset = current(
+            $this->getContainer()
+                ->get('doctrine')
+                ->getRepository(DigitalAsset::class)
+                ->findBy([], ['id' => 'DESC'], 1)
+        );
+
+        $this->assertInstanceOf(DigitalAsset::class, $digitalAsset);
+        $this->assertEquals(self::DIGITAL_ASSET_TITLE_2, (string)$digitalAsset->getTitle());
+
+        $this->assertInstanceOf(File::class, $digitalAsset->getSourceFile());
+        $this->assertEquals(self::DIGITAL_ASSET_IMAGE_2, $digitalAsset->getSourceFile()->getOriginalFilename());
     }
 
     /**

@@ -206,6 +206,36 @@ class DigitalAssetController extends AbstractController
     }
 
     /**
+     * @Route("/widget/choose-image", name="oro_digital_asset_widget_choose_image")
+     * @Template("@OroDigitalAsset/DigitalAsset/widget/choose.html.twig")
+     * @AclAncestor("oro_digital_asset_create")
+     *
+     * @return array|RedirectResponse
+     */
+    public function chooseImageAction()
+    {
+        $mimeTypes = $this->get(FileConstraintsProvider::class)->getImageMimeTypes();
+        $maxFileSize = $this->get(FileConstraintsProvider::class)->getMaxSize();
+
+        return $this->handleChooseForm(true, $mimeTypes, $maxFileSize);
+    }
+
+    /**
+     * @Route("/widget/choose-file", name="oro_digital_asset_widget_choose_file")
+     * @Template("@OroDigitalAsset/DigitalAsset/widget/choose.html.twig")
+     * @AclAncestor("oro_digital_asset_create")
+     *
+     * @return array|RedirectResponse
+     */
+    public function chooseFileAction()
+    {
+        $mimeTypes = $this->get(FileConstraintsProvider::class)->getFileMimeTypes();
+        $maxFileSize = $this->get(FileConstraintsProvider::class)->getMaxSize();
+
+        return $this->handleChooseForm(false, $mimeTypes, $maxFileSize);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedServices(): array
