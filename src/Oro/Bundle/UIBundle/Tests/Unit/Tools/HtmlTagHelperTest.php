@@ -25,6 +25,26 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         $this->cachePath = $this->getTempDir('cache_test_data');
         $this->htmlTagProvider = $this->createMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
         $this->helper = new HtmlTagHelper($this->htmlTagProvider, $this->cachePath);
+
+        $this->helper->setAttribute('img', 'usemap', 'CDATA');
+        $this->helper->setAttribute('img', 'ismap', 'Bool');
+
+        $this->helper->setElement('map', 'Block', 'Flow', 'Common', true);
+        $this->helper->setAttribute('map', 'id', 'ID');
+        $this->helper->setAttribute('map', 'name', 'CDATA');
+
+        $this->helper->setElement('area', 'Inline', 'Empty', 'Common', true);
+        $this->helper->setAttribute('area', 'id', 'ID');
+        $this->helper->setAttribute('area', 'name', 'CDATA');
+        $this->helper->setAttribute('area', 'title', 'Text');
+        $this->helper->setAttribute('area', 'alt', 'Text');
+        $this->helper->setAttribute('area', 'coords', 'CDATA');
+        $this->helper->setAttribute('area', 'accesskey', 'Character');
+        $this->helper->setAttribute('area', 'nohref', 'Bool');
+        $this->helper->setAttribute('area', 'href', 'URI');
+        $this->helper->setAttribute('area', 'shape', 'Enum#rect,circle,poly,default');
+        $this->helper->setAttribute('area', 'target', 'Enum#_blank,_self,_target,_top');
+        $this->helper->setAttribute('area', 'tabindex', 'Text');
     }
 
     protected function tearDown()
@@ -60,7 +80,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
      * @param string $value
      * @param array $allowedElements
      * @param string $allowedTags
-     * @param param string $expected
+     * @param string $expected
      */
     public function testSanitizeIframe($value, array $allowedElements, $allowedTags, $expected)
     {
@@ -189,6 +209,13 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
      */
     protected function sanitizeDataProvider(): array
     {
+        $mapHtml = '<img src="planets.gif" width="145" height="126" alt="Planets" usemap="#planetmap">'.
+            '<map name="planetmap">'.
+            '<area shape="rect" coords="0,0,82,126" href="sun.htm" alt="Sun" tabindex="-1">'.
+            '<area shape="circle" coords="90,58,3" href="mercur.htm" alt="Mercury" tabindex="0">'.
+            '<area shape="circle" coords="124,58,8" href="venus.htm" alt="Venus" tabindex="1">'.
+            '</map>';
+
         return [
             'default' => ['sometext', [], 'sometext'],
             'not allowed tag' => ['<p>sometext</p>', ['a'], 'sometext'],
@@ -214,6 +241,15 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
                 ['div[id]'],
                 '<div id="test">sometext</div>'
             ],
+            'map element' => [
+                $mapHtml,
+                [
+                    'img[src|width|height|alt|usemap]',
+                    'map[name]',
+                    'area[shape|coords|href|alt|tabindex]'
+                ],
+                $mapHtml
+            ]
         ];
     }
 

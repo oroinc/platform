@@ -8,8 +8,8 @@ namespace Oro\Bundle\FormBundle\Provider;
  */
 class HtmlTagProvider
 {
+    public const HTML_ALLOWED_ELEMENTS = 'html_allowed_elements';
     private const EXTEND_KEY = 'extends';
-    private const HTML_ALLOWED_ELEMENTS = 'html_allowed_elements';
     private const HTML_PURIFIER_IFRAME_DOMAINS = 'html_purifier_iframe_domains';
     private const HTML_PURIFIER_URI_SCHEMES = 'html_purifier_uri_schemes';
 
@@ -32,7 +32,7 @@ class HtmlTagProvider
      */
     public function getAllowedElements(string $scope): array
     {
-        $allowedElements = ['@[style|class]'];
+        $allowedElements = ['@[id|style|class]'];
         foreach ($this->getPurifierConfigByKey($scope, self::HTML_ALLOWED_ELEMENTS) as $name => $data) {
             $allowedElement = $name;
             if (!empty($data['attributes'])) {

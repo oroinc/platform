@@ -17,7 +17,7 @@ class HtmlTagProviderTest extends WebTestCase
      * @var array
      */
     protected $allowedElements = [
-        '@[style|class]',
+        '@[id|style|class]',
         'table[cellspacing|cellpadding|border|align|width]',
         'thead[align|valign]',
         'tbody[align|valign]',

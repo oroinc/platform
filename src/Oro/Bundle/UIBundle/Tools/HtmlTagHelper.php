@@ -24,6 +24,16 @@ class HtmlTagHelper
     private $htmlPurifiers = [];
 
     /**
+     * @var array
+     */
+    private $additionalAttributes = [];
+
+    /**
+     * @var array
+     */
+    private $additionalElements = [];
+
+    /**
      * @var HtmlTagProvider
      */
     private $htmlTagProvider;
@@ -54,6 +64,38 @@ class HtmlTagHelper
     public function getLastErrorCollector()
     {
         return $this->lastErrorCollector;
+    }
+
+    /**
+     * @param string $elementName
+     * @param string $attributeName
+     * @param string $attributeType
+     */
+    public function setAttribute(string $elementName, string $attributeName, string $attributeType): void
+    {
+        $this->additionalAttributes[$elementName][$attributeName] = $attributeType;
+    }
+
+    /**
+     * @param string $elementName
+     * @param string $type
+     * @param string $contents
+     * @param string $attributeCollections
+     * @param bool $excludeSameElement
+     */
+    public function setElement(
+        string $elementName,
+        string $type,
+        string $contents,
+        string $attributeCollections,
+        bool $excludeSameElement = false
+    ): void {
+        $this->additionalElements[$elementName] = [
+            'type' => $type,
+            'contents' => $contents,
+            'attribute_collections' => $attributeCollections,
+            'excludeSameElement' => $excludeSameElement
+        ];
     }
 
     /**
@@ -97,16 +139,24 @@ class HtmlTagHelper
 
             $def = $config->maybeGetRawHTMLDefinition();
             if ($def) {
-                $def->addElement(
-                    'style',
-                    'Block',
-                    'Flow',
-                    'Common',
-                    [
-                        'type' => 'Enum#text/css',
-                        'media' => 'CDATA',
-                    ]
-                );
+                foreach ($this->additionalElements as $elementName => $data) {
+                    $element = $def->addElement(
+                        $elementName,
+                        $data['type'],
+                        $data['contents'],
+                        $data['attribute_collections']
+                    );
+
+                    if ($data['excludeSameElement'] === true) {
+                        $element->excludes = [$elementName => true];
+                    }
+                }
+
+                foreach ($this->additionalAttributes as $elementName => $attributeData) {
+                    foreach ($attributeData as $attributeName => $attributeType) {
+                        $def->addAttribute($elementName, $attributeName, $attributeType);
+                    }
+                }
             }
 
             $this->htmlPurifiers[$scope] = new \HTMLPurifier($config);

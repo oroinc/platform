@@ -150,6 +150,104 @@ services:
         arguments:
             - '@oro_form.provider.html_tag_provider'
             - '%kernel.cache_dir%'
+        calls:
+            # Additional div attributes
+            - ['setAttribute', ['div', 'role', 'Text']]
+            - ['setAttribute', ['div', 'aria-label', 'Text']]
+            - ['setAttribute', ['div', 'aria-labelledby', 'Text']]
+            - ['setAttribute', ['div', 'aria-orientation', 'Enum#horizontal,vertical']]
+            - ['setAttribute', ['div', 'aria-valuenow', 'Number']]
+            - ['setAttribute', ['div', 'aria-valuemin', 'Number']]
+            - ['setAttribute', ['div', 'aria-valuemax', 'Number']]
+            - ['setAttribute', ['div', 'aria-live', 'Text']]
+            - ['setAttribute', ['div', 'aria-atomic', 'Bool']]
+            - ['setAttribute', ['div', 'aria-hidden', 'Bool']]
+            - ['setAttribute', ['div', 'data-spy', 'Text']]
+            - ['setAttribute', ['div', 'data-ride', 'Text']]
+            - ['setAttribute', ['div', 'data-interval', 'Number']]
+            - ['setAttribute', ['div', 'data-parent', 'Text']]
+            - ['setAttribute', ['div', 'data-target', 'Text']]
+            - ['setAttribute', ['div', 'data-offset', 'Number']]
+            - ['setAttribute', ['div', 'data-delay', 'Number']]
+            - ['setAttribute', ['div', 'data-autohide', 'Bool']]
+            - ['setAttribute', ['div', 'tabindex', 'Text']]
+             # span attributes
+            - ['setAttribute', ['span', 'title', 'CDATA']]
+            - ['setAttribute', ['span', 'role', 'Text']]
+            - ['setAttribute', ['span', 'aria-hidden', 'Bool']]
+            - ['setAttribute', ['span', 'data-toggle', 'Text']]
+            - ['setAttribute', ['span', 'data-content', 'Text']]
+            - ['setAttribute', ['span', 'tabindex', 'Text']]
+            # button attributes
+            - ['setAttribute', ['button', 'id', 'ID']]
+            - ['setAttribute', ['button', 'type', 'CDATA']]
+            - ['setAttribute', ['button', 'title', 'CDATA']]
+            - ['setAttribute', ['button', 'aria-label', 'Text']]
+            - ['setAttribute', ['button', 'aria-haspopup', 'Bool']]
+            - ['setAttribute', ['button', 'aria-expanded', 'Bool']]
+            - ['setAttribute', ['button', 'aria-labelledby', 'Text']]
+            - ['setAttribute', ['button', 'aria-controls', 'Text']]
+            - ['setAttribute', ['button', 'data-dismiss', 'Text']]
+            - ['setAttribute', ['button', 'data-toggle', 'Text']]
+            - ['setAttribute', ['button', 'data-target', 'Text']]
+            - ['setAttribute', ['button', 'data-display', 'Text']]
+            - ['setAttribute', ['button', 'data-content', 'Text']]
+            - ['setAttribute', ['button', 'data-container', 'Text']]
+            - ['setAttribute', ['button', 'data-placement', 'Enum#top,bottom,left,right']]
+            - ['setAttribute', ['button', 'disabled', 'Bool']]
+            # style attributes
+            - ['setAttribute', ['style', 'type', 'Enum#text/css']]
+            - ['setAttribute', ['style', 'media', 'CDATA']]
+            # img attributes
+            - ['setAttribute', ['img', 'usemap', 'CDATA']]
+            - ['setAttribute', ['img', 'ismap', 'Bool']]
+            # nav attributes
+            - ['setAttribute', ['nav', 'aria-label', 'Text']]
+            # map attributes
+            - ['setAttribute', ['map', 'id', 'ID']]
+            - ['setAttribute', ['map', 'name', 'CDATA']]
+            # Ul attributes
+            - ['setAttribute', ['ul', 'role', 'Text']]
+            # li attributes
+            - ['setAttribute', ['li', 'aria-current', 'Text']]
+            - ['setAttribute', ['li', 'aria-selected', 'Bool']]
+            - ['setAttribute', ['li', 'data-target', 'Text']]
+            - ['setAttribute', ['li', 'data-slide-to', 'Text']]
+            # cite attributes
+            - ['setAttribute', ['cite', 'title', 'Text']]
+            # a attributes
+            - ['setAttribute', ['a', 'target', 'Text']]
+            - ['setAttribute', ['a', 'title', 'Text']]
+            - ['setAttribute', ['a', 'role', 'Text']]
+            - ['setAttribute', ['a', 'data-toggle', 'Text']]
+            - ['setAttribute', ['a', 'data-slide', 'Text']]
+            - ['setAttribute', ['a', 'data-trigger', 'Text']]
+            - ['setAttribute', ['a', 'aria-label', 'Text']]
+            - ['setAttribute', ['a', 'aria-disabled', 'Enum#true,false']]
+            - ['setAttribute', ['a', 'aria-expanded', 'Bool']]
+            - ['setAttribute', ['a', 'aria-controls', 'Text']]
+            - ['setAttribute', ['a', 'aria-haspopup', 'Bool']]
+            - ['setAttribute', ['a', 'aria-selected', 'Bool']]
+            - ['setAttribute', ['a', 'data-content', 'Text']]
+            - ['setAttribute', ['a', 'tabindex', 'Text']]
+            - ['setAttribute', ['a', 'data-placement', 'Enum#top,bottom,left,right']]
+            # area attributes
+            - ['setAttribute', ['area', 'id', 'ID']]
+            - ['setAttribute', ['area', 'name', 'CDATA']]
+            - ['setAttribute', ['area', 'title', 'Text']]
+            - ['setAttribute', ['area', 'alt', 'Text']]
+            - ['setAttribute', ['area', 'coords', 'CDATA']]
+            - ['setAttribute', ['area', 'accesskey', 'Character']]
+            - ['setAttribute', ['area', 'nohref', 'Bool']]
+            - ['setAttribute', ['area', 'href', 'URI']]
+            - ['setAttribute', ['area', 'shape', 'Enum#rect,circle,poly,default']]
+            - ['setAttribute', ['area', 'target', 'Enum#_blank,_self,_target,_top']]
+            - ['setAttribute', ['area', 'tabindex', 'Text']]
+            # Set Custom Elements
+            - ['setElement', ['button', 'Block', 'Flow', 'Common', true]]
+            - ['setElement', ['style', 'Block', 'Flow', 'Common', true]]
+            - ['setElement', ['map', 'Block', 'Flow', 'Common', true]]
+            - ['setElement', ['area', 'Inline', 'Empty', 'Common', true]]
 
     oro_ui.flash_message_helper:
         class: 'Oro\Bundle\UIBundle\Tools\FlashMessageHelper'

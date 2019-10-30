@@ -87,7 +87,7 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
             'default scope' => [
                 'scope' => 'default',
                 'expectedResult' => [
-                    '@[style|class]',
+                    '@[id|style|class]',
                     'p',
                     'span[id]',
                     'br',
@@ -98,7 +98,7 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
             'additional scope' => [
                 'scope' => 'additional',
                 'expectedResult' => [
-                    '@[style|class]',
+                    '@[id|style|class]',
                     'p',
                     'span[id]',
                     'br',
@@ -110,7 +110,7 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
             'extra scope' => [
                 'scope' => 'extra',
                 'expectedResult' => [
-                    '@[style|class]',
+                    '@[id|style|class]',
                     'p',
                     'span[id]',
                     'br',
