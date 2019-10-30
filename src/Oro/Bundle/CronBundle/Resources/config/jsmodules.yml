@@ -1,0 +1,7 @@
+aliases:
+    oro/filter/command_with_args-filter$: orocron/js/filter/command-with-args-filter
+dynamic-imports:
+    orocron:
+        - orocron/js/app/views/schedule-intervals-view
+    orofilter:
+        - oro/filter/command_with_args-filter

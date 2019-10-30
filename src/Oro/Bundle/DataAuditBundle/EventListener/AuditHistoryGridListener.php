@@ -6,6 +6,9 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 
+/**
+ * Bind entity class and id to grid parameters
+ */
 class AuditHistoryGridListener
 {
     const GRID_PARAM_CLASS      = 'object_class';
@@ -52,7 +55,7 @@ class AuditHistoryGridListener
             );
 
             if (in_array('objectId', $this->paramsToBind)) {
-                $queryParameters['objectId'] = $parameters->get(self::GRID_PARAM_OBJECT_ID, 0);
+                $queryParameters['objectId'] = (string) $parameters->get(self::GRID_PARAM_OBJECT_ID, 0);
             }
 
             $fieldName = $parameters->get(self::GRID_PARAM_FIELD_NAME, false);

@@ -1,0 +1,9 @@
+aliases:
+    oro/datagrid/action/schedule-sync-action$: orointegration/js/datagrid/action/schedule-sync-action
+dynamic-imports:
+    orodatagrid:
+        - oro/datagrid/action/schedule-sync-action
+    orointegration:
+        - orointegration/js/app/components/integration-connection-checker-component
+        - orointegration/js/app/views/integration-sync-view
+        - orointegration/js/channel-view

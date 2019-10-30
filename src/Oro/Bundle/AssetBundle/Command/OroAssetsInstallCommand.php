@@ -41,8 +41,7 @@ class OroAssetsInstallCommand extends AbstractCommand
             ->runCommand('fos:js-routing:dump', ['--process-isolation' => true])
             ->runCommand('oro:localization:dump')
             ->runCommand('assets:install', $assetsOptions)
-            ->runCommand('oro:assets:build', ['--npm-install'=> true])
-            ->runCommand('oro:requirejs:build', ['--ignore-errors' => true, '--process-isolation' => true]);
+            ->runCommand('oro:assets:build', ['--npm-install'=> true]);
 
         return 0;
     }

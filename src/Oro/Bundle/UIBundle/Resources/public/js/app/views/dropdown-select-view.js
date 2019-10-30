@@ -4,7 +4,7 @@ define(function(require) {
     var DropdownSelectView;
     var $ = require('jquery');
     var _ = require('underscore');
-    var dropdownSelectTemplate = require('tpl!oroui/templates/dropdown-select.html');
+    var dropdownSelectTemplate = require('tpl-loader!oroui/templates/dropdown-select.html');
     var BaseView = require('oroui/js/app/views/base/view');
 
     DropdownSelectView = BaseView.extend({

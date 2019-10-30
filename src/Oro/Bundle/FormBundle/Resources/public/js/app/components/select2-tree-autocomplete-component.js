@@ -36,7 +36,7 @@ define(function(require) {
         },
 
         makeItemTemplate: function(propName, forSelection) {
-            var template = require('tpl!oroform/templates/select2-tree-autocomplete-result.html');
+            var template = require('tpl-loader!oroform/templates/select2-tree-autocomplete-result.html');
 
             var mixData = {
                 newKey: 'oro.form.add_new',

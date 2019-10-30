@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
     var UnreadEmailsStateHolder;
     var _ = require('underscore');
@@ -6,8 +6,8 @@ define(function(require) {
     var sync = require('orosync/js/sync');
     var EmailNotificationCollection =
         require('oroemail/js/app/models/email-notification/email-notification-collection');
-    var module = require('module');
-    var channel = module.config().wsChannel;
+    var config = require('module-config').default(module.id);
+    var channel = config.wsChannel;
     var instance;
 
     UnreadEmailsStateHolder = function() {

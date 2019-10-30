@@ -1,0 +1,15 @@
+aliases:
+    oro/select2-attribute-autocomplete-component$: oroentityconfig/js/components/attribute-select-component
+    oroentityconfig/js/attribute-group-collection-component$: oroentityconfig/js/components/attribute-group-collection-component
+    oroentityconfig/js/attribute-group-tab-content-component$: oroentityconfig/js/components/attribute-group-tab-content-component
+    oroentityconfig/js/attribute-group-tabs-component$: oroentityconfig/js/components/attribute-group-tabs-component
+configs:
+    oroentityconfig/js/sync/attribute-import-sync-notifier: {}
+dynamic-imports:
+    commons:
+        - oro/select2-attribute-autocomplete-component
+    oroentityconfig:
+        - oroentityconfig/js/attribute-group-collection-component
+        - oroentityconfig/js/attribute-group-tab-content-component
+        - oroentityconfig/js/attribute-group-tabs-component
+        - oroentityconfig/js/sync/attribute-import-sync-notifier

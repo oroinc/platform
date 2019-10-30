@@ -4,30 +4,34 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateApiType;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailTemplateApiTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EmailTemplateApiType */
-    private $type;
-
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
+    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $localizationManager;
+
+    /** @var EmailTemplateApiType */
+    private $type;
+
     protected function setUp()
     {
-        $this->localeSettings = $this->createMock(LocaleSettings::class);
         $this->configManager = $this->createMock(ConfigManager::class);
+        $this->localizationManager = $this->createMock(LocalizationManager::class);
 
-        $this->type = new EmailTemplateApiType($this->configManager, $this->localeSettings);
+        $this->type = new EmailTemplateApiType($this->configManager, $this->localizationManager);
     }
 
     public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver */
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));
@@ -37,26 +41,27 @@ class EmailTemplateApiTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildForm()
     {
-        $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
+        $builder = $this->createMock(FormBuilderInterface::class);
+
+        $builder->expects($this->any())->method('add')->willReturnSelf();
+        $builder->expects($this->any())->method('get')->willReturnSelf();
 
         $builder->expects($this->once())
             ->method('addEventSubscriber')
             ->with($this->isInstanceOf('Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber'));
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects($this->exactly(2))
             ->method('get')
-            ->with('oro_email.sanitize_html', false, false, null)
-            ->willReturn(true);
+            ->withConsecutive(['oro_form.wysiwyg_enabled'], ['oro_email.sanitize_html'])
+            ->willReturnOnConsecutiveCalls(false, true);
 
-        $this->localeSettings->expects($this->once())
-            ->method('getLanguage')
-            ->will($this->returnValue('ru_UA'));
-
-        $this->localeSettings->expects($this->once())
-            ->method('getLocalesByCodes')
-            ->will($this->returnValue(['en', 'fr_FR']));
+        $this->localizationManager->expects($this->once())
+            ->method('getLocalizations')
+            ->willReturn([
+                1 => new Localization(),
+                42 => new Localization(),
+            ]);
 
         $this->type->buildForm($builder, []);
     }

@@ -5,7 +5,7 @@ define(function(require) {
     var FlowchartViewerOverlayView = require('../viewer/transition-overlay-view');
 
     FlowChartEditorTransitionOverlayView = FlowchartViewerOverlayView.extend({
-        template: require('tpl!oroworkflow/templates/flowchart/editor/transition.html'),
+        template: require('tpl-loader!oroworkflow/templates/flowchart/editor/transition.html'),
 
         className: function() {
             var classNames = [FlowChartEditorTransitionOverlayView.__super__.className.call(this)];

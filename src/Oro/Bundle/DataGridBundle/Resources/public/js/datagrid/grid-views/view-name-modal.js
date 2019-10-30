@@ -3,8 +3,8 @@ define(function(require) {
 
     var __ = require('orotranslation/js/translator');
     var Modal = require('oroui/js/modal');
-    var contentTemplate = require('tpl!orodatagrid/templates/datagrid/view-name-modal.html');
-    var nameErrorTemplate = require('tpl!orodatagrid/templates/datagrid/view-name-error-modal.html');
+    var contentTemplate = require('tpl-loader!orodatagrid/templates/datagrid/view-name-modal.html');
+    var nameErrorTemplate = require('tpl-loader!orodatagrid/templates/datagrid/view-name-error-modal.html');
 
     var ViewNameModal = Modal.extend({
         contentTemplate: contentTemplate,

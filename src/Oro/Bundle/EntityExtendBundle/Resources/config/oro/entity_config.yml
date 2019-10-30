@@ -1,7 +1,7 @@
 entity_config:
     extend:
         entity:
-            require_js:                     ['oroentityextend/js/init-entity-extend-relation']
+            jsmodules:                     ['oroentityextend/js/init-entity-extend-relation']
             grid_action:
                 -
                     name:                   oro.entity_extend.entity_config.extend.entity.grid_action.remove

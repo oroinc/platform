@@ -1,0 +1,7 @@
+app-modules:
+    - orosync/js/app/modules/content-manager-module
+dynamic-imports:
+    orosync:
+        - orosync/js/content-manager
+        - orosync/js/content/grid-builder
+        - orosync/js/sync

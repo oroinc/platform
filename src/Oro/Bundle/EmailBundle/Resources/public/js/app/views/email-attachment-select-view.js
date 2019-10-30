@@ -6,6 +6,7 @@ define(function(require) {
     var $ = require('jquery');
     var EmailAttachmentListRowView = require('oroemail/js/app/views/email-attachment-list-row-view');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    var template = require('tpl-loader!oroemail/templates/email-attachment/email-attachment-select-view.html');
 
     EmailAttachmentSelectView = BaseCollectionView.extend({
         itemView: EmailAttachmentListRowView,
@@ -117,7 +118,7 @@ define(function(require) {
 
         getTemplateFunction: function() {
             if (!this.template) {
-                this.template = require('tpl!oroemail/templates/email-attachment/email-attachment-select-view.html');
+                this.template = template;
             }
 
             return EmailAttachmentSelectView.__super__.getTemplateFunction.call(this);

@@ -5,7 +5,7 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
 
     WidgetPickerItemView = BaseView.extend({
-        template: require('tpl!oroui/templates/widget-picker/widget-picker-item-view.html'),
+        template: require('tpl-loader!oroui/templates/widget-picker/widget-picker-item-view.html'),
         tagName: 'div',
         className: 'widget-picker__item',
 

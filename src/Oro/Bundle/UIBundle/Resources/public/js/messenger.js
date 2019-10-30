@@ -1,7 +1,7 @@
 define([
     'jquery',
     'underscore',
-    'tpl!oroui/templates/message-item.html',
+    'tpl-loader!oroui/templates/message-item.html',
     'oroui/js/tools',
     'oroui/js/tools/multi-use-resource-manager',
     'cryptojs/sha256',

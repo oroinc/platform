@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeRequestData;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
@@ -71,6 +72,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertSame($data, $this->context->getRequestData());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessWithoutMetadata()
@@ -97,6 +99,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals($inputData, $this->context->getRequestData());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessWithMetadata()
@@ -192,6 +195,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         ];
 
         self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessNoAttributes()
@@ -243,6 +247,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         ];
 
         self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessWithInvalidEntityTypes()
@@ -314,6 +319,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessWithNotAcceptableEntityTypes()
@@ -396,6 +402,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessWithEmptyAcceptableEntityTypes()
@@ -475,6 +482,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
 
         self::assertFalse($this->context->hasErrors());
         self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessWithEmptyAcceptableEntityTypesShouldBeRejected()
@@ -566,6 +574,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessWithInvalidIdentifiers()
@@ -652,6 +661,95 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
+    }
+
+    public function testProcessWithNotResolvedIdentifiers()
+    {
+        $inputData = [
+            'data' => [
+                'relationships' => [
+                    'toOneRelation'  => [
+                        'data' => [
+                            'type' => 'users',
+                            'id'   => 'val1'
+                        ]
+                    ],
+                    'toManyRelation' => [
+                        'data' => [
+                            [
+                                'type' => 'groups',
+                                'id'   => 'val1'
+                            ],
+                            [
+                                'type' => 'groups',
+                                'id'   => 'val2'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('toOneRelation', 'Test\User', false)
+        );
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('toManyRelation', 'Test\Group', true)
+        );
+
+        $this->valueNormalizer->expects(self::any())
+            ->method('normalizeValue')
+            ->willReturnMap(
+                [
+                    ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
+                    ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
+                ]
+            );
+        $this->entityIdTransformer->expects(self::any())
+            ->method('reverseTransform')
+            ->willReturnCallback(
+                function ($value, EntityMetadata $metadata) {
+                    if ('val1' === $value) {
+                        return null;
+                    }
+
+                    return 'normalized::' . $metadata->getClassName() . '::' . $value;
+                }
+            );
+
+        $this->context->setRequestData($inputData);
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+
+        $expectedData = [
+            'toOneRelation'  => [
+                'id'    => null,
+                'class' => 'Test\User'
+            ],
+            'toManyRelation' => [
+                [
+                    'id'    => null,
+                    'class' => 'Test\Group'
+                ],
+                [
+                    'id'    => 'normalized::Test\Group::val2',
+                    'class' => 'Test\Group'
+                ]
+            ]
+        ];
+
+        self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertFalse($this->context->hasErrors());
+        self::assertEquals(
+            [
+                'requestData.toOneRelation.id'    => new NotResolvedIdentifier('val1', 'Test\User'),
+                'requestData.toManyRelation.0.id' => new NotResolvedIdentifier('val1', 'Test\Group')
+            ],
+            $this->context->getNotResolvedIdentifiers()
+        );
     }
 
     public function testProcessShouldNotNormalizeIdOfIncludedEntity()
@@ -698,6 +796,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         ];
 
         self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessShouldNotNormalizeIdOfIncludedPrimaryEntity()
@@ -744,6 +843,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         ];
 
         self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessForEntityThatDoesNotHaveIdentifierFields()
@@ -755,6 +855,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertSame($requestData['meta'], $this->context->getRequestData());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessForEntityThatDoesNotHaveIdentifierFieldsAndNoMetaSectionInRequestData()
@@ -766,5 +867,6 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertSame($requestData, $this->context->getRequestData());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 }

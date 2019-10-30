@@ -29,7 +29,7 @@ define(function(require) {
     var TagsView = BaseView.extend(/** @exports TagsView.prototype */{
         showDefault: true,
 
-        template: require('tpl!orotag/templates/viewer/tags-view.html'),
+        template: require('tpl-loader!orotag/templates/viewer/tags-view.html'),
 
         listen: {
             'change model': 'render'

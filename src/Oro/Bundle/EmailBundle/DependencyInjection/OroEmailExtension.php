@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\DependencyInjection;
 
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-class OroEmailExtension extends Extension
+class OroEmailExtension extends Extension implements PrependExtensionInterface
 {
     /**
      * {@inheritDoc}
@@ -40,5 +42,27 @@ class OroEmailExtension extends Extension
         }
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        // X-Frame-Options header should be removed from embedded forms
+        $securityConfig = $container->getExtensionConfig('nelmio_security');
+
+        $emailTemplatePreviewPath = [
+            '/email/emailtemplate/preview' => 'ALLOW',
+        ];
+
+        if (isset($securityConfig[0]['clickjacking']['paths'])
+            && is_array($securityConfig[0]['clickjacking']['paths'])) {
+            $securityConfig[0]['clickjacking']['paths']
+                = $emailTemplatePreviewPath + $securityConfig[0]['clickjacking']['paths'];
+        }
+
+        /** @var ExtendedContainerBuilder $container */
+        $container->setExtensionConfig('nelmio_security', $securityConfig);
     }
 }

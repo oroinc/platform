@@ -319,7 +319,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
 
         if ($fileName) {
             if ($this->isRelativePath($fileName)) {
-                $fileName = $this->getTestResourcePath('responses', $fileName);
+                $fileName = $this->getTestResourcePath($this->getResponseDataFolderName(), $fileName);
             }
             file_put_contents($fileName, $content);
         } else {

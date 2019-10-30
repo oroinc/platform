@@ -1,15 +1,14 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var DatagridSettingsListCollectionView;
-    var template = require('tpl!orodatagrid/templates/datagrid-settings/datagrid-settings-collection.html');
+    var template = require('tpl-loader!orodatagrid/templates/datagrid-settings/datagrid-settings-collection.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     var DatagridSettingsListFilterModel = require('orodatagrid/js/app/models/datagrid-settings-list/datagrid-settings-list-filter-model');
     var DatagridSettingsListItemView = require('orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-item-view');
-    var module = require('module');
-    var config = module.config();
+    var config = require('module-config').default(module.id);
     require('jquery-ui');
 
     config = _.extend({

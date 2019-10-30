@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 /**
+ * Container for entities' definition and their relations
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class PropertyConfigContainer
@@ -407,12 +408,12 @@ class PropertyConfigContainer
      *
      * @return array
      */
-    public function getRequireJsModules($type = self::TYPE_ENTITY)
+    public function getJsModules($type = self::TYPE_ENTITY)
     {
         $type = $this->getConfigType($type);
 
-        return isset($this->config[$type]['require_js'])
-            ? $this->config[$type]['require_js']
+        return isset($this->config[$type]['jsmodules'])
+            ? $this->config[$type]['jsmodules']
             : [];
     }
 

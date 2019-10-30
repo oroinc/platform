@@ -50,6 +50,17 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
         $this->addOroLocalizationTitleForeignKeys($schema);
 
         $this->addRelationsToScope($schema);
+
+        // Due to the cyclic dependency of bundles, it is not possible to create this key elsewhere during installation
+        if ($schema->hasTable('oro_email_template_localized')) {
+            $table = $schema->getTable('oro_email_template_localized');
+            $table->addForeignKeyConstraint(
+                $schema->getTable('oro_localization'),
+                ['localization_id'],
+                ['id'],
+                ['onDelete' => 'CASCADE']
+            );
+        }
     }
 
     /**

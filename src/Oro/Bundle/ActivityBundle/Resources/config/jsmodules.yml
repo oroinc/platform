@@ -1,0 +1,5 @@
+dynamic-imports:
+    oroactivity:
+        - oroactivity/js/app/components/activity-context-activity-component
+        - oroactivity/js/app/components/activity-context-component
+        - oroactivity/js/app/views/activity-context-activity-view

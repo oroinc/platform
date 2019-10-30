@@ -17,6 +17,7 @@ use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
+use Oro\Bundle\TestFrameworkBundle\Behat\Client\FileDownloader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareTrait;
@@ -2383,5 +2384,32 @@ JS;
     protected function fixStepArgument($argument)
     {
         return str_replace(['\\"', '\\#'], ['"', '#'], $argument);
+    }
+
+    /**
+     * Checks downloading file for a certain link
+     * Example: And I download file "some_link_name.jpg"
+     * @Given /^I download file "([^"]*)"$/
+     */
+    public function iDownloadFile($linkTitle)
+    {
+        $link = $this->getSession()->getPage()->findLink($linkTitle);
+
+        self::assertNotNull($link);
+        if (!$link->hasAttribute('href')) {
+            throw new \InvalidArgumentException(sprintf(
+                'Link "%s" is not downloadable (no href attribute)',
+                $linkTitle
+            ));
+        }
+
+        $url = $this->locatePath($link->getAttribute('href'));
+
+        $pathToSave = tempnam(sys_get_temp_dir(), 'downloaded_file');
+
+        self::assertTrue(
+            (new FileDownloader())->download($url, $pathToSave, $this->getSession()),
+            sprintf('Can not download file for link "%s"', $linkTitle)
+        );
     }
 }

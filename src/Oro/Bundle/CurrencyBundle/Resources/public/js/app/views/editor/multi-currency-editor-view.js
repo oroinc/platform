@@ -88,7 +88,7 @@ define(function(require) {
             return classes.join(' ');
         },
 
-        template: require('tpl!../../../../templates/multi-currency-editor.html'),
+        template: require('tpl-loader!../../../../templates/multi-currency-editor.html'),
 
         availableCurrencies: [],
 

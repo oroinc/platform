@@ -1,8 +1,7 @@
 define(function(require, exports, module) {
     'use strict';
 
-    require('oroui/js/extend/polyfill');
-    require('app-modules!package/commerce-demo/src/Oro/Bundle/DemoUserBundle/Resources/public/js/demo');
+    require('app-modules').default;
 
     var DeviceSwitcherApp;
     var _ = require('underscore');
@@ -12,8 +11,8 @@ define(function(require, exports, module) {
     var DemoPopupView = require('oroviewswitcher/js/app/views/demo/demo-popup-view');
     var DemoHelpCarouselView = require('oroviewswitcher/js/app/views/demo/demo-help-carousel-view');
     var DemoLogoutButtonView = require('oroviewswitcher/js/app/views/demo/demo-logout-button-view');
+    var config = require('module-config').default(module.id);
 
-    var config = module.config();
     var pageModel = innerPageModelService.getModel();
     pageModel.set(_.pick(config, 'personalDemoUrl', 'projectName'));
 

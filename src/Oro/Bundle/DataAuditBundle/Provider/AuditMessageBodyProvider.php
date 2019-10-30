@@ -17,6 +17,9 @@ class AuditMessageBodyProvider
     /** @var EntityNameResolver */
     private $entityNameResolver;
 
+    /** @var string */
+    private $transactionId;
+
     /**
      * @param EntityNameResolver $entityNameResolver
      */
@@ -51,7 +54,7 @@ class AuditMessageBodyProvider
         $body['collections_updated'] = $collectionUpdates;
 
         $body['timestamp'] = time();
-        $body['transaction_id'] = UUIDGenerator::v4();
+        $body['transaction_id'] = $this->getTransactionId();
 
         if (null !== $securityToken) {
             $user = $securityToken->getUser();
@@ -74,5 +77,17 @@ class AuditMessageBodyProvider
         }
 
         return $body;
+    }
+
+    /**
+     * @return string
+     */
+    private function getTransactionId(): string
+    {
+        if (!$this->transactionId) {
+            $this->transactionId = UUIDGenerator::v4();
+        }
+
+        return $this->transactionId;
     }
 }

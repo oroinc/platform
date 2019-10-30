@@ -2,101 +2,81 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class EmailTemplateTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EmailTemplate
-     */
-    protected $emailTemplate;
+    use EntityTestCaseTrait, EntityTrait;
 
-    protected function setUp()
+    public function testConstruct(): void
     {
-        $this->emailTemplate = new EmailTemplate('update_entity.html.twig', "@subject = sdfdsf\n abc");
+        $template = new EmailTemplate('update_entity.html.twig', "@subject = sdfdsf\n abc");
 
-        $this->assertEquals('abc', $this->emailTemplate->getContent());
-        $this->assertFalse($this->emailTemplate->getIsSystem());
-        $this->assertEquals('html', $this->emailTemplate->getType());
+        $this->assertSame('sdfdsf', $template->getSubject());
+        $this->assertSame('abc', $template->getContent());
+
+        // Default values
+        $this->assertFalse($template->getIsSystem());
+        $this->assertTrue($template->getIsEditable());
+        $this->assertSame(EmailTemplate::TYPE_HTML, $template->getType());
     }
 
-    protected function tearDown()
+    public function testProperties(): void
     {
-        unset($this->emailTemplate);
+        $template = new EmailTemplate();
+        $this->assertPropertyAccessors($template, [
+            ['id', 1],
+            ['isSystem', true, false],
+            ['isEditable', true, false],
+            ['name', 'test_name', false],
+            ['parent', 42],
+            ['subject', 'Default subject'],
+            ['content', 'Default content', false],
+            ['entityName', User::class],
+            ['type', EmailTemplate::TYPE_HTML],
+            ['owner', new User()],
+            ['organization', new Organization()],
+            ['visible', true]
+        ]);
+
+        $this->assertPropertyCollections($template, [
+            ['translations', new EmailTemplateTranslation()],
+        ]);
     }
 
-    /**
-     * Test setters, getters
-     */
-    public function testSettersGetters()
+    public function testClone(): void
     {
-        foreach (array(
-                     'name',
-                     'isSystem',
-                     'parent',
-                     'subject',
-                     'content',
-                     'locale',
-                     'entityName',
-                     'type',
-                 ) as $field) {
-            $this->emailTemplate->{'set'.ucfirst($field)}('abc');
-            $this->assertEquals('abc', $this->emailTemplate->{'get'.ucfirst($field)}());
+        $template = new EmailTemplate('original_name', 'original content', EmailTemplate::TYPE_TEXT, true);
+        $template->setIsEditable(false);
+        $this->setValue($template, 'id', 42);
 
-            $translation = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation');
-            $this->emailTemplate->setTranslations(new ArrayCollection(array($translation)));
-            $this->assertInstanceOf(
-                'Doctrine\Common\Collections\ArrayCollection',
-                $this->emailTemplate->getTranslations()
-            );
-            $this->assertCount(1, $this->emailTemplate->getTranslations());
-        }
-    }
+        $originalLocalization = new EmailTemplateTranslation();
+        $template->addTranslation($originalLocalization);
 
-    public function testOrganization()
-    {
-        $template       = new EmailTemplate();
-        $organization   = new Organization();
-        $this->assertNull($template->getOrganization());
-        $template->setOrganization($organization);
-        $this->assertEquals($organization, $template->getOrganization());
-    }
-
-    /**
-     * Test clone, toString
-     */
-    public function testCloneAndToString()
-    {
-        $translation = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation');
-
-        $this->emailTemplate->getTranslations()->add($translation);
-
-        $clone = clone $this->emailTemplate;
+        $clone = clone $template;
 
         $this->assertNull($clone->getId());
-        $this->assertEquals($clone->getParent(), $this->emailTemplate->getId());
+        $this->assertEquals($clone->getParent(), $template->getId());
+        $this->assertSame('original_name', $clone->getName());
+        $this->assertSame('original content', $clone->getContent());
+        $this->assertSame(EmailTemplate::TYPE_TEXT, $clone->getType());
 
         $this->assertFalse($clone->getIsSystem());
         $this->assertTrue($clone->getIsEditable());
 
-        $this->assertEquals($this->emailTemplate->getName(), (string)$this->emailTemplate);
-        $this->assertFalse($clone->getTranslations()->first() === $translation);
+        $clonedLocalization = $clone->getTranslations()->first();
+        $this->assertNotSame($originalLocalization, $clonedLocalization);
+        $this->assertSame($clone, $clonedLocalization->getTemplate());
     }
 
-    public function testCloneForSystemNonEditableTemplate()
+    public function testToString(): void
     {
-        $emailTemplate = new EmailTemplate();
-        $emailTemplate->setIsSystem(true);
-        $emailTemplate->setIsEditable(false);
-
-        $this->assertTrue($emailTemplate->getIsSystem());
-        $this->assertFalse($emailTemplate->getIsEditable());
-
-        $clone = clone $emailTemplate;
-
-        $this->assertFalse($clone->getIsSystem());
-        $this->assertTrue($clone->getIsEditable());
+        $template = new EmailTemplate('template_name');
+        $this->assertSame('template_name', (string)$template);
     }
 }

@@ -1,0 +1,33 @@
+oro_behat_extension:
+  suites:
+    OroDigitalAssetBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroFormBundle::FormContext
+        - OroDataGridBundle::GridContext
+      paths:
+        - '@OroDigitalAssetBundle/Tests/Behat/Features'
+  elements:
+    DigitalAssetManagerField:
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\DigitalAssetManagerField
+    Digital Asset Form:
+      selector: 'form[id^="oro_digital_asset"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          File: 'oro_digital_asset[sourceFile][file]'
+          Title: 'oro_digital_asset[titles][values][default]'
+    Digital Asset Dialog Form:
+      selector: 'form[id^="oro_digital_asset_in_dialog"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          File: 'oro_digital_asset_in_dialog[sourceFile][file]'
+          Title: 'oro_digital_asset_in_dialog[titles][values][default]'
+    Digital Asset Remove Button:
+      selector: '.digital-asset-controls:not([class*="hide"]) a[data-role="digital-asset-remove"]'
+    Digital Asset Edit Button:
+      selector: '.digital-asset-controls:not([class*="hide"]) a[data-role="digital-asset-update"]'
+    Digital Asset Select Grid:
+      selector: 'div[data-page-component-name^="digital-asset-select-"]'
+      class: Oro\Bundle\FrontendBundle\Tests\Behat\Element\Grid

@@ -1,9 +1,9 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var $ = require('jquery');
     var _ = require('underscore');
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
 
     var Popper = require('popper');
     require('bootstrap-dropdown');

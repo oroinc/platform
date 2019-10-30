@@ -1,0 +1,7 @@
+aliases:
+    oro/datagrid/action/merge-mass-action$: oroentitymerge/js/datagrid/action/merge-mass-action
+dynamic-imports:
+    orodatagrid:
+        - oro/datagrid/action/merge-mass-action
+    oroentitymerge:
+        - oroentitymerge/js/merge-view

@@ -1,6 +1,0 @@
-config:
-    paths:
-        'orointegration/js/channel-view': 'bundles/orointegration/js/channel-view.js'
-        'oro/datagrid/action/schedule-sync-action': 'bundles/orointegration/js/datagrid/action/schedule-sync-action.js'
-        'orointegration/js/app/components/integration-connection-checker-component': 'bundles/orointegration/js/app/components/integration-connection-checker-component.js'
-        'orointegration/js/app/views/integration-sync-view': 'bundles/orointegration/js/app/views/integration-sync-view.js'

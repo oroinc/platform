@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var EntityCategoryTabsComponent;
@@ -8,7 +8,7 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
     var BaseCollection = require('oroui/js/app/models/base/collection');
     var TabCollectionView = require('oroui/js/app/views/tab-collection-view');
-    var config = require('module').config();
+    var config = require('module-config').default(module.id);
 
     config = _.extend({
         useDropdown: true

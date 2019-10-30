@@ -13,7 +13,7 @@ define(function(require) {
      */
     TagUpdateView = TagView.extend({
         /** @property */
-        template: require('tpl!../templates/update-tag-list.html'),
+        template: require('tpl-loader!../templates/update-tag-list.html'),
 
         /** @property */
         tagsOverlayTemplate: _.template(

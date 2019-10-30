@@ -37,7 +37,7 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        template: require('tpl!../../../../templates/board/board-view.html'),
+        template: require('tpl-loader!../../../../templates/board/board-view.html'),
 
         /**
          * Shared between shild views timeout to detect early status change

@@ -6,7 +6,7 @@ define(function(require) {
     var BaseWidgetSetupView = require('orosidebar/js/app/views/base-widget/base-widget-setup-view');
 
     StickyNoteSetupView = BaseWidgetSetupView.extend({
-        template: require('tpl!orosidebar/templates/sidebar-widget/sticky-note/sticky-note-setup-view.html'),
+        template: require('tpl-loader!orosidebar/templates/sidebar-widget/sticky-note/sticky-note-setup-view.html'),
 
         validation: {
             content: {

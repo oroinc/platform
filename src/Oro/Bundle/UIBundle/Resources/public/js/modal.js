@@ -1,4 +1,4 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var ModalView;
@@ -7,11 +7,10 @@ define(function(require) {
     var $ = require('jquery');
     var Backbone = require('backbone');
     var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl!oroui/templates/modal-dialog.html');
+    var template = require('tpl-loader!oroui/templates/modal-dialog.html');
     var mediator = require('oroui/js/mediator');
     var tools = require('oroui/js/tools');
-    var module = require('module');
-    var config = module.config();
+    var config = require('module-config').default(module.id);
 
     var SUSPEND_MODE_CLASS = 'suspend-mode';
     var DATA_KEY = 'bs.modal';

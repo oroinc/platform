@@ -208,4 +208,27 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertSame($object, $emptyDataNormalizer($form, ''));
     }
+
+    public function testEmptyDataNormalizerForNotEmptyCompoundFieldWithDataClassAndExistingEmptyDataNormalizer()
+    {
+        $object = new \stdClass();
+        $options = [
+            'data_class' => 'Test\Class',
+            'empty_data' => function () use ($object) {
+                return $object;
+            }
+        ];
+
+        $emptyDataNormalizer = $this->expectBuildForm($options);
+
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::once())
+            ->method('isEmpty')
+            ->willReturn(false);
+
+        $this->entityInstantiator->expects(self::never())
+            ->method('instantiate');
+
+        self::assertSame($object, $emptyDataNormalizer($form, ''));
+    }
 }

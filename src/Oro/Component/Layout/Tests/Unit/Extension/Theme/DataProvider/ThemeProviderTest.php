@@ -71,9 +71,15 @@ class ThemeProviderTest extends \PHPUnit\Framework\TestCase
             ->with($themeName)
             ->willReturn($theme);
 
-        $this->assertSame('path/to/output/css', $this->provider->getStylesOutput($themeName));
-        $this->assertSame('path/to/output/css', $this->provider->getStylesOutput($themeName, 'styles'));
-        $this->assertSame('path/to/output/css/new', $this->provider->getStylesOutput($themeName, 'styles_new'));
+        $this->assertSame('layout-build/test/path/to/output/css', $this->provider->getStylesOutput($themeName));
+        $this->assertSame(
+            'layout-build/test/path/to/output/css',
+            $this->provider->getStylesOutput($themeName, 'styles')
+        );
+        $this->assertSame(
+            'layout-build/test/path/to/output/css/new',
+            $this->provider->getStylesOutput($themeName, 'styles_new')
+        );
         $this->assertSame(null, $this->provider->getStylesOutput($themeName, 'undefined section'));
     }
 
@@ -113,7 +119,10 @@ class ThemeProviderTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive([$themeName], [$parentThemeName], [$grandParentThemeName])
             ->willReturnOnConsecutiveCalls($theme, $parentTheme, $grandParentTheme);
 
-        $this->assertSame('grand/parent/theme/path/to/output/css', $this->provider->getStylesOutput($themeName));
+        $this->assertSame(
+            'layout-build/grand-parent/grand/parent/theme/path/to/output/css',
+            $this->provider->getStylesOutput($themeName)
+        );
         $this->assertNull($this->provider->getStylesOutput($themeName, 'undefined'));
     }
 }

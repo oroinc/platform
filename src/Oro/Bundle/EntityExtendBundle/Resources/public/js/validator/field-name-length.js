@@ -1,6 +1,7 @@
-define(['underscore', 'oroform/js/validator/length'
-], function(_, lengthValidator) {
+define(function(require) {
     'use strict';
+
+    var lengthValidator = require('oroform/js/validator/length');
 
     /**
      * @export oroentityextend/js/validator/field-name-length

@@ -31,7 +31,7 @@ define(function(require) {
 
         scrollHintLabel: 'oro.ui.zoom.scroll_hint',
 
-        scrollHintTemplate: require('tpl!../../../templates/zoom-scroll-hint.html'),
+        scrollHintTemplate: require('tpl-loader!../../../templates/zoom-scroll-hint.html'),
 
         scrollHintDelay: 1000,
 

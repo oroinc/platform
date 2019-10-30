@@ -27,7 +27,7 @@ class FileIconProvider
      *
      * @return string
      */
-    public function getAttachmentIconClass(FileExtensionInterface $entity)
+    public function getExtensionIconClass(FileExtensionInterface $entity): string
     {
         return $this->fileIcons[$entity->getExtension()] ?? $this->fileIcons['default'];
     }
@@ -37,7 +37,7 @@ class FileIconProvider
      *
      * @return array
      */
-    public function getFileIcons()
+    public function getFileIcons(): array
     {
         return $this->fileIcons;
     }

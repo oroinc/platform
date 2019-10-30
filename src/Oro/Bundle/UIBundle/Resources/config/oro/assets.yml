@@ -26,8 +26,8 @@ css:
         # custom styles
         - 'bundles/oroui/css/scss/main.scss'
         - 'bundles/oroui/css/all.css'
-    output: css/themes/oro/oro.css
+    output: css/oro/oro.css
 css_ie:
     inputs:
         - 'bundles/oroui/css/scss/ie/main-ie.scss'
-    output: css/themes/oro/oro-ie.css
+    output: css/oro/oro-ie.css

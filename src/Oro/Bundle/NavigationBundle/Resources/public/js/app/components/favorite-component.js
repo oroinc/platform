@@ -7,7 +7,7 @@ define(function(require) {
     var CollectionView = require('oroui/js/app/views/base/collection-view');
     var ButtonView = require('oronavigation/js/app/views/bookmark-button-view');
     var ItemView = require('oronavigation/js/app/views/bookmark-item-view');
-    var favoriteItemTemplate = require('tpl!oronavigation/templates/favorite-item.html');
+    var favoriteItemTemplate = require('tpl-loader!oronavigation/templates/favorite-item.html');
 
     FavoriteComponent = BaseBookmarkComponent.extend({
         typeName: 'favorite',

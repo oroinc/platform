@@ -1,13 +1,13 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var SidebarRecentEmailsComponent;
     var _ = require('underscore');
     var BaseComponent = require('oroui/js/app/components/base/component');
-    var module = require('module');
+    var config = require('module-config').default(module.id);
     var mediator = require('oroui/js/mediator');
     var sync = require('orosync/js/sync');
-    var channel = module.config().wsChannel;
+    var channel = config.wsChannel;
     var countCache = require('oroemail/js/util/unread-email-count-cache');
     var EmailNotificationCollection =
         require('oroemail/js/app/models/email-notification/email-notification-collection');

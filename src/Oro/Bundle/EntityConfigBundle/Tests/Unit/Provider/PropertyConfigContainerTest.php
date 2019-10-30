@@ -229,12 +229,12 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider getRequireJsModulesProvider
+     * @dataProvider getJsModulesProvider
      */
-    public function testGetRequireJsModules($type, $config, $expectedValues)
+    public function testGetJsModules($type, $config, $expectedValues)
     {
         $this->configContainer->setConfig($config);
-        $result = $this->configContainer->getRequireJsModules($type);
+        $result = $this->configContainer->getJsModules($type);
 
         $this->assertEquals($expectedValues, $result);
     }
@@ -1518,7 +1518,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getRequireJsModulesProvider()
+    public function getJsModulesProvider()
     {
         return [
             'no entity config'                      => [
@@ -1530,7 +1530,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 PropertyConfigContainer::TYPE_ENTITY,
                 [
                     'entity' => [
-                        'require_js' => [
+                        'jsmodules' => [
                             'test' => 'testVal',
                         ]
                     ]
@@ -1541,7 +1541,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 PropertyConfigContainer::TYPE_ENTITY,
                 [
                     'entity' => [
-                        'require_js' => [
+                        'jsmodules' => [
                         ]
                     ]
                 ],
@@ -1559,7 +1559,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
-                        'require_js' => [
+                        'jsmodules' => [
                             'test' => 'testVal',
                         ]
                     ]
@@ -1570,7 +1570,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
-                        'require_js' => [
+                        'jsmodules' => [
                         ]
                     ]
                 ],
@@ -1588,7 +1588,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 PropertyConfigContainer::TYPE_FIELD,
                 [
                     'field' => [
-                        'require_js' => [
+                        'jsmodules' => [
                             'test' => 'testVal',
                         ]
                     ]
@@ -1599,7 +1599,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 PropertyConfigContainer::TYPE_FIELD,
                 [
                     'field' => [
-                        'require_js' => [
+                        'jsmodules' => [
                         ]
                     ]
                 ],
@@ -1617,7 +1617,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
-                        'require_js' => [
+                        'jsmodules' => [
                             'test' => 'testVal',
                         ]
                     ]
@@ -1628,7 +1628,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
-                        'require_js' => [
+                        'jsmodules' => [
                         ]
                     ]
                 ],

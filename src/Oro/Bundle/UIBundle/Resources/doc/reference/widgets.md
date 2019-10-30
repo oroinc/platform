@@ -25,7 +25,7 @@ widget content: remote content loading, widget actions handling, embedded forms 
 widget-to-widget, widget-to-page and page-to-widget interaction based on Backbone events and direct usage of widgets API.
 Each widget on page has it's own unique widget identifier.
 
-### RequireJS services
+### JS Modules services
 
  - **oroui/js/widget-manager** - Widget manager
  - **oro/block-widget** - Block widget

@@ -94,7 +94,7 @@ class CellSelectionListenerTest extends \PHPUnit\Framework\TestCase
                             'columnName' => ['first', 'second'],
                             'selector' => 'changeset'
                         ],
-                        'requireJSModules' => [
+                        'jsmodules' => [
                             'orodatagrid/js/datagrid/listener/change-editable-cell-listener'
                         ],
                     ],
@@ -116,7 +116,7 @@ class CellSelectionListenerTest extends \PHPUnit\Framework\TestCase
                             'columnName' => ['first', 'second'],
                             'selector' => 'changeset'
                         ],
-                        'requireJSModules' => [
+                        'jsmodules' => [
                             'some-module'
                         ],
                     ],
@@ -128,7 +128,7 @@ class CellSelectionListenerTest extends \PHPUnit\Framework\TestCase
                             'columnName' => ['first', 'second'],
                             'selector' => 'changeset'
                         ],
-                        'requireJSModules' => [
+                        'jsmodules' => [
                             'some-module',
                             'orodatagrid/js/datagrid/listener/change-editable-cell-listener'
                         ],
@@ -143,7 +143,7 @@ class CellSelectionListenerTest extends \PHPUnit\Framework\TestCase
                             'columnName' => ['first', 'second'],
                             'selector' => 'changeset'
                         ],
-                        'requireJSModules' => [
+                        'jsmodules' => [
                             'orodatagrid/js/datagrid/listener/change-editable-cell-listener'
                         ],
                     ],
@@ -155,7 +155,7 @@ class CellSelectionListenerTest extends \PHPUnit\Framework\TestCase
                             'columnName' => ['first', 'second'],
                             'selector' => 'changeset'
                         ],
-                        'requireJSModules' => [
+                        'jsmodules' => [
                             'orodatagrid/js/datagrid/listener/change-editable-cell-listener'
                         ],
                     ],

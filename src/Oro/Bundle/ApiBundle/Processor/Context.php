@@ -23,6 +23,7 @@ use Oro\Bundle\ApiBundle\Metadata\Extra\HateoasMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraCollection;
 use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Metadata\TargetMetadataAccessor;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
@@ -59,6 +60,9 @@ class Context extends NormalizeResultContext implements ContextInterface
 
     /** whether HATEOAS is enabled */
     const HATEOAS = 'hateoas';
+
+    /** not resolved identifiers */
+    private const NOT_RESOLVED_IDENTIFIERS = 'not_resolved_identifiers';
 
     /** @var FilterCollection */
     private $filters;
@@ -355,9 +359,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     }
 
     /**
-     * Gets a context for response data normalization.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getNormalizationContext(): array
     {
@@ -412,6 +414,40 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getNotResolvedIdentifiers(): array
+    {
+        return $this->get(self::NOT_RESOLVED_IDENTIFIERS) ?? [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addNotResolvedIdentifier(string $path, NotResolvedIdentifier $identifier): void
+    {
+        $notResolvedIdentifiers = $this->get(self::NOT_RESOLVED_IDENTIFIERS) ?? [];
+        $notResolvedIdentifiers[$path] = $identifier;
+        $this->set(self::NOT_RESOLVED_IDENTIFIERS, $notResolvedIdentifiers);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeNotResolvedIdentifier(string $path): void
+    {
+        $notResolvedIdentifiers = $this->get(self::NOT_RESOLVED_IDENTIFIERS);
+        if ($notResolvedIdentifiers) {
+            unset($notResolvedIdentifiers[$path]);
+            if ($notResolvedIdentifiers) {
+                $this->set(self::NOT_RESOLVED_IDENTIFIERS, $notResolvedIdentifiers);
+            } else {
+                $this->remove(self::NOT_RESOLVED_IDENTIFIERS);
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function hasQuery()
     {
         return null !== $this->query;
@@ -447,6 +483,14 @@ class Context extends NormalizeResultContext implements ContextInterface
     public function setCriteria(Criteria $criteria = null)
     {
         $this->criteria = $criteria;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllEntities(bool $primaryOnly = false): array
+    {
+        throw new \LogicException('The method is not implemented for this context.');
     }
 
     /**

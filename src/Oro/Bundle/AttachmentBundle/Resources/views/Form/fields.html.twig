@@ -26,8 +26,8 @@
                 }) }}>
 
                     {{ oro_file_view(value) }}
-                    {{ form_row(form.emptyFile) }}
-                    {% if form.vars.allow_delete %}
+                    {% if form.emptyFile is defined %}
+                        {{ form_row(form.emptyFile) }}
                         <button data-role="remove"
                                 class="btn btn-action btn-link delete"
                                 type="button"

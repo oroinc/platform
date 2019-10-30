@@ -4,7 +4,7 @@ define([
     'backgrid',
     '../select-state-model',
     'oroui/js/app/views/base/view',
-    'tpl!orodatagrid/templates/datagrid/select-all-header-cell.html'
+    'tpl-loader!orodatagrid/templates/datagrid/select-all-header-cell.html'
 ], function($, _, Backgrid, SelectStateModel, BaseView, template) {
     'use strict';
 

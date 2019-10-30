@@ -66,7 +66,7 @@
 
 {% block oro_ticker_symbol_widget %}
     <script type="text/javascript">
-        require(['jquery', 'bootstrap'],
+        loadModules(['jquery', 'bootstrap'],
         function($){
             $(function() {
                 var cache = {};
@@ -120,12 +120,9 @@
     <div id="{{ id }}-container"></div>
 
     <script type="text/javascript">
-        require(['jquery',
-            'oroform/js/multiple-entity', 'oroform/js/multiple-entity/collection', 'oroform/js/multiple-entity/model',
-            'text!{{ asset('bundles/oroform/js/multiple-entity/templates/multiple-entities.html') }}',
-            'text!{{ asset('bundles/oroform/js/multiple-entity/templates/multiple-entity.html') }}'
-        ],
-        function($, MultipleEntity, MultipleEntityCollection, MultipleEntityModel, EntitiesTpl, EntityTpl) {
+        loadModules(['jquery',
+            'oroform/js/multiple-entity', 'oroform/js/multiple-entity/collection', 'oroform/js/multiple-entity/model'
+        ], function($, MultipleEntity, MultipleEntityCollection, MultipleEntityModel) {
             {% set selectionUrl = null %}
             {% set originalFieldId = attr['data-ftid'] %}
             {% if form.vars.grid_url is defined and form.vars.grid_url %}
@@ -138,8 +135,6 @@
 
             var widget = new MultipleEntity({
                 el: '#{{ id }}-container',
-                template: EntitiesTpl,
-                elementTemplate: EntityTpl,
                 addedElement: 'input[data-ftid="{{ originalFieldId }}_added"]',
                 removedElement: 'input[data-ftid="{{ originalFieldId }}_removed"]',
                 name: {{ id|json_encode|raw }},
@@ -534,7 +529,7 @@
         {{ form_widget(form.mode) }}
     </div>
     <script type="text/javascript">
-        require(['jquery', 'oroform/js/create-select-type-handler'],
+        loadModules(['jquery', 'oroform/js/create-select-type-handler'],
         function ($, createSelectTypeHandler) {
             $(function() {
                 createSelectTypeHandler(

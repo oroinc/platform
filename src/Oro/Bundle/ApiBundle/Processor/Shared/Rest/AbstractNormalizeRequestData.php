@@ -5,11 +5,13 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared\Rest;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
@@ -100,8 +102,16 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
     protected function normalizeEntityId(string $propertyPath, $entityId, EntityMetadata $metadata)
     {
         try {
-            return $this->getEntityIdTransformer($this->context->getRequestType())
+            $normalizedId = $this->getEntityIdTransformer($this->context->getRequestType())
                 ->reverseTransform($entityId, $metadata);
+            if (null === $normalizedId) {
+                $this->context->addNotResolvedIdentifier(
+                    'requestData' . ConfigUtil::PATH_DELIMITER . $propertyPath,
+                    new NotResolvedIdentifier($entityId, $metadata->getClassName())
+                );
+            }
+
+            return $normalizedId;
         } catch (\Exception $e) {
             $this->addValidationError(Constraint::ENTITY_ID, $propertyPath)
                 ->setInnerException($e);

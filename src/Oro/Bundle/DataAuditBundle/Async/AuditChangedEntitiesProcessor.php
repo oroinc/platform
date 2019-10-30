@@ -12,6 +12,11 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Process inserted, updated and deleted entities and create audit logs
+ * Schedule relations processing if needed
+ * Schedule inversed relations processing
+ */
 class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements TopicSubscriberInterface
 {
     /** @var EntityChangesToAuditEntryConverter */
@@ -73,7 +78,7 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
         }
 
         if ($body['entities_deleted']) {
-            $this->entityChangesToAuditEntryConverter->convertSkipFields(
+            $this->entityChangesToAuditEntryConverter->convert(
                 $body['entities_deleted'],
                 $transactionId,
                 $loggedAt,

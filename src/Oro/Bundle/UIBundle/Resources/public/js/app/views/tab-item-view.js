@@ -1,12 +1,11 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     var TabItemView;
     var _ = require('underscore');
     var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
-    var module = require('module');
-    var config = module.config();
+    var config = require('module-config').default(module.id);
 
     config = _.extend({
         className: 'nav-item',
@@ -18,7 +17,7 @@ define(function(require) {
 
         className: config.className,
 
-        template: require('tpl!oroui/templates/tab-collection-item.html'),
+        template: require('tpl-loader!oroui/templates/tab-collection-item.html'),
 
         listen: {
             'change:active model': 'updateStates',

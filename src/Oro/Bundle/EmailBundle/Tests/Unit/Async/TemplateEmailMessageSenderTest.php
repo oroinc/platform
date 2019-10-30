@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
 use Oro\Bundle\EmailBundle\Async\TemplateEmailMessageSender;
-use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -16,9 +16,9 @@ class TemplateEmailMessageSenderTest extends \PHPUnit\Framework\TestCase
     use EntityTrait;
 
     /**
-     * @var TemplateEmailManager|\PHPUnit\Framework\MockObject\MockObject
+     * @var EmailTemplateManager|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $templateEmailManager;
+    private $emailTemplateManager;
 
     /**
      * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
@@ -32,10 +32,10 @@ class TemplateEmailMessageSenderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->templateEmailManager  = $this->createMock(TemplateEmailManager::class);
+        $this->emailTemplateManager  = $this->createMock(EmailTemplateManager::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
-        $this->sender = new TemplateEmailMessageSender($this->templateEmailManager, $this->doctrineHelper);
+        $this->sender = new TemplateEmailMessageSender($this->emailTemplateManager, $this->doctrineHelper);
     }
 
     /**
@@ -131,7 +131,7 @@ class TemplateEmailMessageSenderTest extends \PHPUnit\Framework\TestCase
             ->with(User::class, self::RECIPIENT_USER_ID)
             ->willReturn($user);
 
-        $this->templateEmailManager
+        $this->emailTemplateManager
             ->expects($this->once())
             ->method('sendTemplateEmail')
             ->with(
@@ -169,7 +169,7 @@ class TemplateEmailMessageSenderTest extends \PHPUnit\Framework\TestCase
             ->with(User::class, self::RECIPIENT_USER_ID)
             ->willReturn($user);
 
-        $this->templateEmailManager
+        $this->emailTemplateManager
             ->expects($this->once())
             ->method('sendTemplateEmail')
             ->with(

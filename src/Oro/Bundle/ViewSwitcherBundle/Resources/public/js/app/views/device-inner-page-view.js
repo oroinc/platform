@@ -6,7 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl!oroviewswitcher/templates/switcher-inner-page.html');
+    var template = require('tpl-loader!oroviewswitcher/templates/switcher-inner-page.html');
 
     DeviceInnerPageView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat([

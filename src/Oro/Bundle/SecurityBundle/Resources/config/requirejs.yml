@@ -1,4 +1,0 @@
-config:
-    paths:
-        'orosecurity/js/app/components/switch-organization-component': 'bundles/orosecurity/js/app/components/switch-organization-component.js'
-        'orosecurity/js/app/components/security-access-levels-component': 'bundles/orosecurity/js/app/components/security-access-levels-component.js'

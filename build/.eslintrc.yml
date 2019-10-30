@@ -2,13 +2,15 @@ extends:
   - google
   - "plugin:oro/recommended"
 parserOptions:
-  ecmaVersion: 5
+  ecmaVersion: 2018
+  sourceType: module
 env:
   browser: true
+  commonjs: true
   amd: true
   jasmine: true
 globals:
-  requirejs: true
+  Promise: true
 
 rules:
   # turn off ES6 code style check
@@ -16,6 +18,7 @@ rules:
   prefer-spread: 'off'
   no-var: 'off'
   oro/named-constructor: 'error'
+  arrow-parens: ['error', 'as-needed']
 
   # customization
   indent: ['error', 4, {'SwitchCase': 1}]

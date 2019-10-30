@@ -12,7 +12,7 @@ define(function(require) {
      * @extends ActionLauncher
      */
     ActionComponentDropdownLauncher = ActionLauncher.extend({
-        template: require('tpl!orodatagrid/templates/datagrid/action-component-dropdown-launcher.html'),
+        template: require('tpl-loader!orodatagrid/templates/datagrid/action-component-dropdown-launcher.html'),
 
         /**
          * @type {Object}

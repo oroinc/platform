@@ -33,7 +33,7 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        template: require('tpl!../../../../templates/board/card-view.html'),
+        template: require('tpl-loader!../../../../templates/board/card-view.html'),
 
         /**
          * @inheritDoc

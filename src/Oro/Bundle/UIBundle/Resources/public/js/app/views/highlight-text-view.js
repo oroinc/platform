@@ -9,7 +9,7 @@ define(function(require) {
     var Popover = require('bootstrap-popover');
     var FuzzySearch = require('oroui/js/fuzzy-search');
     var persistentStorage = require('oroui/js/persistent-storage');
-    var highlightSwitcherTemplate = require('tpl!oroui/templates/highlight-switcher.html');
+    var highlightSwitcherTemplate = require('tpl-loader!oroui/templates/highlight-switcher.html');
     var inputWidgetManager = require('oroui/js/input-widget-manager');
 
     HighlightTextView = BaseView.extend({
