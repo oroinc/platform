@@ -12,3 +12,10 @@ services:
             - '@oro_user.manager'
         tags:
             - { name: oro.api.processor, action: create, group: save_data, class: Oro\Bundle\UserBundle\Entity\User }
+
+    oro_user.api.update_new_user:
+        class: Oro\Bundle\UserBundle\Api\Processor\UpdateNewUser
+        arguments:
+            - '@oro_user.manager'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: post_validate, parentAction: create, class: Oro\Bundle\UserBundle\Entity\User }
