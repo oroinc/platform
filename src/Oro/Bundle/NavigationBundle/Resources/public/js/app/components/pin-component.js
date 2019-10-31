@@ -1,19 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var PinComponent;
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var routing = require('routing');
-    var tools = require('oroui/js/tools');
-    var ButtonView = require('oronavigation/js/app/views/bookmark-button-view');
-    var PinBarView = require('oronavigation/js/app/views/pin-bar-view');
-    var DropdownView = require('oronavigation/js/app/views/pin-dropdown-view');
-    var ItemView = require('oronavigation/js/app/views/pin-item-view');
-    var BaseBookmarkComponent = require('oronavigation/js/app/components/base/bookmark-component');
-    var PinbarCollection = require('oronavigation/js/app/models/pinbar-collection');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const routing = require('routing');
+    const tools = require('oroui/js/tools');
+    const ButtonView = require('oronavigation/js/app/views/bookmark-button-view');
+    const PinBarView = require('oronavigation/js/app/views/pin-bar-view');
+    const DropdownView = require('oronavigation/js/app/views/pin-dropdown-view');
+    const ItemView = require('oronavigation/js/app/views/pin-item-view');
+    const BaseBookmarkComponent = require('oronavigation/js/app/components/base/bookmark-component');
+    const PinbarCollection = require('oronavigation/js/app/models/pinbar-collection');
 
-    PinComponent = BaseBookmarkComponent.extend({
+    const PinComponent = BaseBookmarkComponent.extend({
         relatedSiblingComponents: {
             pageStateComponent: 'page-state-component'
         },
@@ -32,8 +31,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function PinComponent() {
-            PinComponent.__super__.constructor.apply(this, arguments);
+        constructor: function PinComponent(options) {
+            PinComponent.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
@@ -60,8 +59,8 @@ define(function(require) {
          * @protected
          */
         _createButtonView: function() {
-            var options = this._options.buttonOptions || {};
-            var collection = this.collection;
+            const options = this._options.buttonOptions || {};
+            const collection = this.collection;
 
             _.extend(options, {
                 el: this._options._sourceElement,
@@ -78,8 +77,8 @@ define(function(require) {
          * @protected
          */
         _createBarView: function() {
-            var options = this._options.barOptions || {};
-            var collection = this.collection;
+            const options = this._options.barOptions || {};
+            const collection = this.collection;
 
             _.extend(options, {
                 autoRender: true,
@@ -96,9 +95,9 @@ define(function(require) {
          * @protected
          */
         _createDropdownView: function() {
-            var options = this._options.dropdownOptions || {};
-            var collection = this.collection;
-            var pinBar = this.pinBar;
+            const options = this._options.dropdownOptions || {};
+            const collection = this.collection;
+            const pinBar = this.pinBar;
 
             _.extend(options, {
                 autoRender: true,
@@ -109,7 +108,7 @@ define(function(require) {
                 },
                 position: function() {
                     if (pinBar.el) {
-                        var left = Math.ceil(pinBar.$el.position().left);
+                        const left = Math.ceil(pinBar.$el.position().left);
 
                         return {
                             left: _.isRTL() ? left : left + Math.ceil(pinBar.$el.width())
@@ -128,9 +127,9 @@ define(function(require) {
         },
 
         isPageStateTraceRequired: function() {
-            var urlObj = document.createElement('a');
+            const urlObj = document.createElement('a');
             urlObj.href = mediator.execute('normalizeUrl', mediator.execute('currentUrl'));
-            var queryObj = tools.unpackFromQueryString(urlObj.search);
+            const queryObj = tools.unpackFromQueryString(urlObj.search);
 
             return this.collection.getCurrentModel() !== undefined && queryObj['restore'];
         },
@@ -144,7 +143,7 @@ define(function(require) {
          * @inheritDoc
          */
         toRemove: function(model) {
-            var self = this;
+            const self = this;
 
             model.destroy({
                 wait: true,
@@ -173,7 +172,7 @@ define(function(require) {
          * @inheritDoc
          */
         toAdd: function(model) {
-            var self = this;
+            const self = this;
             this.actualizeAttributes(model);
             model.save(null, {
                 success: function() {
@@ -183,7 +182,7 @@ define(function(require) {
                     }
                 },
                 errorHandlerMessage: function(event, xhr) {
-                    var item;
+                    let item;
 
                     if (xhr.status === 422) {
                         item = self.collection.find(function(item) {
@@ -207,7 +206,7 @@ define(function(require) {
                 complete: function() {
                     self.refreshPinbar({
                         complete: function() {
-                            var newModel = self.collection.find(function(item) {
+                            const newModel = self.collection.find(function(item) {
                                 return item.get('url') === model.get('url');
                             });
 

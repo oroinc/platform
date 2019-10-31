@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var ColumnFormView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    ColumnFormView = BaseView.extend({
+    const ColumnFormView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat([
             'fieldChoiceView', 'functionChoiceView'
         ]),
@@ -15,8 +14,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ColumnFormView() {
-            ColumnFormView.__super__.constructor.apply(this, arguments);
+        constructor: function ColumnFormView(options) {
+            ColumnFormView.__super__.constructor.call(this, options);
         },
 
         render: function() {
@@ -34,7 +33,7 @@ define(function(require) {
 
         updateFunctionChoices: function(fieldId) {
             if (this.functionChoiceView) {
-                var criteria = this.fieldChoiceView.getApplicableConditions(fieldId);
+                const criteria = this.fieldChoiceView.getApplicableConditions(fieldId);
                 this.functionChoiceView.setActiveFunctions(criteria);
             }
         },

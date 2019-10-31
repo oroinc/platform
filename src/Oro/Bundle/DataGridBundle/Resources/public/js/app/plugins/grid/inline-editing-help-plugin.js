@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var InlineEditingHelpPlugin;
-    var __ = require('orotranslation/js/translator');
-    var BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    var $ = require('jquery');
+    const __ = require('orotranslation/js/translator');
+    const BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    const $ = require('jquery');
 
-    InlineEditingHelpPlugin = BasePlugin.extend({
+    const InlineEditingHelpPlugin = BasePlugin.extend({
         enable: function() {
             this.listenTo(this.main, 'holdInlineEditingBackdrop', this.onHoldInlineEditingBackdrop);
             this.listenTo(this.main, 'releaseInlineEditingBackdrop', this.onReleaseInlineEditingBackdrop);

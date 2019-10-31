@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var FlowchartViewerWorkflowView;
-    var _ = require('underscore');
-    var FlowchartJsPlumbAreaView = require('../jsplumb/area-view');
-    var FlowchartViewerStepView = require('./step-view');
-    var FlowchartViewerTransitionView = require('./transition-view');
-    var FlowchartViewerTransitionOverlayView = require('./transition-overlay-view');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const _ = require('underscore');
+    const FlowchartJsPlumbAreaView = require('../jsplumb/area-view');
+    const FlowchartViewerStepView = require('./step-view');
+    const FlowchartViewerTransitionView = require('./transition-view');
+    const FlowchartViewerTransitionOverlayView = require('./transition-overlay-view');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
-    FlowchartViewerWorkflowView = FlowchartJsPlumbAreaView.extend({
+    const FlowchartViewerWorkflowView = FlowchartJsPlumbAreaView.extend({
         /**
          * @type {Constructor.<FlowchartJsPlumbOverlayView>}
          */
@@ -39,15 +38,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function FlowchartViewerWorkflowView() {
-            FlowchartViewerWorkflowView.__super__.constructor.apply(this, arguments);
+        constructor: function FlowchartViewerWorkflowView(options) {
+            FlowchartViewerWorkflowView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            FlowchartViewerWorkflowView.__super__.initialize.apply(this, arguments);
+            FlowchartViewerWorkflowView.__super__.initialize.call(this, options);
             this.defaultConnectionOptions = _.extend(
                 _.result(this, 'defaultConnectionOptions'),
                 options.connectionOptions || {}
@@ -55,23 +54,23 @@ define(function(require) {
         },
 
         findStepModelByElement: function(el) {
-            var stepCollectionView = this.subview('stepCollectionView');
+            const stepCollectionView = this.subview('stepCollectionView');
             return this.model.get('steps').find(function(model) {
                 return stepCollectionView.getItemView(model).el === el;
             });
         },
 
         connect: function() {
-            FlowchartViewerWorkflowView.__super__.connect.apply(this, arguments);
+            FlowchartViewerWorkflowView.__super__.connect.call(this);
             this.jsPlumbInstance.batch(_.bind(function() {
                 this.$el.addClass(this.className);
-                var transitionOverlayView = this.transitionOverlayView;
-                var connectionOptions = _.extend({}, this.defaultConnectionOptions);
-                var StepView = this.stepView;
-                var TransitionView = this.transitionView;
-                var _this = this;
-                var steps = this.model.get('steps');
-                var stepCollectionView = new BaseCollectionView({
+                const transitionOverlayView = this.transitionOverlayView;
+                const connectionOptions = _.extend({}, this.defaultConnectionOptions);
+                const StepView = this.stepView;
+                const TransitionView = this.transitionView;
+                const _this = this;
+                const steps = this.model.get('steps');
+                const stepCollectionView = new BaseCollectionView({
                     el: this.$el,
                     collection: steps,
                     animationDuration: 0,
@@ -84,7 +83,7 @@ define(function(require) {
                     },
                     autoRender: true
                 });
-                var transitionCollectionView = new BaseCollectionView({
+                const transitionCollectionView = new BaseCollectionView({
                     el: this.$el,
                     collection: this.model.get('transitions'),
                     animationDuration: 0,

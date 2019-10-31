@@ -1,6 +1,12 @@
 define(function(require) {
     'use strict';
 
+    const AbstractRelationEditorView = require('oroform/js/app/views/editor/abstract-relation-editor-view');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const $ = require('jquery');
+    const select2autosizer = require('oroui/js/tools/select2-autosizer');
+
     /**
      * Tags-select content editor. Please note that it requires column data format
      * corresponding to [tags-view](../viewer/tags-view.md).
@@ -64,14 +70,7 @@ define(function(require) {
      * @augments [AbstractRelationEditorView](../../../../FormBundle/Resources/doc/editor/abstract-relation-editor-view.md)
      * @exports TagsEditorView
      */
-    var TagsEditorView;
-    var AbstractRelationEditorView = require('oroform/js/app/views/editor/abstract-relation-editor-view');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var $ = require('jquery');
-    var select2autosizer = require('oroui/js/tools/select2-autosizer');
-
-    TagsEditorView = AbstractRelationEditorView.extend(/** @exports TagsEditorView.prototype */{
+    const TagsEditorView = AbstractRelationEditorView.extend(/** @exports TagsEditorView.prototype */{
         className: 'tags-select-editor',
         DEFAULT_PER_PAGE: 20,
 
@@ -86,15 +85,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function TagsEditorView() {
-            TagsEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function TagsEditorView(options) {
+            TagsEditorView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            TagsEditorView.__super__.initialize.apply(this, arguments);
+            TagsEditorView.__super__.initialize.call(this, options);
             this.listenTo(this.autocompleteApiAccessor, 'cache:clear', this.onCacheClear);
             this.permissions = options.permissions || {};
         },
@@ -114,8 +113,8 @@ define(function(require) {
         },
 
         getSelect2Options: function() {
-            var _this = this;
-            var options = _.omit(TagsEditorView.__super__.getSelect2Options.apply(this, arguments), 'data');
+            const _this = this;
+            const options = _.omit(TagsEditorView.__super__.getSelect2Options.call(this), 'data');
             _this.currentData = null;
             _this.firstPageData = {
                 results: [],
@@ -165,7 +164,7 @@ define(function(require) {
                         _this.currentRequest.state() !== 'resolved') {
                         _this.currentRequest.abort();
                     }
-                    var autoCompleteUrlParameters = _this.buildAutoCompleteUrlParameters();
+                    const autoCompleteUrlParameters = _this.buildAutoCompleteUrlParameters();
                     if (options.term !== '' &&
                         !_this.autocompleteApiAccessor.isCacheExistsFor(autoCompleteUrlParameters)) {
                         _this.debouncedMakeRequest(options, autoCompleteUrlParameters);
@@ -203,12 +202,12 @@ define(function(require) {
         },
 
         isCurrentTagSelected: function() {
-            var select2Data = this.$('.select2-container').inputWidget('data');
+            const select2Data = this.$('.select2-container').inputWidget('data');
             if (!select2Data) {
                 return false;
             }
-            for (var i = 0; i < select2Data.length; i++) {
-                var tag = select2Data[i];
+            for (let i = 0; i < select2Data.length; i++) {
+                const tag = select2Data[i];
                 if (tag.label === this.currentTerm) {
                     return true;
                 }
@@ -217,7 +216,7 @@ define(function(require) {
         },
 
         showResults: function() {
-            var data;
+            let data;
             if (this.currentPage === 1) {
                 data = $.extend({}, this.firstPageData);
                 if (this.permissions.oro_tag_create && this.isValidTerm(this.currentTerm)) {
@@ -245,8 +244,8 @@ define(function(require) {
         },
 
         indexOfTermInResults: function(term, results) {
-            for (var i = 0; i < results.length; i++) {
-                var result = results[i];
+            for (let i = 0; i < results.length; i++) {
+                const result = results[i];
                 if (result.label === term) {
                     return i;
                 }
@@ -256,8 +255,8 @@ define(function(require) {
 
         filterTermFromResults: function(term, results) {
             results = _.clone(results);
-            for (var i = 0; i < results.length; i++) {
-                var result = results[i];
+            for (let i = 0; i < results.length; i++) {
+                const result = results[i];
                 if (result.label === term) {
                     results.splice(i, 1);
                     break;
@@ -267,13 +266,13 @@ define(function(require) {
         },
 
         tagSortCallback: function(a, b) {
-            var firstCondition = this.getTermSimilarity(a.label) - this.getTermSimilarity(b.label);
+            const firstCondition = this.getTermSimilarity(a.label) - this.getTermSimilarity(b.label);
             return firstCondition !== 0 ? firstCondition : a.label.length - b.label.length;
         },
 
         getTermSimilarity: function(term) {
-            var lowerCaseTerm = term.toLowerCase();
-            var index = lowerCaseTerm.indexOf(this.currentTerm.toLowerCase());
+            const lowerCaseTerm = term.toLowerCase();
+            const index = lowerCaseTerm.indexOf(this.currentTerm.toLowerCase());
             if (index === -1) {
                 return 1000;
             }
@@ -298,10 +297,10 @@ define(function(require) {
             if (!this.isSelect2Initialized) {
                 return false;
             }
-            var stringValue = _.toArray(this.getValue().sort().map(function(item) {
+            const stringValue = _.toArray(this.getValue().sort().map(function(item) {
                 return item.label;
             })).join('☕');
-            var stringModelValue = _.toArray(this.getModelValue().sort().map(function(item) {
+            const stringModelValue = _.toArray(this.getModelValue().sort().map(function(item) {
                 return item.name;
             })).join('☕');
             return stringValue !== stringModelValue;
@@ -312,7 +311,7 @@ define(function(require) {
         },
 
         getServerUpdateData: function() {
-            var data = {};
+            const data = {};
             data[this.fieldName] = this.getValue().map(function(item) {
                 return {
                     name: item.label
@@ -322,7 +321,7 @@ define(function(require) {
         },
 
         getModelUpdateData: function() {
-            var data = {};
+            const data = {};
             data[this.fieldName] = this.getValue().map(function(item) {
                 return {
                     id: item.id,

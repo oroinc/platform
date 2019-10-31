@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var RoleCapabilitiesView;
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var CapabilityGroupView = require('orouser/js/views/role/capability-group-view');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const CapabilityGroupView = require('orouser/js/views/role/capability-group-view');
 
     /**
      * @export orouser/js/views/role-view
      */
-    RoleCapabilitiesView = BaseCollectionView.extend({
+    const RoleCapabilitiesView = BaseCollectionView.extend({
         animationDuration: 0,
 
         itemView: CapabilityGroupView,
@@ -20,8 +19,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function RoleCapabilitiesView() {
-            RoleCapabilitiesView.__super__.constructor.apply(this, arguments);
+        constructor: function RoleCapabilitiesView(options) {
+            RoleCapabilitiesView.__super__.constructor.call(this, options);
         },
 
         onVisibilityChange: function() {

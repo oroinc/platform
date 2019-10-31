@@ -1,19 +1,17 @@
 define(['backbone'], function(Backbone) {
     'use strict';
 
-    var WindowsModel;
-
     /**
      * @export  orowindows/js/dialog/state/model
      * @class   orowindows.dialog.state.Model
      * @extends Backbone.Model
      */
-    WindowsModel = Backbone.Model.extend({
+    const WindowsModel = Backbone.Model.extend({
         /**
          * @inheritDoc
          */
-        constructor: function WindowsModel() {
-            WindowsModel.__super__.constructor.apply(this, arguments);
+        constructor: function WindowsModel(attrs, options) {
+            WindowsModel.__super__.constructor.call(this, attrs, options);
         }
     });
 

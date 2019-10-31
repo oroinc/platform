@@ -5,8 +5,7 @@ define([
 ], function(_, AbstractAction, UrlHelper) {
     'use strict';
 
-    var ModelAction;
-    var location = window.location;
+    const location = window.location;
 
     /**
      * Basic model action class.
@@ -15,7 +14,7 @@ define([
      * @class   oro.datagrid.action.ModelAction
      * @extends oro.datagrid.action.AbstractAction
      */
-    ModelAction = AbstractAction.extend({
+    const ModelAction = AbstractAction.extend({
         /** @property {Backbone.Model} */
         model: null,
 
@@ -31,8 +30,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function ModelAction() {
-            ModelAction.__super__.constructor.apply(this, arguments);
+        constructor: function ModelAction(options) {
+            ModelAction.__super__.constructor.call(this, options);
         },
 
         /**
@@ -43,7 +42,7 @@ define([
          * @throws {TypeError} If model is undefined
          */
         initialize: function(options) {
-            var opts = options || {};
+            const opts = options || {};
 
             if (!opts.model) {
                 throw new TypeError('"model" is required');
@@ -58,7 +57,7 @@ define([
                 this.backUrlParameter = opts.backUrlParameter;
             }
 
-            ModelAction.__super__.initialize.apply(this, arguments);
+            ModelAction.__super__.initialize.call(this, options);
         },
 
         /**
@@ -68,8 +67,8 @@ define([
          * @throws {TypeError} If route is undefined
          */
         getLink: function() {
-            var result;
-            var backUrl;
+            let result;
+            let backUrl;
             if (!this.link) {
                 throw new TypeError('"link" is required');
             }

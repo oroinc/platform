@@ -28,8 +28,8 @@ define(['./point2d'], function(Point2d) {
         if (line.slope === Infinity) {
             return new Point2d(line.intercept, this.intercept + this.slope * line.intercept);
         }
-        var x = (line.intercept - this.intercept) / (this.slope - line.slope);
-        var y = this.slope * x + this.intercept;
+        const x = (line.intercept - this.intercept) / (this.slope - line.slope);
+        const y = this.slope * x + this.intercept;
         return new Point2d(x, y);
     };
     return Line2d;

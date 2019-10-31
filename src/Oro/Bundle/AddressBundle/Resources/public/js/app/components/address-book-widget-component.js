@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var AddressBookWidgetComponent;
-    var AddressBookComponent = require('oroaddress/js/app/components/address-book-component');
-    var widgetManager = require('oroui/js/widget-manager');
-    var routing = require('routing');
-    var _ = require('underscore');
+    const AddressBookComponent = require('oroaddress/js/app/components/address-book-component');
+    const widgetManager = require('oroui/js/widget-manager');
+    const routing = require('routing');
+    const _ = require('underscore');
 
-    AddressBookWidgetComponent = AddressBookComponent.extend({
+    const AddressBookWidgetComponent = AddressBookComponent.extend({
         optionNames: AddressBookComponent.prototype.optionNames.concat([
             'wid', 'addressCreateUrl', 'addressUpdateRoute', 'addressDeleteRoute'
         ]),
@@ -15,8 +14,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AddressBookWidgetComponent() {
-            AddressBookWidgetComponent.__super__.constructor.apply(this, arguments);
+        constructor: function AddressBookWidgetComponent(options) {
+            AddressBookWidgetComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -29,10 +28,10 @@ define(function(require) {
         },
 
         _getAddressBookViewOptions: function() {
-            var addressDeleteRoute = this.addressDeleteRoute;
-            var addressUpdateRoute = this.addressUpdateRoute;
+            const addressDeleteRoute = this.addressDeleteRoute;
+            const addressUpdateRoute = this.addressUpdateRoute;
 
-            var options = AddressBookWidgetComponent.__super__._getAddressBookViewOptions.call(this);
+            const options = AddressBookWidgetComponent.__super__._getAddressBookViewOptions.call(this);
 
             return _.extend(options, {
                 addressCreateUrl: this.addressCreateUrl,
@@ -53,7 +52,7 @@ define(function(require) {
 
         _onWidgetLoad: function(widget) {
             widget.getAction('add_address', 'adopted', function(action) {
-                var addressBookView = this.view;
+                const addressBookView = this.view;
                 action.on('click', _.bind(addressBookView.createAddress, addressBookView));
             }.bind(this));
         }

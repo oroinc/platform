@@ -2,13 +2,12 @@
 define(function(require) {
     'use strict';
 
-    var WorkflowViewerComponent;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var workflowModelFactory = require('oroworkflow/js/tools/workflow-model-factory');
-    var FlowchartViewerWorkflowView = require('oroworkflow/js/app/views/flowchart/viewer/workflow-view');
-    var FlowchartStateModel = require('oroworkflow/js/app/models/flowchart-state-model');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const workflowModelFactory = require('oroworkflow/js/tools/workflow-model-factory');
+    const FlowchartViewerWorkflowView = require('oroworkflow/js/app/views/flowchart/viewer/workflow-view');
+    const FlowchartStateModel = require('oroworkflow/js/app/models/flowchart-state-model');
 
     /**
      * Builds workflow editor UI.
@@ -16,7 +15,7 @@ define(function(require) {
      * @class WorkflowViewerComponent
      * @augments BaseComponent
      */
-    WorkflowViewerComponent = BaseComponent.extend(/** @lends WorkflowViewerComponent.prototype */{
+    const WorkflowViewerComponent = BaseComponent.extend(/** @lends WorkflowViewerComponent.prototype */{
         FlowchartWorkflowView: FlowchartViewerWorkflowView,
 
         /**
@@ -27,25 +26,25 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function WorkflowViewerComponent() {
+        constructor: function WorkflowViewerComponent(options) {
             this._initPromises = [];
-            WorkflowViewerComponent.__super__.constructor.apply(this, arguments);
+            WorkflowViewerComponent.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            WorkflowViewerComponent.__super__.initialize.apply(this, arguments);
+            WorkflowViewerComponent.__super__.initialize.call(this, options);
             this.model = workflowModelFactory.createWorkflowModel(options);
 
-            var subComponentPromise = options._subPromises['flowchart-container'];
+            const subComponentPromise = options._subPromises['flowchart-container'];
 
             if (subComponentPromise) {
                 this._initPromises.push(subComponentPromise);
                 this.flowchartState = new FlowchartStateModel();
 
-                var flowchartOptions = _.extend({
+                const flowchartOptions = _.extend({
                     model: this.model,
                     flowchartState: this.flowchartState,
                     chartOptions: {},
@@ -60,7 +59,7 @@ define(function(require) {
 
             if (this._initPromises.length) {
                 this._deferredInit();
-                $.when.apply($, this._initPromises).then(function() {
+                $.when(...this._initPromises).then(function() {
                     delete this._initPromises;
                     this._resolveDeferredInit();
                 }.bind(this));

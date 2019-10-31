@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var MapAction;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var GoogleMaps = require('oroaddress/js/mapservice/googlemaps');
-    var ModelAction = require('oro/datagrid/action/model-action');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const GoogleMaps = require('oroaddress/js/mapservice/googlemaps');
+    const ModelAction = require('oro/datagrid/action/model-action');
 
-    MapAction = ModelAction.extend({
+    const MapAction = ModelAction.extend({
         /**
          * @property {Object}
          */
@@ -23,15 +22,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function MapAction() {
-            MapAction.__super__.constructor.apply(this, arguments);
+        constructor: function MapAction(options) {
+            MapAction.__super__.constructor.call(this, options);
         },
 
         /**
         * @param {Object} options
         */
         initialize: function(options) {
-            MapAction.__super__.initialize.apply(this, arguments);
+            MapAction.__super__.initialize.call(this, options);
 
             this.$mapContainerFrame = $('<div class="map-popover__frame"/>');
             this.mapView = new this.options.mapView({
@@ -49,7 +48,7 @@ define(function(require) {
             delete this.$mapContainerFrame;
             this.datagrid.off(null, null, this);
             this.subviews[0].$el.off('click');
-            MapAction.__super__.dispose.apply(this, arguments);
+            MapAction.__super__.dispose.call(this);
         },
 
         onGridRendered: function() {
@@ -83,13 +82,13 @@ define(function(require) {
          * @param {Object} config
          */
         handlePopover: function(config) {
-            var $popoverTrigger = this.subviews[0].$el;
+            const $popoverTrigger = this.subviews[0].$el;
 
             $popoverTrigger.popover(config).on('shown.bs.popover', _.bind(function() {
                 this.mapView.updateMap(this.getAddress(), this.model.get('label'));
 
                 $(document).on('mouseup', _.bind(function(e) {
-                    var $map = this.mapView.$el;
+                    const $map = this.mapView.$el;
                     if (!$map.is(e.target) && !$map.has(e.target).length) {
                         $popoverTrigger.popover('dispose');
                     }

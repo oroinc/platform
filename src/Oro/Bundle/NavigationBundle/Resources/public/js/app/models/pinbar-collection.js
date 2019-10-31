@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var PinbarCollection;
-    var mediator = require('oroui/js/mediator');
-    var BaseCollection = require('oronavigation/js/app/models/base/collection');
+    const mediator = require('oroui/js/mediator');
+    const BaseCollection = require('oronavigation/js/app/models/base/collection');
 
-    PinbarCollection = BaseCollection.extend({
+    const PinbarCollection = BaseCollection.extend({
         /**
          * @inheritDoc
          */
-        constructor: function PinbarCollection() {
-            PinbarCollection.__super__.constructor.apply(this, arguments);
+        constructor: function PinbarCollection(...args) {
+            PinbarCollection.__super__.constructor.apply(this, args);
         },
 
         getCurrentModel: function() {

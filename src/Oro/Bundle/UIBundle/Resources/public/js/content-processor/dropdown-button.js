@@ -47,7 +47,7 @@ define([
         },
 
         _renderButtons: function() {
-            var $elems = this._collectButtons();
+            let $elems = this._collectButtons();
             if ($elems.length <= 1) {
                 this._removeDropdownMenu();
                 return;
@@ -65,7 +65,7 @@ define([
             // pushes rest buttons to dropdown
             $elems = $elems.not(this.group);
             if ($elems.length > this.options.minItemQuantity) {
-                var $moreButton = this._moreButton();
+                const $moreButton = this._moreButton();
                 this.group.append($moreButton);
 
                 this.initializeSticky({
@@ -112,7 +112,7 @@ define([
          * @private
          */
         _mainButtons: function($buttons) {
-            var $main = $buttons.filter(this.options.mainButtons);
+            let $main = $buttons.filter(this.options.mainButtons);
             if (!$main.length) {
                 $main = $buttons.first();
             }
@@ -127,7 +127,7 @@ define([
          * @private
          */
         _moreButton: function() {
-            var $button = $('<a href="#"/>');
+            const $button = $('<a href="#"/>');
             $button
                 .attr($.extend({
                     'role': 'button',
@@ -164,7 +164,7 @@ define([
         _prepareMainButton: function($main) {
             $main = $main.clone(true);
             if (this.options.truncateLength) {
-                var self = this;
+                const self = this;
                 // set text value string
                 $main.contents().each(function() {
                     if (this.nodeType === Node.TEXT_NODE) {

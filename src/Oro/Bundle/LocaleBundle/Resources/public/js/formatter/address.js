@@ -30,10 +30,10 @@ define(['jquery', '../locale-settings', './name'
             }
             newLine = newLine || '<br/>';
 
-            var format = this.getAddressFormat(country);
-            var formatted = format.replace(/%(\w+)%/g, function(pattern, key) {
-                var lowerCaseKey = key.toLowerCase();
-                var value = '';
+            const format = this.getAddressFormat(country);
+            let formatted = format.replace(/%(\w+)%/g, function(pattern, key) {
+                const lowerCaseKey = key.toLowerCase();
+                let value = '';
                 if ('name' === lowerCaseKey) {
                     value = nameFormatter.format(address, localeSettings.getCountryLocale(country));
                 } else if ('street' === lowerCaseKey) {
@@ -49,13 +49,13 @@ define(['jquery', '../locale-settings', './name'
                 return value || '';
             });
 
-            var addressLines = formatted
+            let addressLines = formatted
                 .split('\\n');
             addressLines = addressLines.filter(function(element) {
                 return $.trim(element) !== '';
             });
             if (typeof newLine === 'function') {
-                for (var i = 0; i < addressLines.length; i++) {
+                for (let i = 0; i < addressLines.length; i++) {
                     addressLines[i] = newLine(addressLines[i]);
                 }
                 formatted = addressLines.join('');

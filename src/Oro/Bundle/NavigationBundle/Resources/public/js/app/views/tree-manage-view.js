@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var TreeManageView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
-    var widgetManager = require('oroui/js/widget-manager');
-    var messenger = require('oroui/js/messenger');
-    var routing = require('routing');
-    var BaseTreeManageView = require('oroui/js/app/views/jstree/base-tree-manage-view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
+    const widgetManager = require('oroui/js/widget-manager');
+    const messenger = require('oroui/js/messenger');
+    const routing = require('routing');
+    const BaseTreeManageView = require('oroui/js/app/views/jstree/base-tree-manage-view');
 
-    TreeManageView = BaseTreeManageView.extend({
+    const TreeManageView = BaseTreeManageView.extend({
         /**
          * @property {String}
          */
@@ -34,8 +33,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function TreeManageView() {
-            TreeManageView.__super__.constructor.apply(this, arguments);
+        constructor: function TreeManageView(options) {
+            TreeManageView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -58,8 +57,8 @@ define(function(require) {
             if (this.initialization || !this.updateAllowed) {
                 return;
             }
-            var route;
-            var routeParams;
+            let route;
+            let routeParams;
             if (this.onRootSelectRoute && selected.node.parent === '#') {
                 route = this.onRootSelectRoute;
                 routeParams = {menuName: this.menu, context: this.context};
@@ -85,7 +84,7 @@ define(function(require) {
                 return;
             }
 
-            var self = this;
+            const self = this;
             $.ajax({
                 async: false,
                 type: 'PUT',
@@ -104,11 +103,11 @@ define(function(require) {
                             widget.render();
                         });
                     }
-                    var reloadMessage = _.__('oro.navigation.menuupdate.reload_link.label');
-                    var reloadLink = '<a href="#" onclick="window.location.reload(false);return false;">' +
+                    const reloadMessage = _.__('oro.navigation.menuupdate.reload_link.label');
+                    const reloadLink = '<a href="#" onclick="window.location.reload(false);return false;">' +
                         reloadMessage + '</a>';
 
-                    var message = _.__(self.successMessage, {
+                    const message = _.__(self.successMessage, {
                         nodeText: data.node.text,
                         reload_link: reloadLink
                     });
@@ -117,7 +116,7 @@ define(function(require) {
                 errorHandlerMessage: false,
                 error: function(xhr) {
                     self.rollback(data);
-                    var message = _.__(self.errorMessage, {nodeText: data.node.text});
+                    let message = _.__(self.errorMessage, {nodeText: data.node.text});
                     if (xhr.responseJSON.message) {
                         message = xhr.responseJSON.message;
                     }

@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var ModalView = require('oroui/js/modal');
-    var DeleteConfirmationView;
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const ModalView = require('oroui/js/modal');
 
     /**
      * Delete confirmation dialog
@@ -13,7 +12,7 @@ define(function(require) {
      * @class   oroui.DeleteConfirmationView
      * @extends oroui.ModalView
      */
-    DeleteConfirmationView = ModalView.extend({
+    const DeleteConfirmationView = ModalView.extend({
         /** @property {String} */
         className: 'modal oro-modal-danger',
 
@@ -31,15 +30,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DeleteConfirmationView() {
-            DeleteConfirmationView.__super__.constructor.apply(this, arguments);
+        constructor: function DeleteConfirmationView(options) {
+            DeleteConfirmationView.__super__.constructor.call(this, options);
         },
 
         /**
          * @param {Object} options
          */
         initialize: function(options) {
-            var fields = ['title', 'okText', 'okButtonClass', 'cancelText'];
+            const fields = ['title', 'okText', 'okButtonClass', 'cancelText'];
 
             _.defaults(options, _.pick(DeleteConfirmationView.prototype, fields));
             DeleteConfirmationView.__super__.initialize.call(this, options);

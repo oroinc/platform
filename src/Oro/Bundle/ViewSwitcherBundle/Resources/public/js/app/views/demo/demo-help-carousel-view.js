@@ -2,18 +2,17 @@
 define(function(require) {
     'use strict';
 
-    var DemoHelpCarouselView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('text-loader!oroviewswitcher/templates/demo-help-carousel.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('text-loader!oroviewswitcher/templates/demo-help-carousel.html');
     require('slick');
-    var slides = [];
+    const slides = [];
 
-    var COOKIE_KEY = 'demo_help_carousel_hidden';
-    var COOKIE_VALUE = '1';
+    const COOKIE_KEY = 'demo_help_carousel_hidden';
+    const COOKIE_VALUE = '1';
 
-    DemoHelpCarouselView = BaseView.extend({
+    const DemoHelpCarouselView = BaseView.extend({
         /**
          * @inheritDoc
          */
@@ -81,9 +80,9 @@ define(function(require) {
          * @inheritDoc
          */
         render: function() {
-            DemoHelpCarouselView.__super__.render.apply(this, arguments);
+            DemoHelpCarouselView.__super__.render.call(this);
 
-            var template = _.template(_.pluck(slides, 'content').join(''));
+            const template = _.template(_.pluck(slides, 'content').join(''));
 
             this.$('[data-role="slides-container"]')
                 .html(template(this.getTemplateData()));
@@ -98,7 +97,7 @@ define(function(require) {
 
             $(window.document).on('keydown' + this.eventNamespace(), this.onKeyDown.bind(this));
 
-            var $carousel = this.getCarouselElement();
+            const $carousel = this.getCarouselElement();
             _.defer(function() {
                 $carousel.slick({
                     dots: true,
@@ -121,7 +120,7 @@ define(function(require) {
         close: function() {
             this.$el.removeClass(this.visibleClass);
 
-            var $carousel = this.getCarouselElement();
+            const $carousel = this.getCarouselElement();
             if ($carousel.is('.slick-initialized')) {
                 $carousel.slick('unslick');
             }
@@ -150,8 +149,8 @@ define(function(require) {
         },
 
         addSlide: function(order, content) {
-            var newSlide = {order: Number(order), content: content};
-            var index = _.findIndex(slides, function(slide) {
+            const newSlide = {order: Number(order), content: content};
+            const index = _.findIndex(slides, function(slide) {
                 return slide.order > newSlide.order;
             });
 

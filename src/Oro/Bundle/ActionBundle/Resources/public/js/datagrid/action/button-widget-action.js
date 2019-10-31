@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var ModelAction = require('oro/datagrid/action/model-action');
-    var ButtonManager = require('oroaction/js/button-manager');
+    const _ = require('underscore');
+    const ModelAction = require('oro/datagrid/action/model-action');
+    const ButtonManager = require('oroaction/js/button-manager');
 
-    var ButtonWidgetAction = ModelAction.extend({
+    const ButtonWidgetAction = ModelAction.extend({
 
         /**
          * @property {Object}
@@ -22,16 +22,16 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ButtonWidgetAction() {
-            ButtonWidgetAction.__super__.constructor.apply(this, arguments);
+        constructor: function ButtonWidgetAction(options) {
+            ButtonWidgetAction.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
-            ButtonWidgetAction.__super__.initialize.apply(this, arguments);
-            var buttonOptions = _.extend({action: _.pick(this, 'name', 'label')}, this.configuration);
+        initialize: function(options) {
+            ButtonWidgetAction.__super__.initialize.call(this, options);
+            const buttonOptions = _.extend({action: _.pick(this, 'name', 'label')}, this.configuration);
             this.buttonManager = new ButtonManager(buttonOptions);
         },
 

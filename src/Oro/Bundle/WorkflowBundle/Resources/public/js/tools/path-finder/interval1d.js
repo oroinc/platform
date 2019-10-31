@@ -36,8 +36,8 @@ define(function() {
      * @returns {Interval1d}
      */
     Interval1d.prototype.intersection = function(s) {
-        var min = Math.max(this.min, s.min);
-        var max = Math.min(this.max, s.max);
+        const min = Math.max(this.min, s.min);
+        const max = Math.min(this.max, s.max);
         return min > max ? null : new Interval1d(min, max);
     };
 

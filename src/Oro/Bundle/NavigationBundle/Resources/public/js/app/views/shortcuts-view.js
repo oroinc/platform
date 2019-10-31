@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var ShortcutsView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var routing = require('routing');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const routing = require('routing');
     require('bootstrap');
 
-    ShortcutsView = BaseView.extend({
+    const ShortcutsView = BaseView.extend({
         autoRender: true,
 
         events: {
@@ -30,8 +29,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ShortcutsView() {
-            ShortcutsView.__super__.constructor.apply(this, arguments);
+        constructor: function ShortcutsView(options) {
+            ShortcutsView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -40,7 +39,7 @@ define(function(require) {
         initialize: function(options) {
             this.options = options || {};
 
-            var $input = this.getTypeaheadInput();
+            const $input = this.getTypeaheadInput();
             this.sourceUrl = $input.data('source-url') ? $input.data('source-url') : null;
             this.entityClass = $input.data('entity-class') ? $input.data('entity-class') : null;
             this.entityId = $input.data('entity-id') ? $input.data('entity-id') : null;
@@ -50,7 +49,7 @@ define(function(require) {
          * @inheritDoc
          */
         render: function() {
-            var $input = this.getTypeaheadInput();
+            const $input = this.getTypeaheadInput();
 
             if (!$input.data('typeahead')) {
                 this.initTypeahead();
@@ -66,17 +65,17 @@ define(function(require) {
         },
 
         initTypeahead: function() {
-            var self = this;
+            const self = this;
             this.getTypeaheadInput().typeahead({
                 source: _.bind(this.source, this),
                 matcher: function(item) {
                     return item.key.toLowerCase().indexOf(this.query.toLowerCase()) !== -1;
                 },
                 sorter: function(items) {
-                    var beginswith = [];
-                    var caseSensitive = [];
-                    var caseInsensitive = [];
-                    var item;
+                    const beginswith = [];
+                    const caseSensitive = [];
+                    const caseInsensitive = [];
+                    let item;
 
                     while ((item = items.shift()) !== undefined) {
                         if (item.key.toLowerCase().indexOf(this.query.toLowerCase()) === 0) {
@@ -91,13 +90,13 @@ define(function(require) {
                     return beginswith.concat(caseSensitive, caseInsensitive);
                 },
                 render: function(items) {
-                    var that = this;
+                    const that = this;
                     items = $(items).map(function(i, item) {
-                        var view;
+                        let view;
 
                         if (item.item.dialog) {
-                            var config = item.item.dialog_config;
-                            var options = {
+                            const config = item.item.dialog_config;
+                            const options = {
                                 'type': config.widget.type,
                                 'multiple': config.widget.multiple,
                                 'refresh-widget-alias': config.widget.refreshWidgetAlias,
@@ -116,7 +115,7 @@ define(function(require) {
                                 },
                                 'createOnEvent': 'click'
                             };
-                            var dataUrl = routing.generate(config.dataUrl, {
+                            const dataUrl = routing.generate(config.dataUrl, {
                                 entityClass: self.entityClass,
                                 entityId: self.entityId
                             });
@@ -158,7 +157,7 @@ define(function(require) {
         },
 
         source: function(query, process) {
-            var self = this;
+            const self = this;
             if (_.isArray(this.sourceUrl)) {
                 process(this.sourceUrl);
                 this.render();
@@ -166,10 +165,10 @@ define(function(require) {
                 process(this.cache[query]);
                 this.render();
             } else {
-                var url = routing.generate(this.sourceUrl, {query: query});
+                const url = routing.generate(this.sourceUrl, {query: query});
                 $.get(url, _.bind(function(data) {
                     this.data = data;
-                    var result = [];
+                    const result = [];
                     _.each(data, function(item, key) {
                         result.push({
                             key: key,
@@ -184,9 +183,9 @@ define(function(require) {
         },
 
         onChange: function() {
-            var $input = this.getTypeaheadInput();
-            var key = $input.val();
-            var dataItem = this.data[key];
+            const $input = this.getTypeaheadInput();
+            const key = $input.val();
+            const dataItem = this.data[key];
 
             if (dataItem !== void 0) {
                 $input.val('').inputWidget('refresh');

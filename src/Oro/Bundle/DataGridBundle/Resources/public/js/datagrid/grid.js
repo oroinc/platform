@@ -1,32 +1,31 @@
 define(function(require) {
     'use strict';
 
-    var Grid;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var Backgrid = require('backgrid');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-    var GridHeader = require('./header');
-    var GridBody = require('./body');
-    var GridFooter = require('./footer');
-    var GridColumns = require('./columns');
-    var Toolbar = require('./toolbar');
-    var SelectState = require('./select-state-model');
-    var ActionColumn = require('./column/action-column');
-    var SelectRowCell = require('oro/datagrid/cell/select-row-cell');
-    var SelectAllHeaderCell = require('./header-cell/select-all-header-cell');
-    var RefreshCollectionAction = require('oro/datagrid/action/refresh-collection-action');
-    var ResetCollectionAction = require('oro/datagrid/action/reset-collection-action');
-    var SelectDataAppearanceAction = require('oro/datagrid/action/select-data-appearance-action');
-    var ExportAction = require('oro/datagrid/action/export-action');
-    var PluginManager = require('oroui/js/app/plugins/plugin-manager');
-    var scrollHelper = require('oroui/js/tools/scroll-helper');
-    var PageableCollection = require('../pageable-collection');
-    var util = require('./util');
-    var tools = require('oroui/js/tools');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const Backgrid = require('backgrid');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const GridHeader = require('./header');
+    const GridBody = require('./body');
+    const GridFooter = require('./footer');
+    const GridColumns = require('./columns');
+    const Toolbar = require('./toolbar');
+    const SelectState = require('./select-state-model');
+    const ActionColumn = require('./column/action-column');
+    const SelectRowCell = require('oro/datagrid/cell/select-row-cell');
+    const SelectAllHeaderCell = require('./header-cell/select-all-header-cell');
+    const RefreshCollectionAction = require('oro/datagrid/action/refresh-collection-action');
+    const ResetCollectionAction = require('oro/datagrid/action/reset-collection-action');
+    const SelectDataAppearanceAction = require('oro/datagrid/action/select-data-appearance-action');
+    const ExportAction = require('oro/datagrid/action/export-action');
+    const PluginManager = require('oroui/js/app/plugins/plugin-manager');
+    const scrollHelper = require('oroui/js/tools/scroll-helper');
+    const PageableCollection = require('../pageable-collection');
+    const util = require('./util');
+    const tools = require('oroui/js/tools');
 
     /**
      * Basic grid class.
@@ -38,7 +37,7 @@ define(function(require) {
      * @class   orodatagrid.datagrid.Grid
      * @extends Backgrid.Grid
      */
-    Grid = Backgrid.Grid.extend({
+    const Grid = Backgrid.Grid.extend({
         /** @property {String} */
         name: 'datagrid',
 
@@ -173,8 +172,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function Grid() {
-            Grid.__super__.constructor.apply(this, arguments);
+        constructor: function Grid(options) {
+            Grid.__super__.constructor.call(this, options);
         },
 
         /**
@@ -195,11 +194,11 @@ define(function(require) {
          * @throws {TypeError} If mandatory options are undefined
          */
         initialize: function(options) {
-            var opts = options || {};
+            const opts = options || {};
             this.pluginManager = new PluginManager(this);
             if (options.plugins) {
-                for (var i = 0; i < options.plugins.length; i++) {
-                    var plugin = options.plugins[i];
+                for (let i = 0; i < options.plugins.length; i++) {
+                    const plugin = options.plugins[i];
                     if (_.isFunction(plugin)) {
                         this.pluginManager.enable(plugin);
                     } else {
@@ -289,24 +288,24 @@ define(function(require) {
          * @param options
          */
         backgridInitialize: function(options) {
-            var filteredOptions = _.omit(
+            const filteredOptions = _.omit(
                 options,
                 ['el', 'id', 'attributes', 'className', 'tagName', 'events', 'themeOptions']
             );
 
             this.header = options.header || this.header;
-            var headerOptions = _.extend({}, filteredOptions);
+            const headerOptions = _.extend({}, filteredOptions);
             this.columns.trigger('configureInitializeOptions', this.header, headerOptions);
             if (headerOptions.themeOptions.hide) {
                 this.header = null;
             }
 
             this.body = options.body || this.body;
-            var bodyOptions = _.extend({}, filteredOptions);
+            const bodyOptions = _.extend({}, filteredOptions);
             this.columns.trigger('configureInitializeOptions', this.body, bodyOptions);
 
             this.footer = options.footer || this.footer;
-            var footerOptions = _.extend({}, filteredOptions);
+            const footerOptions = _.extend({}, filteredOptions);
             this.columns.trigger('configureInitializeOptions', this.footer, footerOptions);
             if (footerOptions.themeOptions.hide) {
                 this.footer = null;
@@ -455,7 +454,7 @@ define(function(require) {
          * @returns {boolean} TRUE if values are not equal, otherwise - FALSE
          */
         stateIsResettable: function(previousState, state) {
-            var fields = ['filters', 'gridView', 'pageSize'];
+            const fields = ['filters', 'gridView', 'pageSize'];
 
             return !tools.isEqualsLoosely(
                 _.pick(previousState, fields),
@@ -478,7 +477,7 @@ define(function(require) {
          * @private
          */
         _initActions: function(opts) {
-            var themeActionsOpts = opts.themeOptions.actionOptions;
+            const themeActionsOpts = opts.themeOptions.actionOptions;
             if (_.isObject(themeActionsOpts)) {
                 this.actionOptions = $.extend(true, {}, this.actionOptions, themeActionsOpts);
             }
@@ -488,7 +487,6 @@ define(function(require) {
          * @inheritDoc
          */
         dispose: function() {
-            var subviews;
             if (this.disposed) {
                 return;
             }
@@ -505,7 +503,7 @@ define(function(require) {
             delete this.resetAction;
             delete this.exportAction;
 
-            subviews = ['header', 'body', 'footer', 'loadingMask'];
+            const subviews = ['header', 'body', 'footer', 'loadingMask'];
             _.each(subviews, function(viewName) {
                 if (this[viewName]) {
                     this[viewName].dispose();
@@ -523,10 +521,10 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        delegateEvents: function() {
-            Grid.__super__.delegateEvents.apply(this, arguments);
+        delegateEvents: function(events) {
+            Grid.__super__.delegateEvents.call(this, events);
 
-            var $parents = this.$('.grid-container').parents();
+            let $parents = this.$('.grid-container').parents();
             if ($parents.length) {
                 $parents = $parents.add(document);
                 $parents.on('scroll' + this.eventNamespace(), _.bind(this.trigger, this, 'scroll'));
@@ -547,8 +545,8 @@ define(function(require) {
          */
         onHandleExport: function(exportRouteOptions) {
             if (exportRouteOptions.hasOwnProperty('filteredResultsGrid')) {
-                var queryParams = tools.unpackFromQueryString(window.location.search);
-                var gridName = exportRouteOptions['filteredResultsGrid'];
+                const queryParams = tools.unpackFromQueryString(window.location.search);
+                const gridName = exportRouteOptions['filteredResultsGrid'];
 
                 if (queryParams.hasOwnProperty('grid') && queryParams['grid'].hasOwnProperty(gridName)) {
                     exportRouteOptions.filteredResultsGridParams = queryParams['grid'][gridName];
@@ -560,7 +558,7 @@ define(function(require) {
          * @inheritDoc
          */
         undelegateEvents: function() {
-            Grid.__super__.undelegateEvents.apply(this, arguments);
+            Grid.__super__.undelegateEvents.call(this);
 
             if (this._$boundScrollHandlerParents) {
                 this._$boundScrollHandlerParents.off(this.eventNamespace());
@@ -587,8 +585,8 @@ define(function(require) {
                 options.columns.unshift(this._createSelectRowColumn());
             }
 
-            for (var i = 0; i < options.columns.length; i++) {
-                var column = options.columns[i];
+            for (let i = 0; i < options.columns.length; i++) {
+                const column = options.columns[i];
                 if (column.order === void 0 && !(column instanceof Backgrid.Column)) {
                     column.order = i + this.DEFAULT_COLUMN_START_INDEX;
                 }
@@ -620,8 +618,7 @@ define(function(require) {
          * @private
          */
         _createActionsColumn: function() {
-            var column;
-            column = new this.actionsColumn({
+            const column = new this.actionsColumn({
                 datagrid: this,
                 actions: this.rowActions,
                 massActions: this.massActions,
@@ -638,8 +635,7 @@ define(function(require) {
          * @private
          */
         _createSelectRowColumn: function() {
-            var column;
-            column = new Backgrid.Column({
+            const column = new Backgrid.Column({
                 name: 'massAction',
                 label: __('Selected Rows'),
                 renderable: true,
@@ -659,7 +655,7 @@ define(function(require) {
          * @returns {{selectedIds: *, inset: boolean}}
          */
         getSelectionState: function() {
-            var state = {
+            const state = {
                 selectedIds: this.selectState.get('rows'),
                 inset: this.selectState.get('inset')
             };
@@ -690,10 +686,9 @@ define(function(require) {
          * @private
          */
         _createToolbar: function(options) {
-            var ComponentConstructor = this.collection.options.modules.datagridSettingsComponentCustom || null;
-            var toolbar;
-            var sortActions = this.sortActions;
-            var toolbarOptions = {
+            const ComponentConstructor = this.collection.options.modules.datagridSettingsComponentCustom || null;
+            const sortActions = this.sortActions;
+            const toolbarOptions = {
                 collection: this.collection,
                 actions: this._getToolbarActions(),
                 extraActions: this._getToolbarExtraActions(),
@@ -708,7 +703,7 @@ define(function(require) {
 
             this.columns.trigger('configureInitializeOptions', this.toolbar, toolbarOptions);
             this.trigger('beforeToolbarInit', toolbarOptions);
-            toolbar = new this.toolbar(toolbarOptions);
+            const toolbar = new this.toolbar(toolbarOptions);
             this.trigger('afterToolbarInit', toolbar);
             return toolbar;
         },
@@ -730,7 +725,7 @@ define(function(require) {
          * @private
          */
         _getToolbarActions: function() {
-            var actions = [];
+            const actions = [];
             if (this.toolbarOptions.addRefreshAction) {
                 actions.push(this.getRefreshAction());
             }
@@ -738,7 +733,7 @@ define(function(require) {
                 actions.push(this.getResetAction());
             }
             if (this.toolbarOptions.addAppearanceSwitcher) {
-                var action = new SelectDataAppearanceAction({
+                const action = new SelectDataAppearanceAction({
                     datagrid: this,
                     launcherOptions: {
                         label: __('oro_datagrid.action.appearance'),
@@ -751,7 +746,7 @@ define(function(require) {
                     order: 700
                 });
                 this.on('appearanceChanged', function(key, options) {
-                    var item = _.findWhere(action.launcherInstanse.items,
+                    const item = _.findWhere(action.launcherInstanse.items,
                         {key: options.type, id: options.id || 'by_type'});
                     if (!item) {
                         throw new Error('Could not find corresponding launcher item');
@@ -771,7 +766,7 @@ define(function(require) {
         },
 
         switchAppearanceClass: function(appearanceType) {
-            var appearanceClass = _.find(this.el.classList, function(cls) {
+            const appearanceClass = _.find(this.el.classList, function(cls) {
                 return /-appearance$/.test(cls);
             });
             if (appearanceClass) {
@@ -789,7 +784,7 @@ define(function(require) {
          * @private
          */
         _getToolbarExtraActions: function() {
-            var actions = [];
+            const actions = [];
             if (!_.isEmpty(this.exportOptions)) {
                 actions.push(this.getExportAction());
             }
@@ -866,7 +861,7 @@ define(function(require) {
          */
         getExportAction: function() {
             if (!this.exportAction) {
-                var links = [];
+                const links = [];
                 _.each(this.exportOptions, function(val, key) {
                     links.push({
                         key: key,
@@ -906,10 +901,10 @@ define(function(require) {
         _listenToCollectionEvents: function() {
             this.listenTo(this.collection, 'request', function(model, xhr) {
                 this._beforeRequest();
-                var self = this;
-                var always = xhr.always;
-                xhr.always = function() {
-                    always.apply(this, arguments);
+                const self = this;
+                const always = xhr.always;
+                xhr.always = function(...args) {
+                    always.apply(this, args);
                     if (!self.disposed) {
                         self._afterRequest(this);
                     }
@@ -953,19 +948,18 @@ define(function(require) {
          * @private
          */
         runRowClickAction: function(model, options) {
-            var config;
             if (!this.rowClickAction) {
                 return;
             }
 
-            var action = new this.rowClickAction({
+            const action = new this.rowClickAction({
                 datagrid: this,
                 model: model
             });
             if (typeof action.dispose === 'function') {
                 this.subviews.push(action);
             }
-            config = model.get('action_configuration');
+            const config = model.get('action_configuration');
             if (!config || config[action.name] !== false) {
                 action.run(options);
             }
@@ -1094,7 +1088,7 @@ define(function(require) {
          * Renders grid toolbar.
          */
         renderToolbar: function() {
-            var self = this;
+            const self = this;
             _.each(this.toolbarOptions.placement, function(enabled, position) {
                 if (enabled) {
                     self.$(self.selectors.toolbars[position]).append(self.getToolbar(position).render().$el);
@@ -1112,7 +1106,7 @@ define(function(require) {
                 return this.toolbars[placement];
             }
 
-            var toolbarOptions = _.extend(this.toolbarOptions, {el: this.$(this.selectors.toolbars[placement])});
+            const toolbarOptions = _.extend(this.toolbarOptions, {el: this.$(this.selectors.toolbars[placement])});
             this.toolbars[placement] = this._createToolbar(toolbarOptions);
 
             return this.toolbars[placement];
@@ -1144,8 +1138,8 @@ define(function(require) {
          * Define no data block.
          */
         _defineNoDataBlock: function() {
-            var messageHTML;
-            var placeholders = {
+            let messageHTML;
+            const placeholders = {
                 entityHint: (this.entityHint || __(this.noDataTranslations.entityHint)).toLowerCase()
             };
 
@@ -1173,7 +1167,7 @@ define(function(require) {
          * @returns {String}
          */
         getEmptyGridMessage: function(placeholders) {
-            var translation = this.noColumnsFlag
+            const translation = this.noColumnsFlag
                 ? this.noDataTranslations.noColumns : this.noDataTranslations.noEntities;
 
             return this.noDataTemplate({
@@ -1235,7 +1229,7 @@ define(function(require) {
          * @private
          */
         _afterRequest: function(jqXHR) {
-            var json = jqXHR.responseJSON || {};
+            const json = jqXHR.responseJSON || {};
             if (json.metadata) {
                 this._processLoadedMetadata(json.metadata);
             }
@@ -1320,7 +1314,7 @@ define(function(require) {
          * @param value
          */
         setAdditionalParameter: function(name, value) {
-            var state = this.collection.state;
+            const state = this.collection.state;
             if (!_.has(state, 'parameters')) {
                 state.parameters = {};
             }
@@ -1334,7 +1328,7 @@ define(function(require) {
          * @param {String} name
          */
         removeAdditionalParameter: function(name) {
-            var state = this.collection.state;
+            const state = this.collection.state;
             if (_.has(state, 'parameters')) {
                 delete state.parameters[name];
             }
@@ -1346,7 +1340,7 @@ define(function(require) {
          * @param cell
          */
         ensureCellIsVisible: function(cell) {
-            var e = $.Event('ensureCellIsVisible');
+            const e = $.Event('ensureCellIsVisible');
             this.trigger('ensureCellIsVisible', e, cell);
             if (e.isDefaultPrevented()) {
                 return;
@@ -1362,13 +1356,13 @@ define(function(require) {
          * @return {Backgrid.Cell}
          */
         findCell: function(model, column) {
-            var rows = this.body.rows;
-            for (var i = 0; i < rows.length; i++) {
-                var row = rows[i];
+            const rows = this.body.rows;
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
                 if (row.model === model) {
-                    var cells = row.subviews;
-                    for (var j = 0; j < cells.length; j++) {
-                        var cell = cells[j];
+                    const cells = row.subviews;
+                    for (let j = 0; j < cells.length; j++) {
+                        const cell = cells[j];
                         if (cell.column === column) {
                             return cell;
                         }
@@ -1426,9 +1420,9 @@ define(function(require) {
         makeComparator: function(attr, order, func) {
             return function(left, right) {
                 // extract the values from the models
-                var t;
-                var l = func(left, attr);
-                var r = func(right, attr);
+                let t;
+                let l = func(left, attr);
+                let r = func(right, attr);
                 // if descending order, swap left and right
                 if (order === 1) {
                     t = l;
@@ -1457,8 +1451,8 @@ define(function(require) {
                 column = this.columns.findWhere({name: column});
             }
 
-            var columnName = null;
-            var columnSortValue = null;
+            let columnName = null;
+            let columnSortValue = null;
             if (_.isObject(column)) {
                 columnName = column.get('name');
                 columnSortValue = column.sortValue();
@@ -1466,9 +1460,9 @@ define(function(require) {
                 column = null;
             }
 
-            var collection = this.collection;
+            const collection = this.collection;
 
-            var order;
+            let order;
 
             if (direction === 'ascending') {
                 order = '-1';
@@ -1478,7 +1472,7 @@ define(function(require) {
                 order = null;
             }
 
-            var extractorDelegate;
+            let extractorDelegate;
             if (order) {
                 extractorDelegate = columnSortValue;
             } else {
@@ -1486,7 +1480,7 @@ define(function(require) {
                     return model.cid.replace('c', '') * 1;
                 };
             }
-            var comparator = this.makeComparator(columnName, order, extractorDelegate);
+            const comparator = this.makeComparator(columnName, order, extractorDelegate);
 
             if (collection instanceof PageableCollection) {
                 collection.setSorting(columnName, order, {sortValue: columnSortValue});
@@ -1520,7 +1514,7 @@ define(function(require) {
          * @return {String|null}
          */
         getGridScope: function() {
-            var nameParts = this.name.split(this.scopeDelimiter);
+            const nameParts = this.name.split(this.scopeDelimiter);
             if (nameParts.length > 2) {
                 throw new Error(
                     'Grid name is invalid, it should not contain more than one occurrence of "' +

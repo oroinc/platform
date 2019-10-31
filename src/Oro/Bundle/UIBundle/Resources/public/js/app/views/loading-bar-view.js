@@ -4,12 +4,11 @@ define(function(require) {
     /**
      * This component display line loader when page is loading and ajax request sending
      */
-    var LoadingBarView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
 
-    LoadingBarView = BaseView.extend({
+    const LoadingBarView = BaseView.extend({
         autoRender: true,
 
         optionNames: BaseView.prototype.optionNames.concat([
@@ -44,8 +43,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function LoadingBarView() {
-            LoadingBarView.__super__.constructor.apply(this, arguments);
+        constructor: function LoadingBarView(options) {
+            LoadingBarView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -59,7 +58,7 @@ define(function(require) {
          * Bind ajaxStart, ajaxComplete, ready and load listeners
          */
         bindEvents: function() {
-            var self = this;
+            const self = this;
 
             if (this.pageLoading) {
                 $(document).on('ready' + this.eventNamespace(), function() {
@@ -96,7 +95,7 @@ define(function(require) {
                 return;
             }
 
-            var loaderWidth = this.$el.width();
+            const loaderWidth = this.$el.width();
 
             this.$el.width(loaderWidth).css({animation: 'none'}).width('100%');
             this.$el.delay(200).fadeOut(300, _.bind(function() {

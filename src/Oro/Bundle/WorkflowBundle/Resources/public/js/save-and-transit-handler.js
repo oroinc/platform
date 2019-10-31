@@ -13,25 +13,25 @@ define([
      * @class   oroworkflow.WorkflowSaveAndTransitHandler
      */
     return function() {
-        var saveBtn = $(this);
+        const saveBtn = $(this);
         // Modify form to stay on edit page after submit
-        var form = saveBtn.closest('form');
-        var actionInput = form.find('input[name="input_action"]');
+        const form = saveBtn.closest('form');
+        const actionInput = form.find('input[name="input_action"]');
         actionInput.val('save_and_stay');
-        var formId = form.prop('id');
+        const formId = form.prop('id');
 
         // On form submit response check for errors
         mediator.once('page:update', function() {
-            var hasErrors = $('.alert-error, .validation-error').length > 0;
+            const hasErrors = $('.alert-error, .validation-error').length > 0;
             if (!hasErrors) {
-                var idRegexp = /update\/(\d+).*/;
-                var responseForm = $('#' + formId);
-                var elementIdMatch = idRegexp.exec(responseForm.prop('action'));
+                const idRegexp = /update\/(\d+).*/;
+                const responseForm = $('#' + formId);
+                const elementIdMatch = idRegexp.exec(responseForm.prop('action'));
                 if (elementIdMatch.length > 1) {
                     // In case when no errors occurred load transitions for created entity
-                    var containerEl = $('<div class="hidden invisible"/>');
+                    const containerEl = $('<div class="hidden invisible"/>');
                     $('body').append(containerEl);
-                    var transitionsWidget = new ButtonsWidget({
+                    const transitionsWidget = new ButtonsWidget({
                         el: containerEl,
                         elementFirst: false,
                         url: routing.generate('oro_workflow_widget_buttons', {
@@ -41,7 +41,7 @@ define([
                     });
                     transitionsWidget.on('renderComplete', function(el) {
                         // Try to execute required transition
-                        var transition = el.find('#transition-' + saveBtn.data('workflow') +
+                        const transition = el.find('#transition-' + saveBtn.data('workflow') +
                             '-' + saveBtn.data('transition'));
                         if (transition.length) {
                             transition.on('transitionHandlerInitialized', function() {

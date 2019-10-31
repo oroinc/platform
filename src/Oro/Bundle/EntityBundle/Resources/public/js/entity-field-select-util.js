@@ -3,7 +3,7 @@ define(['underscore'
     'use strict';
 
     // define a constructor
-    var entityFieldUtil = function($el) {
+    const entityFieldUtil = function($el) {
         this.$el = $el;
     };
 
@@ -17,20 +17,20 @@ define(['underscore'
         },
 
         splitFieldId: function(fieldId) {
-            var result = [];
-            var data = this._getData();
-            var chain = fieldId.split('+');
+            const result = [];
+            let data = this._getData();
+            const chain = fieldId.split('+');
             if (_.size(chain) > 1) {
                 result.push({
                     entity: this.findEntity(this.getEntityName()),
                     label: this._getFieldGroupLabel(chain[0], data)
                 });
-                var prevFieldName = chain[0];
-                var lastItemIndex = _.size(chain) - 2;
+                let prevFieldName = chain[0];
+                const lastItemIndex = _.size(chain) - 2;
                 _.each(_.rest(chain), _.bind(function(item, index) {
                     data = this._getChildren(this._getField(prevFieldName, data));
-                    var pair = this._getPair(item);
-                    var label = index < lastItemIndex
+                    const pair = this._getPair(item);
+                    const label = index < lastItemIndex
                         ? this._getFieldGroupLabel(_.last(pair), data)
                         : this._getFieldLabel(_.last(pair), data);
                     result.push({
@@ -60,15 +60,15 @@ define(['underscore'
         },
 
         getFieldData: function(fieldId) {
-            var result = {};
-            var data = this._getData();
-            var chain = fieldId.split('+');
+            let result = {};
+            let data = this._getData();
+            const chain = fieldId.split('+');
             if (_.size(chain) > 1) {
                 result = this._getField(chain[0], data);
                 data = this._getChildren(result);
-                var lastItemIndex = _.size(chain) - 2;
+                const lastItemIndex = _.size(chain) - 2;
                 _.each(_.rest(chain), _.bind(function(item, index) {
-                    var fieldName = _.last(this._getPair(item));
+                    const fieldName = _.last(this._getPair(item));
                     result = index < lastItemIndex
                         ? this._getField(fieldName, data)
                         : this._getFieldData(fieldName, data);
@@ -86,17 +86,17 @@ define(['underscore'
         },
 
         _getData: function() {
-            var data = this.$el.data('data');
+            const data = this.$el.data('data');
             return _.isUndefined(data) || _.isNull(data) ? [] : data;
         },
 
         _getFieldLabel: function(fieldName, data) {
-            var fieldData = this._getFieldData(fieldName, data);
+            const fieldData = this._getFieldData(fieldName, data);
             return fieldData ? fieldData.text : null;
         },
 
         _getFieldGroupLabel: function(fieldName, data) {
-            var field = this._getField(fieldName, data);
+            const field = this._getField(fieldName, data);
             return field ? field.text : null;
         },
 
@@ -113,7 +113,7 @@ define(['underscore'
          * @private
          */
         _getPair: function(item) {
-            var pair = item.split('::');
+            let pair = item.split('::');
             if (_.size(pair) === 3) {
                 pair = [
                     pair[0],
@@ -125,7 +125,7 @@ define(['underscore'
         },
 
         _getField: function(fieldName, data) {
-            var field = null;
+            let field = null;
             // can't use _.find because it returns first level clone of element
             _.each(data, function(element) {
                 if (element.name === fieldName) {
@@ -136,7 +136,7 @@ define(['underscore'
         },
 
         _getFieldData: function(fieldName, data) {
-            var fields = _.find(data, function(val) {
+            let fields = _.find(data, function(val) {
                 return _.isUndefined(val.name);
             });
             if (_.isUndefined(fields)) {
@@ -185,9 +185,9 @@ define(['underscore'
         },
 
         _convertData: function(fields, entityName, parentFieldId) {
-            var result = [];
+            const result = [];
             _.each(fields, _.bind(function(field) {
-                var fieldId = (null !== parentFieldId)
+                const fieldId = (null !== parentFieldId)
                     ? parentFieldId + '+' + entityName + '::' + field.name
                     : field.name;
                 if (_.isUndefined(field.relation_type)) {

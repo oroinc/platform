@@ -17,10 +17,10 @@ module.exports = Promise.all([
     promises.push($.when($.ready));
 
     return Promise.all(promises).then(function() {
-        var options = _.extend({}, config, {
+        const options = _.extend({}, config, {
             // load routers
             routes: function(match) {
-                var i;
+                let i;
                 for (i = 0; i < routes.length; i += 1) {
                     match(routes[i][0], routes[i][1]);
                 }

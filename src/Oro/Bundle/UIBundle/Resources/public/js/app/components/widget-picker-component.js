@@ -1,24 +1,23 @@
 define(function(require) {
     'use strict';
 
-    var WidgetPickerComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var WidgetPickerFilterModel = require('oroui/js/app/models/widget-picker/widget-picker-filter-model');
-    var WidgetPickerCollectionView = require('oroui/js/app/views/widget-picker/widget-picker-collection-view');
-    var WidgetPickerFilterView = require('oroui/js/app/views/widget-picker/widget-picker-filter-view');
-    var _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const WidgetPickerFilterModel = require('oroui/js/app/models/widget-picker/widget-picker-filter-model');
+    const WidgetPickerCollectionView = require('oroui/js/app/views/widget-picker/widget-picker-collection-view');
+    const WidgetPickerFilterView = require('oroui/js/app/views/widget-picker/widget-picker-filter-view');
+    const _ = require('underscore');
 
     /**
      * @export oroui/js/app/components/widget-picker-component
      * @extends oroui.app.components.base.Component
      * @class oroui.app.components.WidgetPickerComponent
      */
-    WidgetPickerComponent = BaseComponent.extend({
+    const WidgetPickerComponent = BaseComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function WidgetPickerComponent() {
-            WidgetPickerComponent.__super__.constructor.apply(this, arguments);
+        constructor: function WidgetPickerComponent(options) {
+            WidgetPickerComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -26,7 +25,7 @@ define(function(require) {
          */
         initialize: function(options) {
             this._createViews(options);
-            WidgetPickerComponent.__super__.initialize.apply(this, arguments);
+            WidgetPickerComponent.__super__.initialize.call(this, options);
         },
 
         /**
@@ -35,8 +34,8 @@ define(function(require) {
          * @protected
          */
         _createViews: function(options) {
-            var $el = options._sourceElement;
-            var widgetPickerFilterModel = new WidgetPickerFilterModel();
+            const $el = options._sourceElement;
+            const widgetPickerFilterModel = new WidgetPickerFilterModel();
             this.widgetPickerCollectionView = new WidgetPickerCollectionView(
                 _.defaults(options, {
                     el: $el.find('[data-role="widget-picker-container"]'),

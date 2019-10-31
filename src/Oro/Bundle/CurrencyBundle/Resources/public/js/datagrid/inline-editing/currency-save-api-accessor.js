@@ -1,12 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var CurrencyApiAccessor;
+    const _ = require('underscore');
+    const ApiAccessor = require('oroui/js/tools/api-accessor');
 
-    var _ = require('underscore');
-    var ApiAccessor = require('oroui/js/tools/api-accessor');
-
-    CurrencyApiAccessor = ApiAccessor.extend(/** @lends CurrencyApiAccessor.prototype */{
+    const CurrencyApiAccessor = ApiAccessor.extend(/** @lends CurrencyApiAccessor.prototype */{
         /**
          * Prepares the request body.
          *
@@ -14,11 +12,11 @@ define(function(require) {
          * @returns {Object}
          */
         formatBody: function(body) {
-            var value;
-            var formattedBody = {};
-            var cellField = this.initialOptions.cell_field;
-            var valueField = this.initialOptions.value_field;
-            var currencyField = this.initialOptions.currency_field;
+            let value;
+            const formattedBody = {};
+            const cellField = this.initialOptions.cell_field;
+            const valueField = this.initialOptions.value_field;
+            const currencyField = this.initialOptions.currency_field;
 
             if (cellField in body) {
                 value = body[cellField];
@@ -35,11 +33,11 @@ define(function(require) {
 
         onAjaxError: function(xhr) {
             if (xhr.responseJSON && xhr.responseJSON.errors) {
-                var cellFieldErrors = [];
-                var errors = xhr.responseJSON.errors;
-                var cellField = this.initialOptions.cell_field;
+                let cellFieldErrors = [];
+                const errors = xhr.responseJSON.errors;
+                const cellField = this.initialOptions.cell_field;
                 _.each(_.pick(this.initialOptions, 'value_field', 'currency_field'), function(entityField) {
-                    var fieldErrors = _.result(errors.children, entityField);
+                    const fieldErrors = _.result(errors.children, entityField);
                     if (fieldErrors && _.isArray(fieldErrors.errors)) {
                         cellFieldErrors = cellFieldErrors.concat(fieldErrors.errors);
                         delete errors.children[entityField];

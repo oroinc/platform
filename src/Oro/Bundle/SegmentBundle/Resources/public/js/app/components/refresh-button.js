@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var DeleteConfirmation = require('oroui/js/delete-confirmation');
-    var mediator = require('oroui/js/mediator');
-    var options = {
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const DeleteConfirmation = require('oroui/js/delete-confirmation');
+    const mediator = require('oroui/js/mediator');
+    const options = {
         successMessage: 'oro.segment.refresh_dialog.success',
         errorMessage: 'oro.segment.refresh_dialog.error',
         title: 'oro.segment.refresh_dialog.title',
@@ -37,13 +37,13 @@ define(function(require) {
     function onClick(reloadRequired, e) {
         e.preventDefault();
 
-        var confirm = new DeleteConfirmation({
+        const confirm = new DeleteConfirmation({
             title: __(options.title),
             okText: __(options.okText),
             content: __(options.content)
         });
 
-        var url = $(e.target).data('url');
+        const url = $(e.target).data('url');
 
         confirm.on('ok', _.partial(run, url, reloadRequired));
         confirm.open();
@@ -51,8 +51,8 @@ define(function(require) {
 
     return function(additionalOptions) {
         _.extend(options, additionalOptions || {});
-        var reloadRequired = Boolean(options.reloadRequired);
-        var button = options._sourceElement;
+        const reloadRequired = Boolean(options.reloadRequired);
+        const button = options._sourceElement;
         button.click(_.partial(onClick, reloadRequired));
     };
 });

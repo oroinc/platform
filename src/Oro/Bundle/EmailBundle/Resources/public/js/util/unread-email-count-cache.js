@@ -1,19 +1,19 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var _ = require('underscore');
-    var config = require('module-config').default(module.id);
+    const _ = require('underscore');
+    const config = require('module-config').default(module.id);
     // for some reason module configuration sometimes comes as Object, despite it is defined as Array
     // defined {unreadEmailsCount: [{"num":"0","id":0}]}, but comes {unreadEmailsCount: {{"num":"0","id":0}}},
-    var cache = _.toArray(_.result(config, 'unreadEmailsCount'));
-    var hasInitState = true;
+    let cache = _.toArray(_.result(config, 'unreadEmailsCount'));
+    let hasInitState = true;
     return {
         hasInitState: function() {
             return hasInitState;
         },
 
         set: function(id, count) {
-            var newCache = cache.filter(function(item) {
+            const newCache = cache.filter(function(item) {
                 return item.id !== id;
             });
             newCache.push({
@@ -24,8 +24,8 @@ define(function(require, exports, module) {
         },
 
         get: function(id) {
-            var count;
-            var found = _.find(cache, function(item) {
+            let count;
+            const found = _.find(cache, function(item) {
                 return Number(item.id) === Number(id);
             });
             if (found !== void 0) {

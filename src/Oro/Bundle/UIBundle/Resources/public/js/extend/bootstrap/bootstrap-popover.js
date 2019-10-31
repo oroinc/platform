@@ -1,15 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var layout = require('oroui/js/layout');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const layout = require('oroui/js/layout');
 
     require('bootstrap-popover');
     require('./bootstrap-tooltip');
 
-    var Tooltip = $.fn.tooltip.Constructor;
-    var Popover = $.fn.popover.Constructor;
+    const Tooltip = $.fn.tooltip.Constructor;
+    const Popover = $.fn.popover.Constructor;
 
     _.extend(Popover.prototype, _.pick(Tooltip.prototype, 'show', 'hide', 'dispose'));
 
@@ -18,7 +18,7 @@ define(function(require) {
     };
 
     Popover.prototype.applyPlacement = function(offset, placement) {
-        var isOpen = this.isOpen();
+        const isOpen = this.isOpen();
 
         _.extend(this.config, {offset: offset, placement: placement});
         this.update();
@@ -32,7 +32,7 @@ define(function(require) {
     Popover.prototype.getTipElement = function() {
         this.tip = this.tip || $(this.config.template)[0];
 
-        var addClass = $(this.element).data('class');
+        const addClass = $(this.element).data('class');
         if (addClass) {
             $(this.tip).addClass(addClass);
         }
@@ -58,7 +58,7 @@ define(function(require) {
         })
         .on('disposeLayout', function(e) {
             $(e.target).find('[data-toggle="popover"]').each(function() {
-                var $el = $(this);
+                const $el = $(this);
 
                 if ($el.data(Popover.DATA_KEY)) {
                     $el.popover('dispose');

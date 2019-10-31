@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var InnerPageModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
-    InnerPageModel = BaseModel.extend({
+    const InnerPageModel = BaseModel.extend({
         defaults: {
             backToLogin: 'Back to Demo Log-in',
             backToLoginIcon: 'fa-cogs',

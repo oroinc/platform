@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var CellPopupEditorComponent;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var ErrorHolderView = require('../views/inline-editing/error-holder-view');
-    var overlayTool = require('oroui/js/tools/overlay');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const ErrorHolderView = require('../views/inline-editing/error-holder-view');
+    const overlayTool = require('oroui/js/tools/overlay');
 
-    CellPopupEditorComponent = BaseComponent.extend({
+    const CellPopupEditorComponent = BaseComponent.extend({
         /**
          * Key codes
          */
@@ -54,8 +53,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function CellPopupEditorComponent() {
-            CellPopupEditorComponent.__super__.constructor.apply(this, arguments);
+        constructor: function CellPopupEditorComponent(options) {
+            CellPopupEditorComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -85,14 +84,14 @@ define(function(require) {
             this.listenTo(this.options.plugin, 'lockUserActions', function(value) {
                 this.lockUserActions = value;
             });
-            CellPopupEditorComponent.__super__.initialize.apply(this, arguments);
+            CellPopupEditorComponent.__super__.initialize.call(this, options);
             this.enterEditMode();
         },
 
         createView: function() {
-            var View = this.options.view;
-            var cell = this.options.cell;
-            var viewOptions = _.extend({}, this.options.viewOptions, this.getRestrictedOptions(), {
+            const View = this.options.view;
+            const cell = this.options.cell;
+            const viewOptions = _.extend({}, this.options.viewOptions, this.getRestrictedOptions(), {
                 autoRender: true,
                 model: cell.model,
                 fieldName: cell.column.get('name'),
@@ -104,16 +103,16 @@ define(function(require) {
                 this.options.plugin.main.trigger('content:update');
                 viewOptions.value = this.formState;
             }
-            var viewInstance = this.view = new View(viewOptions);
+            const viewInstance = this.view = new View(viewOptions);
 
             viewInstance.$el.addClass('inline-editor-wrapper');
 
-            var position = {
+            const position = {
                 of: cell.$el,
                 within: cell.$el.closest('tbody')
             };
 
-            var isAlignedRight = cell.el && getComputedStyle(cell.el).textAlign === 'right';
+            const isAlignedRight = cell.el && getComputedStyle(cell.el).textAlign === 'right';
 
             if (isAlignedRight) {
                 $.extend(position, {
@@ -122,13 +121,13 @@ define(function(require) {
                 });
             }
 
-            var overlayOptions = $.extend(true, {}, this.OVERLAY_TOOL_DEFAULTS, {
+            const overlayOptions = $.extend(true, {}, this.OVERLAY_TOOL_DEFAULTS, {
                 insertInto: cell.$el,
                 position: position
             });
 
             this.resizeToCell(viewInstance, cell);
-            var overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
+            const overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
             viewInstance.trigger('change:visibility');
 
             this.listenTo(viewInstance, {
@@ -151,7 +150,7 @@ define(function(require) {
                     } else {
                         this.options.cell.$el.toggleClass('has-error', !this.view.isValid());
                         this.formState = this.view.getFormState();
-                        var modelUpdateData = this.view.getModelUpdateData();
+                        const modelUpdateData = this.view.getModelUpdateData();
                         this.oldState = _.pick(this.options.cell.model.toJSON(), _.keys(modelUpdateData));
                         this.exitEditMode(); // have to exit first, before model is updated, to dispose view properly
                         this.updateModel(this.options.cell.model, modelUpdateData);
@@ -166,12 +165,12 @@ define(function(require) {
         },
 
         getRestrictedOptions: function() {
-            var entityRestrictions = this.options.cell.model.get('entity_restrictions');
-            var applicableRestrictions = _.filter(entityRestrictions, function(restriction) {
+            const entityRestrictions = this.options.cell.model.get('entity_restrictions');
+            const applicableRestrictions = _.filter(entityRestrictions, function(restriction) {
                 return restriction.field === this.options.cell.column.get('name');
             }, this);
 
-            var restrictedOptions = {};
+            const restrictedOptions = {};
             _.each(applicableRestrictions, function(restriction) {
                 if (restriction.mode === 'disallow') {
                     restrictedOptions.choices = _.omit(
@@ -210,11 +209,11 @@ define(function(require) {
                 return false;
             }
 
-            var cell = this.options.cell;
-            var serverUpdateData = this.getServerUpdateData();
+            const cell = this.options.cell;
+            let serverUpdateData = this.getServerUpdateData();
             this.applyDivisor(serverUpdateData, false);
             this.formState = this.view.getFormState();
-            var modelUpdateData = this.view.getModelUpdateData();
+            const modelUpdateData = this.view.getModelUpdateData();
             cell.$el.addClass('loading');
             this.oldState = _.pick(cell.model.toJSON(), _.keys(modelUpdateData));
             this.exitEditMode(); // have to exit first, before model is updated, to dispose view properly
@@ -223,15 +222,15 @@ define(function(require) {
             this.errorHolderView.render();
             this.options.plugin.main.trigger('content:update');
             if (this.options.save_api_accessor.initialOptions.field_name) {
-                var keys = _.keys(serverUpdateData);
+                const keys = _.keys(serverUpdateData);
                 if (keys.length > 1) {
                     throw new Error('Only single field editors are supported with field_name option');
                 }
-                var newData = {};
+                const newData = {};
                 newData[this.options.save_api_accessor.initialOptions.field_name] = serverUpdateData[keys[0]];
                 serverUpdateData = newData;
             }
-            var savePromise = this.options.save_api_accessor.send(cell.model.toJSON(), serverUpdateData, {}, {
+            let savePromise = this.options.save_api_accessor.send(cell.model.toJSON(), serverUpdateData, {}, {
                 processingMessage: __('oro.form.inlineEditing.saving_progress'),
                 preventWindowUnload: __('oro.form.inlineEditing.inline_edits'),
                 errorHandlerMessage: false
@@ -252,7 +251,7 @@ define(function(require) {
 
         updateModel: function(model, updateData) {
             // assume "undefined" as delete value request
-            for (var key in updateData) {
+            for (const key in updateData) {
                 if (updateData.hasOwnProperty(key)) {
                     if (updateData[key] === void 0) {
                         model.unset(key);
@@ -272,9 +271,9 @@ define(function(require) {
                 this.options.cell.$el.addClass('edit-mode');
                 this.createView(this.options);
                 // rethrow view events on component
-                this.listenTo(this.view, 'all', function(eventName) {
+                this.listenTo(this.view, 'all', function(eventName, ...args) {
                     if (eventName !== 'dispose') {
-                        this.trigger.apply(this, arguments);
+                        this.trigger(eventName, ...args);
                     }
                 }, this);
             }
@@ -302,8 +301,8 @@ define(function(require) {
         },
 
         toggleHeaderCellHighlight: function(cell, state) {
-            var columnIndex = this.options.plugin.main.columns.indexOf(cell.column);
-            var headerCell = this.options.plugin.main.findHeaderCellByIndex(columnIndex);
+            const columnIndex = this.options.plugin.main.columns.indexOf(cell.column);
+            const headerCell = this.options.plugin.main.findHeaderCellByIndex(columnIndex);
             if (headerCell) {
                 headerCell.$el.toggleClass('header-cell-highlight', state);
             }
@@ -339,8 +338,8 @@ define(function(require) {
         },
 
         exitAndNavigate: function(method) {
-            var plugin = this.options.plugin;
-            var cell = this.options.cell;
+            const plugin = this.options.plugin;
+            const cell = this.options.cell;
             plugin[method](cell);
         },
 
@@ -361,8 +360,8 @@ define(function(require) {
         },
 
         saveAndNavigate: function(method) {
-            var plugin = this.options.plugin;
-            var cell = this.options.cell;
+            const plugin = this.options.plugin;
+            const cell = this.options.cell;
             if (this.isNavigationAvailable()) {
                 plugin[method](cell);
             }
@@ -389,8 +388,8 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            var plugin = this.options.plugin;
-            var cell = this.options.cell;
+            const plugin = this.options.plugin;
+            const cell = this.options.cell;
             if (e.keyCode === this.ENTER_KEY_CODE && !e.ctrlKey && this.isNavigationAvailable()) {
                 if (e.shiftKey) {
                     plugin.editPrevRowCell(cell);
@@ -410,8 +409,8 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            var plugin = this.options.plugin;
-            var cell = this.options.cell;
+            const plugin = this.options.plugin;
+            const cell = this.options.cell;
             if (e.keyCode === this.TAB_KEY_CODE && this.isNavigationAvailable()) {
                 if (e.shiftKey) {
                     plugin.editPrevCell(cell);
@@ -446,8 +445,8 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            var plugin = this.options.plugin;
-            var cell = this.options.cell;
+            const plugin = this.options.plugin;
+            const cell = this.options.cell;
             if (e.altKey && this.isNavigationAvailable()) {
                 switch (e.keyCode) {
                     case this.ARROW_LEFT_KEY_CODE:
@@ -490,11 +489,11 @@ define(function(require) {
                             return this.options.cell.model.attributes.hasOwnProperty(property);
                         }, this)
                     ) {
-                        var fields = response.hasOwnProperty('fields') ? response.fields : response;
+                        const fields = response.hasOwnProperty('fields') ? response.fields : response;
                         this.applyDivisor(fields, true);
-                        var routeParamsRenameMap = _.invert(this.options.save_api_accessor.routeParametersRenameMap);
+                        const routeParamsRenameMap = _.invert(this.options.save_api_accessor.routeParametersRenameMap);
                         _.each(fields, function(item, i) {
-                            var propName = routeParamsRenameMap.hasOwnProperty(i) ? routeParamsRenameMap[i] : i;
+                            const propName = routeParamsRenameMap.hasOwnProperty(i) ? routeParamsRenameMap[i] : i;
                             if (this.options.cell.model.get(propName) !== void 0) {
                                 this.options.cell.model.set(propName, item);
                             }
@@ -517,12 +516,12 @@ define(function(require) {
         },
 
         onSaveError: function(jqXHR) {
-            var errorCode = 'responseJSON' in jqXHR && 'code' in jqXHR.responseJSON
+            const errorCode = 'responseJSON' in jqXHR && 'code' in jqXHR.responseJSON
                 ? jqXHR.responseJSON.code
                 : jqXHR.status;
 
-            var errors = [];
-            var fieldLabel;
+            const errors = [];
+            let fieldLabel;
 
             if (errorCode === 400) {
                 this.onValidationError(jqXHR);
@@ -559,9 +558,9 @@ define(function(require) {
         },
 
         onValidationError: function(jqXHR) {
-            var fieldErrors;
-            var backendErrors;
-            var responseErrors = _.result(jqXHR.responseJSON, 'errors');
+            let fieldErrors;
+            let backendErrors;
+            const responseErrors = _.result(jqXHR.responseJSON, 'errors');
             if (responseErrors) {
                 _.each(responseErrors.children, function(item) {
                     if (_.isArray(item.errors)) {
@@ -585,7 +584,7 @@ define(function(require) {
                 }
                 this.errorHolderView.setErrorMessages(backendErrors);
             } else if (_.isArray(jqXHR.responseJSON)) {
-                var allErrors = _.chain(jqXHR.responseJSON)
+                const allErrors = _.chain(jqXHR.responseJSON)
                     .map(_.property('detail'))
                     .filter()
                     .value();
@@ -593,7 +592,7 @@ define(function(require) {
                 if (this.disposed || this.options.cell.disposed) {
                     _.each(allErrors, _.partial(mediator.execute, 'showMessage', 'error'));
                 } else {
-                    var error = _.first(allErrors);
+                    const error = _.first(allErrors);
                     if (error) {
                         this.errorHolderView.setErrorMessages({value: error});
                     }
@@ -609,8 +608,8 @@ define(function(require) {
         },
 
         applyDivisor: function(fields, toResponse) {
-            var metadata = this.options.cell.column.attributes.metadata;
-            var fieldName = metadata.name;
+            const metadata = this.options.cell.column.attributes.metadata;
+            const fieldName = metadata.name;
             if (_.has(metadata, 'divisor')) {
                 if (!isNaN(fields[fieldName])) {
                     fields[fieldName] = toResponse

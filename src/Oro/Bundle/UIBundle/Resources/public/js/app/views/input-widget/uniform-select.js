@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var UniformSelectInputWidget;
-    var $ = require('jquery');
-    var AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
+    const $ = require('jquery');
+    const AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
     require('jquery.uniform');
 
-    UniformSelectInputWidget = AbstractInputWidget.extend({
+    const UniformSelectInputWidget = AbstractInputWidget.extend({
         widgetFunctionName: 'uniform',
 
         refreshOptions: 'update',
@@ -24,14 +23,14 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function UniformSelectInputWidget() {
-            UniformSelectInputWidget.__super__.constructor.apply(this, arguments);
+        constructor: function UniformSelectInputWidget(options) {
+            UniformSelectInputWidget.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initializeWidget: function() {
+        initializeWidget: function(options) {
             // support for readonly attr
             this.$el.on('click mousedown', function(e) {
                 if ($(e.currentTarget).is('[readonly],[disabled]')) {
@@ -42,7 +41,7 @@ define(function(require) {
                 this.$el.find('option:not(:selected), [value=""]').remove();
             }
 
-            UniformSelectInputWidget.__super__.initializeWidget.apply(this, arguments);
+            UniformSelectInputWidget.__super__.initializeWidget.call(this, options);
             if (this.$el.is('.error:not([multiple])')) {
                 this.$el.removeClass('error');
                 this.getContainer().addClass('error');
@@ -54,7 +53,7 @@ define(function(require) {
          */
         disposeWidget: function() {
             this.$el.uniform.restore(this.$el);
-            UniformSelectInputWidget.__super__.disposeWidget.apply(this, arguments);
+            UniformSelectInputWidget.__super__.disposeWidget.call(this);
         },
 
         /**
@@ -68,7 +67,7 @@ define(function(require) {
          * @inheritDoc
          */
         width: function(width) {
-            UniformSelectInputWidget.__super__.width.apply(this, arguments);
+            UniformSelectInputWidget.__super__.width.call(this, width);
             this.$container.find('span').width(width);
         },
 

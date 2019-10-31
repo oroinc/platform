@@ -1,11 +1,11 @@
 define(['jquery'], function($) {
     'use strict';
 
-    var defaults = {
+    const defaults = {
         print: true
     };
 
-    var Print = function(element) {
+    const Print = function(element) {
         // get lightGallery core plugin data
         this.core = $(element).data('lightGallery');
 
@@ -19,14 +19,14 @@ define(['jquery'], function($) {
 
     Print.prototype.init = function() {
         if (this.core.s.print) {
-            var printButton = '<span class="fa-print lg-print lg-icon"></span>';
+            const printButton = '<span class="fa-print lg-print lg-icon"></span>';
             this.core.$outer.find('.lg-toolbar').append(printButton);
             this.print();
         }
     };
 
     Print.prototype.print = function() {
-        var _this = this;
+        const _this = this;
 
         this.core.$outer.find('.lg-print').on('click.lg', function() {
             _this.printCurrentSlide();
@@ -37,10 +37,10 @@ define(['jquery'], function($) {
      * Create hidden frame with current image and print it
      */
     Print.prototype.printCurrentSlide = function() {
-        var $image = this.core.$slide.eq(this.core.index).find('.lg-object');
-        var printHtml = $image.prop('outerHTML');
+        const $image = this.core.$slide.eq(this.core.index).find('.lg-object');
+        const printHtml = $image.prop('outerHTML');
 
-        var frame = $('<iframe/>', {
+        const frame = $('<iframe/>', {
             name: 'print-frame'
         });
         frame.css({
@@ -49,19 +49,19 @@ define(['jquery'], function($) {
         });
         $('body').append(frame);
 
-        var contentWindow = frame.prop('contentWindow');
-        var contentDocument = frame.prop('contentDocument');
-        var frameDoc = contentWindow ? contentWindow
+        const contentWindow = frame.prop('contentWindow');
+        const contentDocument = frame.prop('contentDocument');
+        const frameDoc = contentWindow ? contentWindow
             : contentDocument.document ? contentDocument.document : contentDocument;
         frameDoc.document.open();
-        var title = $('.lg-sub-html').text();
+        const title = $('.lg-sub-html').text();
         frameDoc.document.write('<html><head><title>' + title + '</title>');
         frameDoc.document.write('</head><body>');
         frameDoc.document.write(printHtml);
         frameDoc.document.write('</body></html>');
         frameDoc.document.close();
         $(window.frames['print-frame']).on('load', function() {
-            var self = $(this).get(0);
+            const self = $(this).get(0);
             setTimeout(function() {
                 self.focus();
                 self.print();

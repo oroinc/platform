@@ -1,8 +1,8 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var config = require('module-config').default(module.id);
-    var routing = require('routing');
+    let config = require('module-config').default(module.id);
+    const routing = require('routing');
 
     return fetch(config.routesResource)
         .then(function(response) {

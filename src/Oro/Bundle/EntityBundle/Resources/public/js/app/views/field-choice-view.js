@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var FieldChoiceView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var Select2View = require('oroform/js/app/views/select2-view');
-    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const Select2View = require('oroform/js/app/views/select2-view');
+    const EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
 
-    FieldChoiceView = Select2View.extend({
+    const FieldChoiceView = Select2View.extend({
         defaultOptions: {
             entity: null,
             dataFilter: function(entityName, entityFields) {
@@ -49,8 +48,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function FieldChoiceView() {
-            FieldChoiceView.__super__.constructor.apply(this, arguments);
+        constructor: function FieldChoiceView(options) {
+            FieldChoiceView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -58,7 +57,7 @@ define(function(require) {
          */
         initialize: function(options) {
             options = $.extend(true, {}, this.defaultOptions, options);
-            var optionNames = _.without(_.keys(this.defaultOptions), 'select2');
+            const optionNames = _.without(_.keys(this.defaultOptions), 'select2');
             optionNames.push('filterPreset', 'exclude', 'include');
             _.extend(this, _.pick(options, optionNames));
             this.callbacks = _.pick(options, _.keys(this.callbacks));
@@ -79,13 +78,13 @@ define(function(require) {
         },
 
         onChange: function(e) {
-            var selectedItem = e.added || this.getData();
+            const selectedItem = e.added || this.getData();
             this.trigger('change', selectedItem);
         },
 
         render: function() {
             this._deferredRender();
-            var providerOptions = {
+            const providerOptions = {
                 rootEntity: this.entity
             };
             _.each(['filterPreset', 'exclude', 'include'], function(key) {
@@ -111,8 +110,8 @@ define(function(require) {
         },
 
         _prepareSelect2Options: function(options) {
-            var template;
-            var select2Opts = _.clone(options.select2);
+            let template;
+            const select2Opts = _.clone(options.select2);
 
             if (select2Opts.formatSelectionTemplate) {
                 template = select2Opts.formatSelectionTemplate;
@@ -125,7 +124,7 @@ define(function(require) {
                     template = _.template(template);
                 }
                 select2Opts.formatSelection = _.bind(function(item) {
-                    var result;
+                    let result;
                     if (item !== null) {
                         result = this.formatChoice(item.id, template);
                     }
@@ -134,11 +133,11 @@ define(function(require) {
             }
             _.extend(select2Opts, {
                 initSelection: function(element, callback) {
-                    var instance = element.data('select2');
-                    var opts = instance.opts;
-                    var id = element.val();
-                    var match = null;
-                    var chain;
+                    const instance = element.data('select2');
+                    const opts = instance.opts;
+                    const id = element.val();
+                    let match = null;
+                    let chain;
                     try {
                         chain = this.dataProvider.pathToEntityChainExcludeTrailingField(id);
                         instance.pagePath = chain[chain.length - 1].basePath;
@@ -147,7 +146,7 @@ define(function(require) {
                     }
                     opts.query({
                         matcher: function(term, text, el) {
-                            var isMatch = id === opts.id(el);
+                            const isMatch = id === opts.id(el);
                             if (isMatch) {
                                 match = el;
                             }
@@ -162,9 +161,9 @@ define(function(require) {
                     return result.id !== void 0 ? result.id : result.pagePath;
                 },
                 data: function() {
-                    var instance = this.$el.data('select2');
-                    var pagePath = (instance && instance.pagePath) || '';
-                    var results = this._select2Data(pagePath);
+                    const instance = this.$el.data('select2');
+                    const pagePath = (instance && instance.pagePath) || '';
+                    let results = this._select2Data(pagePath);
                     if (_.isFunction(this.callbacks.select2ResultsCallback)) {
                         results = this.callbacks.select2ResultsCallback(results);
                     }
@@ -175,12 +174,11 @@ define(function(require) {
                     };
                 }.bind(this),
                 formatBreadcrumbItem: function(item) {
-                    var label;
-                    label = item.field ? item.field.label : item.entity.label;
+                    const label = item.field ? item.field.label : item.entity.label;
                     return label;
                 },
                 breadcrumbs: function(pagePath) {
-                    var chain = [];
+                    let chain = [];
                     if (this.entity) {
                         chain = this.dataProvider.pathToEntityChainExcludeTrailingFieldSafely(pagePath);
                         _.each(chain, function(item) {
@@ -204,7 +202,7 @@ define(function(require) {
         },
 
         formatChoice: function(value, template) {
-            var data;
+            let data;
             if (value) {
                 try {
                     data = this.dataProvider.pathToEntityChainSafely(value);
@@ -218,7 +216,7 @@ define(function(require) {
         },
 
         getApplicableConditions: function(fieldId) {
-            var applicableConditions = this.dataProvider.getFieldSignatureSafely(fieldId);
+            let applicableConditions = this.dataProvider.getFieldSignatureSafely(fieldId);
             if (_.isFunction(this.callbacks.applicableConditionsCallback)) {
                 applicableConditions = this.callbacks.applicableConditionsCallback(applicableConditions, fieldId);
             }
@@ -232,11 +230,11 @@ define(function(require) {
          * @private
          */
         _select2Data: function(path) {
-            var fields = [];
-            var relations = [];
-            var results = [];
-            var chain;
-            var entityFields;
+            const fields = [];
+            const relations = [];
+            const results = [];
+            let chain;
+            let entityFields;
 
             try {
                 chain = this.dataProvider.pathToEntityChainExcludeTrailingField(path);
@@ -246,8 +244,8 @@ define(function(require) {
             }
 
             _.each(entityFields, function(field) {
-                var chainItem = {field: field};
-                var item = {
+                const chainItem = {field: field};
+                const item = {
                     id: this.dataProvider.entityChainToPathSafely(chain.concat(chainItem)),
                     text: field.label
                 };

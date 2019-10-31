@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var ActivityListView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var routing = require('routing');
-    var mediator = require('oroui/js/mediator');
-    var DialogWidget = require('oro/dialog-widget');
-    var DeleteConfirmation = require('oroui/js/delete-confirmation');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const routing = require('routing');
+    const mediator = require('oroui/js/mediator');
+    const DialogWidget = require('oro/dialog-widget');
+    const DeleteConfirmation = require('oroui/js/delete-confirmation');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
-    ActivityListView = BaseCollectionView.extend({
+    const ActivityListView = BaseCollectionView.extend({
         options: {
             configuration: {},
             template: null,
@@ -58,8 +57,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ActivityListView() {
-            ActivityListView.__super__.constructor.apply(this, arguments);
+        constructor: function ActivityListView(options) {
+            ActivityListView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -125,8 +124,8 @@ define(function(require) {
         },
 
         initItemView: function(model) {
-            var className = model.getRelatedActivityClass();
-            var configuration = this.options.configuration[className];
+            const className = model.getRelatedActivityClass();
+            const configuration = this.options.configuration[className];
             if (this.itemView) {
                 return new this.itemView({
                     autoRender: false,
@@ -135,7 +134,7 @@ define(function(require) {
                     ignoreHead: this.options.ignoreHead
                 });
             } else {
-                ActivityListView.__super__.render.apply(this, arguments);
+                ActivityListView.__super__.render.call(this);
             }
         },
 
@@ -187,7 +186,7 @@ define(function(require) {
          * @override
          */
         _getLoadingContainer: function() {
-            var loadingContainer = this.options.loadingContainer;
+            let loadingContainer = this.options.loadingContainer;
             if (loadingContainer instanceof $) {
                 // fetches loading container from options
                 loadingContainer = loadingContainer.get(0);
@@ -200,7 +199,7 @@ define(function(require) {
         },
 
         goto_previous: function() {
-            var currentPage = this.collection.getPage();
+            const currentPage = this.collection.getPage();
             if (currentPage === 1) {
                 return;
             }
@@ -211,7 +210,7 @@ define(function(require) {
 
                 this._reload();
             } else {
-                var nextPage = currentPage - 1;
+                const nextPage = currentPage - 1;
                 this.collection.setPage(nextPage);
 
                 this._setupPageFilterForPrevAction();
@@ -225,7 +224,7 @@ define(function(require) {
             if (this.collection.getCount() < this.collection.getPageSize()) {
                 return;
             }
-            var currentPage = this.collection.getPage();
+            const currentPage = this.collection.getPage();
 
             this.collection.setPage(currentPage + 1);
             this.collection.setPageTotal(this.collection.getPageTotal() + 1);
@@ -236,16 +235,16 @@ define(function(require) {
         },
 
         _setupPageFilterForPrevAction: function() {
-            var model = this.collection.first();
-            var sameModelIds = this._findSameModelsBySortingField(model);
+            const model = this.collection.first();
+            const sameModelIds = this._findSameModelsBySortingField(model);
 
             this.collection.setPageFilterDate(model.attributes[this.collection.pager.sortingField]);
             this.collection.setPageFilterIds(sameModelIds.length ? sameModelIds : [model.id]);
             this.collection.setPageFilterAction('prev');
         },
         _setupPageFilterForNextAction: function() {
-            var model = this.collection.last();
-            var sameModelIds = this._findSameModelsBySortingField(model);
+            const model = this.collection.last();
+            const sameModelIds = this._findSameModelsBySortingField(model);
 
             this.collection.setPageFilterDate(model.attributes[this.collection.pager.sortingField]);
             this.collection.setPageFilterIds(sameModelIds.length ? sameModelIds : [model.id]);
@@ -256,9 +255,9 @@ define(function(require) {
          * @param model ActivityModel to be used for comparison
          */
         _findSameModelsBySortingField: function(model) {
-            var modelIds = [];
-            var sortingField = this.collection.pager.sortingField;
-            var sameModels = _.filter(this.collection.models, function(collectionModel) {
+            let modelIds = [];
+            const sortingField = this.collection.pager.sortingField;
+            const sameModels = _.filter(this.collection.models, function(collectionModel) {
                 return collectionModel.attributes[sortingField] === model.attributes[sortingField];
             }, this);
             if (sameModels.length) {
@@ -286,7 +285,7 @@ define(function(require) {
         },
 
         _reload: function() {
-            var itemViews;
+            let itemViews;
             // please note that _hideLoading will be called in renderAllItems() function
             this._showLoading();
             if (this.options.doNotFetch) {
@@ -321,17 +320,15 @@ define(function(require) {
         },
 
         renderAllItems: function() {
-            var result;
-            var i;
-            var view;
-            var model;
-            var oldViewState;
-            var contentLoadedPromises;
-            var deferredContentLoading;
+            let i;
+            let view;
+            let model;
+            let oldViewState;
+            let deferredContentLoading;
 
-            result = ActivityListView.__super__.renderAllItems.apply(this, arguments);
+            const result = ActivityListView.__super__.renderAllItems.call(this);
 
-            contentLoadedPromises = [];
+            const contentLoadedPromises = [];
 
             if (this.oldViewStates) {
                 // restore state
@@ -366,7 +363,7 @@ define(function(require) {
                 delete this.oldViewStates;
             }
 
-            $.when.apply($, contentLoadedPromises).done(_.bind(function() {
+            $.when(...contentLoadedPromises).done(_.bind(function() {
                 this._hideLoading();
             }, this));
 
@@ -382,7 +379,7 @@ define(function(require) {
         },
 
         _loadModelContentHTML: function(model, actionKey) {
-            var url = this._getUrl(actionKey, model);
+            const url = this._getUrl(actionKey, model);
             if (model.get('is_loaded') === true) {
                 return;
             }
@@ -398,7 +395,7 @@ define(function(require) {
 
         _editItem: function(model, extraOptions) {
             if (!this.itemEditDialog) {
-                var unescapeHTML = function unescapeHTML(unsafe) {
+                const unescapeHTML = function unescapeHTML(unsafe) {
                     return unsafe
                         .replace(/&nbsp;/g, ' ')
                         .replace(/&amp;/g, '&')
@@ -408,7 +405,7 @@ define(function(require) {
                         .replace(/&#039;/g, '\'');
                 };
 
-                var dialogConfiguration = $.extend(true, {}, this.EDIT_DIALOG_CONFIGURATION_DEFAULTS, extraOptions, {
+                const dialogConfiguration = $.extend(true, {}, this.EDIT_DIALOG_CONFIGURATION_DEFAULTS, extraOptions, {
                     url: this._getUrl('itemEdit', model),
                     title: unescapeHTML(model.get('subject')),
                     dialogOptions: {
@@ -424,7 +421,7 @@ define(function(require) {
         },
 
         _deleteItem: function(model) {
-            var confirm = new DeleteConfirmation({
+            const confirm = new DeleteConfirmation({
                 content: this._getMessage('deleteConfirmation')
             });
             confirm.on('ok', _.bind(function() {
@@ -482,7 +479,7 @@ define(function(require) {
          * @protected
          */
         _getUrl: function(actionKey, model) {
-            var routes = model.get('routes');
+            const routes = model.get('routes');
 
             return routing.generate(routes[actionKey], {
                 entity: model.get('relatedActivityClass'),

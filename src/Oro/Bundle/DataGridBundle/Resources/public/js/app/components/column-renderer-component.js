@@ -1,15 +1,14 @@
 define(function(Chaplin) {
     'use strict';
 
-    var ColumnRendererComponent;
-    var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
     /**
      * @class ColumnManagerComponent
      * @extends BaseComponent
      */
-    ColumnRendererComponent = BaseComponent.extend({
+    const ColumnRendererComponent = BaseComponent.extend({
         /**
          * Full collection of columns
          * @type {Backgrid.Columns}
@@ -19,15 +18,15 @@ define(function(Chaplin) {
         /**
          * @inheritDoc
          */
-        constructor: function ColumnRendererComponent() {
-            ColumnRendererComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ColumnRendererComponent(options) {
+            ColumnRendererComponent.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            ColumnRendererComponent.__super__.initialize.apply(this, arguments);
+            ColumnRendererComponent.__super__.initialize.call(this, options);
         },
 
         /**
@@ -38,7 +37,7 @@ define(function(Chaplin) {
                 return;
             }
 
-            ColumnRendererComponent.__super__.dispose.apply(this, arguments);
+            ColumnRendererComponent.__super__.dispose.call(this);
         },
 
         getHtml: function($element) {
@@ -55,14 +54,14 @@ define(function(Chaplin) {
         },
 
         _getElementClasses: function($element, additionalRawClasses) {
-            var elementRawClasses = $element.attr('class') || '';
-            var elementClasses = _.union(additionalRawClasses.split(' '), elementRawClasses.split(' '));
+            const elementRawClasses = $element.attr('class') || '';
+            const elementClasses = _.union(additionalRawClasses.split(' '), elementRawClasses.split(' '));
 
             return _.without(elementClasses, '');
         },
 
         _getAttributesRaw: function(attributes) {
-            var raw = '';
+            let raw = '';
             _.each(attributes, function(value, name) {
                 raw += ' ' + name + '="' + (_.isArray(value) ? value.join(' ') : value) + '"';
             });

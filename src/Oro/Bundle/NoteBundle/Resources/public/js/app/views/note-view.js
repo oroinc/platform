@@ -8,9 +8,7 @@ define([
 ], function($, _, BaseView, routing, dateTimeFormatter, autolinker) {
     'use strict';
 
-    var NoteView;
-
-    NoteView = BaseView.extend({
+    const NoteView = BaseView.extend({
         options: {
             template: null
         },
@@ -32,8 +30,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function NoteView() {
-            NoteView.__super__.constructor.apply(this, arguments);
+        constructor: function NoteView(options) {
+            NoteView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -49,14 +47,14 @@ define([
         },
 
         render: function() {
-            NoteView.__super__.render.apply(this, arguments);
+            NoteView.__super__.render.call(this);
             this._onRender();
 
             return this;
         },
 
         getTemplateData: function() {
-            var data = NoteView.__super__.getTemplateData.call(this);
+            const data = NoteView.__super__.getTemplateData.call(this);
 
             data.collapsed = this.collapsed;
             data.createdAt = dateTimeFormatter.formatDateTime(data.createdAt);

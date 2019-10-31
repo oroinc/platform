@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var CherryRule;
-    var _ = require('underscore');
-    var Rule = require('./jpm-base-rule');
+    const _ = require('underscore');
+    const Rule = require('./jpm-base-rule');
 
-    CherryRule = Rule.extend({
+    const CherryRule = Rule.extend({
         name: 'Cherry',
         match: function(cell) {
-            var children = _.filter(cell.children, function(child) {
+            const children = _.filter(cell.children, function(child) {
                 return child.y > cell.y;
             });
             if (cell.step.get('order') >= 0 && children.length === 2) {
@@ -22,8 +21,8 @@ define(function(require) {
             }
         },
         apply: function() {
-            var context = this.context;
-            var changed = false;
+            const context = this.context;
+            let changed = false;
             if (this.root !== null) {
                 if (this.items[0].x > this.items[1].x) {
                     this.items.reverse();

@@ -24,19 +24,19 @@ define([
         MONTH: 'month',
 
         isValid: function(value) {
-            var type = this._valueType(value);
+            const type = this._valueType(value);
 
             return moment(value, this.formats[type], true).isValid();
         },
 
         formatDisplayValue: function(rawValue) {
-            var type = this._valueType(rawValue);
+            const type = this._valueType(rawValue);
 
             return moment(rawValue, this.formats[type], true).format(this.formats[type][0]);
         },
 
         formatRawValue: function(displayValue) {
-            var type = this._valueType(displayValue);
+            const type = this._valueType(displayValue);
 
             return moment(displayValue, this.formats[type], true).format(this.backendFormats[type]);
         },

@@ -11,15 +11,13 @@ define([
     // Sfjs is global object that provides access to Symfony Debug Toolbar
     // Sfjs is patched to update layout on Debug Toolbar changes
     if (Sfjs !== void 0) {
-        var originalRenderAjaxRequests = Sfjs.renderAjaxRequests;
-        Sfjs.renderAjaxRequests = function() {
-            originalRenderAjaxRequests.call(Sfjs, arguments);
+        const originalRenderAjaxRequests = Sfjs.renderAjaxRequests;
+        Sfjs.renderAjaxRequests = function(...args) {
+            originalRenderAjaxRequests.apply(Sfjs, args);
         };
     }
 
-    var DebugToolbarView;
-
-    DebugToolbarView = PageRegionView.extend({
+    const DebugToolbarView = PageRegionView.extend({
         listen: {
             'page:error mediator': 'onPageUpdate'
         },
@@ -28,7 +26,7 @@ define([
          * @inheritDoc
          */
         constructor: function DebugToolbarView(options) {
-            DebugToolbarView.__super__.constructor.apply(this, arguments);
+            DebugToolbarView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -58,9 +56,9 @@ define([
          * @param {Object} xhr
          */
         updateToolbar: function(xhr) {
-            var token = xhr.getResponseHeader('x-debug-token');
+            const token = xhr.getResponseHeader('x-debug-token');
             if (token) {
-                var url = routing.generate('_wdt', {token: token});
+                const url = routing.generate('_wdt', {token: token});
                 $.get(url, _.bind(this.render, this, token, url));
             }
         },
@@ -73,13 +71,11 @@ define([
          * @param {string} data html content
          */
         render: function(token, url, data) {
-            var id;
-
             if (!data) {
                 return;
             }
 
-            id = 'sfwdt' + token;
+            const id = 'sfwdt' + token;
             this.$el
                 .appendTo('body')
                 .attr('id', id)

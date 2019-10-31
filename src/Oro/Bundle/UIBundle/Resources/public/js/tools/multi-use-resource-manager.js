@@ -1,12 +1,14 @@
 define(function(require) {
     'use strict';
-    var BaseClass = require('../base-class');
+
+    const BaseClass = require('../base-class');
+
     /**
      * Allows to create/remove resource that could be used by multiple holders.
      *
      * Use case:
      * ```javascript
-     * var backdropManager = new MultiUseResourceManager({
+     * const backdropManager = new MultiUseResourceManager({
      *     listen: {
      *         'constructResource': function() {
      *             $(document.body).addClass('backdrop');
@@ -18,7 +20,7 @@ define(function(require) {
      * });
      *
      * // 1. case with Ids
-     * var holderId = backdropManager.hold();
+     * const holderId = backdropManager.hold();
      * // then somewhere
      * backdropManager.release(holderId);
      *
@@ -37,7 +39,7 @@ define(function(require) {
      * @augments [BaseClass](./base-class.md)
      * @exports MultiUseResourceManager
      */
-    var MultiUseResourceManager = BaseClass.extend(/** @lends MultiUseResourceManager.prototype */{
+    const MultiUseResourceManager = BaseClass.extend(/** @lends MultiUseResourceManager.prototype */{
         /**
          * Holders counter
          * @type {number}
@@ -85,7 +87,7 @@ define(function(require) {
          * @param id {*} holder identifier
          */
         release: function(id) {
-            var index = this.holders.indexOf(id);
+            const index = this.holders.indexOf(id);
             if (index !== -1) {
                 this.holders.splice(index, 1);
             }

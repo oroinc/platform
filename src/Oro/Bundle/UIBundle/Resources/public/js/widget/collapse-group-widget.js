@@ -2,8 +2,8 @@ define(function(require) {
     'use strict';
 
     require('jquery-ui');
-    var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
+    const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
 
     $.widget('oroui.collapseGroupWidget', {
         options: {
@@ -22,7 +22,7 @@ define(function(require) {
 
             mediator.on('collapse-group:' + this.options.group + ':setState', this._setGroupState, this);
 
-            var states = {collapsed: 0, expanded: 0};
+            const states = {collapsed: 0, expanded: 0};
             mediator.trigger('collapse-group-widgets:' + this.options.group + ':collectStates', states);
             this._setGroupState(states.collapsed === 0);
         },

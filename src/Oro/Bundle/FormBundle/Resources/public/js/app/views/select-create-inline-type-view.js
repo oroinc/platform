@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var SelectCreateInlineTypeView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var routing = require('routing');
-    var DialogWidget = require('oro/dialog-widget');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var PageableCollection = require('orodatagrid/js/pageable-collection');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const routing = require('routing');
+    const DialogWidget = require('oro/dialog-widget');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const PageableCollection = require('orodatagrid/js/pageable-collection');
 
-    SelectCreateInlineTypeView = BaseView.extend({
+    const SelectCreateInlineTypeView = BaseView.extend({
         autoRender: true,
 
         urlParts: null,
@@ -37,20 +36,20 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function SelectCreateInlineTypeView() {
-            SelectCreateInlineTypeView.__super__.constructor.apply(this, arguments);
+        constructor: function SelectCreateInlineTypeView(options) {
+            SelectCreateInlineTypeView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            SelectCreateInlineTypeView.__super__.initialize.apply(this, arguments);
+            SelectCreateInlineTypeView.__super__.initialize.call(this, options);
             _.extend(this, _.pick(options, 'urlParts', 'entityLabel', 'existingEntityGridId', 'inputSelector'));
         },
 
         buildRouteParams: function(routeType) {
-            var routeParams = this.urlParts[routeType].parameters;
+            const routeParams = this.urlParts[routeType].parameters;
             return _.extend({}, routeParams, this.$(this.inputSelector).data('select2_query_additional_params'));
         },
 
@@ -61,8 +60,8 @@ define(function(require) {
 
         onSelect: function(e) {
             e.preventDefault();
-            var routeName = _.result(this.urlParts.grid, 'gridWidgetView') || this.urlParts.grid.route;
-            var routeParams = this.buildRouteParams('grid');
+            const routeName = _.result(this.urlParts.grid, 'gridWidgetView') || this.urlParts.grid.route;
+            const routeParams = this.buildRouteParams('grid');
             this.dialogWidget = new DialogWidget({
                 title: __('Select {{ entity }}', {entity: this.entityLabel}),
                 url: routing.generate(routeName, routeParams),
@@ -88,9 +87,9 @@ define(function(require) {
          * @param {Object} collection
          */
         onGridLoadComplete: function(collection) {
-            var routeParams = this.buildRouteParams('grid');
+            const routeParams = this.buildRouteParams('grid');
             if (collection.inputName === routeParams.gridName) {
-                var additionalParameters = _.extend(
+                const additionalParameters = _.extend(
                     {},
                     this.select2QueryAdditionalParams,
                     this.$(this.inputSelector).data('select2_query_additional_params')
@@ -106,11 +105,11 @@ define(function(require) {
          */
         _patchGridCollectionUrl: function(collection, params) {
             if (!_.isUndefined(collection)) {
-                var url = collection.url;
+                let url = collection.url;
                 if (_.isUndefined(url)) {
                     return;
                 }
-                var newParams = _.extend(this._getQueryParamsFromUrl(url), params);
+                const newParams = _.extend(this._getQueryParamsFromUrl(url), params);
                 if (url.indexOf('?') !== -1) {
                     url = url.substring(0, url.indexOf('?'));
                 }
@@ -134,7 +133,7 @@ define(function(require) {
                 return {};
             }
 
-            var query = url.substring(url.indexOf('?') + 1, url.length);
+            const query = url.substring(url.indexOf('?') + 1, url.length);
             if (!query.length) {
                 return {};
             }
@@ -147,15 +146,15 @@ define(function(require) {
         },
 
         onGridRowSelect: function(data) {
-            var eventNamespace = this.dialogWidget._wid;
-            var loadingStarted = false;
-            var $input = this.$(this.inputSelector);
-            var onSelect = _.bind(function() {
+            const eventNamespace = this.dialogWidget._wid;
+            let loadingStarted = false;
+            const $input = this.$(this.inputSelector);
+            const onSelect = _.bind(function() {
                 this.dialogWidget.remove();
                 this.dialogWidget = null;
 
-                var $input = this.$(this.inputSelector);
-                var $form = $input.closest('form');
+                const $input = this.$(this.inputSelector);
+                const $form = $input.closest('form');
 
                 if ($form.length && $form.data('validator')) {
                     $form.validate().element($input);
@@ -177,8 +176,8 @@ define(function(require) {
 
         onCreate: function(e) {
             e.preventDefault();
-            var routeName = this.urlParts.create.route;
-            var routeParams = this.buildRouteParams('create');
+            const routeName = this.urlParts.create.route;
+            const routeParams = this.buildRouteParams('create');
             this.dialogWidget = new DialogWidget({
                 title: __('Create {{ entity }}', {entity: this.entityLabel}),
                 url: routing.generate(routeName, routeParams),
@@ -194,12 +193,12 @@ define(function(require) {
             });
 
             this.dialogWidget.once('formSave', _.bind(function(id) {
-                var $input = this.$(this.inputSelector);
+                const $input = this.$(this.inputSelector);
                 $input.inputWidget('val', id, true);
                 this.dialogWidget.remove();
                 this.dialogWidget = null;
 
-                var $form = $input.closest('form');
+                const $form = $input.closest('form');
                 if ($form.length && $form.data('validator')) {
                     $form.validate().element($input);
                 }

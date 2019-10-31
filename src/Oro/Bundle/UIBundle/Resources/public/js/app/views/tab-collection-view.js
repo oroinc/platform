@@ -1,19 +1,18 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var TabCollectionView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var config = require('module-config').default(module.id);
-    var TabItemView = require('./tab-item-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    let config = require('module-config').default(module.id);
+    const TabItemView = require('./tab-item-view');
 
     config = _.extend({
         templateClassName: 'nav nav-tabs responsive-tabs'
     }, config);
 
-    TabCollectionView = BaseCollectionView.extend({
+    const TabCollectionView = BaseCollectionView.extend({
         listSelector: '[data-name="tabs-list"]',
         className: 'tab-collection oro-tabs clearfix',
         itemView: TabItemView,
@@ -30,18 +29,18 @@ define(function(require, exports, module) {
         /**
          * @inheritDoc
          */
-        constructor: function TabCollectionView() {
-            TabCollectionView.__super__.constructor.apply(this, arguments);
+        constructor: function TabCollectionView(options) {
+            TabCollectionView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
             _.extend(this, _.defaults(_.pick(options, ['useDropdown']), this));
 
-            TabCollectionView.__super__.initialize.apply(this, arguments);
+            TabCollectionView.__super__.initialize.call(this, options);
         },
 
         onTabClick: function(e) {
-            var $el = $(e.target);
+            const $el = $(e.target);
 
             e.preventDefault();
 
@@ -66,7 +65,7 @@ define(function(require, exports, module) {
         },
 
         getTemplateData: function() {
-            var data = TabCollectionView.__super__.getTemplateData.call(this);
+            const data = TabCollectionView.__super__.getTemplateData.call(this);
 
             data.templateClassName = config.templateClassName;
             data.tabOptions = {
@@ -77,7 +76,7 @@ define(function(require, exports, module) {
         },
 
         render: function() {
-            TabCollectionView.__super__.render.apply(this, arguments);
+            TabCollectionView.__super__.render.call(this);
 
             this.$el.attr('data-layout', 'separate');
             this.initLayout().done(_.bind(this.handleLayoutInit, this));

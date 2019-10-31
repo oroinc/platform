@@ -1,15 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var Graph = require('oroworkflow/js/tools/path-finder/graph');
-    var Rectangle = require('oroworkflow/js/tools/path-finder/rectangle');
-    var directions = require('oroworkflow/js/tools/path-finder/directions');
-    var _ = require('underscore');
+    const Graph = require('oroworkflow/js/tools/path-finder/graph');
+    const Rectangle = require('oroworkflow/js/tools/path-finder/rectangle');
+    const directions = require('oroworkflow/js/tools/path-finder/directions');
+    const _ = require('underscore');
 
     describe('oroworkflow/js/tools/path-finder/graph', function() {
         beforeEach(function prepareGraph() {
             window.setFixtures('<div class="workflow-flowchart-editor"></div>');
-            var graph = new Graph();
+            const graph = new Graph();
             graph.outerRect = new Rectangle(0, 0, 500, 500);
             graph.rectangles.push(new Rectangle(100, 100, 100, 100));
             this.graph = graph;
@@ -23,8 +23,8 @@ define(function(require) {
         }
 
         it('should add axises around block', function() {
-            var graph = this.graph;
-            var firstRect = graph.rectangles[0];
+            const graph = this.graph;
+            const firstRect = graph.rectangles[0];
             graph.buildCornerAxises();
             expect(graph.baseAxises.length).toBe(4);
             expect(_.any(graph.baseAxises, function(axis) {
@@ -42,15 +42,15 @@ define(function(require) {
         });
 
         it('should add axises out from block center', function() {
-            var graph = this.graph;
-            var firstRect = graph.rectangles[0];
-            var rectCenter = firstRect.center;
+            const graph = this.graph;
+            const firstRect = graph.rectangles[0];
+            const rectCenter = firstRect.center;
             graph.buildCenterAxises();
 
-            var vX = _.countBy(graph.baseAxises, function(axis) {
+            const vX = _.countBy(graph.baseAxises, function(axis) {
                 return axis.a.x;
             });
-            var vY = _.countBy(graph.baseAxises, function(axis) {
+            const vY = _.countBy(graph.baseAxises, function(axis) {
                 return axis.a.y;
             });
 
@@ -66,7 +66,7 @@ define(function(require) {
         });
 
         it('should add axises at center between block pairs', function() {
-            var graph = this.graph;
+            const graph = this.graph;
             graph.rectangles.push(new Rectangle(300, 300, 100, 100));
             graph.buildCenterLinesBetweenNodes();
             expect(graph.baseAxises.length).toBe(2);
@@ -76,12 +76,12 @@ define(function(require) {
         });
 
         it('should add merge compatible center axis between block pairs', function() {
-            var graph = this.graph;
+            const graph = this.graph;
             graph.rectangles.push(new Rectangle(300, 300, 100, 100));
             graph.rectangles.push(new Rectangle(120, 320, 100, 100));
             graph.buildCenterLinesBetweenNodes();
 
-            var objContains = jasmine.objectContaining.bind(jasmine);
+            const objContains = jasmine.objectContaining.bind(jasmine);
             expect(graph.baseAxises.length).toBe(3);
             graph.mergeExtraCenterAxises();
             expect(graph.baseAxises).toEqual([
@@ -91,12 +91,12 @@ define(function(require) {
         });
 
         it('should finalize (setup connections) correctly', function() {
-            var graph = this.graph;
+            const graph = this.graph;
             graph.rectangles.push(new Rectangle(300, 300, 100, 100));
             graph.build();
             expect(graph.verticalAxises.length).toBe(graph.horizontalAxises.length);
             expect(graph.verticalAxises.length).toBe(11);
-            for (var id in graph.nodes) {
+            for (const id in graph.nodes) {
                 if (graph.nodes.hasOwnProperty(id)) {
                     expect(isConnected(graph.nodes[id])).toBeTruthy();
                     expect(graph.nodes[id].vAxis).not.toBe(graph.nodes[id].hAxis);

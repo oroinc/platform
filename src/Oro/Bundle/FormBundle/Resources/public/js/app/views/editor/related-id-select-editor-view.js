@@ -1,6 +1,9 @@
 define(function(require) {
     'use strict';
 
+    const SelectEditorView = require('./select-editor-view');
+    require('jquery.select2');
+
     /**
      * Select-like cell content editor. This view is applicable when the cell value contains label (not the value).
      * The editor will use provided `choices` map and `value_field_name`. The server will be updated with value only.
@@ -77,23 +80,19 @@ define(function(require) {
      * @augments [SelectEditorView](./select-editor-view.md)
      * @exports RelatedIdSelectEditorView
      */
-    var RelatedIdSelectEditorView;
-    var SelectEditorView = require('./select-editor-view');
-    require('jquery.select2');
-
-    RelatedIdSelectEditorView = SelectEditorView.extend(/** @lends RelatedIdSelectEditorView.prototype */{
+    const RelatedIdSelectEditorView = SelectEditorView.extend(/** @lends RelatedIdSelectEditorView.prototype */{
         /**
          * @inheritDoc
          */
-        constructor: function RelatedIdSelectEditorView() {
-            RelatedIdSelectEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function RelatedIdSelectEditorView(options) {
+            RelatedIdSelectEditorView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            RelatedIdSelectEditorView.__super__.initialize.apply(this, arguments);
+            RelatedIdSelectEditorView.__super__.initialize.call(this, options);
             if (options.value_field_name) {
                 this.valueFieldName = options.value_field_name;
             } else {
@@ -105,9 +104,9 @@ define(function(require) {
             if (!options.choices) {
                 throw new Error('`choices` option is required');
             }
-            var choices = options.choices;
-            var result = [];
-            for (var id in choices) {
+            const choices = options.choices;
+            const result = [];
+            for (const id in choices) {
                 if (choices.hasOwnProperty(id)) {
                     result.push({
                         id: id,
@@ -127,8 +126,8 @@ define(function(require) {
         },
 
         getChoiceLabel: function(choiceId) {
-            for (var i = 0; i < this.availableChoices.length; i++) {
-                var option = this.availableChoices[i];
+            for (let i = 0; i < this.availableChoices.length; i++) {
+                const option = this.availableChoices[i];
                 if (option.id === choiceId) {
                     return option.text;
                 }
@@ -136,13 +135,13 @@ define(function(require) {
         },
 
         getServerUpdateData: function() {
-            var data = {};
+            const data = {};
             data[this.valueFieldName] = this.getValue();
             return data;
         },
 
         getModelUpdateData: function() {
-            var data = this.getServerUpdateData();
+            const data = this.getServerUpdateData();
             data[this.fieldName] = this.getChoiceLabel(this.getValue());
             return data;
         }

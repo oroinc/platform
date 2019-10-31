@@ -1,11 +1,11 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
-    var cssVars = require('css-vars-ponyfill');
-    var config = require('module-config').default(module.id);
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
+    const cssVars = require('css-vars-ponyfill');
+    let config = require('module-config').default(module.id);
     config = _.defaults({}, config, {
         onlyLegacy: false,
         preserveStatic: false,
@@ -13,7 +13,7 @@ define(function(require, exports, module) {
         updateURLs: false
     });
 
-    var cssVariablesManager = {
+    const cssVariablesManager = {
         /**
          * @property {Object}
          */
@@ -74,10 +74,10 @@ define(function(require, exports, module) {
                 context = document.head;
             }
 
-            var regexp = /(--[\w-]*:)/g;
-            var regexpVal = /:\s?[\w\d-(): ]*/g;
-            var content = window.getComputedStyle(context, ':before').getPropertyValue('content');
-            var breakpoint = {};
+            const regexp = /(--[\w-]*:)/g;
+            const regexpVal = /:\s?[\w\d-(): ]*/g;
+            let content = window.getComputedStyle(context, ':before').getPropertyValue('content');
+            const breakpoint = {};
 
             if (content === 'none') {
                 mediator.trigger('css:breakpoints:fetched', breakpoint);
@@ -87,8 +87,8 @@ define(function(require, exports, module) {
 
             content = content.split('|');
             content.forEach(_.bind(function(value, i) {
-                var name = value.match(regexp);
-                var varVal = value.match(regexpVal);
+                const name = value.match(regexp);
+                const varVal = value.match(regexpVal);
                 if (name && varVal) {
                     breakpoint[name[0].slice(0, -1)] = varVal[0].substr(1).trim();
                 }

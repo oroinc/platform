@@ -1,25 +1,24 @@
 define(function(require) {
     'use strict';
 
-    var StickyElementView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var stickyElementMixin = require('oroui/js/app/views/sticky-element/sticky-element-mixin');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const stickyElementMixin = require('oroui/js/app/views/sticky-element/sticky-element-mixin');
 
-    StickyElementView = BaseView.extend(_.extend({}, stickyElementMixin, {
+    const StickyElementView = BaseView.extend(_.extend({}, stickyElementMixin, {
         /**
          * @inheritDoc
          */
-        constructor: function StickyElementView() {
-            StickyElementView.__super__.constructor.apply(this, arguments);
+        constructor: function StickyElementView(options) {
+            StickyElementView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            StickyElementView.__super__.initialize.apply(this, arguments);
+            StickyElementView.__super__.initialize.call(this, options);
 
             this.initializeSticky({
                 $stickyElement: $(options.el),
@@ -37,7 +36,7 @@ define(function(require) {
 
             this.disposeSticky();
 
-            StickyElementView.__super__.dispose.apply(this, arguments);
+            StickyElementView.__super__.dispose.call(this);
         }
     }));
 

@@ -1,9 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var BooleanCell;
-    var Backgrid = require('backgrid');
-    var __ = require('orotranslation/js/translator');
+    const Backgrid = require('backgrid');
+    const __ = require('orotranslation/js/translator');
 
     /**
      * Boolean column cell. Added missing behaviour.
@@ -12,7 +11,7 @@ define(function(require) {
      * @class   oro.datagrid.cell.BooleanCell
      * @extends Backgrid.BooleanCell
      */
-    BooleanCell = Backgrid.BooleanCell.extend({
+    const BooleanCell = Backgrid.BooleanCell.extend({
         /** @property {Boolean} */
         listenRowClick: true,
 
@@ -23,8 +22,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function BooleanCell() {
-            BooleanCell.__super__.constructor.apply(this, arguments);
+        constructor: function BooleanCell(options) {
+            BooleanCell.__super__.constructor.call(this, options);
             this.listenTo(this.model, 'change:' + this.column.get('name'), this.onModelChange);
         },
 
@@ -38,8 +37,8 @@ define(function(require) {
             } else {
                 // render a yes/no text for non editable cell
                 this.$el.empty();
-                var text = '';
-                var columnData = this.model.get(this.column.get('name'));
+                let text = '';
+                const columnData = this.model.get(this.column.get('name'));
                 if (columnData !== null) {
                     text = this.formatter.fromRaw(columnData) ? __('Yes') : __('No');
                 }
@@ -67,8 +66,8 @@ define(function(require) {
         onRowClicked: function(row, e) {
             if (this.currentEditor && !this.currentEditor.$el.is(e.target)) {
                 // click on the row, but outside of currentEditor
-                var columnName = this.column.get('name');
-                var currentValue = this.model.get(columnName);
+                const columnName = this.column.get('name');
+                const currentValue = this.model.get(columnName);
                 this.model.set(columnName, !currentValue);
             }
         },
@@ -79,7 +78,7 @@ define(function(require) {
          */
         onModelChange: function(model) {
             if (this.currentEditor) {
-                var val = this.currentEditor.formatter.fromRaw(model.get(this.column.get('name')), model);
+                const val = this.currentEditor.formatter.fromRaw(model.get(this.column.get('name')), model);
                 this.currentEditor.$el.prop('checked', val);
             }
         }

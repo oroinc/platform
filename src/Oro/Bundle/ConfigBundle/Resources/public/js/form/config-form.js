@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var ConfigForm;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var messenger = require('oroui/js/messenger');
-    var Modal = require('oroui/js/modal');
-    var DefaultFieldValueView = require('oroform/js/app/views/default-field-value-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const messenger = require('oroui/js/messenger');
+    const Modal = require('oroui/js/modal');
+    const DefaultFieldValueView = require('oroform/js/app/views/default-field-value-view');
 
-    ConfigForm = DefaultFieldValueView.extend({
+    const ConfigForm = DefaultFieldValueView.extend({
 
         /**
          * @param {Object} Where key is input name and value is changed value
@@ -31,8 +30,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ConfigForm() {
-            ConfigForm.__super__.constructor.apply(this, arguments);
+        constructor: function ConfigForm(options) {
+            ConfigForm.__super__.constructor.call(this, options);
         },
 
         /**
@@ -58,12 +57,12 @@ define(function(require) {
 
             this.$el.off('change', 'input[data-needs-page-reload]');
 
-            ConfigForm.__super__.dispose.apply(this, arguments);
+            ConfigForm.__super__.dispose.call(this);
         },
 
         _onNeedsReloadChange: function(e) {
-            var $input = $(e.target);
-            var name = $input.attr('name');
+            const $input = $(e.target);
+            const name = $input.attr('name');
 
             if (this.changedValues.hasOwnProperty(name)) {
                 delete this.changedValues[name];
@@ -75,7 +74,7 @@ define(function(require) {
         },
 
         removeValidationErrors: function($field) {
-            var $container = $field.closest('.controls');
+            const $container = $field.closest('.controls');
             $container
                 .removeClass('validation-error')
                 .find('.error')
@@ -84,7 +83,7 @@ define(function(require) {
         },
 
         onDefaultCheckboxStateChange: function(e) {
-            var $checkbox = $(e.target);
+            const $checkbox = $(e.target);
             if ($checkbox.is(':checked')) {
                 this.removeValidationErrors($checkbox);
             }
@@ -96,8 +95,8 @@ define(function(require) {
          * @param event
          */
         resetHandler: function(event) {
-            var $checkboxes = this.$el.find('.parent-scope-checkbox input');
-            var confirm = new Modal({
+            const $checkboxes = this.$el.find('.parent-scope-checkbox input');
+            const confirm = new Modal({
                 title: __('Confirmation'),
                 okText: __('OK'),
                 cancelText: __('Cancel'),
@@ -105,14 +104,14 @@ define(function(require) {
                 className: 'modal modal-primary'
             });
 
-            var self = this;
+            const self = this;
             confirm.on('ok', _.bind(function() {
                 this.$el.get(0).reset();
                 this.$el.find('.select2').each(function(key, elem) {
                     $(elem).inputWidget('val', null, true);
                 });
                 this.$el.find('.removeRow').each(function() {
-                    var $row = $(this).closest('*[data-content]');
+                    const $row = $(this).closest('*[data-content]');
                     // non-persisted options have a simple number for data-content
                     if (_.isNumber($row.data('content'))) {
                         $row.trigger('content:remove').remove();
@@ -125,7 +124,7 @@ define(function(require) {
                 this.$el.find(':input').change();
 
                 this.$el.find(':input').each(function() {
-                    var $field = $(this);
+                    const $field = $(this);
                     self.removeValidationErrors($field);
                 });
             }, this));

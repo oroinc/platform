@@ -2,10 +2,9 @@
 define(function(require) {
     'use strict';
 
-    var HistoryNavigationComponent;
-    var BaseComponent = require('../components/base/component');
-    var StatefulModel = require('../models/base/stateful-model');
-    var HistoryNavigationView = require('../views/history-navigation-view');
+    const BaseComponent = require('../components/base/component');
+    const StatefulModel = require('../models/base/stateful-model');
+    const HistoryNavigationView = require('../views/history-navigation-view');
 
     /**
      * Builds history controls for undo/redo capability.
@@ -13,7 +12,7 @@ define(function(require) {
      * @class HistoryNavigationComponent
      * @augments BaseComponent
      */
-    HistoryNavigationComponent = BaseComponent.extend(/** @lends HistoryNavigationComponent.prototype */{
+    const HistoryNavigationComponent = BaseComponent.extend(/** @lends HistoryNavigationComponent.prototype */{
         history: null,
 
         observedModel: null,
@@ -21,8 +20,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function HistoryNavigationComponent() {
-            HistoryNavigationComponent.__super__.constructor.apply(this, arguments);
+        constructor: function HistoryNavigationComponent(options) {
+            HistoryNavigationComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -41,9 +40,9 @@ define(function(require) {
         },
 
         onHistoryNavigate: function(index) {
-            var history = this.observedModel.history;
+            const history = this.observedModel.history;
             if (history.setIndex(index)) {
-                var state = history.getCurrentState();
+                const state = history.getCurrentState();
                 this.observedModel.setState(state.get('data'));
             }
         }

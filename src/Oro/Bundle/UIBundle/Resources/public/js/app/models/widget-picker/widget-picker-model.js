@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var WidgetPickerModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
-    var _ = require('underscore');
+    const BaseModel = require('oroui/js/app/models/base/model');
+    const _ = require('underscore');
 
-    WidgetPickerModel = BaseModel.extend({
+    const WidgetPickerModel = BaseModel.extend({
         defaults: {
             dialogIcon: '',
             title: '',
@@ -18,8 +17,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function WidgetPickerModel() {
-            WidgetPickerModel.__super__.constructor.apply(this, arguments);
+        constructor: function WidgetPickerModel(attrs, options) {
+            WidgetPickerModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
@@ -34,7 +33,7 @@ define(function(require) {
          * @returns {Array}
          */
         getData: function() {
-            var attributes = _.clone(this.getAttributes());
+            const attributes = _.clone(this.getAttributes());
             delete attributes.added;
             return attributes;
         },

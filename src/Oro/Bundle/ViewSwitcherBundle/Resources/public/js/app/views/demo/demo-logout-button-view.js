@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var DemoLogoutButtonView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl-loader!oroviewswitcher/templates/demo-logout-button.html');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('tpl-loader!oroviewswitcher/templates/demo-logout-button.html');
 
-    DemoLogoutButtonView = BaseView.extend({
+    const DemoLogoutButtonView = BaseView.extend({
         keepElement: true,
         autoRender: true,
         template: template,

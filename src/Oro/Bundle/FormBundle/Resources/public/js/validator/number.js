@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var localeSettings = require('orolocale/js/locale-settings');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const localeSettings = require('orolocale/js/locale-settings');
 
-    var defaultParam = {
+    const defaultParam = {
         notNumberMessage: 'oro.form.number.nan',
         exactMessage: 'oro.form.number.exect',
         maxMessage: 'oro.form.number.max',
@@ -24,7 +24,7 @@ define(function(require) {
      * @returns {boolean|number}
      */
     function between(number, min, max) {
-        var result = true;
+        let result = true;
         if (!_.isUndefined(min) && min === max) {
             result = number === parseInt(min, 10) || 0;
         } else {
@@ -38,7 +38,7 @@ define(function(require) {
         return result;
     }
     function toNumber(value) {
-        var numberFormats = localeSettings.getNumberFormats('decimal');
+        const numberFormats = localeSettings.getNumberFormats('decimal');
         value = String(value).split(numberFormats.grouping_separator_symbol).join('');
         value = value.replace(numberFormats.decimal_separator_symbol, '.');
         return Number(value);
@@ -54,8 +54,8 @@ define(function(require) {
             return !isNaN(value) && between(value, param.min, param.max) === true;
         },
         function(param, element, value, placeholders) {
-            var message;
-            var number;
+            let message;
+            let number;
             param = _.extend({}, defaultParam, param);
             value = _.isUndefined(value) ? this.elementValue(element) : value;
             value = toNumber(value);

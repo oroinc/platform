@@ -3,10 +3,10 @@ define(['./extends', './interval2d', './directions', './point2d'
     'use strict';
     __extends(Axis, Interval2d);
 
-    var TOP_TO_BOTTOM_ID = directions.TOP_TO_BOTTOM.id;
-    var BOTTOM_TO_TOP_ID = directions.BOTTOM_TO_TOP.id;
-    var LEFT_TO_RIGHT_ID = directions.LEFT_TO_RIGHT.id;
-    var RIGHT_TO_LEFT_ID = directions.RIGHT_TO_LEFT.id;
+    const TOP_TO_BOTTOM_ID = directions.TOP_TO_BOTTOM.id;
+    const BOTTOM_TO_TOP_ID = directions.BOTTOM_TO_TOP.id;
+    const LEFT_TO_RIGHT_ID = directions.LEFT_TO_RIGHT.id;
+    const RIGHT_TO_LEFT_ID = directions.RIGHT_TO_LEFT.id;
     /**
      * Creates axis
      *
@@ -43,10 +43,10 @@ define(['./extends', './interval2d', './directions', './point2d'
      */
     Object.defineProperty(Axis.prototype, 'connections', {
         get: function() {
-            var result = [];
-            var vectorId = this.b.sub(this.a).unitVector.abs().rot180().id;
-            for (var i = this.nodes.length - 1; i >= 1; i--) {
-                var node = this.nodes[i];
+            const result = [];
+            const vectorId = this.b.sub(this.a).unitVector.abs().rot180().id;
+            for (let i = this.nodes.length - 1; i >= 1; i--) {
+                const node = this.nodes[i];
                 result.push(node.connections[vectorId]);
             }
             return result;
@@ -60,8 +60,8 @@ define(['./extends', './interval2d', './directions', './point2d'
      */
     Object.defineProperty(Axis.prototype, 'closestLeftClone', {
         get: function() {
-            var closestLeftClone = null;
-            var leftClone = this.clonesAtLeft[0];
+            let closestLeftClone = null;
+            let leftClone = this.clonesAtLeft[0];
             while (leftClone) {
                 closestLeftClone = leftClone;
                 leftClone = leftClone.clonesAtRight[leftClone.clonesAtRight.length - 1];
@@ -77,8 +77,8 @@ define(['./extends', './interval2d', './directions', './point2d'
      */
     Object.defineProperty(Axis.prototype, 'closestRightClone', {
         get: function() {
-            var closestRightClone = null;
-            var rightClone = this.clonesAtRight[0];
+            let closestRightClone = null;
+            let rightClone = this.clonesAtRight[0];
             while (rightClone) {
                 closestRightClone = rightClone;
                 rightClone = rightClone.clonesAtLeft[rightClone.clonesAtLeft.length - 1];
@@ -94,17 +94,17 @@ define(['./extends', './interval2d', './directions', './point2d'
      */
     Object.defineProperty(Axis.prototype, 'allClones', {
         get: function() {
-            var clones = [];
-            var i;
-            var clone;
+            const clones = [];
+            let i;
+            let clone;
             for (i = 0; i < this.clonesAtLeft.length; i++) {
                 clone = this.clonesAtLeft[i];
-                clones.push.apply(clones, clone.allClones);
+                clones.push(...clone.allClones);
             }
             clones.push(this);
             for (i = 0; i < this.clonesAtRight.length; i++) {
                 clone = this.clonesAtRight[i];
-                clones.push.apply(clones, clone.allClones);
+                clones.push(...clone.allClones);
             }
             return clones;
         },
@@ -120,9 +120,9 @@ define(['./extends', './interval2d', './directions', './point2d'
      * @returns {Axis}
      */
     Axis.createFromInterval = function(interval, graph) {
-        var costMultiplier = interval.costMultiplier;
-        var isVertical = interval.isVertical;
-        var axis = new Axis(interval.a, interval.b, graph, costMultiplier);
+        const costMultiplier = interval.costMultiplier;
+        const isVertical = interval.isVertical;
+        const axis = new Axis(interval.a, interval.b, graph, costMultiplier);
         // this is fix for zero length axises
         if (isVertical !== undefined) {
             axis.isVertical = isVertical;
@@ -189,19 +189,19 @@ define(['./extends', './interval2d', './directions', './point2d'
      * @param {NodePoint} node
      */
     Axis.prototype.addFinalNode = function(node) {
-        var nextNodeConnVector = this.nextNodeConnVector;
-        var nextNodeConn;
-        var prevNodeConn;
+        const nextNodeConnVector = this.nextNodeConnVector;
+        let nextNodeConn;
+        let prevNodeConn;
         if ((nextNodeConn = node.connections[nextNodeConnVector.id])) {
-            var nextNode = nextNodeConn.second(node);
-            var nextIndex = this.nodes.indexOf(nextNode);
+            const nextNode = nextNodeConn.second(node);
+            const nextIndex = this.nodes.indexOf(nextNode);
             if (nextIndex === -1) {
                 throw new Error('Invalid add node call');
             }
             this.nodes.splice(nextIndex, 0, node);
         } else if ((prevNodeConn = node.connections[this.prevNodeConnVector.id])) {
-            var prevNode = prevNodeConn.second(node);
-            var prevIndex = this.nodes.indexOf(prevNode);
+            const prevNode = prevNodeConn.second(node);
+            const prevIndex = this.nodes.indexOf(prevNode);
             if (prevIndex === -1) {
                 throw new Error('Invalid add node call');
             }
@@ -216,10 +216,10 @@ define(['./extends', './interval2d', './directions', './point2d'
      */
     Axis.prototype.finalize = function() {
         // this.nodes.forEach((node)=>node.draw('red'));
-        var firstNode = this.nodes[0];
-        var lastNode = this.nodes[this.nodes.length - 1];
-        var node;
-        var i;
+        const firstNode = this.nodes[0];
+        const lastNode = this.nodes[this.nodes.length - 1];
+        let node;
+        let i;
         if (this.isVertical) {
             if (firstNode.connections[TOP_TO_BOTTOM_ID]) {
                 firstNode.connections[TOP_TO_BOTTOM_ID].remove();
@@ -264,7 +264,7 @@ define(['./extends', './interval2d', './directions', './point2d'
      * @param {Axis} axis
      */
     Axis.prototype.merge = function(axis) {
-        var points = [this.a, this.b, axis.a, axis.b];
+        const points = [this.a, this.b, axis.a, axis.b];
         points.sort(function(a, b) {
             return a.x - b.x + a.y - b.y;
         });
@@ -278,11 +278,11 @@ define(['./extends', './interval2d', './directions', './point2d'
      * @param {Point2d} direction
      */
     Axis.prototype.cloneAtDirection = function(direction) {
-        var axis = Axis.createFromInterval(this, this.graph);
-        for (var i = 0; i < this.nodes.length; i++) {
-            var node = this.nodes[i];
-            var clonedNode = node.clone();
-            var secondNode = node.nextNode(direction);
+        const axis = Axis.createFromInterval(this, this.graph);
+        for (let i = 0; i < this.nodes.length; i++) {
+            const node = this.nodes[i];
+            const clonedNode = node.clone();
+            const secondNode = node.nextNode(direction);
             if (node.used && secondNode.used) {
                 clonedNode.used = true;
             }
@@ -306,7 +306,7 @@ define(['./extends', './interval2d', './directions', './point2d'
      * It will creates them if they are not found.
      */
     Axis.prototype.ensureTraversableSiblings = function() {
-        var clone;
+        let clone;
         clone = this.closestLeftClone;
         if (!clone || clone.isUsed) {
             this.clonesAtLeft.unshift(this.cloneAtDirection(this.nextNodeConnVector.rot90().abs().rot180()));

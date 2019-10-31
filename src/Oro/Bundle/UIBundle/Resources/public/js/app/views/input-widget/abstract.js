@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var AbstractInputWidgetView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
 
     /**
      * AbstractInputWidgetView is the base class for all input widgets.
      * InputWidget is used to provide a common API for all input widgets.
      * By using this API you provide ability to change input widget to any other or remove it.
      */
-    AbstractInputWidgetView = BaseView.extend({
+    const AbstractInputWidgetView = BaseView.extend({
         /** @property {jQuery} */
         $container: null,
 
@@ -45,8 +44,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AbstractInputWidgetView() {
-            AbstractInputWidgetView.__super__.constructor.apply(this, arguments);
+        constructor: function AbstractInputWidgetView(options) {
+            AbstractInputWidgetView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -71,8 +70,8 @@ define(function(require) {
             }
         },
 
-        delegateEvents: function() {
-            AbstractInputWidgetView.__super__.delegateEvents.apply(this, arguments);
+        delegateEvents: function(events) {
+            AbstractInputWidgetView.__super__.delegateEvents.call(this, events);
             if (this.refreshOnChange) {
                 this._addEvent('change', _.bind(this.refresh, this));
             }
@@ -120,7 +119,7 @@ define(function(require) {
                 .removeAttr('data-bound-input-widget');
             delete this.$container;
 
-            return AbstractInputWidgetView.__super__.dispose.apply(this, arguments);
+            return AbstractInputWidgetView.__super__.dispose.call(this);
         },
 
         disposeWidget: function() {
@@ -149,7 +148,7 @@ define(function(require) {
         applyWidgetFunction: function(command, args) {
             args = Array.prototype.slice.apply(args);
             args.unshift(command);
-            return this.widgetFunction.apply(this, args);
+            return this.widgetFunction(...args);
         },
 
         /**

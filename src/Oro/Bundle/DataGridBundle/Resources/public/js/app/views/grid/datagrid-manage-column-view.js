@@ -1,17 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var DatagridManageColumnView;
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var DatagridModuleManagerView = require('orodatagrid/js/app/views/grid/datagrid-module-manager-view');
-    var DatagridSettingsListCollection = require('orodatagrid/js/app/models/datagrid-settings-list/datagrid-settings-list-collection');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const DatagridModuleManagerView = require('orodatagrid/js/app/views/grid/datagrid-module-manager-view');
+    const DatagridSettingsListCollection =
+        require('orodatagrid/js/app/models/datagrid-settings-list/datagrid-settings-list-collection');
 
     /**
      * @class DatagridManageColumnView
      * @extends DatagridModuleManagerView
      */
-    DatagridManageColumnView = DatagridModuleManagerView.extend({
+    const DatagridManageColumnView = DatagridModuleManagerView.extend({
         /**
          * Contains a snapshot of columns state which is created when grid.collection is loaded.
          * Used in _onDatagridSettingsHide() to detect whether it is needed to refresh grid to fetch new columns.
@@ -30,8 +30,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DatagridManageColumnView() {
-            DatagridManageColumnView.__super__.constructor.apply(this, arguments);
+        constructor: function DatagridManageColumnView(options) {
+            DatagridManageColumnView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -44,7 +44,7 @@ define(function(require) {
 
             this._onDatagridSettingsHide = _.debounce(this._onDatagridSettingsHide, 100);
 
-            DatagridManageColumnView.__super__.initialize.apply(this, arguments);
+            DatagridManageColumnView.__super__.initialize.call(this, options);
 
             this._applyState(this.grid.collection, this.grid.collection.state);
         },
@@ -60,7 +60,7 @@ define(function(require) {
                 this.columns.sort();
             });
 
-            return DatagridModuleManagerView.__super__.delegateListeners.apply(this, arguments);
+            return DatagridModuleManagerView.__super__.delegateListeners.call(this);
         },
 
         /**
@@ -70,10 +70,10 @@ define(function(require) {
          * @protected
          */
         _createManagedCollection: function() {
-            var managedColumns = [];
+            const managedColumns = [];
 
             this.collection.each(function(column, i) {
-                var isManageable = column.get('manageable') !== false;
+                const isManageable = column.get('manageable') !== false;
 
                 // set initial order
                 if (_.isUndefined(column.get('order')) || isManageable) {
@@ -99,7 +99,7 @@ define(function(require) {
                 return;
             }
 
-            var columnsState = this._createState();
+            const columnsState = this._createState();
             this.grid.collection.updateState({
                 columns: columnsState
             });
@@ -112,8 +112,8 @@ define(function(require) {
          */
         _applyState: function(collection, state) {
             state = state || collection.state;
-            var columnsState = state.columns;
-            var attrs;
+            const columnsState = state.columns;
+            let attrs;
 
             if (tools.isEqualsLoosely(this._createState(), columnsState)) {
                 // nothing to apply, state is the same
@@ -123,7 +123,7 @@ define(function(require) {
             this._applyingState = true;
 
             this.collection.each(function(column, i) {
-                var name = column.get('name');
+                const name = column.get('name');
                 if (columnsState[name]) {
                     attrs = _.defaults(_.pick(columnsState[name], ['renderable', 'order']), {renderable: true});
                 } else {
@@ -144,11 +144,11 @@ define(function(require) {
          * @protected
          */
         _createState: function(collection) {
-            var state = {};
+            const state = {};
 
             this.collection.each(function(column) {
-                var name = column.get('name');
-                var order = column.get('order');
+                const name = column.get('name');
+                const order = column.get('order');
 
                 state[name] = {
                     renderable: column.get('renderable')

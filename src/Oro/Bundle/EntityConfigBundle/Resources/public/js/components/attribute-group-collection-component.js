@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var AttributeGroupComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var Modal = require('oroui/js/modal');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const Modal = require('oroui/js/modal');
 
-    AttributeGroupComponent = BaseComponent.extend({
+    const AttributeGroupComponent = BaseComponent.extend({
         /**
          * @property {Object}
          */
@@ -29,8 +28,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AttributeGroupComponent() {
-            AttributeGroupComponent.__super__.constructor.apply(this, arguments);
+        constructor: function AttributeGroupComponent(options) {
+            AttributeGroupComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -42,15 +41,15 @@ define(function(require) {
             this.options = _.defaults(options || {}, this.options);
             mediator.on('attribute-select:find-selected-attributes', this.onGetSelectedAttributes, this);
 
-            var groups = this.getAllGroups();
+            const groups = this.getAllGroups();
             if (groups.length === 1) {
                 this.hideRemoveButton(groups);
             } else {
                 this.showRemoveButton(groups);
             }
-            var self = this;
+            const self = this;
             $(this.options._sourceElement).parent().find(this.removeBtn).on('click', function(event) {
-                var systemAttributesSelected = self.getAttributeSelect().find('option[locked="locked"]:selected');
+                const systemAttributesSelected = self.getAttributeSelect().find('option[locked="locked"]:selected');
                 if (systemAttributesSelected.length) {
                     self.showConfirmModal(this);
                     return false;
@@ -60,20 +59,19 @@ define(function(require) {
         },
 
         showConfirmModal: function(removeBtn) {
-            var confirmDialog = new Modal({
+            const confirmDialog = new Modal({
                 title: _.__('oro.attribute.remove_confirmation_title'),
                 content: _.__('oro.attribute.remove_confirmation_text'),
                 className: 'modal oro-modal-danger'
             });
 
             confirmDialog.on('ok', function() {
-                var item;
-                var closest = '*[data-content]';
+                let closest = '*[data-content]';
                 if ($(removeBtn).data('closest')) {
                     closest = $(removeBtn).data('closest');
                 }
 
-                item = $(removeBtn).closest(closest);
+                const item = $(removeBtn).closest(closest);
                 item.trigger('content:remove').remove();
                 confirmDialog.close();
             });
@@ -98,13 +96,13 @@ define(function(require) {
         },
 
         onGetSelectedAttributes: function(eventData) {
-            var groupLabel = $(this.options._sourceElement).find('[data-attribute-select-group]').val();
+            const groupLabel = $(this.options._sourceElement).find('[data-attribute-select-group]').val();
 
             eventData.attributeSelects.push({groupLabel: groupLabel, attributesSelect: this.getAttributeSelect()});
         },
 
         dispose: function() {
-            var groups = this.getAllGroups();
+            const groups = this.getAllGroups();
             if (groups.length === 2) { // Disable remove button for the last group
                 this.hideRemoveButton(groups);
             }

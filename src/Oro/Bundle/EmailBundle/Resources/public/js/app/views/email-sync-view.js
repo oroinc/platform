@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var EmailSyncView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
-    var messenger = require('oroui/js/messenger');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const messenger = require('oroui/js/messenger');
 
-    EmailSyncView = BaseView.extend({
+    const EmailSyncView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat([
             'syncPath', 'processingMessage', 'errorHandlerMessage', 'actionProcessing', 'actionSync'
         ]),
@@ -18,14 +17,14 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailSyncView() {
-            EmailSyncView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailSyncView(options) {
+            EmailSyncView.__super__.constructor.call(this, options);
         },
 
         onSync: function(e) {
             e.preventDefault();
 
-            var $button = $(e.currentTarget);
+            const $button = $(e.currentTarget);
             if ($button.attr('disabled')) {
                 return;
             }

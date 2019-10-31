@@ -1,0 +1,10 @@
+services:
+    Oro\Bundle\AttachmentBundle\Command\MigrateImagesCommand:
+        public: false
+        class: Oro\Bundle\AttachmentBundle\Command\MigrateImagesCommand
+        arguments:
+            - '@doctrine'
+            - '@oro_attachment.filtered_attachment_migration'
+            - 'attachment/resize'
+        tags:
+            - { name: console.command }

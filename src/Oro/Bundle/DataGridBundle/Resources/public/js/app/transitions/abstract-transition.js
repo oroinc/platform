@@ -4,10 +4,9 @@ define(function(require) {
     /**
      * Defines transition interface
      */
-    var AbstractTransition;
-    var BaseClass = require('oroui/js/base-class');
+    const BaseClass = require('oroui/js/base-class');
 
-    AbstractTransition = BaseClass.extend({
+    const AbstractTransition = BaseClass.extend({
         /**
          * @inheritDoc
          */

@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var VariableDatePickerView;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var TabsView = require('oroui/js/app/views/tabs-view');
-    var DateVariableHelper = require('orofilter/js/date-variable-helper');
-    var DateValueHelper = require('orofilter/js/date-value-helper');
-    var DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
-    var moment = require('moment');
-    var localeSettings = require('orolocale/js/locale-settings');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const TabsView = require('oroui/js/app/views/tabs-view');
+    const DateVariableHelper = require('orofilter/js/date-variable-helper');
+    const DateValueHelper = require('orofilter/js/date-value-helper');
+    const DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
+    const moment = require('moment');
+    const localeSettings = require('orolocale/js/locale-settings');
     require('orofilter/js/datevariables-widget');
     require('orofilter/js/itemizedpicker-widget');
 
@@ -20,7 +19,7 @@ define(function(require) {
     }
 
     function findKey(map, value) {
-        var foundKey;
+        let foundKey;
         _.each(map, function(item, key) {
             if (item === value) {
                 foundKey = key;
@@ -30,7 +29,7 @@ define(function(require) {
         return foundKey;
     }
 
-    VariableDatePickerView = DatePickerView.extend({
+    const VariableDatePickerView = DatePickerView.extend({
         defaultTabs: [],
 
         partsDateValidation: {
@@ -72,8 +71,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function VariableDatePickerView() {
-            VariableDatePickerView.__super__.constructor.apply(this, arguments);
+        constructor: function VariableDatePickerView(options) {
+            VariableDatePickerView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -113,7 +112,7 @@ define(function(require) {
 
             this.dateVariableHelper = new DateVariableHelper(options.datePickerOptions.dateVars);
             this.dateValueHelper = new DateValueHelper(options.dayFormats);
-            VariableDatePickerView.__super__.initialize.apply(this, arguments);
+            VariableDatePickerView.__super__.initialize.call(this, options);
         },
 
         /**
@@ -164,13 +163,12 @@ define(function(require) {
          * @param {Object} options
          */
         initTabsView: function(options) {
-            var tabs;
             this.$dropdown = this.$frontDateField
                 .wrap('<div class="dropdown datefilter">').parent();
             this.$dropdown
                 .append('<div class="dropdown-menu dropdown-menu-calendar"></div>')
                 .on('shown.bs.dropdown', _.bind(this.onOpen, this));
-            tabs = new TabsView({
+            const tabs = new TabsView({
                 el: this.$dropdown.find('.dropdown-menu'),
                 template: options.dropdownTemplate,
                 data: {
@@ -189,7 +187,7 @@ define(function(require) {
          * @param {Object} options
          */
         initDatePicker: function(options) {
-            var widgetOptions = {};
+            const widgetOptions = {};
             this.$calendar = this.$dropdown.find('#calendar-' + this.cid);
             _.extend(widgetOptions, options.datePickerOptions, {
                 onSelect: _.bind(this.onSelect, this)
@@ -207,15 +205,15 @@ define(function(require) {
          * @param target
          */
         checkConsistency: function(target) {
-            var date = this.$frontDateField.val();
+            const date = this.$frontDateField.val();
             if (!this._preventFrontendUpdate && !target && !this._isDateValid(date)) {
                 this.$frontDateField.val('');
             }
         },
 
         _isDateValid: function(date) {
-            var part = this.$variables.dateVariables('getPart');
-            var validator = this.partsDateValidation[part];
+            const part = this.$variables.dateVariables('getPart');
+            const validator = this.partsDateValidation[part];
             if (!validator) {
                 return false;
             }
@@ -229,7 +227,7 @@ define(function(require) {
          * @param {Object} options
          */
         initVariablePicker: function(options) {
-            var widgetOptions = {};
+            const widgetOptions = {};
             _.extend(widgetOptions, options.datePickerOptions, {
                 onSelect: _.bind(this.onSelect, this)
             });
@@ -261,7 +259,7 @@ define(function(require) {
          */
         onSelect: function(date) {
             this.$frontDateField.val(date);
-            VariableDatePickerView.__super__.onSelect.apply(this, arguments);
+            VariableDatePickerView.__super__.onSelect.call(this, date);
             this.close();
         },
 
@@ -271,7 +269,7 @@ define(function(require) {
          * @returns {string}
          */
         getBackendFormattedValue: function() {
-            var value = this.$frontDateField.val();
+            const value = this.$frontDateField.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
                 return this.dateVariableHelper.formatRawValue(value);
             }
@@ -286,7 +284,7 @@ define(function(require) {
         },
 
         getBackendPartFormattedValue: function() {
-            var value = this.$frontDateField.val();
+            const value = this.$frontDateField.val();
 
             switch (this.$variables.dateVariables('getPart')) {
                 case 'dayofweek':
@@ -304,7 +302,7 @@ define(function(require) {
          * @returns {string}
          */
         getFrontendFormattedDate: function() {
-            var value = this.$el.val();
+            const value = this.$el.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
                 return this.dateVariableHelper.formatDisplayValue(value);
             }
@@ -319,7 +317,7 @@ define(function(require) {
         },
 
         getFrontendPartFormattedDate: function() {
-            var value = this.$el.val();
+            const value = this.$el.val();
             switch (this.$variables.dateVariables('getPart')) {
                 case 'dayofweek':
                     return localeSettings.getCalendarDayOfWeekNames('wide')[value];
@@ -338,7 +336,7 @@ define(function(require) {
                 // handle only events triggered with proper NS (omit just any show events)
                 return;
             }
-            var value = this.$frontDateField.val();
+            const value = this.$frontDateField.val();
             if (!this.dateVariableHelper.isDateVariable(value)) {
                 this.$calendar.datepicker('setDate', value);
             }

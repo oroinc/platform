@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var SubTreeActionView;
-    var AbstractActionView = require('oroui/js/app/views/jstree/abstract-action-view');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
+    const AbstractActionView = require('oroui/js/app/views/jstree/abstract-action-view');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
 
-    SubTreeActionView = AbstractActionView.extend({
+    const SubTreeActionView = AbstractActionView.extend({
         options: _.extend({}, AbstractActionView.prototype.options, {
             itemsLabel: __('oro.ui.jstree.actions.subitems.itemsLabel'),
             doNotSelectIcon: 'long-arrow-up',
@@ -20,15 +19,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function SubTreeActionView() {
-            SubTreeActionView.__super__.constructor.apply(this, arguments);
+        constructor: function SubTreeActionView(options) {
+            SubTreeActionView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            SubTreeActionView.__super__.initialize.apply(this, arguments);
+            SubTreeActionView.__super__.initialize.call(this, options);
             this.options.selectLabel = __(this.options.selectLabel, {
                 itemsLabel: this.options.itemsLabel
             });
@@ -45,7 +44,7 @@ define(function(require) {
                 this.options.icon = this.options.selectIcon;
                 this.options.label = this.options.selectLabel;
             }
-            return SubTreeActionView.__super__.render.apply(this, arguments);
+            return SubTreeActionView.__super__.render.call(this);
         },
 
         onClick: function() {

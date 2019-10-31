@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var PageBreadcrumbView;
-    var _ = require('underscore');
-    var PageRegionView = require('./../base/page-region-view');
+    const _ = require('underscore');
+    const PageRegionView = require('./../base/page-region-view');
 
-    PageBreadcrumbView = PageRegionView.extend({
+    const PageBreadcrumbView = PageRegionView.extend({
         listen: {
             'mainMenuUpdated mediator': 'onMenuUpdate'
         },
@@ -26,8 +25,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function PageBreadcrumbView() {
-            PageBreadcrumbView.__super__.constructor.apply(this, arguments);
+        constructor: function PageBreadcrumbView(options) {
+            PageBreadcrumbView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -39,7 +38,7 @@ define(function(require) {
          * @param {Object} menuView
          */
         onMenuUpdate: function(menuView) {
-            var breadcrumbs = menuView.getActiveItems();
+            const breadcrumbs = menuView.getActiveItems();
             if (breadcrumbs.length) {
                 this.data = {
                     breadcrumb: this.breadcrumbsTemplate({breadcrumbs: breadcrumbs})

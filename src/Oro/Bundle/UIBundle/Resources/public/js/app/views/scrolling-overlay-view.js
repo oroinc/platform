@@ -1,21 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var ScrollingOverlayView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    var ENTER_KEY_CODE = 13;
-    var SPACE_KEY_CODE = 32;
-    var SCROLL_STEP = 40;
+    const ENTER_KEY_CODE = 13;
+    const SPACE_KEY_CODE = 32;
+    const SCROLL_STEP = 40;
 
-    ScrollingOverlayView = BaseView.extend({
+    const ScrollingOverlayView = BaseView.extend({
         /**
          * @inheritDoc
          */
         events: function() {
-            var events = {};
+            const events = {};
 
             events['keydown ' + this._scrollButtonsSelector] = this.onScroll;
             events['keyup ' + this._scrollButtonsSelector] = this.stopScroll;
@@ -52,11 +51,11 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ScrollingOverlayView() {
+        constructor: function ScrollingOverlayView(options) {
             this._uniqKey = _.uniqueId('scrolling-overlay-');
             this._scrollButtonsSelector = '[id^=' + this._uniqKey + ']';
 
-            ScrollingOverlayView.__super__.constructor.apply(this, arguments);
+            ScrollingOverlayView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -72,7 +71,7 @@ define(function(require) {
                 throw new Error('Required option `$scrollingContent` is missing in `ScrollingOverlayView`');
             }
 
-            ScrollingOverlayView.__super__.initialize.apply(this, arguments);
+            ScrollingOverlayView.__super__.initialize.call(this, options);
         },
 
         /**
@@ -149,7 +148,7 @@ define(function(require) {
          * @param {string} direction='up'|'down'
          */
         updateVerticalScroll: function(direction) {
-            var newScrollPosition = this.$scrollingContent.scrollTop();
+            let newScrollPosition = this.$scrollingContent.scrollTop();
 
             if (direction === 'up') {
                 newScrollPosition -= this.scrollStep;
@@ -166,7 +165,7 @@ define(function(require) {
                 return;
             }
 
-            var direction = $(event.currentTarget).data('direction');
+            const direction = $(event.currentTarget).data('direction');
 
             this.updateVerticalScroll(direction);
             this.timerId = setInterval(this.updateVerticalScroll.bind(this, direction), 150);
@@ -183,10 +182,10 @@ define(function(require) {
          * Show / hide scroll handles
          */
         updateScrollButtons: function() {
-            var $scrollHandles = $(this._scrollButtonsSelector);
-            var scrollContentHeight = Math.round(this.$scrollingContent.outerHeight());
-            var scrollTop = this.$scrollingContent.scrollTop();
-            var bottomPosition = _.reduce(this.$scrollingContent.children(), function(result, item) {
+            const $scrollHandles = $(this._scrollButtonsSelector);
+            const scrollContentHeight = Math.round(this.$scrollingContent.outerHeight());
+            const scrollTop = this.$scrollingContent.scrollTop();
+            const bottomPosition = _.reduce(this.$scrollingContent.children(), function(result, item) {
                 return result + Math.round($(item).outerHeight());
             }, 0);
 

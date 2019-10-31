@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var pageStateChecker;
-    var _ = require('underscore');
+    const _ = require('underscore');
 
-    pageStateChecker = {
+    const pageStateChecker = {
         /**
          * @type {Array.<Function>}
          */
@@ -32,7 +31,7 @@ define(function(require) {
          * @param {Function} checker
          */
         removeChecker: function(checker) {
-            var index = this._checkers.indexOf(checker);
+            const index = this._checkers.indexOf(checker);
             if (index !== -1) {
                 this._checkers.splice(index, 1);
             }
