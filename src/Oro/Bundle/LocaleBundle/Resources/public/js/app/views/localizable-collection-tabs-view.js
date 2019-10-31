@@ -187,7 +187,7 @@ define(function(require) {
             const parentItemCode = this.getParentItemCode($item);
             if (parentItemCode) {
                 const $fromValue = this._getFromValue(parentItemCode);
-                let $toValue = this.getValueEl($item);
+                const $toValue = this.getValueEl($item);
                 this.cloneValue($fromValue, $toValue);
             }
 
@@ -234,7 +234,7 @@ define(function(require) {
          * @param {Boolean} enable
          */
         enableDisableValue: function($element, enable) {
-            let $$elementContainer = $element.closest(this.options.selectors.itemValue);
+            const $$elementContainer = $element.closest(this.options.selectors.itemValue);
 
             if (enable) {
                 $$elementContainer.show();
@@ -254,7 +254,7 @@ define(function(require) {
         cloneValue: function($fromValue, $toValue) {
             let isChanged = false;
             $fromValue.each(function(i) {
-                let toValue = $toValue.get(i);
+                const toValue = $toValue.get(i);
                 if ($(toValue).val() !== $(this).val()) {
                     isChanged = true;
                     $(toValue).val($(this).val());
