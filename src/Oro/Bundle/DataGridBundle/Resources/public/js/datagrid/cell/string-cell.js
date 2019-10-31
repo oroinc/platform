@@ -4,8 +4,6 @@ define([
 ], function(Backgrid, CellFormatter) {
     'use strict';
 
-    var StringCell;
-
     /**
      * String column cell. Added missing behaviour.
      *
@@ -13,7 +11,7 @@ define([
      * @class   oro.datagrid.cell.StringCell
      * @extends Backgrid.StringCell
      */
-    StringCell = Backgrid.StringCell.extend({
+    const StringCell = Backgrid.StringCell.extend({
         /**
          @property {(Backgrid.CellFormatter|Object|string)}
          */
@@ -22,15 +20,15 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function StringCell() {
-            StringCell.__super__.constructor.apply(this, arguments);
+        constructor: function StringCell(options) {
+            StringCell.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         render: function() {
-            var render = StringCell.__super__.render.apply(this, arguments);
+            const render = StringCell.__super__.render.call(this);
 
             this.enterEditMode();
 
@@ -42,7 +40,7 @@ define([
          */
         enterEditMode: function() {
             if (this.isEditableColumn()) {
-                StringCell.__super__.enterEditMode.apply(this, arguments);
+                StringCell.__super__.enterEditMode.call(this);
             }
         },
 
@@ -51,7 +49,7 @@ define([
          */
         exitEditMode: function() {
             if (!this.isEditableColumn()) {
-                StringCell.__super__.exitEditMode.apply(this, arguments);
+                StringCell.__super__.exitEditMode.call(this);
             }
         }
     });

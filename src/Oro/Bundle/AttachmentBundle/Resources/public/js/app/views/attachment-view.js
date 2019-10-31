@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var AttachmentView;
-    var BaseView = require('oroui/js/app/views/base/view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    AttachmentView = BaseView.extend({
+    const AttachmentView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat(['inputSelector']),
 
         events: {
@@ -14,8 +13,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AttachmentView() {
-            AttachmentView.__super__.constructor.apply(this, arguments);
+        constructor: function AttachmentView(options) {
+            AttachmentView.__super__.constructor.call(this, options);
         },
 
         onRemoveAttachment: function(e) {

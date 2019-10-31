@@ -3,7 +3,7 @@ define(
     function($, sync, messenger, routing, _, mediator) {
         'use strict';
 
-        var console = window.console;
+        const console = window.console;
 
         /**
          * @export ororeminder/js/reminder-handler
@@ -21,7 +21,7 @@ define(
              * @param {Boolean} wampEnable Is WAMP enabled
              */
             init: function(id, wampEnable) {
-                var self = this;
+                const self = this;
 
                 mediator.on('page:afterChange', function() {
                     self.showReminders();
@@ -38,7 +38,7 @@ define(
              * @param {integer} id Current user id
              */
             initWamp: function(id) {
-                var self = this;
+                const self = this;
                 sync.subscribe('oro/reminder_remind/' + id, function(reminders) {
                     self.addReminders(reminders);
                     self.showReminders();
@@ -51,7 +51,7 @@ define(
              * @param {Array} reminders
              */
             setReminders: function(reminders) {
-                var self = this;
+                const self = this;
                 this.reminders = {};
                 _.each(reminders, function(reminder) {
                     self.addReminder(reminder);
@@ -64,7 +64,7 @@ define(
              * @param {Array} reminders
              */
             addReminders: function(reminders) {
-                var self = this;
+                const self = this;
                 _.each(reminders, function(reminder) {
                     self.addReminder(reminder);
                 });
@@ -76,12 +76,12 @@ define(
              * @param {Object} newReminder
              */
             addReminder: function(newReminder) {
-                var uniqueId = newReminder.uniqueId;
-                var newId = newReminder.id;
-                var oldReminder = this.reminders[uniqueId];
+                const uniqueId = newReminder.uniqueId;
+                const newId = newReminder.id;
+                const oldReminder = this.reminders[uniqueId];
                 if (!oldReminder) {
-                    var removeDate = this.removeDates[uniqueId];
-                    var currentDate = new Date();
+                    const removeDate = this.removeDates[uniqueId];
+                    const currentDate = new Date();
                     // If was already removed less then 60 secs ago, ignore it
                     if (removeDate && currentDate.getTime() - removeDate.getTime() < 60000) {
                         return;
@@ -101,12 +101,12 @@ define(
              * @param {integer} uniqueId
              */
             removeReminder: function(uniqueId) {
-                var reminder = this.reminders[uniqueId];
+                const reminder = this.reminders[uniqueId];
                 if (!reminder) {
                     return;
                 }
-                var url = routing.generate('oro_api_post_reminder_shown');
-                var removeIds = reminder.duplicateIds || [];
+                const url = routing.generate('oro_api_post_reminder_shown');
+                const removeIds = reminder.duplicateIds || [];
                 removeIds.push(reminder.id);
 
                 $.post(url, {ids: removeIds});
@@ -120,18 +120,19 @@ define(
              * Show reminders
              */
             showReminders: function() {
-                var self = this;
+                const self = this;
 
                 // Remove all reminders
                 $('.alert-reminder').remove();
 
                 _.each(this.reminders, function(reminder, uniqueId) {
-                    var message = this.getReminderMessage(reminder);
+                    let message = this.getReminderMessage(reminder);
                     message += '(<a class="reminder-dismiss-link" data-id="' + reminder.id + '" data-unique-id="' +
                         reminder.uniqueId + '" href="#">dismiss</a>)';
 
-                    var actions = messenger.notificationFlashMessage('reminder', message, {delay: false, flash: false});
-                    var data = {actions: actions, uniqueId: uniqueId};
+                    const actions =
+                        messenger.notificationFlashMessage('reminder', message, {delay: false, flash: false});
+                    const data = {actions: actions, uniqueId: uniqueId};
 
                     $('.reminder-dismiss-link[data-id="' + reminder.id + '"]')
                         .bind('click', data, function(event) {
@@ -146,7 +147,7 @@ define(
 
                 $('.alert-reminder .hash-navigation-link').unbind('click').bind('click', function(event) {
                     event.preventDefault();
-                    var url = $(this).attr('href');
+                    const url = $(this).attr('href');
                     mediator.execute('redirectTo', {url: url});
                 });
             },
@@ -156,9 +157,9 @@ define(
              * @returns {string}
              */
             getReminderMessage: function(reminder) {
-                var message = '';
+                let message = '';
                 try {
-                    var template = $('.reminder_templates[data-identifier="' + reminder.templateId + '"]').html();
+                    let template = $('.reminder_templates[data-identifier="' + reminder.templateId + '"]').html();
                     if ($.trim(template) === '') {
                         template = $('.reminder_templates[data-identifier="default"]').html();
                     }

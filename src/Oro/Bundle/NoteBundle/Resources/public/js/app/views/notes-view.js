@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var NotesView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
-    var DialogWidget = require('oro/dialog-widget');
-    var DeleteConfirmation = require('oroui/js/delete-confirmation');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const LoadingMask = require('oroui/js/app/views/loading-mask-view');
+    const DialogWidget = require('oro/dialog-widget');
+    const DeleteConfirmation = require('oroui/js/delete-confirmation');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
-    NotesView = BaseCollectionView.extend({
+    const NotesView = BaseCollectionView.extend({
         options: {
             template: null,
             itemTemplate: null,
@@ -36,8 +35,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function NotesView() {
-            NotesView.__super__.constructor.apply(this, arguments);
+        constructor: function NotesView(options) {
+            NotesView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -93,9 +92,9 @@ define(function(require) {
         },
 
         toggleSorting: function(e) {
-            var $el = $(e.currentTarget);
-            var titleAlt = $el.data('title-alt');
-            var iconAlt = $el.data('icon-alt');
+            const $el = $(e.currentTarget);
+            const titleAlt = $el.data('title-alt');
+            const iconAlt = $el.data('icon-alt');
             $el.data('title-alt', $el.attr('title'));
             $el.attr('title', titleAlt);
             $el.data('icon-alt', $el.find('i').attr('class').replace(/ hide-text/, ''));
@@ -105,7 +104,7 @@ define(function(require) {
         },
 
         _reload: function(sorting) {
-            var state = {};
+            const state = {};
             if (!_.isUndefined(sorting)) {
                 this.collection.setSorting(sorting);
             }
@@ -133,8 +132,8 @@ define(function(require) {
         },
 
         _addItem: function(e) {
-            var url = this._getUrl('createItem');
-            var routeAdditionalParams = $(e).data('route_additional_params') || {};
+            let url = this._getUrl('createItem');
+            const routeAdditionalParams = $(e).data('route_additional_params') || {};
 
             if (!_.isEmpty(routeAdditionalParams)) {
                 url += (url.indexOf('?') === -1 ? '?' : '&') + $.param(routeAdditionalParams);
@@ -148,7 +147,7 @@ define(function(require) {
         },
 
         _deleteItem: function(model) {
-            var confirm = new DeleteConfirmation({
+            const confirm = new DeleteConfirmation({
                 content: this._getMessage('deleteConfirmation')
             });
             confirm.on('ok', _.bind(function() {
@@ -221,8 +220,8 @@ define(function(require) {
                 this.itemEditDialog.on('formSave', _.bind(function(response) {
                     this.itemEditDialog.remove();
                     mediator.execute('showFlashMessage', 'success', this._getMessage('itemSaved'));
-                    var insertPosition;
-                    var model = this.collection.get(response.id);
+                    let insertPosition;
+                    const model = this.collection.get(response.id);
                     if (model) {
                         model.set(response);
                     } else {

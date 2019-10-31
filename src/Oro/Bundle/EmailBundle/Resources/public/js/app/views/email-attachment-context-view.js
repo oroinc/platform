@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var EmailAttachmentContextView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
 
-    EmailAttachmentContextView = BaseView.extend({
+    const EmailAttachmentContextView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat(['enableAttachmentSelector']),
         /**
          * @inheritDoc
@@ -13,14 +12,14 @@ define(function(require) {
         constructor: function EmailAttachmentContextView(options) {
             this.$enableAttachment = $(options.el).closest('form').find(options.enableAttachmentSelector);
 
-            EmailAttachmentContextView.__super__.constructor.apply(this, arguments);
+            EmailAttachmentContextView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            EmailAttachmentContextView.__super__.initialize.apply(this, arguments);
+            EmailAttachmentContextView.__super__.initialize.call(this, options);
 
             this.setVisibility();
         },
@@ -53,7 +52,7 @@ define(function(require) {
 
         dispose: function() {
             delete this.$enableAttachment;
-            EmailAttachmentContextView.__super__.dispose.apply(this, arguments);
+            EmailAttachmentContextView.__super__.dispose.call(this);
         }
     });
 

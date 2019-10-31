@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var ExpressionEditorUtil;
-    var _ = require('underscore');
+    const _ = require('underscore');
 
-    ExpressionEditorUtil = function(options) {
+    const ExpressionEditorUtil = function(options) {
         this._initialize(options);
     };
 
@@ -139,15 +138,15 @@ define(function(require) {
          * @private
          */
         _convertExpressionToNativeJS: function(expression) {
-            var clearMethods = ['_clearStrings', '_clearDataSource', '_clearArrays', '_clearSeparators'];
-            for (var i = 0; i < clearMethods.length; i++) {
+            const clearMethods = ['_clearStrings', '_clearDataSource', '_clearArrays', '_clearSeparators'];
+            for (let i = 0; i < clearMethods.length; i++) {
                 expression = this[clearMethods[i]](expression);
                 if (expression === false) {
                     return false;
                 }
             }
 
-            var items = expression.split(this.regex.splitExpressionToItems);
+            const items = expression.split(this.regex.splitExpressionToItems);
             _.each(items, this._convertItemToNativeJS, this);
 
             return items.join('');
@@ -165,12 +164,12 @@ define(function(require) {
             if (item.length === 0) {
                 return item;
             }
-            var prevSeparator = i - 1;
-            var prevItem = prevSeparator - 1;
-            var nextSeparator = i + 1;
-            var nextItem = nextSeparator + 1;
+            const prevSeparator = i - 1;
+            const prevItem = prevSeparator - 1;
+            let nextSeparator = i + 1;
+            let nextItem = nextSeparator + 1;
 
-            var groupedItem = item + this.strings.itemSeparator + items[nextItem];
+            const groupedItem = item + this.strings.itemSeparator + items[nextItem];
             if (items[nextItem] && this.allItems[groupedItem]) {
                 // items with whitespaces, for example: `not in`
                 item = groupedItem;
@@ -181,7 +180,7 @@ define(function(require) {
                 nextItem = nextSeparator + 1;
             }
 
-            var nativeJS = this._getNativeJS(item);
+            let nativeJS = this._getNativeJS(item);
             if (nativeJS === item) {
                 items[i] = nativeJS;
                 return nativeJS;
@@ -226,18 +225,18 @@ define(function(require) {
          * @private
          */
         _clearDataSource: function(expression) {
-            var dataSources = this.dataSource;
+            const dataSources = this.dataSource;
             if (!dataSources.length) {
                 return expression;
             }
 
-            var items = expression.split(this.regex.splitExpressionToItems);
-            var item;
+            const items = expression.split(this.regex.splitExpressionToItems);
+            let item;
             // check all items
-            for (var i = 0; i < items.length; i++) {
+            for (let i = 0; i < items.length; i++) {
                 item = items[i];
                 // check all data sources in item
-                for (var j = 0; j < dataSources.length; j++) {
+                for (let j = 0; j < dataSources.length; j++) {
                     item = item.split(new RegExp('(' + dataSources[j] + ')'));
                     if (item.length < 2 || item[0] !== '') {
                         // data source not found in item or not in item beginning
@@ -265,9 +264,9 @@ define(function(require) {
          * @private
          */
         _clearArrays: function(expression) {
-            var array;
-            var changedExpression;
-            var arrayPlaceholder = this.strings.arrayPlaceholder;
+            let array;
+            let changedExpression;
+            const arrayPlaceholder = this.strings.arrayPlaceholder;
 
             /*
             while we have an [ or ]
@@ -324,7 +323,7 @@ define(function(require) {
          * @private
          */
         _getNativeJS: function(item) {
-            var foundItem = this.allItems[item];
+            const foundItem = this.allItems[item];
             if (this.itemToNativeJS[item] !== undefined) {
                 return this.itemToNativeJS[item];
             } else if (foundItem && this.itemToNativeJS[foundItem.type] !== undefined) {
@@ -341,15 +340,15 @@ define(function(require) {
          * @private
          */
         _validateNativeJS: function(expression) {
-            var testExpression = expression.replace(this.regex.nativeReplaceAllowedBeforeTest, '');
+            const testExpression = expression.replace(this.regex.nativeReplaceAllowedBeforeTest, '');
             if (this.regex.nativeFindNotAllowed.test(testExpression)) {
                 return false;
             }
             // replace all "&&" and "||" to "&", because if first part of "&&" or "||" return true or false - JS ignore(do not execute) second part
             expression = expression.replace(this.regex.nativeReplaceLogicalIOperations, '&');
             try {
-                var f = new Function('return ' + expression);
-                var result = f();
+                const f = new Function('return ' + expression);
+                const result = f();
                 return _.isBoolean(result) || !_.isUndefined(result);
             } catch (e) {
                 return false;
@@ -386,9 +385,9 @@ define(function(require) {
          * @param {String} item
          */
         updateAutocompleteItem: function(autocompleteData, item) {
-            var positionModifier = 0;
-            var hasChild = !!autocompleteData.items[item].child;
-            var hasDataSource = this.dataSource.indexOf(item) !== -1;
+            let positionModifier = 0;
+            const hasChild = !!autocompleteData.items[item].child;
+            const hasDataSource = this.dataSource.indexOf(item) !== -1;
 
             if (hasDataSource) {
                 item += '[]';
@@ -498,7 +497,7 @@ define(function(require) {
          * @private
          */
         _getEntityChild: function(level, parentItem, entity) {
-            var child = {};
+            const child = {};
 
             level++;
             if (level > this.options.itemLevelLimit) {
@@ -506,7 +505,7 @@ define(function(require) {
             }
 
             _.each(this.options.entities.fields_data[entity], function(itemInfo, item) {
-                var childItem = parentItem + this.strings.childSeparator + item;
+                const childItem = parentItem + this.strings.childSeparator + item;
                 itemInfo.parentItem = parentItem;
                 if (itemInfo.type === 'relation') {
                     itemInfo.child = this._getEntityChild(level, childItem, itemInfo.relation_alias);
@@ -525,7 +524,7 @@ define(function(require) {
          * @return {Object}
          */
         _prepareAutocompleteData: function(expression, position) {
-            var autocompleteData = {
+            const autocompleteData = {
                 expression: expression, // full expression
                 position: position, // cursor position
                 item: '', // item under cursor or just "item"
@@ -557,11 +556,11 @@ define(function(require) {
          * @private
          */
         _setAutocompleteItem: function(autocompleteData) {
-            var beforeCaret = autocompleteData.expression.slice(0, autocompleteData.position);
-            var afterCaret = autocompleteData.expression.slice(autocompleteData.position);
+            const beforeCaret = autocompleteData.expression.slice(0, autocompleteData.position);
+            const afterCaret = autocompleteData.expression.slice(autocompleteData.position);
 
-            var itemBeforeCursor = beforeCaret.replace(this.regex.itemPartBeforeCursor, '');
-            var itemAfterCursor = afterCaret.replace(this.regex.itemPartAfterCursor, '');
+            const itemBeforeCursor = beforeCaret.replace(this.regex.itemPartBeforeCursor, '');
+            const itemAfterCursor = afterCaret.replace(this.regex.itemPartAfterCursor, '');
 
             autocompleteData.beforeItem = beforeCaret.slice(0, beforeCaret.length - itemBeforeCursor.length);
             autocompleteData.afterItem = afterCaret.slice(itemAfterCursor.length);
@@ -582,8 +581,8 @@ define(function(require) {
          * @private
          */
         _setAutocompleteGroup: function(autocompleteData) {
-            var prevItemStr = _.trim(autocompleteData.beforeItem).split(this.strings.itemSeparator).pop();
-            var prevItem = this.allItems[prevItemStr] || {};
+            const prevItemStr = _.trim(autocompleteData.beforeItem).split(this.strings.itemSeparator).pop();
+            const prevItem = this.allItems[prevItemStr] || {};
 
             if (!prevItemStr || prevItemStr === '(' || prevItem.group === 'operations') {
                 autocompleteData.group = 'entities';
@@ -599,9 +598,9 @@ define(function(require) {
          * @private
          */
         _setAutocompleteItems: function(autocompleteData) {
-            var items = this[autocompleteData.group + 'Items'];
-            var item;
-            for (var i = 0; i < autocompleteData.itemChild.length - 1; i++) {
+            let items = this[autocompleteData.group + 'Items'];
+            let item;
+            for (let i = 0; i < autocompleteData.itemChild.length - 1; i++) {
                 item = autocompleteData.itemChild[i];
                 item = item.replace(this.regex.cutDataSourceId, '');
                 items = items[item] || {};
@@ -621,8 +620,8 @@ define(function(require) {
          * @private
          */
         _setAutocompleteDataSource: function(autocompleteData) {
-            var dataSourceKey = autocompleteData.itemCursorChild.replace(this.regex.cutDataSourceId, '');
-            var dataSourceValue = '';
+            let dataSourceKey = autocompleteData.itemCursorChild.replace(this.regex.cutDataSourceId, '');
+            let dataSourceValue = '';
 
             if (dataSourceKey === autocompleteData.itemCursorChild) {
                 dataSourceKey = '';

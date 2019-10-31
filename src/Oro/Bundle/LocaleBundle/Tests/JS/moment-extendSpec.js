@@ -1,22 +1,22 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var moment = require('moment');
+    const _ = require('underscore');
+    const moment = require('moment');
 
     describe('method `tz` with second parameter', function() {
-        var dateTimeFormat = 'YYYY-MM-DD[T]HH:mm:ss';
-        var dateTimeTZFormat = 'YYYY-MM-DD[T]HH:mm:ssZZ';
-        var dates = ['2016-01-01T01:00:00', '2016-05-10T12:00:00', '2016-10-30T18:00:00'];
-        var timezones = ['America/Los_Angeles', 'UTC', 'Europe/Kiev', 'Asia/Tokyo'];
-        var offsets = ['', '-10:00', '-01:00', '+5:00'];
+        const dateTimeFormat = 'YYYY-MM-DD[T]HH:mm:ss';
+        const dateTimeTZFormat = 'YYYY-MM-DD[T]HH:mm:ssZZ';
+        const dates = ['2016-01-01T01:00:00', '2016-05-10T12:00:00', '2016-10-30T18:00:00'];
+        const timezones = ['America/Los_Angeles', 'UTC', 'Europe/Kiev', 'Asia/Tokyo'];
+        const offsets = ['', '-10:00', '-01:00', '+5:00'];
         describe('should change timezone without changing time', function() {
             _.each(dates, function(date) {
                 _.each(timezones, function(timezone) {
                     _.each(offsets, function(offset) {
-                        var dateWithOffset = date + offset;
+                        const dateWithOffset = date + offset;
                         it('at ' + dateWithOffset, function() {
-                            var expectedMoment = moment.tz(date, dateTimeFormat, true, timezone);
+                            const expectedMoment = moment.tz(date, dateTimeFormat, true, timezone);
                             expect(
                                 moment(dateWithOffset, dateTimeTZFormat).tz(timezone, true).format(dateTimeTZFormat)
                             ).toBe(expectedMoment.format(dateTimeTZFormat));
@@ -31,7 +31,7 @@ define(function(require) {
                 _.each(timezones, function(timezone) {
                     _.each(timezones, function(initTZ) {
                         it('at ' + date + ' (' + initTZ + ')', function() {
-                            var expectedMoment = moment.tz(date, dateTimeFormat, true, timezone);
+                            const expectedMoment = moment.tz(date, dateTimeFormat, true, timezone);
                             expect(moment.tz(date, dateTimeFormat, true, initTZ).tz(timezone, true)
                                 .format(dateTimeTZFormat)).toBe(expectedMoment.format(dateTimeTZFormat));
                         });
@@ -42,7 +42,7 @@ define(function(require) {
 
         describe('should work correctly in case', function() {
             it('long transformation chain', function() {
-                var momentInst = moment('2016-07-04T20:00:00+01:00', dateTimeTZFormat, true);
+                const momentInst = moment('2016-07-04T20:00:00+01:00', dateTimeTZFormat, true);
                 momentInst.tz('Europe/Kiev', true).add(240, 'minutes').tz('Asia/Tokyo', true).add(-5, 'hours')
                     .tz('UTC', true).add(60, 'minutes').tz('America/Los_Angeles', true);
                 expect(momentInst.format(dateTimeTZFormat)).toBe('2016-07-04T20:00:00-0700');

@@ -6,8 +6,6 @@ define([
 ], function(_, Backgrid, SelectCellRadioEditor, textUtil) {
     'use strict';
 
-    var SelectCell;
-
     /**
      * Select column cell. Added missing behaviour.
      *
@@ -15,7 +13,7 @@ define([
      * @class   oro.datagrid.cell.SelectCell
      * @extends Backgrid.SelectCell
      */
-    SelectCell = Backgrid.SelectCell.extend({
+    const SelectCell = Backgrid.SelectCell.extend({
         events: {},
 
         optionValues: [],
@@ -23,8 +21,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function SelectCell() {
-            SelectCell.__super__.constructor.apply(this, arguments);
+        constructor: function SelectCell(options) {
+            SelectCell.__super__.constructor.call(this, options);
         },
 
         /**
@@ -35,7 +33,7 @@ define([
                 this.editor = SelectCellRadioEditor;
             }
 
-            var choices = options.column.get('metadata').choices;
+            const choices = options.column.get('metadata').choices;
             if (choices) {
                 this.optionValues = [];
                 _.each(choices, function(value, label) {
@@ -44,7 +42,7 @@ define([
             } else {
                 throw new Error('Column metadata must have choices specified');
             }
-            SelectCell.__super__.initialize.apply(this, arguments);
+            SelectCell.__super__.initialize.call(this, options);
 
             this.listenTo(this.model, 'change:' + this.column.get('name'), function() {
                 this.enterEditMode();
@@ -61,7 +59,7 @@ define([
                 return;
             }
 
-            var render = SelectCell.__super__.render.apply(this, arguments);
+            const render = SelectCell.__super__.render.call(this);
 
             this.enterEditMode();
 
@@ -73,7 +71,7 @@ define([
          */
         enterEditMode: function() {
             if (this.isEditableColumn()) {
-                SelectCell.__super__.enterEditMode.apply(this, arguments);
+                SelectCell.__super__.enterEditMode.call(this);
             }
         },
 

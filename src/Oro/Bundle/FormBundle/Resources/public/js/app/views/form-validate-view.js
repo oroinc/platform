@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var FormValidateView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
     require('jquery.validate');
 
-    FormValidateView = BaseView.extend({
+    const FormValidateView = BaseView.extend({
         keepElement: true,
 
         autoRender: true,
@@ -16,8 +15,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function FormValidateView() {
-            FormValidateView.__super__.constructor.apply(this, arguments);
+        constructor: function FormValidateView(options) {
+            FormValidateView.__super__.constructor.call(this, options);
         },
 
         /**

@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var AccessLevelsCollection;
-    var _ = require('underscore');
-    var RoutingCollection = require('oroui/js/app/models/base/routing-collection');
+    const _ = require('underscore');
+    const RoutingCollection = require('oroui/js/app/models/base/routing-collection');
 
-    AccessLevelsCollection = RoutingCollection.extend({
+    const AccessLevelsCollection = RoutingCollection.extend({
         routeDefaults: {
             routeName: 'oro_security_access_levels'
         },
@@ -13,8 +12,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AccessLevelsCollection() {
-            AccessLevelsCollection.__super__.constructor.apply(this, arguments);
+        constructor: function AccessLevelsCollection(...args) {
+            AccessLevelsCollection.__super__.constructor.apply(this, args);
         },
 
         parse: function(resp, options) {

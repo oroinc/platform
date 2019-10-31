@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var PasswordGenerateComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const _ = require('underscore');
 
-    PasswordGenerateComponent = BaseComponent.extend({
+    const PasswordGenerateComponent = BaseComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function PasswordGenerateComponent() {
-            PasswordGenerateComponent.__super__.constructor.apply(this, arguments);
+        constructor: function PasswordGenerateComponent(options) {
+            PasswordGenerateComponent.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {

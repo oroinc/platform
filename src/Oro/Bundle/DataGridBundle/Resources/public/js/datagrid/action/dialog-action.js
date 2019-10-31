@@ -6,8 +6,6 @@ define([
 ], function($, __, ModelAction, WidgetComponent) {
     'use strict';
 
-    var DialogAction;
-
     /**
      * Dialog action
      *
@@ -15,7 +13,7 @@ define([
      * @class   oro.datagrid.action.DialogAction
      * @extends oro.datagrid.action.ModelAction
      */
-    DialogAction = ModelAction.extend({
+    const DialogAction = ModelAction.extend({
         useDirectLauncherLink: false,
         widgetOptions: null,
         widgetComponent: null,
@@ -42,8 +40,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function DialogAction() {
-            DialogAction.__super__.constructor.apply(this, arguments);
+        constructor: function DialogAction(options) {
+            DialogAction.__super__.constructor.call(this, options);
         },
 
         /**
@@ -53,7 +51,7 @@ define([
          * @throws {TypeError} If model is undefined
          */
         initialize: function(options) {
-            DialogAction.__super__.initialize.apply(this, arguments);
+            DialogAction.__super__.initialize.call(this, options);
 
             // make own widgetOptions property from prototype
             this.widgetOptions = $.extend(true, {}, this.widgetDefaultOptions, this.widgetOptions, {

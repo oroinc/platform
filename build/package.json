@@ -11,11 +11,15 @@
     "test-codestyle": "./node_modules/.bin/eslint ../../ -c .eslintrc.yml --ignore-path .eslintignore --quiet"
   },
   "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/plugin-transform-runtime": "^7.6.2",
+    "@babel/preset-env": "^7.6.3",
     "autoprefixer": "9.6.1",
+    "babel-loader": "^8.0.6",
     "css-loader": "^3.1.0",
     "deepmerge": "3.3.0",
-    "eslint": "6.0.1",
-    "eslint-config-google": "0.13.0",
+    "eslint": "6.5.1",
+    "eslint-config-google": "0.14.0",
     "eslint-plugin-oro": "https://api.github.com/repos/laboro/eslint-plugin-oro/tarball/0.0.1",
     "exports-loader": "^0.7.0",
     "expose-loader": "^0.7.5",
@@ -54,7 +58,8 @@
     "webpack-merge": "4.2.1"
   },
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
+    "@babel/runtime": "^7.6.3",
+    "core-js": "^3.3.3",
     "whatwg-fetch": "^3.0.0"
   }
 }

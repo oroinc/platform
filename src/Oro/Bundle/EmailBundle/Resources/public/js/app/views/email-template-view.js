@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var EmailTemplateView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var EmailTemplateCollection = require('oroemail/js/app/models/email-template-collection');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const EmailTemplateCollection = require('oroemail/js/app/models/email-template-collection');
 
     /**
      * @export oroemail/js/app/views/email-template-view
      */
-    EmailTemplateView = BaseView.extend({
+    const EmailTemplateView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat(['collectionOptions', 'targetSelector', 'target']),
 
         events: {
@@ -20,8 +19,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailTemplateView() {
-            EmailTemplateView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailTemplateView(options) {
+            EmailTemplateView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -53,7 +52,7 @@ define(function(require) {
          * onChange event listener
          */
         selectionChanged: function() {
-            var entityId = this.$el.val();
+            const entityId = this.$el.val();
             this.collection.setEntityId(entityId.split('\\').join('_'));
             if (entityId) {
                 this.collection.fetch({reset: true});

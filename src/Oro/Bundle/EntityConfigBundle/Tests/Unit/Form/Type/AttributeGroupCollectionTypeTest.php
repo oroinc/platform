@@ -32,7 +32,10 @@ class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
                 CollectionType::class => new CollectionType(),
                 AttributeGroupType::class => new AttributeGroupType(),
                 LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionTypeStub(),
-                AttributeMultiSelectType::class => new AttributeMultiSelectType($attributeManagerMock)
+                AttributeMultiSelectType::class => new AttributeMultiSelectType(
+                    $attributeManagerMock,
+                    $this->getTranslator()
+                )
             ], []),
 
         ];

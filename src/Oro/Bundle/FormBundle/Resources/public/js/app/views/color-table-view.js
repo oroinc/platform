@@ -2,12 +2,12 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
 ], function($, _, BaseSimpleColorPickerView, colorUtil) {
     'use strict';
 
-    var ColorTableView = BaseSimpleColorPickerView.extend({
+    const ColorTableView = BaseSimpleColorPickerView.extend({
         /**
          * @inheritDoc
          */
-        constructor: function ColorTableView() {
-            ColorTableView.__super__.constructor.apply(this, arguments);
+        constructor: function ColorTableView(options) {
+            ColorTableView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -46,7 +46,7 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
          * @inheritDoc
          */
         _getPicker: function() {
-            var pickerId = this.$el.prop('id') + '_picker';
+            const pickerId = this.$el.prop('id') + '_picker';
             this.$parent.append('<span id="' + pickerId + '" style="display: none;"></span>');
             return this.$parent.find('#' + pickerId);
         },

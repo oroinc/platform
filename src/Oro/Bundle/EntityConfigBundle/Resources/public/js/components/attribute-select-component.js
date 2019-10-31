@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var AttributeSelectComponent;
-    var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
-    var _ = require('underscore');
+    const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
+    const _ = require('underscore');
 
-    var Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
+    const Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
 
-    AttributeSelectComponent = Select2AutocompleteComponent.extend({
+    const AttributeSelectComponent = Select2AutocompleteComponent.extend({
         /**
          * @property {Object}
          */
@@ -34,8 +33,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AttributeSelectComponent() {
-            AttributeSelectComponent.__super__.constructor.apply(this, arguments);
+        constructor: function AttributeSelectComponent(options) {
+            AttributeSelectComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -45,7 +44,7 @@ define(function(require) {
             this.options = _.defaults(options || {}, this.options);
             this.attributeSelect = options._sourceElement;
             this.ftid = $(this.attributeSelect).data('ftid');
-            var self = this;
+            const self = this;
 
             AttributeSelectComponent.__super__.initialize.call(this, options);
 
@@ -62,10 +61,10 @@ define(function(require) {
             $(this.attributeSelect).on('selected', function(e) {
                 // Modify selected tag to show initial value (without braces)
                 if (e.val in self.oldOptionLabels) {
-                    var tag = $(self.attributeSelect).parent().find('.select2-choices li div').last();
+                    const tag = $(self.attributeSelect).parent().find('.select2-choices li div').last();
                     $(tag).html(self.oldOptionLabels[e.val]);
                 }
-                var eventData = {
+                const eventData = {
                     ftid: self.ftid,
                     selectedValue: e.val
                 };
@@ -81,13 +80,13 @@ define(function(require) {
          */
         prepareDropdown: function(selectedOptions) {
             if (selectedOptions.length) {
-                for (var id in selectedOptions) {
+                for (const id in selectedOptions) {
                     if (selectedOptions.hasOwnProperty(id)) {
-                        var option = $(this.attributeSelect).find('option[value="' + id + '"]');
-                        var oldText = $(option).text();
-                        var moveFrom = _.__('oro.attribute.move_from');
-                        var groupName = selectedOptions[id] ? selectedOptions[id] : _.__('oro.attribute.noname');
-                        var newText = oldText + '(' + moveFrom + ' ' + groupName + ')';
+                        const option = $(this.attributeSelect).find('option[value="' + id + '"]');
+                        const oldText = $(option).text();
+                        const moveFrom = _.__('oro.attribute.move_from');
+                        const groupName = selectedOptions[id] ? selectedOptions[id] : _.__('oro.attribute.noname');
+                        const newText = oldText + '(' + moveFrom + ' ' + groupName + ')';
                         $(option).text(newText);
                         this.oldOptionLabels[id] = oldText;
                     }
@@ -97,9 +96,9 @@ define(function(require) {
 
         restoreInitialDropdown: function() {
             if (this.oldOptionLabels.length) {
-                for (var id in this.oldOptionLabels) {
+                for (const id in this.oldOptionLabels) {
                     if (this.oldOptionLabels.hasOwnProperty(id)) {
-                        var option = $(this.attributeSelect).find('option[value="' + id + '"]');
+                        const option = $(this.attributeSelect).find('option[value="' + id + '"]');
                         $(option).text(this.oldOptionLabels[id]);
                     }
                 }
@@ -121,18 +120,18 @@ define(function(require) {
             }
 
             // Move system attributes to the first group
-            var selectedSystemOptions = $(this.attributeSelect).find('option[locked="locked"]:selected');
-            var optionsArray = $(selectedSystemOptions).map(function() {
+            const selectedSystemOptions = $(this.attributeSelect).find('option[locked="locked"]:selected');
+            const optionsArray = $(selectedSystemOptions).map(function() {
                 return this.value;
             }).get();
 
             if (optionsArray.length) {
-                var select = eventData.firstGroup.find('[data-bound-input-widget="select2"]');
-                for (var i = 0; i < optionsArray.length; i++) {
-                    var value = optionsArray[i];
+                const select = eventData.firstGroup.find('[data-bound-input-widget="select2"]');
+                for (let i = 0; i < optionsArray.length; i++) {
+                    const value = optionsArray[i];
                     this.applyOption(value, true, select);
                 }
-                var message = _.__('oro.attribute.attributes_moved_to_default_group');
+                const message = _.__('oro.attribute.attributes_moved_to_default_group');
                 mediator.execute('showFlashMessage', 'info', message);
             }
         },
@@ -143,7 +142,7 @@ define(function(require) {
          * @param {Object} select
          */
         applyOption: function(value, isSelected, select) {
-            var option;
+            let option;
             if (isSelected) {
                 option = $(select).find('option[value="' + value + '"]').not(':selected');
             } else {
@@ -159,20 +158,20 @@ define(function(require) {
         },
 
         addLabelsToAttributesFromOtherGroups: function() {
-            var eventData = {attributeSelects: []};
+            const eventData = {attributeSelects: []};
             mediator.trigger('attribute-select:find-selected-attributes', eventData);
 
-            var selectedOptions = [];
-            var self = this;
+            const selectedOptions = [];
+            const self = this;
             $(eventData.attributeSelects).each(function(key, value) {
-                var groupLabel = value.groupLabel;
-                var attributesSelect = value.attributesSelect;
+                const groupLabel = value.groupLabel;
+                const attributesSelect = value.attributesSelect;
                 if ($(attributesSelect).data('ftid') === self.ftid) {
                     return;
                 }
 
                 $(attributesSelect).find('option:selected').each(function() {
-                    var val = $(this).val();
+                    const val = $(this).val();
                     selectedOptions[val] = groupLabel;
                 });
             });

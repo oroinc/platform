@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var WidgetSetupModalView;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var ModalView = require('oroui/js/modal');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const ModalView = require('oroui/js/modal');
 
-    WidgetSetupModalView = ModalView.extend({
+    const WidgetSetupModalView = ModalView.extend({
         /** @property {String} */
         className: 'modal oro-modal-normal widget-setup',
 
@@ -30,7 +29,7 @@ define(function(require) {
 
             options.title = _.result(options.content, 'widgetTitle') || __('oro.sidebar.widget.setup.dialog.title');
 
-            WidgetSetupModalView.__super__.initialize.apply(this, arguments);
+            WidgetSetupModalView.__super__.initialize.call(this, options);
 
             this._bindEventHandlers();
         },

@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var LocalizationSelectView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
 
-    LocalizationSelectView = BaseView.extend({
+    const LocalizationSelectView = BaseView.extend({
         /**
          * @property {Object}
          */
@@ -29,8 +28,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function LocalizationSelectView() {
-            LocalizationSelectView.__super__.constructor.apply(this, arguments);
+        constructor: function LocalizationSelectView(options) {
+            LocalizationSelectView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -64,8 +63,8 @@ define(function(require) {
          * @param {Object} data
          */
         onEnabledLocalizationsChanged: function(data) {
-            var select = this.$select;
-            var selected = select.val();
+            const select = this.$select;
+            const selected = select.val();
 
             select.find('option[value!=""]').remove().val('').change();
 

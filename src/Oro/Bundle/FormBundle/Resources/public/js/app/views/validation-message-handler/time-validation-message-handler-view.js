@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var TimeValidationMessageHandlerView;
-    var $ = require('jquery');
-    var AbstractValidationMessageHandlerView =
+    const $ = require('jquery');
+    const AbstractValidationMessageHandlerView =
         require('oroform/js/app/views/validation-message-handler/abstract-validation-message-handler-view');
 
-    TimeValidationMessageHandlerView = AbstractValidationMessageHandlerView.extend({
+    const TimeValidationMessageHandlerView = AbstractValidationMessageHandlerView.extend({
         events: {
             showTimepicker: 'onTimepickerDialogToggle',
             hideTimepicker: 'onTimepickerDialogToggle'
@@ -15,12 +14,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function TimeValidationMessageHandlerView() {
-            TimeValidationMessageHandlerView.__super__.constructor.apply(this, arguments);
+        constructor: function TimeValidationMessageHandlerView(options) {
+            TimeValidationMessageHandlerView.__super__.constructor.call(this, options);
         },
 
         isActive: function() {
-            var $list = this.$el.data('timepicker-list');
+            const $list = this.$el.data('timepicker-list');
 
             return $list && $list.is(':visible') && !$list.hasClass('ui-timepicker-positioned-top');
         },

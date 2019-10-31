@@ -6,9 +6,7 @@ define([
 ], function(_, Chaplin, View, LoadingMaskView) {
     'use strict';
 
-    var BaseCollectionView;
-
-    BaseCollectionView = Chaplin.CollectionView.extend({
+    const BaseCollectionView = Chaplin.CollectionView.extend({
         /**
          * Selector of the element that should be covered with loading mask
          *
@@ -28,8 +26,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function BaseCollectionView() {
-            BaseCollectionView.__super__.constructor.apply(this, arguments);
+        constructor: function BaseCollectionView(options) {
+            BaseCollectionView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -38,7 +36,7 @@ define([
         initialize: function(options) {
             _.extend(this, _.pick(options, ['fallbackSelector', 'loadingSelector', 'loadingContainerSelector',
                 'itemSelector', 'listSelector', 'animationDuration']));
-            BaseCollectionView.__super__.initialize.apply(this, arguments);
+            BaseCollectionView.__super__.initialize.call(this, options);
         },
 
         // This class doesn’t inherit from the application-specific View class,
@@ -66,15 +64,15 @@ define([
          * @override
          */
         initLoadingIndicator: function() {
-            var loadingContainer = this._getLoadingContainer();
+            const loadingContainer = this._getLoadingContainer();
             if (loadingContainer) {
-                var loading = new LoadingMaskView({
+                const loading = new LoadingMaskView({
                     container: loadingContainer
                 });
                 this.subview('loading', loading);
                 this.loadingSelector = loading.$el;
             }
-            return BaseCollectionView.__super__.initLoadingIndicator.apply(this, arguments);
+            return BaseCollectionView.__super__.initLoadingIndicator.call(this);
         },
 
         /**
@@ -84,7 +82,7 @@ define([
          * @protected
          */
         _getLoadingContainer: function() {
-            var loadingContainer;
+            let loadingContainer;
             if (this.loadingContainerSelector) {
                 loadingContainer = this.$(this.loadingContainerSelector).get(0);
             }
@@ -101,9 +99,7 @@ define([
          * @override
          */
         toggleLoadingIndicator: function() {
-            var visible;
-
-            visible = (this.collection.length === 0 || this.showLoadingForce) && this.collection.isSyncing();
+            const visible = (this.collection.length === 0 || this.showLoadingForce) && this.collection.isSyncing();
             if (this.subview('loading')) {
                 this.subview('loading').toggle(visible);
             } else {
@@ -117,17 +113,17 @@ define([
          * Removes all elements that do not match current models from DOM
          */
         cleanup: function() {
-            var $list = this.listSelector ? this.$(this.listSelector) : this.$el;
+            const $list = this.listSelector ? this.$(this.listSelector) : this.$el;
             if ($list.length === 0) {
                 throw new Error('could not find list DOM element');
             }
-            var list = $list[0];
-            var validChildren = _.map(this.getItemViews(), function(view) {
+            const list = $list[0];
+            const validChildren = _.map(this.getItemViews(), function(view) {
                 return view.el;
             });
-            var toRemove = _.difference(list.children, validChildren);
-            for (var i = 0; i < toRemove.length; i++) {
-                var child = toRemove[i];
+            const toRemove = _.difference(list.children, validChildren);
+            for (let i = 0; i < toRemove.length; i++) {
+                const child = toRemove[i];
                 list.removeChild(child);
             }
         }

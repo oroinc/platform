@@ -1,24 +1,23 @@
 define(function(require) {
     'use strict';
 
-    var ActivityContextComponent;
-    var $ = require('jquery');
-    var __ = require('orotranslation/js/translator');
-    var routing = require('routing');
-    var widgetManager = require('oroui/js/widget-manager');
-    var messenger = require('oroui/js/messenger');
-    var mediator = require('oroui/js/mediator');
-    var MultiGridComponent = require('orodatagrid/js/app/components/multi-grid-component');
+    const $ = require('jquery');
+    const __ = require('orotranslation/js/translator');
+    const routing = require('routing');
+    const widgetManager = require('oroui/js/widget-manager');
+    const messenger = require('oroui/js/messenger');
+    const mediator = require('oroui/js/mediator');
+    const MultiGridComponent = require('orodatagrid/js/app/components/multi-grid-component');
 
     /**
      * @exports ActivityContextComponent
      */
-    ActivityContextComponent = MultiGridComponent.extend({
+    const ActivityContextComponent = MultiGridComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function ActivityContextComponent() {
-            ActivityContextComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ActivityContextComponent(options) {
+            ActivityContextComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -28,9 +27,9 @@ define(function(require) {
          * @param {} data
          */
         onRowSelect: function(gridWidget, data) {
-            var id = data.model.get('id');
-            var dialogWidgetName = this.options.dialogWidgetName;
-            var contextTargetClass = this.contextView.currentTargetClass();
+            const id = data.model.get('id');
+            const dialogWidgetName = this.options.dialogWidgetName;
+            const contextTargetClass = this.contextView.currentTargetClass();
 
             gridWidget._showLoading();
             $.ajax({

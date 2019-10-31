@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var Backbone = require('backbone');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
 
     /**
      *
@@ -43,7 +43,7 @@ define(function(require) {
         },
 
         removeApplicant: function(applicant) {
-            var index = this.applicants.indexOf(applicant);
+            const index = this.applicants.indexOf(applicant);
             if (index !== -1) {
                 this.applicants.splice(index, 1);
                 this.trigger('removeApplicant', this, applicant);

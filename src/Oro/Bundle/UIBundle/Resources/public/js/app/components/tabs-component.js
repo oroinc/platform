@@ -1,19 +1,18 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var TabsComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var mediator = require('oroui/js/mediator');
-    var config = require('module-config').default(module.id);
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const mediator = require('oroui/js/mediator');
+    let config = require('module-config').default(module.id);
 
     config = _.extend({
         useDropdown: true,
         dropdownText: _.__('oro.ui.tab_view_more')
     }, config);
 
-    TabsComponent = BaseComponent.extend({
+    const TabsComponent = BaseComponent.extend({
         /**
          * @property {Object}
          */
@@ -56,15 +55,15 @@ define(function(require, exports, module) {
         /**
          * @inheritDoc
          */
-        constructor: function TabsComponent() {
-            TabsComponent.__super__.constructor.apply(this, arguments);
+        constructor: function TabsComponent(options) {
+            TabsComponent.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            TabsComponent.__super__.initialize.apply(this, arguments);
+            TabsComponent.__super__.initialize.call(this, options);
 
             this.options = $.extend(true, {}, this.options, options || {});
             this.$el = options._sourceElement;
@@ -143,7 +142,7 @@ define(function(require, exports, module) {
 
         saveDropdownOuterWidth: function() {
             this.getElement('tabs').each(function(index, tab) {
-                var $tab = $(tab);
+                const $tab = $(tab);
 
                 $tab.data('dropdownOuterWidth', $tab.find(':first-child').outerWidth(true));
             });
@@ -153,17 +152,17 @@ define(function(require, exports, module) {
             if (this.disposed) {
                 return;
             }
-            var self = this;
-            var $tabsContainer = this.getElement('tabsContainer');
-            var dropdownContainerWidth = $tabsContainer.width();
+            const self = this;
+            const $tabsContainer = this.getElement('tabsContainer');
+            let dropdownContainerWidth = $tabsContainer.width();
             if (!$tabsContainer.is(':visible') || this.dropdownContainerWidth === dropdownContainerWidth) {
                 return;
             }
             this.dropdownContainerWidth = dropdownContainerWidth;
 
-            var visibleWidth = this.dropdownVisibleWidth();
-            var dropdownWidth = this.getElement('dropdown').outerWidth(true);
-            var updated = false;
+            let visibleWidth = this.dropdownVisibleWidth();
+            const dropdownWidth = this.getElement('dropdown').outerWidth(true);
+            let updated = false;
 
             if (
                 dropdownContainerWidth < visibleWidth ||
@@ -172,7 +171,7 @@ define(function(require, exports, module) {
                 dropdownContainerWidth -= dropdownWidth;
 
                 $.each(this.getElement('visibleTabs').get().reverse(), function() {
-                    var $tab = $(this);
+                    const $tab = $(this);
                     visibleWidth -= $tab.data('dropdownOuterWidth');
                     $tab.prependTo(self.getElement('dropdownMenu'));
 
@@ -184,7 +183,7 @@ define(function(require, exports, module) {
                     }
                 });
             } else {
-                var showAll = false;
+                let showAll = false;
                 if (dropdownContainerWidth >= visibleWidth + this.dropdownHiddenWidth()) {
                     showAll = true;
                 } else {
@@ -192,7 +191,7 @@ define(function(require, exports, module) {
                 }
 
                 this.getElement('hiddenTabs').each(function(i) {
-                    var $tab = $(this);
+                    const $tab = $(this);
                     if (!showAll) {
                         visibleWidth += $tab.data('dropdownOuterWidth');
                         if (dropdownContainerWidth < visibleWidth || i === 0 && $tab.hasClass('active')) {
@@ -238,11 +237,11 @@ define(function(require, exports, module) {
         },
 
         dropdownUpdateLabel: function() {
-            var $dropdownToggleLabel = this.getElement('dropdownToggleLabel');
-            var hiddenActive = this.getElement('hiddenTabs').find('a').filter('.active');
-            var defaultLabel = $dropdownToggleLabel.data('dropdownDefaultLabel');
-            var currentLabel = $dropdownToggleLabel.html();
-            var neededLabel = hiddenActive.length > 0 ? hiddenActive.html() : defaultLabel;
+            const $dropdownToggleLabel = this.getElement('dropdownToggleLabel');
+            const hiddenActive = this.getElement('hiddenTabs').find('a').filter('.active');
+            const defaultLabel = $dropdownToggleLabel.data('dropdownDefaultLabel');
+            const currentLabel = $dropdownToggleLabel.html();
+            const neededLabel = hiddenActive.length > 0 ? hiddenActive.html() : defaultLabel;
 
             if (currentLabel !== neededLabel) {
                 $dropdownToggleLabel.html(neededLabel);
@@ -262,7 +261,7 @@ define(function(require, exports, module) {
          * @returns {Number}
          */
         dropdownVisibleWidth: function() {
-            var width = 0;
+            let width = 0;
             this.getElement('visibleTabs').each(function() {
                 width += $(this).data('dropdownOuterWidth');
             });
@@ -273,7 +272,7 @@ define(function(require, exports, module) {
          * @returns {Number}
          */
         dropdownHiddenWidth: function() {
-            var width = 0;
+            let width = 0;
             this.getElement('hiddenTabs').each(function() {
                 width += $(this).data('dropdownOuterWidth');
             });
@@ -290,7 +289,7 @@ define(function(require, exports, module) {
 
             mediator.off(null, null, this);
             $(document).off('shown.bs.collapse', this.updateStateOfHiddenTabs);
-            TabsComponent.__super__.dispose.apply(this, arguments);
+            TabsComponent.__super__.dispose.call(this);
         }
     });
 

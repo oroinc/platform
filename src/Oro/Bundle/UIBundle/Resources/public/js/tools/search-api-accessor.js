@@ -1,6 +1,9 @@
 define(function(require) {
     'use strict';
 
+    const _ = require('underscore');
+    const ApiAccessor = require('./api-accessor');
+
     /**
      * Provides access to the search API for autocompletes.
      * This class is by design to be initiated from server configuration.
@@ -14,19 +17,14 @@ define(function(require) {
      * @augments [ApiAccessor](./api-accessor.md)
      * @exports SearchApiAccessor
      */
-    var SearchApiAccessor;
-
-    var _ = require('underscore');
-    var ApiAccessor = require('./api-accessor');
-
-    SearchApiAccessor = ApiAccessor.extend(/** @lends SearchApiAccessor.prototype */{
+    const SearchApiAccessor = ApiAccessor.extend(/** @lends SearchApiAccessor.prototype */{
         DEFAULT_HTTP_METHOD: 'GET',
 
         /**
          * @inheritDoc
          */
-        constructor: function SearchApiAccessor() {
-            SearchApiAccessor.__super__.constructor.apply(this, arguments);
+        constructor: function SearchApiAccessor(options) {
+            SearchApiAccessor.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
@@ -74,9 +72,9 @@ define(function(require) {
          * @returns {Object}
          */
         formatResult: function(response) {
-            var results = response.results;
-            for (var i = 0; i < results.length; i++) {
-                var result = results[i];
+            const results = response.results;
+            for (let i = 0; i < results.length; i++) {
+                const result = results[i];
                 result.id = result[this.valueFieldName];
                 result.label = result[this.labelFieldName];
             }

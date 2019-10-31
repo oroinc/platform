@@ -4,8 +4,6 @@ define([
 ], function(_, AbstractListener) {
     'use strict';
 
-    var CallbackListener;
-
     /**
      * Listener with custom callback to execute
      *
@@ -13,15 +11,15 @@ define([
      * @class   orodatagrid.datagrid.listener.CallbackListener
      * @extends orodatagrid.datagrid.listener.AbstractListener
      */
-    CallbackListener = AbstractListener.extend({
+    const CallbackListener = AbstractListener.extend({
         /** @param {Call} */
         processCallback: null,
 
         /**
          * @inheritDoc
          */
-        constructor: function CallbackListener() {
-            CallbackListener.__super__.constructor.apply(this, arguments);
+        constructor: function CallbackListener(...args) {
+            CallbackListener.__super__.constructor.apply(this, args);
         },
 
         /**
@@ -36,7 +34,7 @@ define([
 
             this.processCallback = options.processCallback;
 
-            CallbackListener.__super__.initialize.apply(this, arguments);
+            CallbackListener.__super__.initialize.call(this, options);
         },
 
         /**

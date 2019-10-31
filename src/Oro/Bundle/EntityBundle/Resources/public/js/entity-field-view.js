@@ -2,13 +2,12 @@ define(['underscore', 'backbone'
 ], function(_, Backbone) {
     'use strict';
 
-    var EntityFeildView;
     /**
      * @export  oroentity/js/entity-field-view
      * @class   oroentity.EntityFieldView
      * @extends Backbone.View
      */
-    EntityFeildView = Backbone.View.extend({
+    const EntityFeildView = Backbone.View.extend({
         /** @property {Object} */
         options: {
             fieldsLabel: null,
@@ -23,8 +22,8 @@ define(['underscore', 'backbone'
         /**
          * @inheritDoc
          */
-        constructor: function EntityFeildView() {
-            EntityFeildView.__super__.constructor.apply(this, arguments);
+        constructor: function EntityFeildView(options) {
+            EntityFeildView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -65,19 +64,19 @@ define(['underscore', 'backbone'
                 return {};
             }
 
-            var result = {
+            const result = {
                 parent_entity: null,
                 entity: this.getEntityName(),
                 field: fieldId
             };
-            var chain = result.field.split('+');
+            const chain = result.field.split('+');
             if (_.size(chain) > 1) {
-                var pair = _.last(chain).split('::');
+                const pair = _.last(chain).split('::');
                 result.parent_entity = result.entity;
                 result.entity = pair[_.size(pair) - 2];
                 result.field = _.last(pair);
                 if (_.size(chain) > 2) {
-                    var parentField = chain[_.size(chain) - 2].split('::');
+                    const parentField = chain[_.size(chain) - 2].split('::');
                     result.parent_entity = parentField[_.size(parentField) - 2];
                 }
             }

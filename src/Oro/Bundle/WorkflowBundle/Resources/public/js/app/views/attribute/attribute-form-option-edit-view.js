@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var AttributeFormOptionEditView;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var FieldChoiceView = require('oroentity/js/app/views/field-choice-view');
-    var helper = require('oroworkflow/js/tools/workflow-helper');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const FieldChoiceView = require('oroentity/js/app/views/field-choice-view');
+    const helper = require('oroworkflow/js/tools/workflow-helper');
     require('jquery.validate');
 
-    AttributeFormOptionEditView = BaseView.extend({
+    const AttributeFormOptionEditView = BaseView.extend({
         attributes: {
             'class': 'widget-content'
         },
@@ -35,8 +34,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AttributeFormOptionEditView() {
-            AttributeFormOptionEditView.__super__.constructor.apply(this, arguments);
+        constructor: function AttributeFormOptionEditView(options) {
+            AttributeFormOptionEditView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -44,14 +43,14 @@ define(function(require) {
          */
         initialize: function(options) {
             options = options || {};
-            var requiredMissed = this.requiredOptions.filter(function(option) {
+            const requiredMissed = this.requiredOptions.filter(function(option) {
                 return _.isUndefined(options[option]);
             });
             if (requiredMissed.length) {
                 throw new TypeError('Missing required option(s): ' + requiredMissed.join(', '));
             }
             this.options = _.defaults(options, this.options);
-            var template = this.options.template || $('#attribute-form-option-edit-template').html();
+            const template = this.options.template || $('#attribute-form-option-edit-template').html();
             this.template = _.template(template);
 
             this.entity_field_template = this.options.entity_field_template ||
@@ -63,7 +62,7 @@ define(function(require) {
         },
 
         onAdd: function() {
-            var formData = helper.getFormData(this.form);
+            const formData = helper.getFormData(this.form);
 
             formData.property_path = this.options.entityFieldsProvider.getPropertyPathByPath(formData.property_path);
             formData.required = formData.hasOwnProperty('required');

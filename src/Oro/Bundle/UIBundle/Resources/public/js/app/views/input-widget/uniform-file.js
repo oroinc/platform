@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var UniformFileInputWidgetView;
-    var AbstractInputWidgetView = require('oroui/js/app/views/input-widget/abstract');
-    var __ = require('orotranslation/js/translator');
+    const AbstractInputWidgetView = require('oroui/js/app/views/input-widget/abstract');
+    const __ = require('orotranslation/js/translator');
     require('jquery.uniform');
 
-    UniformFileInputWidgetView = AbstractInputWidgetView.extend({
+    const UniformFileInputWidgetView = AbstractInputWidgetView.extend({
         widgetFunctionName: 'uniform',
 
         initializeOptions: {
@@ -21,15 +20,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function UniformFileInputWidgetView() {
-            UniformFileInputWidgetView.__super__.constructor.apply(this, arguments);
+        constructor: function UniformFileInputWidgetView(options) {
+            UniformFileInputWidgetView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initializeWidget: function() {
-            UniformFileInputWidgetView.__super__.initializeWidget.apply(this, arguments);
+        initializeWidget: function(options) {
+            UniformFileInputWidgetView.__super__.initializeWidget.call(this, options);
             if (this.$el.is('.error')) {
                 this.$el.removeClass('error');
                 this.getContainer().addClass('error');
@@ -41,7 +40,7 @@ define(function(require) {
          */
         disposeWidget: function() {
             this.$el.uniform.restore(this.$el);
-            UniformFileInputWidgetView.__super__.disposeWidget.apply(this, arguments);
+            UniformFileInputWidgetView.__super__.disposeWidget.call(this);
         },
 
         /**

@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var ActionManager;
-    var _ = require('underscore');
-    var error = require('oroui/js/error');
+    const _ = require('underscore');
+    const error = require('oroui/js/error');
 
     /**
      * Actions manager, can stored action views, and share for all jstree
      *
      * @type {Object}
      */
-    ActionManager = {
+    const ActionManager = {
         /**
          * Actions stack
          *

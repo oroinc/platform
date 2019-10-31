@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var Select2AutocompleteEnabledLocalizationComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
 
-    Select2AutocompleteEnabledLocalizationComponent = Select2AutocompleteComponent.extend({
+    const Select2AutocompleteEnabledLocalizationComponent = Select2AutocompleteComponent.extend({
         /**
          * @property {Object}
          */
@@ -30,8 +29,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function Select2AutocompleteEnabledLocalizationComponent() {
-            Select2AutocompleteEnabledLocalizationComponent.__super__.constructor.apply(this, arguments);
+        constructor: function Select2AutocompleteEnabledLocalizationComponent(options) {
+            Select2AutocompleteEnabledLocalizationComponent.__super__.constructor.call(this, options);
         },
 
         /**

@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var BaseCollection;
-    var _ = require('underscore');
-    var Chaplin = require('chaplin');
-    var BaseModel = require('./model');
+    const _ = require('underscore');
+    const Chaplin = require('chaplin');
+    const BaseModel = require('./model');
 
     /**
      * @class BaseCollection
      * @extends Chaplin.Collection
      */
-    BaseCollection = Chaplin.Collection.extend(/** @lends BaseCollection.prototype */{
+    const BaseCollection = Chaplin.Collection.extend(/** @lends BaseCollection.prototype */{
         cidPrefix: 'cl',
 
         model: BaseModel,

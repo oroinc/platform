@@ -16,7 +16,7 @@ define([
         });
     }
 
-    var Select2EmailRecipientsComponent = Select2Component.extend({
+    const Select2EmailRecipientsComponent = Select2Component.extend({
         ViewType: Select2View,
 
         $el: null,
@@ -24,8 +24,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function Select2EmailRecipientsComponent() {
-            Select2EmailRecipientsComponent.__super__.constructor.apply(this, arguments);
+        constructor: function Select2EmailRecipientsComponent(options) {
+            Select2EmailRecipientsComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -33,12 +33,12 @@ define([
          */
         initialize: function(options) {
             this.$el = options._sourceElement;
-            Select2EmailRecipientsComponent.__super__.initialize.apply(this, arguments);
+            Select2EmailRecipientsComponent.__super__.initialize.call(this, options);
         },
 
-        preConfig: function() {
-            var config = Select2EmailRecipientsComponent.__super__.preConfig.apply(this, arguments);
-            var searchChoice = {data: {id: '', text: ''}};
+        preConfig: function(config) {
+            Select2EmailRecipientsComponent.__super__.preConfig.call(this, config);
+            const searchChoice = {data: {id: '', text: ''}};
             this.$el.data({
                 'search-choice': searchChoice,
                 'organizations': [],
@@ -46,7 +46,7 @@ define([
                 'contexts': []
             });
 
-            var self = this;
+            const self = this;
             config.ajax.results = function(data) {
                 return {results: self._processResultData(data)};
             };
@@ -55,9 +55,9 @@ define([
              * Adds organization in request parameters so
              * there is no mix of organizations in records
              */
-            var originalData = config.ajax.data;
-            config.ajax.data = function() {
-                var params = originalData.apply(this, arguments);
+            const originalData = config.ajax.data;
+            config.ajax.data = function(...args) {
+                const params = originalData.apply(this, args);
 
                 if (self.$el.data('organization')) {
                     params.organization = self.$el.data('organization');
@@ -71,7 +71,7 @@ define([
              * previously autocompleted text instead of text currently typed
              */
             config.createSearchChoice = function(term, data) {
-                var selectedData = this.opts.element.inputWidget('data');
+                const selectedData = this.opts.element.inputWidget('data');
                 if (!dataHasText(data, term) && !dataHasText(selectedData, term)) {
                     searchChoice.data = {id: '', text: ''};
                     searchChoice.data.id = term;
@@ -88,7 +88,7 @@ define([
          * Extracts metadata, update contexts, retrieve data for select2
          */
         _processResultData: function(data) {
-            var self = this;
+            const self = this;
             return _.map(data.results, function(section) {
                 if (typeof section.children === 'undefined') {
                     self._processData(section.data);
@@ -122,10 +122,10 @@ define([
                 return;
             }
 
-            var contexts = this.$el.data('contexts');
-            var organizations = this.$el.data('organizations');
+            const contexts = this.$el.data('contexts');
+            const organizations = this.$el.data('organizations');
 
-            var parsedItem = JSON.parse(data);
+            const parsedItem = JSON.parse(data);
             if (parsedItem.contextText) {
                 contexts[parsedItem.key] = {};
                 contexts[parsedItem.key] = {

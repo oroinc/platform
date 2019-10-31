@@ -4,9 +4,7 @@ define([
 ], function($, _) {
     'use strict';
 
-    var FilterTemplate;
-
-    FilterTemplate = {
+    const FilterTemplate = {
         /**
          * Template for filter criteria
          *
@@ -40,9 +38,9 @@ define([
         },
 
         _getTemplate: function(property) {
-            var selector = this[property + 'Selector'] || '';
-            var theme = this.templateTheme;
-            var src = theme && $(selector + '-' + theme).text() || $(selector).text();
+            const selector = this[property + 'Selector'] || '';
+            const theme = this.templateTheme;
+            const src = theme && $(selector + '-' + theme).text() || $(selector).text();
 
             return !_.isEmpty(src) ? _.template(src) : this[property];
         }

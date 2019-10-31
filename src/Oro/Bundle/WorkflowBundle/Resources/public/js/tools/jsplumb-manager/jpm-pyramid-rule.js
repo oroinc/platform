@@ -1,19 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var PyramidRule;
-    var _ = require('underscore');
-    var Rule = require('./jpm-base-rule');
+    const _ = require('underscore');
+    const Rule = require('./jpm-base-rule');
 
-    PyramidRule = Rule.extend({
+    const PyramidRule = Rule.extend({
         name: 'Pyramid',
         priority: 20,
         match: function(cell) {
-            var a;
-            var b;
-            var c;
-            var temp;
-            var children = _.filter(cell.children, function(child) {
+            let a;
+            let b;
+            let c;
+            let temp;
+            const children = _.filter(cell.children, function(child) {
                 return child.y === cell.y + 1 || child.y === cell.y + 2;
             });
             children.sort(function(a, b) {
@@ -54,8 +53,8 @@ define(function(require) {
             return false;
         },
         apply: function() {
-            var context = this.context;
-            var changed = false;
+            const context = this.context;
+            let changed = false;
             if (this.root) {
                 changed = context.move(this.items[0], this.root.x - 1) || changed;
                 changed = context.move(this.items[1], this.root.x) || changed;

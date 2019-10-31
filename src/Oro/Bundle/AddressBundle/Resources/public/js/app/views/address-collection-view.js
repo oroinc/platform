@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var AddressCollectionView;
-    var BaseView = require('oroui/js/app/views/base/view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    AddressCollectionView = BaseView.extend({
+    const AddressCollectionView = BaseView.extend({
         events: {
             'click [data-name="field__types"] input': 'onClicked'
         },
@@ -12,12 +11,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AddressCollectionView() {
-            AddressCollectionView.__super__.constructor.apply(this, arguments);
+        constructor: function AddressCollectionView(options) {
+            AddressCollectionView.__super__.constructor.call(this, options);
         },
 
         onClicked: function(e) {
-            var currentTarget = e.currentTarget;
+            const currentTarget = e.currentTarget;
 
             if (!currentTarget.checked) {
                 return;

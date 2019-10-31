@@ -1,4 +1,6 @@
-var ORO = (function(ORO) {
+/* global ORO */
+/* eslint no-var: off */
+ORO = (function(ORO) {
     'use strict';
 
     var IframeEmbeddedForm = function(container, options) {

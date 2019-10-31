@@ -64,9 +64,9 @@ define([
         },
 
         reset: function(model) {
-            var elementsMap;
-            var attrs;
-            var self = this;
+            let elementsMap;
+            let attrs;
+            const self = this;
             this._hideErrors();
             this.validated = false;
             this.model = model;
@@ -74,7 +74,7 @@ define([
                 elementsMap = this._elementsMap();
                 attrs = model.toJSON();
                 $.each(attrs, function(name, value) {
-                    var $elem = elementsMap[name];
+                    const $elem = elementsMap[name];
                     if ($elem) {
                         value = self.options.setter($elem, name, value);
                         setValue($elem, value);
@@ -91,7 +91,6 @@ define([
         },
 
         _onSaveItem: function(e) {
-            var attrs;
             e.preventDefault();
 
             this.element.trigger('before-save');
@@ -100,7 +99,7 @@ define([
                 return;
             }
 
-            attrs = this._collectAttrs();
+            const attrs = this._collectAttrs();
             if (this.model) {
                 this.model.set(attrs);
             } else {
@@ -126,8 +125,8 @@ define([
         },
 
         _validate: function(elem) {
-            var validator = this._getValidator();
-            var result = true;
+            const validator = this._getValidator();
+            let result = true;
             if (validator) {
                 this.element.removeAttr('data-validation-ignore');
                 if (elem) {
@@ -145,7 +144,7 @@ define([
         },
 
         _hideErrors: function() {
-            var validator = this._getValidator();
+            const validator = this._getValidator();
 
             if (validator) {
                 validator.resetElements(this._elements());
@@ -154,7 +153,7 @@ define([
         },
 
         _getValidator: function() {
-            var validator;
+            let validator;
             if (this.form.data('validator')) {
                 validator = this.form.validate();
             }
@@ -174,7 +173,7 @@ define([
         },
 
         _onClick: function(e) {
-            var $target = $(e.target);
+            const $target = $(e.target);
             if ($target.is(this.options.addButton) || $target.is(this.options.saveButton)) {
                 this._onSaveItem(e);
             } else if ($target.is(this.options.cancelButton)) {
@@ -183,8 +182,8 @@ define([
         },
 
         _collectAttrs: function() {
-            var arrts = {};
-            var self = this;
+            const arrts = {};
+            const self = this;
 
             $.each(this._elementsMap(), function(name, $elem) {
                 arrts[name] = self.options.getter($elem, name, $elem.val());
@@ -194,26 +193,25 @@ define([
         },
 
         _elementsMap: function() {
-            var mapped;
-            var elementsMap = {};
-            var $container = this.element;
-            var pattern = this.options.namePattern;
+            const elementsMap = {};
+            const $container = this.element;
+            const pattern = this.options.namePattern;
 
             // collect elements using map
             $.each(this.options.mapping, function(attrName, elemName) {
-                var $elem = $container.find('[name="' + elemName + '"]');
+                const $elem = $container.find('[name="' + elemName + '"]');
                 if ($elem.length) {
                     elementsMap[attrName] = $elem;
                 }
             });
 
-            mapped = $.map(elementsMap, function($elem) {
+            const mapped = $.map(elementsMap, function($elem) {
                 return $elem[0];
             });
 
             // collect elements using name pattern
             $.each(this._elements().not(mapped), function() {
-                var name = this.name && (this.name.match(pattern) || [])[1];
+                const name = this.name && (this.name.match(pattern) || [])[1];
                 if (name && !elementsMap[name]) {
                     elementsMap[name] = $(this);
                 }

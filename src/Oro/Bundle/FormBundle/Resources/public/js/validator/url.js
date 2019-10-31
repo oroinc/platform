@@ -3,12 +3,12 @@ define([
 ], function($, _, __, XRegExp) {
     'use strict';
 
-    var defaultParam = {
+    const defaultParam = {
         message: 'This value is not a valid URL.'
     };
 
     // JS version of \Symfony\Component\Validator\Constraints\UrlValidator::PATTERN
-    var pattern = '^(http|https)://' + // protocol
+    const pattern = '^(http|https)://' + // protocol
         '(([\\pL\\pN-]+:)?([\\pL\\pN-]+)@)?' + // basic auth
         '(' +
             '([-\\pL\\pN\\pS\\.])+(\\.?([\\pL\\pN]|xn\\-\\-[\\pL\\pN-]+)+\\.?)' + // a domain name
@@ -45,7 +45,7 @@ define([
     return [
         'Url',
         function(value, element) {
-            var regexp = new XRegExp(pattern);
+            const regexp = new XRegExp(pattern);
             return this.optional(element) || regexp.test(value);
         },
         function(param) {

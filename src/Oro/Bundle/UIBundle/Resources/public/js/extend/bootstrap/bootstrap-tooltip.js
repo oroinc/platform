@@ -1,16 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const $ = require('jquery');
+    const _ = require('underscore');
 
     require('jquery-ui');
     require('bootstrap-tooltip');
 
-    var Tooltip = $.fn.tooltip.Constructor;
-    var original = _.pick(Tooltip.prototype, 'show', 'hide', '_getContainer');
+    const Tooltip = $.fn.tooltip.Constructor;
+    const original = _.pick(Tooltip.prototype, 'show', 'hide', '_getContainer');
 
-    var DATA_ATTRIBUTE_PATTERN = /^data-[\w-]*$/i;
+    const DATA_ATTRIBUTE_PATTERN = /^data-[\w-]*$/i;
     Tooltip.Default.whiteList['*'].push(DATA_ATTRIBUTE_PATTERN);
     _.extend(Tooltip.Default.whiteList, {
         mark: [],
@@ -32,10 +32,10 @@ define(function(require) {
         figure: []
     });
 
-    Tooltip.prototype.show = function() {
-        var result = original.show.apply(this, arguments);
-        var hideHandler = this.hide.bind(this, null);
-        var dialogEvents = _.map(['dialogresize', 'dialogdrag', 'dialogreposition'], function(item) {
+    Tooltip.prototype.show = function(...args) {
+        const result = original.show.apply(this, args);
+        const hideHandler = this.hide.bind(this, null);
+        const dialogEvents = _.map(['dialogresize', 'dialogdrag', 'dialogreposition'], function(item) {
             return item + '.oro-bs-tooltip';
         });
         $(this.element).closest('.ui-dialog').on(dialogEvents.join(' '), hideHandler);
@@ -49,16 +49,16 @@ define(function(require) {
         return result;
     };
 
-    Tooltip.prototype.hide = function() {
+    Tooltip.prototype.hide = function(...args) {
         if ($(this.getTipElement()).hasClass('show')) {
             $(this.element).parents().add(window).off('.oro-bs-tooltip');
         }
 
-        return original.hide.apply(this, arguments);
+        return original.hide.apply(this, args);
     };
 
-    Tooltip.prototype._getContainer = function() {
-        var modal;
+    Tooltip.prototype._getContainer = function(...args) {
+        let modal;
         if (
             this.config.container === false &&
             (modal = $(this.element).closest('.modal').get(0))
@@ -66,11 +66,11 @@ define(function(require) {
             return modal;
         }
 
-        return original._getContainer.apply(this, arguments);
+        return original._getContainer.apply(this, args);
     };
 
-    var delegateAction = function(method, action) {
-        return function() {
+    const delegateAction = function(method, action) {
+        return function(args) {
             if (this.element === null) {
                 // disposed
                 return;
@@ -88,7 +88,7 @@ define(function(require) {
                 clearTimeout(this.timeout);
                 delete this.timeout;
             }
-            return method.apply(this, arguments);
+            return method.apply(this, args);
         };
     };
 
@@ -101,7 +101,7 @@ define(function(require) {
         })
         .on('disposeLayout', function(e) {
             $(e.target).find('[data-toggle="tooltip"]').each(function() {
-                var $el = $(this);
+                const $el = $(this);
 
                 if ($el.data(Tooltip.DATA_KEY)) {
                     $el.tooltip('dispose');

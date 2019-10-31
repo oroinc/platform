@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var SidebarWidgetContainerCollection;
-    var _ = require('underscore');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
-    var SidebarWidgetContainerModel = require('orosidebar/js/app/models/sidebar-widget-container-model');
+    const _ = require('underscore');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
+    const SidebarWidgetContainerModel = require('orosidebar/js/app/models/sidebar-widget-container-model');
 
-    SidebarWidgetContainerCollection = BaseCollection.extend({
+    const SidebarWidgetContainerCollection = BaseCollection.extend({
         model: SidebarWidgetContainerModel,
 
         comparator: 'position',
@@ -14,8 +13,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function SidebarWidgetContainerCollection() {
-            SidebarWidgetContainerCollection.__super__.constructor.apply(this, arguments);
+        constructor: function SidebarWidgetContainerCollection(data, options) {
+            SidebarWidgetContainerCollection.__super__.constructor.call(this, data, options);
         },
 
         /**
@@ -23,7 +22,7 @@ define(function(require) {
          */
         initialize: function(data, options) {
             _.extend(this, _.pick(options, ['url']));
-            SidebarWidgetContainerCollection.__super__.initialize.apply(this, arguments);
+            SidebarWidgetContainerCollection.__super__.initialize.call(this, data, options);
         }
     });
 

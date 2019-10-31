@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var lengthValidator = require('oroform/js/validator/length');
+    const lengthValidator = require('oroform/js/validator/length');
 
     /**
      * @export oroentityextend/js/validator/field-name-length

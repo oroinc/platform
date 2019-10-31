@@ -1,21 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var InlineEditingPlugin;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
-    var BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    var CellIterator = require('../../../datagrid/cell-iterator');
-    var ApiAccessor = require('oroui/js/tools/api-accessor');
-    var Modal = require('oroui/js/modal');
-    var SplitEventList = require('./inline-editing-plugin/split-event-list');
-    var pageStateChecker = require('oronavigation/js/app/services/page-state-checker');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
+    const BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    const CellIterator = require('../../../datagrid/cell-iterator');
+    const ApiAccessor = require('oroui/js/tools/api-accessor');
+    const Modal = require('oroui/js/modal');
+    const SplitEventList = require('./inline-editing-plugin/split-event-list');
+    const pageStateChecker = require('oronavigation/js/app/services/page-state-checker');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('oroform/js/app/views/editor/text-editor-view');
 
-    InlineEditingPlugin = BasePlugin.extend({
+    const InlineEditingPlugin = BasePlugin.extend({
         /**
          * Help message for cells
          */
@@ -30,7 +29,7 @@ define(function(require) {
             this.activeEditorComponents = [];
             this.patchCellConstructor = _.bind(this.patchCellConstructor, this);
             this.hasChanges = this.hasChanges.bind(this);
-            InlineEditingPlugin.__super__.initialize.apply(this, arguments);
+            InlineEditingPlugin.__super__.initialize.call(this, main, options);
         },
 
         enable: function() {
@@ -53,7 +52,7 @@ define(function(require) {
             if (!this.options.metadata.inline_editing.save_api_accessor) {
                 throw new Error('"save_api_accessor" option is required');
             }
-            var ConcreteApiAccessor = this.options.metadata.inline_editing.save_api_accessor['class'];
+            const ConcreteApiAccessor = this.options.metadata.inline_editing.save_api_accessor['class'];
             this.saveApiAccessor = new ConcreteApiAccessor(
                 _.omit(this.options.metadata.inline_editing.save_api_accessor, 'class'));
             if (this.main.rendered) {
@@ -89,8 +88,8 @@ define(function(require) {
         },
 
         onColumnStateChange: function() {
-            for (var i = 0; i < this.activeEditorComponents.length; i++) {
-                var editorComponent = this.activeEditorComponents[i];
+            for (let i = 0; i < this.activeEditorComponents.length; i++) {
+                const editorComponent = this.activeEditorComponents[i];
                 if (!editorComponent.options.cell.column || !editorComponent.options.cell.column.get('renderable')) {
                     editorComponent.dispose();
                     i--;
@@ -99,14 +98,14 @@ define(function(require) {
         },
 
         confirmNavigation: function() {
-            var confirmModal = new Modal({
+            const confirmModal = new Modal({
                 title: __('oro.datagrid.inline_editing.refresh_confirm_modal.title'),
                 content: __('oro.ui.leave_page_with_unsaved_data_confirm'),
                 okText: __('Ok, got it'),
                 className: 'modal modal-primary',
                 cancelText: __('Cancel')
             });
-            var deferredConfirmation = $.Deferred();
+            const deferredConfirmation = $.Deferred();
 
             deferredConfirmation.always(_.bind(function() {
                 this.stopListening(confirmModal);
@@ -126,7 +125,7 @@ define(function(require) {
 
         beforeGridCollectionFetch: function(collection, options) {
             if (this.hasChanges()) {
-                var deferredConfirmation = this.confirmNavigation();
+                const deferredConfirmation = this.confirmNavigation();
                 deferredConfirmation.then(_.bind(this.removeActiveEditorComponents, this));
                 options.waitForPromises.push(deferredConfirmation.promise());
             } else {
@@ -136,7 +135,7 @@ define(function(require) {
 
         beforeRedirectTo: function(queue) {
             if (this.hasChanges()) {
-                var deferredConfirmation = this.confirmNavigation();
+                const deferredConfirmation = this.confirmNavigation();
                 queue.push(deferredConfirmation.promise());
             }
         },
@@ -154,30 +153,30 @@ define(function(require) {
         },
 
         patchCellConstructor: function(column) {
-            var Cell = column.get('cell');
-            var inlineEditingPlugin = this;
-            var oldClassName = Cell.prototype.className;
-            var splitEventsList = new SplitEventList(Cell, 'isEditable', {
+            const Cell = column.get('cell');
+            const inlineEditingPlugin = this;
+            const oldClassName = Cell.prototype.className;
+            const splitEventsList = new SplitEventList(Cell, 'isEditable', {
                 'dblclick': 'enterEditModeIfNeeded',
                 'mousedown [data-role=edit]': 'enterEditModeIfNeeded',
                 'click': _.noop,
                 'mouseenter': 'delayedIconRender'
             });
-            var extended = Cell.extend({
+            const extended = Cell.extend({
                 constructor: function(options) {
                     // column should be initialized to valid work of className generation
                     this.column = options.column;
-                    Cell.apply(this, arguments);
+                    Cell.call(this, options);
                 },
                 className: _.isFunction(oldClassName)
                     ? function() {
-                        var calculatedClassName = oldClassName.call(this);
-                        var addClassName = inlineEditingPlugin.isEditable(this)
+                        const calculatedClassName = oldClassName.call(this);
+                        const addClassName = inlineEditingPlugin.isEditable(this)
                             ? 'editable view-mode prevent-text-selection-on-dblclick' : '';
                         return (calculatedClassName ? calculatedClassName + ' ' : '') + addClassName;
                     }
                     : function() {
-                        var addClassName = inlineEditingPlugin.isEditable(this)
+                        const addClassName = inlineEditingPlugin.isEditable(this)
                             ? 'editable view-mode prevent-text-selection-on-dblclick' : '';
                         return (oldClassName ? oldClassName + ' ' : '') + addClassName;
                     },
@@ -231,12 +230,12 @@ define(function(require) {
         },
 
         isEditable: function(cell) {
-            var columnMetadata = cell.column.get('metadata');
+            const columnMetadata = cell.column.get('metadata');
             if (!columnMetadata || !cell.model || !cell.column.get('renderable')) {
                 return false;
             }
-            var fieldName = cell.column.get('name');
-            var fullRestriction = _.find(cell.model.get('entity_restrictions'), function(restriction) {
+            const fieldName = cell.column.get('name');
+            const fullRestriction = _.find(cell.model.get('entity_restrictions'), function(restriction) {
                 return restriction.field === fieldName && restriction.mode === 'full';
             });
             if (fullRestriction) {
@@ -249,11 +248,11 @@ define(function(require) {
         },
 
         getCellEditorOptions: function(cell) {
-            var cellEditorOptions = cell.column.get('cellEditorOptions');
+            let cellEditorOptions = cell.column.get('cellEditorOptions');
             if (!cellEditorOptions) {
-                var columnMetadata = cell.column.get('metadata');
+                const columnMetadata = cell.column.get('metadata');
                 cellEditorOptions = $.extend(true, {}, _.result(_.result(columnMetadata, 'inline_editing'), 'editor'));
-                var saveApiAccessor = _.result(_.result(columnMetadata, 'inline_editing'), 'save_api_accessor');
+                let saveApiAccessor = _.result(_.result(columnMetadata, 'inline_editing'), 'save_api_accessor');
 
                 if (!cellEditorOptions.component_options) {
                     cellEditorOptions.component_options = {};
@@ -261,9 +260,9 @@ define(function(require) {
 
                 if (saveApiAccessor) {
                     if (!(saveApiAccessor instanceof ApiAccessor)) {
-                        var saveApiOptions = _.extend({}, this.options.metadata.inline_editing.save_api_accessor,
+                        const saveApiOptions = _.extend({}, this.options.metadata.inline_editing.save_api_accessor,
                             saveApiAccessor);
-                        var ConcreteApiAccessor = saveApiOptions.class;
+                        const ConcreteApiAccessor = saveApiOptions.class;
                         saveApiAccessor = new ConcreteApiAccessor(_.omit(saveApiOptions, 'class'));
                     }
                     cellEditorOptions.save_api_accessor = saveApiAccessor;
@@ -272,7 +271,7 @@ define(function(require) {
                     cellEditorOptions.save_api_accessor = this.saveApiAccessor;
                 }
 
-                var validationRules = _.result(columnMetadata.inline_editing, 'validation_rules') || {};
+                const validationRules = _.result(columnMetadata.inline_editing, 'validation_rules') || {};
 
                 _.each(validationRules, function(params, ruleName) {
                     // normalize rule's params, in case is it was defined as 'NotBlank: ~'
@@ -295,7 +294,7 @@ define(function(require) {
         },
 
         enterEditMode: function(cell, fromPreviousCell) {
-            var existingEditorComponent;
+            let existingEditorComponent;
             // if there's previously focused editor, blur it
             if (this._focusedCell && this._focusedCell !== cell) {
                 existingEditorComponent = this.getOpenedEditor(this._focusedCell);
@@ -312,17 +311,17 @@ define(function(require) {
             }
             this.main.ensureCellIsVisible(cell);
 
-            var editor = this.getCellEditorOptions(cell);
+            const editor = this.getCellEditorOptions(cell);
             editor.viewOptions.className = this.buildClassNames(editor, cell).join(' ');
 
-            var CellEditorComponent = editor.component;
-            var CellEditorView = editor.view;
+            const CellEditorComponent = editor.component;
+            const CellEditorView = editor.view;
 
             if (!CellEditorView) {
                 throw new Error('Editor view in not available for `' + cell.column.get('name') + '` column');
             }
 
-            var editorComponent = new CellEditorComponent(_.extend({}, editor.component_options, {
+            const editorComponent = new CellEditorComponent(_.extend({}, editor.component_options, {
                 cell: cell,
                 view: CellEditorView,
                 viewOptions: editor.viewOptions,
@@ -340,7 +339,7 @@ define(function(require) {
                 if (this._focusedCell) {
                     this.highlightCell(this._focusedCell, false);
                 }
-                var index = this.activeEditorComponents.indexOf(editorComponent);
+                const index = this.activeEditorComponents.indexOf(editorComponent);
                 if (index !== -1) {
                     this.activeEditorComponents.splice(index, 1);
                 }
@@ -360,7 +359,7 @@ define(function(require) {
         },
 
         buildClassNames: function(editor, cell) {
-            var classNames = ['skip-row-click'];
+            const classNames = ['skip-row-click'];
             if (editor.view_options && editor.view_options.css_class_name) {
                 classNames.push(editor.view_options.css_class_name);
             }
@@ -395,10 +394,10 @@ define(function(require) {
         },
 
         editCellByIteratorMethod: function(iteratorMethod, cell) {
-            var _this = this;
-            var fromPreviousCell = iteratorMethod === 'prev';
+            const _this = this;
+            const fromPreviousCell = iteratorMethod === 'prev';
             this.trigger('lockUserActions', true);
-            var cellIterator = new CellIterator(this.main, cell);
+            const cellIterator = new CellIterator(this.main, cell);
             function checkEditable(cell) {
                 if (!_this.isEditable(cell)) {
                     return cellIterator[iteratorMethod]().then(checkEditable);
@@ -414,7 +413,7 @@ define(function(require) {
         },
 
         removeActiveEditorComponents: function() {
-            for (var i = 0; i < this.activeEditorComponents.length; i++) {
+            for (let i = 0; i < this.activeEditorComponents.length; i++) {
                 this.activeEditorComponents[i].dispose();
             }
             this.activeEditorComponents = [];
@@ -445,8 +444,8 @@ define(function(require) {
         },
 
         toggleHeaderCellHighlight: function(cell, state) {
-            var columnIndex = this.main.columns.indexOf(cell.column);
-            var headerCell = this.main.findHeaderCellByIndex(columnIndex);
+            const columnIndex = this.main.columns.indexOf(cell.column);
+            const headerCell = this.main.findHeaderCellByIndex(columnIndex);
             if (headerCell) {
                 headerCell.$el.toggleClass('header-cell-highlight', state);
             }

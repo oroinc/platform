@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var FlowchartJsPlumbAreaView;
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var $ = require('jquery');
-    var jsPlumb = require('jsplumb');
-    var JPManager = require('../../../../tools/jsplumb-manager');
-    var FlowchartJsPlumbBaseView = require('./base-view');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const $ = require('jquery');
+    const jsPlumb = require('jsplumb');
+    const JPManager = require('../../../../tools/jsplumb-manager');
+    const FlowchartJsPlumbBaseView = require('./base-view');
     require('../../../../tools/jsplumb-smartline');
 
-    FlowchartJsPlumbAreaView = FlowchartJsPlumbBaseView.extend({
+    const FlowchartJsPlumbAreaView = FlowchartJsPlumbBaseView.extend({
         /**
          * @type {JsPlumbManager}
          */
@@ -64,8 +63,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function FlowchartJsPlumbAreaView() {
-            FlowchartJsPlumbAreaView.__super__.constructor.apply(this, arguments);
+        constructor: function FlowchartJsPlumbAreaView(options) {
+            FlowchartJsPlumbAreaView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -79,7 +78,7 @@ define(function(require) {
             this.flowchartState = options.flowchartState;
             _.extend(this, _.pick(options, 'chartHandlers'));
 
-            FlowchartJsPlumbAreaView.__super__.initialize.apply(this, arguments);
+            FlowchartJsPlumbAreaView.__super__.initialize.call(this, options);
         },
 
         dispose: function() {
@@ -92,14 +91,14 @@ define(function(require) {
             FlowchartJsPlumbAreaView.__super__.dispose.call(this);
         },
 
-        delegateEvents: function() {
-            FlowchartJsPlumbAreaView.__super__.delegateEvents.apply(this, arguments);
+        delegateEvents: function(events) {
+            FlowchartJsPlumbAreaView.__super__.delegateEvents.call(this, events);
             $(document).on('zoomchange' + this.eventNamespace(), _.bind(this.onZoomChange, this));
             return this;
         },
 
         undelegateEvents: function() {
-            FlowchartJsPlumbAreaView.__super__.undelegateEvents.apply(this, arguments);
+            FlowchartJsPlumbAreaView.__super__.undelegateEvents.call(this);
             $(document).off(this.eventNamespace());
             return this;
         },
@@ -116,7 +115,7 @@ define(function(require) {
         },
 
         connect: function() {
-            var chartOptions = _.defaults({
+            const chartOptions = _.defaults({
                 container: this.id()
             }, this.defaultsChartOptions);
             this.jsPlumbInstance = jsPlumb.getInstance(chartOptions);
@@ -126,8 +125,8 @@ define(function(require) {
             }
             this.debouncedRepaintEverything = _.debounce(this.repaintEverything.bind(this), 0);
             this.jsPlumbManager = new JPManager(this.jsPlumbInstance, this.model);
-            var stepWithPosition = this.model.get('steps').find(function(step) {
-                var position = step.get('position');
+            const stepWithPosition = this.model.get('steps').find(function(step) {
+                const position = step.get('position');
                 return _.isArray(position) && position.length === 2;
             });
             // if positions of step wasn't defined

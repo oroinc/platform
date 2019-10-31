@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var EmailNotificationFormView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    EmailNotificationFormView = BaseView.extend({
+    const EmailNotificationFormView = BaseView.extend({
         selectors: null,
 
         defaults: {
@@ -23,7 +22,7 @@ define(function(require) {
         constructor: function EmailNotificationFormView(options) {
             _.extend(this, this.defaults, _.pick(options, 'selectors'));
 
-            EmailNotificationFormView.__super__.constructor.apply(this, arguments);
+            EmailNotificationFormView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -40,8 +39,8 @@ define(function(require) {
         onChange: function() {
             mediator.execute('showLoading');
 
-            var $form = this.$(this.selectors.form);
-            var data = $form.serializeArray();
+            const $form = this.$(this.selectors.form);
+            const data = $form.serializeArray();
 
             data.push({name: 'reloadWithoutSaving', value: true});
 

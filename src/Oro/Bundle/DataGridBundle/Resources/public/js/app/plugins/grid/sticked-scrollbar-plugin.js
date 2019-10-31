@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var StickedScrollbarPlugin;
-    var BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    var viewportManager = require('oroui/js/viewport-manager');
-    var mediator = require('oroui/js/mediator');
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    const viewportManager = require('oroui/js/viewport-manager');
+    const mediator = require('oroui/js/mediator');
+    const $ = require('jquery');
+    const _ = require('underscore');
 
     require('jquery.mousewheel');
     require('styled-scroll-bar');
 
-    StickedScrollbarPlugin = BasePlugin.extend({
+    const StickedScrollbarPlugin = BasePlugin.extend({
         viewport: {
             minScreenType: 'any'
         },
@@ -31,14 +30,14 @@ define(function(require) {
             // (has to be removed only in dispose)
             mediator.on('viewport:change', this.onViewportChange);
 
-            return StickedScrollbarPlugin.__super__.initialize.apply(this, arguments);
+            return StickedScrollbarPlugin.__super__.initialize.call(this, grid, options);
         },
 
         /**
          * @inheritDoc
          */
         eventNamespace: function() {
-            return StickedScrollbarPlugin.__super__.eventNamespace.apply(this, arguments) + '.stickedScrollbar';
+            return StickedScrollbarPlugin.__super__.eventNamespace.call(this) + '.stickedScrollbar';
         },
 
         /**
@@ -66,11 +65,11 @@ define(function(require) {
 
             this.delegateEvents();
 
-            var displayScrollbar = this.checkScrollbarDisplay();
+            const displayScrollbar = this.checkScrollbarDisplay();
 
             this.domCache.$container.styledScrollBar(displayScrollbar ? 'update': 'sleep');
 
-            StickedScrollbarPlugin.__super__.enable.apply(this, arguments);
+            StickedScrollbarPlugin.__super__.enable.call(this);
         },
 
         /**
@@ -84,7 +83,7 @@ define(function(require) {
             this.undelegateEvents();
             this.domCache.$container.styledScrollBar('dispose');
 
-            return StickedScrollbarPlugin.__super__.disable.apply(this, arguments);
+            return StickedScrollbarPlugin.__super__.disable.call(this);
         },
 
         /**
@@ -99,7 +98,7 @@ define(function(require) {
             delete this.domCache;
             mediator.off('viewport:change', this.onViewportChange);
 
-            return StickedScrollbarPlugin.__super__.dispose.apply(this, arguments);
+            return StickedScrollbarPlugin.__super__.dispose.call(this);
         },
 
         setupDomCache: function() {
@@ -116,8 +115,8 @@ define(function(require) {
         },
 
         delegateEvents: function() {
-            var manageScroll = _.bind(this.manageScroll, this);
-            var updateCustomScrollbar = _.debounce(_.bind(this.updateCustomScrollbar, this), 50);
+            const manageScroll = _.bind(this.manageScroll, this);
+            const updateCustomScrollbar = _.debounce(_.bind(this.updateCustomScrollbar, this), 50);
 
             /*
             * For cases, when layout has full screen container with own scrollbar and window doesn't have scrollbar
@@ -159,9 +158,9 @@ define(function(require) {
         },
 
         checkScrollbarDisplay: function() {
-            var $grid = this.domCache.$grid;
-            var $container = this.domCache.$container;
-            var display = $grid.width() > $container.width();
+            const $grid = this.domCache.$grid;
+            const $container = this.domCache.$container;
+            let display = $grid.width() > $container.width();
 
             if (display && this.isGridHiddenUnderCollapse()) {
                 display = false;
@@ -178,16 +177,16 @@ define(function(require) {
         },
 
         inViewport: function() {
-            var containerOffsetTop = this.domCache.$container.offset().top;
-            var containerHeight = this.domCache.$container.height();
-            var windowHeight = this.domCache.$window.height();
-            var windowScrollTop = this.domCache.$window.scrollTop();
-            var tHeadHeight = this.domCache.$thead.height();
-            var scrollBarHeight = this.domCache.$scrollbar.height();
+            const containerOffsetTop = this.domCache.$container.offset().top;
+            const containerHeight = this.domCache.$container.height();
+            const windowHeight = this.domCache.$window.height();
+            const windowScrollTop = this.domCache.$window.scrollTop();
+            const tHeadHeight = this.domCache.$thead.height();
+            const scrollBarHeight = this.domCache.$scrollbar.height();
 
-            var viewportTop = containerOffsetTop - windowScrollTop;
-            var viewportBottom = windowHeight - viewportTop - containerHeight;
-            var viewportLowLevel = windowHeight + windowScrollTop - tHeadHeight - scrollBarHeight;
+            const viewportTop = containerOffsetTop - windowScrollTop;
+            const viewportBottom = windowHeight - viewportTop - containerHeight;
+            const viewportLowLevel = windowHeight + windowScrollTop - tHeadHeight - scrollBarHeight;
 
             return viewportBottom > 0 || viewportLowLevel < containerOffsetTop;
         },
@@ -201,9 +200,9 @@ define(function(require) {
         },
 
         detachScrollbar: function() {
-            var $scrollbar = this.domCache.$scrollbar;
-            var containerWidth = this.domCache.$container.width();
-            var containerLeftOffset = this.domCache.$container.offset().left;
+            const $scrollbar = this.domCache.$scrollbar;
+            const containerWidth = this.domCache.$container.width();
+            const containerLeftOffset = this.domCache.$container.offset().left;
             $scrollbar.removeAttr('style');
 
             $scrollbar.css({

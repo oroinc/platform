@@ -2,7 +2,7 @@ extends:
   - google
   - "plugin:oro/recommended"
 parserOptions:
-  ecmaVersion: 2018
+  ecmaVersion: 2019
   sourceType: module
 env:
   browser: true
@@ -14,11 +14,8 @@ globals:
 
 rules:
   # turn off ES6 code style check
-  prefer-rest-params: 'off'
-  prefer-spread: 'off'
-  no-var: 'off'
-  oro/named-constructor: 'error'
   arrow-parens: ['error', 'as-needed']
+  oro/named-constructor: 'error'
 
   # customization
   indent: ['error', 4, {'SwitchCase': 1}]
@@ -30,7 +27,7 @@ rules:
       ignoreComments: true
       ignoreTrailingComments: true
       ignoreRegExpLiterals: true
-      ignorePattern: '^\s*var\s.+=\s*require\s*\(|\.extend\(\/\*\*\s+@lends\s.+\*\/\{$'
+      ignorePattern: '^\s*const\s.+=\s*require\s*\(|\.extend\(\/\*\*\s+@lends\s.+\*\/\{$'
   comma-dangle: ['error', 'never']
   eqeqeq: ['error', 'smart']
   no-useless-call: 'error'
@@ -38,7 +35,12 @@ rules:
   no-loop-func: 'error'
   no-eval: 'error'
   no-undef: 'error'
-  operator-linebreak: 'error'
+  operator-linebreak:
+    - 'error'
+    - 'after'
+    - overrides:
+        "?": 'before'
+        ":": 'before'
   new-cap:
     - 'error'
     - newIsCap: true

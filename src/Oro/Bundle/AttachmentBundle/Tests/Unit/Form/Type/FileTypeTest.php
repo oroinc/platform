@@ -143,20 +143,6 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
             ->method('getData')
             ->willReturn(null);
 
-        $formEvent->expects($this->once())
-            ->method('getForm')
-            ->willReturn($form = $this->createMock(FormInterface::class));
-
-        $form->expects($this->once())
-            ->method('has')
-            ->with('emptyFile')
-            ->willReturn(true);
-
-        $form->expects($this->once())
-            ->method('get')
-            ->with('emptyFile')
-            ->willReturn($this->createMock(FormInterface::class));
-
         $this->type->postSubmit($formEvent);
     }
 
@@ -167,20 +153,6 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
         $formEvent->expects($this->once())
             ->method('getData')
             ->willReturn($file = $this->createMock(File::class));
-
-        $formEvent->expects($this->once())
-            ->method('getForm')
-            ->willReturn($form = $this->createMock(FormInterface::class));
-
-        $form->expects($this->once())
-            ->method('has')
-            ->with('emptyFile')
-            ->willReturn(true);
-
-        $form->expects($this->once())
-            ->method('get')
-            ->with('emptyFile')
-            ->willReturn($this->createMock(FormInterface::class));
 
         $file
             ->expects($this->never())
@@ -197,23 +169,9 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
             ->method('getData')
             ->willReturn($file = $this->createMock(File::class));
 
-        $formEvent->expects($this->once())
-            ->method('getForm')
-            ->willReturn($form = $this->createMock(FormInterface::class));
-
-        $form->expects($this->once())
-            ->method('has')
-            ->with('emptyFile')
-            ->willReturn(true);
-
-        $form->expects($this->once())
-            ->method('get')
-            ->with('emptyFile')
-            ->willReturn($emptyFileForm = $this->createMock(FormInterface::class));
-
-        $emptyFileForm
+        $file
             ->expects($this->once())
-            ->method('getData')
+            ->method('isEmptyFile')
             ->willReturn(true);
 
         $file

@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var ExportButtonView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
-    var ImportExportManager = require('oroimportexport/js/importexport-manager');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const ImportExportManager = require('oroimportexport/js/importexport-manager');
 
-    ExportButtonView = BaseView.extend({
+    const ExportButtonView = BaseView.extend({
         /**
          * @property {Object}
          */
@@ -28,8 +27,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ExportButtonView() {
-            ExportButtonView.__super__.constructor.apply(this, arguments);
+        constructor: function ExportButtonView(options) {
+            ExportButtonView.__super__.constructor.call(this, options);
         },
 
         /**

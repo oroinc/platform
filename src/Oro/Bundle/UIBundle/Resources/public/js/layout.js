@@ -1,21 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var scrollspy = require('oroui/js/scrollspy');
-    var mediator = require('oroui/js/mediator');
-    var tools = require('oroui/js/tools');
-    var scrollHelper = require('oroui/js/tools/scroll-helper');
-    var Popover = require('bootstrap-popover');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const scrollspy = require('oroui/js/scrollspy');
+    const mediator = require('oroui/js/mediator');
+    const tools = require('oroui/js/tools');
+    const scrollHelper = require('oroui/js/tools/scroll-helper');
+    const Popover = require('bootstrap-popover');
 
     require('jquery-ui');
 
-    var document = window.document;
-    var console = window.console;
-    var pageRenderedCbPool = [];
+    const document = window.document;
+    const console = window.console;
+    let pageRenderedCbPool = [];
 
-    var layout = {
+    const layout = {
         /**
          * Default padding to keep when calculate available height for fullscreen layout
          */
@@ -48,9 +48,7 @@ define(function(require) {
          * @param {string|HTMLElement|jQuery.Element} container
          */
         init: function(container) {
-            var $container;
-
-            $container = $(container);
+            const $container = $(container);
 
             this.styleForm($container);
 
@@ -65,7 +63,7 @@ define(function(require) {
         },
 
         initPopover: function(container, options) {
-            var $items = container.find('[data-toggle="popover"]').filter(function() {
+            const $items = container.find('[data-toggle="popover"]').filter(function() {
                 // skip already initialized popovers
                 return !$(this).data(Popover.DATA_KEY);
             });
@@ -88,7 +86,7 @@ define(function(require) {
 
             $items.not('[data-close="false"]').each(function(i, el) {
                 // append close link
-                var content = el.getAttribute('data-content');
+                let content = el.getAttribute('data-content');
                 content += '<i class="fa-close popover-close"></i>';
                 el.setAttribute('data-content', content);
             });
@@ -104,7 +102,7 @@ define(function(require) {
 
             $('body')
                 .on('click.popover-hide', function(e) {
-                    var $target = $(e.target);
+                    const $target = $(e.target);
                     // '[aria-describedby]' -- meens the popover is opened
                     $items.filter('[aria-describedby]').each(function() {
                         // the 'is' for buttons that trigger popups
@@ -136,9 +134,7 @@ define(function(require) {
          * @param {string|HTMLElement|jQuery.Element} container
          */
         dispose: function(container) {
-            var $container;
-
-            $container = $(container);
+            const $container = $(container);
 
             $container.off({
                 'content:changed': this.onContentChanged,
@@ -151,7 +147,7 @@ define(function(require) {
         },
 
         hideProgressBar: function() {
-            var $bar = $('#progressbar');
+            const $bar = $('#progressbar');
             if ($bar.is(':visible')) {
                 $bar.hide();
                 $('#page').show();
@@ -214,9 +210,9 @@ define(function(require) {
          * @returns {number}
          */
         getAvailableHeight: function($mainEl, boundingClientRect) {
-            var $parents = $mainEl.parents();
-            var documentHeight = scrollHelper.documentHeight();
-            var heightDiff = documentHeight -
+            const $parents = $mainEl.parents();
+            const documentHeight = scrollHelper.documentHeight();
+            let heightDiff = documentHeight -
                 (boundingClientRect ? boundingClientRect : $mainEl[0].getBoundingClientRect()).top;
             $parents.each(function() {
                 heightDiff += this.scrollTop;
@@ -252,7 +248,7 @@ define(function(require) {
             if (this._scrollDisabledElements && this._scrollDisabledElements.length) {
                 this.enablePageScroll();
             }
-            var $scrollableParents = $mainEl.parents();
+            const $scrollableParents = $mainEl.parents();
             $scrollableParents.scrollTop(0);
             $scrollableParents.addClass('disable-scroll');
             this._scrollDisabledElements = $scrollableParents;
@@ -299,25 +295,25 @@ define(function(require) {
          * @private
          */
         adjustLabelsWidth: function($context) {
-            var controlGroups = $context.find('.control-group').filter(function(i, group) {
+            const controlGroups = $context.find('.control-group').filter(function(i, group) {
                 return !$(group).find('> .control-label').length && !$(group).closest('.tab-content, .controls').length;
             });
-            var labels = $context.find('.control-label').filter(function(i, label) {
+            const labels = $context.find('.control-label').filter(function(i, label) {
                 return !$(label).closest('.widget-title-container').length;
             });
 
             labels.css('width', '');
 
-            var width = labels.map(function(i, label) {
+            const width = labels.map(function(i, label) {
                 return label.getBoundingClientRect().width;
             }).get();
 
-            var newWidth = Math.ceil(Math.max.apply(null, width));
+            const newWidth = Math.ceil(Math.max.apply(null, width));
             labels.css('width', newWidth);
 
             controlGroups.each(function(i, group) {
-                var prop = 'margin-' + (_.isRTL() ? 'right' : 'left');
-                var controls = $(group).find('> .controls');
+                const prop = 'margin-' + (_.isRTL() ? 'right' : 'left');
+                const controls = $(group).find('> .controls');
                 controls
                     .css(prop, '')
                     .css(prop, parseInt(controls.css(prop)) + newWidth);

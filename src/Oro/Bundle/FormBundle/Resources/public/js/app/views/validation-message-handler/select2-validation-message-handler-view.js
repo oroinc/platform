@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var Select2ValidationMessageHandlerView;
-    var $ = require('jquery');
-    var AbstractValidationMessageHandlerView =
+    const $ = require('jquery');
+    const AbstractValidationMessageHandlerView =
         require('oroform/js/app/views/validation-message-handler/abstract-validation-message-handler-view');
 
-    Select2ValidationMessageHandlerView = AbstractValidationMessageHandlerView.extend({
+    const Select2ValidationMessageHandlerView = AbstractValidationMessageHandlerView.extend({
         events: {
             'select2-close': 'onSelect2DialogReposition',
             'select2:dialogReposition': 'onSelect2DialogReposition'
@@ -15,12 +14,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function Select2ValidationMessageHandlerView() {
-            Select2ValidationMessageHandlerView.__super__.constructor.apply(this, arguments);
+        constructor: function Select2ValidationMessageHandlerView(options) {
+            Select2ValidationMessageHandlerView.__super__.constructor.call(this, options);
         },
 
         isActive: function() {
-            var select2Instance = this.$el.data('select2');
+            const select2Instance = this.$el.data('select2');
 
             return select2Instance.opened() && !select2Instance.container.hasClass('select2-drop-above');
         },

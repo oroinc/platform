@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var DemoPopupView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('text-loader!oroviewswitcher/templates/demo-popup.html');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('text-loader!oroviewswitcher/templates/demo-popup.html');
 
-    var COOKIE_KEY = 'demo_popup_hidden';
-    var COOKIE_VALUE = '1';
+    const COOKIE_KEY = 'demo_popup_hidden';
+    const COOKIE_VALUE = '1';
 
-    DemoPopupView = BaseView.extend({
+    const DemoPopupView = BaseView.extend({
         /**
          * @inheritDoc
          */
@@ -57,7 +56,7 @@ define(function(require) {
             }
 
             this._toDie = false;
-            DemoPopupView.__super__.initialize.apply(this, arguments);
+            DemoPopupView.__super__.initialize.call(this, options);
         },
 
         /**
@@ -79,7 +78,7 @@ define(function(require) {
          * @inheritDoc
          */
         render: function() {
-            DemoPopupView.__super__.render.apply(this, arguments);
+            DemoPopupView.__super__.render.call(this);
 
             _.delay(function() {
                 this.$el.addClass(this.visibleClass);
@@ -98,8 +97,8 @@ define(function(require) {
          * @returns {string}
          */
         getExpiredDate: function() {
-            var currentDate = new Date().getTime();
-            var twoDays = 1000 * 60 * 60 * 48;
+            const currentDate = new Date().getTime();
+            const twoDays = 1000 * 60 * 60 * 48;
 
             return new Date(currentDate + twoDays).toUTCString();
         },
@@ -108,7 +107,7 @@ define(function(require) {
          * @inheritDoc
          */
         getTemplateData: function() {
-            var data = DemoPopupView.__super__.getTemplateData.call(this);
+            const data = DemoPopupView.__super__.getTemplateData.call(this);
 
             return _.extend({}, data, {
                 url: this.url

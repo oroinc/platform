@@ -39,6 +39,7 @@ oro:
                 choose_image.label: Choose Image
                 choose_another.label: Choose another
                 remove.label: Remove
+                invalid_digital_asset: invalid value
 
             dialog:
                 datagrid_title:

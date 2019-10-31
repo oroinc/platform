@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var UnreadEmailsCounterView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var UnreadEmailsStateHolder = require('oroemail/js/app/unread-emails-state-holder');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const UnreadEmailsStateHolder = require('oroemail/js/app/unread-emails-state-holder');
 
-    UnreadEmailsCounterView = BaseView.extend({
+    const UnreadEmailsCounterView = BaseView.extend({
         listen: {
             'change:count model': 'render'
         },
@@ -16,8 +15,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function UnreadEmailsCounterView() {
-            UnreadEmailsCounterView.__super__.constructor.apply(this, arguments);
+        constructor: function UnreadEmailsCounterView(options) {
+            UnreadEmailsCounterView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -26,7 +25,7 @@ define(function(require) {
         initialize: function(options) {
             this.model = UnreadEmailsStateHolder.getModel();
             this.model.set('count', options.count);
-            UnreadEmailsCounterView.__super__.initialize.apply(this, arguments);
+            UnreadEmailsCounterView.__super__.initialize.call(this, options);
         },
 
         render: function() {

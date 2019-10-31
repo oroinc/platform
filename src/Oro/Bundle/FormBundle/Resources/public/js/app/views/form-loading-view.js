@@ -1,33 +1,32 @@
 define(function(require) {
     'use strict';
 
-    var FormLoadingView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var FormSectionLoadingView = require('oroform/js/app/views/form-section-loading-view');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const FormSectionLoadingView = require('oroform/js/app/views/form-section-loading-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
 
-    FormLoadingView = BaseView.extend({
+    const FormLoadingView = BaseView.extend({
         autoRender: true,
 
         /**
          * @inheritDoc
          */
-        constructor: function FormLoadingView() {
-            FormLoadingView.__super__.constructor.apply(this, arguments);
+        constructor: function FormLoadingView(options) {
+            FormLoadingView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
-            var self = this;
+        initialize: function(options) {
+            const self = this;
             // TODO: uncomment when scrol to section will be fixed
             // var index = this.$(window.location.hash).parents('.responsive-section').index();
             //
             // index = index !== -1 ? index : 0;
-            var index = 0;
+            const index = 0;
 
             this.$('.responsive-section').not(':nth-child(' + (index + 1) + ')').each(function(index, el) {
                 self.subview('form-section-loading-' + index, new FormSectionLoadingView({
@@ -35,18 +34,18 @@ define(function(require) {
                 }));
             });
 
-            FormLoadingView.__super__.initialize.apply(this, arguments);
+            FormLoadingView.__super__.initialize.call(this, options);
         },
 
         render: function() {
-            FormLoadingView.__super__.render.apply(this, arguments);
+            FormLoadingView.__super__.render.call(this);
 
             this.$el.removeAttr('data-skip-input-widgets');
             this.$el.addClass('lazy-loading');
 
             this.initLayout()
                 .then(function() {
-                    var $buttons = this._getNavButtons();
+                    const $buttons = this._getNavButtons();
                     $buttons.addClass('disabled');
                     this._loadSubviews().then(this._afterLoadSubviews.bind(this, $buttons));
                 }.bind(this));
@@ -61,11 +60,11 @@ define(function(require) {
         },
 
         _loadSubviews: function() {
-            var promises = _.map(this.subviews, function(view) {
+            const promises = _.map(this.subviews, function(view) {
                 return view.startLoading();
             });
 
-            return $.when.apply($, promises);
+            return $.when(...promises);
         },
 
         _getNavButtons: function() {

@@ -1,22 +1,22 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var ActivityContextCollection = require('oroactivity/js/app/models/activity-context-collection');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var WidgetManager = require('oroui/js/widget-manager');
-    var routing = require('routing');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const ActivityContextCollection = require('oroactivity/js/app/models/activity-context-collection');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const WidgetManager = require('oroui/js/widget-manager');
+    const routing = require('routing');
 
     /**
      * @exports MultiGridView
      */
-    var MultiGridView = BaseView.extend({
+    const MultiGridView = BaseView.extend({
         /**
          * @inheritDoc
          */
-        constructor: function MultiGridView() {
-            MultiGridView.__super__.constructor.apply(this, arguments);
+        constructor: function MultiGridView(options) {
+            MultiGridView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -50,11 +50,11 @@ define(function(require) {
         },
 
         initEvents: function() {
-            var self = this;
-            var dropdown = this.$('.context-items-dropdown');
-            var firstItem = this.$('.activity-context-current-item');
+            const self = this;
+            const dropdown = this.$('.context-items-dropdown');
+            const firstItem = this.$('.activity-context-current-item');
             this.collection.on('add', function(model) {
-                var routeParams = self.options.params.grid_query || {params: {}};
+                let routeParams = self.options.params.grid_query || {params: {}};
                 routeParams.params.class_name = model.get('className');
                 routeParams.gridName = model.get('gridName');
                 if (!_.isUndefined(self.options.params.routeParams)) {
@@ -65,12 +65,12 @@ define(function(require) {
                     );
                 }
 
-                var gridUrl = routing.generate('oro_datagrid_widget', routeParams);
+                const gridUrl = routing.generate('oro_datagrid_widget', routeParams);
 
-                var view = self.template({
+                const view = self.template({
                     entity: model
                 });
-                var $view = $(view);
+                const $view = $(view);
 
                 if (model.attributes.first) {
                     firstItem.html(model.attributes.label);
@@ -83,10 +83,10 @@ define(function(require) {
                     dropdown.find('.dropdown-item').each(function() {
                         $(this).removeClass('active');
                     });
-                    var item = $(this);
+                    const item = $(this);
                     firstItem.html(item.html());
                     item.addClass('active');
-                    var gridWidgetName = self.options.gridWidgetName;
+                    const gridWidgetName = self.options.gridWidgetName;
                     WidgetManager.getWidgetInstanceByAlias(gridWidgetName, function(widget) {
                         widget.setUrl(gridUrl);
                         widget.render();

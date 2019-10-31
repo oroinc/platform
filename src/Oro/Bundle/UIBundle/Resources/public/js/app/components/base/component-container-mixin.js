@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var componentContainerMixin;
-    var ComponentManager = require('oroui/js/app/components/component-manager');
-    var $ = require('jquery');
+    const ComponentManager = require('oroui/js/app/components/component-manager');
+    const $ = require('jquery');
 
-    componentContainerMixin = {
+    const componentContainerMixin = {
         /**
          * @returns {jQuery}
          */
@@ -78,7 +77,7 @@ define(function(require) {
          */
         initPageComponents: function(options) {
             if (!this.hasOwnLayout()) {
-                var error = new Error('PageComponents can not be initialized for the element without own layout');
+                const error = new Error('PageComponents can not be initialized for the element without own layout');
                 return $.Deferred().reject(error);
             }
             return this._getComponentManager().init(options);

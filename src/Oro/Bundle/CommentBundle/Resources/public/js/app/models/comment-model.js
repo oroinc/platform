@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var CommentModel;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Chaplin = require('chaplin');
-    var routing = require('routing');
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Chaplin = require('chaplin');
+    const routing = require('routing');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
-    CommentModel = BaseModel.extend({
+    const CommentModel = BaseModel.extend({
         route: 'oro_api_comment_get_item',
         routeRemoveAttachment: 'oro_api_comment_remove_attachment_item',
 
@@ -33,20 +32,20 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function CommentModel() {
-            CommentModel.__super__.constructor.apply(this, arguments);
+        constructor: function CommentModel(...args) {
+            CommentModel.__super__.constructor.apply(this, args);
         },
 
         initialize: function(attrs, options) {
-            CommentModel.__super__.initialize.apply(this, arguments);
+            CommentModel.__super__.initialize.call(this, attrs, options);
             this.on('request', this.beginSync);
             this.on('sync', this.finishSync);
             this.on('error', this.unsync);
         },
 
         url: function() {
-            var url;
-            var parameters;
+            let url;
+            let parameters;
             if (this.isNew()) {
                 if (!this.get('relationClass') || !this.get('relationId')) {
                     throw new Error('Please specify relationClass and relationId');
@@ -67,8 +66,8 @@ define(function(require) {
         },
 
         removeAttachment: function() {
-            var model = this;
-            var url = routing.generate(this.routeRemoveAttachment, {id: model.id});
+            const model = this;
+            const url = routing.generate(this.routeRemoveAttachment, {id: model.id});
             return $.ajax({
                 url: url,
                 type: 'POST',
@@ -84,7 +83,7 @@ define(function(require) {
         },
 
         serialize: function() {
-            var data = CommentModel.__super__.serialize.call(this);
+            const data = CommentModel.__super__.serialize.call(this);
             data.isNew = this.isNew();
             data.hasActions = data.removable || data.editable;
             data.message = this.getMessage();
@@ -99,8 +98,8 @@ define(function(require) {
         },
 
         getShortMessage: function() {
-            var shortMessage = this.getMessage();
-            var lineBreak = shortMessage.indexOf('<br />');
+            let shortMessage = this.getMessage();
+            const lineBreak = shortMessage.indexOf('<br />');
             if (lineBreak > 0) {
                 shortMessage = shortMessage.substr(0, shortMessage.indexOf('<br />'));
             }
@@ -109,7 +108,7 @@ define(function(require) {
         },
 
         getMessage: function() {
-            var message = this.get('message');
+            let message = this.get('message');
             message = _.nl2br(message);
             return message;
         }

@@ -7,8 +7,6 @@ define([
 ], function(_, mediator, messenger, __, MassAction) {
     'use strict';
 
-    var FrontendMassAction;
-
     /**
      * Frontend mass action class.
      *
@@ -16,19 +14,19 @@ define([
      * @class   oro.datagrid.action.FrontendMassAction
      * @extends oro.datagrid.action.MassAction
      */
-    FrontendMassAction = MassAction.extend({
+    const FrontendMassAction = MassAction.extend({
         /**
          * @inheritDoc
          */
-        constructor: function FrontendMassAction() {
-            FrontendMassAction.__super__.constructor.apply(this, arguments);
+        constructor: function FrontendMassAction(options) {
+            FrontendMassAction.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         execute: function() {
-            var selectionState = this.datagrid.getSelectionState();
+            const selectionState = this.datagrid.getSelectionState();
             if (selectionState.selectedIds.length === 0 && selectionState.inset) {
                 messenger.notificationFlashMessage('warning', __(this.messages.empty_selection));
             } else {

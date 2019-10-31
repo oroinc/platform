@@ -1,12 +1,7 @@
-define([
-    'underscore',
-    'oroui/js/messenger',
-    'orotranslation/js/translator',
-    'oro/datagrid/action/mass-action'
-], function(_, messenger, __, MassAction) {
+define(function(require) {
     'use strict';
 
-    var MarkAction;
+    const MassAction = require('oro/datagrid/action/mass-action');
 
     /**
      * Mark email as read/unread
@@ -15,7 +10,7 @@ define([
      * @class   oro.datagrid.action.MarkAction
      * @extends oro.datagrid.action.MassAction
      */
-    MarkAction = MassAction.extend({
+    const MarkAction = MassAction.extend({
 
     });
 

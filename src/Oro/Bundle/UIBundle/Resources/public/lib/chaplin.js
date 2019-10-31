@@ -2219,7 +2219,7 @@ module.exports = CollectionView = (function(superClass) {
       prop = ref[i];
       delete this[prop];
     }
-    return CollectionView.__super__.dispose.apply(this, arguments);
+    return CollectionView.__super__.dispose.call(this);
   };
 
   return CollectionView;
@@ -2491,7 +2491,7 @@ module.exports = Layout = (function(superClass) {
       delete this[prop];
     }
     mediator.removeHandlers(this);
-    return Layout.__super__.dispose.apply(this, arguments);
+    return Layout.__super__.dispose.call(this);
   };
 
   return Layout;

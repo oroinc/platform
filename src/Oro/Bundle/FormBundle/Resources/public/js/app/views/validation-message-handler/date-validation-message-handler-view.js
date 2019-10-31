@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var DateValidationMessageHandlerView;
-    var $ = require('jquery');
-    var AbstractValidationMessageHandlerView =
+    const $ = require('jquery');
+    const AbstractValidationMessageHandlerView =
         require('oroform/js/app/views/validation-message-handler/abstract-validation-message-handler-view');
 
-    DateValidationMessageHandlerView = AbstractValidationMessageHandlerView.extend({
+    const DateValidationMessageHandlerView = AbstractValidationMessageHandlerView.extend({
         events: {
             'datepicker:dialogHide': 'onDatepickerDialogReposition',
             'datepicker:dialogReposition': 'onDatepickerDialogReposition'
@@ -15,8 +14,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DateValidationMessageHandlerView() {
-            DateValidationMessageHandlerView.__super__.constructor.apply(this, arguments);
+        constructor: function DateValidationMessageHandlerView(options) {
+            DateValidationMessageHandlerView.__super__.constructor.call(this, options);
         },
 
         isActive: function() {

@@ -3,8 +3,6 @@ define([
 ], function(StringCell) {
     'use strict';
 
-    var TimeCell;
-
     /**
      * Time column cell
      *
@@ -12,7 +10,7 @@ define([
      * @class   oro.datagrid.cell.TimeCell
      * @extends oro.datagrid.cell.StringCell
      */
-    TimeCell = StringCell.extend({
+    const TimeCell = StringCell.extend({
         type: 'time',
 
         className: 'time-cell',
@@ -20,8 +18,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function TimeCell() {
-            TimeCell.__super__.constructor.apply(this, arguments);
+        constructor: function TimeCell(options) {
+            TimeCell.__super__.constructor.call(this, options);
         }
     });
 

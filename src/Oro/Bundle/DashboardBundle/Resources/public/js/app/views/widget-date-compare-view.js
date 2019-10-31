@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var WidgetDateCompareView;
-    var BaseView = require('oroui/js/app/views/base/view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    WidgetDateCompareView = BaseView.extend({
+    const WidgetDateCompareView = BaseView.extend({
         autoRender: true,
 
         optionNames: BaseView.prototype.optionNames.concat(['useDateSelector', 'datepickerSelector']),
@@ -18,23 +17,23 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function WidgetDateCompareView() {
-            WidgetDateCompareView.__super__.constructor.apply(this, arguments);
+        constructor: function WidgetDateCompareView(options) {
+            WidgetDateCompareView.__super__.constructor.call(this, options);
         },
 
         onChange: function(e) {
-            var state = e.currentTarget.checked ? 'enable' : 'disable';
+            const state = e.currentTarget.checked ? 'enable' : 'disable';
             this.$(this.datepickerSelector).datepicker(state);
         },
 
         render: function() {
-            var $compareToDate = this.$(this.useDateSelector);
+            const $compareToDate = this.$(this.useDateSelector);
 
             if ($compareToDate.prop('checked') === false) {
                 this.$(this.datepickerSelector).datepicker('disable');
             }
 
-            return WidgetDateCompareView.__super__.render.apply(this, arguments);
+            return WidgetDateCompareView.__super__.render.call(this);
         }
     });
 

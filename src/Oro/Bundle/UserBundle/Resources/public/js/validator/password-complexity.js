@@ -4,7 +4,7 @@ define([
 ], function(_, __, unicodeMatcher) {
     'use strict';
 
-    var defaultParam = {
+    const defaultParam = {
         message: 'Invalid value {{ value }}.',
         requireMinLength: 0,
         requireLowerCase: false,
@@ -25,7 +25,7 @@ define([
     return [
         'Oro\\Bundle\\UserBundle\\Validator\\Constraints\\PasswordComplexity',
         function(value, element, param) {
-            var messages = [];
+            const messages = [];
 
             // if the password field is not required and value is empty, skip validation
             if (!element.required && value.length === 0) {
@@ -59,7 +59,7 @@ define([
             return 0 === messages.length;
         },
         function(param, element) {
-            var placeholders = {};
+            const placeholders = {};
 
             param = _.extend({}, defaultParam, param);
             placeholders.value = this.elementValue(element);

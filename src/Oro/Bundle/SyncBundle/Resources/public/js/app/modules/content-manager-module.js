@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var mediator = require('oroui/js/mediator');
-    var contentManager = require('orosync/js/content-manager');
+    const mediator = require('oroui/js/mediator');
+    const contentManager = require('orosync/js/content-manager');
 
     /**
      * Init ContentManager's handlers

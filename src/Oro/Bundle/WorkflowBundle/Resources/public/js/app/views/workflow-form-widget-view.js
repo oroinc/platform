@@ -1,38 +1,37 @@
 define(function(require) {
     'use strict';
 
-    var WorkflowFormWidgetView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
-    var widgetManager = require('oroui/js/widget-manager');
-    var mediator = require('oroui/js/mediator');
-    var performTransition = require('oroworkflow/js/transition-executor');
-    var TransitionEventHandlers = require('oroworkflow/js/transition-event-handlers');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const widgetManager = require('oroui/js/widget-manager');
+    const mediator = require('oroui/js/mediator');
+    const performTransition = require('oroworkflow/js/transition-executor');
+    const TransitionEventHandlers = require('oroworkflow/js/transition-event-handlers');
 
     /**
      * @export  oroworkflow/js/app/views/workflow-form-widget-view
      * @class   oro.WorkflowFormWidgetView
      * @extends Backbone.View
      */
-    WorkflowFormWidgetView = BaseView.extend({
+    const WorkflowFormWidgetView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat(['widgetAlias', 'saveAndTransitButtonSelector']),
 
         /**
          * @inheritDoc
          */
-        constructor: function WorkflowFormWidgetView() {
-            WorkflowFormWidgetView.__super__.constructor.apply(this, arguments);
+        constructor: function WorkflowFormWidgetView(options) {
+            WorkflowFormWidgetView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
+        initialize: function(options) {
             this._bindEvents();
 
             widgetManager.getWidgetInstanceByAlias(this.widgetAlias, this._bindWidgetEvents.bind(this));
 
-            WorkflowFormWidgetView.__super__.initialize.apply(this, arguments);
+            WorkflowFormWidgetView.__super__.initialize.call(this, options);
         },
 
         onSaveAndTransit: function(e) {
@@ -74,7 +73,7 @@ define(function(require) {
         dispose: function() {
             this._unbindEvents();
 
-            WorkflowFormWidgetView.__super__.dispose.apply(this, arguments);
+            WorkflowFormWidgetView.__super__.dispose.call(this);
         }
     });
 

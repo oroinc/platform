@@ -4,8 +4,6 @@ define([
 ], function(ModelAction, DeactivationHandler) {
     'use strict';
 
-    var WorkflowDeactivateAction;
-
     /**
      * Activate AJAX action, triggers confirmation dialog and deactivate workflow definition
      *
@@ -13,9 +11,9 @@ define([
      * @class   oro.datagrid.action.WorkflowDeactivateAction
      * @extends oro.datagrid.action.ModelAction
      */
-    WorkflowDeactivateAction = ModelAction.extend({
+    const WorkflowDeactivateAction = ModelAction.extend({
         execute: function() {
-            var datagrid = this.datagrid;
+            const datagrid = this.datagrid;
 
             this.on('deactivation_start', function() {
                 datagrid.showLoading();

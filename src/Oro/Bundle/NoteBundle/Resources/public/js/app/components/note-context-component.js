@@ -1,21 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var ActivityContextComponent;
-    var BaseComponent = require('oroactivity/js/app/components/activity-context-activity-component');
-    var ActivityContextActivityView = require('oronote/js/app/views/note-context-component-view');
+    const BaseComponent = require('oroactivity/js/app/components/activity-context-activity-component');
+    const ActivityContextActivityView = require('oronote/js/app/views/note-context-component-view');
 
-    ActivityContextComponent = BaseComponent.extend({
+    const ActivityContextComponent = BaseComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function ActivityContextComponent() {
-            ActivityContextComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ActivityContextComponent(options) {
+            ActivityContextComponent.__super__.constructor.call(this, options);
         },
 
         initView: function() {
-            var items = typeof this.options.contextTargets === 'undefined' ? false : this.options.contextTargets;
-            var editable = typeof this.options.editable === 'undefined' ? false : this.options.editable;
+            const items = typeof this.options.contextTargets === 'undefined' ? false : this.options.contextTargets;
+            const editable = typeof this.options.editable === 'undefined' ? false : this.options.editable;
             this.contextsView = new ActivityContextActivityView({
                 contextTargets: items,
                 entityId: this.options.entityId,

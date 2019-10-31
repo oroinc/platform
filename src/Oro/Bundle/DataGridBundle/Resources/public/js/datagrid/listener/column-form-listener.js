@@ -6,8 +6,6 @@ define([
 ], function($, _, mediator, AbstractGridChangeListener) {
     'use strict';
 
-    var ColumnFormListener;
-
     /**
      * Listener for entity edit form and datagrid
      *
@@ -15,7 +13,7 @@ define([
      * @class   orodatagrid.datagrid.listener.ColumnFormListener
      * @extends orodatagrid.datagrid.listener.AbstractGridChangeListener
      */
-    ColumnFormListener = AbstractGridChangeListener.extend({
+    const ColumnFormListener = AbstractGridChangeListener.extend({
         /** @param {Object} */
         selectors: {
             included: null,
@@ -25,8 +23,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function ColumnFormListener() {
-            ColumnFormListener.__super__.constructor.apply(this, arguments);
+        constructor: function ColumnFormListener(...args) {
+            ColumnFormListener.__super__.constructor.apply(this, args);
         },
 
         /**
@@ -41,7 +39,7 @@ define([
             this.grid = options.grid;
             this.confirmModal = {};
 
-            ColumnFormListener.__super__.initialize.apply(this, arguments);
+            ColumnFormListener.__super__.initialize.call(this, options);
 
             this.selectRows();
             this.listenTo(options.grid.collection, {
@@ -56,7 +54,7 @@ define([
          * @inheritDoc
          */
         setDatagridAndSubscribe: function() {
-            ColumnFormListener.__super__.setDatagridAndSubscribe.apply(this, arguments);
+            ColumnFormListener.__super__.setDatagridAndSubscribe.call(this);
 
             /** Restore include/exclude state from pagestate */
             mediator.bind('pagestate_restored', function() {
@@ -68,10 +66,10 @@ define([
          * Selecting rows
          */
         selectRows: function() {
-            var columnName = this.columnName;
+            const columnName = this.columnName;
 
             this.grid.collection.each(function(model) {
-                var isActive = model.get(columnName);
+                const isActive = model.get(columnName);
                 model.trigger('backgrid:selected', model, isActive);
             });
         },
@@ -82,7 +80,7 @@ define([
         _processValue: function(id, model) {
             id = String(id);
 
-            var isActive = model.get(this.columnName);
+            const isActive = model.get(this.columnName);
 
             if (isActive) {
                 this._includeRow(id);
@@ -94,8 +92,8 @@ define([
         },
 
         _excludeRow: function(id) {
-            var included = this.get('included');
-            var excluded = this.get('excluded');
+            let included = this.get('included');
+            let excluded = this.get('excluded');
 
             if (_.contains(included, id)) {
                 included = _.without(included, id);
@@ -110,8 +108,8 @@ define([
         },
 
         _includeRow: function(id) {
-            var included = this.get('included');
-            var excluded = this.get('excluded');
+            let included = this.get('included');
+            let excluded = this.get('excluded');
 
             if (_.contains(excluded, id)) {
                 excluded = _.without(excluded, id);
@@ -146,8 +144,8 @@ define([
          * @inheritDoc
          */
         _synchronizeState: function() {
-            var included = this.get('included');
-            var excluded = this.get('excluded');
+            const included = this.get('included');
+            const excluded = this.get('excluded');
             if (this.selectors.included) {
                 $(this.selectors.included).val(included.join(','));
             }
@@ -180,9 +178,9 @@ define([
           * @private
           */
         _restoreState: function() {
-            var included = [];
-            var excluded = [];
-            var columnName = this.columnName;
+            let included = [];
+            let excluded = [];
+            const columnName = this.columnName;
             if (this.selectors.included && $(this.selectors.included).length) {
                 included = this._explode($(this.selectors.included).val());
                 this.set('included', included);
@@ -193,8 +191,8 @@ define([
             }
 
             _.each(this.grid.collection.models, function(model) {
-                var isActive = model.get(columnName);
-                var modelId = String(model.id);
+                const isActive = model.get(columnName);
+                const modelId = String(model.id);
                 if (!isActive && _.contains(included, modelId)) {
                     model.set(columnName, true);
                 }
@@ -226,7 +224,7 @@ define([
                 return;
             }
             delete this.grid;
-            ColumnFormListener.__super__.dispose.apply(this, arguments);
+            ColumnFormListener.__super__.dispose.call(this);
         }
     });
 
@@ -242,20 +240,20 @@ define([
      * @param {Object} [options.metadata] configuration for the grid
      */
     ColumnFormListener.init = function(deferred, options) {
-        var gridOptions = options.metadata.options || {};
-        var gridInitialization = options.gridPromise;
+        const gridOptions = options.metadata.options || {};
+        const gridInitialization = options.gridPromise;
 
-        var gridListenerOptions = gridOptions.rowSelection || gridOptions.columnListener; // for BC
+        const gridListenerOptions = gridOptions.rowSelection || gridOptions.columnListener; // for BC
 
         if (gridListenerOptions) {
             gridInitialization.done(function(grid) {
-                var listenerOptions = _.defaults({
+                const listenerOptions = _.defaults({
                     $gridContainer: grid.$el,
                     gridName: grid.name,
                     grid: grid
                 }, gridListenerOptions);
 
-                var listener = new ColumnFormListener(listenerOptions);
+                const listener = new ColumnFormListener(listenerOptions);
                 deferred.resolve(listener);
             }).fail(function() {
                 deferred.reject();

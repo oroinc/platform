@@ -13,15 +13,14 @@ define(function(require) {
      *
      * @exports AclUsersSearchApiAccessor
      */
-    var AclUsersSearchApiAccessor;
-    var SearchApiAccessor = require('oroui/js/tools/search-api-accessor');
+    const SearchApiAccessor = require('oroui/js/tools/search-api-accessor');
 
-    AclUsersSearchApiAccessor = SearchApiAccessor.extend(/** @lends AclUsersSearchApiAccessor.prototype */{
+    const AclUsersSearchApiAccessor = SearchApiAccessor.extend(/** @lends AclUsersSearchApiAccessor.prototype */{
         /**
          * @inheritDoc
          */
-        constructor: function AclUsersSearchApiAccessor() {
-            AclUsersSearchApiAccessor.__super__.constructor.apply(this, arguments);
+        constructor: function AclUsersSearchApiAccessor(options) {
+            AclUsersSearchApiAccessor.__super__.constructor.call(this, options);
         },
 
         /**

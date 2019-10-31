@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var InputWidgetManager;
-    var AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var error = require('oroui/js/error');
+    const AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const error = require('oroui/js/error');
 
     /**
      * InputWidgetManager used to register input widgets and create widget for applicable inputs.
@@ -30,7 +29,7 @@ define(function(require) {
      *     //or you can remove widget from InputWidgetManager
      *     InputWidgetManager.removeWidget('uniform-select')
      */
-    InputWidgetManager = {
+    const InputWidgetManager = {
         noWidgetSelector: '.no-input-widget',
 
         widgets: {},
@@ -66,7 +65,7 @@ define(function(require) {
 
         getWidgetsByPriority: function() {
             if (!this._cachedWidgetsByPriority) {
-                var self = this;
+                const self = this;
                 this._cachedWidgetsByPriority = [];
                 _.each(_.sortBy(self.widgets, 'priority'), function(widget) {
                     if (!self.isValidWidget(widget)) {
@@ -93,8 +92,8 @@ define(function(require) {
          * @param {Object|null} options
          */
         create: function($inputs, widgetKey, options) {
-            var self = this;
-            var widgetsByPriority = this.getWidgetsByPriority();
+            const self = this;
+            const widgetsByPriority = this.getWidgetsByPriority();
 
             if (options || widgetKey) {
                 // create new widget with options
@@ -102,13 +101,13 @@ define(function(require) {
             }
 
             _.each($inputs, function(input) {
-                var $input = $(input);
+                const $input = $(input);
                 if (self.hasWidget($input)) {
                     return;
                 }
 
-                for (var i = 0; i < widgetsByPriority.length; i++) {
-                    var widget = widgetsByPriority[i];
+                for (let i = 0; i < widgetsByPriority.length; i++) {
+                    const widget = widgetsByPriority[i];
                     if (self.isApplicable($input, widget, widgetKey)) {
                         self.createWidget($input, widget.Widget, options || {});
                         break;
@@ -147,7 +146,7 @@ define(function(require) {
                 options = {};
             }
             options.el = $input.get(0);
-            var widget = new Widget(options);
+            const widget = new Widget(options);
             if (!widget.isInitialized()) {
                 widget.dispose();
             }
@@ -175,10 +174,10 @@ define(function(require) {
 
         getCompoundQuery: function() {
             if (!this._cachedCompoundQuery) {
-                var queries = [];
-                var widgetsByPriority = this.getWidgetsByPriority();
-                for (var i = 0; i < widgetsByPriority.length; i++) {
-                    var widget = widgetsByPriority[i];
+                const queries = [];
+                const widgetsByPriority = this.getWidgetsByPriority();
+                for (let i = 0; i < widgetsByPriority.length; i++) {
+                    const widget = widgetsByPriority[i];
                     queries.push(widget.selector);
                 }
                 this._cachedCompoundQuery = queries.join(',');
@@ -190,7 +189,7 @@ define(function(require) {
          * Finds and initializes all input widgets in container
          */
         seekAndCreateWidgetsInContainer: function($container) {
-            var foundElements = $container.find(this.getCompoundQuery()).filter(
+            const foundElements = $container.find(this.getCompoundQuery()).filter(
                 ':not(' +
                 (this.noWidgetSelector ? (this.noWidgetSelector + ',') : '') +
                 '[data-bound-input-widget], [data-page-component-module], [data-bound-component]' +
@@ -212,9 +211,9 @@ define(function(require) {
                 // no inputWidgets
                 return;
             }
-            var self = this;
+            const self = this;
             $container.find('[data-bound-input-widget]').each(function() {
-                var widget = self.getWidget($(this));
+                const widget = self.getWidget($(this));
                 if (widget) {
                     widget.dispose();
                 }
@@ -230,10 +229,10 @@ define(function(require) {
          * @returns {Array.<Object>}
          */
         findWidgetsInContainer: function($container, Constructor) {
-            var widgets = [];
+            const widgets = [];
 
             $container.find('[data-bound-input-widget]').each(function(i, el) {
-                var widget = this.getWidget($(el));
+                const widget = this.getWidget($(el));
 
                 if (widget && (!_.isObject(Constructor) || widget instanceof Constructor)) {
                     widgets.push(widget);
@@ -263,41 +262,40 @@ define(function(require) {
          * @param {String|null} command
          * @returns {mixed}
          */
-        inputWidget: function(command) {
-            var args = _.rest(arguments);
+        inputWidget: function(command, ...args) {
             if (command === 'create') {
                 args.unshift(this);
-                InputWidgetManager.create.apply(InputWidgetManager, args);
+                InputWidgetManager.create(...args);
                 return this;
             }
             if (command === 'seekAndCreate') {
                 args.unshift(this);
-                InputWidgetManager.seekAndCreateWidgetsInContainer.apply(InputWidgetManager, args);
+                InputWidgetManager.seekAndCreateWidgetsInContainer(...args);
                 return this;
             }
             if (command === 'seekAndDestroy') {
                 args.unshift(this);
-                InputWidgetManager.seekAndDestroyWidgetsInContainer.apply(InputWidgetManager, args);
+                InputWidgetManager.seekAndDestroyWidgetsInContainer(...args);
                 return this;
             }
 
-            var response = null;
-            var overrideJqueryMethods = AbstractInputWidget.prototype.overrideJqueryMethods;
+            let response = null;
+            const overrideJqueryMethods = AbstractInputWidget.prototype.overrideJqueryMethods;
             this.each(function(i) {
-                var result = null;
-                var $input = $(this);
-                var widget = InputWidgetManager.getWidget($input);
+                let result = null;
+                const $input = $(this);
+                const widget = InputWidgetManager.getWidget($input);
 
                 if (!command) {
                     result = widget;
                 } else if (!widget || !_.isFunction(widget[command])) {
                     if (_.indexOf(overrideJqueryMethods, command) !== -1) {
-                        result = $input[command].apply($input, args);
+                        result = $input[command](...args);
                     } else if (widget) {
                         InputWidgetManager.error('Input widget doesn\'t support command ' + command);
                     }
                 } else {
-                    result = widget[command].apply(widget, args);
+                    result = widget[command](...args);
                 }
 
                 if (i === 0) {

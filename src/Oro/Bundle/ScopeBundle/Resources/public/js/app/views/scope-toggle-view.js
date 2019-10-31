@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var ScopeToggleView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
 
     /**
      * @export oroscope/js/app/views/scope-toggle-view
      * @extends oroui.app.views.base.View
      * @class oroscope.app.views.ScopeToggleView
      */
-    ScopeToggleView = BaseView.extend({
+    const ScopeToggleView = BaseView.extend({
         /**
          * @property {Object}
          */
@@ -35,8 +34,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ScopeToggleView() {
-            ScopeToggleView.__super__.constructor.apply(this, arguments);
+        constructor: function ScopeToggleView(options) {
+            ScopeToggleView.__super__.constructor.call(this, options);
         },
 
         /**

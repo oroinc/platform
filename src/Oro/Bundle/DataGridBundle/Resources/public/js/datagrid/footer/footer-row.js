@@ -4,9 +4,7 @@ define([
 ], function(FooterCell, Chaplin) {
     'use strict';
 
-    var FooterRow;
-
-    FooterRow = Chaplin.CollectionView.extend({
+    const FooterRow = Chaplin.CollectionView.extend({
         tagName: 'tr',
 
         className: '',
@@ -16,8 +14,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function FooterRow() {
-            FooterRow.__super__.constructor.apply(this, arguments);
+        constructor: function FooterRow(options) {
+            FooterRow.__super__.constructor.call(this, options);
         },
 
         /** @property */
@@ -29,13 +27,13 @@ define([
 
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
-            var _this = this;
+            const _this = this;
             // let descendants override itemView
             if (!this.itemView) {
                 this.itemView = function(itemViewOptions) {
-                    var column = itemViewOptions.model;
-                    var FooterCell = column.get('footerCell') || options.footerCell || _this.footerCell;
-                    var cellOptions = {
+                    const column = itemViewOptions.model;
+                    const FooterCell = column.get('footerCell') || options.footerCell || _this.footerCell;
+                    const cellOptions = {
                         column: column,
                         collection: _this.dataCollection,
                         rowName: options.rowName,
@@ -50,7 +48,7 @@ define([
                     return new FooterCell(cellOptions);
                 };
             }
-            FooterRow.__super__.initialize.apply(this, arguments);
+            FooterRow.__super__.initialize.call(this, options);
             this.cells = this.subviews;
         },
 

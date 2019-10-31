@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var EntityError = require('./entity-error');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const EntityError = require('./entity-error');
 
     /**
      * @deprecated
@@ -27,10 +27,9 @@ define(function(require) {
      */
     EntityFieldsUtil.filterFields = function(fields, rules, include) {
         fields = _.filter(fields, function(item) {
-            var result;
-            result = _.some(rules, function(rule) {
-                var result;
-                var cut;
+            const result = _.some(rules, function(rule) {
+                let result;
+                let cut;
                 // rule can be a property name
                 if (_.isString(rule)) {
                     result = _.intersection(
@@ -51,8 +50,8 @@ define(function(require) {
     };
 
     EntityFieldsUtil.errorHandler = (function() {
-        var message = __('oro.entity.not_exist');
-        var handler = _.bind(mediator.execute, mediator, 'showErrorMessage', message);
+        const message = __('oro.entity.not_exist');
+        const handler = _.bind(mediator.execute, mediator, 'showErrorMessage', message);
         return _.throttle(handler, 100, {trailing: false});
     }());
 
@@ -127,14 +126,14 @@ define(function(require) {
          * @returns {Array.<Object>}
          */
         pathToEntityChain: function(path, trim) {
-            var self = this;
-            var data = this.data;
+            const self = this;
+            const data = this.data;
 
             if (!data[this.entity]) {
                 return [];
             }
 
-            var chain = [{
+            let chain = [{
                 entity: data[this.entity],
                 path: '',
                 basePath: ''
@@ -146,9 +145,9 @@ define(function(require) {
 
             try {
                 _.each(path.split('+'), function(item, i) {
-                    var fieldName;
-                    var entityName;
-                    var pos;
+                    let fieldName;
+                    let entityName;
+                    let pos;
 
                     if (i === 0) {
                         // first item is always just a field name
@@ -224,12 +223,11 @@ define(function(require) {
          * @returns {string}
          */
         entityChainToPath: function(chain, end) {
-            var path;
             end = end || chain.length;
 
             try {
                 chain = _.map(chain.slice(1, end), function(item) {
-                    var result = item.field.name;
+                    let result = item.field.name;
                     if (item.entity) {
                         result += '+' + item.entity.name;
                     }
@@ -240,7 +238,7 @@ define(function(require) {
                 chain = [];
             }
 
-            path = chain.join('::');
+            const path = chain.join('::');
 
             return path;
         },
@@ -253,9 +251,8 @@ define(function(require) {
          * @returns {Object}
          */
         getApplicableConditions: function(fieldId) {
-            var result = {};
-            var chain;
-            var entity;
+            let result = {};
+            let chain;
 
             if (!fieldId) {
                 return result;
@@ -267,7 +264,7 @@ define(function(require) {
                 return result;
             }
 
-            entity = chain[chain.length - 1];
+            const entity = chain[chain.length - 1];
             if (entity) {
                 result = {
                     parent_entity: null,
@@ -295,9 +292,9 @@ define(function(require) {
          * @returns {string}
          */
         getPropertyPathByPath: function(path) {
-            var propertyPathParts = [];
+            const propertyPathParts = [];
             _.each(path.split('+'), function(item, i) {
-                var part;
+                let part;
                 if (i === 0) {
                     // first item is always just a field name
                     propertyPathParts.push(item);
@@ -327,16 +324,16 @@ define(function(require) {
          * @returns {string}
          */
         getPathByPropertyPath: function(pathData) {
-            var fieldIdParts;
+            let fieldIdParts;
             if (!_.isArray(pathData)) {
                 pathData = pathData.split('.');
             }
 
-            var entityData = this.data[this.entity];
+            let entityData = this.data[this.entity];
             try {
                 fieldIdParts = _.map(pathData.slice(0, pathData.length - 1), function(fieldName) {
-                    var fieldPartId = fieldName;
-                    var fieldsData = null;
+                    let fieldPartId = fieldName;
+                    let fieldsData = null;
                     if (entityData.hasOwnProperty('fieldsIndex')) {
                         fieldsData = entityData.fieldsIndex;
                     } else if (
