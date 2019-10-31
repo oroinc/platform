@@ -88,7 +88,10 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
                     LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionType(
                         $this->registry
                     ),
-                    AttributeMultiSelectType::class => new AttributeMultiSelectType($this->attributeManager),
+                    AttributeMultiSelectType::class => new AttributeMultiSelectType(
+                        $this->attributeManager,
+                        $this->getTranslator()
+                    ),
                     LocalizedPropertyType::class => new LocalizedPropertyType(),
                     LocalizationCollectionType::class => new LocalizationCollectionTypeStub(
                         [
