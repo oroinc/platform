@@ -34,6 +34,18 @@ class FileListener
      */
     public function prePersist(File $entity, LifecycleEventArgs $args)
     {
+        $entityManager = $args->getEntityManager();
+
+        if ($entity->isEmptyFile() && $entityManager->contains($entity)) {
+            // Skips updates if file is going to be deleted.
+            $entityManager->getUnitOfWork()->clearEntityChangeSet(spl_object_hash($entity));
+
+            $entityManager->refresh($entity);
+            $entity->setEmptyFile(true);
+
+            return;
+        }
+
         $this->fileManager->preUpload($entity);
         $file = $entity->getFile();
         if (null !== $file && $file->isFile()) {
@@ -58,7 +70,7 @@ class FileListener
     {
         $entityManager = $args->getEntityManager();
 
-        // Delete File it is marked for deletion and new file is not provided.
+        // Delete File if it is marked for deletion and new file is not provided.
         if ($entity->isEmptyFile() && !$entity->getFile()) {
             $entityManager->remove($entity);
         } else {
