@@ -1,5 +1,5 @@
 default:
-    html_allowed_elements:
+    allowed_html_elements:
         p: ~
         span:
             attributes:
@@ -13,29 +13,35 @@ default:
         iframe:
             attributes:
                 - allowfullscreen
-    html_purifier_iframe_domains:
+        a:
+            attributes:
+                - target
+    allowed_iframe_domains:
         - 'youtube.com/embed/'
         - 'player.vimeo.com/video/'
-    html_purifier_uri_schemes:
+    allowed_uri_schemes:
         - 'http'
         - 'https'
         - 'ftp'
 
 additional:
     extends: default
-    html_allowed_elements:
+    allowed_html_elements:
+        a:
+            attributes:
+                - title
         div: ~
-    html_purifier_iframe_domains:
+    allowed_iframe_domains:
         - 'maps.google.com'
-    html_purifier_uri_schemes:
+    allowed_uri_schemes:
         - 'tel'
 
 extra:
     extends: additional
-    html_allowed_elements:
+    allowed_html_elements:
         img:
             hasClosingTag: false
-    html_purifier_iframe_domains:
+    allowed_iframe_domains:
         - 'example.com'
-    html_purifier_uri_schemes:
+    allowed_uri_schemes:
         - 'mailto'

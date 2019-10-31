@@ -6,6 +6,9 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Purifier configuration tree
+ */
 class Configuration implements ConfigurationInterface
 {
     /**
@@ -36,7 +39,7 @@ class Configuration implements ConfigurationInterface
                                 ->example('default')
                                 ->defaultNull()
                             ->end()
-                            ->arrayNode('html_purifier_iframe_domains')
+                            ->arrayNode('allowed_iframe_domains')
                                 ->info(
                                     'Only these domains will be allowed in iframes ' .
                                     '(in case iframes are enabled in allowed elements)'
@@ -44,12 +47,12 @@ class Configuration implements ConfigurationInterface
                                 ->example(['youtube.com/embed/', 'player.vimeo.com/video/'])
                                 ->scalarPrototype()->end()
                             ->end()
-                            ->arrayNode('html_purifier_uri_schemes')
+                            ->arrayNode('allowed_uri_schemes')
                                 ->info('Allowed URI schemes for HTMLPurifier')
                                 ->example(['http', 'https', 'mailto', 'ftp', 'data', 'tel'])
                                 ->scalarPrototype()->end()
                             ->end()
-                            ->arrayNode('html_allowed_elements')
+                            ->arrayNode('allowed_html_elements')
                                 ->info('Allowed elements and attributes for HTMLPurifier')
                                 ->arrayPrototype()
                                     ->info('Collection of allowed HTML elements for HTMLPurifier')

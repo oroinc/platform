@@ -92,7 +92,8 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
                     'span[id]',
                     'br',
                     'style[media|type]',
-                    'iframe[allowfullscreen]'
+                    'iframe[allowfullscreen]',
+                    'a[target]'
                 ]
             ],
             'additional scope' => [
@@ -104,7 +105,8 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
                     'br',
                     'style[media|type]',
                     'iframe[allowfullscreen]',
-                    'div'
+                    'a[target|title]',
+                    'div',
                 ]
             ],
             'extra scope' => [
@@ -116,6 +118,7 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
                     'br',
                     'style[media|type]',
                     'iframe[allowfullscreen]',
+                    'a[target|title]',
                     'div',
                     'img'
                 ]
@@ -131,15 +134,15 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
         return [
             'default scope' => [
                 'scope' => 'default',
-                'expectedResult' => '<p></p><span></span><br><style></style><iframe></iframe>'
+                'expectedResult' => '<p></p><span></span><br><style></style><iframe></iframe><a></a>'
             ],
             'additional scope' => [
                 'scope' => 'additional',
-                'expectedResult' => '<p></p><span></span><br><style></style><iframe></iframe><div></div>'
+                'expectedResult' => '<p></p><span></span><br><style></style><iframe></iframe><a></a><div></div>'
             ],
             'extra scope' => [
                 'scope' => 'extra',
-                'expectedResult' => '<p></p><span></span><br><style></style><iframe></iframe><div></div><img>'
+                'expectedResult' => '<p></p><span></span><br><style></style><iframe></iframe><a></a><div></div><img>'
             ]
         ];
     }

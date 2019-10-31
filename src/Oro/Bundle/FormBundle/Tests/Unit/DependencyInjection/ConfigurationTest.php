@@ -36,21 +36,21 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 'html_purifier_modes' => [
                     'scope_1' => [
                         'extends' => null,
-                        'html_purifier_iframe_domains' => [],
-                        'html_purifier_uri_schemes' => [],
-                        'html_allowed_elements' => [],
+                        'allowed_iframe_domains' => [],
+                        'allowed_uri_schemes' => [],
+                        'allowed_html_elements' => [],
                     ],
                     'scope_2' => [
                         'extends' => 'scope_1',
-                        'html_purifier_iframe_domains' => [],
-                        'html_purifier_uri_schemes' => [],
-                        'html_allowed_elements' => [],
+                        'allowed_iframe_domains' => [],
+                        'allowed_uri_schemes' => [],
+                        'allowed_html_elements' => [],
                     ],
                     'scope_3' => [
                         'extends' => null,
-                        'html_purifier_iframe_domains' => [],
-                        'html_purifier_uri_schemes' => [],
-                        'html_allowed_elements' => [
+                        'allowed_iframe_domains' => [],
+                        'allowed_uri_schemes' => [],
+                        'allowed_html_elements' => [
                             'table' => [
                                 'attributes' => ['cellspacing', 'cellpadding'],
                                 'hasClosingTag' => true
@@ -66,7 +66,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'extends' => 'scope_1'
                     ],
                     'scope_3' => [
-                        'html_allowed_elements' => [
+                        'allowed_html_elements' => [
                             'table' => [
                                 'attributes' => ['cellspacing', 'cellpadding']
                             ]

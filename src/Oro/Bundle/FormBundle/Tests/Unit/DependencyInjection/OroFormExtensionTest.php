@@ -17,10 +17,10 @@ class OroFormExtensionTest extends \PHPUnit\Framework\TestCase
                 0,
                 [
                     'default' => [
-                        'html_allowed_elements' => [],
+                        'allowed_html_elements' => [],
                         'extends' => null,
-                        'html_purifier_iframe_domains' => [],
-                        'html_purifier_uri_schemes' => []
+                        'allowed_iframe_domains' => [],
+                        'allowed_uri_schemes' => []
                     ]
                 ]
             );
@@ -38,7 +38,7 @@ class OroFormExtensionTest extends \PHPUnit\Framework\TestCase
             'oro_form' => [
                 'html_purifier_modes' => [
                     'default' => [
-                        'html_allowed_elements' => []
+                        'allowed_html_elements' => []
                     ]
                 ]
             ]

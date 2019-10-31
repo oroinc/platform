@@ -1,7 +1,7 @@
 oro_form:
     html_purifier_modes:
         default:
-            html_purifier_uri_schemes:
+            allowed_uri_schemes:
                 - 'http'
                 - 'https'
                 - 'mailto'
@@ -9,7 +9,7 @@ oro_form:
                 - 'data'
                 - 'tel'
 
-            html_allowed_elements:
+            allowed_html_elements:
                 table:
                     attributes:
                         - cellspacing

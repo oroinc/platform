@@ -15,9 +15,9 @@ List of allowed HTML tags you can find [here](../../config/oro/app.yml).
 # src/Acme/Bundle/DemoBundle/Resources/config/oro/app.yml
 
 oro_form:
-    purifier:
-        wysiwyg:
-            html_allowed_elements:
+    html_purifier_modes:
+        default:
+            allowed_html_elements:
                 div:
                     attributes:
                         - data-url
