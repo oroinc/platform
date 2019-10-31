@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var ComponentShortcutsManager = require('oroui/js/component-shortcuts-manager');
+    const ComponentShortcutsManager = require('oroui/js/component-shortcuts-manager');
 
     ComponentShortcutsManager.add('module', {});
 

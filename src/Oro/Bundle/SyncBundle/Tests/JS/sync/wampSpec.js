@@ -1,13 +1,15 @@
-define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
-], function(Wamp, Backbone, requirejsExposure) {
+define(function(require) {
     'use strict';
 
-    var exposure = requirejsExposure.disclose('orosync/js/sync/wamp');
+    const Wamp = require('orosync/js/sync/wamp');
+    const Backbone = require('backbone');
+    const jsmoduleExposure = require('jsmodule-exposure');
+    const exposure = jsmoduleExposure.disclose('orosync/js/sync/wamp');
 
-    describe('orosync/js/sync/wamp', function() {
-        var ab;
-        var $;
-        var session;
+    xdescribe('orosync/js/sync/wamp', function() {
+        let ab;
+        let $;
+        let session;
         beforeEach(function() {
             ab = jasmine.createSpyObj('ab', ['debug', 'connect']);
             $ = jasmine.createSpy('$');
@@ -23,8 +25,8 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
             exposure.recover('$');
         });
         describe('create instance', function() {
-            var wamp;
-            var options;
+            let wamp;
+            let options;
             beforeEach(function() {
                 options = {host: '127.0.0.1', syncTicketUrl: 'test_url'};
             });
@@ -81,8 +83,8 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
             });
 
             describe('connection callbacks', function() {
-                var onConnect;
-                var onHangup;
+                let onConnect;
+                let onHangup;
                 beforeEach(function() {
                     $.ajax.and.callFake(function(url, params) {
                         params.success({ticket: 'test_ticket'});
@@ -102,9 +104,9 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
                 });
 
                 it('on connect with queid subscription', function() {
-                    var callback11 = function() {};
-                    var callback12 = function() {};
-                    var callback21 = function() {};
+                    const callback11 = function() {};
+                    const callback12 = function() {};
+                    const callback21 = function() {};
                     wamp.channels = {
                         '/some/channel/1': [callback11, callback12],
                         '/some/channel/2': [callback21]
@@ -148,10 +150,10 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
             });
 
             describe('subscription handling', function() {
-                var wrappedCallback;
-                var originalCallback1 = function() {};
-                var originalCallback2 = function() {};
-                var channel = 'some/channel';
+                let wrappedCallback;
+                const originalCallback1 = function() {};
+                const originalCallback2 = function() {};
+                const channel = 'some/channel';
                 beforeEach(function() {
                     wamp = new Wamp(options);
                     wamp.session = session;

@@ -1,16 +1,15 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var HighlighterTitle;
-    var config = require('module-config').default(module.id);
-    var _ = require('underscore');
-    var BaseClass = require('oroui/js/base-class');
+    const config = require('module-config').default(module.id);
+    const _ = require('underscore');
+    const BaseClass = require('oroui/js/base-class');
 
-    var defaults = {
+    const defaults = {
         prefix: '● '
     };
 
-    HighlighterTitle = BaseClass.extend({
+    const HighlighterTitle = BaseClass.extend({
         /**
          * @inheritDoc
          */
@@ -22,7 +21,7 @@ define(function(require, exports, module) {
          * @inheritDoc
          */
         initialize: function(options) {
-            var names = _.keys(defaults);
+            const names = _.keys(defaults);
             _.extend(this, defaults, _.pick(config, names), _.pick(options, names));
 
             HighlighterTitle.__super__.initialize.call(this, options);

@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var ExportConfigurableWidgetView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
-    var widgetManager = require('oroui/js/widget-manager');
-    var exportHandler = require('oroimportexport/js/export-handler');
-    var mediator = require('oroui/js/mediator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const widgetManager = require('oroui/js/widget-manager');
+    const exportHandler = require('oroimportexport/js/export-handler');
+    const mediator = require('oroui/js/mediator');
 
-    ExportConfigurableWidgetView = BaseView.extend({
+    const ExportConfigurableWidgetView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat(['errorMessage', 'wid']),
 
         events: {
@@ -18,13 +17,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ExportConfigurableWidgetView() {
-            ExportConfigurableWidgetView.__super__.constructor.apply(this, arguments);
+        constructor: function ExportConfigurableWidgetView(options) {
+            ExportConfigurableWidgetView.__super__.constructor.call(this, options);
         },
 
         onFormSubmit: function(e) {
             e.preventDefault();
-            var currentTarget = e.currentTarget;
+            const currentTarget = e.currentTarget;
 
             mediator.execute('showLoading');
 

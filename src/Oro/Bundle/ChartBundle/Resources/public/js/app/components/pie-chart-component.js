@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var PieChartComponent;
-    var Flotr = require('flotr2');
-    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
-    var _ = require('underscore');
+    const Flotr = require('flotr2');
+    const BaseChartComponent = require('orochart/js/app/components/base-chart-component');
+    const _ = require('underscore');
 
     /**
      * @class orochart.app.components.PieChartComponent
      * @extends orochart.app.components.BaseChartComponent
      * @exports orochart/app/components/pie-chart-component
      */
-    PieChartComponent = BaseChartComponent.extend({
+    const PieChartComponent = BaseChartComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function PieChartComponent() {
-            PieChartComponent.__super__.constructor.apply(this, arguments);
+        constructor: function PieChartComponent(options) {
+            PieChartComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -30,13 +29,13 @@ define(function(require) {
         },
 
         setChartSize: function() {
-            var isChanged = false;
-            var $container = this.$container;
-            var isLegendWrapped = $container.hasClass('wrapped-chart-legend');
-            var $chart = this.$chart;
-            var $widgetContent = $container.parent();
-            var $chartLegend = this.$legend;
-            var chartWidth = Math.min(Math.round($widgetContent.width() * Number(this.options.settings.ratio)), 350);
+            let isChanged = false;
+            const $container = this.$container;
+            const isLegendWrapped = $container.hasClass('wrapped-chart-legend');
+            const $chart = this.$chart;
+            const $widgetContent = $container.parent();
+            const $chartLegend = this.$legend;
+            const chartWidth = Math.min(Math.round($widgetContent.width() * Number(this.options.settings.ratio)), 350);
 
             if (chartWidth > 0 && chartWidth !== $chart.width()) {
                 $chart.width(chartWidth);
@@ -71,12 +70,12 @@ define(function(require) {
          * @overrides
          */
         draw: function() {
-            var $chart = this.$chart;
-            var $legend = this.$legend;
-            var data = this.data;
-            var settings = this.options.settings;
-            var chartData = [];
-            var showPercentInTooltip = true;
+            const $chart = this.$chart;
+            const $legend = this.$legend;
+            const data = this.data;
+            const settings = this.options.settings;
+            const chartData = [];
+            let showPercentInTooltip = true;
 
             this.valueSuffix = settings.hasOwnProperty('valueSuffix') ? settings.valueSuffix : '';
             this.valuePrefix = settings.hasOwnProperty('valuePrefix') ? settings.valuePrefix : '';
@@ -86,9 +85,9 @@ define(function(require) {
                 showPercentInTooltip = !!(parseInt(settings.showPercentInTooltip) || settings.showPercentInTooltip > 0);
             }
 
-            var trackFormatter = _.bind(showPercentInTooltip ? this.percentFormatter : this.valueFormatter, this);
+            const trackFormatter = _.bind(showPercentInTooltip ? this.percentFormatter : this.valueFormatter, this);
 
-            for (var i in data) {
+            for (const i in data) {
                 if (data.hasOwnProperty(i)) {
                     chartData.push({data: [[0, data[i].fraction]], label: data[i].label});
                 }
@@ -142,14 +141,14 @@ define(function(require) {
         },
 
         percentFormatter: function(obj) {
-            var value = parseFloat(parseFloat(obj[this.options.settings.fraction_input_data_field] * 100).toFixed(2));
+            const value = parseFloat(parseFloat(obj[this.options.settings.fraction_input_data_field] * 100).toFixed(2));
 
             return this.getTooltipText(obj.series.label, value, '', '%');
         },
 
         valueFormatter: function(obj) {
-            var rawValue = this.data[obj.nearest.seriesIndex][this.options.settings.fraction_input_data_field];
-            var value = parseFloat(parseFloat(rawValue).toPrecision(2));
+            const rawValue = this.data[obj.nearest.seriesIndex][this.options.settings.fraction_input_data_field];
+            const value = parseFloat(parseFloat(rawValue).toPrecision(2));
 
             return this.getTooltipText(obj.series.label, value, this.valuePrefix, this.valueSuffix);
         },

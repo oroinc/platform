@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var jsPlumb = require('jsplumb');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var JsPlumbSmartlineManager = require('./jsplumb-smartline-manager');
+    const jsPlumb = require('jsplumb');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const JsPlumbSmartlineManager = require('./jsplumb-smartline-manager');
 
     function ensureSmartLineManager(jsPlumbInstance) {
         if (!jsPlumbInstance.__smartLineManager) {
@@ -13,69 +13,67 @@ define(function(require) {
         return jsPlumbInstance.__smartLineManager;
     }
 
-    function Smartline(params) {
+    function Smartline(params, ...args) {
         this.type = 'Smartline';
         this.idPrefix = 'smartline-connector-';
         params = params || {};
         params.stub = params.stub === null || params.stub === void 0 ? 30 : params.stub;
-        var segments;
-        var _super = jsPlumb.Connectors.AbstractConnector.apply(this, arguments);
+        let segments;
+        const _super = jsPlumb.Connectors.AbstractConnector.call(this, params, ...args);
         this.smartlineManager = ensureSmartLineManager(params._jsPlumb);
-        var midpoint = params.midpoint === null || params.midpoint === void 0 ? 0.5 : params.midpoint;
-        var alwaysRespectStubs = params.alwaysRespectStubs === true;
-        var userSuppliedSegments = null;
-        var lastx = null;
-        var lasty = null;
-        var cornerRadius = params.cornerRadius !== null && params.midpoint !== void 0 ? params.cornerRadius : 0;
-        var sgn = function(n) {
+        const midpoint = params.midpoint === null || params.midpoint === void 0 ? 0.5 : params.midpoint;
+        const alwaysRespectStubs = params.alwaysRespectStubs === true;
+        let userSuppliedSegments = null;
+        let lastx = null;
+        let lasty = null;
+        const cornerRadius = params.cornerRadius !== null && params.midpoint !== void 0 ? params.cornerRadius : 0;
+        const sgn = function(n) {
             return n < 0 ? -1 : n === 0 ? 0 : 1;
         };
         /**
          * helper method to add a segment.
          */
-        var addSegment = function(segments, x, y, paintInfo) {
+        const addSegment = function(segments, x, y, paintInfo) {
             if (lastx === x && lasty === y) {
                 return;
             }
-            var lx = lastx === null ? paintInfo.sx : lastx;
-            var ly = lasty === null ? paintInfo.sy : lasty;
-            var o = lx === x ? 'v' : 'h';
-            var sgnx = sgn(x - lx);
-            var sgny = sgn(y - ly);
+            const lx = lastx === null ? paintInfo.sx : lastx;
+            const ly = lasty === null ? paintInfo.sy : lasty;
+            const o = lx === x ? 'v' : 'h';
+            const sgnx = sgn(x - lx);
+            const sgny = sgn(y - ly);
 
             lastx = x;
             lasty = y;
             segments.push([lx, ly, x, y, o, sgnx, sgny]);
         };
-        var segLength = function(s) {
+        const segLength = function(s) {
             return Math.sqrt(Math.pow(s[0] - s[2], 2) + Math.pow(s[1] - s[3], 2));
         };
-        var _cloneArray = function(a) {
-            var _a = [];
-            _a.push.apply(_a, a);
-            return _a;
+        const _cloneArray = function(a) {
+            return [...a];
         };
-        var writeSegments = function(conn, segments, paintInfo) {
-            var current = null;
-            var next;
-            for (var i = 0; i < segments.length - 1; i++) {
+        const writeSegments = function(conn, segments, paintInfo) {
+            let current = null;
+            let next;
+            for (let i = 0; i < segments.length - 1; i++) {
                 current = current || _cloneArray(segments[i]);
                 next = _cloneArray(segments[i + 1]);
                 if (cornerRadius > 0 && current[4] !== next[4]) {
-                    var radiusToUse = Math.min(cornerRadius, segLength(current), segLength(next));
+                    const radiusToUse = Math.min(cornerRadius, segLength(current), segLength(next));
                     // right angle. adjust current segment's end point, and next segment's start point.
                     current[2] -= current[5] * radiusToUse;
                     current[3] -= current[6] * radiusToUse;
                     next[0] += next[5] * radiusToUse;
                     next[1] += next[6] * radiusToUse;
-                    var ac = (current[6] === next[5] && next[5] === 1) ||
+                    const ac = (current[6] === next[5] && next[5] === 1) ||
                             ((current[6] === next[5] && next[5] === 0) && current[5] !== next[6]) ||
                             (current[6] === next[5] && next[5] === -1);
-                    var sgny = next[1] > current[3] ? 1 : -1;
-                    var sgnx = next[0] > current[2] ? 1 : -1;
-                    var sgnEqual = sgny === sgnx;
-                    var cx = (sgnEqual && ac || (!sgnEqual && !ac)) ? next[0] : current[2];
-                    var cy = (sgnEqual && ac || (!sgnEqual && !ac)) ? current[3] : next[1];
+                    const sgny = next[1] > current[3] ? 1 : -1;
+                    const sgnx = next[0] > current[2] ? 1 : -1;
+                    const sgnEqual = sgny === sgnx;
+                    const cx = (sgnEqual && ac || (!sgnEqual && !ac)) ? next[0] : current[2];
+                    const cy = (sgnEqual && ac || (!sgnEqual && !ac)) ? current[3] : next[1];
 
                     _super.addSegment(conn, 'Straight', {
                         x1: current[0], y1: current[1], x2: current[2], y2: current[3]
@@ -93,9 +91,9 @@ define(function(require) {
                     });
                 } else {
                     // dx + dy are used to adjust for line width.
-                    var dx = (current[2] === current[0]) ? 0
+                    const dx = (current[2] === current[0]) ? 0
                         : (current[2] > current[0]) ? (paintInfo.lw / 2) : -(paintInfo.lw / 2);
-                    var dy = (current[3] === current[1]) ? 0
+                    const dy = (current[3] === current[1]) ? 0
                         : (current[3] > current[1]) ? (paintInfo.lw / 2) : -(paintInfo.lw / 2);
                     _super.addSegment(conn, 'Straight', {
                         x1: current[0] - dx, y1: current[1] - dy, x2: current[2] + dx, y2: current[3] + dy
@@ -120,14 +118,14 @@ define(function(require) {
         };
 
         this.getAbsSegments = function(conn) {
-            var i;
-            var j;
-            var cur;
-            var rect1 = conn.endpoints[0].canvas.getBoundingClientRect();
-            var rect2 = conn.endpoints[1].canvas.getBoundingClientRect();
-            var x = Math.min((rect1.left + rect1.right), (rect2.left + rect2.right)) / 2;
-            var y = Math.min((rect1.top + rect1.bottom), (rect2.top + rect2.bottom)) / 2;
-            var result = [];
+            let i;
+            let j;
+            let cur;
+            const rect1 = conn.endpoints[0].canvas.getBoundingClientRect();
+            const rect2 = conn.endpoints[1].canvas.getBoundingClientRect();
+            const x = Math.min((rect1.left + rect1.right), (rect2.left + rect2.right)) / 2;
+            const y = Math.min((rect1.top + rect1.bottom), (rect2.top + rect2.bottom)) / 2;
+            const result = [];
             for (i = 0; i < segments.length; i++) {
                 cur = [segments[i][0] + x, segments[i][1] + y, segments[i][2] + x, segments[i][3] + y, segments[i][4]];
                 if (i > 0) {
@@ -169,10 +167,10 @@ define(function(require) {
         };
 
         function getBorderRadius(el, directionY, directionX) {
-            var borderRadius = 0;
-            var maxPossibleBorderRadius = Math.min(el.offsetWidth / 2, el.offsetHeight / 2);
-            var propName = ['border', directionY, directionX, 'radius'].join('-');
-            var styles = window.getComputedStyle(el);
+            let borderRadius = 0;
+            const maxPossibleBorderRadius = Math.min(el.offsetWidth / 2, el.offsetHeight / 2);
+            const propName = ['border', directionY, directionX, 'radius'].join('-');
+            const styles = window.getComputedStyle(el);
             if (styles[propName] && styles[propName] !== 'none') {
                 borderRadius = Math.min(parseFloat(styles[propName]) || 0, maxPossibleBorderRadius);
             }
@@ -180,12 +178,12 @@ define(function(require) {
         }
 
         function getAdjustment(el, point, direction) {
-            var realX = point.x - el.offsetLeft;
+            const realX = point.x - el.offsetLeft;
             if (realX < 1 || realX > el.offsetWidth - 1) {
                 return 0;
             }
-            var dx;
-            var borderRadius;
+            let dx;
+            let borderRadius;
             if (realX < el.offsetWidth / 2) {
                 borderRadius = getBorderRadius(el, direction, 'left');
                 dx = borderRadius - realX;
@@ -205,17 +203,17 @@ define(function(require) {
 
         function getSourceElement(elem, pos) {
             return _.find($(elem).find('.jsplumb-source').toArray(), function(source) {
-                var offsetLeft = elem.offsetLeft + source.offsetLeft;
-                var offsetTop = elem.offsetTop + source.offsetTop;
+                const offsetLeft = elem.offsetLeft + source.offsetLeft;
+                const offsetTop = elem.offsetTop + source.offsetTop;
                 return pos[0] >= offsetLeft && pos[0] <= (offsetLeft + source.offsetWidth) &&
                     pos[1] >= offsetTop && pos[1] <= (offsetTop + source.offsetHeight);
             });
         }
 
         function adjustSourcePosition(paintInfo, params) {
-            var elem = params.sourceEndpoint.element;
-            var source = getSourceElement(elem, params.sourcePos);
-            var sourceStyle = window.getComputedStyle(source);
+            const elem = params.sourceEndpoint.element;
+            const source = getSourceElement(elem, params.sourcePos);
+            const sourceStyle = window.getComputedStyle(source);
             if (sourceStyle.visibility === 'hidden' || sourceStyle.display === 'none') {
                 dockSourcePositionToEdge(elem, paintInfo, params);
             } else if (source) {
@@ -227,12 +225,12 @@ define(function(require) {
         }
 
         function dockSourcePositionToEdge(elem, paintInfo, params) {
-            var centerX; // center of curve of rounded corner
-            var centerY; // center of curve of rounded corner
-            var ratio;
-            var directionX = elem.offsetLeft + elem.offsetWidth / 2 - params.sourcePos[0] >= 0 ? 'left' : 'right';
-            var directionY = elem.offsetTop + elem.offsetHeight / 2 - params.sourcePos[1] >= 0 ? 'top' : 'bottom';
-            var radius = getBorderRadius(elem, directionY, directionX);
+            let centerX; // center of curve of rounded corner
+            let centerY; // center of curve of rounded corner
+            let ratio;
+            const directionX = elem.offsetLeft + elem.offsetWidth / 2 - params.sourcePos[0] >= 0 ? 'left' : 'right';
+            const directionY = elem.offsetTop + elem.offsetHeight / 2 - params.sourcePos[1] >= 0 ? 'top' : 'bottom';
+            const radius = getBorderRadius(elem, directionY, directionX);
             if (directionX === 'left') {
                 centerX = elem.offsetLeft + radius;
             } else {
@@ -243,8 +241,8 @@ define(function(require) {
             } else {
                 centerY = elem.offsetTop + elem.offsetHeight - radius;
             }
-            var dx = params.sourcePos[0] - centerX;
-            var dy = params.sourcePos[1] - centerY;
+            const dx = params.sourcePos[0] - centerX;
+            const dy = params.sourcePos[1] - centerY;
             if (directionX === 'left' && dx >= 0 || directionX === 'right' && dx <= 0) { // dock to horizontal side
                 if (directionY === 'top') {
                     paintInfo.points[1] += elem.offsetTop - params.sourcePos[1];
@@ -264,33 +262,32 @@ define(function(require) {
             }
         }
 
-        this._compute = function(paintInfo, params) {
+        this._compute = function(paintInfo, params, ...args) {
             if (params.sourceEndpoint.isTemporarySource || params.sourceEndpoint.getAttachedElements().length === 0 ||
                 params.targetEndpoint.getAttachedElements().length === 0) {
                 // in case this connection is new one or is moving to another target or source
                 // use jsPlumb Flowchart connector behaviour
                 adjustSourcePosition(paintInfo, params);
-                return this._flowchartConnectorCompute.apply(this, arguments);
+                return this._flowchartConnectorCompute(paintInfo, params, ...args);
             }
 
             // compute the rest of the line
-            var points = this.smartlineManager.getConnectionPath(this, paintInfo);
+            const points = this.smartlineManager.getConnectionPath(this, paintInfo);
             if (points.length === 0) {
                 // leave everything as is
                 return;
             }
 
-            var sourcePoint = points.shift().clone();
-            var targetPoint = points.pop().clone();
-            var correction;
-            var ENDPOINT_SPACE_TO_LINE = 4;
+            const sourcePoint = points.shift().clone();
+            const targetPoint = points.pop().clone();
+            const ENDPOINT_SPACE_TO_LINE = 4;
 
             // adjust source and target points
             sourcePoint.y += getAdjustment(params.sourceEndpoint.element, sourcePoint, 'bottom');
             targetPoint.y -= getAdjustment(params.targetEndpoint.element, targetPoint, 'top');
 
             // find required correction
-            correction = {
+            const correction = {
                 x: Math.min(sourcePoint.x, targetPoint.x),
                 y: Math.min(sourcePoint.y, targetPoint.y)
             };
@@ -300,8 +297,8 @@ define(function(require) {
             paintInfo.sy += ENDPOINT_SPACE_TO_LINE + 1;
 
             // set valid archors
-            var oldAnchorX = params.sourceEndpoint.anchor.x;
-            var oldAnchorY = params.sourceEndpoint.anchor.y;
+            const oldAnchorX = params.sourceEndpoint.anchor.x;
+            const oldAnchorY = params.sourceEndpoint.anchor.y;
             params.sourceEndpoint.anchor.x = (sourcePoint.x - params.sourceEndpoint.element.offsetLeft) /
                 params.sourceEndpoint.element.offsetWidth;
             params.sourceEndpoint.anchor.y = (sourcePoint.y - params.sourceEndpoint.element.offsetTop) /
@@ -326,7 +323,7 @@ define(function(require) {
             segments = [];
 
             if (points.length) {
-                for (var i = 0; i < points.length; i++) {
+                for (let i = 0; i < points.length; i++) {
                     addSegment(segments, points[i].x - correction.x, points[i].y - correction.y, paintInfo);
                 }
             } else {
@@ -341,14 +338,14 @@ define(function(require) {
         };
 
         this.getPath = function() {
-            var _last = null;
-            var _lastAxis = null;
-            var s = [];
-            var segs = userSuppliedSegments || segments;
-            var seg;
-            var axis;
-            var axisIndex;
-            for (var i = 0; i < segs.length; i++) {
+            let _last = null;
+            let _lastAxis = null;
+            const s = [];
+            const segs = userSuppliedSegments || segments;
+            let seg;
+            let axis;
+            let axisIndex;
+            for (let i = 0; i < segs.length; i++) {
                 seg = segs[i];
                 axis = seg[4];
                 axisIndex = (axis === 'v' ? 3 : 2);
@@ -370,14 +367,14 @@ define(function(require) {
 
         this.setPath = function(path) {
             userSuppliedSegments = [];
-            for (var i = 0; i < path.length; i++) {
-                var lx = path[i].start[0];
-                var ly = path[i].start[1];
-                var x = path[i].end[0];
-                var y = path[i].end[1];
-                var o = lx === x ? 'v' : 'h';
-                var sgnx = sgn(x - lx);
-                var sgny = sgn(y - ly);
+            for (let i = 0; i < path.length; i++) {
+                const lx = path[i].start[0];
+                const ly = path[i].start[1];
+                const x = path[i].end[0];
+                const y = path[i].end[1];
+                const o = lx === x ? 'v' : 'h';
+                const sgnx = sgn(x - lx);
+                const sgny = sgn(y - ly);
 
                 userSuppliedSegments.push([lx, ly, x, y, o, sgnx, sgny]);
             }
@@ -397,19 +394,19 @@ define(function(require) {
             lastx = null;
             lasty = null;
 
-            var midx = paintInfo.startStubX + ((paintInfo.endStubX - paintInfo.startStubX) * midpoint);
-            var midy = paintInfo.startStubY + ((paintInfo.endStubY - paintInfo.startStubY) * midpoint);
-            var orientations = {x: [0, 1], y: [1, 0]};
-            var commonStubCalculator = function() {
+            const midx = paintInfo.startStubX + ((paintInfo.endStubX - paintInfo.startStubX) * midpoint);
+            const midy = paintInfo.startStubY + ((paintInfo.endStubY - paintInfo.startStubY) * midpoint);
+            const orientations = {x: [0, 1], y: [1, 0]};
+            const commonStubCalculator = function() {
                 return [paintInfo.startStubX, paintInfo.startStubY, paintInfo.endStubX, paintInfo.endStubY];
             };
-            var stubCalculators = {
+            const stubCalculators = {
                 perpendicular: commonStubCalculator,
                 orthogonal: commonStubCalculator,
                 opposite: function(axis) {
-                    var pi = paintInfo;
-                    var idx = axis === 'x' ? 0 : 1;
-                    var areInProximity = {
+                    const pi = paintInfo;
+                    const idx = axis === 'x' ? 0 : 1;
+                    const areInProximity = {
                         x: function() {
                             return ((pi.so[idx] === 1 && (
                                 ((pi.startStubX > pi.endStubX) && (pi.tx > pi.startStubX)) ||
@@ -451,18 +448,18 @@ define(function(require) {
                 }
             };
 
-            var stubs = stubCalculators[paintInfo.anchorOrientation](paintInfo.sourceAxis);
-            var idx = paintInfo.sourceAxis === 'x' ? 0 : 1;
-            var oidx = paintInfo.sourceAxis === 'x' ? 1 : 0;
-            var ss = stubs[idx];
-            var oss = stubs[oidx];
-            var es = stubs[idx + 2];
-            var oes = stubs[oidx + 2];
+            const stubs = stubCalculators[paintInfo.anchorOrientation](paintInfo.sourceAxis);
+            const idx = paintInfo.sourceAxis === 'x' ? 0 : 1;
+            const oidx = paintInfo.sourceAxis === 'x' ? 1 : 0;
+            const ss = stubs[idx];
+            const oss = stubs[oidx];
+            const es = stubs[idx + 2];
+            const oes = stubs[oidx + 2];
 
-            var lineCalculators = {
+            const lineCalculators = {
                 perpendicular: function(axis) {
-                    var pi = paintInfo;
-                    var sis = {
+                    const pi = paintInfo;
+                    const sis = {
                         x: [
                             [[1, 2, 3, 4], null, [2, 1, 4, 3]],
                             null,
@@ -474,39 +471,39 @@ define(function(require) {
                             [[4, 1, 2, 3], null, [1, 4, 3, 2]]
                         ]
                     };
-                    var stubs = {
+                    const stubs = {
                         x: [[pi.startStubX, pi.endStubX], null, [pi.endStubX, pi.startStubX]],
                         y: [[pi.startStubY, pi.endStubY], null, [pi.endStubY, pi.startStubY]]
                     };
-                    var midLines = {
+                    const midLines = {
                         x: [[midx, pi.startStubY], [midx, pi.endStubY]],
                         y: [[pi.startStubX, midy], [pi.endStubX, midy]]
                     };
-                    var linesToEnd = {
+                    const linesToEnd = {
                         x: [[pi.endStubX, pi.startStubY]],
                         y: [[pi.startStubX, pi.endStubY]]
                     };
-                    var startToEnd = {
+                    const startToEnd = {
                         x: [[pi.startStubX, pi.endStubY], [pi.endStubX, pi.endStubY]],
                         y: [[pi.endStubX, pi.startStubY], [pi.endStubX, pi.endStubY]]
                     };
-                    var startToMidToEnd = {
+                    const startToMidToEnd = {
                         x: [[pi.startStubX, midy], [pi.endStubX, midy], [pi.endStubX, pi.endStubY]],
                         y: [[midx, pi.startStubY], [midx, pi.endStubY], [pi.endStubX, pi.endStubY]]
                     };
-                    var otherStubs = {
+                    const otherStubs = {
                         x: [pi.startStubY, pi.endStubY],
                         y: [pi.startStubX, pi.endStubX]
                     };
-                    var soIdx = orientations[axis][0];
-                    var toIdx = orientations[axis][1];
-                    var _so = pi.so[soIdx] + 1;
-                    var _to = pi.to[toIdx] + 1;
-                    var otherFlipped = (pi.to[toIdx] === -1 && (otherStubs[axis][1] < otherStubs[axis][0])) ||
+                    const soIdx = orientations[axis][0];
+                    const toIdx = orientations[axis][1];
+                    const _so = pi.so[soIdx] + 1;
+                    const _to = pi.to[toIdx] + 1;
+                    const otherFlipped = (pi.to[toIdx] === -1 && (otherStubs[axis][1] < otherStubs[axis][0])) ||
                         (pi.to[toIdx] === 1 && (otherStubs[axis][1] > otherStubs[axis][0]));
-                    var stub1 = stubs[axis][_so][0];
-                    var stub2 = stubs[axis][_so][1];
-                    var segmentIndexes = sis[axis][_so][_to];
+                    const stub1 = stubs[axis][_so][0];
+                    const stub2 = stubs[axis][_so][1];
+                    const segmentIndexes = sis[axis][_so][_to];
 
                     if (pi.segment === segmentIndexes[3] || (pi.segment === segmentIndexes[2] && otherFlipped)) {
                         return midLines[axis];
@@ -521,8 +518,8 @@ define(function(require) {
                     }
                 },
                 orthogonal: function(axis, startStub, otherStartStub, endStub, otherEndStub) {
-                    var pi = paintInfo;
-                    var extent = {
+                    const pi = paintInfo;
+                    const extent = {
                         x: pi.so[0] === -1 ? Math.min(startStub, endStub) : Math.max(startStub, endStub),
                         y: pi.so[1] === -1 ? Math.min(startStub, endStub) : Math.max(startStub, endStub)
                     }[axis];
@@ -541,13 +538,13 @@ define(function(require) {
                     }[axis];
                 },
                 opposite: function(axis, ss, oss, es) {
-                    var pi = paintInfo;
-                    var otherAxis = {x: 'y', y: 'x'}[axis];
-                    var dim = {x: 'height', y: 'width'}[axis];
-                    var comparator = pi['is' + axis.toUpperCase() + 'GreaterThanStubTimes2'];
+                    const pi = paintInfo;
+                    const otherAxis = {x: 'y', y: 'x'}[axis];
+                    const dim = {x: 'height', y: 'width'}[axis];
+                    const comparator = pi['is' + axis.toUpperCase() + 'GreaterThanStubTimes2'];
 
                     if (params.sourceEndpoint.elementId === params.targetEndpoint.elementId) {
-                        var _val = oss + ((1 - params.sourceEndpoint.anchor[otherAxis]) * params.sourceInfo[dim]) +
+                        const _val = oss + ((1 - params.sourceEndpoint.anchor[otherAxis]) * params.sourceInfo[dim]) +
                             _super.maxStub;
                         return {
                             x: [
@@ -589,9 +586,9 @@ define(function(require) {
             addSegment(segments, stubs[0], stubs[1], paintInfo);
 
             // compute the rest of the line
-            var p = lineCalculators[paintInfo.anchorOrientation](paintInfo.sourceAxis, ss, oss, es, oes);
+            const p = lineCalculators[paintInfo.anchorOrientation](paintInfo.sourceAxis, ss, oss, es, oes);
             if (p) {
-                for (var i = 0; i < p.length; i++) {
+                for (let i = 0; i < p.length; i++) {
                     addSegment(segments, p[i][0], p[i][1], paintInfo);
                 }
             }
@@ -606,40 +603,40 @@ define(function(require) {
         };
     }
 
-    function juExtend(child, parent, _protoFn) {
-        var i;
+    function juExtend(child, parent, ...rest) {
+        let i;
         parent = Object.prototype.toString.call(parent) === '[object Array]' ? parent : [parent];
 
         for (i = 0; i < parent.length; i++) {
-            for (var j in parent[i].prototype) {
+            for (const j in parent[i].prototype) {
                 if (parent[i].prototype.hasOwnProperty(j)) {
                     child.prototype[j] = parent[i].prototype[j];
                 }
             }
         }
 
-        var _makeFn = function(name, protoFn) {
-            return function() {
+        const _makeFn = function(name, protoFn) {
+            return function(...args) {
                 for (i = 0; i < parent.length; i++) {
                     if (parent[i].prototype[name]) {
-                        parent[i].prototype[name].apply(this, arguments);
+                        parent[i].prototype[name].apply(this, args);
                     }
                 }
-                return protoFn.apply(this, arguments);
+                return protoFn.apply(this, args);
             };
         };
 
-        var _oneSet = function(fns) {
-            for (var k in fns) {
+        const _oneSet = function(fns) {
+            for (const k in fns) {
                 if (fns.hasOwnProperty(k)) {
                     child.prototype[k] = _makeFn(k, fns[k]);
                 }
             }
         };
 
-        if (arguments.length > 2) {
-            for (i = 2; i < arguments.length; i++) {
-                _oneSet(arguments[i]);
+        if (rest.length) {
+            for (i = 0; i < rest.length; i++) {
+                _oneSet(rest[i]);
             }
         }
 
@@ -649,9 +646,9 @@ define(function(require) {
     juExtend(Smartline, jsPlumb.Connectors.AbstractConnector);
     jsPlumb.registerConnectorType(Smartline, 'Smartline');
     _.each(jsPlumb.getRenderModes(), function(renderer) {
-        jsPlumb.Connectors[renderer].Smartline = function() {
-            Smartline.apply(this, arguments);
-            jsPlumb.ConnectorRenderers[renderer].apply(this, arguments);
+        jsPlumb.Connectors[renderer].Smartline = function(...args) {
+            Smartline.apply(this, args);
+            jsPlumb.ConnectorRenderers[renderer].apply(this, args);
         };
         juExtend(jsPlumb.Connectors[renderer].Smartline, [Smartline, jsPlumb.ConnectorRenderers[renderer]]);
     });

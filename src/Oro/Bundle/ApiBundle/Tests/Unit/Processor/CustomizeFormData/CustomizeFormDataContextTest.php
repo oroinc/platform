@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
@@ -175,6 +176,36 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(FormInterface::class);
         $this->context->setForm($form);
         self::assertSame($form, $this->context->getForm());
+    }
+
+    public function testFindForm()
+    {
+        $entity = new \stdClass();
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::any())
+            ->method('getData')
+            ->willReturn($entity);
+
+        $this->context->setForm($form);
+
+        self::assertSame($form, $this->context->findForm($entity));
+        self::assertNull($this->context->findForm(new \stdClass()));
+
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntity1 = new \stdClass();
+        $includedEntity1Form = $this->createMock(FormInterface::class);
+        $includedEntity1Data = new IncludedEntityData('0', 0);
+        $includedEntity1Data->setForm($includedEntity1Form);
+        $includedEntities->add($includedEntity1, \stdClass::class, 1, $includedEntity1Data);
+        $includedEntity2 = new \stdClass();
+        $includedEntities->add($includedEntity2, \stdClass::class, 2, new IncludedEntityData('1', 1));
+
+        $this->context->setIncludedEntities($includedEntities);
+
+        self::assertSame($includedEntity1Form, $this->context->findForm($includedEntity1));
+        self::assertNull($this->context->findForm($includedEntity2));
+        self::assertSame($form, $this->context->findForm($entity));
+        self::assertNull($this->context->findForm(new \stdClass()));
     }
 
     public function testFindFormFieldWhenFieldDoesNotExist()

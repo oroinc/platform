@@ -3,9 +3,9 @@ define(['jquery', 'routing'], function($, routing) {
 
     return {
         generate: function(folderId) {
-            var url = routing.generate('oro_email_user_emails');
+            let url = routing.generate('oro_email_user_emails');
             if (Number(folderId)) {
-                var params = $.param({
+                const params = $.param({
                     f: {
                         folders: {
                             value: [folderId]

@@ -5,8 +5,6 @@ define([
 ], function(AjaxdeleteAction, DeleteConfirmation, mediator) {
     'use strict';
 
-    var AjaxdeletefieldAction;
-
     /**
      * Ajax delete field action, shows confirmation dialogue, triggers REST AJAX request
      * and on success - refresh current page
@@ -15,7 +13,7 @@ define([
      * @class   oro.datagrid.action.AjaxdeletefieldAction
      * @extends oro.datagrid.action.AjaxdeleteAction
      */
-    AjaxdeletefieldAction = AjaxdeleteAction.extend({
+    const AjaxdeletefieldAction = AjaxdeleteAction.extend({
         confirmation: true,
 
         /** @property {Function} */
@@ -34,8 +32,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function AjaxdeletefieldAction() {
-            AjaxdeletefieldAction.__super__.constructor.apply(this, arguments);
+        constructor: function AjaxdeletefieldAction(options) {
+            AjaxdeletefieldAction.__super__.constructor.call(this, options);
         },
 
         _onAjaxSuccess: function(data) {

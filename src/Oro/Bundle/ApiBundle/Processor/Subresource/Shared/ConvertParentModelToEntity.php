@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Converts the parent model to an entity and adds the entity to the context instead of the model.
+ * Converts the parent model to an ORM entity and adds the entity to the context instead of the model.
  */
 class ConvertParentModelToEntity implements ProcessorInterface
 {

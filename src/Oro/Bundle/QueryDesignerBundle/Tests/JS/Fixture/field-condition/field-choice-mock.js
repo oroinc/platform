@@ -1,23 +1,22 @@
 define(function(require) {
     'use strict';
 
-    var FieldChoiceMock;
-    var _ = require('underscore');
-    var _data = null;
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    let _data = null;
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    FieldChoiceMock = BaseView.extend({
+    const FieldChoiceMock = BaseView.extend({
         value: '',
 
         entity: null,
 
         data: null,
 
-        constructor: function FieldChoiceMock() {
+        constructor: function FieldChoiceMock(options) {
             FieldChoiceMock.lastCreatedInstance = this;
             this.data = _.clone(_data);
             spyOn(this, 'setValue').and.callThrough();
-            FieldChoiceMock.__super__.constructor.apply(this, arguments);
+            FieldChoiceMock.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
@@ -40,19 +39,19 @@ define(function(require) {
         },
 
         getData: function() {
-            var entity = this.data[this.entity];
-            var field = _.findWhere(entity.fields, {name: this.value});
+            const entity = this.data[this.entity];
+            const field = _.findWhere(entity.fields, {name: this.value});
             return {id: this.value, text: field.label};
         },
 
         getApplicableConditions: function(fieldId) {
-            var entity = this.data[this.entity];
-            var signature = null;
+            const entity = this.data[this.entity];
+            let signature = null;
             if (!entity || !fieldId) {
                 return signature;
             }
 
-            var field = _.findWhere(entity.fields, {name: fieldId});
+            const field = _.findWhere(entity.fields, {name: fieldId});
             if (field) {
                 signature = _.pick(field, 'type', 'relationType', 'identifier');
                 signature.field = field.name;

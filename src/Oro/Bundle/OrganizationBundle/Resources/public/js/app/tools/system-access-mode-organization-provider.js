@@ -5,7 +5,7 @@ define([
 
     return {
         getOrganizationId: function() {
-            var urlParts = this._getCurrentUrl().split('?');
+            const urlParts = this._getCurrentUrl().split('?');
             if (urlParts.length !== 2) {
                 return;
             }

@@ -401,6 +401,7 @@ services:
             - '@liip_imagine.filter.configuration'
             - '@oro_layout.loader.image_filter'
             - '%oro_attachment.filesystem_name.mediacache%'
+            - '%kernel.project_dir%/public/%oro_attachment.filesystem_dir.mediacache%'
 
     oro_attachment.liip_imagine.filter.loader.watermark:
         class: Liip\ImagineBundle\Imagine\Filter\Loader\WatermarkFilterLoader

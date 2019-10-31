@@ -20,7 +20,7 @@ define([
             vector = b.sub(a).unitVector;
         }
         this.vector = vector;
-        var vid = vector.id;
+        const vid = vector.id;
         a.connections[vid] = this;
         b.connections[-vid/* vector.rot180().id */] = this;
         if (this.axis.graph.isConnectionUnderRect(this)) {
@@ -59,7 +59,7 @@ define([
      * Unregisters connection is nodes it links
      */
     Connection.prototype.remove = function() {
-        var vid = this.vector.id;
+        const vid = this.vector.id;
         if (this.a.connections[vid] === this) {
             this.a.connections[vid] = null;
         }

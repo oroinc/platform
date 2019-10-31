@@ -7,12 +7,10 @@ define([
 ], function($, _, __, messenger, BaseView) {
     'use strict';
 
-    var UserApiKeyGenView;
-
     /**
      * @export orouser/js/views/user-apikey-gen-view
      */
-    UserApiKeyGenView = BaseView.extend({
+    const UserApiKeyGenView = BaseView.extend({
         events: {
             'submit form': 'onSubmit'
         },
@@ -36,8 +34,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function UserApiKeyGenView() {
-            UserApiKeyGenView.__super__.constructor.apply(this, arguments);
+        constructor: function UserApiKeyGenView(options) {
+            UserApiKeyGenView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -47,7 +45,7 @@ define([
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-            var missingRequiredOptions = this.requiredOptions.filter(function(option) {
+            const missingRequiredOptions = this.requiredOptions.filter(function(option) {
                 return _.isUndefined(options[option]);
             });
             if (missingRequiredOptions.length) {
@@ -68,14 +66,14 @@ define([
          * onSubmit form event handler
          */
         onSubmit: function(event) {
-            var data = this.$form.serializeArray();
-            var url = this.$form.attr('action');
+            const data = this.$form.serializeArray();
+            const url = this.$form.attr('action');
 
             if (!this.$submitBtn.is('.process')) {
                 this.$submitBtn.addClass('process');
             }
 
-            var options = {
+            const options = {
                 type: 'POST',
                 data: data,
                 dataType: 'json'
@@ -94,7 +92,7 @@ define([
          * @param response
          */
         onAjaxSuccess: function(response) {
-            var newApiKey = response.data.apiKey;
+            const newApiKey = response.data.apiKey;
             this.$apiKeyElement.html(newApiKey);
             messenger.notificationMessage(
                 'success',

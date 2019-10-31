@@ -152,8 +152,8 @@ define(['./interval1d', './interval2d', './point2d'], function(Interval1d, Inter
      * @returns {Rectangle}
      */
     Rectangle.prototype.intersection = function(box) {
-        var horizontalInterval = this.horizontalInterval.intersection(box.horizontalInterval);
-        var verticalInterval = this.verticalInterval.intersection(box.verticalInterval);
+        const horizontalInterval = this.horizontalInterval.intersection(box.horizontalInterval);
+        const verticalInterval = this.verticalInterval.intersection(box.verticalInterval);
         return horizontalInterval === null || verticalInterval === null ? null
             : new Rectangle(horizontalInterval, verticalInterval);
     };
@@ -186,8 +186,8 @@ define(['./interval1d', './interval2d', './point2d'], function(Interval1d, Inter
      * @returns {number}
      */
     Rectangle.prototype.distanceToPoint = function(point) {
-        var dx = this.horizontalInterval.distanceTo(point.x);
-        var dy = this.verticalInterval.distanceTo(point.y);
+        const dx = this.horizontalInterval.distanceTo(point.x);
+        const dy = this.verticalInterval.distanceTo(point.y);
         return Math.sqrt(dx * dx + dy * dy);
     };
 

@@ -3,8 +3,6 @@ define([
 ], function(DateTimeCell) {
     'use strict';
 
-    var DateCell;
-
     /**
      * Date column cell
      *
@@ -12,7 +10,7 @@ define([
      * @class   oro.datagrid.cell.DateCell
      * @extends oro.datagrid.cell.DateTimeCell
      */
-    DateCell = DateTimeCell.extend({
+    const DateCell = DateTimeCell.extend({
         type: 'date',
 
         className: 'date-cell',
@@ -20,8 +18,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function DateCell() {
-            DateCell.__super__.constructor.apply(this, arguments);
+        constructor: function DateCell(options) {
+            DateCell.__super__.constructor.call(this, options);
         }
     });
 

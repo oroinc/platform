@@ -125,9 +125,8 @@ class BuildFormBuilder implements ProcessorInterface
     {
         $formOptions = [];
         $options = $context->getConfig()->getFormOptions();
-        if (!empty($options)) {
-            unset($options['entry_options']);
-            $formOptions = \array_replace($formOptions, $options);
+        if (!empty($options) && isset($options['validation_groups'])) {
+            $formOptions['validation_groups'] = $options['validation_groups'];
         }
         $formOptions[ValidationExtension::ENABLE_FULL_VALIDATION] = $this->enableFullValidation;
 
@@ -148,11 +147,9 @@ class BuildFormBuilder implements ProcessorInterface
             'config'   => $config
         ];
         $options = $config->getFormOptions();
-        if (!empty($options) && \array_key_exists('entry_options', $options)) {
-            $entryOptions = $options['entry_options'];
-            if (!empty($entryOptions)) {
-                $entryFormOptions = \array_replace($entryFormOptions, $entryOptions);
-            }
+        if (!empty($options)) {
+            unset($options['validation_groups']);
+            $entryFormOptions = \array_replace($entryFormOptions, $options);
         }
         $entryFormOptions[CustomizeFormDataHandler::API_CONTEXT] = $context;
 

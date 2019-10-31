@@ -1,23 +1,22 @@
 define(function(require) {
     'use strict';
 
-    var LineChartComponent;
-    var _ = require('underscore');
-    var Flotr = require('flotr2');
-    var dataFormatter = require('orochart/js/data_formatter');
-    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
+    const _ = require('underscore');
+    const Flotr = require('flotr2');
+    const dataFormatter = require('orochart/js/data_formatter');
+    const BaseChartComponent = require('orochart/js/app/components/base-chart-component');
 
     /**
      * @class orochart.app.components.LineChartComponent
      * @extends orochart.app.components.BaseChartComponent
      * @exports orochart/app/components/line-chart-component
      */
-    LineChartComponent = BaseChartComponent.extend({
+    const LineChartComponent = BaseChartComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function LineChartComponent() {
-            LineChartComponent.__super__.constructor.apply(this, arguments);
+        constructor: function LineChartComponent(options) {
+            LineChartComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -31,8 +30,8 @@ define(function(require) {
                 if (second.label === null || second.label === undefined) {
                     return 1;
                 }
-                var firstLabel = dataFormatter.parseValue(first.label, this.options.data_schema.label.type);
-                var secondLabel = dataFormatter.parseValue(second.label, this.options.data_schema.label.type);
+                const firstLabel = dataFormatter.parseValue(first.label, this.options.data_schema.label.type);
+                const secondLabel = dataFormatter.parseValue(second.label, this.options.data_schema.label.type);
                 return firstLabel - secondLabel;
             }, this));
         },
@@ -44,13 +43,13 @@ define(function(require) {
          * @param {Object} limits
          */
         processData: function(chartData, limits) {
-            for (var i in this.data) {
+            for (const i in this.data) {
                 if (!this.data.hasOwnProperty(i)) {
                     continue;
                 }
-                var yValue = dataFormatter.parseValue(this.data[i].value, this.options.data_schema.value.type);
+                let yValue = dataFormatter.parseValue(this.data[i].value, this.options.data_schema.value.type);
                 yValue = yValue === null ? parseInt(i) : yValue;
-                var xValue = dataFormatter.parseValue(this.data[i].label, this.options.data_schema.label.type);
+                let xValue = dataFormatter.parseValue(this.data[i].label, this.options.data_schema.label.type);
                 xValue = xValue === null ? parseInt(i) : xValue;
                 if (limits.xMax === null) {
                     limits.xMax = xValue;
@@ -63,13 +62,13 @@ define(function(require) {
                 limits.yMax = limits.yMax < yValue ? yValue : limits.yMax;
                 limits.yMin = limits.yMin > yValue ? yValue : limits.yMin;
 
-                var item = [xValue, yValue];
+                const item = [xValue, yValue];
                 chartData.push(item);
             }
-            var deltaX = limits.xMax - limits.xMin;
-            var deltaY = limits.yMax - limits.yMin;
-            var xStep = (deltaX > 0 ? deltaX / this.data.length : 1);
-            var yStep = (deltaY > 0 ? deltaY / this.data.length : 1);
+            const deltaX = limits.xMax - limits.xMin;
+            const deltaY = limits.yMax - limits.yMin;
+            const xStep = (deltaX > 0 ? deltaX / this.data.length : 1);
+            const yStep = (deltaY > 0 ? deltaY / this.data.length : 1);
             limits.xMax += xStep;
             limits.yMax += yStep;
             limits.xMin -= xStep;
@@ -82,26 +81,26 @@ define(function(require) {
          * @overrides
          */
         draw: function() {
-            var $chart = this.$chart;
-            var options = this.options;
-            var xFormat = options.data_schema.label.type;
-            var yFormat = options.data_schema.value.type;
+            const $chart = this.$chart;
+            const options = this.options;
+            const xFormat = options.data_schema.label.type;
+            const yFormat = options.data_schema.value.type;
             if (!$chart.get(0).clientWidth) {
                 return;
             }
 
-            var rawData = this.data;
+            const rawData = this.data;
 
             if (dataFormatter.isValueNumerical(xFormat)) {
                 this.sortData();
             }
 
-            var connectDots = options.settings.connect_dots_with_line;
-            var colors = this.config.default_settings.chartColors;
-            var getXLabel = function(data) {
-                var label = dataFormatter.formatValue(data, xFormat);
+            const connectDots = options.settings.connect_dots_with_line;
+            const colors = this.config.default_settings.chartColors;
+            const getXLabel = function(data) {
+                let label = dataFormatter.formatValue(data, xFormat);
                 if (label === null) {
-                    var number = parseInt(data);
+                    const number = parseInt(data);
                     if (rawData.length > number) {
                         label = rawData[number].label === null ? 'N/A' : rawData[number].label;
                     } else {
@@ -110,10 +109,10 @@ define(function(require) {
                 }
                 return label;
             };
-            var getYLabel = function(data) {
-                var label = dataFormatter.formatValue(data, yFormat);
+            const getYLabel = function(data) {
+                let label = dataFormatter.formatValue(data, yFormat);
                 if (label === null) {
-                    var number = parseInt(data);
+                    const number = parseInt(data);
                     if (rawData.length > number) {
                         label = rawData[data].value === null ? 'N/A' : rawData[data].value;
                     } else {
@@ -123,8 +122,8 @@ define(function(require) {
                 return label;
             };
 
-            var chartData = [];
-            var limits = {
+            const chartData = [];
+            const limits = {
                 yMax: null,
                 yMin: null,
                 xMax: null,
@@ -132,7 +131,7 @@ define(function(require) {
             };
             this.processData(chartData, limits);
 
-            var chart = {
+            const chart = {
                 data: chartData,
                 color: colors[0],
                 markers: {

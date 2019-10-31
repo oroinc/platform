@@ -5,21 +5,19 @@ define([
 ], function(_, Backbone, AddressModel) {
     'use strict';
 
-    var AddressCollection;
-
     /**
      * @export  oroaddress/js/address/collection
      * @class   oroaddress.address.Collection
      * @extends Backbone.Collection
      */
-    AddressCollection = Backbone.Collection.extend({
+    const AddressCollection = Backbone.Collection.extend({
         model: AddressModel,
 
         /**
          * @inheritDoc
          */
-        constructor: function AddressCollection() {
-            AddressCollection.__super__.constructor.apply(this, arguments);
+        constructor: function AddressCollection(...args) {
+            AddressCollection.__super__.constructor.apply(this, args);
         },
 
         /**
@@ -32,7 +30,7 @@ define([
         onActiveChange: function(item) {
             // Only 1 item allowed to be active
             if (item.get('active')) {
-                var activeItems = this.where({active: true});
+                const activeItems = this.where({active: true});
                 _.each(activeItems, function(activeItem) {
                     if (activeItem.get('id') !== item.get('id')) {
                         activeItem.set('active', false);

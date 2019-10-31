@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var ToolbarMassActionComponent;
-    var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var ActionsPanel = require('orodatagrid/js/datagrid/actions-panel');
+    const _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const ActionsPanel = require('orodatagrid/js/datagrid/actions-panel');
 
     /**
      * @class ToolbarMassActionComponent
      * @extends BaseComponent
      */
-    ToolbarMassActionComponent = BaseComponent.extend({
+    const ToolbarMassActionComponent = BaseComponent.extend({
         /**
          * Instance of grid
          * @type {Backgrid.Grid}
@@ -20,8 +19,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ToolbarMassActionComponent() {
-            ToolbarMassActionComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ToolbarMassActionComponent(options) {
+            ToolbarMassActionComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -30,12 +29,12 @@ define(function(require) {
         initialize: function(options) {
             _.extend(this, _.pick(options, ['collection', 'actions', 'grid']));
 
-            var actions = [];
-            var grid = this.grid;
+            const actions = [];
+            const grid = this.grid;
 
             this.actions.each(function(Action) {
-                var ActionModule = Action.get('module');
-                var action = new ActionModule({datagrid: grid});
+                const ActionModule = Action.get('module');
+                const action = new ActionModule({datagrid: grid});
 
                 this.listenTo(action, 'preExecute', this.onActionRun.bind(this));
                 actions.push(action);
@@ -49,7 +48,7 @@ define(function(require) {
                     this.actionsPanel.$el.dropdown('toggle');
                 }
             });
-            ToolbarMassActionComponent.__super__.initialize.apply(this, arguments);
+            ToolbarMassActionComponent.__super__.initialize.call(this, options);
         },
 
         onActionRun: function(action) {
@@ -73,7 +72,7 @@ define(function(require) {
             delete this.actions;
             delete this.grid;
 
-            ToolbarMassActionComponent.__super__.dispose.apply(this, arguments);
+            ToolbarMassActionComponent.__super__.dispose.call(this);
         }
     });
 

@@ -1,8 +1,7 @@
 const _ = require('underscore');
 const modules = require('dynamic-imports');
 
-function loadModule(name) {
-    const values = _.rest(arguments);
+function loadModule(name, ...values) {
     if (!modules[name]) {
         throw new Error('Module "' + name + '" is not found the list of modules');
     }
@@ -23,8 +22,8 @@ function loadModule(name) {
  * @return {Promise}
  */
 module.exports = function loadModules(modules, callback, context) {
-    var requirements;
-    var processModules;
+    let requirements;
+    let processModules;
 
     if (_.isObject(modules) && !_.isArray(modules)) {
         // if modules is an object of {formal_name: module_name}
@@ -44,7 +43,7 @@ module.exports = function loadModules(modules, callback, context) {
         };
     }
 
-    var promises = requirements.map(function(moduleName) {
+    const promises = requirements.map(function(moduleName) {
         return loadModule(moduleName);
     });
 
@@ -55,7 +54,7 @@ module.exports = function loadModules(modules, callback, context) {
                 if (callback) {
                     callback.apply(context || null, modules);
                 }
-                resolve.apply(null, modules);
+                resolve(...modules);
             })
             .catch(function(error) {
                 reject(error);

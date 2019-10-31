@@ -1,21 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var ConfigurationTreeView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var tools = require('oroui/js/tools');
-    var routing = require('routing');
-    var BaseTreeView = require('oroui/js/app/views/jstree/base-tree-view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const tools = require('oroui/js/tools');
+    const routing = require('routing');
+    const BaseTreeView = require('oroui/js/app/views/jstree/base-tree-view');
 
-    ConfigurationTreeView = BaseTreeView.extend({
+    const ConfigurationTreeView = BaseTreeView.extend({
         autoSelectFoundNode: true,
 
         /**
          * @inheritDoc
          */
-        constructor: function ConfigurationTreeView() {
-            ConfigurationTreeView.__super__.constructor.apply(this, arguments);
+        constructor: function ConfigurationTreeView(options) {
+            ConfigurationTreeView.__super__.constructor.call(this, options);
         },
 
         isNodeHasHandler: function(node) {
@@ -23,18 +22,18 @@ define(function(require) {
         },
 
         redirect: function(node) {
-            var parent = _.last(_.without(node.parents, '#'));
-            var routeParams = _.extend({}, this.onSelectRouteParameters, {
+            const parent = _.last(_.without(node.parents, '#'));
+            const routeParams = _.extend({}, this.onSelectRouteParameters, {
                 activeGroup: parent + '/' + node.id
             });
 
-            var state = tools.unpackFromQueryString(location.search)[this.viewGroup] || {};
+            const state = tools.unpackFromQueryString(location.search)[this.viewGroup] || {};
             if (_.isUndefined(routeParams[this.viewGroup])) {
                 routeParams[this.viewGroup] = state;
             }
-            var url = routing.generate(this.onSelectRoute, routeParams);
+            const url = routing.generate(this.onSelectRoute, routeParams);
             // simulate click on real link to check page state
-            var $link = $('<a>').attr('href', url);
+            const $link = $('<a>').attr('href', url);
             this.$tree.before($link);
             $link.click().remove();
         },

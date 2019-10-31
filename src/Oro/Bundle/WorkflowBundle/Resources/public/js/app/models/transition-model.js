@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var TransitionModel;
-    var _ = require('underscore');
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const _ = require('underscore');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
-    TransitionModel = BaseModel.extend({
+    const TransitionModel = BaseModel.extend({
         defaults: {
             name: null,
             label: null,
@@ -26,8 +25,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function TransitionModel() {
-            TransitionModel.__super__.constructor.apply(this, arguments);
+        constructor: function TransitionModel(attrs, options) {
+            TransitionModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
@@ -57,7 +56,7 @@ define(function(require) {
         },
 
         destroy: function(options) {
-            var transitionDefinition = this.getTransitionDefinition();
+            const transitionDefinition = this.getTransitionDefinition();
             if (transitionDefinition) {
                 transitionDefinition.destroy();
             }

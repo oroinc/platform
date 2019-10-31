@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var UPSInvalidateCacheComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    UPSInvalidateCacheComponent = BaseComponent.extend({
+    const UPSInvalidateCacheComponent = BaseComponent.extend({
         /**
          * @property {Object}
          */
@@ -21,8 +20,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function UPSInvalidateCacheComponent() {
-            UPSInvalidateCacheComponent.__super__.constructor.apply(this, arguments);
+        constructor: function UPSInvalidateCacheComponent(options) {
+            UPSInvalidateCacheComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -47,7 +46,7 @@ define(function(require) {
         },
 
         toggleRemoveInvalidationVisibility: function() {
-            var value = $(this.invalidateAt).val();
+            const value = $(this.invalidateAt).val();
             if (value === '') {
                 $(this.removeInvalidationButton).hide();
             } else {
@@ -62,7 +61,7 @@ define(function(require) {
         },
 
         onSelectChange: function() {
-            var value = $(this.invalidateType).val();
+            const value = $(this.invalidateType).val();
             if (value === 'immediate') {
                 $(this.invalidateNow).val(1);
                 $(this.$elem).find('tr>td:gt(1)').hide();

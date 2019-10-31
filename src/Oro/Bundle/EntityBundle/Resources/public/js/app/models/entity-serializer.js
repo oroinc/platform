@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var serializer;
-    var _ = require('underscore');
-    var Backbone = require('backbone');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
 
-    serializer = {
+    const serializer = {
         serializeAttributes: function(model, attributes, modelStack) {
             if (modelStack === undefined) {
                 modelStack = {};
@@ -26,11 +25,10 @@ define(function(require) {
         },
 
         serializeModelAttributes: function(model, currentModel, modelStack) {
-            var attributes;
             if (model === currentModel || model.cid in modelStack) {
                 return model.identifier || null;
             }
-            attributes = _.isFunction(model.getAttributesAndRelationships)
+            const attributes = _.isFunction(model.getAttributesAndRelationships)
                 ? model.getAttributesAndRelationships()
                 : _.isFunction(model.getAttributes) ? model.getAttributes() : model.attributes;
             return this.serializeAttributes(model, attributes, modelStack);

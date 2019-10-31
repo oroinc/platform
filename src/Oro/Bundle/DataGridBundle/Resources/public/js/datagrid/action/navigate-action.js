@@ -6,8 +6,6 @@ define([
 ], function(_, __, mediator, ModelAction) {
     'use strict';
 
-    var NavigateAction;
-
     /**
      * Navigate action. Changes window location to url, from getLink method
      *
@@ -15,7 +13,7 @@ define([
      * @class   oro.datagrid.action.NavigateAction
      * @extends oro.datagrid.action.ModelAction
      */
-    NavigateAction = ModelAction.extend({
+    const NavigateAction = ModelAction.extend({
 
         /**
          * If `true` then created launcher will be complete clickable link,
@@ -28,8 +26,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function NavigateAction() {
-            NavigateAction.__super__.constructor.apply(this, arguments);
+        constructor: function NavigateAction(options) {
+            NavigateAction.__super__.constructor.call(this, options);
         },
 
         /**
@@ -39,7 +37,7 @@ define([
          * @param {Boolean} options.useDirectLauncherLink
          */
         initialize: function(options) {
-            NavigateAction.__super__.initialize.apply(this, arguments);
+            NavigateAction.__super__.initialize.call(this, options);
 
             if (options.useDirectLauncherLink) {
                 this.useDirectLauncherLink = options.useDirectLauncherLink;
@@ -66,10 +64,10 @@ define([
          * @param {Object} options
          */
         execute: function(options) {
-            var url = this.getLink();
+            let url = this.getLink();
 
-            var key = this.datagrid.collection.stateHashKey();
-            var value = this.datagrid.collection.stateHashValue();
+            let key = this.datagrid.collection.stateHashKey();
+            let value = this.datagrid.collection.stateHashValue();
 
             url = this.addUrlParameter(url, key, value);
 
@@ -99,7 +97,7 @@ define([
          */
         _preExecuteSubscriber: function(action, options) {
             mediator.once('page:beforeError', function(xmlHttp, options) {
-                var message;
+                let message;
                 if (403 === xmlHttp.status) {
                     options.stopPageProcessing = true;
                     message = __('You do not have permission to perform this action.');

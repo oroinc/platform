@@ -372,14 +372,14 @@ class NormalizeIncludedData implements ProcessorInterface
     }
 
     /**
-     * @param string $parentPath
+     * @param string $parentPointer
      * @param string $property
      *
      * @return string
      */
-    protected function buildPointer($parentPath, $property)
+    protected function buildPointer($parentPointer, $property)
     {
-        return $parentPath . '/' . $property;
+        return $parentPointer . '/' . $property;
     }
 
     /**

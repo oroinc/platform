@@ -1,15 +1,15 @@
 define(['./directions', './settings'], function(directions, settings) {
     'use strict';
 
-    var directionIds = [
+    const directionIds = [
         directions.BOTTOM_TO_TOP.id,
         directions.TOP_TO_BOTTOM.id,
         directions.LEFT_TO_RIGHT.id,
         directions.RIGHT_TO_LEFT.id
     ];
 
-    var shortDirectionUid = {};
-    for (var i = directionIds.length - 1; i >= 0; i--) {
+    const shortDirectionUid = {};
+    for (let i = directionIds.length - 1; i >= 0; i--) {
         shortDirectionUid[directionIds[i]] = i;
     }
 
@@ -46,7 +46,7 @@ define(['./directions', './settings'], function(directions, settings) {
     Object.defineProperty(Path.prototype, 'uid', {
         get: function() {
             if (this._uid === void 0) {
-                var vectorId = this.connection.a === this.fromNode
+                const vectorId = this.connection.a === this.fromNode
                     ? this.connection.vector.id
                     : this.connection.vector.rot180().id;
                 this._uid = this.fromNode.uid * 8 + shortDirectionUid[vectorId];
@@ -75,8 +75,8 @@ define(['./directions', './settings'], function(directions, settings) {
     Object.defineProperty(Path.prototype, 'allConnections', {
         get: function() {
             if (this.previous) {
-                var result = this.previous.allConnections;
-                result.push.apply(result, this.includedConnections);
+                const result = this.previous.allConnections;
+                result.push(...this.includedConnections);
                 return result;
             }
             return this.includedConnections;
@@ -92,12 +92,12 @@ define(['./directions', './settings'], function(directions, settings) {
      */
     Object.defineProperty(Path.prototype, 'includedConnections', {
         get: function() {
-            var node = this.fromNode;
-            var needle = this.toNode;
-            var directionId = this.connection.directionFrom(node).id;
-            var connection = node.connections[directionId];
+            let node = this.fromNode;
+            const needle = this.toNode;
+            const directionId = this.connection.directionFrom(node).id;
+            let connection = node.connections[directionId];
             if (connection !== this.connection) {
-                var result = [];
+                const result = [];
                 result.push(connection);
                 node = connection.second(node);
                 while (node !== needle) {
@@ -122,7 +122,7 @@ define(['./directions', './settings'], function(directions, settings) {
     Object.defineProperty(Path.prototype, 'allNodes', {
         get: function() {
             if (this.previous) {
-                var result = this.previous.allNodes;
+                const result = this.previous.allNodes;
                 result.push(this.toNode);
                 return result;
             }
@@ -139,9 +139,9 @@ define(['./directions', './settings'], function(directions, settings) {
      */
     Object.defineProperty(Path.prototype, 'points', {
         get: function() {
-            var points = [];
-            var current = this;
-            var currentAxis = this.connection.axis;
+            const points = [];
+            let current = this;
+            let currentAxis = this.connection.axis;
             points.push(this.toNode.recommendedPoint);
             while (current) {
                 if (current.connection.axis !== currentAxis) {
@@ -168,12 +168,12 @@ define(['./directions', './settings'], function(directions, settings) {
         if (this.previous) {
             throw new Error('Unable to get path siblings');
         }
-        var result = [this];
-        var connectionDirection = this.connection.directionFrom(this.fromNode);
-        var direction = connectionDirection.rot90().abs();
-        var oppositeDirection = direction.rot180();
-        var nextNode;
-        var nextConnection;
+        const result = [this];
+        const connectionDirection = this.connection.directionFrom(this.fromNode);
+        const direction = connectionDirection.rot90().abs();
+        const oppositeDirection = direction.rot180();
+        let nextNode;
+        let nextConnection;
         nextNode = this.fromNode;
         while ((nextNode = nextNode.nextNode(direction))) {
             if (nextNode.x !== this.fromNode.x || nextNode.y !== this.fromNode.y) {

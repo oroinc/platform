@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var CommentCollection;
-    var LoadMoreCollection = require('oroui/js/app/models/load-more-collection');
-    var CommentModel = require('orocomment/js/app/models/comment-model');
+    const LoadMoreCollection = require('oroui/js/app/models/load-more-collection');
+    const CommentModel = require('orocomment/js/app/models/comment-model');
 
-    CommentCollection = LoadMoreCollection.extend({
+    const CommentCollection = LoadMoreCollection.extend({
         model: CommentModel,
 
         /**
@@ -21,8 +20,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function CommentCollection() {
-            CommentCollection.__super__.constructor.apply(this, arguments);
+        constructor: function CommentCollection(...args) {
+            CommentCollection.__super__.constructor.apply(this, args);
         },
 
         create: function() {

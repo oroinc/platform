@@ -1,19 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var EmailNotificationComponent;
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var tools = require('oroui/js/tools');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var DesktopEmailNotificationView =
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const tools = require('oroui/js/tools');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const DesktopEmailNotificationView =
         require('oroemail/js/app/views/email-notification/email-notification-collection-view');
-    var MobileEmailNotificationView =
+    const MobileEmailNotificationView =
         require('oroemail/js/app/views/email-notification/mobile-email-notification-view');
-    var EmailNotificationCountView =
+    const EmailNotificationCountView =
         require('oroemail/js/app/views/email-notification/email-notification-count-view');
 
-    EmailNotificationComponent = BaseComponent.extend({
+    const EmailNotificationComponent = BaseComponent.extend({
         view: null,
 
         collection: null,
@@ -23,8 +22,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailNotificationComponent() {
-            EmailNotificationComponent.__super__.constructor.apply(this, arguments);
+        constructor: function EmailNotificationComponent(options) {
+            EmailNotificationComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -39,7 +38,7 @@ define(function(require) {
         },
 
         initViews: function(options) {
-            var EmailNotificationView = tools.isMobile() ? MobileEmailNotificationView : DesktopEmailNotificationView;
+            const EmailNotificationView = tools.isMobile() ? MobileEmailNotificationView : DesktopEmailNotificationView;
             this.view = new EmailNotificationView({
                 el: options.listSelector ? options._sourceElement.find(options.listSelector) : options._sourceElement,
                 collection: this.collection,
@@ -49,7 +48,7 @@ define(function(require) {
                 hasMarkAllButton: Boolean(options.hasMarkAllButton),
                 hasMarkVisibleButton: Boolean(options.hasMarkVisibleButton)
             });
-            var iconElement;
+            let iconElement;
             if (options.iconSelector && (iconElement = options._sourceElement.find(options.iconSelector)).length) {
                 this.countView = new EmailNotificationCountView({
                     el: iconElement,

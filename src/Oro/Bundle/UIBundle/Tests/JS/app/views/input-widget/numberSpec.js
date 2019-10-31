@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
+    const $ = require('jquery');
     require('jasmine-jquery');
     require('oroui/js/app/modules/input-widgets');
 
-    var $el;
-    var el;
+    let $el;
+    let el;
 
     beforeEach(function() {
         window.setFixtures(
@@ -19,8 +19,8 @@ define(function(require) {
         $el.data('inputWidget').allowZero = false;
     });
 
-    var testValue = function(val, expected, cursorToStart) {
-        var enteredKey = '';
+    const testValue = function(val, expected, cursorToStart) {
+        let enteredKey = '';
         el.value = '';
         if (!cursorToStart) {
             el.value = val.length ? val.slice(0, val.length - 1) : '';
@@ -29,7 +29,7 @@ define(function(require) {
         el.selectionStart = el.selectionEnd = el.value.length;
 
         // simulate all events during user input
-        var e;
+        let e;
         e = $.Event('keydown', {key: enteredKey});
         $el.trigger(e);
         if (!e.isDefaultPrevented()) {

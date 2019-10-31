@@ -15,7 +15,7 @@ define([
      *
      * Basic usage:
      * ```javascript
-     * var CommentCollection = RoutingCollection.extend({
+     * const CommentCollection = RoutingCollection.extend({
      *     routeDefaults: {
      *         routeName: 'oro_api_comment_get_items',
      *         routeQueryParameterNames: ['page', 'limit']
@@ -32,7 +32,7 @@ define([
      *     }
      * });
      *
-     * var commentCollection = new CommentCollection([], {
+     * const commentCollection = new CommentCollection([], {
      *     routeParameters: {
      *         // specify required parameters
      *         relationId: 123,
@@ -51,9 +51,7 @@ define([
      * @augment BaseCollection
      * @exports RoutingCollection
      */
-    var RoutingCollection;
-
-    RoutingCollection = BaseCollection.extend(/** @lends RoutingCollection.prototype */{
+    const RoutingCollection = BaseCollection.extend(/** @lends RoutingCollection.prototype */{
 
         /**
          * Route object which used to generate urls. Collection will reload whenever route is changed.
@@ -122,8 +120,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function RoutingCollection() {
-            RoutingCollection.__super__.constructor.apply(this, arguments);
+        constructor: function RoutingCollection(...args) {
+            RoutingCollection.__super__.constructor.apply(this, args);
         },
 
         /**
@@ -148,7 +146,7 @@ define([
             this.on('add', this._onAdd);
             this.on('remove', this._onRemove);
 
-            RoutingCollection.__super__.initialize.apply(this, arguments);
+            RoutingCollection.__super__.initialize.call(this, models, options);
         },
 
         /**
@@ -188,10 +186,10 @@ define([
          * @protected
          */
         _mergeAllPropertyVersions: function(attrName) {
-            var attrVersion;
-            var result = {};
-            var attrVersions = Chaplin.utils.getAllPropertyVersions(this, attrName);
-            for (var i = 0; i < attrVersions.length; i++) {
+            let attrVersion;
+            const result = {};
+            const attrVersions = Chaplin.utils.getAllPropertyVersions(this, attrName);
+            for (let i = 0; i < attrVersions.length; i++) {
                 attrVersion = attrVersions[i];
                 if (_.isFunction(attrVersion)) {
                     attrVersion = attrVersion.call(this);
@@ -233,7 +231,7 @@ define([
             this.beginSync();
             this._lastUrl = options.url || this.url();
             this.once('sync error', this.finishSync, this);
-            return RoutingCollection.__super__.sync.apply(this, arguments);
+            return RoutingCollection.__super__.sync.call(this, type, self, options);
         },
 
         /**
@@ -248,7 +246,7 @@ define([
          * Callback for state and route changes.
          */
         checkUrlChange: function() {
-            var newUrl = this.url();
+            const newUrl = this.url();
             if (newUrl !== this._lastUrl) {
                 this.fetch();
             }
@@ -298,7 +296,7 @@ define([
         dispose: function() {
             this._route.dispose();
             this._state.dispose();
-            RoutingCollection.__super__.dispose.apply(this, arguments);
+            RoutingCollection.__super__.dispose.call(this);
         }
     });
 

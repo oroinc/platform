@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var ChoiceTreeFilter;
-    var template = require('tpl-loader!orofilter/templates/filter/choice-tree.html');
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var TextFilter = require('oro/filter/text-filter');
-    var tools = require('oroui/js/tools');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-    var Select2TreeAutocompleteComponent = require('oro/select2-tree-autocomplete-component');
+    const template = require('tpl-loader!orofilter/templates/filter/choice-tree.html');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const TextFilter = require('oro/filter/text-filter');
+    const tools = require('oroui/js/tools');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const Select2TreeAutocompleteComponent = require('oro/select2-tree-autocomplete-component');
 
     /**
      * Number filter: formats value as a number
@@ -17,7 +16,7 @@ define(function(require) {
      * @class   oro.filter.ChoiceBusinessUnitFilter
      * @extends oro.filter.TextFilter
      */
-    ChoiceTreeFilter = TextFilter.extend({
+    const ChoiceTreeFilter = TextFilter.extend({
         template: template,
         templateSelector: '#choice-tree-template',
 
@@ -43,15 +42,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ChoiceTreeFilter() {
-            ChoiceTreeFilter.__super__.constructor.apply(this, arguments);
+        constructor: function ChoiceTreeFilter(options) {
+            ChoiceTreeFilter.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
-            ChoiceTreeFilter.__super__.initialize.apply(this, arguments);
+        initialize: function(options) {
+            ChoiceTreeFilter.__super__.initialize.call(this, options);
             this.data = this.data || [];
             if (this.lazy) {
                 this.loadedMetadata = false;
@@ -69,7 +68,7 @@ define(function(require) {
         },
 
         render: function() {
-            var result = ChoiceTreeFilter.__super__.render.apply(this, arguments);
+            const result = ChoiceTreeFilter.__super__.render.call(this);
             if (!this.loadedMetadata) {
                 this.subview('loading', new LoadingMaskView({
                     container: this.$el
@@ -83,7 +82,7 @@ define(function(require) {
             if (!this.select2component) {
                 this._initSelect2Component();
             }
-            ChoiceTreeFilter.__super__._showCriteria.apply(this, arguments);
+            ChoiceTreeFilter.__super__._showCriteria.call(this);
         },
 
         /**
@@ -93,7 +92,7 @@ define(function(require) {
             if (!this.loadedMetadata) {
                 return;
             }
-            var options = {
+            const options = {
                 _sourceElement: this.$(this.criteriaValueSelectors.value),
                 configs: {
                     allowClear: true,
@@ -127,7 +126,7 @@ define(function(require) {
          */
         setValue: function(value, skipRefresh) {
             if (!tools.isEqualsLoosely(this.value, value)) {
-                var oldValue = this.value;
+                const oldValue = this.value;
                 this.value = tools.deepClone(value);
                 this._updateDOMValue();
                 if (!skipRefresh) {
@@ -154,8 +153,8 @@ define(function(require) {
         },
 
         onDataLoaded: function(e) {
-            var results = _.result(e.items, 'results') || [];
-            var existIds = _.pluck(this.data, 'id');
+            const results = _.result(e.items, 'results') || [];
+            const existIds = _.pluck(this.data, 'id');
             Array.prototype.push.apply(this.data, _.filter(results, function(item) {
                 return existIds.indexOf(item.id) === -1;
             }));
@@ -164,9 +163,9 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        _getCriteriaHint: function() {
-            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
-            var option = null;
+        _getCriteriaHint: function(...args) {
+            const value = (args.length > 0) ? this._getDisplayValue(args[0]) : this._getDisplayValue();
+            const option = null;
 
             if (!value.value) {
                 return this.placeholder;
@@ -175,18 +174,18 @@ define(function(require) {
             if (this.data.length === 0) {
                 this.loadDataById(value);
             } else {
-                var renderedPropertyName = this.renderedPropertyName || 'name';
-                var label = [];
+                const renderedPropertyName = this.renderedPropertyName || 'name';
+                const label = [];
                 _.each(value.value.split(','), function(val) {
-                    var id = parseInt(val);
+                    let id = parseInt(val);
                     if (val && isNaN(id)) {
                         id = val;
                     }
 
-                    var item = _.findWhere(this.data, {id: id});
+                    const item = _.findWhere(this.data, {id: id});
                     if (item !== void 0) {
                         if (item.treePath) {
-                            var path = [];
+                            const path = [];
                             _.each(item.treePath, function(item) {
                                 path.push(item[renderedPropertyName]);
                             });
@@ -201,17 +200,17 @@ define(function(require) {
                     this.select2component.view.$el.select2('data', this.data);
                 }
 
-                var hintValue = this.wrapHintValue ? ('"' + label.join(', ') + '"') : label.join(', ');
+                const hintValue = this.wrapHintValue ? ('"' + label.join(', ') + '"') : label.join(', ');
                 return (option ? option.label + ' ' : '') + hintValue;
             }
         },
 
         getQuery: function(value) {
-            var query;
+            let query;
             if (typeof value.value === 'string') {
                 query = value.value;
             } else {
-                var ids = [];
+                const ids = [];
                 _.each(value.value, function(val) {
                     ids.push(val.id);
                 });
@@ -222,8 +221,8 @@ define(function(require) {
         },
 
         loadDataById: function(value) {
-            var query = this.getQuery(value);
-            var self = this;
+            const query = this.getQuery(value);
+            const self = this;
             $.ajax({
                 url: this.autocomplete_url,
                 data: {
@@ -241,7 +240,7 @@ define(function(require) {
         },
 
         reset: function() {
-            ChoiceTreeFilter.__super__.reset.apply(this, arguments);
+            ChoiceTreeFilter.__super__.reset.call(this);
             this.$(this.criteriaValueSelectors.value).trigger('change');
             this._hideCriteria();
         }

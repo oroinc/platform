@@ -152,7 +152,7 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension implements Logg
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $attachmentConfig->getId();
                 $view->vars['dam_widget'] = [
-                    'preview_metadata' => $file && $file->getFilename()
+                    'preview_metadata' => $file && $file->getId()
                         ? $this->previewMetadataProvider->getMetadata($file) : [],
                     'is_image_type' => $fieldConfigId->getFieldType() === 'image',
                     'route' => $options['dam_widget_route'],

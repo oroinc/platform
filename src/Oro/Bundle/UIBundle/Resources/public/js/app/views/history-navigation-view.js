@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var HistoryNavigationView;
-    var BaseView = require('./base/view');
+    const BaseView = require('./base/view');
 
-    HistoryNavigationView = BaseView.extend({
+    const HistoryNavigationView = BaseView.extend({
         autoRender: true,
         template: require('tpl-loader!oroui/templates/history.html'),
         events: {
@@ -19,17 +18,17 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function HistoryNavigationView() {
-            HistoryNavigationView.__super__.constructor.apply(this, arguments);
+        constructor: function HistoryNavigationView(options) {
+            HistoryNavigationView.__super__.constructor.call(this, options);
         },
 
         onUndo: function() {
-            var index = this.model.get('index');
+            const index = this.model.get('index');
             this.trigger('navigate', index - 1);
         },
 
         onRedo: function() {
-            var index = this.model.get('index');
+            const index = this.model.get('index');
             this.trigger('navigate', index + 1);
         }
     });

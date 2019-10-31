@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
-    var persistentStorage = require('oroui/js/persistent-storage');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
+    const persistentStorage = require('oroui/js/persistent-storage');
 
     require('jquery-ui');
 
@@ -31,7 +31,7 @@ define(function(require) {
         },
 
         _init: function() {
-            var storedState = null;
+            let storedState = null;
             if (this.options.storageKey) {
                 storedState = JSON.parse(persistentStorage.getItem(this.options.storageKey + this.options.uid));
             }
@@ -77,7 +77,7 @@ define(function(require) {
 
             mediator.on('layout:reposition', _.debounce(this._updateState.bind(this), 0));
 
-            var group = this.options.group;
+            const group = this.options.group;
             if (group) {
                 mediator.on('collapse-group-widgets:' + group + ':setState', this._setState, this);
                 mediator.on('collapse-group-widgets:' + group + ':collectStates', this._collectStates, this);

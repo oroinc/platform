@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var ConditionBuilderComponent;
-    var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var ConditionBuilderView = require('oroquerydesigner/js/app/views/condition-builder/condition-builder-view');
+    const _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const ConditionBuilderView = require('oroquerydesigner/js/app/views/condition-builder/condition-builder-view');
 
-    ConditionBuilderComponent = BaseComponent.extend({
+    const ConditionBuilderComponent = BaseComponent.extend({
         /**
          * @type {Array.<string>}
          */
@@ -15,8 +14,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ConditionBuilderComponent() {
-            ConditionBuilderComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ConditionBuilderComponent(options) {
+            ConditionBuilderComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -25,7 +24,7 @@ define(function(require) {
         initialize: function(options) {
             _.extend(this, _.pick(options, 'fieldsRelatedCriteria'));
 
-            var opts = _.extend({el: options._sourceElement},
+            const opts = _.extend({el: options._sourceElement},
                 _.omit(options, 'name', '_sourceElement', '_subPromises', 'fieldsRelatedCriteria'));
 
             this.view = new ConditionBuilderView(opts);
@@ -40,7 +39,7 @@ define(function(require) {
         setEntity: function(entityClassName) {
             this.view.setValue([]);
             _.each(this.fieldsRelatedCriteria, function(criteriaName) {
-                var isEnabled = !_.isEmpty(entityClassName);
+                const isEnabled = !_.isEmpty(entityClassName);
                 this.view.toggleCriteria(criteriaName, isEnabled);
                 this.view.updateCriteriaOptions(criteriaName, {rootEntity: entityClassName});
             }, this);

@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var EmailAttachmentComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var EmailAttachmentSelectView = require('oroemail/js/app/views/email-attachment-select-view');
-    var EmailAttachmentCollection = require('oroemail/js/app/models/email-attachment-collection');
-    var EmailAttachmentCollectionView = require('oroemail/js/app/views/email-attachment-collection-view');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const EmailAttachmentSelectView = require('oroemail/js/app/views/email-attachment-select-view');
+    const EmailAttachmentCollection = require('oroemail/js/app/models/email-attachment-collection');
+    const EmailAttachmentCollectionView = require('oroemail/js/app/views/email-attachment-collection-view');
 
     /**
      * @exports EmailAttachmentComponent
      */
-    EmailAttachmentComponent = BaseComponent.extend({
+    const EmailAttachmentComponent = BaseComponent.extend({
         /**
          * @type {EmailAttachmentCollection}
          */
@@ -49,8 +48,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailAttachmentComponent() {
-            EmailAttachmentComponent.__super__.constructor.apply(this, arguments);
+        constructor: function EmailAttachmentComponent(options) {
+            EmailAttachmentComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -91,9 +90,9 @@ define(function(require) {
          * Binds handlers to control elements
          */
         bindEvents: function() {
-            var self = this;
+            const self = this;
             this.$popupSelectButton.on('click.' + this.cid, function() {
-                var popupView = self.getPopupView();
+                const popupView = self.getPopupView();
                 if (popupView.isShowed) {
                     popupView.hide();
                 } else {
@@ -119,11 +118,11 @@ define(function(require) {
                 this.popupView.showHideFilter();
                 this.popupView.showHideGroups();
 
-                var self = this;
+                const self = this;
                 this.popupCollection.on('attach', function() {
                     self.popupCollection.each(function(model) {
                         if (model.get('checked')) {
-                            var newModel = model.clone();
+                            const newModel = model.clone();
                             self.collection.add(newModel);
                         }
                     });

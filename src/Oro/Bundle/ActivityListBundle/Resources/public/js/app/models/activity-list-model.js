@@ -5,9 +5,7 @@ define([
 ], function($, _, BaseModel) {
     'use strict';
 
-    var ActivityListModel;
-
-    ActivityListModel = BaseModel.extend({
+    const ActivityListModel = BaseModel.extend({
         defaults: {
             id: '',
 
@@ -46,18 +44,18 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function ActivityListModel() {
-            ActivityListModel.__super__.constructor.apply(this, arguments);
+        constructor: function ActivityListModel(...args) {
+            ActivityListModel.__super__.constructor.apply(this, args);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
+        initialize: function(...args) {
             this.once('change:contentHTML', function() {
                 this.set('is_loaded', true);
             });
-            ActivityListModel.__super__.initialize.apply(this, arguments);
+            ActivityListModel.__super__.initialize.apply(this, args);
         },
 
         getRelatedActivityClass: function() {
@@ -70,8 +68,7 @@ define([
          * @param model {Object|ActivityListModel} attributes or model to compare
          */
         isSameActivity: function(model) {
-            var attrsToCompare;
-            attrsToCompare = model instanceof ActivityListModel ? model.toJSON() : model;
+            const attrsToCompare = model instanceof ActivityListModel ? model.toJSON() : model;
 
             if (attrsToCompare.id === this.get('id')) {
                 return true;
@@ -100,7 +97,7 @@ define([
         },
 
         loadContentHTML: function(url) {
-            var options = {
+            const options = {
                 url: url,
                 type: 'get',
                 dataType: 'html',
@@ -121,7 +118,7 @@ define([
                     });
                 }, this))
                 .fail(_.bind(function(response) {
-                    var attrs = {isContentLoading: false};
+                    const attrs = {isContentLoading: false};
                     if (response.status === 403) {
                         attrs.is_loaded = true;
                     }

@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var ResizableArea;
-    var persistentStorage = require('oroui/js/persistent-storage');
-    var BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    var _ = require('underscore');
-    var $ = require('jquery');
+    const persistentStorage = require('oroui/js/persistent-storage');
+    const BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    const _ = require('underscore');
+    const $ = require('jquery');
     require('jquery-ui');
 
-    ResizableArea = BasePlugin.extend({
+    const ResizableArea = BasePlugin.extend({
         /**
          * @property {Options}
          */
@@ -67,7 +66,7 @@ define(function(require) {
                 return;
             }
 
-            ResizableArea.__super__.dispose.apply(this, arguments);
+            ResizableArea.__super__.dispose.call(this);
         },
 
         /**
@@ -106,7 +105,7 @@ define(function(require) {
          * Disable the resizable functionality
          */
         disable: function(removeSize) {
-            var restore = _.isUndefined(removeSize) ? true : removeSize;
+            const restore = _.isUndefined(removeSize) ? true : removeSize;
 
             this.$resizableEl
                 .removeClass('resizable-enable')
@@ -123,7 +122,7 @@ define(function(require) {
          * Enable the resizable functionality
          */
         enable: function(restoreSize) {
-            var restore = _.isUndefined(restoreSize) ? true : restoreSize;
+            const restore = _.isUndefined(restoreSize) ? true : restoreSize;
 
             this.$resizableEl
                 .addClass('resizable-enable')
@@ -150,8 +149,8 @@ define(function(require) {
          * @private
          */
         _savePreviousSize: function(size) {
-            var oldValue = persistentStorage.getItem(ResizableArea.STORAGE_KEY);
-            var newValue = {};
+            let oldValue = persistentStorage.getItem(ResizableArea.STORAGE_KEY);
+            const newValue = {};
 
             oldValue = oldValue ? JSON.parse(oldValue) : {};
 
@@ -167,7 +166,7 @@ define(function(require) {
         },
 
         removePreviousState: function() {
-            var state = JSON.parse(persistentStorage.getItem(ResizableArea.STORAGE_KEY));
+            const state = JSON.parse(persistentStorage.getItem(ResizableArea.STORAGE_KEY));
 
             if (_.isObject(state)) {
                 if (_.has(state, this.options.$resizableEl)) {
@@ -194,11 +193,11 @@ define(function(require) {
      * @static
      */
     ResizableArea.setPreviousState = function($container) {
-        var state = JSON.parse(persistentStorage.getItem(ResizableArea.STORAGE_KEY));
+        const state = JSON.parse(persistentStorage.getItem(ResizableArea.STORAGE_KEY));
 
         if (_.isObject(state)) {
             _.each(state, function(value, key) {
-                var $el = $container.find(key);
+                const $el = $container.find(key);
 
                 if ($.contains($container[0], $el[0])) {
                     $el.css(value);

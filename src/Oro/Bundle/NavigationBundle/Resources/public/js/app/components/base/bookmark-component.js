@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var BaseBookmarkComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var BaseNavigationItemCollection = require('oronavigation/js/app/models/base/collection');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const BaseNavigationItemCollection = require('oronavigation/js/app/models/base/collection');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    BaseBookmarkComponent = BaseComponent.extend({
+    const BaseBookmarkComponent = BaseComponent.extend({
         /**
          * Keeps separately extended options,
          * to prevent disposing the view each time by Composer
@@ -37,8 +36,8 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            var $dataEl = $(options.dataSource);
-            var extraOptions = $dataEl.data('options');
+            const $dataEl = $(options.dataSource);
+            const extraOptions = $dataEl.data('options');
             $dataEl.remove();
 
             this.collection = new this.collectionModel;
@@ -53,12 +52,12 @@ define(function(require) {
                 this.collection.model = this.collection.model.extend({route: this.route});
             }
 
-            var typeName = options._sourceElement.data('type-name');
+            const typeName = options._sourceElement.data('type-name');
             if (!_.isEmpty(typeName)) {
                 this.typeName = typeName;
             }
 
-            var data = $dataEl.data('data');
+            const data = $dataEl.data('data');
             if (data) {
                 this.collection.reset(data);
             }
@@ -87,13 +86,11 @@ define(function(require) {
         },
 
         toAdd: function(model) {
-            var collection;
-            collection = this.collection;
+            const collection = this.collection;
             this.actualizeAttributes(model);
             model.save(null, {
                 success: function() {
-                    var item;
-                    item = collection.find(function(item) {
+                    const item = collection.find(function(item) {
                         return item.get('url') === model.get('url');
                     });
                     if (item) {

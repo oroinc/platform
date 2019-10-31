@@ -52,11 +52,11 @@ define(['underscore'], function(_) {
          * @returns {Object}
          */
         generateEvents: function(view) {
-            var oldEvents = this.canGenerateEventsAsObject
+            const oldEvents = this.canGenerateEventsAsObject
                 ? this.View.prototype.events
                 : this.View.prototype.events.call(view);
-            var events = Object.create(oldEvents);
-            for (var key in this.extendedEvents) {
+            const events = Object.create(oldEvents);
+            for (const key in this.extendedEvents) {
                 if (this.extendedEvents.hasOwnProperty(key)) {
                     events[key] = _.partial(
                         this.selectAndRun,
@@ -70,7 +70,7 @@ define(['underscore'], function(_) {
         },
 
         generateDeclaration: function() {
-            var _this = this;
+            const _this = this;
             return this.canGenerateEventsAsObject
                 ? this.generateEvents()
                 : function() {

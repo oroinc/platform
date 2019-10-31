@@ -24,13 +24,12 @@ define([
 ) {
     'use strict';
 
-    var AddressBookView;
     /**
      * @export  oroaddress/js/address-book
      * @class   oroaddress.AddressBook
      * @extends Backbone.View
      */
-    AddressBookView = BaseView.extend({
+    const AddressBookView = BaseView.extend({
         isEmpty: false,
 
         options: {
@@ -57,8 +56,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function AddressBookView() {
-            AddressBookView.__super__.constructor.apply(this, arguments);
+        constructor: function AddressBookView(options) {
+            AddressBookView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -98,7 +97,7 @@ define([
                 el: this.$mapContainerFrame
             });
 
-            var activeAddress = this.getCollection().find({active: true});
+            const activeAddress = this.getCollection().find({active: true});
             if (activeAddress) {
                 this.activateAddress(activeAddress);
             }
@@ -129,9 +128,9 @@ define([
             }
         },
 
-        _getUrl: function(optionsKey) {
+        _getUrl: function(optionsKey, ...rest) {
             if (_.isFunction(this.options[optionsKey])) {
-                return this.options[optionsKey].apply(this, Array.prototype.slice.call(arguments, 1));
+                return this.options[optionsKey].apply(this, rest);
             }
             return this.options[optionsKey];
         },
@@ -142,7 +141,7 @@ define([
 
         onAddressRemove: function() {
             if (!this.getCollection().where({active: true}).length) {
-                var primaryAddress = this.getCollection().where({primary: true});
+                const primaryAddress = this.getCollection().where({primary: true});
                 if (primaryAddress.length) {
                     primaryAddress[0].set('active', true);
                 } else if (this.getCollection().length) {
@@ -193,7 +192,7 @@ define([
 
         _activatePreviousAddress: function() {
             if (this.activeAddress !== undefined) {
-                var previouslyActive = this.getCollection().where({id: this.activeAddress.get('id')});
+                const previouslyActive = this.getCollection().where({id: this.activeAddress.get('id')});
                 if (previouslyActive.length) {
                     previouslyActive[0].set('active', true);
                 }
@@ -202,7 +201,7 @@ define([
 
         addAddress: function(address) {
             if (!this.$el.find('#address-book-' + address.id).length) {
-                var addressView = new AddressView({
+                const addressView = new AddressView({
                     model: address,
                     map: this.options.addressMapOptions,
                     template: this.options.template,

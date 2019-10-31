@@ -1,21 +1,19 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var tools = require('oroui/js/tools');
-    var FilterTemplate = require('orofilter/js/filter-template');
-    var FilterHint = require('orofilter/js/filter-hint');
-    var config = require('module-config').default(module.id);
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const tools = require('oroui/js/tools');
+    const FilterTemplate = require('orofilter/js/filter-template');
+    const FilterHint = require('orofilter/js/filter-hint');
+    let config = require('module-config').default(module.id);
 
     config = _.extend({
         placeholder: __('All'),
         labelPrefix: ''
     }, config);
-
-    var AbstractFilter;
 
     /**
      * Basic grid filter
@@ -24,7 +22,7 @@ define(function(require, exports, module) {
      * @class   oro.filter.AbstractFilter
      * @extends Backbone.View
      */
-    AbstractFilter = BaseView.extend(_.extend({}, FilterTemplate, {
+    const AbstractFilter = BaseView.extend(_.extend({}, FilterTemplate, {
         /**
          * Is filter can be disabled
          *
@@ -119,8 +117,8 @@ define(function(require, exports, module) {
         /**
          * @inheritDoc
          */
-        constructor: function AbstractFilter() {
-            AbstractFilter.__super__.constructor.apply(this, arguments);
+        constructor: function AbstractFilter(options) {
+            AbstractFilter.__super__.constructor.call(this, options);
         },
 
         /**
@@ -130,7 +128,7 @@ define(function(require, exports, module) {
          * @param {Boolean} [options.enabled]
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, 'enabled', 'visible', 'canDisable', 'placeholder', 'showLabel', 'label',
+            const opts = _.pick(options || {}, 'enabled', 'visible', 'canDisable', 'placeholder', 'showLabel', 'label',
                 'templateSelector', 'templateTheme', 'template', 'renderMode');
             _.extend(this, opts);
 
@@ -147,9 +145,9 @@ define(function(require, exports, module) {
                 this.value = tools.deepClone(this.emptyValue);
             }
 
-            AbstractFilter.__super__.initialize.apply(this, arguments);
+            AbstractFilter.__super__.initialize.call(this, options);
 
-            var hintView = new FilterHint({
+            const hintView = new FilterHint({
                 filter: this
             });
 
@@ -259,7 +257,7 @@ define(function(require, exports, module) {
          */
         setValue: function(value) {
             if (!tools.isEqualsLoosely(this.value, value)) {
-                var oldValue = this.value;
+                const oldValue = this.value;
                 this.value = tools.deepClone(value);
                 this._updateDOMValue();
                 this._onValueUpdated(this.value, oldValue);
@@ -285,8 +283,8 @@ define(function(require, exports, module) {
          */
         _findDropdownFitContainer: function(element) {
             element = element || this.$el;
-            var $container = $();
-            for (var i = 0; i < this.dropdownFitContainers.length && $container.length === 0; i += 1) {
+            let $container = $();
+            for (let i = 0; i < this.dropdownFitContainers.length && $container.length === 0; i += 1) {
                 $container = $(element).closest(this.dropdownFitContainers[i]);
             }
             return $container.length === 0 ? null : $container;
@@ -392,8 +390,8 @@ define(function(require, exports, module) {
          * @protected
          */
         _getInputValue: function(input) {
-            var result;
-            var $input = this.$(input);
+            let result;
+            const $input = this.$(input);
             switch ($input.attr('type')) {
                 case 'radio':
                     $input.each(function() {
@@ -417,11 +415,11 @@ define(function(require, exports, module) {
          * @return {*}
          */
         _setInputValue: function(input, value) {
-            var $input = this.$(input);
+            const $input = this.$(input);
             switch ($input.attr('type')) {
                 case 'radio':
                     $input.each(function() {
-                        var $input = $(this);
+                        const $input = $(this);
                         if ($input.attr('value') === value) {
                             $input.prop('checked', true);
                             $input.click();
@@ -461,8 +459,8 @@ define(function(require, exports, module) {
          * @return {*}
          * @protected
          */
-        _getDisplayValue: function() {
-            var value = (arguments.length > 0) ? arguments[0] : this.getValue();
+        _getDisplayValue: function(...args) {
+            const value = (args.length > 0) ? args[0] : this.getValue();
             return this._formatDisplayValue(value);
         },
 

@@ -1,4 +1,5 @@
 /* global $ */
+/* eslint no-var: off */
 // eslint-disable-next-line no-unused-vars
 function PackageManager(Urls, util) {
     'use strict';

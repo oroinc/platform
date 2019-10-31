@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -227,6 +228,13 @@ interface ContextInterface extends ComponentContextInterface
     public function setSharedData(ParameterBagInterface $sharedData): void;
 
     /**
+     * Gets a context for response data normalization.
+     *
+     * @return array
+     */
+    public function getNormalizationContext(): array;
+
+    /**
      * Gets a list of records contains an additional information about collections,
      * e.g. "has_more" flag in such record indicates whether a collection has more records than it was requested.
      *
@@ -262,6 +270,28 @@ interface ContextInterface extends ComponentContextInterface
      * @param array  $infoRecords
      */
     public function addAssociationInfoRecords(string $propertyPath, array $infoRecords): void;
+
+    /**
+     * Gets all not resolved identifiers.
+     *
+     * @return NotResolvedIdentifier[] [path => identifier, ...]
+     */
+    public function getNotResolvedIdentifiers(): array;
+
+    /**
+     * Adds an identifier that cannot be resolved.
+     *
+     * @param string $path          The path, e.g. "entityId", "filters.owner", "requestData.data.id"
+     * @param NotResolvedIdentifier $identifier The submitted identifier
+     */
+    public function addNotResolvedIdentifier(string $path, NotResolvedIdentifier $identifier): void;
+
+    /**
+     * Removes an identifier that cannot be resolved.
+     *
+     * @param string $path The path, e.g. "entityId", "filters.owner", "requestData.data.id"
+     */
+    public function removeNotResolvedIdentifier(string $path): void;
 
     /**
      * Checks whether a query is used to get result data exists.

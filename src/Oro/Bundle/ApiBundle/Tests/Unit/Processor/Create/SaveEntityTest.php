@@ -27,12 +27,24 @@ class SaveEntityTest extends FormProcessorTestCase
         $this->processor = new SaveEntity($this->doctrineHelper);
     }
 
+    public function testProcessWhenEntityAlreadySaved()
+    {
+        $this->doctrineHelper->expects(self::never())
+            ->method('getEntityManager');
+
+        $this->context->setProcessed(SaveEntity::OPERATION_NAME);
+        $this->context->setResult(new \stdClass());
+        $this->context->setMetadata($this->createMock(EntityMetadata::class));
+        $this->processor->process($this->context);
+    }
+
     public function testProcessWhenNoEntity()
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
 
         $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
     public function testProcessForNotSupportedEntity()
@@ -42,6 +54,7 @@ class SaveEntityTest extends FormProcessorTestCase
 
         $this->context->setResult([]);
         $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
     public function testProcessForNotManageableEntity()
@@ -55,6 +68,7 @@ class SaveEntityTest extends FormProcessorTestCase
 
         $this->context->setResult($entity);
         $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
     public function testProcessForManageableEntityWithSingleId()
@@ -86,6 +100,7 @@ class SaveEntityTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals($entityId, $this->context->getId());
+        self::assertTrue($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
     public function testProcessForManageableEntityWithCompositeId()
@@ -117,6 +132,7 @@ class SaveEntityTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals($entityId, $this->context->getId());
+        self::assertTrue($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
     public function testProcessForManageableEntityWhenIdWasNotGenerated()
@@ -147,6 +163,7 @@ class SaveEntityTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getId());
+        self::assertTrue($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
     public function testProcessWhenEntityAlreadyExists()
@@ -184,5 +201,6 @@ class SaveEntityTest extends FormProcessorTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertTrue($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 }

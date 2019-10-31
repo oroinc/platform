@@ -1,21 +1,20 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var FiltersManager;
-    var template = require('tpl-loader!orofilter/templates/filters-container.html');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var tools = require('oroui/js/tools');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var MultiselectDecorator = require('orofilter/js/multiselect-decorator');
-    var filterWrapper = require('orofilter/js/datafilter-wrapper');
-    var FiltersStateView = require('orofilter/js/app/views/filters-state-view');
-    var persistentStorage = require('oroui/js/persistent-storage');
-    var FilterDialogWidget = require('orofilter/js/app/views/filter-dialog-widget');
-    var config = require('module-config').default(module.id);
-    var DEFAULT_STORAGE_KEY = 'filters-state';
+    const template = require('tpl-loader!orofilter/templates/filters-container.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const tools = require('oroui/js/tools');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const MultiselectDecorator = require('orofilter/js/multiselect-decorator');
+    const filterWrapper = require('orofilter/js/datafilter-wrapper');
+    const FiltersStateView = require('orofilter/js/app/views/filters-state-view');
+    const persistentStorage = require('oroui/js/persistent-storage');
+    const FilterDialogWidget = require('orofilter/js/app/views/filter-dialog-widget');
+    const config = require('module-config').default(module.id);
+    const DEFAULT_STORAGE_KEY = 'filters-state';
 
     /**
      * View that represents all grid filters
@@ -28,7 +27,7 @@ define(function(require, exports, module) {
      * @event updateFilter  on update data of specific filter
      * @event disableFilter on disable specific filter
      */
-    FiltersManager = BaseView.extend({
+    const FiltersManager = BaseView.extend({
         /**
          * List of filter objects
          *
@@ -152,8 +151,8 @@ define(function(require, exports, module) {
         /**
          * @inheritDoc
          */
-        constructor: function FiltersManager() {
-            FiltersManager.__super__.constructor.apply(this, arguments);
+        constructor: function FiltersManager(options) {
+            FiltersManager.__super__.constructor.call(this, options);
         },
 
         /**
@@ -182,7 +181,7 @@ define(function(require, exports, module) {
                 }
             }
 
-            var filterListeners = {
+            const filterListeners = {
                 update: this._onFilterUpdated,
                 change: this._onFilterChanged,
                 disable: this._onFilterDisabled,
@@ -190,7 +189,7 @@ define(function(require, exports, module) {
             };
 
             if (tools.isMobile()) {
-                var outsideActionEvents = 'click.' + this.cid + ' shown.bs.dropdown.' + this.cid;
+                const outsideActionEvents = 'click.' + this.cid + ' shown.bs.dropdown.' + this.cid;
                 filterListeners.updateCriteriaClick = this._onUpdateCriteriaClick;
                 $('body').on(outsideActionEvents, this._onOutsideActionEvent.bind(this));
             }
@@ -203,7 +202,7 @@ define(function(require, exports, module) {
             }, this);
 
             if (this.isFiltersStateViewNeeded(options)) {
-                var filtersStateView = new FiltersStateView({
+                const filtersStateView = new FiltersStateView({
                     el: options.filtersStateElement,
                     filters: options.filters,
                     useAnimationOnInit: options.useFiltersStateAnimationOnInit
@@ -215,7 +214,7 @@ define(function(require, exports, module) {
                 });
             }
 
-            FiltersManager.__super__.initialize.apply(this, arguments);
+            FiltersManager.__super__.initialize.call(this, options);
         },
 
         hasFilters: function() {
@@ -230,7 +229,7 @@ define(function(require, exports, module) {
                 this.listenTo(mediator, 'datagrid:metadata-loaded', this.updateFilters);
             }
 
-            return FiltersManager.__super__.delegateListeners.apply(this, arguments);
+            return FiltersManager.__super__.delegateListeners.call(this);
         },
 
         /**
@@ -247,12 +246,12 @@ define(function(require, exports, module) {
         },
 
         checkFiltersVisibility: function() {
-            var filterSelector = this.$(this.filterSelector);
+            const filterSelector = this.$(this.filterSelector);
             if (!filterSelector.length) {
                 return;
             }
             _.each(this.filters, function(filter) {
-                var option = filterSelector.find('option[value="' + filter.name + '"]');
+                const option = filterSelector.find('option[value="' + filter.name + '"]');
                 if (filter.visible && option.hasClass('hidden')) {
                     option.removeClass('hidden');
 
@@ -350,7 +349,7 @@ define(function(require, exports, module) {
          * Returns list of filter raw values
          */
         getValues: function() {
-            var values = {};
+            const values = {};
             _.each(this.filters, function(filter) {
                 if (filter.enabled) {
                     values[filter.name] = filter.getValue();
@@ -413,7 +412,7 @@ define(function(require, exports, module) {
             if (_.isEmpty(filters)) {
                 return this;
             }
-            var optionsSelectors = [];
+            const optionsSelectors = [];
 
             _.each(filters, function(filter) {
                 this._renderFilter(filter);
@@ -427,7 +426,7 @@ define(function(require, exports, module) {
                 return;
             }
 
-            var options = this.$(this.filterSelector).find(optionsSelectors.join(','));
+            const options = this.$(this.filterSelector).find(optionsSelectors.join(','));
             if (options.length) {
                 options.prop('selected', true);
             }
@@ -449,7 +448,7 @@ define(function(require, exports, module) {
             if (_.isEmpty(filters)) {
                 return this;
             }
-            var optionsSelectors = [];
+            const optionsSelectors = [];
 
             _.each(filters, function(filter) {
                 filter.disable();
@@ -459,7 +458,7 @@ define(function(require, exports, module) {
             if (!this.$(this.filterSelector).length) {
                 return;
             }
-            var options = this.$(this.filterSelector).find(optionsSelectors.join(','));
+            const options = this.$(this.filterSelector).find(optionsSelectors.join(','));
             if (options.length) {
                 options.prop('selected', false);
             }
@@ -477,7 +476,7 @@ define(function(require, exports, module) {
          */
         _renderFilter: function(filter) {
             if (!filter.isRendered()) {
-                var oldEl = filter.$el;
+                const oldEl = filter.$el;
                 filter.setRenderMode(this.renderMode);
                 // filter rendering process replaces $el
                 filter.render();
@@ -511,7 +510,7 @@ define(function(require, exports, module) {
             );
 
             this.dropdownContainer = this.$el.find('.filter-container');
-            var $filterItems = this.dropdownContainer.find('.filter-items');
+            const $filterItems = this.dropdownContainer.find('.filter-items');
 
             _.each(this.filters, function(filter) {
                 if (_.isFunction(filter.setDropdownContainer)) {
@@ -537,7 +536,7 @@ define(function(require, exports, module) {
             } else {
                 this._initializeSelectWidget();
             }
-            var filtersStateView = this.subview('filters-state');
+            const filtersStateView = this.subview('filters-state');
             if (filtersStateView) {
                 filtersStateView.render();
                 if (this.viewMode === FiltersManager.MANAGE_VIEW_MODE) {
@@ -565,7 +564,8 @@ define(function(require, exports, module) {
          * @private
          */
         _publishCountSelectedFilters: function(count) {
-            var countFilters = (!_.isUndefined(count) && _.isNumber(count)) ? count : this._calculateSelectedFilters();
+            const countFilters = (!_.isUndefined(count) && _.isNumber(count))
+                ? count : this._calculateSelectedFilters();
 
             mediator.trigger(
                 'filterManager:selectedFilters:count:' + this.collection.options.gridName,
@@ -580,7 +580,7 @@ define(function(require, exports, module) {
          * @private
          */
         _publishCountChangedFilters: function(count) {
-            var countFilters = (!_.isUndefined(count) && _.isNumber(count)) ? count : this._calculateChangedFilters();
+            const countFilters = (!_.isUndefined(count) && _.isNumber(count)) ? count : this._calculateChangedFilters();
 
             mediator.trigger(
                 'filterManager:changedFilters:count:' + this.collection.options.gridName,
@@ -594,7 +594,7 @@ define(function(require, exports, module) {
          */
         _calculateSelectedFilters: function() {
             return _.reduce(this.filters, function(memo, filter) {
-                var num = (
+                const num = (
                     filter.enabled &&
                     !filter.isEmptyValue() &&
                     !_.isEqual(filter.emptyValue, filter.value)
@@ -610,9 +610,9 @@ define(function(require, exports, module) {
          */
         _calculateChangedFilters: function() {
             return _.reduce(this.filters, function(memo, filter) {
-                var domVal = filter._readDOMValue();
+                const domVal = filter._readDOMValue();
 
-                var num = (filter.enabled &&
+                const num = (filter.enabled &&
                    !_.isEqual(filter.value, domVal) &&
                    !_.isEqual(filter.emptyValue, domVal) &&
                    !_.isUndefined(domVal.type) &&
@@ -624,8 +624,8 @@ define(function(require, exports, module) {
         },
 
         _resetHintContainer: function() {
-            var $container = this.dropdownContainer.find('.filter-items-hint');
-            var show = false;
+            const $container = this.dropdownContainer.find('.filter-items-hint');
+            let show = false;
             $container.children('span').each(function() {
                 if (this.style.display !== 'none') {
                     show = true;
@@ -647,8 +647,7 @@ define(function(require, exports, module) {
          * @protected
          */
         _initializeSelectWidget: function() {
-            var $button;
-            var multiselectDefaults = {
+            const multiselectDefaults = {
                 multiple: true,
                 selectedList: 0,
                 classes: 'select-filter-widget',
@@ -657,7 +656,7 @@ define(function(require, exports, module) {
                     at: 'left bottom'
                 }
             };
-            var options = _.extend(
+            const options = _.extend(
                 multiselectDefaults,
                 {
                     selectedText: this.addButtonHint,
@@ -689,7 +688,7 @@ define(function(require, exports, module) {
             });
 
             this.selectWidget.setViewDesign(this);
-            $button = this.selectWidget.multiselect('instance').button;
+            const $button = this.selectWidget.multiselect('instance').button;
             this._setButtonDesign($button);
             this._setButtonReset();
         },
@@ -737,8 +736,8 @@ define(function(require, exports, module) {
          * @protected
          */
         _setButtonReset: function() {
-            var $footerContainer = this._createButtonReset();
-            var instance = this.selectWidget.multiselect('instance');
+            const $footerContainer = this._createButtonReset();
+            const instance = this.selectWidget.multiselect('instance');
             instance.menu.append($footerContainer);
         },
 
@@ -748,8 +747,8 @@ define(function(require, exports, module) {
          * @protected
          */
         _setDropdownWidth: function() {
-            var widget = this.selectWidget.getWidget();
-            var requiredWidth = this.selectWidget.getMinimumDropdownWidth() + 24;
+            const widget = this.selectWidget.getWidget();
+            const requiredWidth = this.selectWidget.getMinimumDropdownWidth() + 24;
             widget.width(requiredWidth).css('min-width', requiredWidth + 'px');
         },
 
@@ -791,7 +790,7 @@ define(function(require, exports, module) {
          */
         _onDropdownToggle: function(e) {
             e.preventDefault();
-            var dialogWidget = new FilterDialogWidget({
+            const dialogWidget = new FilterDialogWidget({
                 title: this.filterDialogTitle,
                 content: this.dropdownContainer
             });
@@ -832,7 +831,7 @@ define(function(require, exports, module) {
         },
 
         setViewMode: function(mode) {
-            var modes = [FiltersManager.STATE_VIEW_MODE, FiltersManager.MANAGE_VIEW_MODE];
+            const modes = [FiltersManager.STATE_VIEW_MODE, FiltersManager.MANAGE_VIEW_MODE];
 
             if (this.viewMode === mode || !_.contains(modes, mode)) {
                 return;

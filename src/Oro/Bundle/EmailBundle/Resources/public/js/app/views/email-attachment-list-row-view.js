@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var EmailAttachmentListRowView;
-    var $ = require('jquery');
-    var datetime = require('orolocale/js/formatter/datetime');
-    var numeral = require('numeral');
-    var EmailAttachmentModel = require('oroemail/js/app/models/email-attachment-model');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl-loader!oroemail/templates/email-attachment/email-attachment-list-row-view.html');
+    const $ = require('jquery');
+    const datetime = require('orolocale/js/formatter/datetime');
+    const numeral = require('numeral');
+    const EmailAttachmentModel = require('oroemail/js/app/models/email-attachment-model');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('tpl-loader!oroemail/templates/email-attachment/email-attachment-list-row-view.html');
 
-    EmailAttachmentListRowView = BaseView.extend({
+    const EmailAttachmentListRowView = BaseView.extend({
         model: EmailAttachmentModel,
 
         events: {
@@ -23,8 +22,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailAttachmentListRowView() {
-            EmailAttachmentListRowView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailAttachmentListRowView(options) {
+            EmailAttachmentListRowView.__super__.constructor.call(this, options);
         },
 
         render: function() {
@@ -46,7 +45,7 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            var data = EmailAttachmentListRowView.__super__.getTemplateData.apply(this, arguments);
+            const data = EmailAttachmentListRowView.__super__.getTemplateData.call(this);
             if ('fileName' in data && data.fileName.length > 15) {
                 data.fileName = data.fileName.substr(0, 7) + '..' + data.fileName.substr(data.fileName.length - 7);
             }

@@ -1,18 +1,17 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var TabItemView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var config = require('module-config').default(module.id);
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    let config = require('module-config').default(module.id);
 
     config = _.extend({
         className: 'nav-item',
         templateClassName: 'nav-link'
     }, config);
 
-    TabItemView = BaseView.extend({
+    const TabItemView = BaseView.extend({
         tagName: 'li',
 
         className: config.className,
@@ -31,12 +30,12 @@ define(function(require, exports, module) {
         /**
          * @inheritDoc
          */
-        constructor: function TabItemView() {
-            TabItemView.__super__.constructor.apply(this, arguments);
+        constructor: function TabItemView(options) {
+            TabItemView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
-            TabItemView.__super__.initialize.apply(this, arguments);
+            TabItemView.__super__.initialize.call(this, options);
 
             this.updateStates();
         },
@@ -46,7 +45,7 @@ define(function(require, exports, module) {
             this.$el.toggleClass('changed', !!this.model.get('changed'));
 
             if (this.model.get('active')) {
-                var tabPanel = this.model.get('controlTabPanel') || this.model.get('id');
+                const tabPanel = this.model.get('controlTabPanel') || this.model.get('id');
                 $('#' + tabPanel).attr('aria-labelledby', this.model.get('uniqueId'));
             }
         },

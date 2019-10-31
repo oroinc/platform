@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var FallbackView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var tinyMCE = require('tinymce/tinymce');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const tinyMCE = require('tinymce/tinymce');
 
     /**
      * @export orolocale/js/app/views/fallback-view
      * @extends oroui.app.views.base.View
      * @class orolocale.app.views.FallbackView
      */
-    FallbackView = BaseView.extend({
+    const FallbackView = BaseView.extend({
         autoRender: true,
 
         initSubviews: true,
@@ -64,8 +63,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function FallbackView() {
-            FallbackView.__super__.constructor.apply(this, arguments);
+        constructor: function FallbackView(options) {
+            FallbackView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -104,7 +103,7 @@ define(function(require) {
          * Doing something after loading child components
          */
         handleLayoutInit: function() {
-            var self = this;
+            const self = this;
 
             this.mapItemsByCode();
 
@@ -125,7 +124,7 @@ define(function(require) {
          * Bind events to controls
          */
         bindEvents: function() {
-            var self = this;
+            const self = this;
 
             this.getValueEl(this.$el)
                 .change(_.bind(this.cloneValueToChildrenEvent, this))
@@ -152,13 +151,13 @@ define(function(require) {
          * Create item code to element mapping
          */
         mapItemsByCode: function() {
-            var self = this;
+            const self = this;
 
             this.itemsByCode = {};
 
             this.$el.find(this.options.selectors.item).each(function() {
-                var $item = $(this);
-                var itemCode = self.getItemCode($item);
+                const $item = $(this);
+                const itemCode = self.getItemCode($item);
 
                 if (!itemCode) {
                     return;
@@ -172,13 +171,13 @@ define(function(require) {
          * Create item to children mapping
          */
         mapItemToChildren: function() {
-            var self = this;
+            const self = this;
 
             this.itemToChildren = {};
 
             this.$el.find(this.options.selectors.item).each(function() {
-                var $item = $(this);
-                var parentItemCode = self.getParentItemCode($item);
+                const $item = $(this);
+                const parentItemCode = self.getParentItemCode($item);
 
                 if (!parentItemCode) {
                     return;
@@ -215,14 +214,14 @@ define(function(require) {
          * @param {Event} e
          */
         switchFallbackTypeEvent: function(e) {
-            var $item = this.getItemEl(e.currentTarget);
+            const $item = this.getItemEl(e.currentTarget);
 
             this.mapItemToChildren();
 
-            var parentItemCode = this.getParentItemCode($item);
+            const parentItemCode = this.getParentItemCode($item);
             if (parentItemCode) {
-                var $fromValue = this.getValueEl(this.itemsByCode[parentItemCode]);
-                var $toValue = this.getValueEl($item);
+                const $fromValue = this.getValueEl(this.itemsByCode[parentItemCode]);
+                const $toValue = this.getValueEl($item);
                 this.cloneValue($fromValue, $toValue);
             } else {
                 this.cloneValueToChildrenEvent(e);
@@ -255,12 +254,12 @@ define(function(require) {
          * @param {jQuery} $item
          */
         cloneValueToChildren: function($item) {
-            var $fromValue = this.getValueEl($item);
-            var itemCode = this.getItemCode($item);
+            const $fromValue = this.getValueEl($item);
+            const itemCode = this.getItemCode($item);
 
-            var self = this;
+            const self = this;
             $.each(this.itemToChildren[itemCode] || [], function() {
-                var $toValue = self.getValueEl(this);
+                const $toValue = self.getValueEl(this);
                 self.cloneValue($fromValue, $toValue);
             });
         },
@@ -271,12 +270,12 @@ define(function(require) {
          * @param {jQuery} $item
          */
         switchUseFallback: function($item) {
-            var $useFallback = this.getUseFallbackEl($item);
+            const $useFallback = this.getUseFallbackEl($item);
             if ($useFallback.length === 0) {
                 return;
             }
 
-            var checked = $useFallback.get(0).checked;
+            const checked = $useFallback.get(0).checked;
 
             this.enableDisableValue(this.getValueEl($item), !checked);
             this.enableDisableFallback(this.getFallbackEl($item), checked);
@@ -289,9 +288,9 @@ define(function(require) {
          * @param {Boolean} enable
          */
         enableDisableValue: function($element, enable) {
-            var $$elementContainer = $element.closest(this.options.selectors.itemValue);
+            const $$elementContainer = $element.closest(this.options.selectors.itemValue);
 
-            var editor;
+            let editor;
             if ($$elementContainer.find('.mce-tinymce').length > 0) {
                 editor = tinyMCE.get($$elementContainer.find('textarea').attr('id'));
             }
@@ -322,7 +321,7 @@ define(function(require) {
          * @param {Boolean} enable
          */
         enableDisableFallback: function($fallback, enable) {
-            var $fallbackContainer = $fallback.inputWidget('getContainer');
+            const $fallbackContainer = $fallback.inputWidget('getContainer');
 
             if (enable) {
                 $fallback.removeAttr('disabled');
@@ -348,9 +347,9 @@ define(function(require) {
          * @param {jQuery} $toValue
          */
         cloneValue: function($fromValue, $toValue) {
-            var isChanged = false;
+            let isChanged = false;
             $fromValue.each(function(i) {
-                var toValue = $toValue.get(i);
+                const toValue = $toValue.get(i);
                 if ($(this).is(':checkbox') || $(this).is(':radio')) {
                     if (toValue.checked !== this.checked) {
                         isChanged = true;
@@ -376,7 +375,7 @@ define(function(require) {
          * @returns {jQuery}
          */
         getItemEl: function(el) {
-            var $item = $(el);
+            let $item = $(el);
             if (!$item.is(this.options.selectors.item)) {
                 $item = $item.closest(this.options.selectors.item);
             }
@@ -424,12 +423,12 @@ define(function(require) {
          * @returns {undefined|String}
          */
         getParentItemCode: function($item) {
-            var $select = this.getFallbackEl($item);
+            const $select = this.getFallbackEl($item);
             if ($select.length === 0 || $select.attr('disabled')) {
                 return;
             }
 
-            var parentItemCode = $select.attr('data-parent-localization');
+            const parentItemCode = $select.attr('data-parent-localization');
 
             return parentItemCode && $select.val() !== 'system' ? parentItemCode : $select.val();
         },
@@ -442,8 +441,8 @@ define(function(require) {
          * @returns {String}
          */
         getItemCode: function($item) {
-            var $select = this.getFallbackEl($item);
-            var itemCode;
+            const $select = this.getFallbackEl($item);
+            let itemCode;
 
             if ($select.length === 0) {
                 itemCode = 'system';
@@ -458,8 +457,8 @@ define(function(require) {
          * Check is child has custom value
          */
         isChildEdited: function() {
-            var isChildEdited = false;
-            var $childItems = this.$el.find(this.options.selectors.childItem);
+            let isChildEdited = false;
+            const $childItems = this.$el.find(this.options.selectors.childItem);
 
             this.getValueEl($childItems).each(function() {
                 if (this.disabled) {
@@ -484,7 +483,7 @@ define(function(require) {
          * Change status icon depending on expanded flag and child custom values
          */
         setStatusIcon: function() {
-            var icon;
+            let icon;
 
             if (this.options.expanded) {
                 icon = 'save';
@@ -501,9 +500,9 @@ define(function(require) {
                 .one('click' + this.eventNamespace(), _.bind(this[icon.event], this))
                 .toggleClass(this.options.statusActiveClass, this.options.expanded);
 
-            var $defaultLabel = this.$el.find(this.options.selectors.defaultItem)
+            const $defaultLabel = this.$el.find(this.options.selectors.defaultItem)
                 .find(this.options.selectors.itemLabel);
-            var $childItems = this.$el.find(this.options.selectors.childItem);
+            const $childItems = this.$el.find(this.options.selectors.childItem);
 
             if (this.options.expanded) {
                 if (this.options.hideDefaultLabel) {

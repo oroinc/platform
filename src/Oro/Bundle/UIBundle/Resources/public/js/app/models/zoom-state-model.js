@@ -8,8 +8,7 @@ define(function(require) {
      * @augment BaseModel
      * @exports ZoomStateModel
      */
-    var ZoomStateModel;
-    var BaseModel = require('./base/model');
+    const BaseModel = require('./base/model');
 
     // homogeneous matrix
     function applyMatrix(point, matrix) {
@@ -19,7 +18,7 @@ define(function(require) {
         ];
     }
 
-    ZoomStateModel = BaseModel.extend(/** @lends ZoomStateModel.prototype */{
+    const ZoomStateModel = BaseModel.extend(/** @lends ZoomStateModel.prototype */{
         /**
          * @inheritDoc
          * @member {Object}
@@ -73,15 +72,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ZoomStateModel() {
-            ZoomStateModel.__super__.constructor.apply(this, arguments);
+        constructor: function ZoomStateModel(attrs, options) {
+            ZoomStateModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(attributes, options) {
-            ZoomStateModel.__super__.initialize.apply(this, arguments);
+            ZoomStateModel.__super__.initialize.call(this, attributes, options);
             if (!options.wrapper || !options.inner) {
                 throw new Error('ZoomStateModel requires wrapper and inner options to be passed');
             }
@@ -105,17 +104,17 @@ define(function(require) {
         },
 
         getPosition: function(el) {
-            var pos = {
+            let pos = {
                 left: el.offsetLeft,
                 top: el.offsetTop,
                 width: el.offsetWidth,
                 height: el.offsetHeight
             };
 
-            var style = getComputedStyle(el);
+            const style = getComputedStyle(el);
             try {
                 if (style.transform && style.transform !== 'none') {
-                    var matrix = style.transform
+                    const matrix = style.transform
                         .replace('matrix(', '')
                         .replace(')', '')
                         .split(' ')
@@ -123,23 +122,23 @@ define(function(require) {
                             return str.trim();
                         })
                         .map(parseFloat);
-                    var transformOrigin = style.transformOrigin
+                    const transformOrigin = style.transformOrigin
                         .split(' ')
                         .map(parseFloat);
-                    var transformCenter = [pos.left + transformOrigin[0], pos.top + transformOrigin[1]];
-                    var leftTop = applyMatrix([transformCenter[0] - pos.left,
+                    const transformCenter = [pos.left + transformOrigin[0], pos.top + transformOrigin[1]];
+                    const leftTop = applyMatrix([transformCenter[0] - pos.left,
                         transformCenter[1] - pos.top], matrix);
-                    var leftBottom = applyMatrix([transformCenter[0] - pos.left,
+                    const leftBottom = applyMatrix([transformCenter[0] - pos.left,
                         transformCenter[1] - pos.top - pos.height], matrix);
-                    var rightTop = applyMatrix([transformCenter[0] - pos.left - pos.width,
+                    const rightTop = applyMatrix([transformCenter[0] - pos.left - pos.width,
                         transformCenter[1] - pos.top], matrix);
-                    var rightBottom = applyMatrix([transformCenter[0] - pos.left - pos.width,
+                    const rightBottom = applyMatrix([transformCenter[0] - pos.left - pos.width,
                         transformCenter[1] - pos.top - pos.height], matrix);
 
-                    var left = Math.min(leftTop[0], leftBottom[0], rightTop[0], rightBottom[0]);
-                    var right = Math.max(leftTop[0], leftBottom[0], rightTop[0], rightBottom[0]);
-                    var top = Math.min(leftTop[1], leftBottom[1], rightTop[1], rightBottom[1]);
-                    var bottom = Math.max(leftTop[1], leftBottom[1], rightTop[1], rightBottom[1]);
+                    const left = Math.min(leftTop[0], leftBottom[0], rightTop[0], rightBottom[0]);
+                    const right = Math.max(leftTop[0], leftBottom[0], rightTop[0], rightBottom[0]);
+                    const top = Math.min(leftTop[1], leftBottom[1], rightTop[1], rightBottom[1]);
+                    const bottom = Math.max(leftTop[1], leftBottom[1], rightTop[1], rightBottom[1]);
                     pos = {
                         left: left + transformCenter[0],
                         top: top + transformCenter[1],
@@ -154,17 +153,17 @@ define(function(require) {
         },
 
         autoZoom: function() {
-            var inner = this.inner;
-            var left = Infinity;
-            var right = -Infinity;
-            var top = Infinity;
-            var bottom = -Infinity;
-            for (var i = 0; i < inner.children.length; i++) {
-                var el = inner.children[i];
+            const inner = this.inner;
+            let left = Infinity;
+            let right = -Infinity;
+            let top = Infinity;
+            let bottom = -Infinity;
+            for (let i = 0; i < inner.children.length; i++) {
+                const el = inner.children[i];
                 if (el.offsetHeight === 0 || el.offsetWidth === 0) {
                     continue;
                 }
-                var pos = this.getPosition(el);
+                const pos = this.getPosition(el);
 
                 if (left > pos.left) {
                     left = pos.left;
@@ -181,12 +180,12 @@ define(function(require) {
             }
 
             // calculate zoom level
-            var zoomLevel = Math.min(
+            const zoomLevel = Math.min(
                 1,
                 (this.wrapper.clientWidth - this.get('autoZoomPadding') * 2) / (right - left),
                 (this.wrapper.clientHeight - this.get('autoZoomPadding') * 2) / (bottom - top)
             );
-            var clientCenter = {
+            const clientCenter = {
                 x: this.wrapper.clientWidth / 2,
                 y: this.wrapper.clientHeight / 2
             };
@@ -196,7 +195,7 @@ define(function(require) {
             top = zoomLevel * (top - clientCenter.y);
             bottom = zoomLevel * (bottom - clientCenter.y);
 
-            var currentCenter = {
+            const currentCenter = {
                 x: (left + right) / 2,
                 y: (top + bottom) / 2
             };
@@ -215,9 +214,9 @@ define(function(require) {
             if (dy === void 0) {
                 dy = this.getCenter().y;
             }
-            var currentZoom = this.get('zoom');
-            var zoomSpeed = zoom / currentZoom;
-            var center = this.getCenter();
+            const currentZoom = this.get('zoom');
+            const zoomSpeed = zoom / currentZoom;
+            const center = this.getCenter();
             zoom = Math.min(zoom, this.get('maxZoom'));
             zoom = Math.max(zoom, this.get('minZoom'));
             this.set({

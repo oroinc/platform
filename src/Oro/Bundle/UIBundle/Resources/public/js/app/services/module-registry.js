@@ -1,5 +1,5 @@
-var loadModules = require('oroui/js/app/services/load-modules');
-var preloadedModules = {};
+const loadModules = require('oroui/js/app/services/load-modules');
+const preloadedModules = {};
 
 module.exports = {
     preload: function(moduleName) {

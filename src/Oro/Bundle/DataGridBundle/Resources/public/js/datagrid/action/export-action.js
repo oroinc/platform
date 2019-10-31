@@ -7,8 +7,6 @@ define([
 ], function($, _, AbstractAction, __, mediator) {
     'use strict';
 
-    var ExportAction;
-
     /**
      * Allows to export grid data
      *
@@ -16,7 +14,7 @@ define([
      * @class   oro.datagrid.action.ExportAction
      * @extends oro.datagrid.action.AbstractAction
      */
-    ExportAction = AbstractAction.extend({
+    const ExportAction = AbstractAction.extend({
 
         /** @property oro.PageableCollection */
         collection: undefined,
@@ -39,8 +37,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function ExportAction() {
-            ExportAction.__super__.constructor.apply(this, arguments);
+        constructor: function ExportAction(options) {
+            ExportAction.__super__.constructor.call(this, options);
         },
 
         /**
@@ -55,19 +53,19 @@ define([
             this.reloadData = false;
             this.frontend_handle = 'ajax';
 
-            ExportAction.__super__.initialize.apply(this, arguments);
+            ExportAction.__super__.initialize.call(this, options);
         },
 
         /**
          * {@inheritdoc}
          */
         createLauncher: function(options) {
-            var launcher = ExportAction.__super__.createLauncher.apply(this, arguments);
+            const launcher = ExportAction.__super__.createLauncher.call(this, options);
             // update 'href' attribute for each export type
             this.listenTo(launcher, 'expand', function(launcher) {
-                var fetchData = this.collection.getFetchData();
+                const fetchData = this.collection.getFetchData();
                 _.each(launcher.$el.find('.dropdown-menu a'), function(el) {
-                    var $el = $(el);
+                    const $el = $(el);
                     if (!this.isModalBinded) {
                         this.createWarningModalForMaxRecords($el, launcher);
                     }
@@ -92,14 +90,14 @@ define([
         _onAjaxError: function(jqXHR) {
             mediator.execute('showFlashMessage', 'error', this.messages.fail);
 
-            ExportAction.__super__._onAjaxError.apply(this, arguments);
+            ExportAction.__super__._onAjaxError.call(this, jqXHR);
         },
 
         createWarningModalForMaxRecords: function($el, launcher) {
-            var linkData = _.findWhere(launcher.links, {key: $el.data('key')});
-            var state = this.collection.state || {};
-            var totalRecords = state.totalRecords || 0;
-            var self = this;
+            const linkData = _.findWhere(launcher.links, {key: $el.data('key')});
+            const state = this.collection.state || {};
+            const totalRecords = state.totalRecords || 0;
+            const self = this;
 
             if (linkData.show_max_export_records_dialog &&
                 linkData.max_export_records &&
@@ -107,7 +105,7 @@ define([
                 $el.on('click', function(e) {
                     e.stopPropagation();
                     e.preventDefault();
-                    var link = $el;
+                    const link = $el;
 
                     self.confirmModal = (new self.confirmModalConstructor({
                         title: __(self.messages.confirm_title),

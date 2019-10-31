@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\Extra\HateoasMetadataExtra;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -794,6 +795,35 @@ class ContextTest extends \PHPUnit\Framework\TestCase
             ],
             $this->context->getInfoRecords()
         );
+    }
+
+    public function testNotResolvedIdentifiers()
+    {
+        self::assertFalse($this->context->has('not_resolved_identifiers'));
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
+
+        $path1 = 'test.path1';
+        $identifier1 = new NotResolvedIdentifier('test1', 'Test\Class1');
+        $this->context->addNotResolvedIdentifier($path1, $identifier1);
+        self::assertTrue($this->context->has('not_resolved_identifiers'));
+        self::assertSame([$path1 => $identifier1], $this->context->getNotResolvedIdentifiers());
+
+        $path2 = 'test.path2';
+        $identifier2 = new NotResolvedIdentifier('test2', 'Test\Class2');
+        $this->context->addNotResolvedIdentifier($path2, $identifier2);
+        self::assertTrue($this->context->has('not_resolved_identifiers'));
+        self::assertSame(
+            [$path1 => $identifier1, $path2 => $identifier2],
+            $this->context->getNotResolvedIdentifiers()
+        );
+
+        $this->context->removeNotResolvedIdentifier($path1);
+        self::assertTrue($this->context->has('not_resolved_identifiers'));
+        self::assertSame([$path2 => $identifier2], $this->context->getNotResolvedIdentifiers());
+
+        $this->context->removeNotResolvedIdentifier($path2);
+        self::assertFalse($this->context->has('not_resolved_identifiers'));
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testConfigExtras()

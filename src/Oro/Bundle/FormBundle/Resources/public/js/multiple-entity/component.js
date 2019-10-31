@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var MultipleEntityComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var routing = require('routing');
-    var CallbackListener = require('orodatagrid/js/datagrid/listener/callback-listener');
-    var WidgetManager = require('oroui/js/widget-manager');
-    var MultipleEntityModel = require('oroform/js/multiple-entity/model');
-    var _ = require('underscore');
-    var $ = require('jquery');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const routing = require('routing');
+    const CallbackListener = require('orodatagrid/js/datagrid/listener/callback-listener');
+    const WidgetManager = require('oroui/js/widget-manager');
+    const MultipleEntityModel = require('oroform/js/multiple-entity/model');
+    const _ = require('underscore');
+    const $ = require('jquery');
 
-    MultipleEntityComponent = BaseComponent.extend({
+    const MultipleEntityComponent = BaseComponent.extend({
         optionNames: BaseComponent.prototype.optionNames.concat([
             'wid', 'addedVal', 'removedVal', 'gridName', 'columnName', 'fieldTitles', 'extraData', 'link', 'entityName',
             'fieldName'
@@ -19,12 +18,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function MultipleEntityComponent() {
-            MultipleEntityComponent.__super__.constructor.apply(this, arguments);
+        constructor: function MultipleEntityComponent(options) {
+            MultipleEntityComponent.__super__.constructor.call(this, options);
         },
 
-        initialize: function() {
-            MultipleEntityComponent.__super__.initialize.apply(this, arguments);
+        initialize: function(options) {
+            MultipleEntityComponent.__super__.initialize.call(this, options);
 
             this.addedModels = {};
 
@@ -33,14 +32,14 @@ define(function(require) {
         },
 
         _bindEvent: function() {
-            var self = this;
+            const self = this;
             WidgetManager.getWidgetInstance(this.wid, function(widget) {
                 widget.getAction('select', 'adopted', function(selectBtn) {
                     selectBtn.click(function() {
-                        var addedVal = $(self.addedVal).val();
-                        var removedVal = $(self.removedVal).val();
-                        var appendedIds = addedVal.length ? addedVal.split(',') : [];
-                        var removedIds = removedVal.length ? removedVal.split(',') : [];
+                        const addedVal = $(self.addedVal).val();
+                        const removedVal = $(self.removedVal).val();
+                        const appendedIds = addedVal.length ? addedVal.split(',') : [];
+                        const removedIds = removedVal.length ? removedVal.split(',') : [];
                         widget.trigger('completeSelection', appendedIds, self.addedModels, removedIds);
                     });
                 });
@@ -58,7 +57,7 @@ define(function(require) {
         },
 
         onModelSelect: function(value, model, listener) {
-            var id = model.get('id');
+            const id = model.get('id');
             if (model.get(listener.columnName)) {
                 this.addedModels[id] = new MultipleEntityModel({
                     id: model.get('id'),
@@ -79,11 +78,11 @@ define(function(require) {
         },
 
         _getLabel: function(model) {
-            var label = '';
+            let label = '';
 
             if (!_.isUndefined(this.fieldTitles)) {
-                for (var i = 0; i < this.fieldTitles.length; i++) {
-                    var field = model.get(this.fieldTitles[i]);
+                for (let i = 0; i < this.fieldTitles.length; i++) {
+                    const field = model.get(this.fieldTitles[i]);
                     if (field) {
                         label += field + ' ';
                     }
@@ -94,10 +93,10 @@ define(function(require) {
         },
 
         _getExtraData: function(model) {
-            var extraData = [];
+            const extraData = [];
 
             if (!_.isUndefined(this.extraData)) {
-                for (var j = 0; j < this.extraData.length; j++) {
+                for (let j = 0; j < this.extraData.length; j++) {
                     extraData.push({
                         label: this.extraData[j].label,
                         value: model.get(this.extraData[j].value)
@@ -112,7 +111,7 @@ define(function(require) {
             this.callbackListener.dispose();
             delete this.callbackListener;
 
-            MultipleEntityComponent.__super__.dispose.apply(this, arguments);
+            MultipleEntityComponent.__super__.dispose.call(this);
         }
     });
 

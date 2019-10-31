@@ -12,8 +12,10 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SaveEntity implements ProcessorInterface
 {
+    public const OPERATION_NAME = 'save_existing_entity';
+
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /**
      * @param DoctrineHelper $doctrineHelper
@@ -30,6 +32,11 @@ class SaveEntity implements ProcessorInterface
     {
         /** @var SingleItemContext $context */
 
+        if ($context->isProcessed(self::OPERATION_NAME)) {
+            // the entity was already saved
+            return;
+        }
+
         $entity = $context->getResult();
         if (!\is_object($entity)) {
             // an entity does not exist
@@ -43,5 +50,7 @@ class SaveEntity implements ProcessorInterface
         }
 
         $em->flush();
+
+        $context->setProcessed(self::OPERATION_NAME);
     }
 }

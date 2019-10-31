@@ -1,23 +1,22 @@
 define(function(require) {
     'use strict';
 
-    var ImportDialogWidget;
-    var BaseDialogView = require('oro/dialog-widget');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var messenger = require('oroui/js/messenger');
+    const BaseDialogView = require('oro/dialog-widget');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const messenger = require('oroui/js/messenger');
 
     /**
      * @export  oroimportexport/js/app/widgets/import-dialog-widget
      * @class   oroimportexport.widget.ImportDialogWidget
      * @extends orowindows.widget.DialogWidget
      */
-    ImportDialogWidget = BaseDialogView.extend({
+    const ImportDialogWidget = BaseDialogView.extend({
         /**
          * @inheritDoc
          */
-        constructor: function ImportDialogWidget() {
-            ImportDialogWidget.__super__.constructor.apply(this, arguments);
+        constructor: function ImportDialogWidget(options) {
+            ImportDialogWidget.__super__.constructor.call(this, options);
         },
 
         _onContentLoad: function(content) {

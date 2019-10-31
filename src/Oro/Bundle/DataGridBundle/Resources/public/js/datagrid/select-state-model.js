@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var SelectStateModel;
-    var _ = require('underscore');
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const _ = require('underscore');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
-    SelectStateModel = BaseModel.extend({
+    const SelectStateModel = BaseModel.extend({
         defaults: {
             inset: true,
             rows: []
@@ -14,24 +13,24 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function SelectStateModel() {
-            SelectStateModel.__super__.constructor.apply(this, arguments);
+        constructor: function SelectStateModel(attrs, options) {
+            SelectStateModel.__super__.constructor.call(this, attrs, options);
         },
 
         addRow: function(model) {
-            var id = model.get('id');
+            const id = model.get('id');
             this.set('rows', _.uniq(this.attributes.rows.concat(id)));
             return this;
         },
 
         removeRow: function(model) {
-            var id = model.get('id');
+            const id = model.get('id');
             this.set('rows', _.without(this.attributes.rows, id));
             return this;
         },
 
         hasRow: function(model) {
-            var id = model.get('id');
+            const id = model.get('id');
             return this.get('rows').indexOf(id) !== -1;
         },
 

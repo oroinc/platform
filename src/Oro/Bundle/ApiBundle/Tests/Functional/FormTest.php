@@ -4,17 +4,20 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
+use Oro\Bundle\ApiBundle\Form\FormPropertyAccessor;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Form\Type\BooleanType;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class FormTest extends WebTestCase
 {
@@ -139,6 +142,19 @@ class FormTest extends WebTestCase
         $form->setData($object);
 
         $form->submit(['id' => 123, 'title' => '']);
+        self::assertTrue($form->isSubmitted(), 'isSubmitted');
+        self::assertFalse($form->isValid(), 'isValid');
+        self::assertTrue($form->isSynchronized(), 'isSynchronized');
+    }
+
+    public function testSetNullToNotNullableProperty()
+    {
+        $form = $this->getForm(['csrf_protection' => false]);
+        $object = new TestObject();
+        $object->setTitle('test');
+        $form->setData($object);
+
+        $form->submit(['id' => 123, 'title' => null]);
         self::assertTrue($form->isSubmitted(), 'isSubmitted');
         self::assertFalse($form->isValid(), 'isValid');
         self::assertTrue($form->isSynchronized(), 'isSynchronized');
@@ -318,9 +334,11 @@ class FormTest extends WebTestCase
             $options['data_class'] = TestObject::class;
         }
         $options['extra_fields_message'] = FormHelper::EXTRA_FIELDS_MESSAGE;
-        $form = $this->getContainer()->get('form.factory')->create(FormType::class, null, $options);
 
-        return $form;
+        return $this->getContainer()->get('form.factory')
+            ->createBuilder(FormType::class, null, $options)
+            ->setDataMapper(new PropertyPathMapper(new FormPropertyAccessor(new PropertyAccessor())))
+            ->getForm();
     }
 
     /**

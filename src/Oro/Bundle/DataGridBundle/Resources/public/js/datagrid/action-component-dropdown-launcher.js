@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var ActionComponentDropdownLauncher;
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var ActionLauncher = require('orodatagrid/js/datagrid/action-launcher');
-    var DatagridSettingsDialogWidget = require('./datagrid-settings-dialog-widget');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const ActionLauncher = require('orodatagrid/js/datagrid/action-launcher');
+    const DatagridSettingsDialogWidget = require('./datagrid-settings-dialog-widget');
 
     /**
      * @class ActionComponentDropdownLauncher
      * @extends ActionLauncher
      */
-    ActionComponentDropdownLauncher = ActionLauncher.extend({
+    const ActionComponentDropdownLauncher = ActionLauncher.extend({
         template: require('tpl-loader!orodatagrid/templates/datagrid/action-component-dropdown-launcher.html'),
 
         /**
@@ -46,8 +45,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ActionComponentDropdownLauncher() {
-            ActionComponentDropdownLauncher.__super__.constructor.apply(this, arguments);
+        constructor: function ActionComponentDropdownLauncher(options) {
+            ActionComponentDropdownLauncher.__super__.constructor.call(this, options);
         },
 
         /**
@@ -70,7 +69,7 @@ define(function(require) {
          * @inheritDoc
          */
         getTemplateData: function() {
-            var data = ActionComponentDropdownLauncher.__super__.getTemplateData.call(this);
+            const data = ActionComponentDropdownLauncher.__super__.getTemplateData.call(this);
             data.wrapperClassName = this.wrapperClassName;
             return data;
         },
@@ -85,7 +84,7 @@ define(function(require) {
                 this.$('.dropdown-toggle').on('click' + this.eventNamespace(), _.bind(this.openDialogWidget, this));
             }
             this.componentOptions._sourceElement = this.$('.dropdown-menu');
-            var Component = this.componentConstructor;
+            const Component = this.componentConstructor;
             this.component = new Component(this.componentOptions);
             return this;
         },
@@ -137,9 +136,9 @@ define(function(require) {
             if (_.isFunction(this.component.updateViews)) {
                 this.component.updateViews();
             }
-            var $dropdownMenu = this.$('>.dropdown-menu');
+            const $dropdownMenu = this.$('>.dropdown-menu');
             if ($dropdownMenu.length) {
-                var rect = $dropdownMenu[0].getBoundingClientRect();
+                const rect = $dropdownMenu[0].getBoundingClientRect();
                 $dropdownMenu.css({
                     maxWidth: rect.right + 'px'
                 });

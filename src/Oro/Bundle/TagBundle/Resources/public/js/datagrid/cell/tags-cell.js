@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var TagsCell;
-    var Backgrid = require('backgrid');
-    var _ = require('underscore');
-    var routing = require('routing');
-    var TagsView = require('orotag/js/app/views/viewer/tags-view');
+    const Backgrid = require('backgrid');
+    const _ = require('underscore');
+    const routing = require('routing');
+    const TagsView = require('orotag/js/app/views/viewer/tags-view');
 
     /**
      * Cell able to display tags values.
      *
      * Requires income data format:
      * ```javascript
-     * var cellValue = [{id: 1, text: 'tag-1'}, {id: 2, text: 'tag-2'}, ...];
+     * const cellValue = [{id: 1, text: 'tag-1'}, {id: 2, text: 'tag-2'}, ...];
      * ```
      *
      * Also please prepare and pass choices through cell configuration
@@ -21,7 +20,7 @@ define(function(require) {
      * @class   oro.datagrid.cell.TagsCell
      * @extends oro.datagrid.cell.StringCell
      */
-    TagsCell = Backgrid.StringCell.extend(_.extend(
+    const TagsCell = Backgrid.StringCell.extend(_.extend(
         _.pick(TagsView.prototype, [
             'template',
             'getTemplateFunction',
@@ -40,11 +39,11 @@ define(function(require) {
              */
             className: 'tags-cell tags-container',
 
-            initialize: function() {
-                Backgrid.StringCell.__super__.initialize.apply(this, arguments);
+            initialize: function(options) {
+                Backgrid.StringCell.__super__.initialize.call(this, options);
                 this.fieldName = this.column.get('name');
                 // TODO move url generation to server side
-                var tags = this.model.get(this.fieldName);
+                let tags = this.model.get(this.fieldName);
                 tags = _.map(tags, function(tag) {
                     if (!tag.hasOwnProperty('url')) {
                         tag.url = routing.generate('oro_tag_search', {

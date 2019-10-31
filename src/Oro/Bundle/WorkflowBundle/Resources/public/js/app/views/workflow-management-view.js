@@ -1,20 +1,19 @@
 define(function(require) {
     'use strict';
 
-    var WorkflowManagementView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var __ = require('orotranslation/js/translator');
-    var Confirmation = require('oroui/js/delete-confirmation');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var StepsListView = require('./step/step-list-view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const __ = require('orotranslation/js/translator');
+    const Confirmation = require('oroui/js/delete-confirmation');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const StepsListView = require('./step/step-list-view');
 
     /**
      * @export  oroworkflow/js/workflow-management
      * @class   oro.WorkflowManagement
      * @extends Backbone.View
      */
-    WorkflowManagementView = BaseView.extend({
+    const WorkflowManagementView = BaseView.extend({
         events: {
             'click .add-step-btn': 'addNewStep',
             'click .add-transition-btn': 'addNewTransition',
@@ -35,8 +34,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function WorkflowManagementView() {
-            WorkflowManagementView.__super__.constructor.apply(this, arguments);
+        constructor: function WorkflowManagementView(options) {
+            WorkflowManagementView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -53,7 +52,7 @@ define(function(require) {
                 workflow: this.model
             });
 
-            var template = this.options.templateTranslateLink || $('#workflow-translate-link-template').html();
+            const template = this.options.templateTranslateLink || $('#workflow-translate-link-template').html();
             this.templateTranslateLink = _.template(template);
 
             this.listenTo(this.model.get('steps'), 'destroy', this.onStepRemove);
@@ -82,11 +81,11 @@ define(function(require) {
         },
 
         initStartStepSelector: function() {
-            var getSteps = _.bind(function(query) {
-                var steps = [];
+            const getSteps = _.bind(function(query) {
+                const steps = [];
                 _.each(this.model.get('steps').models, function(step) {
                     // starting point is not allowed to be a start step
-                    var stepLabel = step.get('label');
+                    const stepLabel = step.get('label');
                     if (!step.get('_is_start') &&
                         (!query.term || query.term === stepLabel || _.indexOf(stepLabel, query.term) !== -1)
                     ) {
@@ -102,12 +101,12 @@ define(function(require) {
 
             this.$startStepEl = this.$('[name="start_step"]');
 
-            var select2Options = {
+            const select2Options = {
                 allowClear: true,
                 query: getSteps,
                 placeholder: __('Choose step...'),
                 initSelection: _.bind(function(element, callback) {
-                    var startStep = this.model.getStepByName(element.val());
+                    const startStep = this.model.getStepByName(element.val());
                     callback({
                         id: startStep.get('name'),
                         text: startStep.get('label')
@@ -119,7 +118,7 @@ define(function(require) {
         },
 
         onEntityChange: function(e) {
-            var oldVal = _.result(e.removed, 'id') || null;
+            const oldVal = _.result(e.removed, 'id') || null;
             if (oldVal !== null && this._hasData()) {
                 this._confirm(this.applyEntitySelectValue.bind(this),
                     function() {
@@ -136,7 +135,7 @@ define(function(require) {
         },
 
         _confirm: function(onConfirm, onCancel) {
-            var confirm = new Confirmation({
+            const confirm = new Confirmation({
                 title: __('Change Entity Confirmation'),
                 okText: __('Yes'),
                 content: __('oro.workflow.change_entity_confirmation')

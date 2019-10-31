@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var SidebarComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var SidebarModel = require('orosidebar/js/app/models/sidebar-model');
-    var SidebarView = require('orosidebar/js/app/views/sidebar-view');
-    var SidebarWidgetContainerCollection = require('orosidebar/js/app/models/sidebar-widget-container-collection');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const SidebarModel = require('orosidebar/js/app/models/sidebar-model');
+    const SidebarView = require('orosidebar/js/app/views/sidebar-view');
+    const SidebarWidgetContainerCollection = require('orosidebar/js/app/models/sidebar-widget-container-collection');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    SidebarComponent = BaseComponent.extend({
+    const SidebarComponent = BaseComponent.extend({
         /**
          * @inheritDoc
          */
@@ -28,11 +27,11 @@ define(function(require) {
                 urlRoot: options.urlRoot
             });
 
-            var availableWidgets = _.mapObject(options.availableWidgets, function(defaults) {
+            const availableWidgets = _.mapObject(options.availableWidgets, function(defaults) {
                 return _.defaults({description: __(defaults.description)}, defaults);
             });
 
-            var widgetsData = JSON.parse(options.widgetsData);
+            const widgetsData = JSON.parse(options.widgetsData);
             _.each(widgetsData, function(data) {
                 // extend widgets data with defaults
                 _.defaults(data, availableWidgets[data.widgetName]);
@@ -41,12 +40,12 @@ define(function(require) {
                 url: options.url
             });
 
-            var loadPromises = this.widgetsCollection.map(function(widgetModel) {
+            const loadPromises = this.widgetsCollection.map(function(widgetModel) {
                 return widgetModel.loadModule();
             });
 
             this._deferredInit();
-            $.when.apply($, loadPromises).then(function() {
+            $.when(...loadPromises).then(function() {
                 this.view = new SidebarView({
                     el: options._sourceElement,
                     autoRender: true,
