@@ -36,7 +36,6 @@
 {% block oro_file_with_digital_asset_widget %}
     {%- spaceless -%}
         {% import 'OroUIBundle::macros.html.twig' as UI %}
-        {% set is_set = value is not empty and value.id and value.originalFilename is not empty %}
 
         <div class="digital-asset-item"
             {{ UI.renderPageComponentAttributes({
@@ -44,7 +43,7 @@
                 options: {
                     view: 'orodigitalasset/js/app/views/digital-asset-choose-form-view',
                     isImageType: dam_widget.is_image_type,
-                    isSet: is_set,
+                    isSet: form.digitalAsset.vars.data is not empty,
                     widgetOptions: {
                         title: (dam_widget.is_image_type
                             ? 'oro.digitalasset.dam.dialog.select_image'
@@ -58,16 +57,23 @@
                 }
             }) }}
         >
-            {% if is_set %}
-                <a href="{{ dam_widget.preview_metadata.download }}" class="no-hash digital-asset-filename"
-                   title="{{ dam_widget.preview_metadata.title }}" data-role="digital-asset-filename">
-                    {% if dam_widget.is_image_type and dam_widget.preview_metadata.preview %}
-                        <img src="{{ dam_widget.preview_metadata.preview }}"
-                             alt="{{ dam_widget.preview_metadata.title }}"/>
-                    {% else %}
-                        <i class="{{ dam_widget.preview_metadata.icon }}"></i>
-                    {% endif %}
-                    {{ dam_widget.preview_metadata.filename }}
+            {% if dam_widget.is_valid_digital_asset %}
+                {% if dam_widget.preview_metadata %}
+                    <a href="{{ dam_widget.preview_metadata.download }}" class="no-hash digital-asset-filename"
+                       title="{{ dam_widget.preview_metadata.title }}" data-role="digital-asset-filename">
+                        {% if dam_widget.is_image_type and dam_widget.preview_metadata.preview %}
+                            <img src="{{ dam_widget.preview_metadata.preview }}"
+                                 alt="{{ dam_widget.preview_metadata.title }}"/>
+                        {% else %}
+                            <i class="{{ dam_widget.preview_metadata.icon }}"></i>
+                        {% endif %}
+                        {{ dam_widget.preview_metadata.filename }}
+                    </a>
+                {% endif %}
+            {% else %}
+                <a href="#" class="no-hash digital-asset-filename" data-role="digital-asset-filename">
+                    <i class="fa-file-o"></i>
+                    {{ 'oro.digitalasset.dam.form.invalid_digital_asset'|trans }}
                 </a>
             {% endif %}
 
