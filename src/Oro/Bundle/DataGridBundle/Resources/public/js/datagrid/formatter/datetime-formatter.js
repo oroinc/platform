@@ -9,7 +9,7 @@ define(['underscore', 'backgrid', 'orolocale/js/formatter/datetime'
      * @class   orodatagrid.datagrid.formatter.DateTimeFormatter
      * @extends Backgrid.CellFormatter
      */
-    var DatagridDateTimeFormatter = function(options) {
+    const DatagridDateTimeFormatter = function(options) {
         _.extend(this, options);
     };
 
@@ -59,7 +59,7 @@ define(['underscore', 'backgrid', 'orolocale/js/formatter/datetime'
                 return string.charAt(0).toUpperCase() + string.slice(1);
             }
 
-            var functionName = prefix + capitaliseFirstLetter(this.type) + suffix;
+            const functionName = prefix + capitaliseFirstLetter(this.type) + suffix;
             if (
                 !DateTimeFormatter.hasOwnProperty(functionName) ||
                 typeof DateTimeFormatter[functionName] !== 'function'

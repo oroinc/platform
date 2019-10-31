@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var ExportConfigurableTemplateWidgetView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
-    var widgetManager = require('oroui/js/widget-manager');
-    var exportHandler = require('oroimportexport/js/export-handler');
-    var messenger = require('oroui/js/messenger');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const widgetManager = require('oroui/js/widget-manager');
+    const exportHandler = require('oroimportexport/js/export-handler');
+    const messenger = require('oroui/js/messenger');
 
-    ExportConfigurableTemplateWidgetView = BaseView.extend({
+    const ExportConfigurableTemplateWidgetView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat(['downloadMessage', 'wid']),
 
         events: {
@@ -18,14 +17,14 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ExportConfigurableTemplateWidgetView() {
-            ExportConfigurableTemplateWidgetView.__super__.constructor.apply(this, arguments);
+        constructor: function ExportConfigurableTemplateWidgetView(options) {
+            ExportConfigurableTemplateWidgetView.__super__.constructor.call(this, options);
         },
 
         onFormSubmit: function(e) {
             e.preventDefault();
-            var currentTarget = e.currentTarget;
-            var downloadingMessage = messenger.notificationMessage('info', this.downloadMessage);
+            const currentTarget = e.currentTarget;
+            const downloadingMessage = messenger.notificationMessage('info', this.downloadMessage);
 
             widgetManager.getWidgetInstance(this.wid, function(widget) {
                 widget.remove();

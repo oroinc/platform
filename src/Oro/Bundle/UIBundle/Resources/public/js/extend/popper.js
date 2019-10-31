@@ -1,15 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var Popper = require('popper');
+    const Popper = require('popper');
 
     Popper.Defaults.modifiers.adjustHeight = {
         order: 550,
         enabled: false,
         fn: function(data, options) {
-            var scrollElement = data.instance.state.scrollElement;
-            var clientRect;
-            var availableHeight;
+            const scrollElement = data.instance.state.scrollElement;
+            let clientRect;
+            let availableHeight;
             if (scrollElement.tagName.toUpperCase() === 'BODY') {
                 availableHeight = scrollElement.parentElement.clientHeight - data.popper.top;
             } else {

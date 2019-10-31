@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroform/js/app/views/select2-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroform/js/app/views/select2-view');
 
-    var Select2EmailRecipientsView = BaseView.extend({
+    const Select2EmailRecipientsView = BaseView.extend({
         $contextEl: null,
 
         clearSearch: null,
@@ -19,18 +19,18 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function Select2EmailRecipientsView() {
-            Select2EmailRecipientsView.__super__.constructor.apply(this, arguments);
+        constructor: function Select2EmailRecipientsView(options) {
+            Select2EmailRecipientsView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
+        initialize: function(options) {
             this.$contextEl = $('[data-ftid=oro_email_email_contexts]');
             this.$el.on('input-widget:init', _.bind(this._onSelect2Init, this));
             this._initEditation();
-            Select2EmailRecipientsView.__super__.initialize.apply(this, arguments);
+            Select2EmailRecipientsView.__super__.initialize.call(this, options);
         },
 
         /**
@@ -38,13 +38,13 @@ define(function(require) {
          * + mark organization of the recipient as current one
          */
         _onRecipientAdd: function(e, id) {
-            var contexts = this.$el.data('contexts');
-            var organizations = this.$el.data('organizations');
+            const contexts = this.$el.data('contexts');
+            const organizations = this.$el.data('organizations');
             if (typeof contexts[id] === 'undefined') {
                 return;
             }
 
-            var data = this.$contextEl.inputWidget('data');
+            const data = this.$contextEl.inputWidget('data');
             this.$el.data('organization', _.result(organizations, id, null));
             data.push(contexts[id]);
             this.$contextEl.inputWidget('data', data);
@@ -54,15 +54,15 @@ define(function(require) {
             this.$el.valid();
             this.searchChoice.data = {id: '', text: ''};
 
-            var data = this.$contextEl.inputWidget('data');
+            const data = this.$contextEl.inputWidget('data');
             if (e.added) {
                 this.$el.trigger('recipient:add', e.added.id);
             }
 
             if (e.removed) {
-                var contexts = this.$el.data('contexts');
+                const contexts = this.$el.data('contexts');
                 if (typeof contexts[e.removed.id] !== 'undefined') {
-                    var newData = _.reject(data, function(item) {
+                    const newData = _.reject(data, function(item) {
                         return item.id === contexts[e.removed.id].id;
                     });
                     this.$contextEl.inputWidget('data', newData);
@@ -77,7 +77,7 @@ define(function(require) {
         },
 
         _onSelect2Init: function() {
-            var select2 = this.$el.data('select2');
+            const select2 = this.$el.data('select2');
             this.select2 = select2;
             this.searchChoice = this.$el.data('search-choice');
 
@@ -99,10 +99,10 @@ define(function(require) {
             this.clearSearch();
         },
 
-        _selectHighlighted: function(originalMethod) {
-            var val = this.select2.search.val();
+        _selectHighlighted: function(originalMethod, ...rest) {
+            const val = this.select2.search.val();
             if (val) {
-                var valueExistsAlready = _.some(this.select2.opts.element.inputWidget('data'), function(item) {
+                const valueExistsAlready = _.some(this.select2.opts.element.inputWidget('data'), function(item) {
                     return val === item.text;
                 });
 
@@ -115,11 +115,11 @@ define(function(require) {
                     return false;
                 }
             }
-            return originalMethod.apply(this.select2, _.rest(arguments));
+            return originalMethod.apply(this.select2, rest);
         },
 
         _onKeyUp: function() {
-            var val = this._extractItemsFromSearch(true);
+            const val = this._extractItemsFromSearch(true);
             if (!val) {
                 return;
             }
@@ -144,9 +144,9 @@ define(function(require) {
          * Make selected data editable
          */
         _initEditation: function() {
-            var $el = this.$el;
+            const $el = this.$el;
             $el.parent('.controls').on('click', '.select2-search-choice', _.bind(function(e) {
-                var $choice = $(e.currentTarget);
+                const $choice = $(e.currentTarget);
                 this._extractItemsFromSearch();
                 $el.one('change', _.bind(function(e) {
                     $el.inputWidget('search', e.removed.text);
@@ -156,23 +156,23 @@ define(function(require) {
         },
 
         _extractItemsFromSearch: function(withoutLast) {
-            var value = $(this.select2.search).val() || '';
-            var rest = this._extractItemsFromString(value, withoutLast);
+            const value = $(this.select2.search).val() || '';
+            const rest = this._extractItemsFromString(value, withoutLast);
             if (rest && rest !== value) {
                 this.select2.externalSearch(rest);
             }
         },
 
         _extractItemsFromString: function(value, withoutLast) {
-            var gate = withoutLast ? 2 : 1;
-            var rest = '';
-            var splitRegEx = new RegExp('[' + Select2EmailRecipientsView.SEPARATORS.join() + ']');
-            var parts = value.split(splitRegEx);
+            const gate = withoutLast ? 2 : 1;
+            let rest = '';
+            const splitRegEx = new RegExp('[' + Select2EmailRecipientsView.SEPARATORS.join() + ']');
+            const parts = value.split(splitRegEx);
             if (parts.length >= gate) {
                 if (withoutLast) {
                     rest = parts.pop();
                 }
-                var existingValues = _.pluck(this.select2.data(), 'text');
+                const existingValues = _.pluck(this.select2.data(), 'text');
                 parts.forEach(_.bind(function(item) {
                     item = item.trim();
                     if (item.length > 0) {

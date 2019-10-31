@@ -5,14 +5,12 @@ define([
 ], function(Backgrid, _, __) {
     'use strict';
 
-    var MultiRelationCell;
-
     /**
      * Cell able to display many to one relation.
      *
      * Requires income data format:
      * ```javascript
-     * var cellValue = {
+     * const cellValue = {
      *     data: [
      *         {
      *             id: <id>,
@@ -27,7 +25,7 @@ define([
      * @class   oro.datagrid.cell.MultiRelationCell
      * @extends oro.datagrid.cell.StringCell
      */
-    MultiRelationCell = Backgrid.StringCell.extend({
+    const MultiRelationCell = Backgrid.StringCell.extend({
         /**
          * @property {string}
          */
@@ -46,15 +44,15 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function MultiRelationCell() {
-            MultiRelationCell.__super__.constructor.apply(this, arguments);
+        constructor: function MultiRelationCell(options) {
+            MultiRelationCell.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         render: function() {
-            var value = this.model.get(this.column.get('name'));
+            let value = this.model.get(this.column.get('name'));
 
             if (_.isString(value)) {
                 try {
@@ -72,7 +70,7 @@ define([
                 };
             }
 
-            var html;
+            let html;
             try {
                 html = value.count > 0 ? (
                     '<span class="multiselect-value-wrapper"><span class="value-item">' +

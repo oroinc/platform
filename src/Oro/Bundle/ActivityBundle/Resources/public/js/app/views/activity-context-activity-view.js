@@ -11,12 +11,10 @@ define([
 ], function($, _, __, routing, messenger, BaseView, mediator, ActivityContextActivityCollection, error) {
     'use strict';
 
-    var ActivityContextActivityView;
-
     /**
      * @export oroactivity/js/app/views/activity-context-activity-view
      */
-    ActivityContextActivityView = BaseView.extend({
+    const ActivityContextActivityView = BaseView.extend({
         options: {},
 
         events: {},
@@ -24,8 +22,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function ActivityContextActivityView() {
-            ActivityContextActivityView.__super__.constructor.apply(this, arguments);
+        constructor: function ActivityContextActivityView(options) {
+            ActivityContextActivityView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -42,7 +40,7 @@ define([
 
             if (this.options.contextTargets) {
                 this.collection.reset();
-                for (var i in this.options.contextTargets) {
+                for (const i in this.options.contextTargets) {
                     if (this.options.contextTargets.hasOwnProperty(i)) {
                         this.collection.add(this.options.contextTargets[i]);
                     }
@@ -54,7 +52,7 @@ define([
              */
             this.listenTo(mediator, 'widget:doRefresh:activity-context-activity-list-widget', this.doRefresh, this);
             this.listenTo(mediator, 'widget:doRefresh:activity-thread-context', this.doRefresh, this);
-            ActivityContextActivityView.__super__.initialize.apply(this, arguments);
+            ActivityContextActivityView.__super__.initialize.call(this, options);
 
             if (!this.options.contextTargets) {
                 this.doRefresh();
@@ -68,12 +66,12 @@ define([
         },
 
         doRefresh: function() {
-            var url = routing.generate('oro_api_get_activity_context', {
+            const url = routing.generate('oro_api_get_activity_context', {
                 activity: this.options.activityClass,
                 id: this.options.entityId
             });
-            var collection = this.collection;
-            var self = this;
+            const collection = this.collection;
+            const self = this;
             $.ajax({
                 method: 'GET',
                 url: url,
@@ -94,20 +92,20 @@ define([
         },
 
         initEvents: function() {
-            var self = this;
+            const self = this;
 
             this.collection.on('reset', function() {
                 self.$containerContextTargets.html('');
             });
 
             this.collection.on('add', function(model) {
-                var view = self.template({
+                const view = self.template({
                     entity: model,
                     inputName: self.inputName,
                     editable: self.editable
                 });
 
-                var $view = $(view);
+                const $view = $(view);
                 self.$containerContextTargets.append($view);
 
                 $view.find('[data-role="delete-item"]').click(function() {

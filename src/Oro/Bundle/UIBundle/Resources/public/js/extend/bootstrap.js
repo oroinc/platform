@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    require('./polyfill');
     require('./bootstrap/bootstrap-collapse');
     require('./bootstrap/bootstrap-dropdown');
     require('./bootstrap/bootstrap-modal');

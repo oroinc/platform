@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var DatagridSettingsListView;
-    var template = require('tpl-loader!orodatagrid/templates/datagrid-settings/datagrid-settings.html');
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const template = require('tpl-loader!orodatagrid/templates/datagrid-settings/datagrid-settings.html');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
 
     /**
      * @class DatagridSettingsListView
      * @extends BaseView
      */
-    DatagridSettingsListView = BaseView.extend({
+    const DatagridSettingsListView = BaseView.extend({
         /**
          * @inheritDoc
          */
@@ -47,8 +46,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DatagridSettingsListView() {
-            DatagridSettingsListView.__super__.constructor.apply(this, arguments);
+        constructor: function DatagridSettingsListView(options) {
+            DatagridSettingsListView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -75,14 +74,14 @@ define(function(require) {
          * Update filter view from its state
          */
         updateView: function() {
-            var models = this._getFilteredModels();
-            var hasUnrenderable = Boolean(_.find(models, function(model) {
+            const models = this._getFilteredModels();
+            const hasUnrenderable = Boolean(_.find(models, function(model) {
                 return !model.get('renderable');
             }));
-            var hasRenderable = Boolean(_.find(models, function(model) {
+            const hasRenderable = Boolean(_.find(models, function(model) {
                 return model.get('renderable');
             }));
-            var hasChanged = Boolean(_.find(models, function(model) {
+            const hasChanged = Boolean(_.find(models, function(model) {
                 return model.get('renderable') !== model.get('metadata').renderable;
             }));
 
@@ -106,13 +105,13 @@ define(function(require) {
          * Fix view height
          */
         adjustListHeight: function() {
-            var windowHeight = $(window).height();
-            var $wrapper = this.$('[data-role="datagrid-settings-table-wrapper"]');
-            var $footerHeight = (this.$('[data-role="datagrid-settings-footer"]').outerHeight() || 0) +
+            const windowHeight = $(window).height();
+            const $wrapper = this.$('[data-role="datagrid-settings-table-wrapper"]');
+            const $footerHeight = (this.$('[data-role="datagrid-settings-footer"]').outerHeight() || 0) +
                 this.getUIDialogActionHeight() +
                 this.getDropdownBottomInnerOffset();
-            var rect = $wrapper[0].getBoundingClientRect();
-            var margin = (this.$('[data-role="datagrid-settings-table"]').outerHeight(true) - rect.height) / 2;
+            const rect = $wrapper[0].getBoundingClientRect();
+            const margin = (this.$('[data-role="datagrid-settings-table"]').outerHeight(true) - rect.height) / 2;
 
             $wrapper.css('max-height', Math.max(windowHeight - rect.top - margin - $footerHeight, 120) + 'px');
         },
@@ -122,7 +121,7 @@ define(function(require) {
          * @returns {Number}
          */
         getUIDialogActionHeight: function() {
-            var $actions = this.$el.closest('.ui-dialog').find('.ui-dialog-buttonpane');
+            const $actions = this.$el.closest('.ui-dialog').find('.ui-dialog-buttonpane');
 
             return $actions.length ? $actions.outerHeight() : 0;
         },
@@ -132,7 +131,7 @@ define(function(require) {
          * @returns {Number}
          */
         getDropdownBottomInnerOffset: function() {
-            var $dropdown = this.$el.closest('.dropdown-menu');
+            const $dropdown = this.$el.closest('.dropdown-menu');
 
             return parseInt($dropdown.length
                 ? window.getComputedStyle($dropdown.get(0), null).getPropertyValue('padding-bottom')

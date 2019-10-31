@@ -4,8 +4,6 @@ define([
 ], function(AbstractAction, DropdownSelectChoiceLauncher) {
     'use strict';
 
-    var SelectDataAppearanceAction;
-
     /**
      * Resets collection to initial state
      *
@@ -13,7 +11,7 @@ define([
      * @class   oro.datagrid.action.ResetCollectionAction
      * @extends oro.datagrid.action.AbstractAction
      */
-    SelectDataAppearanceAction = AbstractAction.extend({
+    const SelectDataAppearanceAction = AbstractAction.extend({
         /** @property {Function} */
         launcher: DropdownSelectChoiceLauncher,
 
@@ -23,8 +21,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function SelectDataAppearanceAction() {
-            SelectDataAppearanceAction.__super__.constructor.apply(this, arguments);
+        constructor: function SelectDataAppearanceAction(options) {
+            SelectDataAppearanceAction.__super__.constructor.call(this, options);
         },
 
         /**
@@ -35,14 +33,14 @@ define([
          * @throws {TypeError} If collection is undefined
          */
         initialize: function(options) {
-            var opts = options || {};
+            const opts = options || {};
 
             if (!opts.datagrid) {
                 throw new TypeError('"datagrid" is required');
             }
             this.datagrid = opts.datagrid;
 
-            SelectDataAppearanceAction.__super__.initialize.apply(this, arguments);
+            SelectDataAppearanceAction.__super__.initialize.call(this, options);
         },
 
         /**

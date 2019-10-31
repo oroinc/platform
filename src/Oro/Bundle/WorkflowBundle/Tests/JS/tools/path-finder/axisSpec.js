@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var Axis = require('oroworkflow/js/tools/path-finder/axis');
-    var Graph = require('oroworkflow/js/tools/path-finder/graph');
-    var Point2d = require('oroworkflow/js/tools/path-finder/point2d');
-    var NodePoint = require('oroworkflow/js/tools/path-finder/node-point');
-    var directions = require('oroworkflow/js/tools/path-finder/directions');
+    const Axis = require('oroworkflow/js/tools/path-finder/axis');
+    const Graph = require('oroworkflow/js/tools/path-finder/graph');
+    const Point2d = require('oroworkflow/js/tools/path-finder/point2d');
+    const NodePoint = require('oroworkflow/js/tools/path-finder/node-point');
+    const directions = require('oroworkflow/js/tools/path-finder/directions');
 
     describe('oroworkflow/js/tools/path-finder/axis', function() {
         beforeEach(function() {
@@ -22,14 +22,14 @@ define(function(require) {
         }
 
         it('should construct', function() {
-            var graph = this.graph;
-            var axis1 = this.axis;
+            const graph = this.graph;
+            const axis1 = this.axis;
             expect(axis1.costMultiplier).toBe(1);
             expect(axis1.isVertical).toBe(true);
             expect(axis1.used).toBe(false);
             expect(axis1.graph).toBe(graph);
 
-            var axis2 = new Axis(new Point2d(0, 0), new Point2d(100, 0), graph, 1);
+            const axis2 = new Axis(new Point2d(0, 0), new Point2d(100, 0), graph, 1);
             expect(axis2.isVertical).toBe(false);
             expect(axis2.used).toBe(false);
             expect(axis2.graph).toBe(graph);
@@ -38,9 +38,9 @@ define(function(require) {
         });
 
         it('should save axis into node during addition', function() {
-            var verticalAxis = this.axis;
-            var horizontalAxis = new Axis(new Point2d(0, 0), new Point2d(100, 0), this.graph, 1);
-            var node = new NodePoint(0, 0);
+            const verticalAxis = this.axis;
+            const horizontalAxis = new Axis(new Point2d(0, 0), new Point2d(100, 0), this.graph, 1);
+            const node = new NodePoint(0, 0);
             verticalAxis.addNode(node);
             horizontalAxis.addNode(node);
 
@@ -48,10 +48,10 @@ define(function(require) {
             expect(node.vAxis).toBe(verticalAxis);
         });
         it('should add nodes and finalize correctly', function() {
-            var axis = this.axis;
-            var node1 = new NodePoint(0, 0);
-            var node2 = new NodePoint(0, 100);
-            var node3 = new NodePoint(0, 50);
+            const axis = this.axis;
+            const node1 = new NodePoint(0, 0);
+            const node2 = new NodePoint(0, 100);
+            const node3 = new NodePoint(0, 50);
             axis.addNode(node1);
             axis.addNode(node2);
             axis.addNode(node3);
@@ -72,15 +72,15 @@ define(function(require) {
         });
 
         it('should add final nodes correctly', function() {
-            var axis = this.axis;
-            var topNode = new NodePoint(0, 0);
-            var bottomNode = new NodePoint(0, 100);
+            const axis = this.axis;
+            const topNode = new NodePoint(0, 0);
+            const bottomNode = new NodePoint(0, 100);
             axis.addNode(topNode);
             axis.addNode(bottomNode);
             axis.sortNodes();
             axis.finalize();
 
-            var centerNode = new NodePoint(0, 50);
+            const centerNode = new NodePoint(0, 50);
             centerNode.vAxis = axis;
             centerNode.connect(directions.BOTTOM_TO_TOP, topNode);
             centerNode.connect(directions.TOP_TO_BOTTOM, bottomNode);
@@ -92,13 +92,13 @@ define(function(require) {
             expect(axis.nodes[1]).toEqual(centerNode);
             expect(axis.nodes[2]).toEqual(bottomNode);
 
-            var topClone = topNode.clone();
+            const topClone = topNode.clone();
             topClone.connect(directions.TOP_TO_BOTTOM, topNode);
             axis.addFinalNode(topClone);
             expect(axis.nodes[0]).toEqual(topClone);
             expect(axis.nodes[1]).toEqual(topNode);
 
-            var bottomClone = bottomNode.clone();
+            const bottomClone = bottomNode.clone();
             bottomClone.connect(directions.BOTTOM_TO_TOP, bottomNode);
             axis.addFinalNode(bottomClone);
             expect(axis.nodes[axis.nodes.length - 2]).toEqual(bottomNode);
@@ -107,11 +107,11 @@ define(function(require) {
 
         describe('axis connections', function() {
             beforeEach(function() {
-                var graph = this.graph;
-                var axis = this.axis;
-                var a = new NodePoint(0, 0);
-                var b = new NodePoint(0, 50);
-                var c = new NodePoint(0, 100);
+                const graph = this.graph;
+                const axis = this.axis;
+                const a = new NodePoint(0, 0);
+                const b = new NodePoint(0, 50);
+                const c = new NodePoint(0, 100);
                 a.hAxis = new Axis(a.clone(), a.clone(), graph, 1);
                 a.hAxis.addNode(a);
                 a.hAxis.finalize();
@@ -132,23 +132,23 @@ define(function(require) {
             });
 
             it('should clone itself at direction', function() {
-                var axisV = this.axis;
+                const axisV = this.axis;
 
-                var leftClone = axisV.cloneAtDirection(directions.LEFT_TO_RIGHT);
+                const leftClone = axisV.cloneAtDirection(directions.LEFT_TO_RIGHT);
                 expect(leftClone.nodes.map(mapNodesToCoordinates))
                     .toEqual(axisV.nodes.map(mapNodesToCoordinates));
 
-                var rightClone = axisV.cloneAtDirection(directions.RIGHT_TO_LEFT);
+                const rightClone = axisV.cloneAtDirection(directions.RIGHT_TO_LEFT);
                 expect(rightClone.nodes.map(mapNodesToCoordinates))
                     .toEqual(axisV.nodes.map(mapNodesToCoordinates));
             });
 
             it('should merge another axis into itself', function() {
-                var biggerAxis = this.axis;
-                var initialLocation = axisLocation(biggerAxis);
-                var node1 = new NodePoint(0, 25);
-                var node2 = new NodePoint(0, 75);
-                var smallerAxis = new Axis(node1, node2, this.graph);
+                const biggerAxis = this.axis;
+                const initialLocation = axisLocation(biggerAxis);
+                const node1 = new NodePoint(0, 25);
+                const node2 = new NodePoint(0, 75);
+                const smallerAxis = new Axis(node1, node2, this.graph);
                 biggerAxis.merge(smallerAxis);
                 expect(axisLocation(biggerAxis)).toEqual(initialLocation);
                 smallerAxis.merge(biggerAxis);
@@ -156,11 +156,11 @@ define(function(require) {
             });
 
             it('should have valid connection vectors', function() {
-                var axisV = this.axis;
+                const axisV = this.axis;
                 expect(axisV.nextNodeConnVector.id).toBe(directions.TOP_TO_BOTTOM.id);
                 expect(axisV.prevNodeConnVector.id).toBe(directions.BOTTOM_TO_TOP.id);
 
-                var axisH = new Axis(new Point2d(0, 0), new Point2d(100, 0), null, 1);
+                let axisH = new Axis(new Point2d(0, 0), new Point2d(100, 0), null, 1);
                 expect(axisH.nextNodeConnVector.id).toBe(directions.LEFT_TO_RIGHT.id);
                 expect(axisH.prevNodeConnVector.id).toBe(directions.RIGHT_TO_LEFT.id);
 
@@ -170,7 +170,7 @@ define(function(require) {
             });
 
             it('should have valid connection list', function() {
-                var axis = this.axis;
+                const axis = this.axis;
                 expect(axis.connections.length).toBe(2);
                 expect(axis.connections[0]).toEqual(axis.nodes[1].connections[directions.TOP_TO_BOTTOM.id]);
                 expect(axis.connections[0]).toEqual(axis.nodes[2].connections[directions.BOTTOM_TO_TOP.id]);
@@ -179,7 +179,7 @@ define(function(require) {
             });
 
             it('should ensure traversable siblings', function() {
-                var axis = this.axis;
+                const axis = this.axis;
 
                 expect(axis.allClones.length).toBe(1);
                 axis.ensureTraversableSiblings();
@@ -187,8 +187,8 @@ define(function(require) {
                 expect(axis.closestRightClone).toBeDefined();
                 expect(axis.allClones.length).toBe(3);
 
-                var leftClone = axis.closestLeftClone;
-                var rightClone = axis.closestRightClone;
+                const leftClone = axis.closestLeftClone;
+                const rightClone = axis.closestRightClone;
                 axis.ensureTraversableSiblings();
                 expect(axis.closestLeftClone).toBe(leftClone);
                 expect(axis.closestRightClone).toBe(rightClone);

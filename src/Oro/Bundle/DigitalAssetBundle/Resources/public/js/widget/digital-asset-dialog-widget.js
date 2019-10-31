@@ -1,15 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var DialogWidget = require('oro/dialog-widget');
-    var errorHandler = require('oroui/js/error');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const DialogWidget = require('oro/dialog-widget');
+    const errorHandler = require('oroui/js/error');
 
-    var DigitalAssetDialogWidget;
-
-    DigitalAssetDialogWidget = DialogWidget.extend({
+    const DigitalAssetDialogWidget = DialogWidget.extend({
         options: _.extend({}, DialogWidget.prototype.options, {
             alias: 'dam-dialog',
             title: __('oro.digitalasset.dam.dialog.select_file'),
@@ -32,19 +30,19 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DigitalAssetDialogWidget() {
-            DigitalAssetDialogWidget.__super__.constructor.apply(this, arguments);
+        constructor: function DigitalAssetDialogWidget(options) {
+            DigitalAssetDialogWidget.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            DigitalAssetDialogWidget.__super__.initialize.apply(this, arguments);
+            DigitalAssetDialogWidget.__super__.initialize.call(this, options);
 
             // Adds Cancel button to the actions container at the bottom of dialog window.
             this.listenTo(this, 'widgetReady', (function($el) {
-                var cancelButton = $el.find('[type="reset"]').clone();
+                const cancelButton = $el.find('[type="reset"]').clone();
                 cancelButton.text(__('oro.digitalasset.dam.dialog.cancel.label'));
                 cancelButton.on('click', (function() {
                     this.remove();
@@ -58,7 +56,7 @@ define(function(require) {
          * @inheritDoc
          */
         initializeWidget: function(options) {
-            DigitalAssetDialogWidget.__super__.initializeWidget.apply(this, arguments);
+            DigitalAssetDialogWidget.__super__.initializeWidget.call(this, options);
 
             this.on('formReset', _.bind(this._onFormReset, this));
         },
@@ -87,7 +85,7 @@ define(function(require) {
          * Overrides parent method to enable JSON-only handling on content load - prevents dialog window from blanking.
          */
         _onContentLoad: function(content) {
-            var json = this._getJson(content);
+            const json = this._getJson(content);
 
             delete this.loading;
 

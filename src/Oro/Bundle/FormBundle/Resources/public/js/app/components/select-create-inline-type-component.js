@@ -1,27 +1,26 @@
 define(function(require) {
     'use strict';
 
-    var SelectCreateInlineTypeComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var SelectCreateInlineTypeView = require('oroform/js/app/views/select-create-inline-type-view');
-    var _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const SelectCreateInlineTypeView = require('oroform/js/app/views/select-create-inline-type-view');
+    const _ = require('underscore');
     require('jquery.select2');
 
-    SelectCreateInlineTypeComponent = BaseComponent.extend({
+    const SelectCreateInlineTypeComponent = BaseComponent.extend({
         ViewConstructor: SelectCreateInlineTypeView,
 
         /**
          * @inheritDoc
          */
-        constructor: function SelectCreateInlineTypeComponent() {
-            SelectCreateInlineTypeComponent.__super__.constructor.apply(this, arguments);
+        constructor: function SelectCreateInlineTypeComponent(options) {
+            SelectCreateInlineTypeComponent.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            SelectCreateInlineTypeComponent.__super__.initialize.apply(this, arguments);
+            SelectCreateInlineTypeComponent.__super__.initialize.call(this, options);
             this.view = new this.ViewConstructor(_.extend({
                 el: options._sourceElement
             }, _.pick(options, 'urlParts', 'entityLabel', 'existingEntityGridId', 'inputSelector')));

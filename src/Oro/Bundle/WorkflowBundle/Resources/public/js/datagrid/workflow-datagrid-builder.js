@@ -1,28 +1,27 @@
 define(function(require) {
     'use strict';
 
-    var workflowDatagridBuilder;
-    var _ = require('underscore');
-    var PermissionModel = require('orouser/js/models/role/permission-model');
-    var AccessLevelsCollection = require('orouser/js/models/role/access-levels-collection');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
-    var RowView = require('oroworkflow/js/datagrid/workflow-action-permissions-row-view');
-    var ReadonlyRowView = require('orouser/js/datagrid/action-permissions-readonly-row-view');
+    const _ = require('underscore');
+    const PermissionModel = require('orouser/js/models/role/permission-model');
+    const AccessLevelsCollection = require('orouser/js/models/role/access-levels-collection');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
+    const RowView = require('oroworkflow/js/datagrid/workflow-action-permissions-row-view');
+    const ReadonlyRowView = require('orouser/js/datagrid/action-permissions-readonly-row-view');
 
-    workflowDatagridBuilder = {
+    const workflowDatagridBuilder = {
         processDatagridOptions: function(deferred, options) {
-            var reg = /\\/g;
+            const reg = /\\/g;
             options.themeOptions.rowView = options.themeOptions.readonly ? ReadonlyRowView : RowView;
             _.each(options.data.data, function(item) {
                 item.permissions = new BaseCollection(item.permissions, {
                     model: PermissionModel
                 });
 
-                var routeParameters = {oid: item.identity.replace(reg, '_'), permission: ''};
+                const routeParameters = {oid: item.identity.replace(reg, '_'), permission: ''};
                 if (options.metadata.options.access_level_route) {
                     routeParameters.routeName = options.metadata.options.access_level_route;
                 }
-                var accessLevelsCollection = new AccessLevelsCollection([], {
+                const accessLevelsCollection = new AccessLevelsCollection([], {
                     routeParameters: routeParameters
                 });
                 item.permissions.accessLevels = accessLevelsCollection;

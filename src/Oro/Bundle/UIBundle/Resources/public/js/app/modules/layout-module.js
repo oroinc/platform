@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var mediator = require('oroui/js/mediator');
-    var layout = require('oroui/js/layout');
+    const mediator = require('oroui/js/mediator');
+    const layout = require('oroui/js/layout');
 
     /**
      * Init layout's handlers and listeners

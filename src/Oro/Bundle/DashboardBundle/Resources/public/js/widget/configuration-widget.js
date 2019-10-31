@@ -2,12 +2,12 @@ define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'undersc
 ], function(__, routing, DialogWidget, _) {
     'use strict';
 
-    var ConfigurationWidget = DialogWidget.extend({
+    const ConfigurationWidget = DialogWidget.extend({
         /**
          * @inheritDoc
          */
-        constructor: function ConfigurationWidget() {
-            ConfigurationWidget.__super__.constructor.apply(this, arguments);
+        constructor: function ConfigurationWidget(options) {
+            ConfigurationWidget.__super__.constructor.call(this, options);
         },
 
         /**
@@ -34,7 +34,7 @@ define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'undersc
                 options.widget.options.configurationDialogOptions || {}
             );
 
-            ConfigurationWidget.__super__.initialize.apply(this, arguments);
+            ConfigurationWidget.__super__.initialize.call(this, options);
         }
     });
 

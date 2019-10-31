@@ -5,13 +5,11 @@ define([
 ], function($, _, mediator) {
     'use strict';
 
-    var layoutSubtreeManager;
-
     /**
      * @export oroui/js/layout-subtree-manager
      * @name   oro.layoutSubtreeManager
      */
-    layoutSubtreeManager = {
+    const layoutSubtreeManager = {
         url: window.location.href,
 
         method: 'get',
@@ -26,7 +24,7 @@ define([
          * @param {Object} view LayoutSubtreeView instance
          */
         addView: function(view) {
-            var blockId = view.options.blockId;
+            const blockId = view.options.blockId;
 
             this.viewsCollection[blockId] = view;
 
@@ -47,13 +45,13 @@ define([
          * @param {Object} view LayoutSubtreeView instance
          */
         removeView: function(view) {
-            var blockId = view.options.blockId;
+            const blockId = view.options.blockId;
 
             delete this.viewsCollection[blockId];
 
             Object.keys(this.reloadEvents).map((function(eventName) {
-                var eventBlockIds = this.reloadEvents[eventName];
-                var index = eventBlockIds.indexOf(blockId);
+                const eventBlockIds = this.reloadEvents[eventName];
+                const index = eventBlockIds.indexOf(blockId);
                 if (index > -1) {
                     eventBlockIds.splice(index, 1);
                 }
@@ -73,16 +71,16 @@ define([
          */
         _callViewMethod: function(blockIds, methodName, methodArguments) {
             blockIds.map((function(blockId) {
-                var view = this.viewsCollection[blockId];
+                const view = this.viewsCollection[blockId];
                 if (!view) {
                     return;
                 }
 
-                var viewArguments = methodArguments || [];
+                let viewArguments = methodArguments || [];
                 if (typeof viewArguments === 'function') {
                     viewArguments = viewArguments(blockId);
                 }
-                view[methodName].apply(view, viewArguments);
+                view[methodName](...viewArguments);
             }).bind(this));
         },
 
@@ -93,8 +91,8 @@ define([
          * @param {Object} options
          */
         _reloadLayouts: function(event, options) {
-            var self = this;
-            var eventBlockIds = this.reloadEvents[event] || [];
+            const self = this;
+            const eventBlockIds = this.reloadEvents[event] || [];
             if (!(eventBlockIds instanceof Array) || !eventBlockIds.length) {
                 return;
             }

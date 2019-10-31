@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var StackedBarChartComponent;
-    var _ = require('underscore');
-    var Flotr = require('flotr2');
-    var dataFormatter = require('orochart/js/data_formatter');
-    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
+    const _ = require('underscore');
+    const Flotr = require('flotr2');
+    const dataFormatter = require('orochart/js/data_formatter');
+    const BaseChartComponent = require('orochart/js/app/components/base-chart-component');
 
     /**
      * @class orochart.app.components.StackedBarChartComponent
      * @extends orochart.app.components.BaseChartComponent
      * @exports orochart/app/components/stackedbar-char-component
      */
-    StackedBarChartComponent = BaseChartComponent.extend({
+    const StackedBarChartComponent = BaseChartComponent.extend({
         aspectRatio: 0.6,
 
         initialDatasetSize: 30,
@@ -20,8 +19,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function StackedBarChartComponent() {
-            StackedBarChartComponent.__super__.constructor.apply(this, arguments);
+        constructor: function StackedBarChartComponent(options) {
+            StackedBarChartComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -30,24 +29,24 @@ define(function(require) {
          * @overrides
          */
         draw: function() {
-            var container = this.$chart.get(0);
-            var series = this.getSeries();
+            const container = this.$chart.get(0);
+            const series = this.getSeries();
 
             // speculatively use first series to set xaxis size
-            var sample = series[0];
-            var xSize = {
+            const sample = series[0];
+            const xSize = {
                 min: sample.data[sample.data.length - this.initialDatasetSize][0],
                 max: sample.data[sample.data.length - 1][0]
             };
 
-            var graph = this.drawGraph(container, series, xSize);
+            const graph = this.drawGraph(container, series, xSize);
             this.setupPanning(graph, container, series);
         },
 
         setupPanning: function(initialGraph, container, series) {
-            var graph = initialGraph;
-            var drawGraph = _.bind(this.drawGraph, this);
-            var start;
+            let graph = initialGraph;
+            const drawGraph = _.bind(this.drawGraph, this);
+            let start;
 
             Flotr.EventAdapter.observe(container, 'flotr:mousedown', function(e) {
                 start = graph.getEventPosition(e);
@@ -60,8 +59,8 @@ define(function(require) {
             }
 
             function onMove(e, o) {
-                var xaxis = graph.axes.x;
-                var offset = start.x - o.x;
+                const xaxis = graph.axes.x;
+                const offset = start.x - o.x;
 
                 // Redrawl the graph with new axis
                 graph = drawGraph(
@@ -76,9 +75,9 @@ define(function(require) {
         },
 
         drawGraph: function(container, series, xSize) {
-            var options = this.options;
-            var settings = this.options.settings;
-            var chartOptions = {
+            const options = this.options;
+            const settings = this.options.settings;
+            const chartOptions = {
                 colors: settings.chartColors,
                 fontColor: settings.chartFontColor,
                 fontSize: settings.chartFontSize,
@@ -125,13 +124,13 @@ define(function(require) {
         },
 
         YTickFormatter: function(value) {
-            var yFormat = this.options.data_schema.value.type;
+            const yFormat = this.options.data_schema.value.type;
 
             return dataFormatter.formatValue(value, yFormat);
         },
 
         XTickFormatter: function(value) {
-            var xFormat = this.options.data_schema.label.type;
+            const xFormat = this.options.data_schema.label.type;
 
             return dataFormatter.formatValue(value, xFormat);
         },
@@ -143,16 +142,16 @@ define(function(require) {
         },
 
         getSeries: function() {
-            var yFormat = this.options.data_schema.value.type;
-            var xFormat = this.options.data_schema.label.type;
-            var seriesData = [];
+            const yFormat = this.options.data_schema.value.type;
+            const xFormat = this.options.data_schema.label.type;
+            const seriesData = [];
 
             _.each(this.data, function(categoryDataSet, category) {
-                var serieData = [];
+                const serieData = [];
                 _.each(categoryDataSet, function(categoryData, i) {
-                    var yValue = dataFormatter.parseValue(categoryData.value, yFormat);
+                    let yValue = dataFormatter.parseValue(categoryData.value, yFormat);
                     yValue = yValue === null ? parseInt(i) : yValue;
-                    var xValue = dataFormatter.parseValue(categoryData.label, xFormat);
+                    let xValue = dataFormatter.parseValue(categoryData.label, xFormat);
                     xValue = xValue === null ? parseInt(i) : xValue;
 
                     serieData.push([xValue, yValue]);

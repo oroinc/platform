@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    var AutoResponseRuleComponent = BaseComponent.extend({
+    const AutoResponseRuleComponent = BaseComponent.extend({
         relatedSiblingComponents: {
             conditionBuilderComponent: 'condition-builder'
         },
@@ -13,8 +13,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AutoResponseRuleComponent() {
-            AutoResponseRuleComponent.__super__.constructor.apply(this, arguments);
+        constructor: function AutoResponseRuleComponent(options) {
+            AutoResponseRuleComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -30,16 +30,16 @@ define(function(require) {
 
             this.listenTo(this.conditionBuilderComponent.view, 'change', this.setFiltersValue);
 
-            AutoResponseRuleComponent.__super__.initialize.apply(this, arguments);
+            AutoResponseRuleComponent.__super__.initialize.call(this, options);
         },
 
         getValue: function() {
-            var value = this.$definitionInput.val();
+            const value = this.$definitionInput.val();
             return value.length ? JSON.parse(value) : {};
         },
 
         setFiltersValue: function(filtersValue) {
-            var value = this.getValue();
+            const value = this.getValue();
             value.filters = filtersValue;
             this.$definitionInput.val(JSON.stringify(value));
         },

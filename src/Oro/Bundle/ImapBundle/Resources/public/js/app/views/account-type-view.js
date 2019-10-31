@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var AccountTypeView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
 
-    AccountTypeView = BaseView.extend({
+    const AccountTypeView = BaseView.extend({
         html: '',
 
         events: {
@@ -16,8 +15,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AccountTypeView() {
-            AccountTypeView.__super__.constructor.apply(this, arguments);
+        constructor: function AccountTypeView(options) {
+            AccountTypeView.__super__.constructor.call(this, options);
         },
 
         /**

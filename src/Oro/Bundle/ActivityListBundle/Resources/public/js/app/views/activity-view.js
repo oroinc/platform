@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var ActivityView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var mediator = require('oroui/js/mediator');
-    var routing = require('routing');
-    var dateTimeFormatter = require('orolocale/js/formatter/datetime');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-    var CommentComponent = require('orocomment/js/app/components/comment-component');
-    var transitionHandler = require('oroworkflow/js/transition-handler');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const mediator = require('oroui/js/mediator');
+    const routing = require('routing');
+    const dateTimeFormatter = require('orolocale/js/formatter/datetime');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const CommentComponent = require('orocomment/js/app/components/comment-component');
+    const transitionHandler = require('oroworkflow/js/transition-handler');
 
-    ActivityView = BaseView.extend({
+    const ActivityView = BaseView.extend({
         options: {
             configuration: {
                 has_comments: false
@@ -45,7 +44,7 @@ define(function(require) {
         },
         listen: {
             'addedToParent': function() {
-                var view = this.getEmailThreadView();
+                const view = this.getEmailThreadView();
                 if (view) {
                     view.refreshEmails();
                 }
@@ -58,8 +57,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ActivityView() {
-            ActivityView.__super__.constructor.apply(this, arguments);
+        constructor: function ActivityView(options) {
+            ActivityView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -72,15 +71,15 @@ define(function(require) {
                 this.template = _.template($(this.options.template).html());
             }
             if (this.model.get('relatedActivityClass')) {
-                var templateName = '#template-activity-item-' + this.model.get('relatedActivityClass');
+                let templateName = '#template-activity-item-' + this.model.get('relatedActivityClass');
                 templateName = templateName.replace(/\\/g, '_');
                 this.template = _.template($(templateName).html());
             }
-            ActivityView.__super__.initialize.apply(this, arguments);
+            ActivityView.__super__.initialize.call(this, options);
         },
 
         getTemplateData: function() {
-            var data = ActivityView.__super__.getTemplateData.call(this);
+            const data = ActivityView.__super__.getTemplateData.call(this);
             data.has_comments = this.options.configuration.has_comments;
             data.ignoreHead = this.options.ignoreHead;
             data.collapsed = this.collapsed;
@@ -107,7 +106,7 @@ define(function(require) {
         },
 
         render: function() {
-            ActivityView.__super__.render.apply(this, arguments);
+            ActivityView.__super__.render.call(this);
             if (this.$('.activity-actions > .dropdown-menu li').children().length === 0) {
                 this.$('.activity-actions > .dropdown-menu').hide();
                 this.$('.activity-actions > [data-toggle="dropdown"]').text('');
@@ -118,8 +117,8 @@ define(function(require) {
 
         onTransition: function(e) {
             e.preventDefault();
-            var $el = $(e.target);
-            var activityModel = this.model;
+            const $el = $(e.target);
+            const activityModel = this.model;
 
             $el.one('transitions_success', function() {
                 // manually update the model in case the workflow transition does not change any of it's attributes
@@ -139,7 +138,7 @@ define(function(require) {
         },
 
         onAccordionHeaderClick: function(e) {
-            var ignoreItems = 'a, button, .accordition-toggle';
+            const ignoreItems = 'a, button, .accordition-toggle';
             if ($(e.target).is(ignoreItems) || $(e.target).parents(ignoreItems).length) {
                 // ignore clicks on links, buttons and accordition-toggle
                 return;
@@ -197,21 +196,21 @@ define(function(require) {
 
         _handleLayoutInit: function() {
             // if the activity has an EmailTreadView -- handle comment count change in own way
-            var emailTreadView = this.getEmailThreadView();
+            const emailTreadView = this.getEmailThreadView();
             if (emailTreadView) {
                 this.listenTo(emailTreadView, 'commentCountChanged', function(diff) {
                     this.model.set('commentCount', this.model.get('commentCount') + diff);
                 });
             }
-            var loadingView = this.subview('loading');
+            const loadingView = this.subview('loading');
             if (loadingView) {
                 loadingView.hide();
             }
         },
 
         _onCommentCountChange: function() {
-            var quantity = this.model.get('commentCount');
-            var $elem = this.$(this.options.commentsCountBlock);
+            const quantity = this.model.get('commentCount');
+            const $elem = this.$(this.options.commentsCountBlock);
             $elem.html(quantity);
             $elem.parent()[quantity > 0 ? 'show' : 'hide']();
         },
@@ -237,12 +236,11 @@ define(function(require) {
          * @param {Object} options
          */
         initCommentsComponent: function(options) {
-            var commentsComponent;
             if (!this.isCommentComponentRequired()) {
                 return;
             }
             options._sourceElement = this.$(this.options.commentsBlock);
-            commentsComponent = new CommentComponent(options);
+            const commentsComponent = new CommentComponent(options);
             this.pageComponent('comments', commentsComponent, options._sourceElement[0]);
             this.listenTo(commentsComponent.collection, 'stateChange', this.updateCommentsQuantity, this);
         },
@@ -259,15 +257,15 @@ define(function(require) {
         },
 
         updateCommentsQuantity: function() {
-            var component = this.pageComponent('comments');
+            const component = this.pageComponent('comments');
             if (component !== null) {
                 this.model.set('commentCount', component.collection.getState().totalItemsQuantity);
             }
         },
 
         getEmailThreadView: function() {
-            var threadViewComponent = this.pageComponent('thread-view');
-            var view;
+            const threadViewComponent = this.pageComponent('thread-view');
+            let view;
 
             if (threadViewComponent) {
                 view = threadViewComponent.view.pageComponent('email-thread').view;

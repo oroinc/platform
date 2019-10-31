@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
+    const _ = require('underscore');
 
     function recurAllChildrenCount(cell, ignores) {
-        var count = 1;
+        let count = 1;
         ignores.push(cell);
         _.each(cell.children, function(child) {
             if (ignores.indexOf(child) < 0 && child.y >= cell.y) {
@@ -15,7 +15,7 @@ define(function(require) {
         return count;
     }
 
-    var Cell = function(options) {
+    const Cell = function(options) {
         _.extend(this, options);
         _.defaults(this, {
             children: []

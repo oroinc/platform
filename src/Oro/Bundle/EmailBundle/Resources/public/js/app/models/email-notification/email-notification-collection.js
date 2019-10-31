@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var EmailNotificationCollection;
-    var EmailNotificationModel = require('./email-notification-model');
-    var RoutingCollection = require('oroui/js/app/models/base/routing-collection');
-    var error = require('oroui/js/error');
+    const EmailNotificationModel = require('./email-notification-model');
+    const RoutingCollection = require('oroui/js/app/models/base/routing-collection');
+    const error = require('oroui/js/error');
 
     /**
      * @export oroemail/js/app/models/email-notification-collection
      */
-    EmailNotificationCollection = RoutingCollection.extend({
+    const EmailNotificationCollection = RoutingCollection.extend({
         model: EmailNotificationModel,
 
         routeDefaults: {
@@ -22,8 +21,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailNotificationCollection() {
-            EmailNotificationCollection.__super__.constructor.apply(this, arguments);
+        constructor: function EmailNotificationCollection(...args) {
+            EmailNotificationCollection.__super__.constructor.apply(this, args);
         },
 
         setRouteParams: function(params) {
@@ -34,7 +33,7 @@ define(function(require) {
         },
 
         markAllAsRead: function() {
-            for (var i in this.models) {
+            for (const i in this.models) {
                 if (this.models.hasOwnProperty(i)) {
                     this.models[i].set({seen: 1});
                 }
@@ -59,9 +58,9 @@ define(function(require) {
 
         // TODO: remove after server side gets work correctly
         checkServerResponse: function(response) {
-            var length = response.emails.length;
-            var count = Number(response.count);
-            var limit = this._route.get('limit');
+            const length = response.emails.length;
+            const count = Number(response.count);
+            const limit = this._route.get('limit');
             if (length > limit || length < Math.min(limit, count)) {
                 throw new Error('Wrong server response', response);
             } else {

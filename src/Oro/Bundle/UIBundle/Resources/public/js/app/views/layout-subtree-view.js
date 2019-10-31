@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var LayoutSubtreeView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-    var LayoutSubtreeManager = require('oroui/js/layout-subtree-manager');
-    var mediator = require('oroui/js/mediator');
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const LayoutSubtreeManager = require('oroui/js/layout-subtree-manager');
+    const mediator = require('oroui/js/mediator');
+    const $ = require('jquery');
+    const _ = require('underscore');
 
-    LayoutSubtreeView = BaseView.extend({
+    const LayoutSubtreeView = BaseView.extend({
         options: {
             blockId: '',
             reloadEvents: [],
@@ -33,19 +32,19 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function LayoutSubtreeView() {
-            LayoutSubtreeView.__super__.constructor.apply(this, arguments);
+        constructor: function LayoutSubtreeView(options) {
+            LayoutSubtreeView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
             this.options = $.extend(true, {}, this.options, options);
-            LayoutSubtreeView.__super__.initialize.apply(this, arguments);
+            LayoutSubtreeView.__super__.initialize.call(this, options);
             LayoutSubtreeManager.addView(this);
         },
 
         dispose: function() {
             LayoutSubtreeManager.removeView(this);
-            return LayoutSubtreeView.__super__.dispose.apply(this, arguments);
+            return LayoutSubtreeView.__super__.dispose.call(this);
         },
 
         setContent: function(content) {
@@ -89,7 +88,7 @@ define(function(require) {
             if (!this.options.showLoading) {
                 return;
             }
-            var $container = this.$el.closest('[data-role="layout-subtree-loading-container"]');
+            let $container = this.$el.closest('[data-role="layout-subtree-loading-container"]');
             if (!$container.length) {
                 $container = this.$el;
             }
@@ -110,8 +109,8 @@ define(function(require) {
             this.formState = {};
 
             _.each(this._getInputs(), _.bind(function(input) {
-                var name = input.name;
-                var value = input.value;
+                let name = input.name;
+                let value = input.value;
 
                 if ($(input).is(':checkbox, :radio')) {
                     name += ':' + value;
@@ -127,18 +126,18 @@ define(function(require) {
             }
 
             _.each(this._getInputs(), _.bind(function(input) {
-                var name = input.name;
-                var isRadio = $(input).is(':checkbox, :radio');
+                let name = input.name;
+                const isRadio = $(input).is(':checkbox, :radio');
                 if (isRadio) {
                     name += ':' + input.value;
                 }
 
-                var savedInput = this.formState[name];
+                const savedInput = this.formState[name];
                 if (savedInput === undefined || (isRadio && !savedInput)) {
                     return;
                 }
 
-                var $input = $(input);
+                const $input = $(input);
                 if (isRadio) {
                     $input.click();
                 } else {

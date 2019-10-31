@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var EmailEditorModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
     /**
      * @export  oroemail/js/app/models/email-editor-model
      */
-    EmailEditorModel = BaseModel.extend({
+    const EmailEditorModel = BaseModel.extend({
         defaults: {
             appendSignature: false,
             isSignatureEditable: false,
@@ -19,8 +18,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailEditorModel() {
-            EmailEditorModel.__super__.constructor.apply(this, arguments);
+        constructor: function EmailEditorModel(...args) {
+            EmailEditorModel.__super__.constructor.apply(this, args);
         }
     });
 

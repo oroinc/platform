@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var SwipeableView;
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    SwipeableView = BaseView.extend({
+    const SwipeableView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat(['minDistanceXAxis', 'maxDistanceYAxis', 'maxAllowedTime']),
 
         /** @type {string} */
@@ -73,7 +72,7 @@ define(function(require) {
         _swipeMove: function(event) {
             event = ('changedTouches' in event) ? event.changedTouches[0] : event;
 
-            var touchEndCoords = {
+            const touchEndCoords = {
                 x: event.pageX - this.touchStartCoords.x,
                 y: event.pageY - this.touchStartCoords.y
             };

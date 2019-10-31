@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var SidebarModel;
-    var _ = require('underscore');
-    var BaseModel = require('oroui/js/app/models/base/model');
-    var constants = require('orosidebar/js/sidebar-constants');
+    const _ = require('underscore');
+    const BaseModel = require('oroui/js/app/models/base/model');
+    const constants = require('orosidebar/js/sidebar-constants');
 
-    SidebarModel = BaseModel.extend({
+    const SidebarModel = BaseModel.extend({
         defaults: {
             position: constants.SIDEBAR_LEFT,
             state: constants.SIDEBAR_MINIMIZED

@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var PageCenterTitleView;
-    var BaseView = require('oroui/js/app/views/base/view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    PageCenterTitleView = BaseView.extend({
+    const PageCenterTitleView = BaseView.extend({
         leftBlock: null,
 
         rightBlock: null,
@@ -18,12 +17,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function PageCenterTitleView() {
-            PageCenterTitleView.__super__.constructor.apply(this, arguments);
+        constructor: function PageCenterTitleView(options) {
+            PageCenterTitleView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
-            PageCenterTitleView.__super__.initialize.apply(this, arguments);
+            PageCenterTitleView.__super__.initialize.call(this, options);
 
             this.leftBlock = this.$el.siblings('.pull-left-extra')[0];
             this.rightBlock = this.$el.siblings('.title-buttons-container')[0];
@@ -45,7 +44,7 @@ define(function(require) {
             }
 
             if (this.inFewRows()) {
-                var storedDisplay = this.el.style.display;
+                const storedDisplay = this.el.style.display;
                 this.el.style.display = 'none';
                 this.currentClass = this.inFewRows() ? 'center-under-left' : 'center-under-both';
                 this.container.classList.add(this.currentClass);
@@ -54,8 +53,8 @@ define(function(require) {
         },
 
         inFewRows: function() {
-            var leftRect = this.leftBlock.getBoundingClientRect();
-            var rightRect = this.rightBlock.getBoundingClientRect();
+            const leftRect = this.leftBlock.getBoundingClientRect();
+            const rightRect = this.rightBlock.getBoundingClientRect();
 
             return leftRect.bottom <= rightRect.top || rightRect.bottom <= leftRect.top;
         }

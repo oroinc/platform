@@ -4,8 +4,6 @@ define([
 ], function(HtmlCell, PhoneFormatter) {
     'use strict';
 
-    var PhoneCell;
-
     /**
      * Phone cell
      *
@@ -13,7 +11,7 @@ define([
      * @class   oro.datagrid.cell.PhoneCell
      * @extends oro.datagrid.cell.HtmlCell
      */
-    PhoneCell = HtmlCell.extend({
+    const PhoneCell = HtmlCell.extend({
         /** @property */
         className: 'phone-cell',
 
@@ -30,8 +28,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function PhoneCell() {
-            PhoneCell.__super__.constructor.apply(this, arguments);
+        constructor: function PhoneCell(options) {
+            PhoneCell.__super__.constructor.call(this, options);
         },
 
         /**

@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var DashboardContainerView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var routing = require('routing');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var widgetManager = require('oroui/js/widget-manager');
-    var DashboardItemWidget = require('orodashboard/js/widget/dashboard-item');
-    var dashboardUtil = require('orodashboard/js/dashboard-util');
-    var ConfigurationWidget = require('orodashboard/js/widget/configuration-widget');
-    var WidgetPickerModal = require('orodashboard/js/widget-picker-modal');
-    var contentManager = require('orosync/js/content-manager');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const routing = require('routing');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const widgetManager = require('oroui/js/widget-manager');
+    const DashboardItemWidget = require('orodashboard/js/widget/dashboard-item');
+    const dashboardUtil = require('orodashboard/js/dashboard-util');
+    const ConfigurationWidget = require('orodashboard/js/widget/configuration-widget');
+    const WidgetPickerModal = require('orodashboard/js/widget-picker-modal');
+    const contentManager = require('orosync/js/content-manager');
     require('jquery-ui');
 
-    DashboardContainerView = BaseView.extend({
+    const DashboardContainerView = BaseView.extend({
         /**
          * @property {Object}
          */
@@ -33,7 +32,7 @@ define(function(require) {
             allowEdit: false,
             placeholder: {
                 element: function(currentItem) {
-                    var height = $(currentItem).height();
+                    const height = $(currentItem).height();
                     return $(
                         '<div><div class="widget-placeholder" style="height: ' + height + 'px;">' +
                             __('oro.dashboard.drop_placeholder_label') +
@@ -48,8 +47,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DashboardContainerView() {
-            DashboardContainerView.__super__.constructor.apply(this, arguments);
+        constructor: function DashboardContainerView(options) {
+            DashboardContainerView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -58,7 +57,7 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var self = this;
+            const self = this;
             this.options = _.extend({}, this.options, options);
 
             mediator.off('dashboard:widget:add', this.addToDashboard, this);
@@ -100,7 +99,7 @@ define(function(require) {
 
             $('.dashboard-widgets-add').on('click', _.bind(this._onClickAddWidget, this));
 
-            DashboardContainerView.__super__.initialize.apply(this, arguments);
+            DashboardContainerView.__super__.initialize.call(this, options);
 
             // prevents caching dashboard page, to keep it actual
             contentManager.cacheIgnore();
@@ -110,7 +109,7 @@ define(function(require) {
          * @return {Array}
          */
         getAvailableWidgets: function() {
-            var widgets = this.widgets;
+            const widgets = this.widgets;
             return _.map(this.options.availableWidgets, function(widgetObject) {
                 return _.extend(widgetObject, {
                     added: _.filter(widgets, function(widget) {
@@ -126,9 +125,9 @@ define(function(require) {
          */
         _onClickAddWidget: function(e) {
             e.preventDefault();
-            var columnIndex = $(e.target).closest(this.options.columnsSelector).index();
-            var targetColumn = (columnIndex === -1) ? 0 : columnIndex;
-            var widgetPickerModal = new WidgetPickerModal({
+            const columnIndex = $(e.target).closest(this.options.columnsSelector).index();
+            const targetColumn = (columnIndex === -1) ? 0 : columnIndex;
+            const widgetPickerModal = new WidgetPickerModal({
                 dashboard: this,
                 dashboardId: this.options.dashboardId,
                 targetColumn: targetColumn,
@@ -142,16 +141,16 @@ define(function(require) {
          * @param {object} data
          */
         addToDashboard: function(data) {
-            var wid = 'dashboard-widget-' + data.id;
-            var containerId = 'widget-container-' + wid;
-            var column = data.layout_position[0] ? data.layout_position[0] : 0;
+            const wid = 'dashboard-widget-' + data.id;
+            const containerId = 'widget-container-' + wid;
+            const column = data.layout_position[0] ? data.layout_position[0] : 0;
             $('#dashboard-column-' + column).prepend($('<div id="' + containerId + '"></div>'));
-            var state = {
+            const state = {
                 id: data.id,
                 expanded: data.expanded,
                 layoutPosition: data.layout_position
             };
-            var widgetParams = {
+            const widgetParams = {
                 widgetType: 'dashboard-item',
                 wid: wid,
                 url: routing.generate(data.config.route, _.extend(data.config.route_parameters, {
@@ -165,7 +164,7 @@ define(function(require) {
                 widgetName: data.name,
                 configurationDialogOptions: data.config.configuration_dialog_options
             };
-            var widget = new DashboardItemWidget(widgetParams);
+            const widget = new DashboardItemWidget(widgetParams);
             widget.render();
             this.add(widget);
 
@@ -178,16 +177,16 @@ define(function(require) {
          * Save layout position
          */
         saveLayoutPosition: function() {
-            var self = this;
-            var data = {
+            const self = this;
+            const data = {
                 layoutPositions: {}
             };
             $(this.options.columnsSelector).each(function(columnIndex, columnElement) {
                 $('> div', columnElement).each(function(widgetIndex, widgetContainer) {
-                    var wid = $('.widget-content', widgetContainer).data('wid');
+                    const wid = $('.widget-content', widgetContainer).data('wid');
                     if (self.widgets[wid]) {
-                        var widget = self.widgets[wid];
-                        var id = widget.state.id;
+                        const widget = self.widgets[wid];
+                        const id = widget.state.id;
                         data.layoutPositions[id] = widget.state.layoutPosition = [columnIndex, widgetIndex];
                     }
                 });
@@ -206,7 +205,7 @@ define(function(require) {
          * @param {DashboardItemWidget} widget
          */
         add: function(widget) {
-            var wid = widget.getWid();
+            const wid = widget.getWid();
             this.widgets[wid] = widget;
             this._updateEmptyTextVisibility();
 
@@ -226,7 +225,7 @@ define(function(require) {
          * @private
          */
         _onRemove: function(el, widget) {
-            var container = widget.widget.parent();
+            const container = widget.widget.parent();
             widget.remove();
             container.remove();
             delete this.widgets[widget.getWid()];
@@ -244,7 +243,7 @@ define(function(require) {
          * @private
          */
         _onConfigure: function(el, widget) {
-            var configurationWidget = new ConfigurationWidget({
+            const configurationWidget = new ConfigurationWidget({
                 widget: widget
             });
             mediator.on('widget_success:' + configurationWidget.getWid(), widget.render, widget);
@@ -269,14 +268,14 @@ define(function(require) {
          */
         _lockLayoutHeight: function() {
             this._releaseLayoutHeight();
-            var columns = $(this.options.columnsSelector);
-            var scrollableContainer = columns.parents('.scrollable-container').first();
-            var container = scrollableContainer.find('.dashboard-container');
-            var padding = parseInt(container.css('paddingBottom')) + parseInt(container.css('paddingTop'));
-            var maxHeight = scrollableContainer.height() - padding;
+            const columns = $(this.options.columnsSelector);
+            const scrollableContainer = columns.parents('.scrollable-container').first();
+            const container = scrollableContainer.find('.dashboard-container');
+            const padding = parseInt(container.css('paddingBottom')) + parseInt(container.css('paddingTop'));
+            let maxHeight = scrollableContainer.height() - padding;
 
             columns.each(function(columnIndex, columnElement) {
-                var currentHeight = $(columnElement).height();
+                const currentHeight = $(columnElement).height();
                 maxHeight = maxHeight > currentHeight ? maxHeight : currentHeight;
             });
 
@@ -302,7 +301,7 @@ define(function(require) {
          * @private
          */
         _updateEmptyTextVisibility: function() {
-            var self = this;
+            const self = this;
 
             $(this.options.columnsSelector).each(function(columnIndex, columnElement) {
                 if (self._isEmptyColumn(columnIndex)) {
@@ -319,7 +318,7 @@ define(function(require) {
          * @private
          */
         _isEmptyColumn: function(columnIndex) {
-            var result = true;
+            let result = true;
 
             _.each(this.widgets, function(widget) {
                 if (widget.state.layoutPosition[0] === columnIndex) {

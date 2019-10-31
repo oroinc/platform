@@ -4,8 +4,6 @@ define([
 ], function(mediator, ModelAction) {
     'use strict';
 
-    var FrontendAction;
-
     /**
      * Action triggers frontend event
      *
@@ -13,12 +11,12 @@ define([
      * @class oro.datagrid.action.FrontendAction
      * @extends oro.datagrid.action.ModelAction
      */
-    FrontendAction = ModelAction.extend({
+    const FrontendAction = ModelAction.extend({
         /**
          * @inheritDoc
          */
-        constructor: function FrontendAction() {
-            FrontendAction.__super__.constructor.apply(this, arguments);
+        constructor: function FrontendAction(options) {
+            FrontendAction.__super__.constructor.call(this, options);
         },
 
         /**

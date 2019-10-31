@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var EmailAttachmentModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
     /**
      * @export  oroemail/js/app/models/email-template-model
      */
-    EmailAttachmentModel = BaseModel.extend({
+    const EmailAttachmentModel = BaseModel.extend({
         defaults: {
             id: null,
             type: '',
@@ -24,8 +23,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailAttachmentModel() {
-            EmailAttachmentModel.__super__.constructor.apply(this, arguments);
+        constructor: function EmailAttachmentModel(...args) {
+            EmailAttachmentModel.__super__.constructor.apply(this, args);
         },
 
         toggleChecked: function() {

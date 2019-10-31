@@ -5,11 +5,9 @@ define(function(require) {
      * Designed to provide timeout that takes in account hidden state of page and guaranteed waits
      * given time in visible page mode
      */
-    var pageVisibilityTracker;
-
-    var _ = require('underscore');
-    var timeoutIds = {};
-    var pageShownTime = window.document.visibilityState === 'visible' ? Date.now() : -1;
+    const _ = require('underscore');
+    const timeoutIds = {};
+    let pageShownTime = window.document.visibilityState === 'visible' ? Date.now() : -1;
 
     /**
      * Recursively creates timeouts till the whole timeout is spent in visible mode of page and stores
@@ -20,7 +18,7 @@ define(function(require) {
      * @param {number} delay
      */
     function timeout(uid, callback, delay) {
-        var startTime = Date.now();
+        const startTime = Date.now();
 
         timeoutIds[uid] = setTimeout(function() {
             if (window.document.visibilityState === 'hidden' || pageShownTime > startTime) {
@@ -37,14 +35,14 @@ define(function(require) {
         }
     });
 
-    pageVisibilityTracker = {
+    const pageVisibilityTracker = {
         /**
          * @param {function} callback
          * @param {number} delay
          * @return {string}
          */
         setTimeout: function(callback, delay) {
-            var uid = _.uniqueId();
+            const uid = _.uniqueId();
 
             timeout(uid, callback, delay);
 

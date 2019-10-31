@@ -3,7 +3,7 @@ define(function() {
     'use strict';
 
     /** @exports persistentStorage */
-    var persistentStorage;
+    let persistentStorage;
 
     try {
         // test localStorage

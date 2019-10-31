@@ -19,6 +19,7 @@ const postcssConfig = path.join(__dirname, '../postcss.config.js');
 const prepareModulesMap = require('./plugin/map/prepare-modules-map');
 const resolve = require('enhanced-resolve');
 const webpackMerge = require('webpack-merge');
+const babelConfig = require('./../babel.config.js');
 
 class ConfigBuilder {
     constructor() {
@@ -80,10 +81,10 @@ class ConfigBuilder {
      * @returns {Function}
      */
     getWebpackConfig() {
-        return (env, args) => {
+        return (env = {}, args) => {
             this._initialize(args, env);
 
-            let selectedTheme = env ? env.theme : undefined;
+            let selectedTheme = env.theme;
             this._validateThemeName(selectedTheme);
 
             let themes = [];
@@ -114,7 +115,7 @@ class ConfigBuilder {
 
             const resolvedPublicPath = path.resolve(this._publicPath);
 
-            const stats = env && env.stats ? env.stats : {
+            const stats = env.stats || {
                 hash: false,
                 version: false,
                 children: false,
@@ -134,7 +135,7 @@ class ConfigBuilder {
                     // Due of using third  party libraries 'chunkFilename' should consist of only from [name]
                     chunkFilename: 'chunk/[name].js?version=[chunkhash:8]',
                 },
-                devtool: 'inline-cheap-module-source-map',
+                devtool: !env.skipSourcemap && 'inline-cheap-module-source-map',
                 mode: 'development',
                 optimization: {
                     namedModules: true,
@@ -237,6 +238,22 @@ class ConfigBuilder {
                     })
                 ]
             };
+
+            if (!env.skipJS && !env.skipBabel) {
+                webpackConfig.module.rules.push({
+                    test: /\.js$/,
+                    exclude: [
+                        /\/platform\/build\//,
+                        /bundles\/(?:bowerassets|npmassets|components)\//,
+                        /\/bundles\/.+\/lib\/?/
+                    ],
+                    use: {
+                        loader: 'babel-loader',
+                        options: babelConfig
+                    }
+                });
+            }
+
             if (args.hot) {
                 const https = this._appConfig.devServerOptions.https;
                 const schema = https ? 'https' : 'http';
@@ -257,7 +274,6 @@ class ConfigBuilder {
                 };
                 webpackConfig.output.publicPath = `${schema}://${devServerHost}:${devServerPort}/`;
             }
-
 
             //Additional setting for production mode
             if (this._isProduction) {
@@ -312,8 +328,8 @@ class ConfigBuilder {
                     return moduleName => resolver({}, '', moduleName, {});
                 })(resolve.create.sync({...resolverConfig}));
 
-                let cssEntryPoints = env && !env.skipCSS ? this._getCssEntryPoints(theme, buildPublicPath) : {};
-                let jsEntryPoints = env && !env.skipJS && Object.keys(themeConfig.aliases).length
+                let cssEntryPoints = !env.skipCSS ? this._getCssEntryPoints(theme, buildPublicPath) : {};
+                let jsEntryPoints = !env.skipJS && Object.keys(themeConfig.aliases).length
                     ? this._getJsEntryPoints(theme) : {};
 
                 let entryPoints = {...cssEntryPoints, ...jsEntryPoints};
@@ -355,7 +371,7 @@ class ConfigBuilder {
 
     _initialize(args, env) {
         this._isProduction = args.mode === 'production';
-        this._symfonyEnv = env ? env.symfony : undefined;
+        this._symfonyEnv = env.symfony;
         this._appConfig = AppConfigLoader.getConfig(this._cachePath, this._symfonyEnv);
 
         this._modulesConfigLoader = new ModulesConfigLoader(
@@ -393,8 +409,6 @@ class ConfigBuilder {
         return {
             'app': [
                 'whatwg-fetch',
-                'core-js/fn/promise',
-                'oroui/js/extend/polyfill',
                 'oroui/js/app',
                 'oroui/js/app/services/app-ready-load-modules'
             ]

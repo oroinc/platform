@@ -5,8 +5,6 @@ define([
 ], function(__, messenger, AjaxAction) {
     'use strict';
 
-    var ScheduleSyncAction;
-
     /**
      * Schedule channel sync action, triggers AJAX request
      *
@@ -14,12 +12,12 @@ define([
      * @class   oro.datagrid.action.ScheduleSyncAction
      * @extends oro.datagrid.action.AjaxAction
      */
-    ScheduleSyncAction = AjaxAction.extend({
+    const ScheduleSyncAction = AjaxAction.extend({
         /**
          * @inheritDoc
          */
-        constructor: function ScheduleSyncAction() {
-            ScheduleSyncAction.__super__.constructor.apply(this, arguments);
+        constructor: function ScheduleSyncAction(options) {
+            ScheduleSyncAction.__super__.constructor.call(this, options);
         },
 
         _onAjaxSuccess: function(data) {
@@ -30,8 +28,8 @@ define([
         },
 
         _showAjaxSuccessMessage: function(data) {
-            var defaultMessage = data.successful ? this.messages.success : this.messages.error;
-            var message = data.message || __(defaultMessage);
+            const defaultMessage = data.successful ? this.messages.success : this.messages.error;
+            const message = data.message || __(defaultMessage);
 
             if (message) {
                 messenger.notificationFlashMessage(data.successful ? 'success' : 'error', message);

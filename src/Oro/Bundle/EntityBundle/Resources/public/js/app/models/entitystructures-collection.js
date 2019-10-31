@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var EntityStructuresCollection;
-    var _ = require('underscore');
-    var SyncMachineProxyCache = require('oroui/js/app/models/sync-machine-proxy-cache');
-    var EntityCollection = require('oroentity/js/app/models/entity-collection');
+    const _ = require('underscore');
+    const SyncMachineProxyCache = require('oroui/js/app/models/sync-machine-proxy-cache');
+    const EntityCollection = require('oroentity/js/app/models/entity-collection');
 
-    EntityStructuresCollection = EntityCollection.extend(/** @lends EntityStructuresCollection.prototype */{
+    const EntityStructuresCollection = EntityCollection.extend(/** @lends EntityStructuresCollection.prototype */{
         ROUTE: {
             read: 'oro_rest_api_list'
         },

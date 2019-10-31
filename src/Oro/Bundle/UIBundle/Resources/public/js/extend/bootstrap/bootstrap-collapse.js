@@ -1,8 +1,29 @@
 define(function(require) {
     'use strict';
 
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const persistentStorage = require('oroui/js/persistent-storage');
+    const mediator = require('oroui/js/mediator');
+    require('bootstrap-collapse');
+
+    const DATA_KEY = 'bs.collapse';
+    const EVENT_KEY = '.' + DATA_KEY;
+    const DATA_API_KEY = '.data-api';
+    const Event = {
+        SHOW: 'show' + EVENT_KEY,
+        SHOWN: 'shown' + EVENT_KEY,
+        HIDE: 'hide' + EVENT_KEY,
+        HIDDEN: 'hidden' + EVENT_KEY,
+        CLICK_DATA_API: 'click' + EVENT_KEY + DATA_API_KEY
+    };
+
+    const STATE_ID_DATA_KEY = 'data-collapse-state-id';
+    const Collapse = $.fn.collapse.Constructor;
+    const original = _.pick(Collapse.prototype, 'show', 'hide');
+
     function titleUpdate(state, el) {
-        var attr = 'data-' + state + '-title';
+        const attr = 'data-' + state + '-title';
 
         if (el.hasAttribute(attr)) {
             el.setAttribute('title', el.getAttribute(attr));
@@ -10,7 +31,7 @@ define(function(require) {
     }
 
     function setState(triggerArray, state) {
-        var stateIdHolder = _.find(triggerArray, function(el) {
+        const stateIdHolder = _.find(triggerArray, function(el) {
             return el.hasAttribute(STATE_ID_DATA_KEY);
         });
 
@@ -19,33 +40,12 @@ define(function(require) {
         }
     }
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var persistentStorage = require('oroui/js/persistent-storage');
-    var mediator = require('oroui/js/mediator');
-    require('bootstrap-collapse');
-
-    var DATA_KEY = 'bs.collapse';
-    var EVENT_KEY = '.' + DATA_KEY;
-    var DATA_API_KEY = '.data-api';
-    var Event = {
-        SHOW: 'show' + EVENT_KEY,
-        SHOWN: 'shown' + EVENT_KEY,
-        HIDE: 'hide' + EVENT_KEY,
-        HIDDEN: 'hidden' + EVENT_KEY,
-        CLICK_DATA_API: 'click' + EVENT_KEY + DATA_API_KEY
-    };
-
-    var STATE_ID_DATA_KEY = 'data-collapse-state-id';
-    var Collapse = $.fn.collapse.Constructor;
-    var original = _.pick(Collapse.prototype, 'show', 'hide');
-
     Collapse.prototype.show = function() {
         this._triggerArray.forEach(_.partial(titleUpdate, 'expanded'));
 
         setState(this._triggerArray, true);
 
-        return original.show.apply(this, arguments);
+        return original.show.call(this);
     };
 
     Collapse.prototype.hide = function() {
@@ -53,7 +53,7 @@ define(function(require) {
 
         setState(this._triggerArray, false);
 
-        return original.hide.apply(this, arguments);
+        return original.hide.call(this);
     };
 
     $(document)
@@ -65,7 +65,7 @@ define(function(require) {
         })
         .on('initLayout', function(event) {
             $(event.target).find('[data-toggle="collapse"]').each(function(index, el) {
-                var state = persistentStorage.getItem(el.getAttribute(STATE_ID_DATA_KEY));
+                const state = persistentStorage.getItem(el.getAttribute(STATE_ID_DATA_KEY));
 
                 if (state !== null) {
                     $(el.getAttribute('data-target') || el.getAttribute('href')).collapse(

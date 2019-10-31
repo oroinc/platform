@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var ReportChartDataSchemaView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var Select2View = require('oroform/js/app/views/select2-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const Select2View = require('oroform/js/app/views/select2-view');
 
-    ReportChartDataSchemaView = BaseView.extend({
+    const ReportChartDataSchemaView = BaseView.extend({
         autoRender: true,
 
         optionsTemplate: _.template('<%= field %>(<%= group %>,<%= name %>,<%= type %>)'),
@@ -32,15 +31,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ReportChartDataSchemaView() {
-            ReportChartDataSchemaView.__super__.constructor.apply(this, arguments);
+        constructor: function ReportChartDataSchemaView(options) {
+            ReportChartDataSchemaView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            var optionNames = _.keys(this.defaults);
+            const optionNames = _.keys(this.defaults);
             _.extend(this, _.defaults(_.pick(options, optionNames), this.defaults));
             ReportChartDataSchemaView.__super__.initialize.call(this, options);
         },
@@ -76,8 +75,8 @@ define(function(require) {
          * @protected
          */
         _whenColumnsCollectionIsReady: function() {
-            var deferred = $.Deferred();
-            var eventName = 'items-manager:table:reset:' + this.fieldsTableIdentifier;
+            const deferred = $.Deferred();
+            const eventName = 'items-manager:table:reset:' + this.fieldsTableIdentifier;
             this.listenToOnce(mediator, eventName, function(collection) {
                 this.columnsCollection = collection;
                 this.dataProvider = collection.dataProvider;
@@ -92,10 +91,10 @@ define(function(require) {
          * @protected
          */
         _render: function() {
-            var ftid = this.$el.data('ftid');
+            const ftid = this.$el.data('ftid');
             this.$el.find('input[type=text][id^="' + ftid + '_"]').each(function(i, el) {
-                var exclude = this.$(el).data('type-filter');
-                var fieldSelector = new Select2View({
+                const exclude = this.$(el).data('type-filter');
+                const fieldSelector = new Select2View({
                     el: el,
                     select2Config: this._prepareSelect2Options(exclude)
                 });
@@ -108,14 +107,14 @@ define(function(require) {
          * @protected
          */
         _updateSelectedValue: function() {
-            var columns = this.columnsCollection.clone().removeInvalidModels().toJSON();
+            const columns = this.columnsCollection.clone().removeInvalidModels().toJSON();
             _.each(this.subviewsByName, function(view, viewName) {
-                var value;
+                let value;
                 if (viewName.substr(0, 9) !== 'selector:' || !(value = view.getValue())) {
                     return;
                 }
-                var index = value.indexOf('(');
-                var name = index > 0 ? value.substr(0, index) : value;
+                const index = value.indexOf('(');
+                const name = index > 0 ? value.substr(0, index) : value;
                 if (!_.findWhere(columns, {name: name})) {
                     view.setValue('');
                 }
@@ -135,10 +134,10 @@ define(function(require) {
                 placeholder: __('oro.entity.form.choose_entity_field'),
                 data: this.data.bind(this, exclude),
                 initSelection: function(element, callback) {
-                    var value = element.val();
-                    var index = value.indexOf('(');
-                    var fieldId = index > 0 ? value.substr(0, index) : value;
-                    var node = _.last(this.dataProvider.pathToEntityChainSafely(fieldId));
+                    const value = element.val();
+                    const index = value.indexOf('(');
+                    const fieldId = index > 0 ? value.substr(0, index) : value;
+                    const node = _.last(this.dataProvider.pathToEntityChainSafely(fieldId));
                     callback({
                         id: value,
                         text: node.field.label
@@ -153,26 +152,26 @@ define(function(require) {
          * @param {Array} exclude
          */
         data: function(exclude) {
-            var data = {
+            const data = {
                 more: false,
                 results: []
             };
 
-            var columns = this.columnsCollection.clone().removeInvalidModels().toJSON();
-            var optionsTemplate = this.optionsTemplate;
+            const columns = this.columnsCollection.clone().removeInvalidModels().toJSON();
+            const optionsTemplate = this.optionsTemplate;
 
             _.each(columns, function(column) {
-                var options = column.func;
-                var chain = this.dataProvider.pathToEntityChainSafely(column.name).slice(1);
-                var entity = chain[chain.length - 1];
-                var items = data.results;
-                var updatedLabel = column.label;
+                const options = column.func;
+                const chain = this.dataProvider.pathToEntityChainSafely(column.name).slice(1);
+                const entity = chain[chain.length - 1];
+                let items = data.results;
+                const updatedLabel = column.label;
                 if (!entity || !EntityStructureDataProvider.filterFields([entity.field], exclude).length) {
                     return;
                 }
                 _.each(chain, function(part) {
-                    var item;
-                    var id;
+                    let item;
+                    let id;
                     if (part.entity) {
                         item = _.findWhere(items, {path: part.path});
                         if (!item) {

@@ -3,21 +3,19 @@ define([
 ], function(_, Backbone, EntityModel) {
     'use strict';
 
-    var multipleEntityCollection;
-
     /**
      * @export  oroform/js/multiple-entity/collection
      * @class   oroform.MultipleEntity.Collection
      * @extends Backbone.Collection
      */
-    multipleEntityCollection = Backbone.Collection.extend({
+    const multipleEntityCollection = Backbone.Collection.extend({
         model: EntityModel,
 
         /**
          * @inheritDoc
          */
-        constructor: function multipleEntityCollection() {
-            multipleEntityCollection.__super__.constructor.apply(this, arguments);
+        constructor: function multipleEntityCollection(...args) {
+            multipleEntityCollection.__super__.constructor.apply(this, args);
         },
 
         /**
@@ -30,7 +28,7 @@ define([
         onIsDefaultChange: function(item) {
             // Only 1 item allowed to be default
             if (item.get('isDefault')) {
-                var defaultItems = this.where({isDefault: true});
+                const defaultItems = this.where({isDefault: true});
                 _.each(defaultItems, function(defaultItem) {
                     if (defaultItem.get('id') !== item.get('id')) {
                         defaultItem.set('isDefault', false);

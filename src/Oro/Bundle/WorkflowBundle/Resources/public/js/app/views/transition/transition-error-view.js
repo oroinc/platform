@@ -1,29 +1,28 @@
 define(function(require) {
     'use strict';
 
-    var TransitionErrorView;
-    var widgetManager = require('oroui/js/widget-manager');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const widgetManager = require('oroui/js/widget-manager');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    TransitionErrorView = BaseView.extend({
+    const TransitionErrorView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat(['wid']),
 
         /**
          * @inheritDoc
          */
-        constructor: function TransitionErrorView() {
-            TransitionErrorView.__super__.constructor.apply(this, arguments);
+        constructor: function TransitionErrorView(options) {
+            TransitionErrorView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
+        initialize: function(options) {
             widgetManager.getWidgetInstance(this.wid, function(widget) {
                 widget.trigger('formSaveError');
             });
 
-            TransitionErrorView.__super__.initialize.apply(this, arguments);
+            TransitionErrorView.__super__.initialize.call(this, options);
         }
     });
 

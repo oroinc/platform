@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var BookmarkButtonView;
-    var mediator = require('oroui/js/mediator');
-    var PageRegionView = require('oroui/js/app/views/base/page-region-view');
-    var document = window.document;
-    var titleRendered = null;
+    const mediator = require('oroui/js/mediator');
+    const PageRegionView = require('oroui/js/app/views/base/page-region-view');
+    const document = window.document;
+    let titleRendered = null;
 
-    BookmarkButtonView = PageRegionView.extend({
+    const BookmarkButtonView = PageRegionView.extend({
         pageItems: ['navigationElements', 'titleShort', 'titleSerialized'],
 
         /**
@@ -33,8 +32,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function BookmarkButtonView() {
-            BookmarkButtonView.__super__.constructor.apply(this, arguments);
+        constructor: function BookmarkButtonView(options) {
+            BookmarkButtonView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -56,7 +55,7 @@ define(function(require) {
         render: function() {
             this.updateState();
 
-            var data = this.getTemplateData();
+            const data = this.getTemplateData();
             if (!data || !data.navigationElements) {
                 // no data, it is initial auto render, skip rendering
                 return this;
@@ -71,7 +70,7 @@ define(function(require) {
                  * Setting serialized titles for pinbar button
                  */
                 if (data.titleSerialized) {
-                    var titleSerialized = JSON.parse(data.titleSerialized);
+                    const titleSerialized = JSON.parse(data.titleSerialized);
                     if (titleSerialized.template) {
                         this.$el.data('title', titleSerialized);
                     }
@@ -84,15 +83,14 @@ define(function(require) {
         },
 
         updateState: function() {
-            var model;
-            model = this.collection.getCurrentModel();
+            const model = this.collection.getCurrentModel();
             this.$el.toggleClass('gold-icon', Boolean(model));
         },
 
         onToggle: function() {
-            var attrs;
-            var Model;
-            var model = this.collection.getCurrentModel();
+            let attrs;
+            let Model;
+            let model = this.collection.getCurrentModel();
             if (model) {
                 this.collection.trigger('toRemove', model);
             } else {
@@ -104,7 +102,7 @@ define(function(require) {
         },
 
         getItemAttrs: function() {
-            var title = this.$el.data('title');
+            const title = this.$el.data('title');
             return {
                 url: mediator.execute('currentUrl'),
                 title_rendered: titleRendered || this.$el.data('title-rendered'),

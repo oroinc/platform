@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var SegmentComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var tools = require('oroui/js/tools');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var EntityFieldsCollection = require('oroquerydesigner/js/app/models/entity-fields-collection');
-    var GroupingModel = require('oroquerydesigner/js/app/models/grouping-model');
-    var ColumnModel = require('oroquerydesigner/js/app/models/column-model');
-    var DeleteConfirmation = require('oroui/js/delete-confirmation');
-    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
-    var ColumnFormView = require('oroquerydesigner/js/app/views/column-form-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const tools = require('oroui/js/tools');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const EntityFieldsCollection = require('oroquerydesigner/js/app/models/entity-fields-collection');
+    const GroupingModel = require('oroquerydesigner/js/app/models/grouping-model');
+    const ColumnModel = require('oroquerydesigner/js/app/models/column-model');
+    const DeleteConfirmation = require('oroui/js/delete-confirmation');
+    const EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
+    const ColumnFormView = require('oroquerydesigner/js/app/views/column-form-view');
     require('oroui/js/items-manager/editor');
     require('oroui/js/items-manager/table');
 
-    SegmentComponent = BaseComponent.extend({
+    const SegmentComponent = BaseComponent.extend({
         relatedSiblingComponents: {
             conditionBuilderComponent: 'condition-builder',
             columnFieldChoiceComponent: 'column-field-choice',
@@ -65,18 +64,18 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function SegmentComponent() {
-            SegmentComponent.__super__.constructor.apply(this, arguments);
+        constructor: function SegmentComponent(options) {
+            SegmentComponent.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            var providerPromise = EntityStructureDataProvider.createDataProvider({}, this);
-            var modulesPromise = !options.extensions ? [] : tools.loadModules(options.extensions).then(function() {
+            const providerPromise = EntityStructureDataProvider.createDataProvider({}, this);
+            const modulesPromise = !options.extensions ? [] : tools.loadModules(options.extensions).then((...args) => {
                 // promise always has to return array of extensions, even if there's only one extension module
-                return _.values(arguments);
+                return args;
             });
             this.processOptions(options);
             this._deferredInit();
@@ -99,7 +98,7 @@ define(function(require) {
             this.initGrouping();
             this.initDateGrouping();
             this.initColumn();
-            var promise = this.configureFilters();
+            const promise = this.configureFilters();
 
             this.form = this.$storage.parents('form');
             this.form.submit(_.bind(this.onBeforeSubmit, this));
@@ -115,26 +114,26 @@ define(function(require) {
         },
 
         initEntityChangeEvents: function() {
-            var $entityChoice = $(this.options.entityChoice);
+            const $entityChoice = $(this.options.entityChoice);
             this.entityClassName = $entityChoice.val();
 
-            var handleEntityChange = function() {
+            const handleEntityChange = function() {
                 this.entityClassName = $entityChoice.val();
-                var data = {};
+                const data = {};
                 this.trigger('resetData', data);
                 this.save(data);
                 this.trigger('entityChange', this.entityClassName);
             }.bind(this);
 
-            var onEntityChoiceChange = function(e) {
+            const onEntityChoiceChange = function(e) {
                 if (this.entityClassName === $entityChoice.val()) {
                     // there's nothing to confirm
                     return;
                 }
 
-                var confirm;
-                var oldVal = _.result(e.removed, 'id');
-                var requiresConfirm = _.some(this.load() || [], function(value) {
+                let confirm;
+                const oldVal = _.result(e.removed, 'id');
+                const requiresConfirm = _.some(this.load() || [], function(value) {
                     return !_.isEmpty(value);
                 });
 
@@ -162,7 +161,7 @@ define(function(require) {
         },
 
         onBeforeSubmit: function(e) {
-            var issues = [];
+            let issues = [];
 
             // please note that event name, looks like method call
             // 'cause listeners will populate issues array by components
@@ -175,7 +174,7 @@ define(function(require) {
             }
 
             issues = _.map(_.groupBy(issues, 'type'), function(items, type) {
-                var components = _.map(items, function(item) {
+                let components = _.map(items, function(item) {
                     return item.component;
                 });
                 components = {components: '<b>' + components.join('</b>, <b>') + '</b>'};
@@ -188,7 +187,7 @@ define(function(require) {
                 issues = issues[0];
             }
 
-            var modal = new DeleteConfirmation({
+            const modal = new DeleteConfirmation({
                 title: __('oro.segment.confirm.dialog.title'),
                 content: __('oro.segment.confirm.dialog.message', {data_issue: issues}),
                 okCloses: true,
@@ -228,7 +227,7 @@ define(function(require) {
          * @returns {string}
          */
         formatChoice: function(value, template) {
-            var data;
+            let data;
             if (value) {
                 data = this.dataProvider.pathToEntityChainSafely(value);
             }
@@ -241,8 +240,8 @@ define(function(require) {
          * @param {string=} key name of data branch
          */
         load: function(key) {
-            var data = {};
-            var json = this.$storage.val();
+            let data = {};
+            const json = this.$storage.val();
             if (json) {
                 try {
                     data = JSON.parse(json);
@@ -260,7 +259,7 @@ define(function(require) {
          * @param {string=} key name of data branch
          */
         save: function(value, key) {
-            var data = this.load();
+            let data = this.load();
             if (key) {
                 data[key] = value;
             } else {
@@ -300,9 +299,9 @@ define(function(require) {
          * Initializes Fields Grouping component
          */
         initGrouping: function() {
-            var options = this.options.grouping;
-            var $table = $(options.itemContainer);
-            var $editor = $(options.form);
+            const options = this.options.grouping;
+            const $table = $(options.itemContainer);
+            const $editor = $(options.form);
 
             if (_.isEmpty($table) || _.isEmpty($editor) || !this.groupingFieldChoiceComponent) {
                 // there's no grouping
@@ -315,7 +314,7 @@ define(function(require) {
             });
 
             // prepare collection for Items Manager
-            var collection = new EntityFieldsCollection(this.load('grouping_columns'), {
+            const collection = new EntityFieldsCollection(this.load('grouping_columns'), {
                 model: GroupingModel,
                 dataProvider: this.dataProvider
             });
@@ -324,7 +323,7 @@ define(function(require) {
             });
 
             // setup confirmation dialog for delete item
-            var confirm = new DeleteConfirmation({content: '', disposeOnHidden: false});
+            const confirm = new DeleteConfirmation({content: '', disposeOnHidden: false});
             confirm.on('ok', function() {
                 collection.remove(this.model);
             });
@@ -358,7 +357,7 @@ define(function(require) {
             });
 
             // setup Items Manager's table
-            var template = _.template(this.options.fieldChoiceOptions.select2.formatSelectionTemplate);
+            const template = _.template(this.options.fieldChoiceOptions.select2.formatSelectionTemplate);
             $table.itemsManagerTable({
                 collection: collection,
                 itemTemplate: $(options.itemTemplate).html(),
@@ -408,10 +407,10 @@ define(function(require) {
          * Initializes Columns component
          */
         initColumn: function() {
-            var options = this.options.column;
-            var metadata = this.options.metadata;
-            var $table = $(options.itemContainer);
-            var $form = $(options.form);
+            const options = this.options.column;
+            const metadata = this.options.metadata;
+            const $table = $(options.itemContainer);
+            const $form = $(options.form);
 
             if (_.isEmpty($form) || !this.columnFieldChoiceComponent) {
                 // there's no columns
@@ -424,7 +423,7 @@ define(function(require) {
                 this.columnFieldChoiceComponent.view.setEntity(entityClassName);
             });
 
-            var functionChoiceView = null;
+            let functionChoiceView = null;
             if (this.columnFunctionChoiceComponent) {
                 functionChoiceView = this.columnFunctionChoiceComponent.view;
             }
@@ -435,10 +434,10 @@ define(function(require) {
                 functionChoiceView: functionChoiceView
             });
 
-            var $editor = this.columnFormView.$el;
+            const $editor = this.columnFormView.$el;
 
             // prepare collection for Items Manager
-            var collection = new EntityFieldsCollection(this.load('columns'), {
+            const collection = new EntityFieldsCollection(this.load('columns'), {
                 model: ColumnModel,
                 dataProvider: this.dataProvider
             });
@@ -447,7 +446,7 @@ define(function(require) {
             });
 
             // setup confirmation dialog for delete item
-            var confirm = new DeleteConfirmation({content: '', disposeOnHidden: false});
+            const confirm = new DeleteConfirmation({content: '', disposeOnHidden: false});
             confirm.on('ok', function() {
                 collection.remove(this.model);
             });
@@ -471,7 +470,7 @@ define(function(require) {
                             group_name: $el.find(':selected').data('group_name')
                         };
 
-                        var returnType = $el.find(':selected').data('return_type');
+                        const returnType = $el.find(':selected').data('return_type');
                         if (value && returnType) {
                             value.return_type = returnType;
                         }
@@ -480,7 +479,7 @@ define(function(require) {
                 }
             }));
 
-            var sortingLabels = {};
+            const sortingLabels = {};
             $editor.find('select[name*=sorting]').find('option:not([value=""])').each(function() {
                 sortingLabels[this.value] = $(this).text();
             });
@@ -505,14 +504,14 @@ define(function(require) {
                 $editor.itemsManagerEditor('reset');
             });
 
-            var template = _.template(this.options.fieldChoiceOptions.select2.formatSelectionTemplate);
+            const template = _.template(this.options.fieldChoiceOptions.select2.formatSelectionTemplate);
             $table.itemsManagerTable({
                 collection: collection,
                 itemTemplate: $(options.itemTemplate).html(),
                 itemRender: function(tmpl, data) {
-                    var item;
-                    var itemFunc;
-                    var func = data.func;
+                    let item;
+                    let itemFunc;
+                    const func = data.func;
 
                     try {
                         data.name = this.formatChoice(data.name, template);

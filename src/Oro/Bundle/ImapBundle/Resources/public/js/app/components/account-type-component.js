@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var AccountTypeComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var accountTypeView = require('oroimap/js/app/views/account-type-view');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var routing = require('routing');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const accountTypeView = require('oroimap/js/app/views/account-type-view');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const routing = require('routing');
 
-    AccountTypeComponent = BaseComponent.extend({
+    const AccountTypeComponent = BaseComponent.extend({
         ViewType: accountTypeView,
 
         /**
          * @inheritDoc
          */
-        constructor: function AccountTypeComponent() {
-            AccountTypeComponent.__super__.constructor.apply(this, arguments);
+        constructor: function AccountTypeComponent(options) {
+            AccountTypeComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -27,7 +26,7 @@ define(function(require) {
             this.route = _.result(options, 'route') || '';
             this.formParentName = _.result(options, 'formParentName') || '';
 
-            var viewConfig = this.prepareViewOptions(options);
+            const viewConfig = this.prepareViewOptions(options);
             this.view = new this.ViewType(viewConfig);
             this.view.render();
 

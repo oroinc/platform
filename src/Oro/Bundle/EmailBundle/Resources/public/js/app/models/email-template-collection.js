@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var EmailTemplateCollection;
-    var routing = require('routing');
-    var EmailTemplateModel = require('./email-template-model');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
-    var _ = require('underscore');
+    const routing = require('routing');
+    const EmailTemplateModel = require('./email-template-model');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
+    const _ = require('underscore');
 
     /**
      * @export oroemail/js/app/models/email-template-collection
      */
-    EmailTemplateCollection = BaseCollection.extend({
+    const EmailTemplateCollection = BaseCollection.extend({
         route: null,
 
         routeId: null,
@@ -26,8 +25,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailTemplateCollection() {
-            EmailTemplateCollection.__super__.constructor.apply(this, arguments);
+        constructor: function EmailTemplateCollection(...args) {
+            EmailTemplateCollection.__super__.constructor.apply(this, args);
         },
 
         /**
@@ -36,13 +35,13 @@ define(function(require) {
         initialize: function(models, options) {
             _.extend(this, _.pick(options, ['route', 'routeId', 'includeNonEntity', 'includeSystemTemplates']));
 
-            var routeParams = {};
+            const routeParams = {};
 
             routeParams[this.routeId] = null;
 
             this.url = routing.generate(this.route, routeParams);
 
-            EmailTemplateCollection.__super__.initialize.apply(this, arguments);
+            EmailTemplateCollection.__super__.initialize.call(this, models, options);
         },
 
         /**
@@ -51,7 +50,7 @@ define(function(require) {
          * @param {String} id
          */
         setEntityId: function(id) {
-            var routeParams = {};
+            const routeParams = {};
             routeParams[this.routeId] = id;
             routeParams.includeNonEntity = this.includeNonEntity ? '1' : '0';
             routeParams.includeSystemTemplates = this.includeSystemTemplates ? '1' : '0';

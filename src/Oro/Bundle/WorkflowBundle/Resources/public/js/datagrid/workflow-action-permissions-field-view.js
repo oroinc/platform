@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var WorkflowActionPermissionsFieldView;
-    var mediator = require('oroui/js/mediator');
-    var ActionPermissionsFieldView = require('orouser/js/datagrid/action-permissions-field-view');
+    const mediator = require('oroui/js/mediator');
+    const ActionPermissionsFieldView = require('orouser/js/datagrid/action-permissions-field-view');
 
-    WorkflowActionPermissionsFieldView = ActionPermissionsFieldView.extend({
+    const WorkflowActionPermissionsFieldView = ActionPermissionsFieldView.extend({
         /**
          * @inheritDoc
          */
-        constructor: function WorkflowActionPermissionsFieldView() {
-            WorkflowActionPermissionsFieldView.__super__.constructor.apply(this, arguments);
+        constructor: function WorkflowActionPermissionsFieldView(options) {
+            WorkflowActionPermissionsFieldView.__super__.constructor.call(this, options);
         },
 
         onAccessLevelChange: function(model) {

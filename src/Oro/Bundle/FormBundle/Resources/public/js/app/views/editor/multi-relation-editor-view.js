@@ -1,6 +1,10 @@
 define(function(require) {
     'use strict';
 
+    const RelatedIdRelationEditorView = require('./related-id-relation-editor-view');
+    const _ = require('underscore');
+    const select2autosizer = require('oroui/js/tools/select2-autosizer');
+
     /**
      * Multi-relation content editor. Please note that it requires column data format
      * corresponding to multi-relation-cell.
@@ -62,25 +66,20 @@ define(function(require) {
      * @augments [RelatedIdRelationEditorView](./related-id-relation-editor-view.md)
      * @exports MultiRelationEditorView
      */
-    var MultiRelationEditorView;
-    var RelatedIdRelationEditorView = require('./related-id-relation-editor-view');
-    var _ = require('underscore');
-    var select2autosizer = require('oroui/js/tools/select2-autosizer');
-
-    MultiRelationEditorView = RelatedIdRelationEditorView.extend(/** @lends MultiRelationEditorView.prototype */{
+    const MultiRelationEditorView = RelatedIdRelationEditorView.extend(/** @lends MultiRelationEditorView.prototype */{
         className: 'multi-relation-editor',
 
         /**
          * @inheritDoc
          */
-        constructor: function MultiRelationEditorView() {
-            MultiRelationEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function MultiRelationEditorView(options) {
+            MultiRelationEditorView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
             options.ignore_value_field_name = true;
             this.maximumSelectionLength = options.maximumSelectionLength;
-            MultiRelationEditorView.__super__.initialize.apply(this, arguments);
+            MultiRelationEditorView.__super__.initialize.call(this, options);
         },
 
         events: {
@@ -96,7 +95,7 @@ define(function(require) {
         },
 
         getInitialResultItem: function() {
-            var modelValue = this.getModelValue();
+            const modelValue = this.getModelValue();
             if (modelValue !== null && modelValue && modelValue.data) {
                 return modelValue.data;
             } else {
@@ -126,7 +125,7 @@ define(function(require) {
         },
 
         getSelect2Options: function() {
-            var options = MultiRelationEditorView.__super__.getSelect2Options.apply(this, arguments);
+            const options = MultiRelationEditorView.__super__.getSelect2Options.call(this);
             options.multiple = true;
             options.maximumSelectionLength = this.maximumSelectionLength;
             return options;
@@ -147,8 +146,8 @@ define(function(require) {
         },
 
         getValue: function() {
-            var select2Value = this.$('input[name=value]').val();
-            var ids;
+            const select2Value = this.$('input[name=value]').val();
+            let ids;
             if (select2Value !== '') {
                 ids = select2Value.split(',').map(function(id) {
                     return parseInt(id);
@@ -167,7 +166,7 @@ define(function(require) {
         },
 
         getServerUpdateData: function() {
-            var data = {};
+            const data = {};
             data[this.fieldName] = this.getValue();
             return data;
         },

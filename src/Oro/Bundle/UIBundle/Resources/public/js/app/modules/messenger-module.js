@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var mediator = require('oroui/js/mediator');
-    var messenger = require('oroui/js/messenger');
+    const mediator = require('oroui/js/mediator');
+    const messenger = require('oroui/js/messenger');
 
     /**
      * Init messenger's handlers

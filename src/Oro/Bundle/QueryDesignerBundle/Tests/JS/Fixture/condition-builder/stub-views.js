@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var Backbone = require('backbone');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
 
     function StubView(options) {
-        var stub = _.extend(Object.create(Backbone.Events), {
+        const stub = _.extend(Object.create(Backbone.Events), {
             $el: options.el,
             value: options.value,
             render: function() {

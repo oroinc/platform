@@ -7,9 +7,7 @@ define([
 ], function(_, HeaderCell, Chaplin, ColumnRendererComponent, util) {
     'use strict';
 
-    var HeaderRow;
-
-    HeaderRow = Chaplin.CollectionView.extend({
+    const HeaderRow = Chaplin.CollectionView.extend({
         tagName: 'tr',
 
         className: '',
@@ -27,8 +25,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function HeaderRow() {
-            HeaderRow.__super__.constructor.apply(this, arguments);
+        constructor: function HeaderRow(options) {
+            HeaderRow.__super__.constructor.call(this, options);
         },
 
         /**
@@ -40,14 +38,14 @@ define([
 
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
-            var _this = this;
+            const _this = this;
             _.extend(this, _.pick(options, ['themeOptions', 'template']));
             // let descendants override itemView
             if (!this.itemView) {
                 this.itemView = function(options) {
-                    var column = options.model;
-                    var CurrentHeaderCell = column.get('headerCell') || options.headerCell || HeaderCell;
-                    var cellOptions = {
+                    const column = options.model;
+                    const CurrentHeaderCell = column.get('headerCell') || options.headerCell || HeaderCell;
+                    const cellOptions = {
                         column: column,
                         collection: _this.dataCollection,
                         themeOptions: {
@@ -64,7 +62,7 @@ define([
 
             this.columnRenderer = new ColumnRendererComponent(options);
 
-            HeaderRow.__super__.initialize.apply(this, arguments);
+            HeaderRow.__super__.initialize.call(this, options);
             this.cells = this.subviews;
         },
 
@@ -86,7 +84,7 @@ define([
             if (this.template) {
                 this.renderCustomTemplate();
             } else {
-                HeaderRow.__super__.render.apply(this, arguments);
+                HeaderRow.__super__.render.call(this);
             }
             this._resolveDeferredRender();
 
@@ -94,11 +92,11 @@ define([
         },
 
         renderCustomTemplate: function() {
-            var self = this;
+            const self = this;
             this.$el.html(this.template({
                 themeOptions: this.themeOptions ? this.themeOptions : {},
                 render: function(columnName) {
-                    var columnModel = _.find(self.columns.models, function(model) {
+                    const columnModel = _.find(self.columns.models, function(model) {
                         return model.get('name') === columnName;
                     });
                     if (columnModel) {
@@ -107,8 +105,8 @@ define([
                     return '';
                 },
                 attributes: function(columnName, additionalAttributes) {
-                    var attributes = additionalAttributes || {};
-                    var columnModel = _.find(self.columns.models, function(model) {
+                    const attributes = additionalAttributes || {};
+                    const columnModel = _.find(self.columns.models, function(model) {
                         return model.get('name') === columnName;
                     });
                     if (columnModel) {

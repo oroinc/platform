@@ -7,14 +7,12 @@ define([
 ], function($, _, __, Modal, AbstractListener) {
     'use strict';
 
-    var AbstractGridChangeListener;
-
     /**
      * @export  orodatagrid/js/datagrid/listener/abstract-grid-change-listener
      * @class   orodatagrid.datagrid.listener.AbstractGridChangeListener
      * @extends orodatagrid.datagrid.listener.AbstractListener
      */
-    AbstractGridChangeListener = AbstractListener.extend({
+    const AbstractGridChangeListener = AbstractListener.extend({
 
         /** @param {Object} */
         confirmModal: {},
@@ -22,8 +20,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function AbstractGridChangeListener() {
-            AbstractGridChangeListener.__super__.constructor.apply(this, arguments);
+        constructor: function AbstractGridChangeListener(...args) {
+            AbstractGridChangeListener.__super__.constructor.apply(this, args);
         },
 
         /**
@@ -44,7 +42,7 @@ define([
          * Set datagrid instance
          */
         setDatagridAndSubscribe: function() {
-            AbstractGridChangeListener.__super__.setDatagridAndSubscribe.apply(this, arguments);
+            AbstractGridChangeListener.__super__.setDatagridAndSubscribe.call(this);
 
             this._clearState();
             this._restoreState();
@@ -54,7 +52,7 @@ define([
          * @inheritDoc
          */
         getGridEvents: function() {
-            var events = AbstractGridChangeListener.__super__.getGridEvents.call(this);
+            const events = AbstractGridChangeListener.__super__.getGridEvents.call(this);
             events['preExecute:refresh:' + this.gridName] = _.bind(this._onExecuteRefreshAction, this);
             events['preExecute:reset:' + this.gridName] = _.bind(this._onExecuteResetAction, this);
             return events;

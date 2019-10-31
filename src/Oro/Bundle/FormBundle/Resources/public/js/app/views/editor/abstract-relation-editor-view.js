@@ -29,13 +29,12 @@ define(function(require) {
      * @augments [SelectEditorView](./select-editor-view.md)
      * @exports AbstractRelationEditorView
      */
-    var AbstractRelationEditorView;
-    var SelectEditorView = require('./select-editor-view');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
+    const SelectEditorView = require('./select-editor-view');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
     require('jquery.select2');
 
-    AbstractRelationEditorView = SelectEditorView.extend(/** @lends AbstractRelationEditorView.prototype */{
+    const AbstractRelationEditorView = SelectEditorView.extend(/** @lends AbstractRelationEditorView.prototype */{
         input_delay: 250,
         currentTerm: '',
         DEFAULT_PER_PAGE: 20,
@@ -43,15 +42,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AbstractRelationEditorView() {
-            AbstractRelationEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function AbstractRelationEditorView(options) {
+            AbstractRelationEditorView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            AbstractRelationEditorView.__super__.initialize.apply(this, arguments);
+            AbstractRelationEditorView.__super__.initialize.call(this, options);
             this.autocompleteApiAccessor = options.autocomplete_api_accessor.instance;
             this.perPage = options.per_page || this.DEFAULT_PER_PAGE;
             if (options.input_delay) {
@@ -73,7 +72,7 @@ define(function(require) {
         },
 
         makeRequest: function(options, autoCompleteUrlParameters) {
-            var _this = this;
+            const _this = this;
             if (this.disposed) {
                 return;
             }
@@ -116,7 +115,7 @@ define(function(require) {
     }, {
         DEFAULT_ACCESSOR_CLASS: 'oroentity/js/tools/entity-select-search-api-accessor',
         processMetadata: function(columnMetadata) {
-            var apiSpec = columnMetadata.inline_editing.autocomplete_api_accessor;
+            const apiSpec = columnMetadata.inline_editing.autocomplete_api_accessor;
             if (!_.isObject(apiSpec)) {
                 throw new Error('`autocomplete_api_accessor` is required option');
             }
@@ -129,7 +128,7 @@ define(function(require) {
                         enable: true
                     };
                 }
-                var AutocompleteApiAccessor = apiSpec['class'];
+                const AutocompleteApiAccessor = apiSpec['class'];
                 apiSpec.instance = new AutocompleteApiAccessor(apiSpec);
                 if (!columnMetadata.inline_editing.editor.view_options) {
                     columnMetadata.inline_editing.editor.view_options = {};

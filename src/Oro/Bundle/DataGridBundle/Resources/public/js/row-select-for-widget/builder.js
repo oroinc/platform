@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var widgetManager = require('oroui/js/widget-manager');
+    const widgetManager = require('oroui/js/widget-manager');
 
     return {
         /**
@@ -12,12 +12,12 @@ define(function(require) {
         },
 
         processDatagridOptions: function(deferred, options) {
-            var params = options.gridBuildersOptions.rowSelectForWidget || {};
+            const params = options.gridBuildersOptions.rowSelectForWidget || {};
 
             if (params.multiSelect) {
                 options.metadata.options.multiSelectRowEnabled = true;
             } else {
-                var wid = params.wid;
+                const wid = params.wid;
 
                 if (!wid) {
                     throw Error('"wid" has to be defined');

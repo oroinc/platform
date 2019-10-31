@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var FlowchartStateModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
-    FlowchartStateModel = BaseModel.extend({
+    const FlowchartStateModel = BaseModel.extend({
         defaults: {
             transitionLabelsVisible: true
         },
@@ -12,8 +11,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function FlowchartStateModel() {
-            FlowchartStateModel.__super__.constructor.apply(this, arguments);
+        constructor: function FlowchartStateModel(...args) {
+            FlowchartStateModel.__super__.constructor.apply(this, args);
         }
     });
 

@@ -6,15 +6,13 @@ define([
 ], function($, _, Backbone, template) {
     'use strict';
 
-    var VisibleItemsCounter;
-
     /**
      * Datagrid simple pagination widget
      *
      * @class   orodatagrid.datagrid.VisibleItemsCounter
      * @extends Backbone.View
      */
-    VisibleItemsCounter = Backbone.View.extend({
+    const VisibleItemsCounter = Backbone.View.extend({
         /** @property */
         enabled: true,
 
@@ -38,8 +36,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function VisibleItemsCounter() {
-            VisibleItemsCounter.__super__.constructor.apply(this, arguments);
+        constructor: function VisibleItemsCounter(options) {
+            VisibleItemsCounter.__super__.constructor.call(this, options);
         },
 
         /**
@@ -99,7 +97,7 @@ define([
          * @return {*}
          */
         render: function() {
-            var state = this.collection.state;
+            const state = this.collection.state;
 
             // prevent render if data is not loaded yet
             if (state.totalRecords === null) {

@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var BarChartComponent;
-    var Flotr = require('flotr2');
-    var numberFormatter = require('orolocale/js/formatter/number');
-    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
+    const Flotr = require('flotr2');
+    const numberFormatter = require('orolocale/js/formatter/number');
+    const BaseChartComponent = require('orochart/js/app/components/base-chart-component');
 
     /**
      * @class orochart.app.components.BarChartComponent
      * @extends orochart.app.components.BaseChartComponent
      * @exports orochart/app/components/bar-char-component
      */
-    BarChartComponent = BaseChartComponent.extend({
+    const BarChartComponent = BaseChartComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function BarChartComponent() {
-            BarChartComponent.__super__.constructor.apply(this, arguments);
+        constructor: function BarChartComponent(options) {
+            BarChartComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -25,20 +24,19 @@ define(function(require) {
          * @overrides
          */
         draw: function() {
-            var intValue;
-            var maxValue = 0;
-            var $chart = this.$chart;
-            var data = this.data;
-            var options = this.options;
-            var settings = this.options.settings;
-            var formatter = options.data_schema.value.formatter;
+            let intValue;
+            let maxValue = 0;
+            const $chart = this.$chart;
+            const data = this.data;
+            const options = this.options;
+            const settings = this.options.settings;
+            const formatter = options.data_schema.value.formatter;
 
-            var xNumber = 0;
-            var chartData = [];
-            var xLabels = [];
-            var chartOptions;
+            let xNumber = 0;
+            const chartData = [];
+            const xLabels = [];
 
-            for (var i in data) {
+            for (const i in data) {
                 if (!data.hasOwnProperty(i)) {
                     continue;
                 }
@@ -48,7 +46,7 @@ define(function(require) {
                 xLabels.push(data[i].label);
             }
 
-            chartOptions = {
+            const chartOptions = {
                 data: chartData,
                 color: settings.chartColors[0],
                 markers: {
@@ -80,7 +78,7 @@ define(function(require) {
                         track: true,
                         relative: true,
                         trackFormatter: function(data) {
-                            var yValue;
+                            let yValue;
 
                             if (formatter) {
                                 yValue = numberFormatter[formatter](data.y);

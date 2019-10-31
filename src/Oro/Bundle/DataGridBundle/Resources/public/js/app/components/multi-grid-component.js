@@ -1,16 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var widgetManager = require('oroui/js/widget-manager');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var MultiGridView = require('orodatagrid/js/app/views/multi-grid-view');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const widgetManager = require('oroui/js/widget-manager');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const MultiGridView = require('orodatagrid/js/app/views/multi-grid-view');
 
     /**
      * @exports MultiGridComponent
      */
-    var MultiGridComponent = BaseComponent.extend({
+    const MultiGridComponent = BaseComponent.extend({
         /**
          * keys
          * - dialogWidgetName: name of the widget
@@ -29,8 +29,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function MultiGridComponent() {
-            MultiGridComponent.__super__.constructor.apply(this, arguments);
+        constructor: function MultiGridComponent(options) {
+            MultiGridComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -44,8 +44,8 @@ define(function(require) {
         },
 
         initView: function() {
-            var params = this.options.params || {};
-            var routeParams = {};
+            let params = this.options.params || {};
+            let routeParams = {};
 
             widgetManager.getWidgetInstanceByAlias(this.options.dialogWidgetName, function(widget) {
                 routeParams = widget.options.routeParams || {};
@@ -68,8 +68,8 @@ define(function(require) {
          * @protected
          */
         _bindGridEvent: function() {
-            var self = this;
-            var gridWidgetName = this.options.gridWidgetName;
+            const self = this;
+            const gridWidgetName = this.options.gridWidgetName;
             if (!gridWidgetName) {
                 return;
             }
@@ -86,9 +86,9 @@ define(function(require) {
          * @param {} data
          */
         onRowSelect: function(gridWidget, data) {
-            var id = data.model.get('id');
-            var dialogWidgetName = this.options.dialogWidgetName;
-            var targetClass = this.contextView.currentTargetClass();
+            const id = data.model.get('id');
+            const dialogWidgetName = this.options.dialogWidgetName;
+            const targetClass = this.contextView.currentTargetClass();
 
             mediator.trigger(
                 dialogWidgetName + ':select',

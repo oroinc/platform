@@ -7,13 +7,11 @@ define([
 ], function($, _, mediator, tools, PageRegionView) {
     'use strict';
 
-    var PageContentView;
-
     /**
      * Finds first container that has active scrollbar and sets focus on it for ability of scrolling it by keyboard
      */
     function focusScrollElement() {
-        var scrollable = [
+        const scrollable = [
             '.scrollable-container',
             '.other-scroll',
             '.layout-content .scrollable-container',
@@ -21,9 +19,9 @@ define([
             '.scrollspy'
         ];
 
-        var target = _.find(scrollable, function(item) {
-            var $el = $(item).first();
-            var overflow = $el.css('overflow-y');
+        const target = _.find(scrollable, function(item) {
+            const $el = $(item).first();
+            const overflow = $el.css('overflow-y');
             return $el.length && /auto|scroll/.test(overflow) && $el[0].scrollHeight > $el[0].clientHeight;
         });
 
@@ -37,12 +35,12 @@ define([
         }
     }
 
-    PageContentView = PageRegionView.extend({
+    const PageContentView = PageRegionView.extend({
         /**
          * @inheritDoc
          */
-        constructor: function PageContentView() {
-            PageContentView.__super__.constructor.apply(this, arguments);
+        constructor: function PageContentView(options) {
+            PageContentView.__super__.constructor.call(this, options);
         },
 
         template: function(data) {
@@ -58,7 +56,7 @@ define([
             PageContentView.__super__.render.call(this);
 
             // @TODO discuss if scripts section is still in use
-            var data = this.getTemplateData();
+            const data = this.getTemplateData();
             if (data && data.scripts) {
                 this.$el.append(data.scripts);
             }
@@ -87,12 +85,12 @@ define([
          * is not active on purpose (autofocus attribute)
          */
         initFocus: function() {
-            var activeElement = document.activeElement;
+            const activeElement = document.activeElement;
             if (tools.isTouchDevice() || $(activeElement).is('[autofocus]')) {
                 return;
             }
 
-            var delay = 200;
+            const delay = 200;
             this.$('form:first').focusFirstInput();
             if (!tools.isMobile() && activeElement === document.activeElement) {
                 _.delay(focusScrollElement, delay);

@@ -5,17 +5,16 @@ define([
 ], function($, _, Select2View) {
     'use strict';
 
-    var Select2AutocompleteView;
-    Select2AutocompleteView = Select2View.extend({
+    const Select2AutocompleteView = Select2View.extend({
         events: {
             change: function(e) {
                 if (this.$el.data('select2').opts.multiple) {
-                    var selectedData = this.$el.data('selected-data') || [];
+                    const selectedData = this.$el.data('selected-data') || [];
                     if (e.added) {
                         selectedData.push(e.added);
                     }
                     if (e.removed) {
-                        var index = _.findIndex(selectedData, function(obj) {
+                        const index = _.findIndex(selectedData, function(obj) {
                             return obj.id === e.removed.id;
                         });
                         if (index !== -1) {
@@ -31,8 +30,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function Select2AutocompleteView() {
-            Select2AutocompleteView.__super__.constructor.apply(this, arguments);
+        constructor: function Select2AutocompleteView(options) {
+            Select2AutocompleteView.__super__.constructor.call(this, options);
         }
     });
 

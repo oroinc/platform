@@ -1,14 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var Backbone = require('oroui/js/extend/backbone');
+    const Backbone = require('oroui/js/extend/backbone');
 
     describe('oroui/js/extend/backbone', function() {
         describe('Backbone.Events', function() {
-            var obj1;
-            var obj2;
-            var obj3;
-            var handler;
+            let obj1;
+            let obj2;
+            let obj3;
+            let handler;
 
             beforeEach(function() {
                 obj1 = Object.create(Backbone.Events);

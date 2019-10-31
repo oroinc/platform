@@ -6,9 +6,7 @@ define([
 ], function(BaseCollection, ActivityModel, _, routing) {
     'use strict';
 
-    var ActivityListCollection;
-
-    ActivityListCollection = BaseCollection.extend({
+    const ActivityListCollection = BaseCollection.extend({
         model: ActivityModel,
         route: '',
         routeParameters: {},
@@ -29,8 +27,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function ActivityListCollection() {
-            ActivityListCollection.__super__.constructor.apply(this, arguments);
+        constructor: function ActivityListCollection(...args) {
+            ActivityListCollection.__super__.constructor.apply(this, args);
         },
 
         /**
@@ -109,9 +107,9 @@ define([
                 return;
             }
 
-            var i;
-            var newModel;
-            var oldModel;
+            let i;
+            let newModel;
+            let oldModel;
             if (options.parse) {
                 for (i = 0; i < models.data.length; i++) {
                     newModel = models.data[i];

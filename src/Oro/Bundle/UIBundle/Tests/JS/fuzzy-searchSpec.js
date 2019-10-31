@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var FuzzySearch = require('oroui/js/fuzzy-search');
+    const FuzzySearch = require('oroui/js/fuzzy-search');
 
     describe('oroui/js/fuzzy-search', function() {
         it('check isMatched', function() {

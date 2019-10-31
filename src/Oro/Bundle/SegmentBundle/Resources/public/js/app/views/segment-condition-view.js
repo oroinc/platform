@@ -1,32 +1,29 @@
 define(function(require) {
     'use strict';
 
-    // @export orosegment/js/app/views/segment-condition-view
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const SegmentFilter = require('orosegment/js/filter/segment-filter');
+    const AbstractConditionView = require('oroquerydesigner/js/app/views/abstract-condition-view');
+    const SegmentChoiceView = require('orosegment/js/app/views/segment-choice-view');
 
-    var SegmentConditionView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var SegmentFilter = require('orosegment/js/filter/segment-filter');
-    var AbstractConditionView = require('oroquerydesigner/js/app/views/abstract-condition-view');
-    var SegmentChoiceView = require('orosegment/js/app/views/segment-choice-view');
-
-    SegmentConditionView = AbstractConditionView.extend({
+    const SegmentConditionView = AbstractConditionView.extend({
         /**
          * @inheritDoc
          */
-        constructor: function SegmentConditionView() {
-            SegmentConditionView.__super__.constructor.apply(this, arguments);
+        constructor: function SegmentConditionView(options) {
+            SegmentConditionView.__super__.constructor.call(this, options);
         },
 
         getDefaultOptions: function() {
-            var defaultOptions = SegmentConditionView.__super__.getDefaultOptions.call(this);
+            const defaultOptions = SegmentConditionView.__super__.getDefaultOptions.call(this);
             return _.extend({}, defaultOptions, {
                 segmentChoice: {}
             });
         },
 
         initChoiceInputView: function() {
-            var choiceInput = new SegmentChoiceView(_.extend({
+            const choiceInput = new SegmentChoiceView(_.extend({
                 autoRender: true,
                 el: this.$choiceInput,
                 entity: this.options.rootEntity
@@ -37,8 +34,8 @@ define(function(require) {
         onChoiceInputReady: function(choiceInputView) {
             SegmentConditionView.__super__.onChoiceInputReady.call(this, choiceInputView);
             if (this.filter) {
-                var filterValue = this._getFilterValue();
-                var label = this.filter.getSelectedLabel();
+                const filterValue = this._getFilterValue();
+                const label = this.filter.getSelectedLabel();
                 if (filterValue && label) {
                     choiceInputView.setData({
                         id: 'segment_' + filterValue.value,
@@ -49,10 +46,10 @@ define(function(require) {
         },
 
         _renderFilter: function(fieldId) {
-            var segmentId = fieldId.split('_')[1];
-            var filterId = this._getSegmentFilterId();
+            const segmentId = fieldId.split('_')[1];
+            const filterId = this._getSegmentFilterId();
 
-            var data = this.subview('choice-input').getData();
+            const data = this.subview('choice-input').getData();
             if (_.has(data, 'id')) {
                 data.value = segmentId;
                 // pre-set data
@@ -64,8 +61,8 @@ define(function(require) {
                 });
             }
 
-            var filterOptions = this.options.filters[filterId];
-            var filter = new (SegmentFilter.extend(filterOptions))();
+            const filterOptions = this.options.filters[filterId];
+            const filter = new (SegmentFilter.extend(filterOptions))();
             this._appendFilter(filter);
         },
 
@@ -76,7 +73,7 @@ define(function(require) {
          * @private
          */
         _getSegmentFilterId: function() {
-            var filterId = null;
+            let filterId = null;
 
             _.each(this.options.filters, function(filter, id) {
                 if ('segment' === filter.name) {
@@ -88,7 +85,7 @@ define(function(require) {
         },
 
         _collectValue: function() {
-            var value = SegmentConditionView.__super__._collectValue.call(this);
+            const value = SegmentConditionView.__super__._collectValue.call(this);
 
             if (!_.isEmpty(value)) {
                 value.criteria = 'condition-segment';
@@ -98,7 +95,7 @@ define(function(require) {
         },
 
         getColumnName: function() {
-            var entity = this.subview('choice-input').entity;
+            const entity = this.subview('choice-input').entity;
             return this.filter ? _.result(this.filter.entity_ids, entity) : null;
         }
     });

@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var UserMenuEmailNotificationComponent;
-    var _ = require('underscore');
-    var sync = require('orosync/js/sync');
-    var mediator = require('oroui/js/mediator');
-    var EmailNotificationCollection =
+    const _ = require('underscore');
+    const sync = require('orosync/js/sync');
+    const mediator = require('oroui/js/mediator');
+    const EmailNotificationCollection =
         require('oroemail/js/app/models/email-notification/email-notification-collection');
-    var EmailNotificationCountModel =
+    const EmailNotificationCountModel =
         require('oroemail/js/app/models/email-notification/email-notification-count-model');
-    var EmailNotificationComponent = require('oroemail/js/app/components/email-notification-component');
+    const EmailNotificationComponent = require('oroemail/js/app/components/email-notification-component');
 
-    UserMenuEmailNotificationComponent = EmailNotificationComponent.extend({
+    const UserMenuEmailNotificationComponent = EmailNotificationComponent.extend({
         collection: null,
 
         countModel: null,
@@ -33,15 +32,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function UserMenuEmailNotificationComponent() {
-            UserMenuEmailNotificationComponent.__super__.constructor.apply(this, arguments);
+        constructor: function UserMenuEmailNotificationComponent(options) {
+            UserMenuEmailNotificationComponent.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            var emails = options.emails || [];
+            let emails = options.emails || [];
             _.extend(this, _.pick(options, ['wsChannel']));
             if (typeof emails === 'string') {
                 emails = JSON.parse(emails);
@@ -53,7 +52,7 @@ define(function(require) {
             this.notificationHandler = _.debounce(_.bind(this._notificationHandler, this), 1000);
             sync.subscribe(this.wsChannel, this.notificationHandler);
 
-            UserMenuEmailNotificationComponent.__super__.initialize.apply(this, arguments);
+            UserMenuEmailNotificationComponent.__super__.initialize.call(this, options);
         },
 
         _notificationHandler: function() {

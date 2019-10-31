@@ -1,19 +1,18 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var HighlighterFavicon;
-    var config = require('module-config').default(module.id);
-    var _ = require('underscore');
-    var BaseClass = require('oroui/js/base-class');
+    const config = require('module-config').default(module.id);
+    const _ = require('underscore');
+    const BaseClass = require('oroui/js/base-class');
 
-    var defaults = {
+    const defaults = {
         faviconSelector: 'link[rel*="icon"]',
         faviconSize: 16,
         circleRadius: 4,
         circleColor: '#FF0000'
     };
 
-    HighlighterFavicon = BaseClass.extend({
+    const HighlighterFavicon = BaseClass.extend({
         /**
          * @type {HTMLLinkElement}
          */
@@ -35,7 +34,7 @@ define(function(require, exports, module) {
          * @inheritDoc
          */
         initialize: function(options) {
-            var names = _.keys(defaults);
+            const names = _.keys(defaults);
             _.extend(this, defaults, _.pick(config, names), _.pick(options, names));
             this.favicon = document.querySelector(this.faviconSelector);
 
@@ -63,22 +62,22 @@ define(function(require, exports, module) {
                 return;
             }
 
-            var img = new Image();
+            const img = new Image();
             img.src = this.favicon.href;
             img.onload = function() {
                 if (this.disposed || !this.favicon.parentNode) {
                     return;
                 }
 
-                var faviconSize = this.faviconSize;
-                var circleRadius = this.circleRadius;
-                var circleColor = this.circleColor;
+                const faviconSize = this.faviconSize;
+                const circleRadius = this.circleRadius;
+                const circleColor = this.circleColor;
 
-                var canvas = document.createElement('canvas');
+                const canvas = document.createElement('canvas');
                 canvas.width = faviconSize;
                 canvas.height = faviconSize;
 
-                var context = canvas.getContext('2d');
+                const context = canvas.getContext('2d');
 
                 // Draw Original Favicon as Background
                 context.drawImage(img, 0, 0, faviconSize, faviconSize);
