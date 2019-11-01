@@ -132,7 +132,7 @@ class ConfigBuilder {
                 stats: stats,
                 output: {
                     filename: '[name].js',
-                    // Due of using third  party libraries 'chunkFilename' should consist of only from [name]
+                    // Due of using third party libraries 'chunkFilename' should consist of only from [name]
                     chunkFilename: 'chunk/[name].js?version=[chunkhash:8]',
                 },
                 devtool: !env.skipSourcemap && 'inline-cheap-module-source-map',
@@ -172,8 +172,11 @@ class ConfigBuilder {
                         path.join(__dirname, '../node_modules'),
                     ]
                 },
-
                 module: {
+                    noParse: [
+                        /\/bundles\/(npmassets|bowerassets|components)\/(?!jquery|asap)\/.*\.js$/,
+                        /\/bundles\/\.*\/lib\/(?!chaplin|bootstrap|jquery\.dialog).*\.js$/
+                    ],
                     rules: [
                         {
                             test: /\.s?css$/,
@@ -244,7 +247,7 @@ class ConfigBuilder {
                     test: /\.js$/,
                     exclude: [
                         /\/platform\/build\//,
-                        /bundles\/(?:bowerassets|npmassets|components)\//,
+                        /\/bundles\/(?:bowerassets|npmassets|components)\//,
                         /\/bundles\/.+\/lib\/?/
                     ],
                     use: {
