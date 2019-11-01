@@ -129,6 +129,13 @@ class ConfigBuilder {
                 warnings: false
             };
             let webpackConfig = {
+                watchOptions: {
+                    aggregateTimeout: 200,
+                    ignored: [
+                        /\/node_modules\/.*\.js$/,
+                        /\/bundles\/(npmassets|bowerassets|components)\/.*\.js$/
+                    ]
+                },
                 stats: stats,
                 output: {
                     filename: '[name].js',
@@ -146,10 +153,12 @@ class ConfigBuilder {
                                 minSize: 30,
                                 minChunks: 2,
                                 priority: 10,
+                                reuseExistingChunk: true
                             },
                             vendors: {
                                 test: /[\\/]node_modules[\\/]/,
-                                name: 'commons',
+                                name: 'vendors',
+                                priority: -10
                             },
                             tinymce: {
                                 test: /tinymce/,
@@ -238,6 +247,9 @@ class ConfigBuilder {
                     new webpack.IgnorePlugin({
                         resourceRegExp: /^\.\/locale$/,
                         contextRegExp: /moment$/
+                    }),
+                    new webpack.optimize.MinChunkSizePlugin({
+                        minChunkSize: 30000 // Minimum number of characters
                     })
                 ]
             };
