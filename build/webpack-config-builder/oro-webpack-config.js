@@ -8,6 +8,7 @@ const LayoutModulesConfigLoader = require('./modules-config/layout-modules-confi
 const LayoutStyleLoader = require('./style/layout-style-loader');
 const MapModulesPlugin = require('./plugin/map/map-modules-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const HappyPack = require('happypack');
 const ModulesConfigLoader = require('./modules-config/modules-config-loader');
 const DynamicImportsFileWriter = require('./writer/dynamic-imports-file-writer');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
@@ -81,7 +82,7 @@ class ConfigBuilder {
      * @returns {Function}
      */
     getWebpackConfig() {
-        return (env = {}, args) => {
+        return (env = {}, args = {}) => {
             this._initialize(args, env);
 
             let selectedTheme = env.theme;
@@ -255,6 +256,18 @@ class ConfigBuilder {
             };
 
             if (!env.skipJS && !env.skipBabel) {
+                let happyPackOptions = {
+                    id: 'babel',
+                    loaders: [
+                        {
+                            loader: 'babel-loader',
+                            options: babelConfig
+                        }
+                    ]
+                };
+
+                webpackConfig.plugins.push(new HappyPack(happyPackOptions));
+
                 webpackConfig.module.rules.push({
                     test: /\.js$/,
                     exclude: [
@@ -262,10 +275,7 @@ class ConfigBuilder {
                         /\/bundles\/(?:bowerassets|npmassets|components)\//,
                         /\/bundles\/.+\/lib\/?/
                     ],
-                    use: {
-                        loader: 'babel-loader',
-                        options: babelConfig
-                    }
+                    use: 'happypack/loader?id=babel'
                 });
             }
 
