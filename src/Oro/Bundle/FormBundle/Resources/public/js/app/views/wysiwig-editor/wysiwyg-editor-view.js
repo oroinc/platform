@@ -38,7 +38,9 @@ define(function(require) {
         },
 
         events: {
-            'set-focus': 'setFocus'
+            'set-focus': 'setFocus',
+            'wysiwyg:enable': 'enableEditor',
+            'wysiwyg:disable': 'disableEditor'
         },
 
         /**
@@ -54,6 +56,9 @@ define(function(require) {
         initialize: function(options) {
             options = $.extend(true, {}, this.defaults, options);
             this.enabled = options.enabled;
+            if (this.firstRender && !this.autoRender) {
+                this.enabled = false;
+            }
             this.options = _.omit(options, 'enabled', 'el');
             if (tools.isIOS()) {
                 this.options.plugins = _.without(this.options.plugins, 'fullscreen');
@@ -249,6 +254,14 @@ define(function(require) {
                 this.tinymceInstance = null;
             }
             WysiwygEditorView.__super__.dispose.call(this);
+        },
+
+        enableEditor: function() {
+            this.setEnabled(true);
+        },
+
+        disableEditor: function() {
+            this.setEnabled(false);
         }
     });
 

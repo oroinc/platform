@@ -14,6 +14,22 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Transforms form array of LocalizedFallbackValue objects to array of arrays like
+ * [
+ *     'values' => [
+ *         null => <value>,
+ *         1 => <value>,
+ *         2 => new FallbackType(FallbackType::SYSTEM),
+ *     ],
+ *     'ids' => [
+ *         0 => 1,
+ *         1 => 2,
+ *         2 => 3,
+ *     ],
+ * ]
+ * for processing in form, and back.
+ */
 class LocalizedFallbackValueCollectionTransformer implements DataTransformerInterface
 {
     /**
@@ -22,7 +38,7 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
     protected $registry;
 
     /**
-     * @var string
+     * @var string|array
      */
     protected $field;
 
@@ -33,7 +49,7 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
 
     /**
      * @param ManagerRegistry $registry
-     * @param string $field
+     * @param string|array $field
      */
     public function __construct(ManagerRegistry $registry, $field)
     {
@@ -59,6 +75,8 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
             LocalizedFallbackValueCollectionType::FIELD_IDS => [],
         ];
 
+        $propertyAccessor = $this->getPropertyAccessor();
+
         foreach ($value as $localizedFallbackValue) {
             /* @var $localizedFallbackValue LocalizedFallbackValue */
             $localization = $localizedFallbackValue->getLocalization();
@@ -71,8 +89,13 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
             $fallback = $localizedFallbackValue->getFallback();
             if ($fallback) {
                 $value = new FallbackType($fallback);
+            } elseif (\is_array($this->field)) {
+                $value = [];
+                foreach ($this->field as $field) {
+                    $value[$field] = $propertyAccessor->getValue($localizedFallbackValue, $field);
+                }
             } else {
-                $value = $this->getPropertyAccessor()->getValue($localizedFallbackValue, $this->field);
+                $value = $propertyAccessor->getValue($localizedFallbackValue, $this->field);
             }
 
             $result[LocalizedFallbackValueCollectionType::FIELD_VALUES][$key ?: null] = $value;
@@ -142,12 +165,22 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
         }
         $localizedFallbackValue->setLocalization($localizationId ? $this->findLocalization($localizationId) : null);
 
+        $propertyAccessor = $this->getPropertyAccessor();
+
         if ($fieldValue instanceof FallbackType) {
             $localizedFallbackValue->setFallback($fieldValue->getType());
-            $this->getPropertyAccessor()->setValue($localizedFallbackValue, $this->field, null);
+
+            foreach ((array) $this->field as $field) {
+                $propertyAccessor->setValue($localizedFallbackValue, $field, null);
+            }
+        } elseif (\is_array($this->field)) {
+            $localizedFallbackValue->setFallback(null);
+            foreach ($this->field as $field) {
+                $propertyAccessor->setValue($localizedFallbackValue, $field, $fieldValue[$field] ?? null);
+            }
         } else {
             $localizedFallbackValue->setFallback(null);
-            $this->getPropertyAccessor()->setValue($localizedFallbackValue, $this->field, $fieldValue);
+            $propertyAccessor->setValue($localizedFallbackValue, $this->field, $fieldValue);
         }
 
         return $localizedFallbackValue;

@@ -5,6 +5,8 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\JsonType;
+use Doctrine\DBAL\Types\TextType;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
@@ -18,6 +20,9 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
+/**
+ * Updates indexes for the extend entities.
+ */
 class UpdateExtendIndicesMigration implements
     Migration,
     DatabasePlatformAwareInterface,
@@ -145,7 +150,8 @@ class UpdateExtendIndicesMigration implements
     {
         $columnType = $this->fieldTypeHelper->getUnderlyingType($options[ExtendOptionsManager::TYPE_OPTION]);
         if ($this->fieldTypeHelper->isRelation($columnType)
-            || in_array($columnType, [Type::TEXT])
+            || \is_a(Type::getType($columnType), TextType::class, true)
+            || \is_a(Type::getType($columnType), JsonType::class, true)
         ) {
             return;
         }
