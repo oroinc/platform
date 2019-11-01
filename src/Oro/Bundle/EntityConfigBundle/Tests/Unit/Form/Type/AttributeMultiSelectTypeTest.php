@@ -25,11 +25,9 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        $this->managerMock = $this->getMockBuilder(AttributeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->managerMock = $this->createMock(AttributeManager::class);
 
-        $this->formType = new AttributeMultiSelectType($this->managerMock);
+        $this->formType = new AttributeMultiSelectType($this->managerMock, $this->getTranslator());
         parent::setUp();
     }
 
@@ -111,5 +109,136 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
     public function testGetParent()
     {
         $this->assertEquals(Select2ChoiceType::class, $this->formType->getParent());
+    }
+
+    /**
+     * @dataProvider formChoicesDataProvider
+     *
+     * @param array $fields
+     * @param array $fieldsData
+     * @param array $expectedChoices
+     */
+    public function testFormChoices(array $fields, array $fieldsData, array $expectedChoices)
+    {
+        $this->managerMock->expects($this->atLeastOnce())
+            ->method('getActiveAttributesByClass')
+            ->with('')
+            ->willReturn($fields);
+
+        $this->managerMock->expects($this->atLeastOnce())
+            ->method('getAttributeLabel')
+            ->willReturnCallback(function (FieldConfigModel $field) use ($fieldsData) {
+                return $fieldsData[$field->getId()]['label'];
+            });
+
+        $this->managerMock->method('isSystem')
+            ->willReturnCallback(function (FieldConfigModel $field) use ($fieldsData) {
+                return $fieldsData[$field->getId()]['isSystem'];
+            });
+
+        $builder = $this->factory->createBuilder(AttributeMultiSelectType::class, []);
+        $form = $builder->getForm();
+        $actualChoices = $form->getConfig()->getOption('choices');
+        $this->assertEquals($expectedChoices, $actualChoices);
+    }
+
+    /**
+     * @return array
+     */
+    public function formChoicesDataProvider(): array
+    {
+        /** @var FieldConfigModel $field1 */
+        $field1 = $this->getEntity(FieldConfigModel::class, ['id' => 1]);
+        $field1->fromArray('attribute', ['field_name' => 'color_custom_1']);
+        /** @var FieldConfigModel $field2 */
+        $field2 = $this->getEntity(FieldConfigModel::class, ['id' => 2]);
+        $field2->fromArray('attribute', ['field_name' => 'size_custom']);
+        /** @var FieldConfigModel $field3 */
+        $field3 = $this->getEntity(FieldConfigModel::class, ['id' => 3]);
+        $field3->fromArray('attribute', ['field_name' => 'color']);
+        /** @var FieldConfigModel $field4 */
+        $field4 = $this->getEntity(FieldConfigModel::class, ['id' => 4]);
+        $field4->fromArray('attribute', ['field_name' => 'color_custom_2']);
+
+        return [
+            'unique labels' => [
+                'fields' => [
+                    $field1,
+                    $field2,
+                ],
+                'fieldsData' => [
+                    $field1->getId() => ['isSystem' => false, 'label' => 'Color'],
+                    $field2->getId() => ['isSystem' => false, 'label' => 'Size'],
+                ],
+                'expectedChoices' => [
+                    'Color' => $field1->getId(),
+                    'Size' => $field2->getId(),
+                ]
+            ],
+            'non unique labels' => [
+                'fields' => [
+                    $field1,
+                    $field2,
+                    $field3,
+                    $field4,
+                ],
+                'fieldsData' => [
+                    $field1->getId() => ['isSystem' => false, 'label' => 'Color'],
+                    $field2->getId() => ['isSystem' => false, 'label' => 'Size'],
+                    $field3->getId() => ['isSystem' => true, 'label' => 'Color'],
+                    $field4->getId() => ['isSystem' => false, 'label' => 'Color'],
+                ],
+                'expectedChoices' => [
+                    'Size' => $field2->getId(),
+                    'Color(oro.entity_config.attribute.system)' => $field3->getId(),
+                    'Color(color_custom_1)' => $field1->getId(),
+                    'Color(color_custom_2)' => $field4->getId(),
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Field config attribute "field_name" can not be empty.
+     * @dataProvider formChoicesWithFieldsWithoutFieldNameAttributeDataProvider
+     *
+     * @param array $fields
+     */
+    public function testFormChoicesWithFieldsWithoutFieldNameAttribute(array $fields)
+    {
+        $this->managerMock->expects($this->atLeastOnce())
+            ->method('getActiveAttributesByClass')
+            ->with('')
+            ->willReturn($fields);
+
+        $this->managerMock->expects($this->atLeastOnce())
+            ->method('getAttributeLabel')
+            ->willReturn('Label');
+
+        $this->managerMock->method('isSystem')
+            ->willReturn(false);
+
+        $this->factory->createBuilder(AttributeMultiSelectType::class, []);
+    }
+
+    /**
+     * @return array
+     */
+    public function formChoicesWithFieldsWithoutFieldNameAttributeDataProvider(): array
+    {
+        $field1 = $this->getEntity(FieldConfigModel::class, ['id' => 1]);
+        $field1->fromArray('attribute', ['field_name' => 'color_custom_1']);
+        $field2 = $this->getEntity(FieldConfigModel::class, ['id' => 2]);
+        $field2->fromArray('attribute', ['field_name' => '']);
+        $field3 = $this->getEntity(FieldConfigModel::class, ['id' => 3]);
+        $field3->fromArray('attribute', ['field_name' => null]);
+        $field4 = $this->getEntity(FieldConfigModel::class, ['id' => 4]);
+
+        return [
+            [[$field1, $field2]],
+            [[$field3, $field1]],
+            [[$field4, $field1]],
+        ];
     }
 }

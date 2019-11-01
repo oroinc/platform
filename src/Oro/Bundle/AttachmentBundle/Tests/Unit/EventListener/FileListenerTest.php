@@ -4,12 +4,16 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\EventListener\FileListener;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FileListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FileListener  */
@@ -36,6 +40,39 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
         $this->em = $this->createMock(EntityManager::class);
 
         $this->listener = new FileListener($this->fileManager, $this->tokenAccessor);
+    }
+
+    public function testPrePersistWhenManagedAndIsEmptyFile()
+    {
+        $entity = new File();
+        $entity->setEmptyFile(true);
+
+        $this->em
+            ->expects($this->once())
+            ->method('contains')
+            ->with($entity)
+            ->willReturn(true);
+
+        $this->em
+            ->expects($this->once())
+            ->method('getUnitOfWork')
+            ->willReturn($unitOfWork = $this->createMock(UnitOfWork::class));
+
+        $unitOfWork
+            ->expects($this->once())
+            ->method('clearEntityChangeSet')
+            ->with(spl_object_hash($entity));
+
+        $this->em
+            ->expects($this->once())
+            ->method('refresh')
+            ->with($entity);
+
+        $this->fileManager->expects($this->never())
+            ->method('preUpload');
+
+        $this->listener->prePersist($entity, new LifecycleEventArgs($entity, $this->em));
+        $this->assertNull($entity->getOwner());
     }
 
     public function testPrePersistWithoutFileObject()

@@ -69,11 +69,12 @@ class FileType extends AbstractType
     {
         /** @var File $entity */
         $entity = $event->getData();
-        $form = $event->getForm();
+        $isEmptyFile = $entity && $entity->isEmptyFile();
 
         // Property File::$file is filled only when new file is uploaded.
-        if (($entity && $entity->getFile() !== null)
-            || ($form->has('emptyFile') && $form->get('emptyFile')->getData())) {
+        $isNewFile = $entity && $entity->getFile() !== null;
+
+        if ($isNewFile || $isEmptyFile) {
             // Makes doctrine update File entity to enforce triggering of FileListener which uploads an image.
             $entity->setUpdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
         }
