@@ -5,6 +5,8 @@ namespace Oro\Bundle\LocaleBundle\Form\Type;
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\MultipleValueTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -51,7 +53,8 @@ class LocalizedPropertyType extends AbstractType
             ->add(self::FIELD_LOCALIZATIONS, LocalizationCollectionType::class, [
                 'entry_type' => $formType,
                 'entry_options' => $formOptions,
-                'exclude_parent_localization' => $excludeParentLocalization
+                'exclude_parent_localization' => $excludeParentLocalization,
+                'use_tabs' => $options['use_tabs'],
             ]);
 
         $builder->addViewTransformer(new MultipleValueTransformer(self::FIELD_DEFAULT, self::FIELD_LOCALIZATIONS));
@@ -68,7 +71,18 @@ class LocalizedPropertyType extends AbstractType
 
         $resolver->setDefaults([
             'entry_options' => [],
-            'exclude_parent_localization' => false
+            'exclude_parent_localization' => false,
+            'use_tabs' => false,
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options): void
+    {
+        if ($options['use_tabs']) {
+            array_splice($view->vars['block_prefixes'], -1, 0, [$this->getBlockPrefix() . '_tabs']);
+        }
     }
 }

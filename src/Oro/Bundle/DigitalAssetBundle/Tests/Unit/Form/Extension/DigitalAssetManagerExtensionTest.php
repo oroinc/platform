@@ -512,10 +512,98 @@ class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
                 'is_image_type' => false,
                 'route' => $options['dam_widget_route'],
                 'parameters' => $options['dam_widget_parameters'],
+                'is_valid_digital_asset' => true,
             ],
             $formView->vars['dam_widget']
         );
         $this->assertEquals(['sample1', 'oro_file_with_digital_asset', 'sample2'], $formView->vars['block_prefixes']);
+    }
+
+    /**
+     * @dataProvider buildViewWhenSubmittedDataProvider
+     *
+     * @param bool $isValidDigitalAsset
+     */
+    public function testBuildViewWhenSubmitted(bool $isValidDigitalAsset): void
+    {
+        $entityFieldConfig = $this->mockEntityFieldConfig();
+
+        $entityFieldConfig
+            ->expects($this->once())
+            ->method('is')
+            ->with('use_dam')
+            ->willReturn(true);
+
+        $entityFieldConfig
+            ->expects($this->once())
+            ->method('getId')
+            ->willReturn($fieldConfigId = $this->createMock(FieldConfigId::class));
+
+        $fieldConfigId
+            ->expects($this->once())
+            ->method('getFieldType')
+            ->willReturn('sampleType');
+
+        $this->form
+            ->expects($this->once())
+            ->method('getData')
+            ->willReturn(null);
+
+        $this->form
+            ->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+
+        $this->form
+            ->expects($this->once())
+            ->method('get')
+            ->with('digitalAsset')
+            ->willReturn($digitalAssetForm = $this->createMock(FormInterface::class));
+
+        $digitalAssetForm
+            ->expects($this->once())
+            ->method('isValid')
+            ->willReturn($isValidDigitalAsset);
+
+        $formView = new FormView();
+        $formView->vars['block_prefixes'] = ['sample1', 'sample2'];
+        $this->extension->buildView(
+            $formView,
+            $this->form,
+            $options = [
+                'dam_widget_enabled' => true,
+                'dam_widget_route' => 'sample_route',
+                'dam_widget_parameters' => ['sample_params'],
+            ]
+        );
+
+        $this->assertArrayHasKey('dam_widget', $formView->vars);
+        $this->assertEquals(
+            [
+                'preview_metadata' => [],
+                'is_image_type' => false,
+                'route' => $options['dam_widget_route'],
+                'parameters' => $options['dam_widget_parameters'],
+                'is_valid_digital_asset' => $isValidDigitalAsset,
+            ],
+            $formView->vars['dam_widget']
+        );
+        $this->assertEquals(['sample1', 'oro_file_with_digital_asset', 'sample2'], $formView->vars['block_prefixes']);
+    }
+
+    /**
+     * @return array
+     */
+    public function buildViewWhenSubmittedDataProvider(): array
+    {
+        return [
+            'valid' => [
+                'isValidDigitalAsset' => true,
+            ],
+            'invalid' => [
+                'isValidDigitalAsset' => false,
+            ],
+        ];
     }
 
     public function testBuildViewWhenPreviewMetadata(): void
@@ -573,6 +661,7 @@ class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
                 'is_image_type' => true,
                 'route' => $options['dam_widget_route'],
                 'parameters' => $options['dam_widget_parameters'],
+                'is_valid_digital_asset' => true,
             ],
             $formView->vars['dam_widget']
         );
@@ -629,6 +718,7 @@ class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
                 'is_image_type' => $isImageType,
                 'route' => $options['dam_widget_route'],
                 'parameters' => $options['dam_widget_parameters'],
+                'is_valid_digital_asset' => true,
             ],
             $formView->vars['dam_widget']
         );
@@ -705,6 +795,7 @@ class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
                     'parentEntityClass' => $safeEntityClass,
                     'parentEntityFieldName' => self::SAMPLE_FIELD,
                 ],
+                'is_valid_digital_asset' => true,
             ],
             $formView->vars['dam_widget']
         );

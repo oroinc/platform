@@ -18,51 +18,47 @@ will be translated to
 This `data-validation` is supported by client side validation. Which is, by the way, extended version of popular [jQuery Validation Plugin](http://jqueryvalidation.org/).
 
 ## Validation rules
-Client side validation method is RequireJS module, which should export an array with three values:
+Client side validation method is JS module, which should export an array with three values:
  1. Methods name
  2. Validation function
  3. Error message or function which defines message and returns it
 
 Trivial validation rule module would look like:
 ```js
-define(['underscore', 'orotranslation/js/translator']
-function (_, __) {
-    'use strict';
+import _ from 'underscore';
+import __ from 'orotranslation/js/translator';
 
-    var defaultParam = {
-        message: 'Invalid input value'
-    };
+const DEFAULT_PARAM = {
+    message: 'Invalid input value'
+};
 
-    return [
-        'ValidationMethodRule',
+export default [
+    'ValidationMethodRule',
 
-        /**
-         * @param {string|undefined} value
-         * @param {Element} element
-         * @param {?Object} param
-         * @this {jQuery.validator}
-         * @returns {boolean|string}
-         */
-        function (value, element, param) {
-            return true;
-        },
+    /**
+     * @param {string|undefined} value
+     * @param {Element} element
+     * @param {?Object} param
+     * @this {jQuery.validator}
+     * @returns {boolean|string}
+     */
+    (value, element, param) => true
 
-        /**
-         * @param {Object} param
-         * @param {Element} element
-         * @this {jQuery.validator}
-         * @returns {string}
-         */
-        function (param, element) {
-            param = _.extend({}, defaultParam, param);
-            return __(param.message);
-        }
-    ]
-});
+    /**
+     * @param {Object} param
+     * @param {Element} element
+     * @this {jQuery.validator}
+     * @returns {string}
+     */
+    function(param, element) {
+        param = {...DEFAULT_PARAM, ...param};
+        return __(param.message);
+    }
+];
 ```
 
 ## Loading custom validation rules
-To load custom validator, just call `$.validator.loadMethod` with the name of RequireJS module, which exports validation method:
+To load custom validator, just call `$.validator.loadMethod` with the name of JS module, which exports validation method:
 ```js
 $.validator.loadMethod('my/validation/method')
 ```
@@ -88,11 +84,11 @@ After that, validation for sub-entinty works only if some of fields is not blank
 ### Override of optional validation logic
 In case if you want to customize "optional validation group" behaviour you can override a handler which is responsible for
 handle field changes in specific optional validation group. In this case you need:
-1) add custom handler to requirejs.yml
+1) add custom handler to jsmodules.yml
 ```
-config:
-    paths:
-        example/js/custom-handler: 'bundles/example/js/custom-handler.js'
+dynamic-imports:
+    commons:
+        - example/js/custom-handler
 ```
 
 Custom optional validation handler should have two methods: initialize and handle.
@@ -109,16 +105,6 @@ This behaviour is configurable, you can simply return `true` or `false` in your 
       +--<input>
       +--<input>
       +--<input>
-```
-3) all custom handlers should be preloaded to avoid situation when form was loaded but handler was not. To avoid such 
-situations you should add custom application module
-```
-requirejs.yml:
-    paths:
-        example/js/custom-handler: 'bundles/example/js/custom-handler.js'
-    config:
-        appmodules:
-            - example/js/custom-handler
 ```
 
 ## Ignore validation section

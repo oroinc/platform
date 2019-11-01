@@ -406,8 +406,9 @@ define(function(require) {
          */
         getElementXPath: function(element) {
             const paths = [];
-            let tagName = element.nodeName.toLowerCase();
+            let tagName;
             if (element && element.id) {
+                tagName = element.nodeName.toLowerCase();
                 return '//' + tagName + '[@id="' + element.id + '"]';
             } else {
                 // Use nodeName (instead of localName) so namespace prefix is included (if any).

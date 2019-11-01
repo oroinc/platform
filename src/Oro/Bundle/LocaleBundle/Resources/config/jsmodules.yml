@@ -13,6 +13,7 @@ dynamic-imports:
         - orolocale/js/app/views/fallback-view
         - orolocale/js/app/views/localization-select-view
         - orolocale/js/app/views/localizations-select-view
+        - orolocale/js/app/views/localizable-collection-tabs-view
 map:
     "*":
         moment: orolocale/js/moment-l10n

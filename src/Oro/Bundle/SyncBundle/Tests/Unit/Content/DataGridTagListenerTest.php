@@ -63,7 +63,7 @@ class DataGridTagListenerTest extends \PHPUnit\Framework\TestCase
             $config->offsetGetByPath(
                 sprintf('%s[%s]', ToolbarExtension::OPTIONS_PATH, MetadataObject::REQUIRED_MODULES_KEY)
             ),
-            'Should add require js module'
+            'Should add js module'
         );
     }
 }

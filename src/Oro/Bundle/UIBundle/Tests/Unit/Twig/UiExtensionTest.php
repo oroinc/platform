@@ -677,4 +677,35 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
             [5, 4.1]
         ];
     }
+
+    public function testRenderAdditionalData()
+    {
+        $childView = new FormView();
+        $childView->vars['extra_field'] = true;
+        $childView->vars['name'] = 'some_field_name';
+        $form = new FormView();
+        $form->children = [$childView];
+        $actualResult = self::callTwigFunction(
+            $this->extension,
+            'oro_form_additional_data',
+            [$this->environment, $form, 'Label']
+        );
+
+        $this->assertSame(
+            [
+                UiExtension::ADDITIONAL_SECTION_KEY => [
+                    'title' => 'Label',
+                    'priority' => UiExtension::ADDITIONAL_SECTION_PRIORITY,
+                    'subblocks' => [
+                        [
+                            'title' => '',
+                            'useSpan' => false,
+                            'data' => ['some_field_name' => null]
+                        ]
+                    ]
+                ]
+            ],
+            $actualResult
+        );
+    }
 }
