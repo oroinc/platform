@@ -10,7 +10,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Provides multiselect for collection of attributes
+ */
 class AttributeMultiSelectType extends AbstractType
 {
     const NAME = 'oro_entity_config_attribute_multi_select';
@@ -24,12 +28,17 @@ class AttributeMultiSelectType extends AbstractType
     /** @var AttributeManager */
     private $attributeManager;
 
+    /** @var TranslatorInterface */
+    private $translator;
+
     /**
      * @param AttributeManager $attributeManager
+     * @param TranslatorInterface $translator
      */
-    public function __construct(AttributeManager $attributeManager)
+    public function __construct(AttributeManager $attributeManager, TranslatorInterface $translator)
     {
         $this->attributeManager = $attributeManager;
+        $this->translator = $translator;
     }
 
     /**
@@ -40,15 +49,55 @@ class AttributeMultiSelectType extends AbstractType
     {
         if (!$this->choices) {
             $fields = $this->attributeManager->getActiveAttributesByClass($entityClass);
-
+            $existingLabels = [];
             /** @var FieldConfigModel $field */
             foreach ($fields as $field) {
-                $this->choices[$this->attributeManager->getAttributeLabel($field)] = $field->getId();
+                $attributeFieldLabel = $this->attributeManager->getAttributeLabel($field);
                 $this->configFields[$field->getId()] = $field;
+
+                if (\in_array($attributeFieldLabel, $existingLabels, true)) {
+                    if (\array_key_exists($attributeFieldLabel, $this->choices)) {
+                        $updatedLabel = sprintf(
+                            '%s(%s)',
+                            $attributeFieldLabel,
+                            $this->getFieldNameByFieldId($this->choices[$attributeFieldLabel])
+                        );
+                        $this->choices[$updatedLabel] = $this->choices[$attributeFieldLabel];
+                        unset($this->choices[$attributeFieldLabel]);
+                    }
+                    $attributeFieldLabel = sprintf(
+                        '%s(%s)',
+                        $attributeFieldLabel,
+                        $this->getFieldNameByFieldId($field->getId())
+                    );
+                }
+
+                $this->choices[$attributeFieldLabel] = $field->getId();
+                $existingLabels[] = $attributeFieldLabel;
             }
         }
 
         return $this->choices;
+    }
+
+    /**
+     * @param int $id
+     * @return string
+     */
+    private function getFieldNameByFieldId(int $id): string
+    {
+        if ($this->isSystem($id)) {
+            return $this->translator->trans('oro.entity_config.attribute.system');
+        }
+        /** @var FieldConfigModel $field */
+        $field = $this->configFields[$id];
+        $fieldAttributes = $field->toArray('attribute');
+
+        if (empty($fieldAttributes['field_name'])) {
+            throw new \InvalidArgumentException('Field config attribute "field_name" can not be empty.');
+        }
+
+        return $fieldAttributes['field_name'];
     }
 
     /**

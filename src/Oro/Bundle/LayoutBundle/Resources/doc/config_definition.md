@@ -5,7 +5,7 @@
 
 * [Assets](#assets)
 * [Images](#images)
-* [RequireJS Definition](#requirejs-definition)
+* [JS Modules Definition](#js-modules-definition)
 * [Page Templates](#page-templates)
 
 ## Overview
@@ -105,69 +105,41 @@ types:
         max_number: ~
 ```
 
-## RequireJS Definition
+## JS Modules Definition
 
 ### Configuration
 
-The configuration file should be placed in the `layout/{theme_name}/config` folder and named `requirejs.yml`, for example `DemoBundle/Resources/views/layouts/base/config/requirejs.yml`
+Bundle specific options are defined inside the ```jsmodules.yml``` file. For the admin console, it should be placed in the ```%BundleName%\Resources\config``` folder and the `%BundleName%\Resources\views\layouts\{theme_name}\config` folder for frontstore themes.
+It can have six sections, such as ```shim```, ```map```, ```app-modules```, ```dynamic-imports```, ```configs```, and ```aliases```.
+Each bundle's JS module that isn't mentioned in any other JS module and is imported dynamically at runtime (e.g., using option from twig) should be defined in the ```dynamic-imports``` section to be included in the webpack build. That section has subsection with build chunk names that helps place module to suitable chunk. Also, if a JS module is expected to be configurable, it should be added to the ```configs``` section where the key is a module name and the value is an empty object.
 
-#### RequireJS Configuration Reference
-
-LayoutBundle depends on [RequireJSBundle](../../../RequireJSBundle/README.md),
-that is why you can use the configuration reference described in [Require.js config generation](../../../RequireJSBundle/README.md#requirejs-config-generation).
-
-#### Additional Configuration Reference
-
-| Option | Description | Required |
-|------- |-------------|----------|
-| `build_path` | Relative path from theme scripts folder (`public/js/layout/{theme_name}/`) | no |
-
-**Example:**
-
-```yaml
-# src/Acme/Bundle/DemoBundle/Resources/views/layouts/base/config/requirejs.yml
-config:
-    build_path: 'scripts.min.js'
-    shim:
-        'jquery-ui':
-            deps:
-                - 'jquery'
+```yaml    
+    aliases:
+        jquery$: npmassets/jquery/dist/jquery
+        jquery-ui$: oroui/lib/jquery-ui
+        underscore$: npmassets/underscore/underscore
+    app-modules:
+        - oroui/js/app/modules/init-layout
+    configs:
+        oroui/js/app: {}
+    dynamic-imports:
+        oroui:
+            - jquery
+            - oroui/js/app/components/view-component
     map:
-        '*':
-            'jquery': 'oroui/js/jquery-extend'
-        'oroui/js/jquery-extend':
-            'jquery': 'jquery'
-    paths:
-        'jquery': 'bundles/oroui/lib/jquery-1.10.2.js'
-        'jquery-ui': 'bundles/oroui/lib/jquery-ui.min.js'
-        'oroui/js/jquery-extend': 'bundles/oroui/js/jquery-extend.js'
+        "*":
+            jquery: oroui/js/extend/jquery
+        oroui/js/extend/jquery:
+            jquery: jquery
+    shim:
+        jquery:
+            expose:
+                - $
+                - jQuery
+        jquery.form:
+            imports:
+                - jQuery=jquery
 ```
-
-When you execute the following command in the console:
-```
-php bin/console oro:requirejs:build
-```
-The result should be `public/js/layout/base/scripts.min.js`
-
-### RequireJS Config Provider
-
-[RequireJSBundle](../../../RequireJSBundle/README.md) has its own config provider `oro_requirejs.provider.requirejs_config`
-and **is used in the theme by default** (`public/js/oro.min.js` minimized scripts by default).
-If you want use your own minimized scripts in the theme, define the `requires` block type  with the `provider_alias: { '@value': 'oro_layout_requirejs_config_provider' }`
-
-**Example:**
-
-```yaml
-# src/Acme/Bundle/DemoBundle/Resources/views/layouts/base/layout.yml
-...
-requirejs_scripts:
-    blockType: requires
-    options:
-        provider_alias: { '@value': 'oro_layout_requirejs_config_provider' }
-...
-```
-
-`oro_layout_requirejs_config_provider` is alias of `oro_layout.provider.requirejs_config`
 
 ## Page Templates
 

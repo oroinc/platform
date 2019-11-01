@@ -276,7 +276,7 @@ class GetAttrNode extends Node
      */
     protected function assertNodeIterable($evaluatedNode)
     {
-        if (!is_array($evaluatedNode) && $evaluatedNode instanceof \Traversable) {
+        if (!is_array($evaluatedNode) && !$evaluatedNode instanceof \Traversable) {
             throw new \RuntimeException('Unable to iterate through a non-object.');
         }
     }

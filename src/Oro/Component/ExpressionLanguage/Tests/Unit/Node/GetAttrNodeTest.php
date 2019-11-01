@@ -407,6 +407,95 @@ class GetAttrNodeTest extends AbstractNodeTest
     }
 
     /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Unable to iterate through a non-object.
+     */
+    public function testMethodEvaluateAllWithNotTraversableVariables()
+    {
+        $variables = [
+            'items' => new SimpleObject()
+        ];
+
+        $arguments = new CustomNode\BinaryNode(
+            '>',
+            new CustomNode\GetAttrNode(
+                new Node\NameNode('item'),
+                new Node\ConstantNode('index'),
+                new Node\ArgumentsNode(),
+                CustomNode\GetAttrNode::PROPERTY_CALL
+            ),
+            new Node\ConstantNode(10)
+        );
+        $node = new CustomNode\GetAttrNode(
+            new Node\NameNode('items'),
+            new Node\ConstantNode('all'),
+            $arguments,
+            CustomNode\GetAttrNode::ALL_CALL
+        );
+
+        // items.all(item.index > 10)
+        $node->evaluate([], $variables);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Unable to iterate through a non-object.
+     */
+    public function testMethodEvaluateAnyWithNotTraversableVariables()
+    {
+        $variables = [
+            'items' => new SimpleObject()
+        ];
+
+        $arguments = new CustomNode\BinaryNode(
+            '>',
+            new CustomNode\GetAttrNode(
+                new Node\NameNode('item'),
+                new Node\ConstantNode('index'),
+                new Node\ArgumentsNode(),
+                CustomNode\GetAttrNode::PROPERTY_CALL
+            ),
+            new Node\ConstantNode(10)
+        );
+        $node = new CustomNode\GetAttrNode(
+            new Node\NameNode('items'),
+            new Node\ConstantNode('any'),
+            $arguments,
+            CustomNode\GetAttrNode::ANY_CALL
+        );
+
+        // items.any(item.index > 10)
+        $node->evaluate([], $variables);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Unable to iterate through a non-object.
+     */
+    public function testMethodEvaluateSumWithNotTraversableVariables()
+    {
+        $variables = [
+            'items' => new SimpleObject()
+        ];
+
+        $argument = new CustomNode\GetAttrNode(
+            new Node\NameNode('item'),
+            new Node\ConstantNode('foo'),
+            new Node\ArgumentsNode(),
+            CustomNode\GetAttrNode::PROPERTY_CALL
+        );
+        $node = new CustomNode\GetAttrNode(
+            new Node\NameNode('items'),
+            new Node\ConstantNode('sum'),
+            $argument,
+            CustomNode\GetAttrNode::SUM_CALL
+        );
+
+        // items.sum(item.foo)
+        $node->evaluate([], $variables);
+    }
+
+    /**
      * @return array
      */
     public function getDumpData()

@@ -10,6 +10,12 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow;
 class GridColumnManager extends Element
 {
     /**
+     * Represents parent grid
+     * @var Element|null
+     */
+    private $grid;
+
+    /**
      * @param string $title
      */
     public function checkColumnVisibility($title)
@@ -109,10 +115,16 @@ class GridColumnManager extends Element
             return;
         }
 
-        $button = $this->elementFactory->createElement('GridColumnManagerButton');
-        $button->click();
+        // Find elements in parent grid if it is set otherwise elements will be created in element factory
+        if ($this->grid) {
+            $gridSettingsButton = $this->grid->getElement('GridColumnManagerButton');
+            $tabTitle = $this->grid->getElement('GridColumnManagerTabTitle');
+        } else {
+            $gridSettingsButton = $this->elementFactory->createElement('GridColumnManagerButton');
+            $tabTitle = $this->elementFactory->createElement('GridColumnManagerTabTitle');
+        }
 
-        $tabTitle = $this->elementFactory->createElement('GridColumnManagerTabTitle');
+        $gridSettingsButton->click();
         $tabTitle->click();
 
         self::assertTrue($this->isVisible(), 'Can not open grid column manager dropdown');
@@ -144,5 +156,16 @@ class GridColumnManager extends Element
         $visibilityCheckbox = $tableRow->find('css', '.visibility-cell input[type=checkbox]');
 
         return $visibilityCheckbox;
+    }
+
+    /**
+     * @param Element $grid
+     * @return $this
+     */
+    public function setGrid(Element $grid): self
+    {
+        $this->grid = $grid;
+
+        return $this;
     }
 }

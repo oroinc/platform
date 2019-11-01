@@ -24,7 +24,7 @@ Usage example:
     }) }}
 
     <script type="text/javascript">
-        require(['oroui/js/widget-manager'],
+        loadModules(['oroui/js/widget-manager'],
         function(widgetManager) {
             widgetManager.getWidgetInstanceByAlias('user-groups-widget', function(widget) {
                 widget.on('grid-row-select', function(data) {
