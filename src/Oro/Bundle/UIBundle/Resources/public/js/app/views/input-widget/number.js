@@ -55,8 +55,13 @@ define(function(require) {
 
         _setAttr: function() {
             this._rememberAttr();
-            this.$el.attr('type', _.isDesktop() && this.precision !== null ? 'text' : 'number')
-                .attr('pattern', this.precision === 0 ? '[0-9]*' : '');
+
+            if (this.precision !== null) {
+                this.$el.attr({
+                    type: 'text',
+                    pattern: '[0-9]*'
+                });
+            }
         },
 
         _rememberAttr: function() {
