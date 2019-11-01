@@ -126,12 +126,17 @@ define(function(require) {
         loadGoogleMaps: function() {
             let googleMapsSettings = '';
 
-            if (this.options.showWeather) {
-                googleMapsSettings += '&libraries=weather';
-            }
-
             if (this.options.apiKey) {
                 googleMapsSettings += '&key=' + this.options.apiKey;
+            } else {
+                this.mapsLoadExecuted = false;
+                this.addErrorMessage();
+                this.loadingMask.hide();
+                return;
+            }
+
+            if (this.options.showWeather) {
+                googleMapsSettings += '&libraries=weather';
             }
 
             $.ajax({
