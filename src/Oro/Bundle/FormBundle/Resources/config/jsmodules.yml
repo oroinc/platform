@@ -68,7 +68,6 @@ dynamic-imports:
         - oroform/js/validator/time
         - oroform/js/validator/type
         - oroform/js/validator/url
-        - oroform/js/validator/odd
 map:
     "*":
         jquery.validate: oroform/js/extend/validate
