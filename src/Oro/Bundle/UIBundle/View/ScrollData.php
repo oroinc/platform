@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\View;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ *
+ * Provides methods to manipulate with section blocks. Holds scroll data tree.
+ */
 class ScrollData
 {
     const TITLE = 'title';
@@ -47,6 +53,19 @@ class ScrollData
     public function hasBlock($blockId): bool
     {
         return isset($this->data[self::DATA_BLOCKS][$blockId]);
+    }
+
+    /**
+     * @param string|int $blockId
+     * @return array
+     */
+    public function getBlock($blockId): array
+    {
+        if (!$this->hasBlock($blockId)) {
+            throw new \InvalidArgumentException(sprintf('Block with id "%s" has not been found', $blockId));
+        }
+
+        return $this->data[self::DATA_BLOCKS][$blockId];
     }
 
     /**
@@ -252,7 +271,7 @@ class ScrollData
                 if (isset($subblock[self::DATA][$fieldId])) {
                     $fieldData = $subblock[self::DATA][$fieldId];
 
-                    if ($blockId != $currentBlockId) {
+                    if ($blockId !== $currentBlockId) {
                         unset($subblock[self::DATA][$fieldId]);
 
                         $subblockIds = $this->getSubblockIds($blockId);
@@ -323,5 +342,33 @@ class ScrollData
         if (!array_key_exists($subBlockId, $this->data[self::DATA_BLOCKS][$blockId][self::SUB_BLOCKS])) {
             throw new \LogicException(sprintf('Subblock %s is not defined', $subBlockId));
         }
+    }
+
+    /**
+     * Checks whatever passed block is empty
+     * @param string $blockKey
+     * @return bool|null
+     */
+    public function isEmptyBlock(string $blockKey)
+    {
+        if (empty($this->data[ScrollData::DATA_BLOCKS])) {
+            return null;
+        }
+
+        foreach ($this->data[ScrollData::DATA_BLOCKS] as $blockId => $data) {
+            if ($blockId !== $blockKey) {
+                continue;
+            }
+
+            if (!empty($data[ScrollData::SUB_BLOCKS])) {
+                foreach ($data[ScrollData::SUB_BLOCKS] as $subblockId => $subblockData) {
+                    if (!empty($subblockData[ScrollData::DATA])) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }

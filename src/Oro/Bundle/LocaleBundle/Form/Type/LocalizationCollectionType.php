@@ -81,7 +81,8 @@ class LocalizationCollectionType extends AbstractType
             'enabled_fallbacks'     => [],
             'value_type'            => FallbackValueType::class,
             'group_fallback_fields' => null,
-            'exclude_parent_localization' => false
+            'exclude_parent_localization' => false,
+            'use_tabs' => false,
         ]);
     }
 
@@ -112,7 +113,8 @@ class LocalizationCollectionType extends AbstractType
                     'fallback_type_parent_localization' => $parent,
                     'enabled_fallbacks' => $enabledFallbacks,
                     'group_fallback_fields' => $options['group_fallback_fields'],
-                    'exclude_parent_localization' => $excludeParentLocalization
+                    'exclude_parent_localization' => $excludeParentLocalization,
+                    'use_tabs' => $options['use_tabs'],
                 ]
             );
         }

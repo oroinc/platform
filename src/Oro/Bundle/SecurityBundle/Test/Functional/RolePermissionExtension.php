@@ -32,6 +32,19 @@ trait RolePermissionExtension
     }
 
     /**
+     * @after
+     */
+    protected function afterTest()
+    {
+        $container = self::getContainer();
+        if (null !== $container) {
+            $container->get('tests.security.acl.cache.doctrine')->clearCache();
+        }
+
+        parent::afterTest();
+    }
+
+    /**
      * Updates a permission for given entity for the given role.
      *
      * @param string $roleName

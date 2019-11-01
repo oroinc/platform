@@ -127,7 +127,7 @@ Possible name object parameters are same to format placeholder keys.
 Usage example:
 
 ```javascript
-require(['orolocale/js/formatter/name'],
+loadModules(['orolocale/js/formatter/name'],
 function(nameFormatter) {
     var formattedName = nameFormatter.format({
         prefix: 'Mr.',

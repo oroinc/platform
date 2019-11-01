@@ -170,7 +170,7 @@ Next you need to create a TWIG template renders your grid. This template should 
 {% block content %}
     {{ dataGrid.renderGrid('dashboard-recent-calls-grid') }}
     <script type="text/javascript">
-        require(['orocrm/call/info-opener']);
+        loadModules(['orocrm/call/info-opener']);
     </script>
 {% endblock %}
  

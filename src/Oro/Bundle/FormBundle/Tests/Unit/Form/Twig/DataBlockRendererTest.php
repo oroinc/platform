@@ -50,7 +50,7 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
                 0 => [
                     'code'        => 'text_3__subblock',
                     'title'       => null,
-                    'data'        => [null],
+                    'data'        => ['text_3' => ''],
                     'description' => null,
                     'useSpan'     => true,
                     'tooltip'     => null
@@ -65,7 +65,7 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
                 0 => [
                     'code'        => 'first',
                     'title'       => null,
-                    'data'        => [null],
+                    'data'        => ['text_2' => ''],
                     'description' => null,
                     'useSpan'     => true,
                     'tooltip'     => null
@@ -73,7 +73,7 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
                 1 => [
                     'code'        => 'second',
                     'title'       => 'Second SubBlock',
-                    'data'        => [null],
+                    'data'        => ['text_1' => ''],
                     'description' => null,
                     'useSpan'     => true,
                     'tooltip'     => null
@@ -88,7 +88,7 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
                 0 => [
                     'code'        => 'text_4__subblock',
                     'title'       => null,
-                    'data'        => [null],
+                    'data'        => ['text_4' => ''],
                     'description' => null,
                     'useSpan'     => true,
                     'tooltip'     => null
@@ -96,7 +96,7 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
                 1 => [
                     'code'        => 'first',
                     'title'       => null,
-                    'data'        => [null],
+                    'data'        => ['text_5' => ''],
                     'description' => null,
                     'useSpan'     => true,
                     'tooltip'     => null

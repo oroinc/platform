@@ -129,14 +129,16 @@ List of properties that will be used in view to convert json object to string th
 **configs.component**
 
 This option specifies the Select2Component that will be used for configuring Select2 jQuery plugin.
-Make sure that the component with the name `oro/select2-%component%-component` is defined in `requirejs.yml`.
+Make sure that the component with the name `oro/select2-%component%-component` is defined in `jsmodules.yml`.
 For example, `config.component` with value `autocomplete` refers to the module `oro/select2-autocomplete-component` and
-the path to this module name is specified in `Resources/config/requirejs.yml`
+the path to this module name is specified in `Resources/config/jsmodules.yml`
 
 ```yml
-config:
-    paths:
-        'oro/select2-autocomplete-component': 'bundles/oroform/js/app/components/select2-autocomplete-component.js'
+aliases:
+    oro/select2-autocomplete-component$: oroform/js/app/components/select2-autocomplete-component
+dynamic-imports:
+    commons:
+        - oro/select2-autocomplete-component
 ```
 
 There are several predefined values that can be used:
@@ -148,26 +150,26 @@ If you need to extend select2 configuration, you can define your own component n
 create the component (extending from some Select2Component):
 
 ```javascript
-define(function (require) {
-    'use strict';
-    var Select2MyAutocompleteComponent,
-        Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
-    Select2MyAutocompleteComponent = Select2AutocompleteComponent.extend({
-        makeQuery: function (query, configs) {
-            return query + ';' + configs.entity_id;
-        }
-    });
-    return Select2MyAutocompleteComponent;
+import Select2AutocompleteComponent from 'oro/select2-autocomplete-component'
+
+const Select2MyAutocompleteComponent =  Select2AutocompleteComponent.extend({
+    constructor: function Select2MyAutocompleteComponent() {
+        Select2MyAutocompleteComponent.__super__.constructor.apply(this, arguments);
+    },
+    makeQuery: (query, configs) => query + ';' + configs.entity_id
 });
 
+export default Select2MyAutocompleteComponent;
 ```
 
-And declare this module name in requirejs configuration:
+And declare this module name in JS modules configuration:
 
 ```yml
-config:
-    paths:
-        'oro/select2-my-autocomplete-component': 'bundles/mybundle/js/app/components/select2-my-autocomplete-component.js'
+aliases:
+    oro/select2-my-autocomplete-component$: mybundle/js/app/components/select2-my-autocomplete-component
+dynamic-imports:
+    commons:
+        - oro/select2-my-autocomplete-component
 ```
 
 **configs.selection_template_twig**
