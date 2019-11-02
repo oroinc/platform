@@ -1,7 +1,7 @@
 aliases:
     asap$: npmassets/asap/asap
     backbone$: npmassets/backbone/backbone
-    bootstrap$: oroviewswitcher/lib/bootstrap
+    bootstrap$: oroviewswitcher/js/bootstrap
     bootstrap-alert$: npmassets/bootstrap/js/dist/alert
     chaplin$: oroui/lib/chaplin
     cryptojs/sha256$: bowerassets/crypto-js/sha256
