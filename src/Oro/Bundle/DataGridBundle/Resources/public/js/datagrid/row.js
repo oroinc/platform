@@ -115,6 +115,7 @@ define([
 
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
             this.listenTo(this.model, 'change:row_class_name', this.onRowClassNameChanged);
+            this.listenTo(this.model, 'change:isNew', this.onRowNewStatusChange);
 
             this.columnRenderer = new ColumnRendererComponent(options);
 
@@ -193,6 +194,10 @@ define([
             this.$el.toggleClass('row-selected', isSelected);
         },
 
+        onRowNewStatusChange: function(model) {
+            this.$el.toggleClass('row-new', model.get('isNew'));
+        },
+
         onRowClassNameChanged: function(model) {
             const previousClass = model.previous('row_class_name');
             const newClass = _.result(this, 'className');
@@ -212,6 +217,7 @@ define([
             if (this.model.get('row_class_name')) {
                 classes.push(this.model.get('row_class_name'));
             }
+
             return classes.join(' ');
         },
 

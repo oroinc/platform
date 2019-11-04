@@ -7,7 +7,7 @@ oro:
         id.label: Id
         titles:
             label: Title
-            tooltip_file: 'Title for file'
+            tooltip_file: '"Title" text for link'
             tooltip_image: '"Alt" text for image'
         source_file.label: File
         child_files.label: Child Files
@@ -46,6 +46,7 @@ oro:
                     images: Images
                     files: Files
                 uploaded.message: Digital Asset has been uploaded
+                delete_message: Item successfully deleted
                 select_file: Select File
                 select_image: Select Image
                 clear.label: Clear
