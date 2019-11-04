@@ -6,6 +6,7 @@ define(function(require) {
     const __ = require('orotranslation/js/translator');
     const DialogWidget = require('oro/dialog-widget');
     const errorHandler = require('oroui/js/error');
+    const mediator = require('oroui/js/mediator');
 
     const DigitalAssetDialogWidget = DialogWidget.extend({
         options: _.extend({}, DialogWidget.prototype.options, {
@@ -21,11 +22,20 @@ define(function(require) {
                 autoResize: true,
                 allowMaximize: false,
                 allowMinimize: false,
+                dialogClass: 'digital-asset-dialog',
                 modal: true,
                 maximizedHeightDecreaseBy: 'minimize-bar',
                 minWidth: 720
             }
         }),
+
+        listen: {
+            'grid_load:complete mediator': 'onRenderGrid'
+        },
+
+        newDigitalAssetId: null,
+
+        gridName: null,
 
         /**
          * @inheritDoc
@@ -50,6 +60,14 @@ define(function(require) {
 
                 this.addAction('cancel', 'main', cancelButton);
             }).bind(this));
+        },
+
+        onRenderGrid() {
+            if (!this.gridName) {
+                return;
+            }
+
+            mediator.trigger(`datagrid:highlightNew:${this.gridName}`, this.newDigitalAssetId);
         },
 
         /**
@@ -77,6 +95,11 @@ define(function(require) {
 
             $(form).trigger('reset');
             $(form).find('[type="file"]').trigger('change');
+
+            $(form).find('[type="text"]').each((index, element) => {
+                $(element).attr('value', '');
+                $(element).val('').change();
+            });
         },
 
         /**
@@ -91,6 +114,11 @@ define(function(require) {
 
             if (json) {
                 this._onJsonContentResponse(json);
+
+                const {widget} = json;
+
+                this.newDigitalAssetId = widget.newDigitalAssetId;
+                this.gridName = widget.gridName;
             } else {
                 this.disposePageComponents();
                 this.setContent(content, true);
@@ -110,6 +138,10 @@ define(function(require) {
             } else {
                 this._triggerContentLoadEvents();
             }
+
+            this.$el.find('.fallback-status, .fa-language').bind('click', () => {
+                this.resetDialogPosition();
+            });
         }
     });
 

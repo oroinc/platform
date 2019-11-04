@@ -4,7 +4,7 @@ aliases:
     autolinker$: bowerassets/autolinker.js/dist/Autolinker
     backbone$: npmassets/backbone/backbone
     base64$: oroui/js/extend/base64
-    bootstrap$: oroui/lib/bootstrap
+    bootstrap$: oroui/js/bootstrap
     bootstrap-alert$: npmassets/bootstrap/js/dist/alert
     bootstrap-collapse$: npmassets/bootstrap/js/dist/collapse
     bootstrap-dropdown$: npmassets/bootstrap/js/dist/dropdown
@@ -28,7 +28,7 @@ aliases:
     datepair$: bowerassets/datepair/dist/datepair
     extend-popper$: oroui/js/extend/popper
     jquery$: npmassets/jquery/dist/jquery
-    jquery-ui$: oroui/lib/jquery-ui
+    jquery-ui$: oroui/js/jquery-ui
     jquery.cookie$: bowerassets/jquery-cookie/jquery.cookie
     jquery.form$: bowerassets/jquery-form/src/jquery.form
     jquery.jstree$: bowerassets/jstree/dist/jstree

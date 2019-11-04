@@ -23,6 +23,7 @@ use Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationE
 use Symfony\Component\Form\Test\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ConstraintViolationList;
 
@@ -93,7 +94,12 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
                         'label' => 'oro.digitalasset.titles.label',
                         'tooltip' => $expectedTooltip,
                         'required' => true,
-                        'entry_options' => ['constraints' => [new NotBlank()]],
+                        'entry_options' => [
+                            'constraints' => [
+                                new NotBlank(),
+                                new Length(['max' => 255])
+                            ]
+                        ],
                     ],
                 ],
                 [

@@ -175,3 +175,19 @@
         padding-#{$end}: $input-size;
     }
 }
+
+.form-flex {
+    > .control-group {
+        margin-bottom: $form-container-control-row-space;
+
+        .controls {
+            > div {
+                float: none !important;
+            }
+        }
+    }
+
+    .form-buttons {
+        margin-bottom: $form-container-control-row-space;
+    }
+}

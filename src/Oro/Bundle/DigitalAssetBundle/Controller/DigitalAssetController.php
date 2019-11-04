@@ -151,6 +151,7 @@ class DigitalAssetController extends AbstractController
                 function ($entity, FormInterface $form, Request $request) use ($mimeTypes, $maxFileSize, $isImageType) {
                     return [
                         'saved' => $form->isSubmitted() && $form->isValid(),
+                        'digital_asset' => $entity,
                         'is_image_type' => $isImageType,
                         'grid_name' => $isImageType
                             ? 'digital-asset-select-image-grid'

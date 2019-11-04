@@ -106,7 +106,7 @@ method should return `self::REQUEUE`. The message will be returned to the queue 
 2. The `process` method returns `self::REQUEUE`.
 3. The consumer puts the message (i.e. a copy of the message) to the end of the queue setting the `redelivery` flag to true. 
 4. The consumer continues message processing (the requeued message is at the end of the queue).
-5. When the turn of the requeued message comes, the `DelayRedeliveredMessageExtension` works and sets a delay for the requeued message.
+5. When the turn of the requeued message comes, the `RedeliveryMessageExtension` works and sets a delay for the requeued message.
 6. The time set in the delay passes and the message is processed again.
 
 **The workflow of re-queuing messages when an exception is thrown inside a message processor is slightly different:**
@@ -116,7 +116,7 @@ method should return `self::REQUEUE`. The message will be returned to the queue 
 3. The consumer logs the exception and puts the message (i.e. a copy of the message) to the end of the queue setting the `redelivery` flag to true. Then the consumer fails with the exception.
 4. The consumer should be re-run at this stage. It can be done manually or automatically with an utility like [supervisord](http://supervisord.org/). Manual re-run is preferred for developing as developers should review the exceptions thrown on the message processing. Automatic re-run is preferred for regression testing or prod.
 5. The consumer continues message processing (the failing message is at the end of the queue).
-6. When the turn of the failing message comes, the `DelayRedeliveredMessageExtension` works and sets a delay for the failing message.
+6. When the turn of the failing message comes, the `RedeliveryMessageExtension` works and sets a delay for the failing message.
 7. After the delay time passes, the message is processed again and the consumer can fail again.
 
 ### Example

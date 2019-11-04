@@ -7,10 +7,12 @@
             },
             messageAfterPageChange: false,
             triggerSuccess: false,
+            newDigitalAssetId: digital_asset.id,
+            gridName: grid_name,
             trigger: [
                 {
                     eventBroker: 'mediator',
-                    name: 'datagrid:doRefresh:' ~ grid_name,
+                    name: 'datagrid:doInitialRefresh:' ~ grid_name,
                     args: [],
                 },
                 {
@@ -27,7 +29,6 @@
     {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
     {% set grid_render_params = {
-        enableFullScreenLayout: true,
         enableViews: true,
         showViewsInNavbar: false,
         filtersStateElement: '[data-role="filters-state-view-container"]',
@@ -38,7 +39,8 @@
                 wid: app.request.get('_wid'),
                 multiSelect: false
             }
-        }
+        },
+        cssClass: is_image_type ? 'digital-asset-image-grid' : 'digital-asset-file-grid'
     } %}
 
     <div class="widget-content">
@@ -68,18 +70,22 @@
             } -%}
             {{- form_start(form, form_options) -}}
 
-            <fieldset class="form">
-                <div class="form-source-file">
-                    {{- form_row(form.sourceFile) -}}
-                </div>
-                <div class="form-titles">
-                    {{- form_row(form.titles) -}}
-                </div>
+            <div class="form-flex">
+                {{- form_row(form.sourceFile, {
+                    'attr': {
+                        'class': 'form-source-file widget-title-container'
+                    }
+                }) -}}
+                {{- form_row(form.titles, {
+                    'attr': {
+                        'class': 'form-titles widget-title-container'
+                    }
+                }) -}}
                 <div class="widget-actions form-buttons">
                     <button class="btn" type="reset">{{ 'oro.digitalasset.dam.dialog.clear.label'|trans }}</button>
-                    <button class="btn" type="submit">{{ 'oro.digitalasset.dam.dialog.upload.label'|trans }}</button>
+                    <button class="btn btn-primary" type="submit">{{ 'oro.digitalasset.dam.dialog.upload.label'|trans }}</button>
                 </div>
-            </fieldset>
+            </div>
 
             <div class="hide">
                 {{- form_rest(form) -}}

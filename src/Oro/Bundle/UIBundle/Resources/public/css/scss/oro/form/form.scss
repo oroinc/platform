@@ -563,3 +563,24 @@ input[type='number'] {
         display: none;
     }
 }
+
+.form-flex {
+    > .control-group {
+        .control-label {
+            .tooltip-icon {
+                margin-#{$end}: 8px;
+            }
+        }
+    }
+
+    .widget-actions {
+        display: inline-flex;
+        align-items: flex-start;
+
+        .btn {
+            + .btn {
+                margin-#{$start}: 8px;
+            }
+        }
+    }
+}

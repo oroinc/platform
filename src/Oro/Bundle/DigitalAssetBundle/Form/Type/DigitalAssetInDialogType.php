@@ -9,6 +9,7 @@ use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -32,7 +33,12 @@ class DigitalAssetInDialogType extends AbstractType
                         ? 'oro.digitalasset.titles.tooltip_image'
                         : 'oro.digitalasset.titles.tooltip_file',
                     'required' => true,
-                    'entry_options' => ['constraints' => [new NotBlank()]],
+                    'entry_options' => [
+                        'constraints' => [
+                            new NotBlank(),
+                            new Length(['max' => 255])
+                        ]
+                    ],
                 ]
             )
             ->add(
