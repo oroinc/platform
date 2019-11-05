@@ -1330,7 +1330,11 @@ abstract class AbstractQueryConverter
                     }
                     $joinType     = $mapItem['type'];
                     $join         = $query['join'][$joinType][$mapItem['key']];
-                    $parentJoinId = $this->getParentJoinIdForVirtualColumnJoin($join['join'], $mainEntityJoinId);
+                    $parentJoinId = $this->getParentJoinIdForVirtualColumnJoin(
+                        $join['join'],
+                        $mainEntityJoinId,
+                        $joinMap
+                    );
                     if (null !== $parentJoinId) {
                         $alias    = $join['alias'];
                         $joinId   = $this->buildJoinIdentifier($join, $parentJoinId, $joinType);
@@ -1347,7 +1351,8 @@ abstract class AbstractQueryConverter
                             $join         = $query['join'][$joinType][$mapItem['key']];
                             $parentJoinId = $this->getParentJoinIdForVirtualColumnJoin(
                                 $join['join'],
-                                $mainEntityJoinId
+                                $mainEntityJoinId,
+                                $joinMap
                             );
                             if (null !== $parentJoinId) {
                                 $alias    = $join['alias'];
@@ -1402,10 +1407,11 @@ abstract class AbstractQueryConverter
     /**
      * @param string $joinExpr
      * @param string $mainEntityJoinId
+     * @param array $joinMap
      *
      * @return string|null
      */
-    protected function getParentJoinIdForVirtualColumnJoin($joinExpr, $mainEntityJoinId)
+    protected function getParentJoinIdForVirtualColumnJoin($joinExpr, $mainEntityJoinId, $joinMap)
     {
         $parts = explode('.', $joinExpr, 2);
 
