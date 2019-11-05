@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var DialogWidget = require('oro/dialog-widget');
-    var errorHandler = require('oroui/js/error');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const DialogWidget = require('oro/dialog-widget');
+    const errorHandler = require('oroui/js/error');
+    const mediator = require('oroui/js/mediator');
 
-    var DigitalAssetDialogWidget;
-
-    DigitalAssetDialogWidget = DialogWidget.extend({
+    const DigitalAssetDialogWidget = DialogWidget.extend({
         options: _.extend({}, DialogWidget.prototype.options, {
             alias: 'dam-dialog',
             title: __('oro.digitalasset.dam.dialog.select_file'),
@@ -23,28 +22,37 @@ define(function(require) {
                 autoResize: true,
                 allowMaximize: false,
                 allowMinimize: false,
+                dialogClass: 'digital-asset-dialog',
                 modal: true,
                 maximizedHeightDecreaseBy: 'minimize-bar',
                 minWidth: 720
             }
         }),
 
+        listen: {
+            'grid_load:complete mediator': 'onRenderGrid'
+        },
+
+        newDigitalAssetId: null,
+
+        gridName: null,
+
         /**
          * @inheritDoc
          */
-        constructor: function DigitalAssetDialogWidget() {
-            DigitalAssetDialogWidget.__super__.constructor.apply(this, arguments);
+        constructor: function DigitalAssetDialogWidget(options) {
+            DigitalAssetDialogWidget.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            DigitalAssetDialogWidget.__super__.initialize.apply(this, arguments);
+            DigitalAssetDialogWidget.__super__.initialize.call(this, options);
 
             // Adds Cancel button to the actions container at the bottom of dialog window.
             this.listenTo(this, 'widgetReady', (function($el) {
-                var cancelButton = $el.find('[type="reset"]').clone();
+                const cancelButton = $el.find('[type="reset"]').clone();
                 cancelButton.text(__('oro.digitalasset.dam.dialog.cancel.label'));
                 cancelButton.on('click', (function() {
                     this.remove();
@@ -54,11 +62,19 @@ define(function(require) {
             }).bind(this));
         },
 
+        onRenderGrid() {
+            if (!this.gridName) {
+                return;
+            }
+
+            mediator.trigger(`datagrid:highlightNew:${this.gridName}`, this.newDigitalAssetId);
+        },
+
         /**
          * @inheritDoc
          */
         initializeWidget: function(options) {
-            DigitalAssetDialogWidget.__super__.initializeWidget.apply(this, arguments);
+            DigitalAssetDialogWidget.__super__.initializeWidget.call(this, options);
 
             this.on('formReset', _.bind(this._onFormReset, this));
         },
@@ -79,6 +95,11 @@ define(function(require) {
 
             $(form).trigger('reset');
             $(form).find('[type="file"]').trigger('change');
+
+            $(form).find('[type="text"]').each((index, element) => {
+                $(element).attr('value', '');
+                $(element).val('').change();
+            });
         },
 
         /**
@@ -87,12 +108,17 @@ define(function(require) {
          * Overrides parent method to enable JSON-only handling on content load - prevents dialog window from blanking.
          */
         _onContentLoad: function(content) {
-            var json = this._getJson(content);
+            const json = this._getJson(content);
 
             delete this.loading;
 
             if (json) {
                 this._onJsonContentResponse(json);
+
+                const {widget} = json;
+
+                this.newDigitalAssetId = widget.newDigitalAssetId;
+                this.gridName = widget.gridName;
             } else {
                 this.disposePageComponents();
                 this.setContent(content, true);
@@ -112,6 +138,10 @@ define(function(require) {
             } else {
                 this._triggerContentLoadEvents();
             }
+
+            this.$el.find('.fallback-status, .fa-language').bind('click', () => {
+                this.resetDialogPosition();
+            });
         }
     });
 

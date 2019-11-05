@@ -5,19 +5,17 @@ define([
 ], function(_, mediator, AbstractListener) {
     'use strict';
 
-    var ActionFormListener;
-
     /**
      * @export  orodatagrid/js/datagrid/listener/action-form-listener
      * @class   orodatagrid.datagrid.listener.ActionFormListener
      * @extends orodatagrid.datagrid.listener.AbstractListener
      */
-    ActionFormListener = AbstractListener.extend({
+    const ActionFormListener = AbstractListener.extend({
         /**
          * @inheritDoc
          */
-        constructor: function ActionFormListener() {
-            ActionFormListener.__super__.constructor.apply(this, arguments);
+        constructor: function ActionFormListener(...args) {
+            ActionFormListener.__super__.constructor.apply(this, args);
         },
 
         /**
@@ -29,8 +27,8 @@ define([
         },
 
         onFrontAction: function(action) {
-            var triggerAction = action.configuration.triggerAction;
-            var collection = action.datagrid.collection;
+            const triggerAction = action.configuration.triggerAction;
+            const collection = action.datagrid.collection;
 
             if (_.isUndefined(triggerAction)) {
                 return;
@@ -44,14 +42,14 @@ define([
         },
 
         onFrontMassAction: function(action) {
-            var triggerAction = action.configuration.triggerAction;
+            const triggerAction = action.configuration.triggerAction;
 
             if (_.isUndefined(triggerAction)) {
                 return;
             }
 
-            var collection = action.datagrid.collection;
-            var selectedRowsIds = action.datagrid.getSelectionState().selectedIds;
+            const collection = action.datagrid.collection;
+            const selectedRowsIds = action.datagrid.getSelectionState().selectedIds;
 
             // at the moment we support only `excludeRow`
             if (triggerAction === 'excludeRow') {
@@ -83,16 +81,16 @@ define([
      * @param {Object} [options.metadata] configuration for the grid
      */
     ActionFormListener.init = function(deferred, options) {
-        var gridInitialization = options.gridPromise;
+        const gridInitialization = options.gridPromise;
 
         gridInitialization.done(function(grid) {
-            var listenerOptions = {
+            const listenerOptions = {
                 $gridContainer: grid.$el,
                 gridName: grid.name,
                 grid: grid
             };
 
-            var listener = new ActionFormListener(listenerOptions);
+            const listener = new ActionFormListener(listenerOptions);
             deferred.resolve(listener);
         }).fail(function() {
             deferred.reject();

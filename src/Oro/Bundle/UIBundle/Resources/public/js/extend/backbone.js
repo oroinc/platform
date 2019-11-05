@@ -1,27 +1,27 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var componentContainerMixin = require('oroui/js/app/components/base/component-container-mixin');
-    var tools = require('oroui/js/tools');
-    var pageVisibilityTracker = require('oroui/js/tools/page-visibility-tracker');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const componentContainerMixin = require('oroui/js/app/components/base/component-container-mixin');
+    const tools = require('oroui/js/tools');
+    const pageVisibilityTracker = require('oroui/js/tools/page-visibility-tracker');
 
-    var console = window.console;
+    const console = window.console;
 
-    var OriginalBackboneView = Backbone.View;
-    Backbone.View = function(original) {
+    const OriginalBackboneView = Backbone.View;
+    Backbone.View = function(options) {
         this.subviews = [];
         this.subviewsByName = {};
-        OriginalBackboneView.apply(this, arguments);
+        OriginalBackboneView.call(this, options);
     };
     _.extend(Backbone.View, OriginalBackboneView, {
         RENDERING_TIMEOUT: 30000 // 30s
     });
     Backbone.View.prototype = OriginalBackboneView.prototype;
 
-    var original = _.pick(Backbone.View.prototype, 'remove');
+    const original = _.pick(Backbone.View.prototype, 'remove');
 
     // Backbone.View
     Backbone.View.prototype.subviews = null;
@@ -29,8 +29,8 @@ define(function(require) {
     _.extend(Backbone.View.prototype, componentContainerMixin);
 
     Backbone.View.prototype.subview = function(name, view) {
-        var subviews = this.subviews;
-        var byName = this.subviewsByName;
+        const subviews = this.subviews;
+        const byName = this.subviewsByName;
         if (name && view) {
             this.removeSubview(name);
             subviews.push(view);
@@ -42,18 +42,15 @@ define(function(require) {
     };
 
     Backbone.View.prototype.removeSubview = function(nameOrView) {
-        var byName;
-        var index;
-        var name;
-        var otherName;
-        var otherView;
-        var subviews;
-        var view;
+        let name;
+        let otherName;
+        let otherView;
+        let view;
         if (!nameOrView) {
             return;
         }
-        subviews = this.subviews;
-        byName = this.subviewsByName;
+        const subviews = this.subviews;
+        const byName = this.subviewsByName;
         if (typeof nameOrView === 'string') {
             name = nameOrView;
             view = byName[name];
@@ -74,7 +71,7 @@ define(function(require) {
             return;
         }
         view.dispose();
-        index = _.indexOf(subviews, view);
+        const index = _.indexOf(subviews, view);
         if (index !== -1) {
             subviews.splice(index, 1);
         }
@@ -83,14 +80,12 @@ define(function(require) {
 
     Backbone.View.prototype.disposed = false;
     Backbone.View.prototype.dispose = function() {
-        var prop;
-        var properties;
-        var subview;
-        var _i;
-        var _j;
-        var _len;
-        var _len1;
-        var _ref;
+        let prop;
+        let subview;
+        let _i;
+        let _j;
+        let _len;
+        let _len1;
         if (this.disposed || !this.$el) {
             return;
         }
@@ -102,7 +97,7 @@ define(function(require) {
         this.disposePageComponents();
         this.trigger('dispose', this);
 
-        _ref = _.toArray(this.subviews);
+        const _ref = _.toArray(this.subviews);
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             subview = _ref[_i];
             subview.dispose();
@@ -118,7 +113,7 @@ define(function(require) {
             this.undelegateEvents();
         }
 
-        properties = ['el', '$el', 'options', 'model', 'collection', 'subviews', 'subviewsByName', '_callbacks'];
+        const properties = ['el', '$el', 'options', 'model', 'collection', 'subviews', 'subviewsByName', '_callbacks'];
         for (_j = 0, _len1 = properties.length; _j < _len1; _j++) {
             prop = properties[_j];
             delete this[prop];
@@ -156,7 +151,7 @@ define(function(require) {
         // initializes controls in layout
         this.initControls();
         // initializes page components
-        var initPromise = this.initPageComponents(options);
+        const initPromise = this.initPageComponents(options);
         if (!this.deferredRender) {
             this._deferredRender();
             initPromise.always(_.bind(this._resolveDeferredRender, this));
@@ -178,8 +173,8 @@ define(function(require) {
         this.deferredRender = $.Deferred();
         this.deferredRender.timeoutID =
             pageVisibilityTracker.setTimeout(function() {
-                var xpath = tools.getElementXPath(this.el);
-                var error = new Error('Rendering timeout for view of element: "' + xpath + '"');
+                const xpath = tools.getElementXPath(this.el);
+                const error = new Error('Rendering timeout for view of element: "' + xpath + '"');
                 this._rejectDeferredRender(error);
             }.bind(this), Backbone.View.RENDERING_TIMEOUT);
     };
@@ -191,8 +186,8 @@ define(function(require) {
      */
     Backbone.View.prototype._resolveDeferredRender = function() {
         if (this.deferredRender) {
-            var promises = [];
-            var resolve = _.bind(function() {
+            const promises = [];
+            const resolve = _.bind(function() {
                 pageVisibilityTracker.clearTimeout(this.deferredRender.timeoutID);
                 this.deferredRender.resolve(this);
                 delete this.deferredRender;
@@ -208,7 +203,7 @@ define(function(require) {
 
             if (promises.length) {
                 // even with empty list of promises $.when takes about 1.4ms
-                $.when.apply($, promises).done(resolve);
+                $.when(...promises).done(resolve);
             } else {
                 resolve();
             }
@@ -245,10 +240,9 @@ define(function(require) {
     // Backbone.Model
     Backbone.Model.prototype.disposed = false;
     Backbone.Model.prototype.dispose = function() {
-        var prop;
-        var properties;
-        var _i;
-        var _len;
+        let prop;
+        let _i;
+        let _len;
         if (this.disposed) {
             return;
         }
@@ -256,7 +250,7 @@ define(function(require) {
         Backbone.mediator.unsubscribe(null, null, this);
         this.stopListening();
         this.off();
-        properties = ['collection', 'attributes', 'changed', '_escapedAttributes', '_previousAttributes',
+        const properties = ['collection', 'attributes', 'changed', '_escapedAttributes', '_previousAttributes',
             '_silent', '_pending', '_callbacks'];
         for (_i = 0, _len = properties.length; _i < _len; _i++) {
             prop = properties[_i];
@@ -269,10 +263,9 @@ define(function(require) {
     // Backbone.Collection
     Backbone.Collection.prototype.disposed = false;
     Backbone.Collection.prototype.dispose = function() {
-        var prop;
-        var properties;
-        var _i;
-        var _len;
+        let prop;
+        let _i;
+        let _len;
         if (this.disposed) {
             return;
         }
@@ -283,7 +276,7 @@ define(function(require) {
         Backbone.mediator.unsubscribe(null, null, this);
         this.stopListening();
         this.off();
-        properties = ['model', 'models', '_byId', '_byCid', '_callbacks'];
+        const properties = ['model', 'models', '_byId', '_byCid', '_callbacks'];
         for (_i = 0, _len = properties.length; _i < _len; _i++) {
             prop = properties[_i];
             delete this[prop];
@@ -312,13 +305,13 @@ define(function(require) {
      * @return {Backbone.Events}
      */
     Backbone.Events.firstListenTo = function(obj, name, callback) {
-        this.listenTo.apply(this, arguments);
+        this.listenTo(obj, name, callback);
 
         if (!obj) {
             return this;
         }
-        var events = obj._events[name];
-        var last = events.splice(events.length - 1, 1);
+        const events = obj._events[name];
+        const last = events.splice(events.length - 1, 1);
         events.unshift(last[0]);
     };
 
@@ -330,18 +323,18 @@ define(function(require) {
      * @param {Object} [context]
      */
     Backbone.Events.firstOn = function(name, callback, context) {
-        this.on.apply(this, arguments);
+        this.on(name, callback, context);
 
-        var events = this._events[name];
-        var last = events.splice(events.length - 1, 1);
+        const events = this._events[name];
+        const last = events.splice(events.length - 1, 1);
         events.unshift(last[0]);
     };
 
-    var oldLoadUrl = Backbone.History.prototype.loadUrl;
+    const oldLoadUrl = Backbone.History.prototype.loadUrl;
     _.extend(Backbone.History.prototype, {
-        loadUrl: function() {
+        loadUrl: function(...args) {
             try {
-                return oldLoadUrl.apply(this, arguments);
+                return oldLoadUrl.apply(this, args);
             } catch (e) {
                 if (e instanceof URIError) {
                     tools.loadModules(['oroui/js/messenger', 'orotranslation/js/translator'], function(messenger, __) {

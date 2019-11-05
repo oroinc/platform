@@ -1,26 +1,25 @@
 define(function(require) {
     'use strict';
 
-    var Select2AutocompleteComponent;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var Select2AutocompleteView = require('oroform/js/app/views/select2-autocomplete-view');
-    var Select2Component = require('oro/select2-component');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const Select2AutocompleteView = require('oroform/js/app/views/select2-autocomplete-view');
+    const Select2Component = require('oro/select2-component');
 
-    Select2AutocompleteComponent = Select2Component.extend({
+    const Select2AutocompleteComponent = Select2Component.extend({
         ViewType: Select2AutocompleteView,
 
         /**
          * @inheritDoc
          */
-        constructor: function Select2AutocompleteComponent() {
-            Select2AutocompleteComponent.__super__.constructor.apply(this, arguments);
+        constructor: function Select2AutocompleteComponent(options) {
+            Select2AutocompleteComponent.__super__.constructor.call(this, options);
         },
 
         preConfig: function(config) {
-            config = Select2AutocompleteComponent.__super__.preConfig.apply(this, arguments);
+            Select2AutocompleteComponent.__super__.preConfig.call(this, config);
             if (config.allowCreateNew) {
-                var propName = config.renderedPropertyName || 'name';
+                const propName = config.renderedPropertyName || 'name';
                 config.result_template = config.result_template || this.makeItemTemplate(propName, true);
                 config.selection_template = config.selection_template || this.makeItemTemplate(propName, false);
             }
@@ -28,14 +27,14 @@ define(function(require) {
         },
 
         setConfig: function(config) {
-            config = Select2AutocompleteComponent.__super__.setConfig.apply(this, arguments);
+            config = Select2AutocompleteComponent.__super__.setConfig.call(this, config);
             /* 'allowCreateNew' option says to select2 to propose to select new item created with value in search field
              */
             if (config.allowCreateNew) {
                 /* 'renderedPropertyName' option helps to select create a new data item with proper field name
                  *  to be rendered properly in the item template
                  */
-                var propName = config.renderedPropertyName || 'name';
+                const propName = config.renderedPropertyName || 'name';
                 config.createSearchChoice = function(value, results) {
                     return _.object([['id', null], [propName, value]]);
                 };
@@ -50,7 +49,7 @@ define(function(require) {
         },
 
         makeItemTemplate: function(propName, forSelection) {
-            var labelTpl = '_.escape(' + propName + ')';
+            let labelTpl = '_.escape(' + propName + ')';
             if (forSelection) {
                 labelTpl = 'highlight(' + labelTpl + ')';
             }
@@ -62,13 +61,13 @@ define(function(require) {
             if (config.allowCreateNew) {
                 // when it's needed to show not stored new item in the control (e.g. after failed save of form) it
                 // processes id and extracts user input value
-                var json;
+                let json;
                 try {
                     json = JSON.parse(id);
                 } catch (ex) {}
                 if (_.isObject(json) && 'value' in json) {
-                    var propName = config.renderedPropertyName || 'name';
-                    var item = {id: null};
+                    const propName = config.renderedPropertyName || 'name';
+                    const item = {id: null};
                     item[propName] = json.value;
                     self.handleResults(self, config, callback, [item]);
                     return;

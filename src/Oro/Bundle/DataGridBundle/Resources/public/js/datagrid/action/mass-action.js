@@ -7,8 +7,6 @@ define([
 ], function(_, messenger, __, Modal, AbstractAction) {
     'use strict';
 
-    var MassAction;
-
     /**
      * Basic mass action class.
      *
@@ -16,7 +14,7 @@ define([
      * @class   oro.datagrid.action.MassAction
      * @extends oro.datagrid.action.AbstractAction
      */
-    MassAction = AbstractAction.extend({
+    const MassAction = AbstractAction.extend({
         /** @property {Object} */
         defaultMessages: {
             confirm_title: 'Mass Action Confirmation',
@@ -31,17 +29,17 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function MassAction() {
-            MassAction.__super__.constructor.apply(this, arguments);
+        constructor: function MassAction(options) {
+            MassAction.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            MassAction.__super__.initialize.apply(this, arguments);
+            MassAction.__super__.initialize.call(this, options);
 
-            var extendedOptions = {};
+            const extendedOptions = {};
             extendedOptions[this.datagrid.name] = this.datagrid.collection.urlParams || {};
 
             _.extend(this.route_parameters, extendedOptions, {
@@ -65,7 +63,7 @@ define([
          * @returns {boolean}
          */
         checkSelectionState: function() {
-            var selectionState = this.datagrid.getSelectionState();
+            const selectionState = this.datagrid.getSelectionState();
             if (selectionState.selectedIds.length === 0 && selectionState.inset) {
                 messenger.notificationFlashMessage('warning', __(this.messages.empty_selection));
                 return false;
@@ -81,10 +79,10 @@ define([
          * @private
          */
         getActionParameters: function() {
-            var selectionState = this.datagrid.getSelectionState();
-            var collection = this.datagrid.collection;
-            var stateKey = collection.stateHashKey();
-            var params = {
+            const selectionState = this.datagrid.getSelectionState();
+            const collection = this.datagrid.collection;
+            const stateKey = collection.stateHashKey();
+            let params = {
                 inset: selectionState.inset ? 1 : 0,
                 values: selectionState.selectedIds.join(',')
             };
@@ -97,7 +95,7 @@ define([
 
         _onAjaxSuccess: function(data, textStatus, jqXHR) {
             this.datagrid.resetSelectionState();
-            MassAction.__super__._onAjaxSuccess.apply(this, arguments);
+            MassAction.__super__._onAjaxSuccess.call(this, data, textStatus, jqXHR);
         }
     });
 

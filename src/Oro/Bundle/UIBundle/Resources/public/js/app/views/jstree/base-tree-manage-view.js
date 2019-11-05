@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var BaseTreeManageView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var widgetManager = require('oroui/js/widget-manager');
-    var mediator = require('oroui/js/mediator');
-    var messenger = require('oroui/js/messenger');
-    var routing = require('routing');
-    var BaseTreeView = require('oroui/js/app/views/jstree/base-tree-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const widgetManager = require('oroui/js/widget-manager');
+    const mediator = require('oroui/js/mediator');
+    const messenger = require('oroui/js/messenger');
+    const routing = require('routing');
+    const BaseTreeView = require('oroui/js/app/views/jstree/base-tree-view');
 
-    BaseTreeManageView = BaseTreeView.extend({
+    const BaseTreeManageView = BaseTreeView.extend({
         treeEvents: {
             'move_node.jstree': 'onMove',
             'select-subtree-item:change': 'onSelectSubtreeChange'
@@ -44,8 +43,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function BaseTreeManageView() {
-            BaseTreeManageView.__super__.constructor.apply(this, arguments);
+        constructor: function BaseTreeManageView(options) {
+            BaseTreeManageView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -97,12 +96,12 @@ define(function(require) {
          * @param {Object} selected
          */
         onSelect: function(e, selected) {
-            BaseTreeManageView.__super__.onSelect.apply(this, arguments);
+            BaseTreeManageView.__super__.onSelect.call(this, e, selected);
 
             if (this.initialization || !this.updateAllowed) {
                 return;
             }
-            var url;
+            let url;
             if (this.onRootSelectRoute && selected.node.parent === '#') {
                 url = routing.generate(this.onRootSelectRoute, {id: selected.node.id});
             } else {
@@ -122,7 +121,7 @@ define(function(require) {
                 return;
             }
 
-            var self = this;
+            const self = this;
             $.ajax({
                 async: false,
                 type: 'PUT',

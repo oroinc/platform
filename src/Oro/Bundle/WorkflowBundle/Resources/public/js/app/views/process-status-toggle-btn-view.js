@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var ProcessStatusToggleBtnView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var mediator = require('oroui/js/mediator');
-    var $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const mediator = require('oroui/js/mediator');
+    const $ = require('jquery');
 
-    ProcessStatusToggleBtnView = BaseView.extend({
+    const ProcessStatusToggleBtnView = BaseView.extend({
         events: {
             'click [data-role="status-toggle"]': 'onStatusToggle'
         },
@@ -14,8 +13,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ProcessStatusToggleBtnView() {
-            ProcessStatusToggleBtnView.__super__.constructor.apply(this, arguments);
+        constructor: function ProcessStatusToggleBtnView(options) {
+            ProcessStatusToggleBtnView.__super__.constructor.call(this, options);
         },
 
         onStatusToggle: function(e) {

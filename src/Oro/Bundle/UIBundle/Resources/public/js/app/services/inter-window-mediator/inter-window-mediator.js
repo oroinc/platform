@@ -7,11 +7,9 @@
 define(function(require) {
     'use strict';
 
-    var InterWindowMediator;
-    var _ = require('underscore');
-    var BaseClass = require('oroui/js/base-class');
+    const BaseClass = require('oroui/js/base-class');
 
-    InterWindowMediator = BaseClass.extend({
+    const InterWindowMediator = BaseClass.extend({
         /**
          * @inheritDoc
          */
@@ -51,9 +49,9 @@ define(function(require) {
          * @param {string} eventName
          * @param {...(Object|Array|number|string|boolean|null}} - optional data that will be passed to a handler as arguments
          */
-        trigger: function(eventName) {
-            var eventData = {targetId: this.id, args: _.rest(arguments)};
-            var storageKey = InterWindowMediator.NS + eventName;
+        trigger: function(eventName, args) {
+            const eventData = {targetId: this.id, args};
+            const storageKey = InterWindowMediator.NS + eventName;
             localStorage.setItem(storageKey, JSON.stringify(eventData));
             localStorage.removeItem(storageKey);
         },
@@ -68,8 +66,8 @@ define(function(require) {
                 e.key.substring(0, InterWindowMediator.NS.length) === InterWindowMediator.NS &&
                 e.newValue !== null && e.newValue !== ''
             ) {
-                var eventName = e.key.substring(InterWindowMediator.NS.length);
-                var eventData = JSON.parse(e.newValue);
+                const eventName = e.key.substring(InterWindowMediator.NS.length);
+                const eventData = JSON.parse(e.newValue);
 
                 // Since IE11 triggers `storage` event on current window lets check and skip it
                 if (eventData.targetId !== this.id) {

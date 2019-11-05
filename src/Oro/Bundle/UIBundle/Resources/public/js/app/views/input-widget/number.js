@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var NumberInputWidgetView;
-    var AbstractInputWidgetView = require('oroui/js/app/views/input-widget/abstract');
-    var localeSettings = require('orolocale/js/locale-settings');
-    var _ = require('underscore');
-    var $ = require('jquery');
+    const AbstractInputWidgetView = require('oroui/js/app/views/input-widget/abstract');
+    const localeSettings = require('orolocale/js/locale-settings');
+    const _ = require('underscore');
+    const $ = require('jquery');
 
-    var decimalSettings = localeSettings.getNumberFormats('decimal');
-    var decimalSeparator = decimalSettings.decimal_separator_symbol;
-    var groupingSeparator = decimalSettings.grouping_separator_symbol;
+    const decimalSettings = localeSettings.getNumberFormats('decimal');
+    const decimalSeparator = decimalSettings.decimal_separator_symbol;
+    const groupingSeparator = decimalSettings.grouping_separator_symbol;
 
-    NumberInputWidgetView = AbstractInputWidgetView.extend({
+    const NumberInputWidgetView = AbstractInputWidgetView.extend({
         events: {
             input: '_normalizeNumberFieldValue',
             change: '_normalizeNumberFieldValue',
@@ -29,8 +28,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function NumberInputWidgetView() {
-            NumberInputWidgetView.__super__.constructor.apply(this, arguments);
+        constructor: function NumberInputWidgetView(options) {
+            NumberInputWidgetView.__super__.constructor.call(this, options);
         },
 
         findContainer: function() {
@@ -45,18 +44,23 @@ define(function(require) {
 
         disposeWidget: function() {
             this._restoreAttr();
-            return NumberInputWidgetView.__super__.disposeWidget.apply(this, arguments);
+            return NumberInputWidgetView.__super__.disposeWidget.call(this);
         },
 
         _setPrecision: function() {
-            var precision = this.$el.data('precision');
+            const precision = this.$el.data('precision');
             this.precision = _.isUndefined(precision) ? null : precision;
         },
 
         _setAttr: function() {
             this._rememberAttr();
-            this.$el.attr('type', _.isDesktop() && this.precision !== null ? 'text' : 'number')
-                .attr('pattern', this.precision === 0 ? '[0-9]*' : '');
+
+            if (this.precision !== null) {
+                this.$el.attr({
+                    type: 'text',
+                    pattern: '[0-9]*'
+                });
+            }
         },
 
         _rememberAttr: function() {
@@ -82,11 +86,11 @@ define(function(require) {
                 return;
             }
 
-            var field = this.el;
-            var originalValue = field.value;
+            const field = this.el;
+            const originalValue = field.value;
 
             // set fixed length start
-            var keyName = event.key || String.fromCharCode(event.which);
+            const keyName = event.key || String.fromCharCode(event.which);
             if (this.precision > 0 && decimalSeparator === keyName &&
                 field.value.length && field.selectionStart === field.value.length) {
                 field.value = parseInt(field.value).toFixed(this.precision);
@@ -114,8 +118,8 @@ define(function(require) {
                 return;
             }
 
-            var field = this.el;
-            var originalValue = field.value;
+            const field = this.el;
+            const originalValue = field.value;
             if (_.isUndefined(field.value)) {
                 return;
             }
@@ -139,13 +143,13 @@ define(function(require) {
             // filter value end
 
             // validate value start
-            var regExpString = '^([0-9]*\\' + groupingSeparator + '?)+\\' + groupingSeparator + '?';
+            let regExpString = '^([0-9]*\\' + groupingSeparator + '?)+\\' + groupingSeparator + '?';
             if (this.precision > 0) {
                 regExpString += '(\\' + decimalSeparator + '{1})?([0-9]{1,' + this.precision + '})?';
             }
 
-            var regExp = new RegExp(regExpString, 'g');
-            var substitution = field.value.replace(regExp, '');
+            const regExp = new RegExp(regExpString, 'g');
+            const substitution = field.value.replace(regExp, '');
 
             if (!regExp.test(field.value) || substitution.length > 0) {
                 field.value = field.value.match(regExp).join('');
@@ -160,7 +164,7 @@ define(function(require) {
         },
 
         _triggerEventOnValueChange: function(event, value) {
-            var field = event.target;
+            const field = event.target;
             if (field.value !== value) {
                 $(field).trigger(event);
             }

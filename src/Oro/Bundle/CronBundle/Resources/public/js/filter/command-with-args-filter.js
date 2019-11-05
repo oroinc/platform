@@ -3,14 +3,12 @@ define([
 ], function(ChoiceFilter) {
     'use strict';
 
-    var CommandWithArgsFilter;
-
-    CommandWithArgsFilter = ChoiceFilter.extend({
+    const CommandWithArgsFilter = ChoiceFilter.extend({
         /**
          * @inheritDoc
          */
-        constructor: function CommandWithArgsFilter() {
-            CommandWithArgsFilter.__super__.constructor.apply(this, arguments);
+        constructor: function CommandWithArgsFilter(options) {
+            CommandWithArgsFilter.__super__.constructor.call(this, options);
         }
     });
 

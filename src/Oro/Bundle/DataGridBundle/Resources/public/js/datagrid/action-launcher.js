@@ -1,12 +1,11 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var ActionLauncher;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var Backbone = require('backbone');
-    var config = require('module-config').default(module.id);
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const Backbone = require('backbone');
+    let config = require('module-config').default(module.id);
 
     config = _.extend({
         iconHideText: true
@@ -22,7 +21,7 @@ define(function(require, exports, module) {
      * @class   orodatagrid.datagrid.ActionLauncher
      * @extends Backbone.View
      */
-    ActionLauncher = Backbone.View.extend({
+    const ActionLauncher = Backbone.View.extend({
         /** @property */
         enabled: true,
 
@@ -79,8 +78,8 @@ define(function(require, exports, module) {
          * @return {Object}
          */
         events: function() {
-            var events = {};
-            var linkSelector = '';
+            const events = {};
+            let linkSelector = '';
             if (this.links) {
                 events['shown.bs.dropdown'] = 'onDropdownShown';
                 linkSelector = ' .dropdown-menu a';
@@ -92,8 +91,8 @@ define(function(require, exports, module) {
         /**
          * @inheritDoc
          */
-        constructor: function ActionLauncher() {
-            ActionLauncher.__super__.constructor.apply(this, arguments);
+        constructor: function ActionLauncher(options) {
+            ActionLauncher.__super__.constructor.call(this, options);
         },
 
         /**
@@ -117,7 +116,7 @@ define(function(require, exports, module) {
                 throw new TypeError('"action" is required');
             }
 
-            var truthy = _.pick(options, 'template', 'label', 'title', 'icon', 'link',
+            const truthy = _.pick(options, 'template', 'label', 'title', 'icon', 'link',
                 'launcherMode', 'iconClassName', 'className', 'action', 'attributes');
 
             _.extend(
@@ -130,7 +129,7 @@ define(function(require, exports, module) {
                 this.launcherMode = this._convertToLauncherMode();
             }
 
-            ActionLauncher.__super__.initialize.apply(this, arguments);
+            ActionLauncher.__super__.initialize.call(this, options);
         },
 
         /**
@@ -155,11 +154,11 @@ define(function(require, exports, module) {
             delete this.runAction;
             delete this.attributes;
 
-            ActionLauncher.__super__.dispose.apply(this, arguments);
+            ActionLauncher.__super__.dispose.call(this);
         },
 
         getTemplateData: function() {
-            var data = _.pick(this, 'icon', 'title', 'label', 'className', 'iconClassName', 'launcherMode', 'link',
+            const data = _.pick(this, 'icon', 'title', 'label', 'className', 'iconClassName', 'launcherMode', 'link',
                 'links', 'action', 'attributes', 'enabled', 'tagName');
 
             if (!data.label) {
@@ -184,7 +183,7 @@ define(function(require, exports, module) {
          */
         render: function() {
             this.$el.empty();
-            var $el = $(this.template(this.getTemplateData()));
+            const $el = $(this.template(this.getTemplateData()));
             this.setElement($el);
 
             this.trigger('render');
@@ -199,9 +198,9 @@ define(function(require, exports, module) {
          * @return {Boolean}
          */
         onClick: function(e) {
-            var $link;
-            var key;
-            var actionOptions = {};
+            let $link;
+            let key;
+            const actionOptions = {};
             if (!this.enabled) {
                 return this.onClickReturnValue;
             }

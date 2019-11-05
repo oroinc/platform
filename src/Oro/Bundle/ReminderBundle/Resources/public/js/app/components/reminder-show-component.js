@@ -1,28 +1,27 @@
 define(function(require) {
     'use strict';
 
-    var ReminderShowComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var reminderHandler = require('ororeminder/js/reminder-handler');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const reminderHandler = require('ororeminder/js/reminder-handler');
 
-    ReminderShowComponent = BaseComponent.extend({
+    const ReminderShowComponent = BaseComponent.extend({
         optionNames: BaseComponent.prototype.optionNames.concat(['reminderData']),
 
         /**
          * @inheritDoc
          */
-        constructor: function ReminderShowComponent() {
-            ReminderShowComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ReminderShowComponent(options) {
+            ReminderShowComponent.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
+        initialize: function(options) {
             reminderHandler.setReminders(this.reminderData);
             reminderHandler.showReminders();
 
-            ReminderShowComponent.__super__.initialize.apply(this, arguments);
+            ReminderShowComponent.__super__.initialize.call(this, options);
         }
     });
 

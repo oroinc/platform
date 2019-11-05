@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var DateGroupingView;
-    var BaseView = require('oroui/js/app/views/base/view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    DateGroupingView = BaseView.extend({
+    const DateGroupingView = BaseView.extend({
         autoRender: true,
 
         switcherCheckbox: '[data-name="field__use-date-group-filter"]',
@@ -24,8 +23,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DateGroupingView() {
-            DateGroupingView.__super__.constructor.apply(this, arguments);
+        constructor: function DateGroupingView(options) {
+            DateGroupingView.__super__.constructor.call(this, options);
         },
 
         render: function() {

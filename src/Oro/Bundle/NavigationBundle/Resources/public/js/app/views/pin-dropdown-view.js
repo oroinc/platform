@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var DropdownCollectionView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var Chaplin = require('chaplin');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var utils = Chaplin.utils;
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const Chaplin = require('chaplin');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const utils = Chaplin.utils;
 
-    DropdownCollectionView = BaseCollectionView.extend({
+    const DropdownCollectionView = BaseCollectionView.extend({
         listen: {
             'visibilityChange': 'updateVisibility',
             'add collection': 'updateDropdown',
@@ -25,8 +24,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DropdownCollectionView() {
-            DropdownCollectionView.__super__.constructor.apply(this, arguments);
+        constructor: function DropdownCollectionView(options) {
+            DropdownCollectionView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -34,7 +33,7 @@ define(function(require) {
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['position']));
-            DropdownCollectionView.__super__.initialize.apply(this, arguments);
+            DropdownCollectionView.__super__.initialize.call(this, options);
             // handle resize event once per frame (1000 ms / 25 frames)
             this.updateDropdown = _.debounce(this.updateDropdown.bind(this), 40);
         },
@@ -56,7 +55,7 @@ define(function(require) {
         },
 
         updateDropdownMaxHeight: function() {
-            var $list = this.$(this.listSelector);
+            const $list = this.$(this.listSelector);
 
             if ($list.is(':visible')) {
                 $list.css('max-height', $(window).height() - $list.offset().top);
@@ -69,7 +68,7 @@ define(function(require) {
          * Updates position of root element
          */
         positionUpdate: function() {
-            var pos = _.result(this, 'position');
+            const pos = _.result(this, 'position');
             if (pos) {
                 this.$el.css('left', pos.left);
             }
@@ -79,15 +78,14 @@ define(function(require) {
          * Runs filterer and filterCallback methods for each model and its view
          */
         recheckItems: function() {
-            var visibilityChanged;
+            let visibilityChanged;
 
             this.collection.each(function(model, index) {
-                var visibleItemsIndex;
-                var view = this.subview('itemView:' + model.cid);
-                var included = this.filterer(model, index);
+                const view = this.subview('itemView:' + model.cid);
+                const included = this.filterer(model, index);
                 this.filterCallback(view, included);
 
-                visibleItemsIndex = utils.indexOf(this.visibleItems, model);
+                const visibleItemsIndex = utils.indexOf(this.visibleItems, model);
                 if (included && visibleItemsIndex === -1) {
                     // included -- push model to visible items list
                     this.visibleItems.push(model);
@@ -115,7 +113,7 @@ define(function(require) {
         },
 
         renderAllItems: function() {
-            DropdownCollectionView.__super__.renderAllItems.apply(this, arguments);
+            DropdownCollectionView.__super__.renderAllItems.call(this);
             this.updateVisibility();
         },
 

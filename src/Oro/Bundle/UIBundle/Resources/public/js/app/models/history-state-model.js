@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var HistoryStateModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
-    HistoryStateModel = BaseModel.extend({
+    const HistoryStateModel = BaseModel.extend({
         /**
          * @inheritDoc
          */
-        constructor: function HistoryStateModel() {
-            HistoryStateModel.__super__.constructor.apply(this, arguments);
+        constructor: function HistoryStateModel(attrs, options) {
+            HistoryStateModel.__super__.constructor.call(this, attrs, options);
         },
 
         defaults: function() {

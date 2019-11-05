@@ -11,7 +11,7 @@ define([
         });
 
         it('compare mediator to Backbone.Events', function() {
-            var prop;
+            let prop;
             for (prop in Backbone.Events) {
                 if (Backbone.Events.hasOwnProperty(prop)) {
                     expect(mediator[prop]).toEqual(Backbone.Events[prop]);

@@ -7,14 +7,12 @@ define([
 ], function(Backbone, _, ItemCollection) {
     'use strict';
 
-    var DashboardItemsView;
-
     /**
      * @export  orodashboard/js/items/view
      * @class   orodashboard.items.Model
      * @extends Backbone.Model
      */
-    DashboardItemsView = Backbone.View.extend({
+    const DashboardItemsView = Backbone.View.extend({
         events: {
             'change .item-select': '_toggleButtons',
             'click .add-button:not(.disabled)': '_onAddClick',
@@ -36,8 +34,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function DashboardItemsView() {
-            DashboardItemsView.__super__.constructor.apply(this, arguments);
+        constructor: function DashboardItemsView(options) {
+            DashboardItemsView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -61,7 +59,7 @@ define([
         },
 
         _initializeItems: function(itemsData, baseName) {
-            var items = new ItemCollection(itemsData);
+            const items = new ItemCollection(itemsData);
             items.each(function(item, index) {
                 item.set('namePrefix', baseName + '[' + index + ']');
             });
@@ -70,12 +68,12 @@ define([
         },
 
         _initializeFilter: function(items, options) {
-            var selectTpl = _.template(Backbone.$(this.selectTplSelector).html());
-            var select = selectTpl({
+            const selectTpl = _.template(Backbone.$(this.selectTplSelector).html());
+            const select = selectTpl({
                 items: items
             });
 
-            var $filterContainer = this.$('.controls:first');
+            const $filterContainer = this.$('.controls:first');
             $filterContainer.prepend(select);
             this.itemSelect = $filterContainer.find('select');
             this.itemSelect.inputWidget('create', 'select2', {
@@ -86,7 +84,7 @@ define([
             });
 
             items.on('change:show', function(model) {
-                var $option = this.itemSelect.find('option[value=' + model.id + ']');
+                const $option = this.itemSelect.find('option[value=' + model.id + ']');
                 if (model.get('show')) {
                     $option.addClass('hide');
                 } else {
@@ -94,17 +92,17 @@ define([
                 }
             }, this);
 
-            var showedItems = items.where({show: true});
+            const showedItems = items.where({show: true});
             _.each(showedItems, function(item) {
-                var $option = this.itemSelect.find('option[value=' + item.id + ']');
+                const $option = this.itemSelect.find('option[value=' + item.id + ']');
                 $option.addClass('hide');
             }, this);
         },
 
         _initializeItemGrid: function(items) {
-            var $itemContainer = this.$('.item-container');
-            var showedItems = items.where({show: true});
-            var filteredItems = this.filteredItems = new ItemCollection(showedItems, {comparator: 'order'});
+            const $itemContainer = this.$('.item-container');
+            const showedItems = items.where({show: true});
+            const filteredItems = this.filteredItems = new ItemCollection(showedItems, {comparator: 'order'});
 
             $itemContainer.itemsManagerTable({
                 itemTemplate: Backbone.$(this.itemTplSelector).html(),
@@ -135,9 +133,9 @@ define([
             });
 
             $itemContainer.on('change', function(e) {
-                var value;
-                var $target = Backbone.$(e.target);
-                var item = items.get($target.closest('tr').data('cid'));
+                let value;
+                const $target = Backbone.$(e.target);
+                const item = items.get($target.closest('tr').data('cid'));
                 if (item) {
                     value = $target.is(':checkbox') ? $target.is(':checked') : $target.val();
                     item.set($target.data('name'), value);
@@ -146,8 +144,8 @@ define([
         },
 
         _onAddClick: function() {
-            var item = this.itemSelect.inputWidget('val');
-            var model = this.items.get(item);
+            const item = this.itemSelect.inputWidget('val');
+            const model = this.items.get(item);
 
             model.set('show', true);
 
@@ -181,10 +179,10 @@ define([
         },
 
         _moveModel: function(model, shift) {
-            var order;
-            var targetModel;
-            var collection = this.filteredItems;
-            var targetIndex = collection.indexOf(model) + shift;
+            let order;
+            let targetModel;
+            const collection = this.filteredItems;
+            const targetIndex = collection.indexOf(model) + shift;
             if (targetIndex >= 0 && targetIndex < collection.length) {
                 targetModel = collection.at(targetIndex);
                 order = model.get('order');

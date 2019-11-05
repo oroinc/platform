@@ -3,20 +3,19 @@ define(function(require, exports, module) {
 
     require('app-modules').default;
 
-    var DeviceSwitcherApp;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var DeviceSwitcherView = require('oroviewswitcher/js/app/views/device-switcher-view');
-    var innerPageModelService = require('oroviewswitcher/js/app/services/inner-page-model-service');
-    var DemoPopupView = require('oroviewswitcher/js/app/views/demo/demo-popup-view');
-    var DemoHelpCarouselView = require('oroviewswitcher/js/app/views/demo/demo-help-carousel-view');
-    var DemoLogoutButtonView = require('oroviewswitcher/js/app/views/demo/demo-logout-button-view');
-    var config = require('module-config').default(module.id);
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const DeviceSwitcherView = require('oroviewswitcher/js/app/views/device-switcher-view');
+    const innerPageModelService = require('oroviewswitcher/js/app/services/inner-page-model-service');
+    const DemoPopupView = require('oroviewswitcher/js/app/views/demo/demo-popup-view');
+    const DemoHelpCarouselView = require('oroviewswitcher/js/app/views/demo/demo-help-carousel-view');
+    const DemoLogoutButtonView = require('oroviewswitcher/js/app/views/demo/demo-logout-button-view');
+    const config = require('module-config').default(module.id);
 
-    var pageModel = innerPageModelService.getModel();
+    const pageModel = innerPageModelService.getModel();
     pageModel.set(_.pick(config, 'personalDemoUrl', 'projectName'));
 
-    DeviceSwitcherApp = new DeviceSwitcherView({
+    const DeviceSwitcherApp = new DeviceSwitcherView({
         _sourceElement: $('<div class="demo-page" />').appendTo('body'),
         pageModel: pageModel
     });

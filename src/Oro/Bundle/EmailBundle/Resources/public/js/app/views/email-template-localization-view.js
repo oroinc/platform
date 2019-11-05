@@ -7,9 +7,7 @@ define([
 ], function($, _, tinyMCE, mediator, BaseView) {
     'use strict';
 
-    var EmailTemplateLocalizationView;
-
-    EmailTemplateLocalizationView = BaseView.extend({
+    const EmailTemplateLocalizationView = BaseView.extend({
         options: {
             localization: {
                 id: null,
@@ -33,8 +31,8 @@ define([
         /**
          * {@inheritDoc}
          */
-        constructor: function EmailTemplateLocalizationView() {
-            EmailTemplateLocalizationView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailTemplateLocalizationView(options) {
+            EmailTemplateLocalizationView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -56,9 +54,9 @@ define([
             );
 
             this.fields = {};
-            for (var fieldName in this.options.fields) {
+            for (const fieldName in this.options.fields) {
                 if (this.options.fields.hasOwnProperty(fieldName)) {
-                    var field = {
+                    const field = {
                         $input: this.$el.find(this.options.fields[fieldName].input),
                         $fallback: this.$el.find(this.options.fields[fieldName].fallback)
                     };
@@ -92,11 +90,11 @@ define([
                 }
             }
 
-            EmailTemplateLocalizationView.__super__.initialize.call(this, arguments);
+            EmailTemplateLocalizationView.__super__.initialize.call(this, options);
         },
 
         processFallback: function(fieldName) {
-            var field = this.fields[fieldName];
+            const field = this.fields[fieldName];
 
             if (this.isFieldFallback(fieldName)) {
                 field.$input.attr('disabled', 'disabled');
@@ -161,7 +159,7 @@ define([
                 return;
             }
 
-            for (var fieldName in this.fields) {
+            for (const fieldName in this.fields) {
                 if (this.fields.hasOwnProperty(fieldName)) {
                     this.fields[fieldName].$input.off(this.eventNamespace());
                     this.fields[fieldName].$fallback.off(this.eventNamespace());

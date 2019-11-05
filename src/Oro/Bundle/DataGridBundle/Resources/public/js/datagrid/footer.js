@@ -7,8 +7,6 @@ define([
 ], function(_, Backbone, Backgrid, FooterRow, FooterCell) {
     'use strict';
 
-    var Footer;
-
     /**
      * Datagrid footer widget
      *
@@ -16,7 +14,7 @@ define([
      * @class   orodatagrid.datagrid.Footer
      * @extends Backgrid.Footer
      */
-    Footer = Backgrid.Footer.extend({
+    const Footer = Backgrid.Footer.extend({
         /** @property */
         tagName: 'tfoot',
 
@@ -39,8 +37,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function Footer() {
-            Footer.__super__.constructor.apply(this, arguments);
+        constructor: function Footer(options) {
+            Footer.__super__.constructor.call(this, options);
         },
 
         /**
@@ -48,7 +46,6 @@ define([
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['themeOptions']));
-            var state;
 
             this.rows = [];
             if (!options.collection) {
@@ -61,7 +58,7 @@ define([
             this.columns = options.columns;
             this.filteredColumns = options.filteredColumns;
 
-            state = options.collection.state || {};
+            const state = options.collection.state || {};
             if (state.totals && Object.keys(state.totals).length) {
                 this.renderable = true;
                 _.each(state.totals, function(total, rowName) {

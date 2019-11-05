@@ -545,14 +545,12 @@ Custom locale can be passed in third argument:
 JS
 ==
 
-On JS side number formatter is available via module "orolocale/js/formatter/number".
+On JS side number formatter is available via module `orolocale/js/formatter/number`.
 
-To use it include it to via require.js like this:
+Just import it in your code like this:
 
 ```js
-require(['orolocale/js/formatter/number'], function(numberFormatter) {
-
-});
+import numberFormatter from 'orolocale/js/formatter/number';
 ```
 
 This module provides next functions for different cases:
@@ -567,10 +565,10 @@ Formats number to decimal localized format.
 Example of usage:
 
 ```js
-require(['orolocale/js/formatter/number'], function(numberFormatter) {
-    // 10,000.000 depending on locale settings
-    console.log(numberFormatter.formatDecimal(10000)));
-});
+import numberFormatter from 'orolocale/js/formatter/number';
+
+// 10,000.000 depending on locale settings
+console.log(numberFormatter.formatDecimal(10000)));
 ```
 
 ### formatInteger
@@ -580,10 +578,10 @@ Formats number to integer localized format.
 Example of usage:
 
 ```js
-require(['orolocale/js/formatter/number'], function(numberFormatter) {
-    // 10,000 depending on locale settings
-    console.log(numberFormatter.formatInteger(10000)));
-});
+import numberFormatter from 'orolocale/js/formatter/number';
+
+// 10,000 depending on locale settings
+console.log(numberFormatter.formatInteger(10000)));
 ```
 
 ### formatPercent
@@ -593,10 +591,10 @@ Formats number to percent localized format.
 Example of usage:
 
 ```js
-require(['orolocale/js/formatter/number'], function(numberFormatter) {
-    // 50% depending on locale settings
-    console.log(numberFormatter.formatPercent(.5)));
-});
+import numberFormatter from 'orolocale/js/formatter/number';
+
+// 50% depending on locale settings
+console.log(numberFormatter.formatPercent(.5)));
 ```
 
 ### formatCurrency
@@ -606,13 +604,13 @@ Formats number to currency localized format. If currency is not specified, then 
 Example of usage:
 
 ```js
-require(['orolocale/js/formatter/number'], function(numberFormatter) {
-    // ($50,000.45) depending on locale settings if default currency in USD
-    console.log(numberFormatter.formatCurrency(-50000.45)));
+import numberFormatter from 'orolocale/js/formatter/number';
 
-    // €1,000.00 depending on locale settings
-    console.log(numberFormatter.formatCurrency(1000, 'EUR')));
-});
+// ($50,000.45) depending on locale settings if default currency in USD
+console.log(numberFormatter.formatCurrency(-50000.45)));
+
+// €1,000.00 depending on locale settings
+console.log(numberFormatter.formatCurrency(1000, 'EUR')));
 ```
 
 ### unformat
@@ -622,17 +620,17 @@ Parses a number from localized number string. Can be used to parse all styles of
 Example of usage:
 
 ```js
-require(['orolocale/js/formatter/number'], function(numberFormatter) {
-    // 50000.45 depending on locale settings
-    console.log(numberFormatter.unformat('$50,000.45')));
+import numberFormatter from 'orolocale/js/formatter/number';
 
-    // 0.95 depending on locale settings
-    console.log(numberFormatter.unformat('95%')));
+// 50000.45 depending on locale settings
+console.log(numberFormatter.unformat('$50,000.45')));
 
-    // -1000000.456 depending on locale settings
-    console.log(numberFormatter.unformat('(1,000,000.456)')));
+// 0.95 depending on locale settings
+console.log(numberFormatter.unformat('95%')));
 
-    // NaN
-    console.log(numberFormatter.unformat('ssss')));
-});
+// -1000000.456 depending on locale settings
+console.log(numberFormatter.unformat('(1,000,000.456)')));
+
+// NaN
+console.log(numberFormatter.unformat('ssss')));
 ```

@@ -155,7 +155,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      */
     protected function isApplicable(array $options)
     {
-        if ($options['dynamic_fields_disabled'] || empty($options['data_class'])) {
+        if ($options['dynamic_fields_disabled'] || empty($options['data_class']) || empty($options['compound'])) {
             return false;
         }
 

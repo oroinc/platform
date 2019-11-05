@@ -4,22 +4,20 @@ define([
 ], function($, BaseView) {
     'use strict';
 
-    var ActivityContextActivityView;
-
-    ActivityContextActivityView = BaseView.extend({
+    const ActivityContextActivityView = BaseView.extend({
         /**
          * @inheritDoc
          */
-        constructor: function ActivityContextActivityView() {
-            ActivityContextActivityView.__super__.constructor.apply(this, arguments);
+        constructor: function ActivityContextActivityView(options) {
+            ActivityContextActivityView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
+        initialize: function(options) {
             this.on('render', function() {
-                var $icons = this.$el.find('[data-role="delete-item"]');
+                const $icons = this.$el.find('[data-role="delete-item"]');
 
                 if (this.collection.length === 1) {
                     $icons.css('visibility', 'hidden');
@@ -28,7 +26,7 @@ define([
                 }
             });
 
-            ActivityContextActivityView.__super__.initialize.apply(this, arguments);
+            ActivityContextActivityView.__super__.initialize.call(this, options);
         }
     });
 

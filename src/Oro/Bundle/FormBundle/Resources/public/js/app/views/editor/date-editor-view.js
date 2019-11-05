@@ -1,6 +1,14 @@
 define(function(require) {
     'use strict';
 
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const moment = require('moment');
+    const datetimeFormatter = require('orolocale/js/formatter/datetime');
+    const TextEditorView = require('./text-editor-view');
+    const DatepickerView = require('oroui/js/app/views/datepicker/datepicker-view');
+
     /**
      * Date cell content editor
      *
@@ -61,16 +69,7 @@ define(function(require) {
      * @augments [TextEditorView](./text-editor-view.md)
      * @exports DateEditorView
      */
-    var DateEditorView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var moment = require('moment');
-    var datetimeFormatter = require('orolocale/js/formatter/datetime');
-    var TextEditorView = require('./text-editor-view');
-    var DatepickerView = require('oroui/js/app/views/datepicker/datepicker-view');
-
-    DateEditorView = TextEditorView.extend(/** @exports DateEditorView.prototype */{
+    const DateEditorView = TextEditorView.extend(/** @exports DateEditorView.prototype */{
         className: 'date-editor',
         inputType: 'date',
         view: DatepickerView,
@@ -102,14 +101,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DateEditorView() {
-            DateEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function DateEditorView(options) {
+            DateEditorView.__super__.constructor.call(this, options);
         },
 
         render: function() {
             DateEditorView.__super__.render.call(this);
-            var $input;
-            var View = this.view;
+            const View = this.view;
             this.view = new View(this.getViewOptions());
             if (this.options.value) {
                 this.setFormState(this.options.value);
@@ -118,7 +116,7 @@ define(function(require) {
                 this._isDateSelection = true;
             }, this));
             // fix enter behaviour
-            $input = this.$('.hasDatepicker');
+            const $input = this.$('.hasDatepicker');
             $input.bindFirst('keydown' + this.eventNamespace(),
                 _.bind(this.onGenericEnterKeydown, this));
             // fix esc behaviour
@@ -132,12 +130,12 @@ define(function(require) {
                 // there is no other way to get if datepicker is visible
                 if ($('#ui-datepicker-div').is(':visible')) {
                     if (!this.isChanged()) {
-                        DateEditorView.__super__.onGenericEnterKeydown.apply(this, arguments);
+                        DateEditorView.__super__.onGenericEnterKeydown.call(this, e);
                     } else {
                         this.$('.hasDatepicker').datepicker('hide');
                     }
                 } else {
-                    DateEditorView.__super__.onGenericEnterKeydown.apply(this, arguments);
+                    DateEditorView.__super__.onGenericEnterKeydown.call(this, e);
                 }
             }
         },
@@ -148,7 +146,7 @@ define(function(require) {
                 if ($('#ui-datepicker-div').is(':visible')) {
                     this.$('.hasDatepicker').datepicker('hide');
                 } else {
-                    DateEditorView.__super__.onGenericEscapeKeydown.apply(this, arguments);
+                    DateEditorView.__super__.onGenericEscapeKeydown.call(this, e);
                 }
             }
         },
@@ -210,13 +208,13 @@ define(function(require) {
         },
 
         getValue: function() {
-            var raw = this.$('input[name=value]').val();
+            const raw = this.$('input[name=value]').val();
             return !raw ? null : moment.utc(raw, this.format);
         },
 
         isChanged: function() {
-            var value = this.getValue();
-            var modelValue = this.getModelValue();
+            const value = this.getValue();
+            const modelValue = this.getModelValue();
             if (value !== null && modelValue !== null) {
                 return value.diff(modelValue);
             }

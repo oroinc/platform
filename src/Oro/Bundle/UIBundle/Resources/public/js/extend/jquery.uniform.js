@@ -14,18 +14,18 @@ define(function(require) {
         $elParent.toggleClass('uniform-empty-value', $el[0].value.trim() === '');
     }
 
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const $ = require('jquery');
+    const _ = require('underscore');
 
     require('jquery.uniform');
 
-    var classList = ['selectClass', 'selectMultiClass'];
-    var originalUniform = $.fn.uniform;
+    const classList = ['selectClass', 'selectMultiClass'];
+    const originalUniform = $.fn.uniform;
 
     $.fn.uniform = _.wrap($.fn.uniform, function(original, options) {
         if ($(this).is('select')) {
-            var config = _.extend({}, $.uniform.defaults, options);
-            var uniformParentSelectors = _.map(
+            const config = _.extend({}, $.uniform.defaults, options);
+            const uniformParentSelectors = _.map(
                 _.values(_.pick(config, classList)),
                 function(selector) {
                     return '.' + selector;
@@ -34,8 +34,8 @@ define(function(require) {
             original.call(this, config);
 
             return this.each(function() {
-                var $el = $(this);
-                var uniformContainer = $el.parent(uniformParentSelectors);
+                const $el = $(this);
+                const uniformContainer = $el.parent(uniformParentSelectors);
 
                 markIfEmpty($el, uniformContainer);
 

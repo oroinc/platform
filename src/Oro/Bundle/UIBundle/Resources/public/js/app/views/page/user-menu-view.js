@@ -3,14 +3,12 @@ define([
 ], function(PageRegionView) {
     'use strict';
 
-    var PageUserMenuView;
-
-    PageUserMenuView = PageRegionView.extend({
+    const PageUserMenuView = PageRegionView.extend({
         /**
          * @inheritDoc
          */
-        constructor: function PageUserMenuView() {
-            PageUserMenuView.__super__.constructor.apply(this, arguments);
+        constructor: function PageUserMenuView(options) {
+            PageUserMenuView.__super__.constructor.call(this, options);
         },
 
         template: function(data) {

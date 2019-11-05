@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var AddressView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var mediator = require('oroui/js/mediator');
-    var addressFormatter = require('orolocale/js/formatter/address');
-    var deleteConfirmation = require('oroui/js/delete-confirmation');
-    var __ = require('orotranslation/js/translator');
-    var tools = require('oroui/js/tools');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const mediator = require('oroui/js/mediator');
+    const addressFormatter = require('orolocale/js/formatter/address');
+    const deleteConfirmation = require('oroui/js/delete-confirmation');
+    const __ = require('orotranslation/js/translator');
+    const tools = require('oroui/js/tools');
 
     /**
      * @export  oroaddress/js/address/view
      * @class   oroaddress.address.View
      * @extends Backbone.View
      */
-    AddressView = BaseView.extend({
+    const AddressView = BaseView.extend({
         tagName: 'div',
 
         attributes: {
@@ -68,8 +67,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AddressView() {
-            AddressView.__super__.constructor.apply(this, arguments);
+        constructor: function AddressView(options) {
+            AddressView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -98,7 +97,7 @@ define(function(require) {
             }
 
             delete this.confirmRemoveComponent;
-            return AddressView.__super__.dispose.apply(this, arguments);
+            return AddressView.__super__.dispose.call(this);
         },
 
         activate: function() {
@@ -136,7 +135,7 @@ define(function(require) {
                             return;
                         }
 
-                        var confirmRemoveView = new this.confirmRemoveComponent(this.confirmRemoveMessages);
+                        const confirmRemoveView = new this.confirmRemoveComponent(this.confirmRemoveMessages);
 
                         this.subview('confirmRemoveView', confirmRemoveView);
                         confirmRemoveView.on('ok', callback)
@@ -145,7 +144,7 @@ define(function(require) {
                         delete this.confirmRemoveComponentPromise;
                     }.bind(this));
                 } else {
-                    var confirmRemoveView = this.subview('confirmRemoveView');
+                    let confirmRemoveView = this.subview('confirmRemoveView');
 
                     if (confirmRemoveView === void 0 || confirmRemoveView.disposed) {
                         confirmRemoveView = new this.confirmRemoveComponent(this.confirmRemoveMessages);
@@ -163,8 +162,8 @@ define(function(require) {
         },
 
         render: function() {
-            var data = this.model.toJSON();
-            var mappedData = this.prepareData(data);
+            const data = this.model.toJSON();
+            const mappedData = this.prepareData(data);
             data.formatted_address = addressFormatter.format(mappedData, null, '\n');
             data.searchable_string = this.model.getSearchableString();
             this.$el.append(this.template(data));
@@ -175,8 +174,8 @@ define(function(require) {
         },
 
         prepareData: function(data) {
-            var mappedData = {};
-            var map = this.mapping;
+            const mappedData = {};
+            const map = this.mapping;
 
             if (data) {
                 _.each(data, function(value, key) {

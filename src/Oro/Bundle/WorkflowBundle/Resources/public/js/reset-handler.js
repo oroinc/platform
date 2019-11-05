@@ -14,7 +14,7 @@ define([
      * @class   oroworkflow.WorkflowDeleteHandler
      */
     return function() {
-        var element = $(this);
+        const element = $(this);
         if (element.data('_in-progress')) {
             return;
         }
@@ -24,7 +24,7 @@ define([
             element.data('_in-progress', false);
         }
 
-        var confirmReset = new Modal({
+        const confirmReset = new Modal({
             title: __('oro.workflow.workflowdefinition.reset'),
             content: __('oro.workflow.workflowdefinition.reset_message'),
             okText: __('oro.workflow.workflowdefinition.reset_button_text')

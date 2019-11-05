@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var ActivityContextActivityModel;
-    var routing = require('routing');
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const routing = require('routing');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
     /**
      * @export  oroactivity/js/app/models/activity-context-activity-model
      */
-    ActivityContextActivityModel = BaseModel.extend({
+    const ActivityContextActivityModel = BaseModel.extend({
         defaults: {
             entity: '',
             className: '',
@@ -19,12 +18,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ActivityContextActivityModel() {
-            ActivityContextActivityModel.__super__.constructor.apply(this, arguments);
+        constructor: function ActivityContextActivityModel(...args) {
+            ActivityContextActivityModel.__super__.constructor.apply(this, args);
         },
 
         url: function() {
-            var param = {
+            const param = {
                 activity: this.get('activityClassAlias'),
                 id: this.get('entityId'),
                 entity: this.get('targetClassName'),

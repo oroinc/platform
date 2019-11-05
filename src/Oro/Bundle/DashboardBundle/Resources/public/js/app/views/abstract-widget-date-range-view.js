@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var AbstractWidgetDateCompareView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
 
-    AbstractWidgetDateCompareView = BaseView.extend({
+    const AbstractWidgetDateCompareView = BaseView.extend({
         autoRender: true,
 
         optionNames: BaseView.prototype.optionNames.concat([
@@ -17,17 +16,17 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AbstractWidgetDateCompareView() {
-            AbstractWidgetDateCompareView.__super__.constructor.apply(this, arguments);
+        constructor: function AbstractWidgetDateCompareView(options) {
+            AbstractWidgetDateCompareView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
+        initialize: function(options) {
             this.valueConfig = _.clone(this.valueConfig);
 
-            AbstractWidgetDateCompareView.__super__.initialize.apply(this, arguments);
+            AbstractWidgetDateCompareView.__super__.initialize.call(this, options);
         },
 
         _getDataRangeFilterValue: function() {
@@ -41,7 +40,7 @@ define(function(require) {
         },
 
         _renderDateRangeFilter: function(dateRangeFilter) {
-            var value = this._getDataRangeFilterValue();
+            const value = this._getDataRangeFilterValue();
 
             dateRangeFilter.updateValue(value);
             dateRangeFilter.render();

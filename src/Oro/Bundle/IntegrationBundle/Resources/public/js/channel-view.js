@@ -8,14 +8,12 @@ define([
 ], function($, Backbone, _, __, mediator, DeleteConfirmation) {
     'use strict';
 
-    var ChanelView;
-
     /**
      * @export  orointegration/js/channel-view
      * @class   orointegration.channelView
      * @extends Backbone.View
      */
-    ChanelView = Backbone.View.extend({
+    const ChanelView = Backbone.View.extend({
         /**
          * @const
          */
@@ -35,8 +33,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function ChanelView() {
-            ChanelView.__super__.constructor.apply(this, arguments);
+        constructor: function ChanelView(options) {
+            ChanelView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -44,14 +42,14 @@ define([
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-            var requiredMissed = this.requiredOptions.filter(function(option) {
+            const requiredMissed = this.requiredOptions.filter(function(option) {
                 return _.isUndefined(options[option]);
             });
             if (requiredMissed.length) {
                 throw new TypeError('Missing required option(s): ' + requiredMissed.join(','));
             }
 
-            for (var fieldSet in options.fieldsSets) {
+            for (const fieldSet in options.fieldsSets) {
                 if (fieldSet in this.fieldsSets) {
                     this.fieldsSets[fieldSet] = _.union(this.fieldsSets[fieldSet], options.fieldsSets[fieldSet]);
                 } else {
@@ -70,7 +68,7 @@ define([
          * Hide transport type select element in case when only one type exists
          */
         processSelectorState: function() {
-            var $el = $(this.options.transportTypeSelector);
+            const $el = $(this.options.transportTypeSelector);
 
             if ($el.find('option').length < 2) {
                 $el.parents('.control-group:first').hide();
@@ -82,11 +80,11 @@ define([
          * @param {$.Event} e
          */
         changeHandler: function(e) {
-            var $el = $(e.currentTarget);
+            const $el = $(e.currentTarget);
             if ($el.data('cancelled') !== true) {
-                var prevVal = $el.data('current');
+                const prevVal = $el.data('current');
                 if (!this.isEmpty()) {
-                    var confirm = new DeleteConfirmation({
+                    const confirm = new DeleteConfirmation({
                         title: __('oro.integration.change_type'),
                         okText: __('Yes'),
                         content: __('oro.integration.submit')
@@ -115,17 +113,17 @@ define([
         processChange: function($el) {
             this.memoizeValue($el);
 
-            var $form = $(this.options.formSelector);
-            var data = $form.serializeArray();
-            var url = $form.attr('action');
-            var fieldsSet = $el.is(this.options.typeSelector) ? this.fieldsSets.type : this.fieldsSets.transportType;
+            const $form = $(this.options.formSelector);
+            let data = $form.serializeArray();
+            const url = $form.attr('action');
+            const fieldsSet = $el.is(this.options.typeSelector) ? this.fieldsSets.type : this.fieldsSets.transportType;
 
             data = _.filter(data, function(field) {
                 return _.indexOf(fieldsSet, field.name) !== -1;
             });
             data.push({name: this.UPDATE_MARKER, value: $el.attr('name')});
 
-            var event = {formEl: $form, data: data, reloadManually: true};
+            const event = {formEl: $form, data: data, reloadManually: true};
             mediator.trigger('integrationFormReload:before', event);
 
             if (event.reloadManually) {
@@ -139,7 +137,7 @@ define([
          * @returns {boolean}
          */
         isEmpty: function() {
-            var fields = $(this.options.typeSelector).parents('form').find('input[type="text"]:not([name$="[name]"])');
+            let fields = $(this.options.typeSelector).parents('form').find('input[type="text"]:not([name$="[name]"])');
 
             fields = fields.filter(function() {
                 return this.value !== '';
@@ -154,7 +152,7 @@ define([
          * @param {HTMLSelectElement} el
          */
         memoizeValue: function(el) {
-            var $el = $(el);
+            const $el = $(el);
             $el.data('current', $el.val());
         }
     });

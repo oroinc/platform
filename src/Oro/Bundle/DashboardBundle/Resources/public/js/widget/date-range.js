@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var WidgetConfigDateRangeFilter;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var __ = require('orotranslation/js/translator');
-    var DateFilter = require('oro/filter/date-filter');
-    var tools = require('oroui/js/tools');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const __ = require('orotranslation/js/translator');
+    const DateFilter = require('oro/filter/date-filter');
+    const tools = require('oroui/js/tools');
 
-    WidgetConfigDateRangeFilter = DateFilter.extend({
+    const WidgetConfigDateRangeFilter = DateFilter.extend({
         customChoice: {
             attr: [],
             data: -5,
@@ -41,15 +40,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function WidgetConfigDateRangeFilter() {
-            WidgetConfigDateRangeFilter.__super__.constructor.apply(this, arguments);
+        constructor: function WidgetConfigDateRangeFilter(options) {
+            WidgetConfigDateRangeFilter.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            WidgetConfigDateRangeFilter.__super__.initialize.apply(this, arguments);
+            WidgetConfigDateRangeFilter.__super__.initialize.call(this, options);
             options.$form.on('submit' + this.eventNamespace(), _.bind(this.onSubmit, this));
         },
 
@@ -62,17 +61,17 @@ define(function(require) {
         },
 
         onSubmit: function() {
-            var value = _.extend({}, this.emptyValue, this.getValue());
+            const value = _.extend({}, this.emptyValue, this.getValue());
             if (_.values(this.typeValues).indexOf(parseInt(value.type)) !== -1 &&
                 !value.value.start && !value.value.end
             ) {
-                var defaultTypeValue = this.getDefaultTypeValue();
+                const defaultTypeValue = this.getDefaultTypeValue();
                 this.domCache.$datePart.val(defaultTypeValue).change();
             }
         },
 
         onChangeFilterTypeView: function(e) {
-            var val = parseInt($(e.target).val());
+            let val = parseInt($(e.target).val());
             if (val === this.customChoice.value) {
                 val = this.domCache.$customPart.val();
             }
@@ -99,15 +98,15 @@ define(function(require) {
 
             this.domCache = null;
             this.options.$form.off(this.eventNamespace());
-            WidgetConfigDateRangeFilter.__super__.dispose.apply(this, arguments);
+            WidgetConfigDateRangeFilter.__super__.dispose.call(this);
         },
 
         changeFilterType: function(value) {
-            var oldRect = this.el.getBoundingClientRect();
+            const oldRect = this.el.getBoundingClientRect();
 
-            WidgetConfigDateRangeFilter.__super__.changeFilterType.apply(this, arguments);
+            WidgetConfigDateRangeFilter.__super__.changeFilterType.call(this, value);
 
-            var type = parseInt(value, 10);
+            const type = parseInt(value, 10);
             if (!isNaN(type)) {
                 if (_.values(this.typeDefinedValues).indexOf(type) === -1) {
                     this.domCache.$customPart.show();
@@ -120,7 +119,7 @@ define(function(require) {
                     this.domCache.$customPart.data('input-widget').refresh();
                 }
 
-                var newRect = this.el.getBoundingClientRect();
+                const newRect = this.el.getBoundingClientRect();
 
                 if (oldRect.width !== newRect.width || oldRect.height !== newRect.height) {
                     this.$el.trigger('content:changed');
@@ -129,7 +128,7 @@ define(function(require) {
         },
 
         getDefaultTypeValue: function() {
-            var choiceData = _.pluck(this.choices, 'data');
+            const choiceData = _.pluck(this.choices, 'data');
             return choiceData.indexOf(this.typeDefinedValues.all_time) === -1
                 ? this.emptyValue.type
                 : this.typeDefinedValues.all_time;
@@ -137,16 +136,16 @@ define(function(require) {
 
         _getParts: function() {
             if (!this.valueTypes) {
-                return WidgetConfigDateRangeFilter.__super__._getParts.apply(this, arguments);
+                return WidgetConfigDateRangeFilter.__super__._getParts.call(this);
             }
 
-            var parts = [];
-            var value = _.extend({}, this.emptyValue, this.getValue());
-            var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
-            var datePartTemplate = this._getTemplate('fieldTemplate');
+            const parts = [];
+            const value = _.extend({}, this.emptyValue, this.getValue());
+            const selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
+            const datePartTemplate = this._getTemplate('fieldTemplate');
 
-            var typeDefinedValues = _.values(this.typeDefinedValues);
-            var typeDefinedValueChoices = _.filter(this.choices, function(choice) {
+            const typeDefinedValues = _.values(this.typeDefinedValues);
+            const typeDefinedValueChoices = _.filter(this.choices, function(choice) {
                 return typeDefinedValues.indexOf(choice.data) !== -1;
             });
             typeDefinedValueChoices.push(this.customChoice);
@@ -161,8 +160,8 @@ define(function(require) {
                 })
             );
 
-            var typeValues = _.values(this.typeValues);
-            var typeValueChoices = _.filter(this.choices, function(choice) {
+            const typeValues = _.values(this.typeValues);
+            const typeValueChoices = _.filter(this.choices, function(choice) {
                 return typeValues.indexOf(choice.data) !== -1;
             });
             parts.push(

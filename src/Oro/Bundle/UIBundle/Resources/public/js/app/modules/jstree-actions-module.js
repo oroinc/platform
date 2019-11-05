@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var ActionManager = require('oroui/js/jstree-action-manager');
-    var ExpandActionView = require('oroui/js/app/views/jstree/expand-action-view');
-    var CollapseActionView = require('oroui/js/app/views/jstree/collapse-action-view');
-    var MoveActionView = require('oroui/js/app/views/jstree/move-action-view');
+    const ActionManager = require('oroui/js/jstree-action-manager');
+    const ExpandActionView = require('oroui/js/app/views/jstree/expand-action-view');
+    const CollapseActionView = require('oroui/js/app/views/jstree/collapse-action-view');
+    const MoveActionView = require('oroui/js/app/views/jstree/move-action-view');
 
     /**
     * Register actions for all jstree in application
@@ -27,7 +27,7 @@ define(function(require) {
     ActionManager.addAction('move', {
         view: MoveActionView,
         isAvailable: function(options) {
-            var move = options.actions.move || {};
+            const move = options.actions.move || {};
             return options.$tree.data('treeView').checkboxEnabled && move.routeName;
         }
     });

@@ -1,33 +1,32 @@
 define(function(require) {
     'use strict';
 
-    var FormLoadingView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
 
-    FormLoadingView = BaseView.extend({
+    const FormLoadingView = BaseView.extend({
         autoRender: true,
 
         /**
          * @inheritDoc
          */
-        constructor: function FormLoadingView() {
-            FormLoadingView.__super__.constructor.apply(this, arguments);
+        constructor: function FormLoadingView(options) {
+            FormLoadingView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
+        initialize: function(options) {
             this.subview('loadingMaskView', new LoadingMaskView({
                 container: this.$('.section-content')
             }));
 
-            FormLoadingView.__super__.initialize.apply(this, arguments);
+            FormLoadingView.__super__.initialize.call(this, options);
         },
 
         render: function() {
-            FormLoadingView.__super__.render.apply(this, arguments);
+            FormLoadingView.__super__.render.call(this);
 
             this.$el.attr({'data-layout': 'separate', 'data-skip-input-widgets': true});
 
@@ -35,7 +34,7 @@ define(function(require) {
         },
 
         startLoading: function() {
-            var loadingMaskView = this.subview('loadingMaskView');
+            const loadingMaskView = this.subview('loadingMaskView');
 
             loadingMaskView.show();
             this.$el.removeAttr('data-skip-input-widgets');

@@ -1,14 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var DigitalAssetDialogWidget = require('orodigitalasset/js/widget/digital-asset-dialog-widget');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const DigitalAssetDialogWidget = require('orodigitalasset/js/widget/digital-asset-dialog-widget');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    var DigitalAssetChooseFormView;
-
-    DigitalAssetChooseFormView = BaseView.extend({
+    const DigitalAssetChooseFormView = BaseView.extend({
         previewElementTemplate: require('tpl-loader!orodigitalasset/templates/digital-asset-choose-form/preview.html'),
         autoRender: true,
 
@@ -38,15 +36,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DigitalAssetChooseFormView() {
-            DigitalAssetChooseFormView.__super__.constructor.apply(this, arguments);
+        constructor: function DigitalAssetChooseFormView(options) {
+            DigitalAssetChooseFormView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            DigitalAssetChooseFormView.__super__.initialize.apply(this, arguments);
+            DigitalAssetChooseFormView.__super__.initialize.call(this, options);
 
             this.options = $.extend(true, {}, this.options, options);
 
@@ -76,16 +74,17 @@ define(function(require) {
          *  }
          */
         onGridRowSelect: function(data) {
-            var previewMetadata = data.model.get('previewMetadata');
+            const previewMetadata = data.model.get('previewMetadata');
             this.findElement('filename').remove();
             this.findElement('controls').before(this.previewElementTemplate({
                 previewMetadata: previewMetadata,
                 isImageType: this.options.isImageType
             }));
 
-            this.findElement('digitalAssetInput').val(data.model.get('id'));
+            this.setDigitalAsset(data.model.get('id'));
             this.toggleControls(true);
             this.setEmptyFile(false);
+            this.removeValidationErrors();
             this.dialogWidget.remove();
         },
 
@@ -95,8 +94,10 @@ define(function(require) {
         onRemove: function(e) {
             e.preventDefault();
 
+            this.setDigitalAsset('');
             this.toggleControls(false);
             this.setEmptyFile(true);
+            this.removeValidationErrors();
         },
 
         /**
@@ -109,13 +110,19 @@ define(function(require) {
         },
 
         /**
+         * @param {number|string} id
+         */
+        setDigitalAsset: function(id) {
+            this.findElement('digitalAssetInput').val(id);
+        },
+
+        /**
          * @param {boolean} state
          */
         toggleControls: function(state) {
             if (state) {
                 this.findElement('choose').addClass('hide');
                 this.findElement('controls').removeClass('hide');
-                this.removeValidationErrors();
             } else {
                 this.findElement('choose').removeClass('hide');
                 this.findElement('filename').remove();
@@ -124,7 +131,7 @@ define(function(require) {
         },
 
         removeValidationErrors: function() {
-            var $controlGroup = this.$el.closest('.control-group');
+            const $controlGroup = this.$el.closest('.control-group');
 
             $controlGroup.find('.validation-failed').remove();
             $controlGroup.find('.validation-error').removeClass('validation-error');

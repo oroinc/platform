@@ -4,13 +4,12 @@ define(function(require) {
     /**
      * Updates single property during transition
      */
-    var UpdateMainPropertyTransition;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var AbstractTransition = require('./abstract-transition');
-    var mediator = require('oroui/js/mediator');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const AbstractTransition = require('./abstract-transition');
+    const mediator = require('oroui/js/mediator');
 
-    UpdateMainPropertyTransition = AbstractTransition.extend({
+    const UpdateMainPropertyTransition = AbstractTransition.extend({
         constructor: function UpdateMainPropertyTransition(options) {
             UpdateMainPropertyTransition.__super__.constructor.call(this, options);
             this.propertyName = options.propertyName;
@@ -21,12 +20,12 @@ define(function(require) {
          * @inheritDoc
          */
         start: function() {
-            var transition = this;
-            var model = this.model;
-            var boardCollection = this.boardCollection;
-            var properties = this.getPropertiesUpdates();
-            var restoreUpdate = this.getRestoreUpdates();
-            var boardCollectionUpdate = this.relativePosition;
+            const transition = this;
+            const model = this.model;
+            const boardCollection = this.boardCollection;
+            const properties = this.getPropertiesUpdates();
+            const restoreUpdate = this.getRestoreUpdates();
+            const boardCollectionUpdate = this.relativePosition;
             boardCollectionUpdate.properties = properties;
             // move item on screen
             boardCollection.updateBoardItem(model, boardCollectionUpdate);
@@ -70,7 +69,7 @@ define(function(require) {
          * @return {{}} - properties to update
          */
         getPropertiesUpdates: function() {
-            var updates = {};
+            const updates = {};
             updates[this.propertyName] = this.column.get('columnDefinition').ids[0];
             return updates;
         },
@@ -79,13 +78,13 @@ define(function(require) {
          * @return {{}} - board update configuration
          */
         getRestoreUpdates: function() {
-            var _this = this;
-            var columns = this.boardPlugin.getColumns();
-            var initialColumn = columns.find(function(column) {
+            const _this = this;
+            const columns = this.boardPlugin.getColumns();
+            const initialColumn = columns.find(function(column) {
                 return column.get('ids').indexOf(_this.model.get(_this.propertyName)) !== -1;
             });
-            var itemIndex = initialColumn.get('items').indexOf(this.model);
-            var insertAfter = itemIndex === 0 ? void 0 : initialColumn.get('items').at(itemIndex - 1);
+            const itemIndex = initialColumn.get('items').indexOf(this.model);
+            const insertAfter = itemIndex === 0 ? void 0 : initialColumn.get('items').at(itemIndex - 1);
             return {
                 insertAfter: insertAfter,
                 properties: this.getRestorePropertiesUpdates()
@@ -96,13 +95,13 @@ define(function(require) {
          * @return {{}} - properties to update
          */
         getRestorePropertiesUpdates: function() {
-            var updates = {};
+            const updates = {};
             updates[this.propertyName] = this.model.get(this.propertyName);
             return updates;
         }
     }, {
         build: function(model, column, boardPlugin, relativePosition) {
-            var apiAccessorConfiguration = column.get('columnDefinition').transition.save_api_accessor;
+            const apiAccessorConfiguration = column.get('columnDefinition').transition.save_api_accessor;
             return new UpdateMainPropertyTransition({
                 model: model,
                 propertyName: boardPlugin.options.group_by,

@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    var ComponentNeedsB = BaseComponent.extend({
+    const ComponentNeedsB = BaseComponent.extend({
         relatedSiblingComponents: {
             componentB: 'component-b'
         },
@@ -12,12 +12,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ComponentNeedsB() {
-            ComponentNeedsB.__super__.constructor.apply(this, arguments);
+        constructor: function ComponentNeedsB(options) {
+            ComponentNeedsB.__super__.constructor.call(this, options);
         }
     });
 
-    var ComponentNeedsCE = BaseComponent.extend({
+    const ComponentNeedsCE = BaseComponent.extend({
         relatedSiblingComponents: {
             componentC: 'component-c',
             componentE: 'component-e'
@@ -26,12 +26,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ComponentNeedsCE() {
-            ComponentNeedsCE.__super__.constructor.apply(this, arguments);
+        constructor: function ComponentNeedsCE(options) {
+            ComponentNeedsCE.__super__.constructor.call(this, options);
         }
     });
 
-    var ComponentNeedsA = BaseComponent.extend({
+    const ComponentNeedsA = BaseComponent.extend({
         relatedSiblingComponents: {
             componentA: 'component-a'
         },
@@ -39,12 +39,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ComponentNeedsA() {
-            ComponentNeedsA.__super__.constructor.apply(this, arguments);
+        constructor: function ComponentNeedsA(options) {
+            ComponentNeedsA.__super__.constructor.call(this, options);
         }
     });
 
-    var ComponentExtendNoNeedA = ComponentNeedsA.extend({
+    const ComponentExtendNoNeedA = ComponentNeedsA.extend({
         relatedSiblingComponents: {
             componentA: false
         },
@@ -52,21 +52,21 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ComponentExtendNoNeedA() {
-            ComponentExtendNoNeedA.__super__.constructor.apply(this, arguments);
+        constructor: function ComponentExtendNoNeedA(options) {
+            ComponentExtendNoNeedA.__super__.constructor.call(this, options);
         }
     });
 
-    var ComponentNoNeeds = BaseComponent.extend({
+    const ComponentNoNeeds = BaseComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function ComponentNoNeeds() {
-            ComponentNoNeeds.__super__.constructor.apply(this, arguments);
+        constructor: function ComponentNoNeeds(options) {
+            ComponentNoNeeds.__super__.constructor.call(this, options);
         }
     });
 
-    var components = {
+    const components = {
         'js/needs-b-component': ComponentNeedsB,
         'js/needs-ce-component': ComponentNeedsCE,
         'js/needs-a-component': ComponentNeedsA,
@@ -75,7 +75,7 @@ define(function(require) {
     };
 
     return function(moduleName) {
-        var deferred = $.Deferred();
+        const deferred = $.Deferred();
         setTimeout(function() {
             deferred.resolve(components[moduleName]);
         }, 0);

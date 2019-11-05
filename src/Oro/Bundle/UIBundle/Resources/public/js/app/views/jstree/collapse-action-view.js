@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var CollapseActionView;
-    var AbstractActionView = require('oroui/js/app/views/jstree/abstract-action-view');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
+    const AbstractActionView = require('oroui/js/app/views/jstree/abstract-action-view');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
 
-    CollapseActionView = AbstractActionView.extend({
+    const CollapseActionView = AbstractActionView.extend({
         options: _.extend({}, AbstractActionView.prototype.options, {
             icon: 'minus-square-o',
             label: __('oro.ui.jstree.actions.collapse')
@@ -15,8 +14,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function CollapseActionView() {
-            CollapseActionView.__super__.constructor.apply(this, arguments);
+        constructor: function CollapseActionView(options) {
+            CollapseActionView.__super__.constructor.call(this, options);
         },
 
         onClick: function() {

@@ -29,8 +29,10 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
         $this->translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $this->translator->expects($this->any())
             ->method('trans')
-            ->with('oro.locale.fallback.type.parent_localization')
-            ->willReturn('Parent Localization');
+            ->willReturnMap([
+                ['oro.locale.fallback.type.parent_localization', [], null, null, 'Parent Localization'],
+                ['oro.locale.fallback.type.custom', [], null, null, 'Custom']
+            ]);
 
         $this->formType = new FallbackPropertyType($this->translator);
         parent::setUp();
@@ -134,6 +136,19 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
                     'choices' => [0 => '0', 1 => '1'],
                 ],
                 'submittedData' => null,
+            ],
+            'with tabs' => [
+                'inputOptions' => [
+                    'use_tabs' => true,
+                ],
+                'expectedOptions' => [
+                    'choices' => [
+                        'oro.locale.fallback.type.default' => FallbackType::SYSTEM,
+                        'Custom' => FallbackType::NONE,
+                    ],
+                    'use_tabs' => true,
+                ],
+                'submittedData' => FallbackType::NONE,
             ],
         ];
     }

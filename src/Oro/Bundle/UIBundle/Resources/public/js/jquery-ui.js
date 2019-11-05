@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     require('npmassets/jquery-ui/ui/position');
@@ -34,5 +34,4 @@ define(function (require) {
     require('npmassets/jquery-ui/ui/effects/effect-size');
     require('npmassets/jquery-ui/ui/effects/effect-slide');
     require('npmassets/jquery-ui/ui/effects/effect-transfer');
-
 });

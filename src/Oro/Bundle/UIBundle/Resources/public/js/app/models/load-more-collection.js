@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var RoutingCollection = require('./base/routing-collection');
+    const $ = require('jquery');
+    const RoutingCollection = require('./base/routing-collection');
 
     /**
      * Collection with "load more" functionality support. Any add/remove actions will be considered like already done
@@ -14,9 +14,7 @@ define(function(require) {
      * @augment RoutingCollection
      * @exports LoadMoreCollection
      */
-    var LoadMoreCollection;
-
-    LoadMoreCollection = RoutingCollection.extend(/** @lends LoadMoreCollection.prototype */{
+    const LoadMoreCollection = RoutingCollection.extend(/** @lends LoadMoreCollection.prototype */{
         limitPropertyName: 'limit',
 
         initialLimit: 0,
@@ -46,7 +44,7 @@ define(function(require) {
          * @inheritDoc
          */
         constructor: function LoadMoreCollection(models, options) {
-            LoadMoreCollection.__super__.constructor.apply(this, arguments);
+            LoadMoreCollection.__super__.constructor.call(this, models, options);
         },
 
         /**
@@ -65,7 +63,7 @@ define(function(require) {
             if (!this.disposed) {
                 this._state.set('totalItemsQuantity', response.count || 0);
             }
-            return LoadMoreCollection.__super__.parse.apply(this, arguments);
+            return LoadMoreCollection.__super__.parse.call(this, response);
         },
 
         /**
@@ -73,11 +71,10 @@ define(function(require) {
          * @returns {$.Promise} promise
          */
         loadMore: function() {
-            var loadDeferred;
-            var limit = this._route.get(this.limitPropertyName) + this._state.get('loadMoreItemsQuantity');
+            const limit = this._route.get(this.limitPropertyName) + this._state.get('loadMoreItemsQuantity');
 
             this._route.set(this.limitPropertyName, limit);
-            loadDeferred = $.Deferred();
+            const loadDeferred = $.Deferred();
             if (this.isSyncing()) {
                 this.once('sync', function() {
                     loadDeferred.resolve(this);
@@ -94,7 +91,7 @@ define(function(require) {
          * @returns {boolean}
          */
         hasMore: function() {
-            var total = this._state.get('totalItemsQuantity');
+            const total = this._state.get('totalItemsQuantity');
 
             return total === void 0 || this.length < total;
         },
@@ -102,10 +99,10 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        reset: function() {
+        reset: function(...args) {
             this._route.set(this.limitPropertyName, this.initialLimit, {silent: true});
 
-            return LoadMoreCollection.__super__.reset.apply(this, arguments);
+            return LoadMoreCollection.__super__.reset.apply(this, args);
         },
 
         /**

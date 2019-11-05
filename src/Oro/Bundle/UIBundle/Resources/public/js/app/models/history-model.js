@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var HistoryModel;
-    var MAX_LENGTH = 64;
-    var _ = require('underscore');
-    var BaseModel = require('oroui/js/app/models/base/model');
-    var HistoryStateCollection = require('./history-state-collection');
+    const MAX_LENGTH = 64;
+    const _ = require('underscore');
+    const BaseModel = require('oroui/js/app/models/base/model');
+    const HistoryStateCollection = require('./history-state-collection');
 
-    HistoryModel = BaseModel.extend({
+    const HistoryModel = BaseModel.extend({
         defaults: {
             states: null,
             index: -1
@@ -16,8 +15,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function HistoryModel() {
-            HistoryModel.__super__.constructor.apply(this, arguments);
+        constructor: function HistoryModel(attrs, options) {
+            HistoryModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
@@ -32,8 +31,8 @@ define(function(require) {
         },
 
         pushState: function(state) {
-            var states = this.get('states');
-            var index = this.get('index');
+            const states = this.get('states');
+            const index = this.get('index');
             if (states.length > index + 1) {
                 states.reset(states.first(index + 1));
             }

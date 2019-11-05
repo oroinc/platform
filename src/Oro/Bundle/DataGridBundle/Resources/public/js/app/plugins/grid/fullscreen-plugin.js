@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var FullScreenPlugin;
-    var _ = require('underscore');
-    var BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    var mediator = require('oroui/js/mediator');
-    var tools = require('oroui/js/tools');
-    var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
-    var scrollHelper = require('oroui/js/tools/scroll-helper');
+    const _ = require('underscore');
+    const BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    const mediator = require('oroui/js/mediator');
+    const tools = require('oroui/js/tools');
+    const FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
+    const scrollHelper = require('oroui/js/tools/scroll-helper');
 
-    FullScreenPlugin = BasePlugin.extend({
+    const FullScreenPlugin = BasePlugin.extend({
         enable: function() {
             this.listenTo(this.main, 'shown rendered content:update', this.updateLayout, this);
             if (this.main.filterManager) {
@@ -29,7 +28,7 @@ define(function(require) {
         },
 
         listenFilterManager: function() {
-            var debouncedLayoutUpdate = _.debounce(_.bind(this.updateLayout, this), 10);
+            const debouncedLayoutUpdate = _.debounce(_.bind(this.updateLayout, this), 10);
             this.listenTo(this.main.filterManager, 'afterUpdateList', debouncedLayoutUpdate);
             this.listenTo(this.main.filterManager, 'updateFilter', debouncedLayoutUpdate);
         },
@@ -39,8 +38,8 @@ define(function(require) {
          * @returns {string}
          */
         getCssHeightCalcExpression: function() {
-            var documentHeight = scrollHelper.documentHeight();
-            var availableHeight = mediator.execute('layout:getAvailableHeight',
+            const documentHeight = scrollHelper.documentHeight();
+            const availableHeight = mediator.execute('layout:getAvailableHeight',
                 this.main.$grid.parents('.grid-scrollable-container:first'));
             return 'calc(100vh - ' + (documentHeight - availableHeight) + 'px)';
         },
@@ -49,7 +48,6 @@ define(function(require) {
          * Chooses layout on resize or during creation
          */
         updateLayout: function() {
-            var layout;
             if (!this.main.shown) {
                 // not ready to apply layout
                 // try to do that at next js cycle1
@@ -62,7 +60,7 @@ define(function(require) {
             if (tools.isMobile()) {
                 this.manager.enable(FloatingHeaderPlugin);
             }
-            layout = mediator.execute('layout:getPreferredLayout', this.main.$grid);
+            const layout = mediator.execute('layout:getPreferredLayout', this.main.$grid);
             this.setLayout(layout);
         },
 

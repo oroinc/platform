@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var GridColumns;
-    var Backgrid = require('backgrid');
-    var CellEventList = require('./cell-event-list');
+    const Backgrid = require('backgrid');
+    const CellEventList = require('./cell-event-list');
 
-    GridColumns = Backgrid.Columns.extend({
+    const GridColumns = Backgrid.Columns.extend({
         comparator: 'order',
 
         /**
          * @inheritDoc
          */
-        constructor: function GridColumns() {
-            GridColumns.__super__.constructor.apply(this, arguments);
+        constructor: function GridColumns(...args) {
+            GridColumns.__super__.constructor.apply(this, args);
         },
 
         getCellEventList: function() {

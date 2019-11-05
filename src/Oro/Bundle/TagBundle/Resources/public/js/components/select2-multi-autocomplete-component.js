@@ -1,19 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var Select2MultiAutocompleteComponent;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
 
-    Select2MultiAutocompleteComponent = Select2AutocompleteComponent.extend({
+    const Select2MultiAutocompleteComponent = Select2AutocompleteComponent.extend({
         oroTagCreateGranted: false,
 
         /**
          * @inheritDoc
          */
-        constructor: function Select2MultiAutocompleteComponent() {
-            Select2MultiAutocompleteComponent.__super__.constructor.apply(this, arguments);
+        constructor: function Select2MultiAutocompleteComponent(options) {
+            Select2MultiAutocompleteComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -25,12 +24,12 @@ define(function(require) {
         },
 
         preConfig: function(config) {
-            var self = this;
+            const self = this;
             Select2MultiAutocompleteComponent.__super__.preConfig.call(this, config);
             config.maximumInputLength = 50;
 
             config.createSearchChoice = function(term, data) {
-                var match = _.find(data, function(item) {
+                const match = _.find(data, function(item) {
                     return item.name.toLowerCase().localeCompare(term.toLowerCase()) === 0;
                 });
                 if (typeof match === 'undefined' && self.oroTagCreateGranted) {

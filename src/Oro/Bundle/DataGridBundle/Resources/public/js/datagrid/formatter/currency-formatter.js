@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var NumberFormatter = require('./number-formatter');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const NumberFormatter = require('./number-formatter');
 
-    var CurrencyFormatter = function(options) {
+    const CurrencyFormatter = function(options) {
         NumberFormatter.call(this, options);
     };
     CurrencyFormatter.prototype = Object.create(NumberFormatter);
@@ -21,8 +21,8 @@ define(function(require) {
             if (rawData === void 0 || rawData === null || rawData === '') {
                 return '';
             }
-            var value = Number(rawData.substring(3));
-            var currency = rawData.substring(0, 3);
+            const value = Number(rawData.substring(3));
+            const currency = rawData.substring(0, 3);
             if (isNaN(value)) {
                 return __('oro.datagrid.not_number');
             }

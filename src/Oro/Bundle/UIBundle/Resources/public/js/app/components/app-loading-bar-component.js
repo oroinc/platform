@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var AppLoadingBarComponent;
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var LoadingBarView = require('oroui/js/app/views/loading-bar-view');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const LoadingBarView = require('oroui/js/app/views/loading-bar-view');
 
-    AppLoadingBarComponent = BaseComponent.extend({
+    const AppLoadingBarComponent = BaseComponent.extend({
         listen: {
             'page:beforeChange mediator': 'showLoading',
             'page:afterChange mediator': 'hideLoading'
@@ -42,7 +41,7 @@ define(function(require) {
          * @param {Object} options
          */
         initView: function(options) {
-            var viewOptions = _.defaults({}, options.viewOptions, {
+            const viewOptions = _.defaults({}, options.viewOptions, {
                 ajaxLoading: true
             });
             this.view = new LoadingBarView(viewOptions);

@@ -5,8 +5,6 @@ define([
 ], function(_, Backgrid, NumberFormatter) {
     'use strict';
 
-    var NumberCell;
-
     /**
      * Number column cell.
      *
@@ -14,7 +12,7 @@ define([
      * @class   oro.datagrid.cell.NumberCell
      * @extends Backgrid.NumberCell
      */
-    NumberCell = Backgrid.NumberCell.extend({
+    const NumberCell = Backgrid.NumberCell.extend({
         /** @property {orodatagrid.datagrid.formatter.NumberFormatter} */
         formatterPrototype: NumberFormatter,
 
@@ -24,8 +22,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function NumberCell() {
-            NumberCell.__super__.constructor.apply(this, arguments);
+        constructor: function NumberCell(options) {
+            NumberCell.__super__.constructor.call(this, options);
         },
 
         /**
@@ -33,7 +31,7 @@ define([
          */
         initialize: function(options) {
             _.extend(this, options);
-            NumberCell.__super__.initialize.apply(this, arguments);
+            NumberCell.__super__.initialize.call(this, options);
             this.formatter = this.createFormatter();
         },
 
@@ -50,7 +48,7 @@ define([
          * @inheritDoc
          */
         render: function() {
-            var render = NumberCell.__super__.render.apply(this, arguments);
+            const render = NumberCell.__super__.render.call(this);
 
             this.enterEditMode();
 
@@ -62,7 +60,7 @@ define([
          */
         enterEditMode: function() {
             if (this.isEditableColumn()) {
-                NumberCell.__super__.enterEditMode.apply(this, arguments);
+                NumberCell.__super__.enterEditMode.call(this);
             }
         },
 
@@ -71,7 +69,7 @@ define([
          */
         exitEditMode: function() {
             if (!this.isEditableColumn()) {
-                NumberCell.__super__.exitEditMode.apply(this, arguments);
+                NumberCell.__super__.exitEditMode.call(this);
             }
         }
     });

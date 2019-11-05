@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var EmailNotificationCountView;
-    var BaseView = require('oroui/js/app/views/base/view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    EmailNotificationCountView = BaseView.extend({
+    const EmailNotificationCountView = BaseView.extend({
         autoRender: true,
 
         listen: {
@@ -16,15 +15,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailNotificationCountView() {
-            EmailNotificationCountView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailNotificationCountView(options) {
+            EmailNotificationCountView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         getTemplateData: function() {
-            var data = EmailNotificationCountView.__super__.getTemplateData.call(this);
+            const data = EmailNotificationCountView.__super__.getTemplateData.call(this);
 
             if (data.unreadEmailsCount === void 0) {
                 data.unreadEmailsCount = 0;

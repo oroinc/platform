@@ -1,6 +1,17 @@
 define(function(require) {
     'use strict';
 
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const $ = require('jquery');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const BaseModel = require('oroui/js/app/models/base/model');
+    const InlineEditorWrapperView = require('../views/inline-editable-wrapper-view');
+    const frontendTypeMap = require('../../tools/frontend-type-map');
+    const overlayTool = require('oroui/js/tools/overlay');
+    const tools = require('oroui/js/tools');
+
     /**
      * Allows to connect inline editors on view pages.
      * Currently used only for tags-editor. See [index of supported editors](../editor)
@@ -62,19 +73,7 @@ define(function(require) {
      * @augments BaseComponent
      * @exports InlineEditableViewComponent
      */
-    var InlineEditableViewComponent;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var $ = require('jquery');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var BaseModel = require('oroui/js/app/models/base/model');
-    var InlineEditorWrapperView = require('../views/inline-editable-wrapper-view');
-    var frontendTypeMap = require('../../tools/frontend-type-map');
-    var overlayTool = require('oroui/js/tools/overlay');
-    var tools = require('oroui/js/tools');
-
-    InlineEditableViewComponent = BaseComponent.extend(/** @lends InlineEditableViewComponent.prototype */{
+    const InlineEditableViewComponent = BaseComponent.extend(/** @lends InlineEditableViewComponent.prototype */{
         options: {
             overlay: {
                 zIndex: 1,
@@ -108,8 +107,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function InlineEditableViewComponent() {
-            InlineEditableViewComponent.__super__.constructor.apply(this, arguments);
+        constructor: function InlineEditableViewComponent(options) {
+            InlineEditableViewComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -125,17 +124,17 @@ define(function(require) {
             this.messages = options.messages;
             this.eventChannelId = options.eventChannelId;
             this.inlineEditingOptions = options.metadata.inline_editing;
-            var waitors = [];
+            const waitors = [];
             this.fieldName = options.fieldName;
             // frontend type mapped to viewer/editor/reader
-            var classes = frontendTypeMap[options.frontend_type];
+            const classes = frontendTypeMap[options.frontend_type];
             this.classes = classes;
             this.metadata = options.metadata;
             this.model = new BaseModel();
             this.model.set(this.fieldName, options.value);
-            var viewOptions = this.getViewOptions();
+            const viewOptions = this.getViewOptions();
             if (this.inlineEditingOptions.enable) {
-                var ViewerWrapper = classes.viewerWrapper || InlineEditorWrapperView;
+                const ViewerWrapper = classes.viewerWrapper || InlineEditorWrapperView;
                 this.wrapper = new ViewerWrapper({
                     el: options._sourceElement,
                     autoRender: true
@@ -149,7 +148,7 @@ define(function(require) {
                 this.wrapper.on('start-editing', this.enterEditMode, this);
                 waitors.push(tools.loadModuleAndReplace(this.inlineEditingOptions.save_api_accessor, 'class').then(
                     _.bind(function() {
-                        var ConcreteApiAccessor = this.inlineEditingOptions.save_api_accessor['class'];
+                        const ConcreteApiAccessor = this.inlineEditingOptions.save_api_accessor['class'];
                         this.saveApiAccessor = new ConcreteApiAccessor(
                             _.omit(this.inlineEditingOptions.save_api_accessor, 'class'));
                     }, this)
@@ -158,7 +157,7 @@ define(function(require) {
                 viewOptions.el = options._sourceElement;
                 this.view = new classes.viewer(viewOptions);
             }
-            this.deferredInit = $.when.apply($, waitors);
+            this.deferredInit = $.when(...waitors);
         },
 
         isInsertEditorModeOverlay: function() {
@@ -178,16 +177,16 @@ define(function(require) {
                 this.view.$el.removeClass('save-fail');
             }
 
-            var viewInstance = this.createEditorViewInstance();
+            const viewInstance = this.createEditorViewInstance();
 
             if (this.isInsertEditorModeOverlay()) {
-                var overlayOptions = $.extend(true, {}, this.overlayOptions, {
+                const overlayOptions = $.extend(true, {}, this.overlayOptions, {
                     position: {
                         of: this.wrapper.$el
                     }
                 });
 
-                var overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
+                const overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
                 this.listenTo(viewInstance, 'dispose', _.bind(overlay.remove, overlay));
             } else {
                 this.view.$el.hide();
@@ -199,7 +198,7 @@ define(function(require) {
         },
 
         createEditorViewInstance: function() {
-            var View = this.classes.editor;
+            const View = this.classes.editor;
 
             this.editorView = new View(this.getEditorOptions());
             this.resizeTo(this.editorView, this.wrapper);
@@ -208,7 +207,7 @@ define(function(require) {
         },
 
         getEditorOptions: function() {
-            var viewConfiguration = this.inlineEditingOptions.editor
+            const viewConfiguration = this.inlineEditingOptions.editor
                 ? this.inlineEditingOptions.editor.view_options
                 : {};
 
@@ -289,11 +288,11 @@ define(function(require) {
                 this.editorView.focus();
                 return false;
             }
-            var wrapper = this.wrapper;
-            var serverUpdateData = this.editorView.getServerUpdateData();
-            var modelUpdateData = this.editorView.getModelUpdateData();
+            const wrapper = this.wrapper;
+            let serverUpdateData = this.editorView.getServerUpdateData();
+            const modelUpdateData = this.editorView.getModelUpdateData();
             wrapper.$el.addClass('loading');
-            var ctx = {
+            const ctx = {
                 view: wrapper,
                 model: this.model,
                 oldState: _.pick(this.model.toJSON(), _.keys(modelUpdateData)),
@@ -303,15 +302,15 @@ define(function(require) {
             };
             this.updateModel(this.model, this.editorView, modelUpdateData);
             if (this.saveApiAccessor.initialOptions.field_name) {
-                var keys = _.keys(serverUpdateData);
+                const keys = _.keys(serverUpdateData);
                 if (keys.length > 1) {
                     throw new Error('Only single field editors are supported with field_name option');
                 }
-                var newData = {};
+                const newData = {};
                 newData[this.saveApiAccessor.initialOptions.field_name] = serverUpdateData[keys[0]];
                 serverUpdateData = newData;
             }
-            var savePromise = this.saveApiAccessor.send(this.model.toJSON(), serverUpdateData, {}, {
+            let savePromise = this.saveApiAccessor.send(this.model.toJSON(), serverUpdateData, {}, {
                 processingMessage: this.messages.processingMessage,
                 preventWindowUnload: this.messages.preventWindowUnload
             });
@@ -332,7 +331,7 @@ define(function(require) {
 
         updateModel: function(model, editorView, updateData) {
             // assume "undefined" as delete value request
-            for (var key in updateData) {
+            for (const key in updateData) {
                 if (updateData.hasOwnProperty(key)) {
                     if (updateData[key] === void 0) {
                         model.unset(key);
@@ -382,7 +381,7 @@ define(function(require) {
         },
 
         onSaveError: function(jqXHR) {
-            var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
+            const errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
             if (!this.view.disposed && this.view.$el) {
                 this.view.$el.addClass('save-fail');
             }
@@ -390,13 +389,13 @@ define(function(require) {
                 this.model.set(this.oldState);
             }
 
-            var errors = [];
+            const errors = [];
             switch (errorCode) {
                 case 400:
-                    var jqXHRerrors = jqXHR.responseJSON.errors.children;
-                    for (var i in jqXHRerrors) {
+                    const jqXHRerrors = jqXHR.responseJSON.errors.children;
+                    for (const i in jqXHRerrors) {
                         if (jqXHRerrors.hasOwnProperty(i) && jqXHRerrors[i].errors) {
-                            errors.push.apply(errors, _.values(jqXHRerrors[i].errors));
+                            errors.push(..._.values(jqXHRerrors[i].errors));
                         }
                     }
                     break;

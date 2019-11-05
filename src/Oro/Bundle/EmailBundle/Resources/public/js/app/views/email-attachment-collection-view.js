@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var EmailAttachmentCollectionView;
-    var $ = require('jquery');
-    var EmailAttachmentView = require('oroemail/js/app/views/email-attachment-view');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const $ = require('jquery');
+    const EmailAttachmentView = require('oroemail/js/app/views/email-attachment-view');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
     /**
      * @exports EmailAttachmentCollectionView
      */
-    EmailAttachmentCollectionView = BaseCollectionView.extend({
+    const EmailAttachmentCollectionView = BaseCollectionView.extend({
         itemView: EmailAttachmentView,
 
         listen: {
@@ -20,15 +19,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailAttachmentCollectionView() {
-            EmailAttachmentCollectionView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailAttachmentCollectionView(options) {
+            EmailAttachmentCollectionView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            BaseCollectionView.__super__.initialize.apply(this, arguments);
+            BaseCollectionView.__super__.initialize.call(this, options);
             this.itemView = this.itemView.extend({// eslint-disable-line oro/named-constructor
                 inputName: options.inputName,
                 fileIcons: options.fileIcons,
@@ -51,7 +50,7 @@ define(function(require) {
         },
 
         collectionRemove: function() {
-            var self = this;
+            const self = this;
             this.collection.each(function(model) {
                 if (model && !model.get('type') && !model.get('id')) {
                     self.collection.remove(model);

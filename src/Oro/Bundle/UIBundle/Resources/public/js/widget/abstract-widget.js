@@ -1,18 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var AbstractWidgetView;
-    var document = window.document;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var mediator = require('oroui/js/mediator');
-    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
-    var __ = require('orotranslation/js/translator');
-    var errorHandler = require('oroui/js/error');
-    var messenger = require('oroui/js/messenger');
-    var systemAccessModeOrganizationProvider = require('oroorganization/js/app/tools/system-access-mode-organization-provider');
+    const document = window.document;
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const mediator = require('oroui/js/mediator');
+    const LoadingMask = require('oroui/js/app/views/loading-mask-view');
+    const __ = require('orotranslation/js/translator');
+    const errorHandler = require('oroui/js/error');
+    const messenger = require('oroui/js/messenger');
+    const systemAccessModeOrganizationProvider =
+        require('oroorganization/js/app/tools/system-access-mode-organization-provider');
     require('jquery.form');
 
     /**
@@ -20,7 +20,7 @@ define(function(require) {
      * @class   oroui.widget.AbstractWidgetView
      * @extends oroui.app.views.BaseView
      */
-    AbstractWidgetView = BaseView.extend({
+    const AbstractWidgetView = BaseView.extend({
         options: {
             type: 'widget',
             actionsEl: '.widget-actions',
@@ -60,8 +60,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AbstractWidgetView() {
-            AbstractWidgetView.__super__.constructor.apply(this, arguments);
+        constructor: function AbstractWidgetView(options) {
+            AbstractWidgetView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
@@ -187,7 +187,7 @@ define(function(require) {
          * @private
          */
         _getLoadingElement: function() {
-            var loadingElement = this.options.loadingElement || this.loadingElement;
+            const loadingElement = this.options.loadingElement || this.loadingElement;
             return $(loadingElement);
         },
 
@@ -250,12 +250,12 @@ define(function(require) {
          * @private
          */
         _initSectionActions: function() {
-            var widget = this;
-            var sections = this.widget.find('[data-section]');
+            const widget = this;
+            const sections = this.widget.find('[data-section]');
             sections.each(function(i, sectionEl) {
-                var $sectionEl = $(sectionEl);
-                var sectionName = $sectionEl.attr('data-section');
-                var actions = $sectionEl.find('[action-name], [data-action-name]');
+                const $sectionEl = $(sectionEl);
+                const sectionName = $sectionEl.attr('data-section');
+                const actions = $sectionEl.find('[action-name], [data-action-name]');
                 if ($sectionEl.attr('action-name') || $sectionEl.attr('data-action-name')) {
                     actions.push($sectionEl);
                 }
@@ -263,8 +263,8 @@ define(function(require) {
                     widget.actions[sectionName] = {};
                 }
                 actions.each(function(i, actionEl) {
-                    var $actionEl = $(actionEl);
-                    var actionName = $actionEl.attr('action-name') || $actionEl.attr('data-action-name');
+                    const $actionEl = $(actionEl);
+                    const actionName = $actionEl.attr('action-name') || $actionEl.attr('data-action-name');
                     widget.actions[sectionName][actionName] = $actionEl;
                     widget.trigger('widget:add:action:' + sectionName + ':' + actionName, $actionEl);
                 });
@@ -279,22 +279,22 @@ define(function(require) {
         _adoptWidgetActions: function() {
             this.actions.adopted = {};
             this.form = null;
-            var adoptedActionsContainer = this._getAdoptedActionsContainer();
+            const adoptedActionsContainer = this._getAdoptedActionsContainer();
             if (adoptedActionsContainer.length > 0) {
-                var self = this;
-                var form = adoptedActionsContainer.closest('form');
-                var actions = adoptedActionsContainer.find('button, input, a, [data-action-name]');
+                const self = this;
+                const form = adoptedActionsContainer.closest('form');
+                const actions = adoptedActionsContainer.find('button, input, a, [data-action-name]');
 
                 if (form.length > 0) {
                     this.form = form;
                 }
 
                 _.each(actions, function(action, idx) {
-                    var $action = $(action);
-                    var actionId = $action.data('action-name') || 'adopted_action_' + idx;
+                    const $action = $(action);
+                    let actionId = $action.data('action-name') || 'adopted_action_' + idx;
                     switch (action.type && action.type.toLowerCase()) {
                         case 'submit':
-                            var submitReplacement = $('<input type="submit"/>');
+                            const submitReplacement = $('<input type="submit"/>');
                             submitReplacement.css({
                                 position: 'absolute',
                                 left: '-9999px',
@@ -364,12 +364,12 @@ define(function(require) {
                 });
                 this.loading = form.data('jqxhr');
             } else {
-                var formAction = this.form.attr('action');
+                let formAction = this.form.attr('action');
                 formAction = formAction.length > 0 && formAction[0] !== '#' ? formAction : null;
                 if (!this.options.url && formAction) {
                     this.options.url = formAction;
                 }
-                var url = formAction ? formAction : this.options.url;
+                const url = formAction ? formAction : this.options.url;
                 this.loadContent(form.serialize(), form.attr('method'), url);
             }
         },
@@ -426,7 +426,7 @@ define(function(require) {
                     this.actions[section] = {};
                 }
                 this.actions[section][key] = actionElement;
-                var sectionContainer = this.getActionsElement().find('[data-section="' + section + '"]');
+                let sectionContainer = this.getActionsElement().find('[data-section="' + section + '"]');
                 if (!sectionContainer.length) {
                     sectionContainer = this._createWidgetActionsSection(section);
                     sectionContainer.appendTo(this.getActionsElement());
@@ -461,7 +461,7 @@ define(function(require) {
          * @param {string} section section name
          */
         removeAction: function(key, section) {
-            var self = this;
+            const self = this;
             function remove(actions, key) {
                 if (_.isElement(self.actions[key])) {
                     self.actions[key].remove();
@@ -492,7 +492,7 @@ define(function(require) {
             if (section !== undefined) {
                 return this.actions.hasOwnProperty(section) && this.actions[section].hasOwnProperty(key);
             } else {
-                var hasAction = false;
+                let hasAction = false;
                 _.each(this.actions, function(actions) {
                     if (actions.hasOwnProperty(key)) {
                         hasAction = true;
@@ -512,7 +512,7 @@ define(function(require) {
             if (section !== undefined) {
                 return this.actions.hasOwnProperty(section) && !_.isEmpty(this.actions[section]);
             } else {
-                var hasActions = false;
+                let hasActions = false;
                 _.each(this.actions, function(actions) {
                     if (!_.isEmpty(actions)) {
                         hasActions = true;
@@ -531,7 +531,7 @@ define(function(require) {
          */
         getAction: function(key, section, callback) {
             if (this.hasAction(key, section)) {
-                var action = null;
+                let action = null;
                 if (section !== undefined) {
                     action = this.actions[section][key];
                 } else {
@@ -554,12 +554,12 @@ define(function(require) {
          */
         _renderActions: function() {
             this._clearActionsContainer();
-            var container = this.getActionsElement();
+            const container = this.getActionsElement();
 
             if (container) {
                 _.each(this.actions, function(actions, section) {
-                    var sectionContainer = this._createWidgetActionsSection(section);
-                    var move = section === 'adopted' ? this.options.moveAdoptedActions : true;
+                    const sectionContainer = this._createWidgetActionsSection(section);
+                    const move = section === 'adopted' ? this.options.moveAdoptedActions : true;
                     _.each(actions, function(action, key) {
                         this._initActionEvents(action);
                         if (move) {
@@ -593,8 +593,8 @@ define(function(require) {
          * @private
          */
         _initActionEvents: function(action) {
-            var self = this;
-            var type = $(action).attr('type');
+            const self = this;
+            const type = $(action).attr('type');
             if (!type) {
                 return;
             }
@@ -620,7 +620,7 @@ define(function(require) {
          * @private
          */
         _clearActionsContainer: function() {
-            var actionsEl = this.getActionsElement();
+            const actionsEl = this.getActionsElement();
             if (actionsEl) {
                 actionsEl.empty();
             }
@@ -631,7 +631,7 @@ define(function(require) {
          */
         render: function() {
             this._deferredRender();
-            var loadAllowed = !this.options.elementFirst ||
+            const loadAllowed = !this.options.elementFirst ||
                     (this.options.elementFirst && !this.firstRun) ||
                         (this.$el && this.$el.length && this.$el.html().length === 0);
             if (loadAllowed && this.options.url !== false) {
@@ -648,7 +648,7 @@ define(function(require) {
          * @param {String} content
          */
         setContent: function(content) {
-            var widgetContent = $(content).filter('.widget-content:first');
+            const widgetContent = $(content).filter('.widget-content:first');
 
             this.actionsEl = null;
             this.actions = {};
@@ -677,7 +677,7 @@ define(function(require) {
             if (this.firstRun || method === undefined || !method) {
                 method = this.options.method;
             }
-            var options = this.prepareContentRequestOptions(data, method, url);
+            const options = this.prepareContentRequestOptions(data, method, url);
 
             this.trigger('beforeContentLoad', this);
             this.loading = $.ajax(options)
@@ -686,16 +686,16 @@ define(function(require) {
         },
 
         prepareContentRequestOptions: function(data, method, url) {
-            var query = '';
+            let query = '';
 
             if (method.toUpperCase() === 'POST') {
-                var urlParts = url.split('?');
+                const urlParts = url.split('?');
 
                 url = urlParts[0];
                 query = typeof urlParts[1] === 'undefined' ? '' : urlParts[1] + '&';
             }
 
-            var options = {
+            const options = {
                 url: url,
                 type: method,
                 data: query + (data === void 0 ? '' : data + '&'),
@@ -708,7 +708,7 @@ define(function(require) {
         },
 
         _getWidgetData: function() {
-            var data = {
+            const data = {
                 _widgetContainer: this.options.type,
                 _wid: this.getWid(),
                 _widgetInit: this.firstRun ? 1 : 0
@@ -718,7 +718,7 @@ define(function(require) {
                 data._widgetContainerTemplate = this.options.widgetTemplate;
             }
 
-            var organizationId = systemAccessModeOrganizationProvider.getOrganizationId();
+            const organizationId = systemAccessModeOrganizationProvider.getOrganizationId();
 
             if (organizationId) {
                 data._sa_org_id = organizationId;
@@ -743,7 +743,7 @@ define(function(require) {
                 return;
             }
 
-            var message = __('oro.ui.widget_loading_failed');
+            let message = __('oro.ui.widget_loading_failed');
 
             if (jqxhr.status === 403) {
                 message = __('oro.ui.forbidden_error');
@@ -753,7 +753,7 @@ define(function(require) {
                 return;
             }
 
-            var failContent = '<div class="widget-content">' +
+            const failContent = '<div class="widget-content">' +
                 '<div class="alert alert-error" role="alert">' + message + '</div>' +
                 '</div>';
 
@@ -767,7 +767,7 @@ define(function(require) {
          * @private
          */
         _onContentLoad: function(content) {
-            var json = this._getJson(content);
+            const json = this._getJson(content);
 
             if (json) {
                 content = '<div class="widget-content"></div>'; // set empty response to cover base functionality
@@ -820,11 +820,11 @@ define(function(require) {
          * @private
          */
         _onJsonContentResponse: function(content) {
-            var widgetResponse = content.widget || {};
+            const widgetResponse = content.widget || {};
 
             if (_.has(widgetResponse, 'message')) {
-                var message = widgetResponse.message;
-                var messageOptions = widgetResponse.messageOptions || {};
+                let message = widgetResponse.message;
+                const messageOptions = widgetResponse.messageOptions || {};
 
                 if (_.isString(message)) {
                     message = {type: 'success', text: message};
@@ -840,19 +840,19 @@ define(function(require) {
             }
 
             if (_.has(widgetResponse, 'trigger')) {
-                var events = widgetResponse.trigger;
+                let events = widgetResponse.trigger;
 
                 if (!_.isObject(events)) {
                     events = [events];
                 }
 
                 _.each(events, function(event) {
-                    var eventBroker = this._getEventBroker(event);
-                    var eventFunction = this._getEventFunction(event);
+                    const eventBroker = this._getEventBroker(event);
+                    const eventFunction = this._getEventFunction(event);
 
                     if (_.isObject(event)) {
-                        var args = [event.name].concat(event.args);
-                        eventBroker[eventFunction].apply(eventBroker, args);
+                        const args = [event.name].concat(event.args);
+                        eventBroker[eventFunction](...args);
                     } else {
                         eventBroker[eventFunction](event);
                     }

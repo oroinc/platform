@@ -19,7 +19,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         },
 
         _create: function() {
-            var options = this.options;
+            const options = this.options;
 
             switch (typeof options.itemTemplate) {
                 case 'function':
@@ -86,13 +86,13 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         },
 
         _sortCollection: function() {
-            var collection = this.options.collection;
-            var positions = {};
+            const collection = this.options.collection;
+            const positions = {};
             this.element.find('tr').each(function(index) {
                 positions[$(this).data('cid')] = index;
             });
             collection.models.sort(function(left, right) {
-                var diff = positions[left.cid] - positions[right.cid];
+                const diff = positions[left.cid] - positions[right.cid];
                 return diff > 0 ? 1 : (diff < 0 ? -1 : 0);
             });
             collection.trigger('sort');
@@ -103,7 +103,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         },
 
         _onModelAdded: function(model, collection, options) {
-            var newRow = this._renderModel(model);
+            const newRow = this._renderModel(model);
 
             if (_.isUndefined(options.at)) {
                 this.element.append(newRow);
@@ -128,7 +128,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         },
 
         _onModelChanged: function(model) {
-            var $oldItemElement = this._getItemElementByModel(model);
+            const $oldItemElement = this._getItemElementByModel(model);
 
             $oldItemElement.trigger('content:remove');
             $oldItemElement.replaceWith(this._renderModel(model));
@@ -169,9 +169,9 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         },
 
         _renderModel: function(model) {
-            var collection = this.options.collection;
-            var index = collection.indexOf(model);
-            var data = _.extend({
+            const collection = this.options.collection;
+            const index = collection.indexOf(model);
+            const data = _.extend({
                 cid: model.cid,
                 isFirst: index === 0,
                 isLast: index === collection.length - 1
@@ -186,16 +186,16 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         _onAction: function(ev) {
             ev.preventDefault();
 
-            var $el = $(ev.currentTarget);
-            var cid = $el.closest('[data-cid]').data('cid');
-            var model = this.options.collection.get(cid);
+            const $el = $(ev.currentTarget);
+            const cid = $el.closest('[data-cid]').data('cid');
+            const model = this.options.collection.get(cid);
             if (!model) {
                 return;
             }
 
-            var data = $el.data();
-            var action = data.collectionAction;
-            var handler = this.options[action + 'Handler'];
+            const data = $el.data();
+            const action = data.collectionAction;
+            const handler = this.options[action + 'Handler'];
             if (typeof handler === 'function') {
                 handler(model, data);
             } else {

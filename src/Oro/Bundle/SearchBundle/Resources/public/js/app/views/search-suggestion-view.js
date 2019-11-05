@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var SearchSuggestionView;
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var SearchSuggestionCollection = require('orosearch/js/app/models/search-suggestion-collection');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var SearchSuggestionItemView = require('orosearch/js/app/views/search-suggestion-item-view');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const SearchSuggestionCollection = require('orosearch/js/app/models/search-suggestion-collection');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const SearchSuggestionItemView = require('orosearch/js/app/views/search-suggestion-item-view');
 
-    SearchSuggestionView = BaseCollectionView.extend({
+    const SearchSuggestionView = BaseCollectionView.extend({
         animationDuration: 0,
 
         /**
@@ -44,7 +43,7 @@ define(function(require) {
         },
 
         onSuggestionMouseDown: function() {
-            var $search = this.$('[name=search]');
+            const $search = this.$('[name=search]');
 
             if ($search.is(':focus')) {
                 $search.one('blur', function(e) {
@@ -67,7 +66,7 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            var routeParameters = {
+            const routeParameters = {
                 routeName: 'oro_search_suggestion',
                 routeQueryParameterNames: ['search', 'from', 'max_results', 'format'],
                 max_results: 7,
@@ -80,13 +79,13 @@ define(function(require) {
                 minSearchLength: this.minSearchLength
             });
 
-            SearchSuggestionView.__super__.initialize.apply(this, arguments);
+            SearchSuggestionView.__super__.initialize.call(this, options);
         },
 
         delegateEvents: function(events) {
             SearchSuggestionView.__super__.delegateEvents.call(this, events);
 
-            var listener = this.onListScroll.bind(this);
+            const listener = this.onListScroll.bind(this);
 
             this.$('[data-role="search-suggestion-list"]').on('scroll' + this.eventNamespace(), listener);
         },
@@ -104,11 +103,11 @@ define(function(require) {
         },
 
         onKeyDown: function(e) {
-            var selectedModel = this.collection.findWhere({selected: true});
+            const selectedModel = this.collection.findWhere({selected: true});
 
             if (['ArrowDown', 'ArrowUp'].indexOf(e.key) !== -1) {
-                var selectedIndex = this.getSelectedIndex();
-                var length = this.collection.length;
+                let selectedIndex = this.getSelectedIndex();
+                const length = this.collection.length;
 
                 if (e.key === 'ArrowDown') {
                     if (selectedIndex + 1 < length) {
@@ -133,10 +132,10 @@ define(function(require) {
         },
 
         setSelectedIndex: function(index) {
-            var selectedIndex = this.getSelectedIndex();
+            const selectedIndex = this.getSelectedIndex();
 
             if (selectedIndex !== index) {
-                var model = selectedIndex >=0 ? this.collection.at(selectedIndex) : null;
+                let model = selectedIndex >=0 ? this.collection.at(selectedIndex) : null;
 
                 if (model) {
                     model.set('selected', false);
@@ -152,7 +151,7 @@ define(function(require) {
         },
 
         getSelectedIndex: function() {
-            var selectedModel = this.collection.findWhere({selected: true});
+            const selectedModel = this.collection.findWhere({selected: true});
             return this.collection.indexOf(selectedModel);
         },
 
@@ -165,11 +164,11 @@ define(function(require) {
                 return;
             }
 
-            var el = e.target;
+            const el = e.target;
 
             // If user reach bottom of list
             if (el.offsetHeight + el.scrollTop >= el.scrollHeight) {
-                var selectedIndex = this.getSelectedIndex();
+                const selectedIndex = this.getSelectedIndex();
                 this.collection.loadMore().then(function() {
                     this.setSelectedIndex(selectedIndex);
                 }.bind(this));
@@ -183,11 +182,11 @@ define(function(require) {
         },
 
         scrollToSubview: function(view) {
-            var margin = 10;
-            var visibleFrameTop = this.$list.scrollTop();
-            var visibleFrameHeight = this.$list.height();
-            var top = visibleFrameTop + view.$el.position().top;
-            var bottom = top + view.$el.outerHeight(true);
+            const margin = 10;
+            const visibleFrameTop = this.$list.scrollTop();
+            const visibleFrameHeight = this.$list.height();
+            const top = visibleFrameTop + view.$el.position().top;
+            const bottom = top + view.$el.outerHeight(true);
 
             if (top - margin < visibleFrameTop) {
                 this.$list.scrollTop(top - margin);

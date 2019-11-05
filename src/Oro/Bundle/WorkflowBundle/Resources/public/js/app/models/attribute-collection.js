@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var AttributeCollection;
-    var BaseCollection = require('oroui/js/app/models/base/collection');
-    var AttributeModel = require('./attribute-model');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
+    const AttributeModel = require('./attribute-model');
 
-    AttributeCollection = BaseCollection.extend({
+    const AttributeCollection = BaseCollection.extend({
         model: AttributeModel,
 
         /**
          * @inheritDoc
          */
-        constructor: function AttributeCollection() {
-            AttributeCollection.__super__.constructor.apply(this, arguments);
+        constructor: function AttributeCollection(...args) {
+            AttributeCollection.__super__.constructor.apply(this, args);
         }
     });
 

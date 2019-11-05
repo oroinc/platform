@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var MergeView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
 
     /**
      * @typedef MergeView
      * @export oroentitymerge/js/merge-view
      */
-    MergeView = BaseView.extend({
+    const MergeView = BaseView.extend({
         events: {
             'click .entity-merge-select-all': 'onEntitySelectAll',
             'click .entity-merge-field-choice': 'onEntityValueSelect',
@@ -23,25 +22,25 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function MergeView() {
-            MergeView.__super__.constructor.apply(this, arguments);
+        constructor: function MergeView(options) {
+            MergeView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
+        initialize: function(options) {
             this.resetViewState();
 
-            MergeView.__super__.initialize.apply(this, arguments);
+            MergeView.__super__.initialize.call(this, options);
         },
 
         onFixTableWidth: function(event) {
-            var columns = this.$('.entity-merge-column');
-            var master = this.$('.merge-first-column');
-            var firstColumnWidth = parseInt(master.css('width'));
-            var tableWidth = parseInt(this.$('.entity-merge-table').css('width'));
-            var columnWidth = ((tableWidth - firstColumnWidth) / columns.length);
+            const columns = this.$('.entity-merge-column');
+            const master = this.$('.merge-first-column');
+            const firstColumnWidth = parseInt(master.css('width'));
+            const tableWidth = parseInt(this.$('.entity-merge-table').css('width'));
+            const columnWidth = ((tableWidth - firstColumnWidth) / columns.length);
 
             columns.css('width', columnWidth);
         },
@@ -51,7 +50,7 @@ define(function(require) {
          * @desc All field values in the column set to active
          */
         onEntitySelectAll: function(event) {
-            var entityId = $(event.currentTarget).data('entity-key');
+            const entityId = $(event.currentTarget).data('entity-key');
             this.$('.entity-merge-field-choice[value="' + entityId + '"]').click();
         },
 
@@ -61,13 +60,13 @@ define(function(require) {
          */
         onEntityValueSelect: function(event) {
             event.stopImmediatePropagation();
-            var $currentTarget = $(event.currentTarget);
-            var fieldName = $currentTarget.attr('name');
-            var entityKey = parseInt($currentTarget.val());
-            var mergeSelector = '.merge-entity-representative[data-entity-field-name="' + fieldName + '"]';
+            const $currentTarget = $(event.currentTarget);
+            const fieldName = $currentTarget.attr('name');
+            const entityKey = parseInt($currentTarget.val());
+            const mergeSelector = '.merge-entity-representative[data-entity-field-name="' + fieldName + '"]';
 
             this.$(mergeSelector).each(function(index, item) {
-                var $item = $(item);
+                const $item = $(item);
                 if ($item.data('entity-key') !== entityKey) {
                     $item.addClass('entity-merge-not-selected');
                 } else {

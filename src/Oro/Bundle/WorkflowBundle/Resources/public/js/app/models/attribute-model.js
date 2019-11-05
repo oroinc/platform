@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var AttributeModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
-    AttributeModel = BaseModel.extend({
+    const AttributeModel = BaseModel.extend({
         defaults: {
             name: null,
             label: null,
@@ -18,8 +17,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AttributeModel() {
-            AttributeModel.__super__.constructor.apply(this, arguments);
+        constructor: function AttributeModel(...args) {
+            AttributeModel.__super__.constructor.apply(this, args);
         },
 
         /**

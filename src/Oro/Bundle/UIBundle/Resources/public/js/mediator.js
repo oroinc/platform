@@ -5,7 +5,7 @@ define([
 ], function(_, Backbone, Chaplin) {
     'use strict';
 
-    var mediator = Backbone.mediator = Chaplin.mediator;
+    const mediator = Backbone.mediator = Chaplin.mediator;
 
     _.extend(mediator, Backbone.Events);
     /**

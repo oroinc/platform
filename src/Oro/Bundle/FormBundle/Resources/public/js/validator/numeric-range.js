@@ -3,7 +3,7 @@ define([
 ], function(_, range) {
     'use strict';
 
-    var constraint = _.clone(range);
+    const constraint = _.clone(range);
 
     constraint[0] = 'Oro\\Bundle\\ValidationBundle\\Validator\\Constraints\\NumericRange';
 

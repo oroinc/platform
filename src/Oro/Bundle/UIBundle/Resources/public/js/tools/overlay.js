@@ -1,10 +1,11 @@
 define(function(require) {
     'use strict';
-    var $ = require('jquery');
-    var backdropManager = require('./backdrop-manager');
-    var mediator = require('oroui/js/mediator');
 
-    var overlayTool = {
+    const $ = require('jquery');
+    const backdropManager = require('./backdrop-manager');
+    const mediator = require('oroui/js/mediator');
+
+    const overlayTool = {
         createOverlay: function($overlayContent, options) {
             if (!options.insertInto) {
                 options.insertInto = $(document.body);
@@ -17,7 +18,7 @@ define(function(require) {
                 zIndex: options.zIndex
             });
             this.updatePosition($overlayContent, options);
-            var interval = setInterval(function() {
+            const interval = setInterval(function() {
                 if (!$overlayContent.data('interval')) {
                     // fix memory leak
                     clearInterval(interval);
@@ -25,11 +26,12 @@ define(function(require) {
                 overlayTool.updatePosition($overlayContent, options);
             }, 400);
             $overlayContent.data('interval', interval);
+            let backdropId;
             if (options.backdrop) {
-                var backdropId = backdropManager.hold();
+                backdropId = backdropManager.hold();
                 $overlayContent.data('backdrop', backdropId);
             }
-            var overlayControl = {
+            const overlayControl = {
                 remove: function() {
                     mediator.off('overlay:focus', onOverlayFocus);
                     $overlayContent.removeClass('overlay-focused');
@@ -72,10 +74,10 @@ define(function(require) {
 
         updatePosition: function($overlayContent, options) {
             if (options.position) {
-                var _new;
-                var old;
+                let _new;
+                let old;
                 // try to find position for overlay in several iterations
-                for (var i = 0; i < 5; i++) {
+                for (let i = 0; i < 5; i++) {
                     old = _new || ($overlayContent.css('top') + '.' + $overlayContent.css('left'));
                     $overlayContent.position(options.position);
                     _new = $overlayContent.css('top') + '.' + $overlayContent.css('left');

@@ -12,7 +12,7 @@ define(function() {
      * @export  orofilter/js/formatter/abstract-formatter
      * @class   orofilter.formatter.AbstractFormatter
      */
-    var AbstractFormatter = function() {};
+    const AbstractFormatter = function() {};
 
     AbstractFormatter.prototype = {
         /**

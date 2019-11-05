@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var routing = require('routing');
+    const $ = require('jquery');
+    const routing = require('routing');
 
     return {
         create: function(templateId, relatedEntityId) {
-            var url = routing.generate(
+            const url = routing.generate(
                 'oro_api_get_emailtemplate_compiled',
                 {id: templateId, entityId: relatedEntityId}
             );

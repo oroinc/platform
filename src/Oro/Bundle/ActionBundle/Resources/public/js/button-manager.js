@@ -1,16 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
-    var messenger = require('oroui/js/messenger');
-    var widgetManager = require('oroui/js/widget-manager');
-    var Backbone = require('backbone');
-    var tools = require('oroui/js/tools');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
+    const messenger = require('oroui/js/messenger');
+    const widgetManager = require('oroui/js/widget-manager');
+    const Backbone = require('backbone');
+    const tools = require('oroui/js/tools');
 
-    var ButtonManager = function(options) {
+    const ButtonManager = function(options) {
         this.initialize(options);
     };
 
@@ -99,12 +99,12 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         doExecute: function(e) {
-            var self = this;
+            const self = this;
             if (this.options.hasDialog) {
-                var options = this._getDialogOptions();
+                const options = this._getDialogOptions();
                 if (this.options.showDialog) {
                     tools.loadModules(this.options.jsDialogWidget, function(Widget) {
-                        var _widget = new Widget(options);
+                        const _widget = new Widget(options);
                         Backbone.listenTo(_widget, 'formSave', _.bind(function(response) {
                             _widget.hide();
                             self.doResponse(response, e);
@@ -120,7 +120,7 @@ define(function(require) {
             } else {
                 mediator.execute('showLoading');
                 if (this.isTokenProtected()) {
-                    var ajaxOptions = {
+                    const ajaxOptions = {
                         type: 'POST',
                         data: this.options.executionTokenData,
                         dataType: 'json'
@@ -158,7 +158,7 @@ define(function(require) {
          * @param jqXHR
          */
         ajaxFail: function(jqXHR) {
-            var response = _.defaults(jqXHR.responseJSON || {}, {
+            const response = _.defaults(jqXHR.responseJSON || {}, {
                 success: false,
                 message: this.options.action ? this.options.action.label : ''
             });
@@ -181,7 +181,7 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         doResponse: function(response, e) {
-            var callback = _.bind(function() {
+            const callback = _.bind(function() {
                 this._showFlashMessages(response);
             }, this);
 
@@ -216,7 +216,7 @@ define(function(require) {
 
             if (!response.success) {
                 mediator.execute('hideLoading');
-                var messages = response.messages || {};
+                const messages = response.messages || {};
 
                 if (_.isEmpty(messages) && response.message) {
                     messenger.notificationFlashMessage('error', response.message);
@@ -239,7 +239,7 @@ define(function(require) {
          * @param {Object} response
          */
         doPageReload: function(response) {
-            var pageReload = true;
+            let pageReload = true;
             if (response.pageReload !== undefined) {
                 pageReload = Boolean(response.pageReload);
             }
@@ -261,10 +261,10 @@ define(function(require) {
          * @param {function} callback
          */
         showConfirmDialog: function(callback) {
-            var options = {};
+            let options = {};
 
             if (!_.isEmpty(this.options.confirmation)) {
-                var placeholders = this.options.confirmation.message_parameters || {};
+                const placeholders = this.options.confirmation.message_parameters || {};
 
                 options = _.defaults(_.omit(this.options.confirmation, 'component', 'message'), {
                     title: this.messages.confirm_title,
@@ -301,7 +301,7 @@ define(function(require) {
          * @private
          */
         _getDialogOptions: function() {
-            var options = {
+            let options = {
                 title: 'action',
                 url: this.options.dialogUrl,
                 stateEnabled: false,
@@ -315,7 +315,7 @@ define(function(require) {
                 }
             };
 
-            var additionalOptions = this.options.dialogOptions;
+            const additionalOptions = this.options.dialogOptions;
             if (additionalOptions) {
                 if (additionalOptions.dialogOptions !== undefined) {
                     additionalOptions.dialogOptions = _.extend(

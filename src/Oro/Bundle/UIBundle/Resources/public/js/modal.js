@@ -1,21 +1,20 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var ModalView;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var $ = require('jquery');
-    var Backbone = require('backbone');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl-loader!oroui/templates/modal-dialog.html');
-    var mediator = require('oroui/js/mediator');
-    var tools = require('oroui/js/tools');
-    var config = require('module-config').default(module.id);
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const $ = require('jquery');
+    const Backbone = require('backbone');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('tpl-loader!oroui/templates/modal-dialog.html');
+    const mediator = require('oroui/js/mediator');
+    const tools = require('oroui/js/tools');
+    let config = require('module-config').default(module.id);
 
-    var SUSPEND_MODE_CLASS = 'suspend-mode';
-    var DATA_KEY = 'bs.modal';
-    var EVENT_KEY = '.bs.modal';
-    var EVENTS = {
+    const SUSPEND_MODE_CLASS = 'suspend-mode';
+    const DATA_KEY = 'bs.modal';
+    const EVENT_KEY = '.bs.modal';
+    const EVENTS = {
         CLOSE: 'close',
         CANCEL: 'cancel',
         CLICK: 'click',
@@ -60,7 +59,7 @@ define(function(require, exports, module) {
      * @class   oroui.ModalView
      * @extends BaseView
      */
-    ModalView = BaseView.extend({
+    const ModalView = BaseView.extend({
         template: template,
 
         hasOpenModal: false,
@@ -71,7 +70,7 @@ define(function(require, exports, module) {
          * @inheritDoc
          */
         events: function() {
-            var events = {};
+            const events = {};
 
             events[EVENTS.CLICK + ' .cancel'] = this.handlerClick.bind(this, EVENTS.CANCEL);
             events[EVENTS.CLICK + ' .ok'] = this.handlerClick.bind(this, EVENTS.OK);
@@ -96,7 +95,7 @@ define(function(require, exports, module) {
          * @inheritDoc
          */
         attributes: function() {
-            var attrs = {};
+            const attrs = {};
 
             attrs['class'] = 'modal oro-modal-normal';
             attrs['role'] = 'modal';
@@ -109,8 +108,8 @@ define(function(require, exports, module) {
         /**
          * @inheritDoc
          */
-        constructor: function ModalView() {
-            ModalView.__super__.constructor.apply(this, arguments);
+        constructor: function ModalView(options) {
+            ModalView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -130,9 +129,9 @@ define(function(require, exports, module) {
          * @inheritDoc
          */
         render: function() {
-            ModalView.__super__.render.apply(this, arguments);
+            ModalView.__super__.render.call(this);
 
-            var content = this.options.content;
+            const content = this.options.content;
 
             this.$content = this.$('.modal-body');
 
@@ -155,8 +154,8 @@ define(function(require, exports, module) {
          * @inheritDoc
          */
         getTemplateData: function() {
-            var data = ModalView.__super__.getTemplateData.apply(this, arguments);
-            var fields = ['allowOk', 'allowCancel', 'cancelButtonClass', 'closeButtonClass', 'secondaryButtonClass',
+            const data = ModalView.__super__.getTemplateData.call(this);
+            const fields = ['allowOk', 'allowCancel', 'cancelButtonClass', 'closeButtonClass', 'secondaryButtonClass',
                 'okButtonClass', 'closeText', 'cancelText', 'okText', 'secondaryText', 'title', 'content'];
 
             return _.extend({
@@ -175,7 +174,7 @@ define(function(require, exports, module) {
                 return;
             }
 
-            var eventName = EVENTS[triggerKey.toUpperCase()] || null;
+            const eventName = EVENTS[triggerKey.toUpperCase()] || null;
 
             event.preventDefault();
 
@@ -251,10 +250,10 @@ define(function(require, exports, module) {
             }, this.options.modalOptions));
 
             // Adjust the modal and backdrop z-index; for dealing with multiple modals
-            var numModalViews = ModalView.count;
-            var $backdrop = $('.modal-backdrop:eq(' + numModalViews + ')');
-            var backdropIndex = parseInt($backdrop.css('z-index'), 10);
-            var elIndex = parseInt($backdrop.css('z-index'), 10) + 1;
+            const numModalViews = ModalView.count;
+            const $backdrop = $('.modal-backdrop:eq(' + numModalViews + ')');
+            const backdropIndex = parseInt($backdrop.css('z-index'), 10);
+            const elIndex = parseInt($backdrop.css('z-index'), 10) + 1;
 
             $backdrop.css('z-index', backdropIndex + numModalViews);
             this.$el.css('z-index', elIndex + numModalViews);
@@ -331,7 +330,7 @@ define(function(require, exports, module) {
                 return;
             }
 
-            var modal = this.$el.data(DATA_KEY);
+            const modal = this.$el.data(DATA_KEY);
 
             $([modal._element, modal._backdrop]).toggleClass(SUSPEND_MODE_CLASS, isSuspended);
             this.suspended = isSuspended;
@@ -347,7 +346,7 @@ define(function(require, exports, module) {
 
         _fixHeightForMobile: function() {
             this.$('.modal-body').height('auto');
-            var clientHeight = this.$el[0].clientHeight;
+            const clientHeight = this.$el[0].clientHeight;
             if (clientHeight < this.$el[0].scrollHeight) {
                 this.$('.modal-body').height(clientHeight -
                     this.$('.modal-header').outerHeight() -
@@ -397,7 +396,7 @@ define(function(require, exports, module) {
                 return;
             }
 
-            var content = this.options.content;
+            const content = this.options.content;
 
             if (content instanceof Backbone.View && !content.disposed) {
                 content.$el.detach();

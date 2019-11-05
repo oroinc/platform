@@ -7,8 +7,6 @@ define([
 ], function(_, Backbone, Backgrid, HeaderRow, HeaderCell) {
     'use strict';
 
-    var Header;
-
     /**
      * Datagrid header widget
      *
@@ -16,7 +14,7 @@ define([
      * @class   orodatagrid.datagrid.Header
      * @extends Backgrid.Header
      */
-    Header = Backgrid.Header.extend({
+    const Header = Backgrid.Header.extend({
         /** @property */
         tagName: 'thead',
 
@@ -34,8 +32,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function Header() {
-            Header.__super__.constructor.apply(this, arguments);
+        constructor: function Header(options) {
+            Header.__super__.constructor.call(this, options);
         },
 
         /**
@@ -57,7 +55,7 @@ define([
 
             this.filteredColumns = options.filteredColumns;
 
-            var rowOptions = {
+            const rowOptions = {
                 columns: this.columns,
                 collection: this.filteredColumns,
                 dataCollection: this.collection,
@@ -80,7 +78,7 @@ define([
             delete this.row;
             delete this.columns;
             delete this.filteredColumns;
-            Header.__super__.dispose.apply(this, arguments);
+            Header.__super__.dispose.call(this);
         }
     });
 

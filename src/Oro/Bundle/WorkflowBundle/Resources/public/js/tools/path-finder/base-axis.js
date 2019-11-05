@@ -35,9 +35,9 @@ define(['./extends', './axis'], function(__extends, Axis) {
      * @returns {BaseAxis}
      */
     BaseAxis.createFromInterval = function(interval, graph, leftConstraint, rightConstraint, locationDirective) {
-        var costMultiplier = interval.costMultiplier;
-        var isVertical = interval.isVertical;
-        var axis = new BaseAxis(interval.a, interval.b, graph, costMultiplier, leftConstraint, rightConstraint,
+        const costMultiplier = interval.costMultiplier;
+        const isVertical = interval.isVertical;
+        const axis = new BaseAxis(interval.a, interval.b, graph, costMultiplier, leftConstraint, rightConstraint,
             locationDirective);
         // this is fix for zero length axises
         if (isVertical !== undefined) {

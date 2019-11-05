@@ -5,8 +5,6 @@ define([
 ], function(_, NumberCell, CurrencyFormatter) {
     'use strict';
 
-    var CurrencyCell;
-
     /**
      * Currency column cell.
      *
@@ -14,7 +12,7 @@ define([
      * @class   oro.datagrid.cell.CurrencyCell
      * @extends NumberCell
      */
-    CurrencyCell = NumberCell.extend({
+    const CurrencyCell = NumberCell.extend({
         /** @property {orodatagrid.datagrid.formatter.CurrencyFormatter} */
         formatterPrototype: CurrencyFormatter,
 
@@ -24,8 +22,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function CurrencyCell() {
-            CurrencyCell.__super__.constructor.apply(this, arguments);
+        constructor: function CurrencyCell(options) {
+            CurrencyCell.__super__.constructor.call(this, options);
         }
     });
 

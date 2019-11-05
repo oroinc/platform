@@ -2,14 +2,14 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
 ], function(_, Backbone, mediator, BlockWidget) {
     'use strict';
 
-    var $ = Backbone.$;
+    const $ = Backbone.$;
 
     /**
      * @export  oro/page-widget
      * @class   oro.PageWidget
      * @extends oro.BlockWidget
      */
-    return BlockWidget.extend({
+    const PageWidget = BlockWidget.extend({
         options: _.extend({}, BlockWidget.prototype.options, {
             type: 'page',
             contentContainer: '.layout-content',
@@ -38,19 +38,23 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
             replacementEl: null
         }),
 
+        constructor: function PageWidget(options) {
+            PageWidget.__super__.constructor.call(this, options);
+        },
+
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.$replacementEl = $(this.options.replacementEl);
             this.options.container = this.$replacementEl.parent();
             this.on('adoptedFormResetClick', this.remove);
 
-            BlockWidget.prototype.initialize.apply(this, arguments);
+            PageWidget.__super__.initialize.call(this, options);
         },
 
         remove: function() {
-            BlockWidget.prototype.remove.apply(this);
+            PageWidget.__super__.remove.call(this);
 
-            var latestShownPageWidget = $('.page-widget').last();
+            const latestShownPageWidget = $('.page-widget').last();
             latestShownPageWidget.show();
             if (!latestShownPageWidget.length) {
                 this.$replacementEl.show();
@@ -59,17 +63,19 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
         },
 
         _show: function() {
-            var latestShownPageWidget = $('.page-widget').last();
+            const latestShownPageWidget = $('.page-widget').last();
             latestShownPageWidget.hide();
             if (!latestShownPageWidget.length) {
                 this.$replacementEl.hide();
             }
             this.widget.addClass('page-widget');
 
-            BlockWidget.prototype._show.apply(this);
+            PageWidget.__super__._show.call(this);
             this.getActionsElement().find('button').wrap('<div class="btn-group"/>');
 
             mediator.trigger('layout:adjustHeight');
         }
     });
+
+    return PageWidget;
 });

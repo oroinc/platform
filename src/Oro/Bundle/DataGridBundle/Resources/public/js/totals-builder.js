@@ -1,8 +1,8 @@
-define(['jquery', 'underscore', 'oroui/js/mediator'
-], function($, _, mediator) {
+define(['jquery', 'underscore'
+], function($, _) {
     'use strict';
 
-    var initHandler = function(collection) {
+    const initHandler = function(collection) {
         collection.on('beforeReset', function(collection, models, options) {
             collection.state.totals = options.totals;
         });

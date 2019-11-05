@@ -5,8 +5,6 @@ define([
 ], function(ModelAction, DeleteConfirmation, mediator) {
     'use strict';
 
-    var AjaxdeleteAction;
-
     /**
      * Ajax delete action, triggers REST AJAX request
      *
@@ -14,7 +12,7 @@ define([
      * @class   oro.datagrid.action.AjaxdeleteAction
      * @extends oro.datagrid.action.ModelAction
      */
-    AjaxdeleteAction = ModelAction.extend({
+    const AjaxdeleteAction = ModelAction.extend({
         confirmation: true,
 
         /** @property {Function} */
@@ -36,20 +34,20 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function AjaxdeleteAction() {
-            AjaxdeleteAction.__super__.constructor.apply(this, arguments);
+        constructor: function AjaxdeleteAction(options) {
+            AjaxdeleteAction.__super__.constructor.call(this, options);
         },
 
         _doAjaxRequest: function() {
             mediator.trigger('datagrid:beforeRemoveRow:' + this.datagrid.name, this.model);
 
-            AjaxdeleteAction.__super__._doAjaxRequest.apply(this, arguments);
+            AjaxdeleteAction.__super__._doAjaxRequest.call(this);
         },
 
-        _onAjaxSuccess: function(data) {
+        _onAjaxSuccess: function(...args) {
             mediator.trigger('datagrid:afterRemoveRow:' + this.datagrid.name);
 
-            AjaxdeleteAction.__super__._onAjaxSuccess.apply(this, arguments);
+            AjaxdeleteAction.__super__._onAjaxSuccess.apply(this, args);
         }
     });
 

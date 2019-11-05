@@ -2,22 +2,21 @@
 define(function(require) {
     'use strict';
 
-    var GoogleMapsView;
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var __ = require('orotranslation/js/translator');
-    var localeSettings = require('orolocale/js/locale-settings');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var messenger = require('oroui/js/messenger');
-    var $ = Backbone.$;
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const __ = require('orotranslation/js/translator');
+    const localeSettings = require('orolocale/js/locale-settings');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const messenger = require('oroui/js/messenger');
+    const $ = Backbone.$;
 
     /**
      * @export  oroaddress/js/mapservice/googlemaps
      * @class   oroaddress.mapservice.Googlemaps
      * @extends BaseView
      */
-    GoogleMapsView = BaseView.extend({
+    const GoogleMapsView = BaseView.extend({
         options: {
             mapOptions: {
                 zoom: 17,
@@ -45,8 +44,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function GoogleMapsView() {
-            GoogleMapsView.__super__.constructor.apply(this, arguments);
+        constructor: function GoogleMapsView(options) {
+            GoogleMapsView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -87,8 +86,8 @@ define(function(require) {
         },
 
         _initMap: function(location) {
-            var weatherLayer;
-            var cloudLayer;
+            let weatherLayer;
+            let cloudLayer;
             this.removeErrorMessage();
             this._initMapOptions();
             this.map = new google.maps.Map(
@@ -103,8 +102,8 @@ define(function(require) {
             });
 
             if (this.options.showWeather) {
-                var temperatureUnitKey = localeSettings.settings.unit.temperature.toUpperCase();
-                var windSpeedUnitKey = localeSettings.settings.unit.wind_speed.toUpperCase();
+                const temperatureUnitKey = localeSettings.settings.unit.temperature.toUpperCase();
+                const windSpeedUnitKey = localeSettings.settings.unit.wind_speed.toUpperCase();
                 weatherLayer = new google.maps.weather.WeatherLayer({
                     temperatureUnits: google.maps.weather.TemperatureUnit[temperatureUnitKey],
                     windSpeedUnits: google.maps.weather.WindSpeedUnit[windSpeedUnitKey]
@@ -125,14 +124,19 @@ define(function(require) {
         },
 
         loadGoogleMaps: function() {
-            var googleMapsSettings = '';
-
-            if (this.options.showWeather) {
-                googleMapsSettings += '&libraries=weather';
-            }
+            let googleMapsSettings = '';
 
             if (this.options.apiKey) {
                 googleMapsSettings += '&key=' + this.options.apiKey;
+            } else {
+                this.mapsLoadExecuted = false;
+                this.addErrorMessage();
+                this.loadingMask.hide();
+                return;
+            }
+
+            if (this.options.showWeather) {
+                googleMapsSettings += '&libraries=weather';
             }
 
             $.ajax({
@@ -153,7 +157,7 @@ define(function(require) {
         },
 
         updateMap: function(address, label) {
-            var timeoutId;
+            let timeoutId;
 
             this.loadingMask.show();
             this.removeErrorMessage();

@@ -3,7 +3,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
 ], function($, _, __, BaseView, colorUtil) {
     'use strict';
 
-    var BaseSimpleColorPickerView = BaseView.extend({
+    const BaseSimpleColorPickerView = BaseView.extend({
         defaults: {
             pickerActionsTemplate: '<div class="form-actions">' +
                 '<button class="btn pull-right" data-action="cancel" type="button"><%= __("Close") %></button>' +
@@ -18,8 +18,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
         /**
          * @inheritDoc
          */
-        constructor: function BaseSimpleColorPickerView() {
-            BaseSimpleColorPickerView.__super__.constructor.apply(this, arguments);
+        constructor: function BaseSimpleColorPickerView(options) {
+            BaseSimpleColorPickerView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -167,14 +167,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
          * @private
          */
         _getPickerPos: function($swatch) {
-            var $panel = this.$picker.parent().find('.minicolors-panel');
-            var pos = $swatch.position();
-            var x = pos.left + $swatch.offsetParent().scrollLeft() + 5;
-            var y = pos.top + $swatch.offsetParent().scrollTop() + $swatch.outerHeight() + 3;
-            var w = $panel.outerWidth();
-            var h = $panel.outerHeight() + 39;
-            var width = $swatch.offsetParent().width();
-            var height = $swatch.offsetParent().height();
+            const $panel = this.$picker.parent().find('.minicolors-panel');
+            const pos = $swatch.position();
+            let x = pos.left + $swatch.offsetParent().scrollLeft() + 5;
+            let y = pos.top + $swatch.offsetParent().scrollTop() + $swatch.outerHeight() + 3;
+            const w = $panel.outerWidth();
+            const h = $panel.outerHeight() + 39;
+            const width = $swatch.offsetParent().width();
+            const height = $swatch.offsetParent().height();
             if (x > width - w) {
                 x -= w;
             }

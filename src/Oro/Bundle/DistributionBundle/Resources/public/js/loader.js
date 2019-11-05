@@ -2,8 +2,8 @@
 function Loader(element) {
     'use strict';
 
-    var clickedElement = null;
-    var loadingElement = element;
+    let clickedElement = null;
+    const loadingElement = element;
 
     return {
         setClickedElement: function(element) {

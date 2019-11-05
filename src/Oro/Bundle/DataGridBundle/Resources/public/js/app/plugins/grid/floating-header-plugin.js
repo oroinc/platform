@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var FloatingHeaderPlugin;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    var Backbone = require('backbone');
-    var mediator = require('oroui/js/mediator');
-    var scrollHelper = require('oroui/js/tools/scroll-helper');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    const Backbone = require('backbone');
+    const mediator = require('oroui/js/mediator');
+    const scrollHelper = require('oroui/js/tools/scroll-helper');
 
-    FloatingHeaderPlugin = BasePlugin.extend({
+    const FloatingHeaderPlugin = BasePlugin.extend({
         initialize: function(grid) {
             this.grid = grid;
             this.grid.on('shown', _.bind(this.onGridShown, this));
@@ -93,12 +92,12 @@ define(function(require) {
         },
 
         supportDropdowns: function() {
-            var debouncedHideDropdowns = _.debounce(_.bind(function() {
+            const debouncedHideDropdowns = _.debounce(_.bind(function() {
                 this.domCache.thead.find('.show > [data-toggle="dropdown"]').trigger('tohide.bs.dropdown');
             }, this), 100, true);
             // use capture phase to scroll dropdown toggle into view before dropdown will be opened
             this.$grid[0].addEventListener('click', _.bind(function(e) {
-                var dropdownToggle = $(e.target).closest('[data-toggle="dropdown"]');
+                const dropdownToggle = $(e.target).closest('[data-toggle="dropdown"]');
                 if (dropdownToggle.length && dropdownToggle.parent().is('thead:first .dropdown:not(.show)')) {
                     // this will hide dropdowns and ignore next calls to it
                     debouncedHideDropdowns();
@@ -122,19 +121,17 @@ define(function(require) {
             mediator.trigger('gridHeaderCellWidth:beforeUpdate');
 
             this.setupCache();
-            var headerCells = this.domCache.headerCells;
-            var scrollLeft = this.domCache.gridScrollableContainer[0].scrollLeft;
-            var totalWidth;
-            var sumWidth;
-            var widthDecrement = 0;
-            var widths = [];
+            const headerCells = this.domCache.headerCells;
+            const scrollLeft = this.domCache.gridScrollableContainer[0].scrollLeft;
+            let widthDecrement = 0;
+            const widths = [];
             // remove style
             headerCells.attr('style', '');
             this.$grid.css({width: ''});
             this.domCache.gridContainer.css({width: ''});
             this.$el.removeClass('floatThead');
 
-            totalWidth = this.$grid[0].scrollWidth;
+            const totalWidth = this.$grid[0].scrollWidth;
 
             // save widths
             headerCells.each(function(i, headerCell) {
@@ -142,7 +139,7 @@ define(function(require) {
             });
 
             // FF sometimes gives wrong values, need to check
-            sumWidth = _.reduce(widths, function(a, b) {
+            const sumWidth = _.reduce(widths, function(a, b) {
                 return a + b;
             });
 
@@ -152,7 +149,7 @@ define(function(require) {
 
             // set exact sizes to header cells and cells in first row
             headerCells.each(function(i, headerCell) {
-                var cellWidth = widths[i] + widthDecrement;
+                const cellWidth = widths[i] + widthDecrement;
                 headerCell.style.width = cellWidth + 'px';
                 headerCell.style.maxWidth = cellWidth + 'px';
                 headerCell.style.minWidth = cellWidth + 'px';
@@ -180,11 +177,11 @@ define(function(require) {
          */
         selectMode: function() {
             // get gridRect
-            var tableRect = this.domCache.gridContainer[0].getBoundingClientRect();
-            var visibleRect = scrollHelper.getVisibleRect(this.$grid[0], {
+            const tableRect = this.domCache.gridContainer[0].getBoundingClientRect();
+            const visibleRect = scrollHelper.getVisibleRect(this.$grid[0], {
                 top: -this.headerHeight
             }, this.currentFloatTheadMode === 'default');
-            var mode = 'default';
+            let mode = 'default';
             if (visibleRect.top !== tableRect.top || this.grid.layout === 'fullscreen') {
                 mode = this.isHeaderDropdownVisible ? 'relative' : 'fixed';
             }
@@ -202,7 +199,7 @@ define(function(require) {
          * Setups floating header mode
          */
         setFloatTheadMode: function(mode, visibleRect, tableRect) {
-            var theadRect;
+            let theadRect;
             // pass this argument to avoid expensive calculations
             if (!visibleRect) {
                 visibleRect = scrollHelper.getVisibleRect(this.domCache.gridContainer[0], {
@@ -276,7 +273,7 @@ define(function(require) {
          * (hiding/showing and sorting columns)
          */
         onGridContentUpdate: function() {
-            var $theadSizingElement = this.$grid.find('.thead-sizing');
+            const $theadSizingElement = this.$grid.find('.thead-sizing');
             if ($theadSizingElement.length) {
                 $theadSizingElement.remove();
                 this._ensureTHeadSizing();
@@ -291,7 +288,7 @@ define(function(require) {
          */
         _ensureTHeadSizing: function() {
             if (!this.$grid.find('.thead-sizing').length) {
-                var sizingThead = this.domCache.thead.clone();
+                const sizingThead = this.domCache.thead.clone();
                 sizingThead.addClass('thead-sizing');
                 sizingThead.find('th').attr('style', '');
                 sizingThead.insertAfter(this.domCache.thead);
@@ -302,13 +299,13 @@ define(function(require) {
          * Enables other scroll functionality
          */
         enableOtherScroll: function() {
-            var heightDec;
-            var self = this;
-            var scrollContainer = this.domCache.gridScrollableContainer;
-            var otherScroll = this.domCache.otherScroll;
-            var otherScrollInner = this.domCache.otherScrollInner;
-            var scrollBarWidth = mediator.execute('layout:scrollbarWidth');
-            var scrollStateModel = new Backbone.Model();
+            let heightDec;
+            const self = this;
+            const scrollContainer = this.domCache.gridScrollableContainer;
+            const otherScroll = this.domCache.otherScroll;
+            const otherScrollInner = this.domCache.otherScrollInner;
+            const scrollBarWidth = mediator.execute('layout:scrollbarWidth');
+            const scrollStateModel = new Backbone.Model();
 
             this.scrollStateModel = scrollStateModel;
 
@@ -374,9 +371,9 @@ define(function(require) {
                     headerHeight: self.headerHeight
                 });
 
-                var clientRectHeight = scrollContainer[0].getBoundingClientRect().height;
-                var scrollHeight = scrollContainer[0].scrollHeight;
-                var offsetHeight = scrollContainer[0].offsetHeight;
+                const clientRectHeight = scrollContainer[0].getBoundingClientRect().height;
+                let scrollHeight = scrollContainer[0].scrollHeight;
+                const offsetHeight = scrollContainer[0].offsetHeight;
 
                 if (offsetHeight !== clientRectHeight && offsetHeight === Math.round(clientRectHeight)) {
                     // ie/edge bounding rect height may include fraction
@@ -425,8 +422,7 @@ define(function(require) {
             if (!this.connected) {
                 return;
             }
-            var scrollContainerRect;
-            var scrollLeft;
+            let scrollLeft;
             if (this.currentFloatTheadMode === 'default') {
                 if (this.grid.layout === 'fullscreen' &&
                         this.currentFloatTheadMode === 'default' &&
@@ -440,7 +436,7 @@ define(function(require) {
                 this.selectMode();
                 return;
             }
-            scrollContainerRect = this.domCache.otherScrollContainer[0].getBoundingClientRect();
+            const scrollContainerRect = this.domCache.otherScrollContainer[0].getBoundingClientRect();
             if (!this._lastClientRect || (this._lastClientRect.top !== scrollContainerRect.top ||
                     this._lastClientRect.left !== scrollContainerRect.left ||
                     this._lastClientRect.right !== scrollContainerRect.right)) {
@@ -469,7 +465,7 @@ define(function(require) {
                 return;
             }
             if (this.currentFloatTheadMode in {relative: true, fixed: true}) {
-                var _this = this;
+                const _this = this;
                 this.fixHeaderCellWidth();
                 scrollHelper.scrollIntoView(cell.el, function(el, rect) {
                     if (_this.domCache.gridScrollableContainer &&

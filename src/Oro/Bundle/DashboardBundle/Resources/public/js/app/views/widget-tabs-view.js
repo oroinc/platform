@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var WidgetTabsView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
 
-    WidgetTabsView = BaseView.extend({
+    const WidgetTabsView = BaseView.extend({
         events: {
             'shown.bs.tab .tab-button': 'onTabClick'
         },
@@ -18,17 +17,17 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function WidgetTabsView() {
-            WidgetTabsView.__super__.constructor.apply(this, arguments);
+        constructor: function WidgetTabsView(options) {
+            WidgetTabsView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
+        initialize: function(options) {
             this.subview('loading', new LoadingMaskView({container: this._getTabContent()}));
 
-            WidgetTabsView.__super__.initialize.apply(this, arguments);
+            WidgetTabsView.__super__.initialize.call(this, options);
         },
 
         _getTabContent: function() {
@@ -36,10 +35,10 @@ define(function(require) {
         },
 
         onTabClick: function(e) {
-            var $currentTarget = $(e.currentTarget);
-            var previusActiveTab = $(e.relatedTarget);
-            var loadingView = this.subview('loading');
-            var $tabContainer = this._getTabContent();
+            const $currentTarget = $(e.currentTarget);
+            const previusActiveTab = $(e.relatedTarget);
+            const loadingView = this.subview('loading');
+            const $tabContainer = this._getTabContent();
 
             $tabContainer.attr('aria-labelledby', $currentTarget.attr('id'));
             loadingView.show();

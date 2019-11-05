@@ -1,6 +1,10 @@
 define(function(require) {
     'use strict';
 
+    const SelectEditorView = require('./select-editor-view');
+    const _ = require('underscore');
+    const select2autosizer = require('oroui/js/tools/select2-autosizer');
+
     /**
      * Multi-select content editor. Please note that it requires column data format
      * corresponding to multi-select-cell.
@@ -56,19 +60,14 @@ define(function(require) {
      * @augments [SelectEditorView](./select-editor-view.md)
      * @exports MultiSelectEditorView
      */
-    var MultiSelectEditorView;
-    var SelectEditorView = require('./select-editor-view');
-    var _ = require('underscore');
-    var select2autosizer = require('oroui/js/tools/select2-autosizer');
-
-    MultiSelectEditorView = SelectEditorView.extend(/** @lends MultiSelectEditorView.prototype */{
+    const MultiSelectEditorView = SelectEditorView.extend(/** @lends MultiSelectEditorView.prototype */{
         className: 'multi-select-editor',
 
         /**
          * @inheritDoc
          */
-        constructor: function MultiSelectEditorView() {
-            MultiSelectEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function MultiSelectEditorView(options) {
+            MultiSelectEditorView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -77,7 +76,7 @@ define(function(require) {
         initialize: function(options) {
             options.ignore_value_field_name = true;
             this.maximumSelectionLength = options.maximumSelectionLength;
-            MultiSelectEditorView.__super__.initialize.apply(this, arguments);
+            MultiSelectEditorView.__super__.initialize.call(this, options);
         },
 
         events: {
@@ -93,7 +92,7 @@ define(function(require) {
         },
 
         getSelect2Options: function() {
-            var options = MultiSelectEditorView.__super__.getSelect2Options.apply(this, arguments);
+            const options = MultiSelectEditorView.__super__.getSelect2Options.call(this);
             options.multiple = true;
             options.maximumSelectionLength = this.maximumSelectionLength;
             return options;
@@ -115,8 +114,8 @@ define(function(require) {
         },
 
         getValue: function() {
-            var select2Value = this.$('input[name=value]').val();
-            var ids;
+            const select2Value = this.$('input[name=value]').val();
+            let ids;
             if (select2Value !== '') {
                 ids = select2Value.split(',').map(function(id) {
                     return id;
