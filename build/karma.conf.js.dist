@@ -18,6 +18,7 @@ const webpackConfig = (function() {
 
   const {resolve, module, resolveLoader} = OroConfig.getWebpackConfig()({
     skipCSS: true,
+    skipBabel: true,
     theme: theme,
     symfony: environment
   }, {})[0];

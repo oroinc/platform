@@ -355,6 +355,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             'fields'           => [
                 'association4' => [
                     'property_path' => 'association41.association411',
+                    'direction'     => 'input-only',
                     'fields'        => [
                         'association411' => [
                             'fields' => [
@@ -443,6 +444,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $expectedAssociation4->setPropertyPath('association41.association411');
         $expectedAssociation4->setIsNullable(true);
         $expectedAssociation4->setTargetMetadata($association411TargetMetadata);
+        $expectedAssociation4->setDirection(true, false);
         $expectedMetadata->addAssociation($expectedAssociation4);
 
         self::assertEquals($expectedMetadata, $this->context->getResult());
@@ -871,10 +873,12 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             'exclusion_policy' => 'all',
             'fields'           => [
                 'field1'            => [
-                    'property_path' => 'targetAssociation.field11'
+                    'property_path' => 'targetAssociation.field11',
+                    'direction'     => 'input-only'
                 ],
                 'association1'      => [
-                    'property_path' => 'targetAssociation.association11'
+                    'property_path' => 'targetAssociation.association11',
+                    'direction'     => 'output-only'
                 ],
                 'targetAssociation' => [
                     'exclude'      => true,
@@ -938,9 +942,11 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
 
         $field1Metadata = clone $targetMetadata->getField('field11');
         $field1Metadata->setName('field1');
+        $field1Metadata->setDirection(true, false);
         self::assertEquals($field1Metadata, $metadata->getField('field1'));
         $association1Metadata = clone $targetMetadata->getAssociation('association11');
         $association1Metadata->setName('association1');
+        $association1Metadata->setDirection(false, true);
         self::assertEquals($association1Metadata, $metadata->getAssociation('association1'));
     }
 

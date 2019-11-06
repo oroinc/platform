@@ -12,6 +12,10 @@ define(function(require) {
 
         validationOptions: null,
 
+        events: {
+            reset: 'onReset'
+        },
+
         /**
          * @inheritDoc
          */
@@ -30,6 +34,10 @@ define(function(require) {
         render: function() {
             this.validator = this.$el.validate(this.validationOptions || {});
             return this;
+        },
+
+        onReset: function() {
+            this.validator.resetForm();
         },
 
         dispose: function() {

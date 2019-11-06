@@ -4,6 +4,10 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp }
 
+    oro_api.tests.processor_bag:
+        alias: oro_api.processor_bag
+        public: true
+
     oro_api.tests.entity_alias_provider:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestEntitiesAliasProvider
         tags:

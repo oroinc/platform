@@ -2,7 +2,7 @@ aliases:
     asap$: npmassets/asap/asap
     backbone$: npmassets/backbone/backbone
     base64$: oroui/js/extend/base64
-    bootstrap$: oroui/blank/lib/bootstrap
+    bootstrap$: oroui/blank/js/bootstrap
     bootstrap-alert$: npmassets/bootstrap/js/dist/alert
     bootstrap-dropdown$: npmassets/bootstrap/js/dist/dropdown
     bootstrap-modal$: npmassets/bootstrap/js/dist/modal
@@ -20,7 +20,7 @@ aliases:
     datepair$: bowerassets/datepair/dist/datepair
     extend-popper$: oroui/js/extend/popper
     jquery$: npmassets/jquery/dist/jquery
-    jquery-ui$: oroui/lib/jquery-ui
+    jquery-ui$: oroui/js/jquery-ui
     jquery.cookie$: bowerassets/jquery-cookie/jquery.cookie
     jquery.form$: bowerassets/jquery-form/src/jquery.form
     jquery.mousewheel$: bowerassets/jquery-mousewheel/jquery.mousewheel

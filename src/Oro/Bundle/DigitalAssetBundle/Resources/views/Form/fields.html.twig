@@ -49,6 +49,10 @@
                             ? 'oro.digitalasset.dam.dialog.select_image'
                             : 'oro.digitalasset.dam.dialog.select_file')|trans,
                         url: path(dam_widget.route|default('oro_digital_asset_widget_choose'), dam_widget.parameters),
+                        dialogOptions: {
+                            modal: true,
+                            dialogClass: 'digital-asset-dialog'
+                        }
                     },
                     selectors: {
                         digitalAssetInput: '#' ~ form.digitalAsset.vars.id,
