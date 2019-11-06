@@ -30,10 +30,10 @@ define(['../locale-settings'
                 locale = localeSettings.getLocale();
             }
 
-            var format = this.getNameFormat(locale);
-            var formatted = format.replace(/%(\w+)%/g, function(pattern, key) {
-                var lowerCaseKey = key.toLowerCase();
-                var value = '';
+            const format = this.getNameFormat(locale);
+            const formatted = format.replace(/%(\w+)%/g, function(pattern, key) {
+                const lowerCaseKey = key.toLowerCase();
+                let value = '';
                 if (person.hasOwnProperty(lowerCaseKey)) {
                     value = person[lowerCaseKey];
                     if (key !== lowerCaseKey) {
@@ -54,10 +54,10 @@ define(['../locale-settings'
          */
         getNameFormat: function(locale) {
             if (!this.formatCache.hasOwnProperty(locale)) {
-                var localeFallback = localeSettings.getLocaleFallback(locale);
+                const localeFallback = localeSettings.getLocaleFallback(locale);
 
-                var format = null;
-                for (var i = 0; i < localeFallback.length; i++) {
+                let format = null;
+                for (let i = 0; i < localeFallback.length; i++) {
                     if (this.formats.hasOwnProperty(localeFallback[i])) {
                         format = this.formats[localeFallback[i]];
                         break;

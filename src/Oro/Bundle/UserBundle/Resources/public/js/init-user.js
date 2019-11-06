@@ -8,7 +8,7 @@ function($, _, __, mediator, messenger, DialogWidget) {
      * ============================================================ */
     $(function() {
         function checkRoleInputs() {
-            var inputs = $('#roles-list').find('.controls :checkbox');
+            const inputs = $('#roles-list').find('.controls :checkbox');
             inputs.attr('required', inputs.filter(':checked').length > 0 ? null : 'required');
         }
 
@@ -31,7 +31,7 @@ function($, _, __, mediator, messenger, DialogWidget) {
      * from status.js
      * ============================================================ */
     $(function() {
-        var dialogBlock;
+        let dialogBlock;
 
         $('.update-status a').click(function() {
             $.get($(this).attr('href'), function(data) {

@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var WysiwygEditorView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var tools = require('oroui/js/tools');
-    var txtHtmlTransformer = require('./txt-html-transformer');
-    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
-    var tinyMCE = require('tinymce/tinymce');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const tools = require('oroui/js/tools');
+    const txtHtmlTransformer = require('./txt-html-transformer');
+    const LoadingMask = require('oroui/js/app/views/loading-mask-view');
+    const tinyMCE = require('tinymce/tinymce');
 
-    WysiwygEditorView = BaseView.extend({
+    const WysiwygEditorView = BaseView.extend({
         TINYMCE_UI_HEIGHT: 3,
         TEXTAREA_UI_HEIGHT: 22,
 
@@ -39,14 +38,16 @@ define(function(require) {
         },
 
         events: {
-            'set-focus': 'setFocus'
+            'set-focus': 'setFocus',
+            'wysiwyg:enable': 'enableEditor',
+            'wysiwyg:disable': 'disableEditor'
         },
 
         /**
          * @inheritDoc
          */
-        constructor: function WysiwygEditorView() {
-            WysiwygEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function WysiwygEditorView(options) {
+            WysiwygEditorView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -55,6 +56,9 @@ define(function(require) {
         initialize: function(options) {
             options = $.extend(true, {}, this.defaults, options);
             this.enabled = options.enabled;
+            if (this.firstRender && !this.autoRender) {
+                this.enabled = false;
+            }
             this.options = _.omit(options, 'enabled', 'el');
             if (tools.isIOS()) {
                 this.options.plugins = _.without(this.options.plugins, 'fullscreen');
@@ -62,7 +66,7 @@ define(function(require) {
                     return toolbar.replace(/\s*\|\s?fullscreen/, '');
                 });
             }
-            WysiwygEditorView.__super__.initialize.apply(this, arguments);
+            WysiwygEditorView.__super__.initialize.call(this, options);
         },
 
         render: function() {
@@ -93,8 +97,8 @@ define(function(require) {
         },
 
         connectTinyMCE: function() {
-            var self = this;
-            var loadingMaskContainer = this.$el.parents('.ui-dialog');
+            const self = this;
+            let loadingMaskContainer = this.$el.parents('.ui-dialog');
             if (!loadingMaskContainer.length) {
                 loadingMaskContainer = this.$el.parent();
             }
@@ -111,7 +115,7 @@ define(function(require) {
                 }
             }
             this._deferredRender();
-            var options = this.options;
+            const options = this.options;
             if ($(this.$el).prop('disabled') || $(this.$el).prop('readonly')) {
                 options.readonly = true;
             }
@@ -153,21 +157,21 @@ define(function(require) {
                     if (!tools.isMobile()) {
                         self.tinymceInstance.on('FullscreenStateChanged', function(e) {
                             if (e.state) {
-                                var rect = $('#container').get(0).getBoundingClientRect();
-                                var css = {
+                                const rect = $('#container').get(0).getBoundingClientRect();
+                                const css = {
                                     top: rect.top + 'px',
                                     left: rect.left + 'px',
                                     right: Math.max(window.innerWidth - rect.right, 0) + 'px'
                                 };
 
-                                var rules = _.map(_.pairs(css), function(item) {
+                                const rules = _.map(_.pairs(css), function(item) {
                                     return item.join(': ');
                                 }).join('; ');
                                 tools.addCSSRule('div.mce-container.mce-fullscreen', rules);
                                 self.$el.after($('<div />', {'class': 'mce-fullscreen-overlay'}));
-                                var DOM = editor.target.DOM;
-                                var iframe = editor.iframeElement;
-                                var iframeTop = iframe.getBoundingClientRect().top;
+                                const DOM = editor.target.DOM;
+                                const iframe = editor.iframeElement;
+                                const iframeTop = iframe.getBoundingClientRect().top;
                                 DOM.setStyle(iframe, 'height', window.innerHeight - iframeTop);
                             } else {
                                 self.$el.siblings('.mce-fullscreen-overlay').remove();
@@ -212,8 +216,8 @@ define(function(require) {
         },
 
         findFirstQuoteLine: function() {
-            var quoteElement = $.parseHTML('<div>' + this.$el[0].value + '</div>');
-            var quote = $(quoteElement).find('.quote').html();
+            const quoteElement = $.parseHTML('<div>' + this.$el[0].value + '</div>');
+            let quote = $(quoteElement).find('.quote').html();
             if (quote) {
                 quote = txtHtmlTransformer.html2text(quote);
                 this.firstQuoteLine = _.find(quote.split(/(\n\r?|\r\n?)/g), function(line) {
@@ -232,7 +236,7 @@ define(function(require) {
         },
 
         setHeight: function(newHeight) {
-            var currentToolbarHeight;
+            let currentToolbarHeight;
             if (this.tinymceConnected) {
                 currentToolbarHeight = this.$el.parent().find('.mce-toolbar-grp').outerHeight();
                 this.$el.parent().find('iframe').height(newHeight - currentToolbarHeight - this.TINYMCE_UI_HEIGHT);
@@ -250,6 +254,14 @@ define(function(require) {
                 this.tinymceInstance = null;
             }
             WysiwygEditorView.__super__.dispose.call(this);
+        },
+
+        enableEditor: function() {
+            this.setEnabled(true);
+        },
+
+        disableEditor: function() {
+            this.setEnabled(false);
         }
     });
 

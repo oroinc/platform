@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var Chaplin = require('chaplin');
-    var BaseComponent;
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const Chaplin = require('chaplin');
 
     /**
      * Base component's constructor
@@ -18,13 +17,13 @@ define(function(require) {
      * @borrows Chaplin.View.prototype.delegateListener as delegateListener
      * @param {Object} options - Options container
      */
-    BaseComponent = function(options) {
+    function BaseComponent(options) {
         this.cid = _.uniqueId(this.cidPrefix);
         _.extend(this, _.pick(options, _.result(this, 'optionNames')));
         _.extend(this, options[BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME]);
         this.initialize(options);
         this.delegateListeners();
-    };
+    }
 
     BaseComponent.prototype = Object.create(Backbone.Events);
     BaseComponent.prototype.constructor = BaseComponent;
@@ -67,8 +66,8 @@ define(function(require) {
          * @static
          */
         getRelatedSiblingComponentNames: function(Component) {
-            var PROP = BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME;
-            var dependencies = Chaplin.utils.getAllPropertyVersions(Component.prototype, PROP);
+            const PROP = BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME;
+            let dependencies = Chaplin.utils.getAllPropertyVersions(Component.prototype, PROP);
             dependencies.push(_.result(Component.prototype, PROP));
             dependencies = _.extend.apply(null, [{}].concat(dependencies));
 
@@ -129,8 +128,8 @@ define(function(require) {
             this.unsubscribeAllEvents();
             this.stopListening();
             this.off();
-            var siblingComponents = _.keys(BaseComponent.getRelatedSiblingComponentNames(this.constructor));
-            var optionNames = _.result(this, 'optionNames');
+            const siblingComponents = _.keys(BaseComponent.getRelatedSiblingComponentNames(this.constructor));
+            const optionNames = _.result(this, 'optionNames');
 
             // dispose and remove all own properties
             _.each(this, function(item, name) {

@@ -29,7 +29,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
     }
 
     /**
-     * @param string $field
+     * @param string|array $field
      * @param mixed $source
      * @param mixed $expected
      * @dataProvider transformDataProvider
@@ -42,6 +42,8 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
 
     /**
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function transformDataProvider()
     {
@@ -55,6 +57,16 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         $firstTextValue = $this->createLocalizedFallbackValue(6, 1, null, null, 'first');
         $secondTextValue = $this->createLocalizedFallbackValue(7, 2, null, null, 'second');
         $thirdTextValue = $this->createLocalizedFallbackValue(8, 3, FallbackType::PARENT_LOCALIZATION);
+
+        $emptyValues = $this->createLocalizedFallbackValue(1);
+        $string1Value = $this->createLocalizedFallbackValue(2, 1, null, 'string1');
+        $string2Value = $this->createLocalizedFallbackValue(3, 2, null, 'string2');
+        $text1Value = $this->createLocalizedFallbackValue(4, 3, null, null, 'text1');
+        $text2Value = $this->createLocalizedFallbackValue(5, 4, null, null, 'text2');
+        $systemFallbackValue = $this->createLocalizedFallbackValue(6, 5, FallbackType::SYSTEM);
+        $parentFallbackValue = $this->createLocalizedFallbackValue(7, 6, FallbackType::PARENT_LOCALIZATION);
+        $bothValues = $this->createLocalizedFallbackValue(8, 7, null, 'string3', 'text3');
+        $emptyIdValues = $this->createLocalizedFallbackValue(null, 8, FallbackType::SYSTEM);
 
         return [
             'null' => [
@@ -110,6 +122,63 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
                         1 => 6,
                         2 => 7,
                         3 => 8,
+                    ],
+                ],
+            ],
+            'multi fields' => [
+                'field' => ['string', 'text'],
+                'source' => new ArrayCollection(
+                    [
+                        $emptyValues,
+                        $string1Value,
+                        $string2Value,
+                        $text1Value,
+                        $text2Value,
+                        $systemFallbackValue ,
+                        $parentFallbackValue,
+                        $bothValues,
+                        $emptyIdValues,
+                    ]
+                ),
+                'expected' => [
+                    LocalizedFallbackValueCollectionType::FIELD_VALUES => [
+                        null => [
+                            'string' => null,
+                            'text' => null
+                        ],
+                        1 => [
+                            'string' => 'string1',
+                            'text' => null
+                        ],
+                        2 => [
+                            'string' => 'string2',
+                            'text' => null
+                        ],
+                        3 => [
+                            'string' => null,
+                            'text' => 'text1'
+                        ],
+                        4 => [
+                            'string' => null,
+                            'text' => 'text2'
+                        ],
+                        5 => new FallbackType(FallbackType::SYSTEM),
+                        6 => new FallbackType(FallbackType::PARENT_LOCALIZATION),
+                        7 => [
+                            'string' => 'string3',
+                            'text' => 'text3'
+                        ],
+                        8 => new FallbackType(FallbackType::SYSTEM),
+                    ],
+                    LocalizedFallbackValueCollectionType::FIELD_IDS => [
+                        0 => 1,
+                        1 => 2,
+                        2 => 3,
+                        3 => 4,
+                        4 => 5,
+                        5 => 6,
+                        6 => 7,
+                        7 => 8,
                     ],
                 ],
             ],
@@ -176,6 +245,53 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
                     $this->createLocalizedFallbackValue(null, 3, null, 'new_value'),
                 ]),
             ],
+            'valid data multi field' => [
+                'values' => [
+                    1 => $this->createLocalizedFallbackValue(1, null, 'default'),
+                    2 => $this->createLocalizedFallbackValue(2, 1, null, 'string1'),
+                    3 => $this->createLocalizedFallbackValue(3, 2, null, null, 'text2'),
+                    4 => $this->createLocalizedFallbackValue(4, 3, null, 'string3', 'text4'),
+                    5 => $this->createLocalizedFallbackValue(5, 4, FallbackType::SYSTEM),
+                    6 => $this->createLocalizedFallbackValue(6, 5, FallbackType::PARENT_LOCALIZATION),
+                ],
+                'localizations' => [
+                    1 => $this->createLocalization(1),
+                    2 => $this->createLocalization(2),
+                    3 => $this->createLocalization(3),
+                    4 => $this->createLocalization(4),
+                    5 => $this->createLocalization(5),
+                    6 => $this->createLocalization(6),
+                ],
+                'field' => ['string', 'text'],
+                'source' => [
+                    LocalizedFallbackValueCollectionType::FIELD_VALUES => [
+                        null => ['string' => null, 'text' => 'default_updated'],
+                        1 => ['string' => 'string1_updated', 'text' => null],
+                        2 => ['string' => null, 'text' => 'text2_updated'],
+                        3 => new FallbackType(FallbackType::SYSTEM),
+                        4 => new FallbackType(FallbackType::PARENT_LOCALIZATION),
+                        5 => ['string' => 'string4', 'text' => 'text4'],
+                        6 => ['string' => 'new_string', 'text' => 'new_text'],
+                    ],
+                    LocalizedFallbackValueCollectionType::FIELD_IDS => [
+                        0 => 1,
+                        1 => 2,
+                        2 => 3,
+                        3 => 4,
+                        4 => 5,
+                        5 => 6,
+                    ],
+                ],
+                'expected' => new ArrayCollection([
+                    $this->createLocalizedFallbackValue(1, null, null, null, 'default_updated'),
+                    $this->createLocalizedFallbackValue(2, 1, null, 'string1_updated'),
+                    $this->createLocalizedFallbackValue(3, 2, null, null, 'text2_updated'),
+                    $this->createLocalizedFallbackValue(4, 3, FallbackType::SYSTEM),
+                    $this->createLocalizedFallbackValue(5, 4, FallbackType::PARENT_LOCALIZATION),
+                    $this->createLocalizedFallbackValue(6, 5, null, 'string4', 'text4'),
+                    $this->createLocalizedFallbackValue(null, 6, null, 'new_string', 'new_text'),
+                ]),
+            ],
         ];
     }
 
@@ -191,11 +307,31 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
 
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "array or Traversable", "DateTime" given
+     */
+    public function testTransformUnexpectedTypeMultifield()
+    {
+        $transformer = new LocalizedFallbackValueCollectionTransformer($this->registry, ['text']);
+        $transformer->transform(new \DateTime());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      * @expectedExceptionMessage Expected argument of type "array", "DateTime" given
      */
     public function testReverseTransformUnexpectedType()
     {
         $transformer = new LocalizedFallbackValueCollectionTransformer($this->registry, 'text');
+        $transformer->reverseTransform(new \DateTime());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "array", "DateTime" given
+     */
+    public function testReverseTransformUnexpectedTypeMultifield()
+    {
+        $transformer = new LocalizedFallbackValueCollectionTransformer($this->registry, ['text']);
         $transformer->reverseTransform(new \DateTime());
     }
 

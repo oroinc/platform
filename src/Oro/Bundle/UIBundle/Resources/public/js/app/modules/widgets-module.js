@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var mediator = require('oroui/js/mediator');
-    var widgetManager = require('oroui/js/widget-manager');
+    const mediator = require('oroui/js/mediator');
+    const widgetManager = require('oroui/js/widget-manager');
 
     /**
      * Init Widget Manager's handlers and listeners

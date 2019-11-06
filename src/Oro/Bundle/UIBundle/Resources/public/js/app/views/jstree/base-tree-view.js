@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var BaseTreeView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var HighlightTextView = require('oroui/js/app/views/highlight-text-view');
-    var mediator = require('oroui/js/mediator');
-    var tools = require('oroui/js/tools');
-    var Chaplin = require('chaplin');
-    var FuzzySearch = require('oroui/js/fuzzy-search');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-    var ApiAccessor = require('oroui/js/tools/api-accessor');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const HighlightTextView = require('oroui/js/app/views/highlight-text-view');
+    const mediator = require('oroui/js/mediator');
+    const tools = require('oroui/js/tools');
+    const Chaplin = require('chaplin');
+    const FuzzySearch = require('oroui/js/fuzzy-search');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const ApiAccessor = require('oroui/js/tools/api-accessor');
 
     require('jquery.jstree');
 
@@ -24,7 +23,7 @@ define(function(require) {
      * @extends oroui.app.views.base.View
      * @class oroui.app.views.BaseTreeView
      */
-    BaseTreeView = BaseView.extend({
+    const BaseTreeView = BaseView.extend({
         autoRender: true,
 
         optionNames: BaseView.prototype.optionNames.concat([
@@ -156,18 +155,18 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function BaseTreeView() {
+        constructor: function BaseTreeView(options) {
             this.onBeforeOpen = _.debounce(this.onBeforeOpen, this.searchTimeout);
             this.onSearchDelay = _.debounce(this.onSearch, this.searchTimeout);
-            BaseTreeView.__super__.constructor.apply(this, arguments);
+            BaseTreeView.__super__.constructor.call(this, options);
         },
 
         /**
          * @param {Object} options
          */
         initialize: function(options) {
-            BaseTreeView.__super__.initialize.apply(this, arguments);
-            var nodeList = options.data;
+            BaseTreeView.__super__.initialize.call(this, options);
+            const nodeList = options.data;
             if (!nodeList) {
                 return;
             }
@@ -178,7 +177,7 @@ define(function(require) {
             this.$clearSearchButton = this.$('[data-name="clear-search"]');
             this.$tree.data('treeView', this);
 
-            var config = {
+            const config = {
                 core: {
                     multiple: false,
                     data: nodeList,
@@ -217,7 +216,7 @@ define(function(require) {
             this.$tree.jstree(this.jsTreeConfig);
             this.jsTreeInstance = $.jstree.reference(this.$tree);
 
-            var treeEvents = Chaplin.utils.getAllPropertyVersions(this, 'treeEvents');
+            let treeEvents = Chaplin.utils.getAllPropertyVersions(this, 'treeEvents');
             treeEvents = _.extend.apply({}, treeEvents);
             _.each(treeEvents, function(callback, event) {
                 if (this[callback]) {
@@ -232,7 +231,7 @@ define(function(require) {
         onReady: function() {
             this.initialization = false;
 
-            var state = tools.unpackFromQueryString(location.search)[this.viewGroup] || {};
+            const state = tools.unpackFromQueryString(location.search)[this.viewGroup] || {};
             if (this.$searchField.length && state.search) {
                 this.$searchField.val(state.search).change();
             }
@@ -243,10 +242,10 @@ define(function(require) {
         },
 
         openSelectedNode: function() {
-            var nodes = this.jsTreeInstance.get_selected();
-            var parents = [];
+            const nodes = this.jsTreeInstance.get_selected();
+            const parents = [];
             _.each(nodes, function(node) {
-                var parent = this.jsTreeInstance.get_parent(node);
+                const parent = this.jsTreeInstance.get_parent(node);
                 if (parent) {
                     parents.push(parent);
                 }
@@ -315,7 +314,7 @@ define(function(require) {
         },
 
         isElementHasHandler: function($el) {
-            var node = this.jsTreeInstance.get_node($el);
+            const node = this.jsTreeInstance.get_node($el);
             return node ? this.isNodeHasHandler(node) : false;
         },
 
@@ -329,7 +328,7 @@ define(function(require) {
         onSearchEnter: function(e) {
             if (this.autoSelectFoundNode) {
                 this.onSearch(e);
-                var $results = this.$('a.jstree-search');
+                const $results = this.$('a.jstree-search');
                 if ($results.length === 1 && this.isElementHasHandler($results)) {
                     $results.click();
                 }
@@ -345,13 +344,13 @@ define(function(require) {
         },
 
         searchCallback: function(query, node) {
-            var searchBy = node.original.search_by || [];
+            let searchBy = node.original.search_by || [];
             searchBy.unshift(node.text);
             searchBy = _.uniq(searchBy);
 
             query = query.toLowerCase();
 
-            var search;
+            let search;
             if (this._fuzzySearch) {
                 search = function(str) {
                     return FuzzySearch.isMatched(str, query);
@@ -362,7 +361,7 @@ define(function(require) {
                 };
             }
 
-            for (var i = 0, length = searchBy.length; i < length; i++) {
+            for (let i = 0, length = searchBy.length; i < length; i++) {
                 if (searchBy[i] && search(searchBy[i].toString())) {
                     this._foundNodes = true;
                     return true;
@@ -373,7 +372,7 @@ define(function(require) {
         },
 
         onSearch: function(event) {
-            var value = $(event.target).val();
+            let value = $(event.target).val();
             value = _.trim(value).replace(/\s+/g, ' ');
             if (this.searchValue === value) {
                 return;
@@ -444,17 +443,17 @@ define(function(require) {
                 return;
             }
 
-            var additionalNodes = [];
-            var nodesWithAdditional = [];
+            let additionalNodes = [];
+            const nodesWithAdditional = [];
 
             _.each(this.$('li.jstree-node:visible'), function(item) {
-                var $item = $(item);
-                var node = this.jsTreeInstance.get_node(item.id);
+                const $item = $(item);
+                const node = this.jsTreeInstance.get_node(item.id);
                 if (!node.children_d.length || this.isNodeHasHandler(node)) {
                     return;
                 }
 
-                var $child = $item.children('.jstree-children');
+                const $child = $item.children('.jstree-children');
                 if ($child.is(':visible')) {
                     return;
                 }
@@ -501,10 +500,10 @@ define(function(require) {
             if (!tools.isMobile() || !this.jsTreeInstance.settings.autohideNeighbors) {
                 return;
             }
-            var selectedNode = data.node;
+            const selectedNode = data.node;
             if (selectedNode) {
                 selectedNode.parents.reverse().slice(1).forEach(_.bind(function(parentId) {
-                    var node = this.jsTreeInstance.get_node(parentId);
+                    const node = this.jsTreeInstance.get_node(parentId);
                     this.hideNeighbors(node, 0);
                 }, this));
             }
@@ -528,8 +527,8 @@ define(function(require) {
         },
 
         onCheckAllClick: function(event) {
-            var $target = $(event.target);
-            var action = $target.data('action-type');
+            const $target = $(event.target);
+            const action = $target.data('action-type');
 
             if (action === 'checkAll') {
                 this.$tree.jstree('check_all');
@@ -586,7 +585,7 @@ define(function(require) {
                 return [];
             }
 
-            var parent = this.jsTreeInstance.get_node(node.parent);
+            const parent = this.jsTreeInstance.get_node(node.parent);
 
             return this.getChildren(parent)
                 .filter(_.bind(function(item) {

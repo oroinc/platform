@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
+    const _ = require('underscore');
 
     /**
      * @export oroui/js/tools/color-util
@@ -23,7 +23,7 @@ define(function(require) {
          * @returns {Object|null}
          */
         hex2rgb: function(hex) {
-            var result = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            const result = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return result ? {
                 r: parseInt(result[1], 16),
                 g: parseInt(result[2], 16),
@@ -38,8 +38,8 @@ define(function(require) {
          * @returns {string}
          */
         rgb2hex: function(rgb) {
-            var filter = function(dec) {
-                var hex = dec.toString(16).toUpperCase();
+            const filter = function(dec) {
+                const hex = dec.toString(16).toUpperCase();
                 return hex.length === 1 ? '0' + hex : hex;
             };
             return '#' + filter(rgb.r) + filter(rgb.g) + filter(rgb.b);
@@ -60,9 +60,9 @@ define(function(require) {
          *                   If the given color is invalid or cannot be parsed, returns black.
          */
         isDarkColor: function(hex, blackPreference) {
-            var rgb = this.hex2rgb(hex);
-            var white = {r: 255, g: 255, b: 255};
-            var black = {r: 0, g: 0, b: 0};
+            const rgb = this.hex2rgb(hex);
+            const white = {r: 255, g: 255, b: 255};
+            const black = {r: 0, g: 0, b: 0};
             if (!blackPreference) {
                 blackPreference = 0.58;
             }

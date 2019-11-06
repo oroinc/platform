@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var WidgetContainerIconView;
-    var BaseView = require('oroui/js/app/views/base/view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    WidgetContainerIconView = BaseView.extend({
+    const WidgetContainerIconView = BaseView.extend({
         template: require('tpl-loader!orosidebar/templates/sidebar-widget-container/widget-container-icon.html'),
 
         listen: {

@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var DefaultFieldValueView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tinyMCE = require('tinymce/tinymce');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tinyMCE = require('tinymce/tinymce');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    DefaultFieldValueView = BaseView.extend({
+    const DefaultFieldValueView = BaseView.extend({
         /**
          * @inheritDoc
          * @property
@@ -39,8 +38,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DefaultFieldValueView() {
-            DefaultFieldValueView.__super__.constructor.apply(this, arguments);
+        constructor: function DefaultFieldValueView(options) {
+            DefaultFieldValueView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -54,7 +53,7 @@ define(function(require) {
                 }, this));
             }
 
-            return DefaultFieldValueView.__super__.render.apply(this, arguments);
+            return DefaultFieldValueView.__super__.render.call(this);
         },
 
         /**
@@ -62,8 +61,8 @@ define(function(require) {
          * @param e
          */
         onDefaultCheckboxChange: function(e) {
-            var $currentTarget = $(e.currentTarget);
-            var value = $currentTarget.is(':checked');
+            const $currentTarget = $(e.currentTarget);
+            const value = $currentTarget.is(':checked');
 
             this._setFieldsState($currentTarget, value);
         },
@@ -76,13 +75,13 @@ define(function(require) {
          * @private
          */
         _setFieldsState: function($element, value) {
-            var $controls = $element.parents('.controls');
-            var valueEls = $controls.find(':input, a.btn, button')
+            const $controls = $element.parents('.controls');
+            const valueEls = $controls.find(':input, a.btn, button')
                 .not(this.$(this.checkboxSelector))
                 .not('[readonly]');
 
             valueEls.each(function(i, el) {
-                var $el = $(el);
+                const $el = $(el);
 
                 $el
                     .prop('disabled', value)
@@ -105,7 +104,7 @@ define(function(require) {
          */
         _prepareTinymce: function($textareas) {
             $textareas.each(function(i, el) {
-                var editor = tinyMCE.get(el.id);
+                const editor = tinyMCE.get(el.id);
                 if (editor) {
                     editor.setMode($(el).prop('disabled') ? 'readonly' : 'code');
                 }

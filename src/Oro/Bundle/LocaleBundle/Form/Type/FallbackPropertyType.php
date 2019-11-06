@@ -71,6 +71,7 @@ class FallbackPropertyType extends AbstractType
                 ],
                 'localization' => null,
                 'parent_localization' => null,
+                'use_tabs' => false,
             ]
         );
 
@@ -97,6 +98,10 @@ class FallbackPropertyType extends AbstractType
                         $options['parent_localization'],
                         $this->translator->trans($choices[FallbackType::PARENT_LOCALIZATION])
                     );
+                }
+
+                if ($options['use_tabs']) {
+                    $choices[FallbackType::NONE] = $this->translator->trans('oro.locale.fallback.type.custom');
                 }
 
                 return array_flip($choices);

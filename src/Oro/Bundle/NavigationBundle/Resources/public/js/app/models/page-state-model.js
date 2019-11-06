@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var PageStateModel;
-    var routing = require('routing');
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const routing = require('routing');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
-    PageStateModel = BaseModel.extend({
+    const PageStateModel = BaseModel.extend({
         defaults: {
             pageId: '',
             data: '',
@@ -21,16 +20,16 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function PageStateModel() {
-            PageStateModel.__super__.constructor.apply(this, arguments);
+        constructor: function PageStateModel(attrs, options) {
+            PageStateModel.__super__.constructor.call(this, attrs, options);
         },
 
         url: function(method) {
-            var args = [this.postRoute];
+            let args = [this.postRoute];
             if (this.id) {
                 args = [this.putRoute, {id: this.id}];
             }
-            return routing.generate.apply(routing, args);
+            return routing.generate(...args);
         }
     });
 

@@ -46,9 +46,9 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function($, Backbone, 
          * @private
          */
         _convertToAccordion: function() {
-            var $root = this.element.find(this.options.rootElement).first();
+            const $root = this.element.find(this.options.rootElement).first();
             $root.attr('id', this._getGroupId(0)).addClass('accordion');
-            var $groups = $root.find('.dropdown');
+            const $groups = $root.find('.dropdown');
 
             $root.find('.dropdown-menu').removeClass('dropdown-menu').addClass('accordion-body collapse');
             $root.find('.dropdown-menu-wrapper').removeClass('hidden');
@@ -56,15 +56,15 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function($, Backbone, 
             $root.find('.dropdown-menu-wrapper__child').css({'margin-left': 0, 'margin-top': 0});
             $groups.removeClass('dropdown').addClass('accordion-group');
 
-            var self = this;
+            const self = this;
             $groups.add($root).each(function(i) {
-                var $group = $(this);
-                var isActive = $group.hasClass('active');
-                var autoCollapse = self.options.autoCollapse;
-                var $header = $group.find('a>span').first();
-                var $target = $group.find('.accordion-body').first();
-                var headerId = self._getGroupId(i + 1) + '-header';
-                var targetId = self._getGroupId(i + 1);
+                const $group = $(this);
+                const isActive = $group.hasClass('active');
+                const autoCollapse = self.options.autoCollapse;
+                const $header = $group.find('a>span').first();
+                const $target = $group.find('.accordion-body').first();
+                const headerId = self._getGroupId(i + 1) + '-header';
+                const targetId = self._getGroupId(i + 1);
 
                 $header.addClass('accordion-toggle')
                     .toggleClass('collapsed', !isActive)

@@ -4,8 +4,6 @@ define([
 ], function(StringCell, DatagridDateTimeFormatter) {
     'use strict';
 
-    var DateTimeCell;
-
     /**
      * Datetime column cell
      *
@@ -13,7 +11,7 @@ define([
      * @class   oro.datagrid.cell.DateTimeCell
      * @extends oro.datagrid.cell.StringCell
      */
-    DateTimeCell = StringCell.extend({
+    const DateTimeCell = StringCell.extend({
         /**
          * @property {orodatagrid.datagrid.formatter.DateTimeFormatter}
          */
@@ -32,15 +30,15 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function DateTimeCell() {
-            DateTimeCell.__super__.constructor.apply(this, arguments);
+        constructor: function DateTimeCell(options) {
+            DateTimeCell.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            DateTimeCell.__super__.initialize.apply(this, arguments);
+            DateTimeCell.__super__.initialize.call(this, options);
             this.formatter = this.createFormatter();
         },
 

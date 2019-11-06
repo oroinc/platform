@@ -1,14 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var mediator = require('oroui/js/mediator');
-    var routing = require('routing');
-    var tinyMCE = require('tinymce/tinymce');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const mediator = require('oroui/js/mediator');
+    const routing = require('routing');
+    const tinyMCE = require('tinymce/tinymce');
 
-    var CreateOrSelectChoiceComponent = BaseComponent.extend({
+    const CreateOrSelectChoiceComponent = BaseComponent.extend({
 
         MODE_CREATE: 'create',
         MODE_VIEW: 'view',
@@ -33,8 +33,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function CreateOrSelectChoiceComponent() {
-            CreateOrSelectChoiceComponent.__super__.constructor.apply(this, arguments);
+        constructor: function CreateOrSelectChoiceComponent(options) {
+            CreateOrSelectChoiceComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -45,7 +45,7 @@ define(function(require) {
             if (this.editable) {
                 this.requiredOptions.push('editRoute');
             }
-            var missingProperties = _.filter(this.requiredOptions, _.negate(_.bind(options.hasOwnProperty, options)));
+            const missingProperties = _.filter(this.requiredOptions, _.negate(_.bind(options.hasOwnProperty, options)));
             if (missingProperties.length) {
                 throw new Error(
                     'Following properties are required but weren\'t passed: ' +
@@ -79,7 +79,7 @@ define(function(require) {
          * @private
          */
         _onEntityChange: function(e) {
-            var mode = this.MODE_CREATE;
+            let mode = this.MODE_CREATE;
             if (e.val) {
                 mode = this.editable ? this.MODE_EDIT : this.MODE_VIEW;
             }
@@ -133,7 +133,7 @@ define(function(require) {
                 return;
             }
 
-            var route = routing.generate(this.editRoute, {id: e.val});
+            const route = routing.generate(this.editRoute, {id: e.val});
 
             this._setLoading(true);
             $.get(route)
@@ -155,10 +155,10 @@ define(function(require) {
                 return;
             }
 
-            var self = this;
+            const self = this;
             this.$newEntity.find('input[type=text], input[data-default-value], textarea').each(function() {
-                var $el = $(this);
-                var newVal = self._getCleanValue($el);
+                const $el = $(this);
+                const newVal = self._getCleanValue($el);
                 $el.val(newVal);
                 if ($el.is('textarea')) {
                     $el.text(newVal).change();
@@ -193,16 +193,16 @@ define(function(require) {
          * @private
          */
         _setNewEntityForm: function(data) {
-            var $data = $(data);
+            const $data = $(data);
             /*
              * For each input element in added form, create new name to match naming scheme.
              */
             $data.find(':input').each(_.bind(function(index, element) {
-                var $element = $(element);
-                var inputName = $element.attr('name');
+                const $element = $(element);
+                let inputName = $element.attr('name');
                 inputName = inputName.substr(inputName.indexOf('['));
 
-                var $modifiedField = this.$newEntity.find('[name$="' + inputName + '"]');
+                let $modifiedField = this.$newEntity.find('[name$="' + inputName + '"]');
 
                 if ($element.is(':checkbox') || $element.is(':radio')) {
                     $modifiedField = this.$newEntity.find(
@@ -210,7 +210,7 @@ define(function(require) {
                     );
                     $modifiedField.prop('checked', $element.is(':checked')).change();
                 } else {
-                    var editor = tinyMCE.get($modifiedField.attr('id'));
+                    const editor = tinyMCE.get($modifiedField.attr('id'));
                     if (editor) {
                         editor.setContent($element.val());
                     } else {

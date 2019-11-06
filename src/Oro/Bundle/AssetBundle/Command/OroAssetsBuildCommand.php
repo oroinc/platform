@@ -15,6 +15,7 @@ use Symfony\Component\Process\Process;
 
 /**
  * Run bin/webpack to build assets.
+ * @SuppressWarnings(PHPMD)
  */
 class OroAssetsBuildCommand extends Command
 {
@@ -188,6 +189,18 @@ DESCRIPTION
                 InputOption::VALUE_NONE,
                 'Skip build of JS assets.'
             )
+            ->addOption(
+                'skip-babel',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip transpiling code with babel.'
+            )
+            ->addOption(
+                'skip-sourcemap',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip building source map.'
+            )
             ->addUsage('admin.oro --watch')
             ->addUsage('blank -w')
             ->addUsage('blank --hot')
@@ -249,11 +262,7 @@ DESCRIPTION
         $io = new SymfonyStyle($input, $output);
         $process->run(
             function ($type, $buffer) use ($io) {
-                if ($type === Process::ERR) {
-                    $io->error($buffer);
-                } else {
-                    $io->write($buffer);
-                }
+                $io->write($buffer);
             }
         );
 
@@ -301,10 +310,16 @@ DESCRIPTION
         $command[] = '--colors';
 
         if ($input->getOption('skip-css')) {
-            $command[] = '--env.skipCSS=true';
+            $command[] = '--env.skipCSS';
         }
         if ($input->getOption('skip-js')) {
-            $command[] = '--env.skipJS=true';
+            $command[] = '--env.skipJS';
+        }
+        if ($input->getOption('skip-babel')) {
+            $command[] = '--env.skipBabel';
+        }
+        if ($input->getOption('skip-sourcemap')) {
+            $command[] = '--env.skipSourcemap';
         }
 
         return $command;

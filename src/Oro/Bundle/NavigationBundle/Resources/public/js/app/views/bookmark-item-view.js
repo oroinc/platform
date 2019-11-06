@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var BookmarkItemView;
-    var mediator = require('oroui/js/mediator');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const mediator = require('oroui/js/mediator');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    BookmarkItemView = BaseView.extend({
+    const BookmarkItemView = BaseView.extend({
         tagName: 'li',
 
         events: {
@@ -22,8 +21,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function BookmarkItemView() {
-            BookmarkItemView.__super__.constructor.apply(this, arguments);
+        constructor: function BookmarkItemView(options) {
+            BookmarkItemView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -43,8 +42,7 @@ define(function(require) {
          * @returns {boolean}
          */
         checkCurrentUrl: function() {
-            var url;
-            url = this.model.get('url');
+            const url = this.model.get('url');
             return mediator.execute('compareUrl', url);
         },
 
@@ -53,7 +51,7 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            var data = BookmarkItemView.__super__.getTemplateData.call(this);
+            const data = BookmarkItemView.__super__.getTemplateData.call(this);
             // to support previously saved urls without leading slash
             data.url = (data.url[0] !== '/' ? '/' : '') + data.url;
             return data;

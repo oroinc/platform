@@ -2,14 +2,14 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var AttributeCollection = require('oroworkflow/js/app/models/attribute-collection');
-    var StepCollection = require('oroworkflow/js/app/models/step-collection');
-    var StepModel = require('oroworkflow/js/app/models/step-model');
-    var TransitionCollection = require('oroworkflow/js/app/models/transition-collection');
-    var TransitionDefinitionCollection = require('oroworkflow/js/app/models/transition-definition-collection');
-    var WorkflowModel = require('oroworkflow/js/app/models/workflow-model');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const AttributeCollection = require('oroworkflow/js/app/models/attribute-collection');
+    const StepCollection = require('oroworkflow/js/app/models/step-collection');
+    const StepModel = require('oroworkflow/js/app/models/step-model');
+    const TransitionCollection = require('oroworkflow/js/app/models/transition-collection');
+    const TransitionDefinitionCollection = require('oroworkflow/js/app/models/transition-definition-collection');
+    const WorkflowModel = require('oroworkflow/js/app/models/workflow-model');
 
     /**
      * Builds workflow model.
@@ -22,7 +22,7 @@ define(function(require) {
          * @returns {WorkflowModel}
          */
         createWorkflowModel: function(options) {
-            var model = this._createWorkflowModel(options);
+            const model = this._createWorkflowModel(options);
             this.addStartingStep(model);
             return model;
         },
@@ -35,8 +35,8 @@ define(function(require) {
          * @private
          */
         _createWorkflowModel: function(options) {
-            var configuration = options.entity.configuration;
-            var translateLinks = options.entity.translateLinks;
+            const configuration = options.entity.configuration;
+            const translateLinks = options.entity.translateLinks;
 
             configuration.steps = new StepCollection(
                 this._getNodeConfiguration(configuration, 'steps', translateLinks)
@@ -65,7 +65,7 @@ define(function(require) {
             configuration.exclusive_record_groups = options.entity.exclusive_record_groups;
             configuration.applications = options.entity.applications;
 
-            var workflowModel = new WorkflowModel(configuration);
+            const workflowModel = new WorkflowModel(configuration);
             workflowModel.setAvailableDestinations(options.availableDestinations || {});
 
             workflowModel.url = options._sourceElement.attr('action');
@@ -95,7 +95,7 @@ define(function(require) {
          * @private
          */
         _createStartingStep: function(model) {
-            var startStepModel = new StepModel({
+            const startStepModel = new StepModel({
                 name: 'step:starting_point',
                 label: __('(Start)'),
                 order: -1,
@@ -119,7 +119,7 @@ define(function(require) {
          * @private
          */
         _getNodeConfiguration: function(config, node, translateLinks) {
-            var updateConfig = [];
+            const updateConfig = [];
             _.each(config[node], function(item, name) {
                 item.name = name;
                 if (translateLinks && node in translateLinks && name in translateLinks[node]) {

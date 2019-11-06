@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var BaseNavigationItemModel;
-    var _ = require('underscore');
-    var routing = require('routing');
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const _ = require('underscore');
+    const routing = require('routing');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
-    BaseNavigationItemModel = BaseModel.extend({
+    const BaseNavigationItemModel = BaseModel.extend({
         route: 'oro_api_get_navigationitems',
 
         defaults: {
@@ -20,12 +19,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function BaseNavigationItemModel() {
-            BaseNavigationItemModel.__super__.constructor.apply(this, arguments);
+        constructor: function BaseNavigationItemModel(attrs, options) {
+            BaseNavigationItemModel.__super__.constructor.call(this, attrs, options);
         },
 
         url: function() {
-            var base = _.result(this, 'urlRoot') || _.result(this.collection, 'url');
+            let base = _.result(this, 'urlRoot') || _.result(this.collection, 'url');
             if (base && base.indexOf(this.get('type')) === -1) {
                 base += (base.charAt(base.length - 1) === '/' ? '' : '/') + this.get('type');
             } else if (!base) {

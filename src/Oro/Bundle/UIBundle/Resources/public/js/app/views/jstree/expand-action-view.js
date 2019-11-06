@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var ExpandActionView;
-    var AbstractActionView = require('oroui/js/app/views/jstree/abstract-action-view');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
+    const AbstractActionView = require('oroui/js/app/views/jstree/abstract-action-view');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
 
-    ExpandActionView = AbstractActionView.extend({
+    const ExpandActionView = AbstractActionView.extend({
         options: _.extend({}, AbstractActionView.prototype.options, {
             icon: 'plus-square-o',
             label: __('oro.ui.jstree.actions.expand')
@@ -15,17 +14,17 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ExpandActionView() {
-            ExpandActionView.__super__.constructor.apply(this, arguments);
+        constructor: function ExpandActionView(options) {
+            ExpandActionView.__super__.constructor.call(this, options);
         },
 
         onClick: function() {
-            var $tree = this.options.$tree;
-            var settings = $tree.jstree().settings;
-            var autohideNeighbors = settings.autohideNeighbors;
+            const $tree = this.options.$tree;
+            const settings = $tree.jstree().settings;
+            const autohideNeighbors = settings.autohideNeighbors;
 
             settings.autohideNeighbors = false;
-            var afterOpenAll = _.debounce(function() {
+            const afterOpenAll = _.debounce(function() {
                 settings.autohideNeighbors = autohideNeighbors;
                 $tree.off('open_all.jstree', afterOpenAll);
             }, 100);

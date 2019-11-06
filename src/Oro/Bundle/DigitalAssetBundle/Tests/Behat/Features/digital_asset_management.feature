@@ -120,7 +120,7 @@ Feature:  Digital asset management
     Then I should see "The chosen digital asset does not exist or has been deleted"
 
   Scenario: Check uploading PNG image type in dialog popup
-    Given I click "Choose Image"
+    Given I click "Digital Asset Edit Button"
     And I fill "Digital Asset Dialog Form" with:
       | File  | 300x300.png     |
       | Title | PNG image asset |

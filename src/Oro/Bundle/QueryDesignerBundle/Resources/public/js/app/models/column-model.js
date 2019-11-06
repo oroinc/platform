@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var GroupingModel;
-    var EntityFieldModel = require('oroquerydesigner/js/app/models/entity-field-model');
+    const EntityFieldModel = require('oroquerydesigner/js/app/models/entity-field-model');
 
-    GroupingModel = EntityFieldModel.extend({
+    const GroupingModel = EntityFieldModel.extend({
         fieldAttribute: 'name',
 
         defaults: {
@@ -17,8 +16,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function GroupingModel() {
-            GroupingModel.__super__.constructor.apply(this, arguments);
+        constructor: function GroupingModel(...args) {
+            GroupingModel.__super__.constructor.apply(this, args);
         }
     });
 

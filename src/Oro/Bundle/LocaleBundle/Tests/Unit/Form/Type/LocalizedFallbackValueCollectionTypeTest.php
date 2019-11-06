@@ -9,6 +9,8 @@ use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -34,7 +36,8 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit\Framework\TestCa
             'field' => 'string',
             'entry_type' => TextType::class,
             'entry_options' => [],
-            'exclude_parent_localization' => false
+            'exclude_parent_localization' => false,
+            'use_tabs' => false
         ];
 
         $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
@@ -60,7 +63,8 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit\Framework\TestCa
                 [
                     'entry_type' => $type,
                     'entry_options' => $options,
-                    'exclude_parent_localization' => false
+                    'exclude_parent_localization' => false,
+                    'use_tabs' => true
                 ]
             )->willReturnSelf();
         $builder->expects($this->at(1))
@@ -81,8 +85,25 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit\Framework\TestCa
                 'entry_type' => $type,
                 'entry_options' => $options,
                 'field' => $field,
-                'exclude_parent_localization' => false
+                'exclude_parent_localization' => false,
+                'use_tabs' => true
             ]
+        );
+    }
+
+    public function testFinishView(): void
+    {
+        /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $formMock */
+        $formMock = $this->createMock('Symfony\Component\Form\FormInterface');
+
+        $formView = new FormView();
+        $formView->vars['block_prefixes'] = ['form', '_custom_block_prefix'];
+
+        $this->type->finishView($formView, $formMock, ['use_tabs' => true]);
+
+        $this->assertEquals(
+            ['form', 'oro_locale_localized_fallback_value_collection_tabs', '_custom_block_prefix'],
+            $formView->vars['block_prefixes']
         );
     }
 }

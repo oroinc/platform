@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var BarCollectionView;
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var _ = require('underscore');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const _ = require('underscore');
 
-    BarCollectionView = BaseCollectionView.extend({
+    const BarCollectionView = BaseCollectionView.extend({
         animationDuration: 0,
 
         /**
          * @inheritDoc
          */
-        constructor: function BarCollectionView() {
-            BarCollectionView.__super__.constructor.apply(this, arguments);
+        constructor: function BarCollectionView(options) {
+            BarCollectionView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -22,7 +21,7 @@ define(function(require) {
          * @returns {boolean}
          */
         isVisibleItem: function(model) {
-            var itemView = this.subview('itemView:' + model.cid);
+            const itemView = this.subview('itemView:' + model.cid);
             return this.isVisibleView(itemView);
         },
 

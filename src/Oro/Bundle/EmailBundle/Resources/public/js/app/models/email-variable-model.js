@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var EmailVariableModel;
-    var _ = require('underscore');
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const _ = require('underscore');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
     /**
      * @export oroemail/js/app/models/email-variable-model
      */
-    EmailVariableModel = BaseModel.extend({
+    const EmailVariableModel = BaseModel.extend({
         defaults: {
             system: [],
             entity: []
@@ -32,8 +31,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailVariableModel() {
-            EmailVariableModel.__super__.constructor.apply(this, arguments);
+        constructor: function EmailVariableModel(...args) {
+            EmailVariableModel.__super__.constructor.apply(this, args);
         },
 
         /**
@@ -65,7 +64,7 @@ define(function(require) {
          * @returns {string} For example '/field1/field2'. The empty string represents the root
          */
         getPath: function() {
-            var result = '';
+            let result = '';
             _.each(this.path, function(item) {
                 result += '/' + item.fieldName;
             });
@@ -76,7 +75,7 @@ define(function(require) {
          * @returns {array}
          */
         getPathLabels: function() {
-            var result = [];
+            const result = [];
             _.each(this.path, function(item) {
                 result[item.fieldName] = item.fieldLabel;
             });
@@ -111,7 +110,7 @@ define(function(require) {
          * @returns {Object}
          */
         getEntityVariables: function() {
-            var entityName = this._getCurrentEntityName();
+            const entityName = this._getCurrentEntityName();
             if (entityName && _.has(this.attributes.entity, entityName)) {
                 return this.attributes.entity[entityName];
             }
@@ -123,7 +122,7 @@ define(function(require) {
          * @private
          */
         _getCurrentEntityName: function() {
-            var lastItem = _.last(this.path);
+            const lastItem = _.last(this.path);
             return lastItem ? lastItem.relatedEntityName : this.entityName;
         },
 

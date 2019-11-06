@@ -1,23 +1,22 @@
 define(function(require) {
     'use strict';
 
-    var validateTopmostLabelMixin;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var validationMessageHandlers = require('oroform/js/validation-message-handlers');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const validationMessageHandlers = require('oroform/js/validation-message-handlers');
 
     /**
      * Mixin designed to make jquery validator error message visible over container element (e.g. dialog header)
      * @this validator
      */
-    validateTopmostLabelMixin = {
+    const validateTopmostLabelMixin = {
         init: function() {
-            var parentDialog = $(this.currentForm).closest('.ui-dialog');
+            const parentDialog = $(this.currentForm).closest('.ui-dialog');
 
             if (parentDialog.length === 1) {
                 this.parentDialog = parentDialog;
-                var dialogEvents = _.map(['dialogresize', 'dialogdrag', 'dialogreposition'], function(item) {
+                const dialogEvents = _.map(['dialogresize', 'dialogdrag', 'dialogreposition'], function(item) {
                     return item + '.validate';
                 });
                 parentDialog.on(dialogEvents.join(' '), validateTopmostLabelMixin.updateMessageHandlerViews.bind(this));
@@ -34,7 +33,7 @@ define(function(require) {
                 delete this.validationMessageHandlerViews[element.name];
             }
 
-            var Handler = _.find(validationMessageHandlers, function(item) {
+            const Handler = _.find(validationMessageHandlers, function(item) {
                 return item.test(element);
             });
 
@@ -55,7 +54,7 @@ define(function(require) {
         },
 
         removeHandlerByElement: function(element) {
-            var name = element.getAttribute('name');
+            const name = element.getAttribute('name');
 
             if (this.validationMessageHandlerViews && name in this.validationMessageHandlerViews) {
                 this.validationMessageHandlerViews[name].dispose();

@@ -1,18 +1,18 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var $ = require('jquery.validate');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var tools = require('oroui/js/tools');
-    var logger = require('oroui/js/tools/logger');
-    var validationHandler = require('oroform/js/optional-validation-groups-handler');
-    var error = require('oroui/js/error');
-    var config = require('module-config').default(module.id);
-    var validateTopmostLabelMixin = config.useTopmostLabelMixin
+    const $ = require('jquery.validate');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const tools = require('oroui/js/tools');
+    const logger = require('oroui/js/tools/logger');
+    const validationHandler = require('oroform/js/optional-validation-groups-handler');
+    const error = require('oroui/js/error');
+    const config = require('module-config').default(module.id);
+    const validateTopmostLabelMixin = config.useTopmostLabelMixin
         ? require('oroform/js/validate-topmost-label-mixin') : null;
 
-    var original = _.pick($.validator.prototype, 'init', 'showLabel', 'defaultShowErrors', 'resetElements');
+    const original = _.pick($.validator.prototype, 'init', 'showLabel', 'defaultShowErrors', 'resetElements');
 
     /**
      * Collects all ancestor elements that have validation rules
@@ -21,14 +21,14 @@ define(function(require, exports, module) {
      * @returns {Array.<Element>} sorted in order from form element to input element
      */
     function validationHolders(element) {
-        var elems = [];
-        var $el = $(element);
-        var form = $el.parents('form').first();
+        let elems = [];
+        const $el = $(element);
+        const form = $el.parents('form').first();
         // instance of validator
-        var validator = $(form).data('validator');
+        const validator = $(form).data('validator');
         if (validator instanceof $.validator) {
             elems = _.filter($el.add($el.parentsUntil(form)).add(form).toArray(), function(el) {
-                var $el = $(el);
+                const $el = $(el);
                 // is it current element or the first in a group of elements or the first visible one
                 return $el.data('validation') && ($el.is(element) || validator.elementsOf($el).first().is(element));
             });
@@ -44,7 +44,7 @@ define(function(require, exports, module) {
      * @return {Object} key name of validation rule, value is its options
      */
     function validationsOf(element) {
-        var validations = _.map(validationHolders(element), function(el) {
+        const validations = _.map(validationHolders(element), function(el) {
             return filterElementValidators(el);
         });
         validations.unshift({});
@@ -72,16 +72,16 @@ define(function(require, exports, module) {
      * @returns {jQuery}
      */
     function getErrorTarget(element) {
-        var $target = $(validationBelongs(element));
-        var $widgetContainer = $target.inputWidget('getContainer');
+        let $target = $(validationBelongs(element));
+        const $widgetContainer = $target.inputWidget('getContainer');
         if ($widgetContainer) {
             $target = $widgetContainer;
         }
-        var $parent = $target.parent();
+        const $parent = $target.parent();
         if ($parent.is('.input-append, .input-prepend')) {
             $target = $parent;
         }
-        var $validateGroup;
+        let $validateGroup;
         if ($target.is(element) && ($validateGroup = $target.closest('.validate-group')).length) {
             // the element inside validate group -- pass delegate validation to it
             $target = $validateGroup;
@@ -97,8 +97,8 @@ define(function(require, exports, module) {
      * @returns {jQuery}
      */
     function getErrorPlacement(element) {
-        var $targetElem = getErrorTarget(element);
-        var $errorHolder = $targetElem.closest('.fields-row');
+        const $targetElem = getErrorTarget(element);
+        const $errorHolder = $targetElem.closest('.fields-row');
 
         if (!$errorHolder.length) {
             return $targetElem;
@@ -112,8 +112,8 @@ define(function(require, exports, module) {
      * @return {Object}
      */
     function filterElementValidators(el) {
-        var $el = $(el);
-        var validation = $el.data('validation');
+        const $el = $(el);
+        const validation = $el.data('validation');
 
         if (!$el.is(':input')) {
             // remove NotNull/NotBlank from not :input
@@ -136,7 +136,7 @@ define(function(require, exports, module) {
 
     // substitute data rules reader
     $.validator.dataRules = function(element) {
-        var rules = {};
+        let rules = {};
         _.each(validationsOf(element), function(param, method) {
             if ($.validator.methods[method]) {
                 rules[method] = {param: param};
@@ -147,7 +147,7 @@ define(function(require, exports, module) {
         // make sure required validators are at front
         _.each(['NotNull', 'NotBlank'], function(name) {
             if (rules[name]) {
-                var _rules = {};
+                const _rules = {};
                 _rules[name] = rules[name];
                 delete rules[name];
                 rules = $.extend(_rules, rules);
@@ -162,7 +162,7 @@ define(function(require, exports, module) {
             element.name = _.uniqueId('temp-validation-name-');
         }
 
-        var isValid = check.call(this, element);
+        const isValid = check.call(this, element);
 
         if (validateTopmostLabelMixin && isValid) {
             validateTopmostLabelMixin.validationSuccessHandler.call(this, element);
@@ -172,7 +172,7 @@ define(function(require, exports, module) {
     });
 
     $.validator.prototype.valid = _.wrap($.validator.prototype.valid, function(valid) {
-        var isValid = valid.call(this);
+        const isValid = valid.call(this);
         if (isValid) {
             // remove temporary elements names in case valid form, before form submit
             $(this.currentForm)
@@ -185,14 +185,14 @@ define(function(require, exports, module) {
     });
 
     $.validator.prototype.elements = _.wrap($.validator.prototype.elements, function(func) {
-        var $additionalElements = $(this.currentForm).find(':input[data-validate-element]');
-        return func.apply(this, _.rest(arguments)).add($additionalElements);
+        const $additionalElements = $(this.currentForm).find(':input[data-validate-element]');
+        return func.call(this).add($additionalElements);
     });
 
     // saves name of validation rule which is violated
     $.validator.prototype.formatAndAdd = _.wrap($.validator.prototype.formatAndAdd, function(func, element, rule) {
         $(element).data('violated', rule.method);
-        return func.apply(this, _.rest(arguments));
+        return func.call(this, element, rule);
     });
 
     $.validator.prototype.destroy = _.wrap($.validator.prototype.destroy, function(originDestroy) {
@@ -206,30 +206,30 @@ define(function(require, exports, module) {
     // fixes focus on select2 element and problem with focus on hidden inputs
     $.validator.prototype.focusInvalid = _.wrap($.validator.prototype.focusInvalid, function(func) {
         if (!this.settings.focusInvalid) {
-            return func.apply(this, _.rest(arguments));
+            return func.call(this);
         }
 
-        var $elem = $(this.findLastActive() || (this.errorList.length && this.errorList[0].element) || []);
-        var $firstValidationError = $('.validation-failed').filter(':visible').first();
+        const $elem = $(this.findLastActive() || (this.errorList.length && this.errorList[0].element) || []);
+        const $firstValidationError = $('.validation-failed').filter(':visible').first();
 
         if ($elem.is('.select2[type=hidden]')) {
             $elem.parent().find('input.select2-focusser')
                 .focus()
                 .trigger('focusin');
         } else if (!$elem.filter(':visible').length && $firstValidationError.length) {
-            var $scrollableContainer = $firstValidationError.closest('.scrollable-container');
-            var scrollTop = $firstValidationError.position().top + $scrollableContainer.scrollTop();
+            const $scrollableContainer = $firstValidationError.closest('.scrollable-container');
+            const scrollTop = $firstValidationError.position().top + $scrollableContainer.scrollTop();
 
             $scrollableContainer.animate({
                 scrollTop: scrollTop
             }, scrollTop / 2);
         } else {
-            return func.apply(this, _.rest(arguments));
+            return func.call(this);
         }
     });
 
     $.validator.prototype.resetForm = _.wrap($.validator.prototype.resetForm, function(resetForm) {
-        resetForm.apply(this, _.rest(arguments));
+        resetForm.call(this);
         this.collectPristineValues();
     });
 
@@ -268,10 +268,10 @@ define(function(require, exports, module) {
         bindInitialErrors: function(container) {
             this.elementsOf(container || this.currentForm).each(function(i, element) {
                 if (element.name && element.classList.contains('error')) {
-                    var $label;
-                    var classesSelector = this.settings.errorClass.split(' ').join('.');
-                    var selector = this.settings.errorElement + '.' + classesSelector + ':not([id])';
-                    var $placement = getErrorPlacement(element);
+                    let $label;
+                    const classesSelector = this.settings.errorClass.split(' ').join('.');
+                    const selector = this.settings.errorElement + '.' + classesSelector + ':not([id])';
+                    const $placement = getErrorPlacement(element);
 
                     if ($placement.is('.fields-row-error')) {
                         $label = $placement.children(selector);
@@ -283,7 +283,7 @@ define(function(require, exports, module) {
                     this.settings.highlight(element);
 
                     if ($label.length) {
-                        var text = [];
+                        const text = [];
 
                         $label.each(function() {
                             text.push($(this).text());
@@ -303,7 +303,7 @@ define(function(require, exports, module) {
          * @param {Object} errors
          */
         showBackendErrors: function(errors) {
-            var result = {};
+            let result = {};
 
             /**
              * Converts server error response:
@@ -331,7 +331,7 @@ define(function(require, exports, module) {
              */
             (function parseBackendErrors(obj, path) {
                 _.each(obj, function(item, name) {
-                    var _path;
+                    let _path;
                     if (name === 'children') {
                         // skip 'children' level
                         parseBackendErrors(item, path);
@@ -400,9 +400,9 @@ define(function(require, exports, module) {
          * @param {Element|jQuery} element
          */
         hideElementErrors: function(element) {
-            var $placement = getErrorPlacement(element);
+            const $placement = getErrorPlacement(element);
             // Since name of input can contain `[]` lets use `[id=...` selector instead `#...` to avoid jQuery error
-            var selector = '[id="' + this.idOrName($(element)[0]) + '-error"]';
+            const selector = '[id="' + this.idOrName($(element)[0]) + '-error"]';
 
             if ($placement.is('.fields-row-error')) {
                 $placement.children(selector).remove();
@@ -452,7 +452,7 @@ define(function(require, exports, module) {
                 return;
             }
 
-            var label = this.errorsFor(element);
+            const label = this.errorsFor(element);
 
             if (label.length) {
                 this.settings.errorPlacement(label, element);
@@ -510,9 +510,9 @@ define(function(require, exports, module) {
      * @param {string|Array.<string>} module name of AMD module or list of modules
      */
     $.validator.loadMethod = function(module) {
-        tools.loadModules($.makeArray(module), function() {
-            _.each(arguments, function(args) {
-                $.validator.addMethod.apply($.validator, args);
+        tools.loadModules($.makeArray(module), function(...modules) {
+            _.each(modules, function(args) {
+                $.validator.addMethod(...args);
             });
         });
     };
@@ -521,7 +521,7 @@ define(function(require, exports, module) {
         errorElement: 'span',
         errorClass: 'validation-failed',
         errorPlacement: function(label, $el) {
-            var $placement = getErrorPlacement($el);
+            const $placement = getErrorPlacement($el);
             // we need this to remove server side error, because js does not know about it
             if ($placement.is('.fields-row-error')) {
                 label.appendTo($placement);
@@ -530,23 +530,23 @@ define(function(require, exports, module) {
             }
         },
         highlight: function(element) {
-            var $el = getErrorTarget(element);
+            const $el = getErrorTarget(element);
             $el.addClass('error')
                 .closest('.controls').addClass('validation-error');
             $el.closest('.control-group').find('.control-label').addClass('validation-error');
         },
         unhighlight: function(element) {
-            var $target = getErrorTarget(element);
-            var validGroup = true;
+            const $target = getErrorTarget(element);
+            let validGroup = true;
 
             // Check if present more than one element in related container
             if (!$target.is(':input')) {
-                var groupElementNames = _.reduce(this.elementsOf($target), function(memo, num) {
+                const groupElementNames = _.reduce(this.elementsOf($target), function(memo, num) {
                     memo.push(num.name);
                     return memo;
                 }, []);
 
-                for (var i = 0; groupElementNames.length > i; i++) {
+                for (let i = 0; groupElementNames.length > i; i++) {
                     if (this.invalid[groupElementNames[i]] === true) {
                         validGroup = false;
                         break;
@@ -570,7 +570,7 @@ define(function(require, exports, module) {
                 !this.isPristine(element)
             ) {
                 if ($(element).hasClass('select2-focusser')) {
-                    var $selectContainer = $(element).closest('.select2-container');
+                    const $selectContainer = $(element).closest('.select2-container');
 
                     // if this is a compound field, check parent container for ignore data attribute
                     if ($selectContainer.parents('[data-validation-ignore-onblur]').length) {
@@ -582,7 +582,7 @@ define(function(require, exports, module) {
                         return;
                     }
 
-                    var realField = $selectContainer.parent()
+                    const realField = $selectContainer.parent()
                         .find('.select2[type=hidden], select.select2')[0];
 
                     if (realField) {
@@ -605,7 +605,7 @@ define(function(require, exports, module) {
     });
 
     // general validation methods
-    var methods = [
+    const methods = [
         'oroform/js/validator/count',
         'oroform/js/validator/date',
         'oroform/js/validator/datetime',
@@ -637,20 +637,20 @@ define(function(require, exports, module) {
      * @type {Function}
      */
     $.validator.dataRules = _.wrap($.validator.dataRules, function(dataRules, element) {
-        var optionalGroup;
-        var rules = dataRules(element);
+        let optionalGroup;
+        const rules = dataRules(element);
         if (!$.isEmptyObject(rules)) {
             optionalGroup = $(element).parents('[data-validation-optional-group]').get(0);
         }
         if (optionalGroup) {
-            var validator = $(element.form).data('validator');
+            const validator = $(element.form).data('validator');
             validator.settings.unhighlight.call(validator, element);
             _.each(rules, function(param) {
                 param.depends = function() {
                     // all fields in a group failed a required rule (have empty value) - stop group validation
 
                     return _.some(validator.elementsOf(optionalGroup), function(element) {
-                        var $element = $(element);
+                        const $element = $(element);
 
                         return $element.prop('willValidate') && !$element.data('ignore-validation') &&
                             $.validator.methods.required.call(validator, validator.elementValue(element), element);
@@ -675,7 +675,7 @@ define(function(require, exports, module) {
                 return method.call(this, value, element, params);
             }
             return _.every(params, function(param, index) {
-                var result = method.call(this, value, element, param);
+                const result = method.call(this, value, element, param);
                 if (!result) {
                     params.failedIndex = index;
                 }
@@ -688,10 +688,10 @@ define(function(require, exports, module) {
                 if (!_.isArray(params)) {
                     return message.call(this, params, element);
                 }
-                var param = params[params.failedIndex];
+                const param = params[params.failedIndex];
                 delete params.failedIndex;
                 if (param === undefined) {
-                    var e = new Error(
+                    const e = new Error(
                         'For multi-rule validations you should call rule "method" function before access to message.'
                     );
                     error.showErrorInConsole(e);
@@ -700,7 +700,7 @@ define(function(require, exports, module) {
                 return message.call(this, param, element);
             });
         } else if (_.isString(message)) {
-            var translated = __(message);
+            const translated = __(message);
             message = function() {
                 return translated;
             };
@@ -716,8 +716,8 @@ define(function(require, exports, module) {
      * @returns {Object} filtered validation rules
      */
     $.validator.filterUnsupportedValidators = function(validationRules) {
-        var validationRulesCopy = $.extend(true, {}, validationRules);
-        for (var ruleName in validationRulesCopy) {
+        const validationRulesCopy = $.extend(true, {}, validationRules);
+        for (const ruleName in validationRulesCopy) {
             if (validationRulesCopy.hasOwnProperty(ruleName)) {
                 if (!_.isFunction($.validator.methods[ruleName])) {
                     logger.warn('Cannot find validator implementation for `{{rule}}`', {rule: ruleName});

@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var ExtendFieldFormComponent;
-    var $ = require('jquery');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    ExtendFieldFormComponent = BaseComponent.extend({
+    const ExtendFieldFormComponent = BaseComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function ExtendFieldFormComponent() {
-            ExtendFieldFormComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ExtendFieldFormComponent(options) {
+            ExtendFieldFormComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -18,9 +17,9 @@ define(function(require) {
          */
         initialize: function(options) {
             $('form select#' + options.typeId).on('change', function() {
-                var selectedOption = $(this).find('option:selected');
-                var relationFieldName = selectedOption.data('fieldname');
-                var $fieldName = $('input#' + options.fieldId);
+                const selectedOption = $(this).find('option:selected');
+                const relationFieldName = selectedOption.data('fieldname');
+                const $fieldName = $('input#' + options.fieldId);
 
                 if (relationFieldName) {
                     $fieldName.val(relationFieldName).prop('readonly', true);

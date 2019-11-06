@@ -8,8 +8,6 @@ define([
 ], function(_, mediator, Backbone, Chaplin, Backgrid, Row) {
     'use strict';
 
-    var Body;
-
     /**
      * Grid body widget
      *
@@ -20,7 +18,7 @@ define([
      * @class   orodatagrid.datagrid.Body
      * @extends Backgrid.Body
      */
-    Body = Chaplin.CollectionView.extend({
+    const Body = Chaplin.CollectionView.extend({
 
         tagName: 'tbody',
         autoRender: false,
@@ -40,8 +38,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function Body() {
-            Body.__super__.constructor.apply(this, arguments);
+        constructor: function Body(options) {
+            Body.__super__.constructor.call(this, options);
         },
 
         /**
@@ -53,7 +51,7 @@ define([
             if ('rowView' in options.themeOptions) {
                 this.itemView = options.themeOptions.rowView;
             }
-            Body.__super__.initialize.apply(this, arguments);
+            Body.__super__.initialize.call(this, options);
         },
 
         /**
@@ -70,7 +68,7 @@ define([
         },
 
         renderAllItems: function() {
-            var result = Body.__super__.renderAllItems.call(this, arguments);
+            const result = Body.__super__.renderAllItems.call(this);
             mediator.trigger('layout:adjustHeight');
             return result;
         },
@@ -78,7 +76,7 @@ define([
         initItemView: function(model) {
             Row = this.row || this.itemView;
             if (Row) {
-                var rowOptions = {
+                const rowOptions = {
                     autoRender: false,
                     model: model,
                     collection: this.filteredColumns,
@@ -96,8 +94,8 @@ define([
         /**
          * @inheritDoc
          */
-        insertView: function(model, view) {
-            Body.__super__.insertView.apply(this, arguments);
+        insertView: function(model, view, ...rest) {
+            Body.__super__.insertView.call(this, model, view, ...rest);
             this.attachListenerToSingleRow(view);
         },
 
@@ -115,7 +113,7 @@ define([
 
         initFallback: function() {
             if (!this.fallbackSelector && this.emptyText) {
-                var fallbackElement = new Backgrid.EmptyRow({
+                const fallbackElement = new Backgrid.EmptyRow({
                     emptyText: this.emptyText,
                     columns: this.columns
                 }).render().el;
@@ -124,7 +122,7 @@ define([
                 }).join('');
                 this.$el.append(fallbackElement);
             }
-            Body.__super__.initFallback.apply(this, arguments);
+            Body.__super__.initFallback.call(this);
         },
 
         /**
@@ -132,7 +130,7 @@ define([
          */
         render: function() {
             this._deferredRender();
-            Body.__super__.render.apply(this, arguments);
+            Body.__super__.render.call(this);
             this._resolveDeferredRender();
             return this;
         }

@@ -1,27 +1,26 @@
 define(function(require) {
     'use strict';
 
-    var WidgetDatetimeRangeView;
-    var WidgetConfigDateTimeRangeFilter = require('orodashboard/js/widget/datetime-range');
-    var AbstractWidgetDateRangeView = require('orodashboard/js/app/views/abstract-widget-date-range-view');
+    const WidgetConfigDateTimeRangeFilter = require('orodashboard/js/widget/datetime-range');
+    const AbstractWidgetDateRangeView = require('orodashboard/js/app/views/abstract-widget-date-range-view');
 
-    WidgetDatetimeRangeView = AbstractWidgetDateRangeView.extend({
+    const WidgetDatetimeRangeView = AbstractWidgetDateRangeView.extend({
         /**
          * @inheritDoc
          */
-        constructor: function WidgetDatetimeRangeView() {
-            WidgetDatetimeRangeView.__super__.constructor.apply(this, arguments);
+        constructor: function WidgetDatetimeRangeView(options) {
+            WidgetDatetimeRangeView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            WidgetDatetimeRangeView.__super__.initialize.apply(this, arguments);
+            WidgetDatetimeRangeView.__super__.initialize.call(this, options);
 
-            var DatetimeFilterWithMeta = WidgetConfigDateTimeRangeFilter.extend(this.metadata);
-            var dateRangeFilter = new DatetimeFilterWithMeta();
-            var $dateRangeFilter = this._renderDateRangeFilter(dateRangeFilter);
+            const DatetimeFilterWithMeta = WidgetConfigDateTimeRangeFilter.extend(this.metadata);
+            const dateRangeFilter = new DatetimeFilterWithMeta();
+            const $dateRangeFilter = this._renderDateRangeFilter(dateRangeFilter);
 
             this.$('.datetime-range-filter-' + options.formName).append($dateRangeFilter);
             this._dateRangeFilterAfterRender();

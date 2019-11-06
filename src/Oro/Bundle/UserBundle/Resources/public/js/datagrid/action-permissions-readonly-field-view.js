@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var ActionPermissionsReadonlyFieldView;
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var PermissionReadOnlyView = require('orouser/js/datagrid/permission/permission-readonly-view');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const PermissionReadOnlyView = require('orouser/js/datagrid/permission/permission-readonly-view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    ActionPermissionsReadonlyFieldView = BaseView.extend({
+    const ActionPermissionsReadonlyFieldView = BaseView.extend({
         autoRender: false,
 
         animationDuration: 0,
@@ -20,8 +19,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ActionPermissionsReadonlyFieldView() {
-            ActionPermissionsReadonlyFieldView.__super__.constructor.apply(this, arguments);
+        constructor: function ActionPermissionsReadonlyFieldView(options) {
+            ActionPermissionsReadonlyFieldView.__super__.constructor.call(this, options);
         },
 
         render: function() {

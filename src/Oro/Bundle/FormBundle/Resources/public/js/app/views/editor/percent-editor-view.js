@@ -1,6 +1,8 @@
 define(function(require) {
     'use strict';
 
+    const NumberEditorView = require('./number-editor-view');
+
     /**
      * Percent cell content editor.
      *
@@ -57,17 +59,14 @@ define(function(require) {
      * @augments [NumberEditorView](./number-editor-view.md)
      * @exports PercentEditorView
      */
-    var PercentEditorView;
-    var NumberEditorView = require('./number-editor-view');
-
-    PercentEditorView = NumberEditorView.extend(/** @lends PercentEditorView.prototype */{
+    const PercentEditorView = NumberEditorView.extend(/** @lends PercentEditorView.prototype */{
         className: 'number-editor',
 
         /**
          * @inheritDoc
          */
-        constructor: function PercentEditorView() {
-            PercentEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function PercentEditorView(options) {
+            PercentEditorView.__super__.constructor.call(this, options);
         },
 
         parseRawValue: function(value) {
@@ -75,14 +74,14 @@ define(function(require) {
         },
 
         getModelUpdateData: function() {
-            var data = {};
-            var value = this.getValue();
+            const data = {};
+            const value = this.getValue();
             data[this.fieldName] = isNaN(value) ? null : value / 100;
             return data;
         },
 
         formatRawValue: function(value) {
-            var raw = this.parseRawValue(value);
+            const raw = this.parseRawValue(value);
             if (isNaN(raw)) {
                 return '';
             }

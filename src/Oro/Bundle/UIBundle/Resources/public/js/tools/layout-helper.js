@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var layout = require('oroui/js/layout');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const layout = require('oroui/js/layout');
 
-    var layoutHelper = {
+    const layoutHelper = {
 
         elementContext: $('#container'),
 
@@ -15,10 +15,10 @@ define(function(require) {
          * @param {jQuery} elementContext
          */
         setAvailableHeight: function(elementSelector, elementContext) {
-            var $element = $(elementSelector, elementContext || this.elementContext);
+            const $element = $(elementSelector, elementContext || this.elementContext);
 
-            var calculateHeight = function() {
-                var height = $(window).height() - $element.offset().top;
+            const calculateHeight = function() {
+                const height = $(window).height() - $element.offset().top;
                 $element.css({
                     'height': height,
                     'min-height': height

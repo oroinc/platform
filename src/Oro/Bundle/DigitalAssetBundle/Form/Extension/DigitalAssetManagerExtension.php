@@ -152,6 +152,7 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension implements Logg
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $attachmentConfig->getId();
                 $view->vars['dam_widget'] = [
+                    'is_valid_digital_asset' => $form->isSubmitted() ? $form->get('digitalAsset')->isValid() : true,
                     'preview_metadata' => $file && $file->getId()
                         ? $this->previewMetadataProvider->getMetadata($file) : [],
                     'is_image_type' => $fieldConfigId->getFieldType() === 'image',

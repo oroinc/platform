@@ -96,5 +96,6 @@ services:
         class: 'Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType'
         arguments:
             - '@oro_entity_config.manager.attribute_manager'
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_entity_config_attribute_multi_select }

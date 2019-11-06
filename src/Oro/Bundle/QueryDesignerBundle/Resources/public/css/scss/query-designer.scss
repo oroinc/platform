@@ -26,6 +26,7 @@
             .controls {
                 float: #{$start};
                 margin-#{$start}: 0;
+                min-width: 0;
 
                 .select2-container {
                     order: -1;

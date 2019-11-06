@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var EntityTreeSelectFormTypeView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseTreeView = require('oroui/js/app/views/jstree/base-tree-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseTreeView = require('oroui/js/app/views/jstree/base-tree-view');
 
     /**
      * Additional option:
      *  - fieldSelector - selector for field ID field
      */
-    EntityTreeSelectFormTypeView = BaseTreeView.extend({
+    const EntityTreeSelectFormTypeView = BaseTreeView.extend({
         /**
          * @property {Object}
          */
@@ -19,8 +18,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EntityTreeSelectFormTypeView() {
-            EntityTreeSelectFormTypeView.__super__.constructor.apply(this, arguments);
+        constructor: function EntityTreeSelectFormTypeView(options) {
+            EntityTreeSelectFormTypeView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -32,7 +31,7 @@ define(function(require) {
                 return;
             }
 
-            var fieldSelector = options.fieldSelector;
+            const fieldSelector = options.fieldSelector;
             if (!fieldSelector) {
                 return;
             }

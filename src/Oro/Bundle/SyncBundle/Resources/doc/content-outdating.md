@@ -24,7 +24,7 @@ your content will be tagged automatically, in cases when tags should be added dy
 **Example**
 ``` twig
     <script type="text/javascript">
-        require(['orosync/js/content-manager'],
+        loadModules(['orosync/js/content-manager'],
         function(contentManager) {
             contentManager.tagContent(['users']);
         });

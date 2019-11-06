@@ -1,27 +1,26 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Chaplin = require('chaplin');
-    var __ = require('orotranslation/js/translator');
-    var BaseController = require('oroui/js/app/controllers/base/controller');
-    var PageModel = require('oroui/js/app/models/page-model');
-    var errorHandler = require('oroui/js/error');
-    var config = require('module-config').default(module.id);
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Chaplin = require('chaplin');
+    const __ = require('orotranslation/js/translator');
+    const BaseController = require('oroui/js/app/controllers/base/controller');
+    const PageModel = require('oroui/js/app/models/page-model');
+    const errorHandler = require('oroui/js/error');
+    let config = require('module-config').default(module.id);
 
-    var PageController;
-    var document = window.document;
-    var location = window.location;
-    var history = window.history;
-    var utils = Chaplin.utils;
-    var mediator = Chaplin.mediator;
+    const document = window.document;
+    const location = window.location;
+    const history = window.history;
+    const utils = Chaplin.utils;
+    const mediator = Chaplin.mediator;
 
     config = _.extend({
         fullRedirect: false
     }, config);
 
-    PageController = BaseController.extend({});
+    const PageController = BaseController.extend({});
     _.extend(PageController.prototype, {
         fullRedirect: config.fullRedirect,
 
@@ -29,10 +28,10 @@ define(function(require, exports, module) {
          * Creates page model
          * @override
          */
-        initialize: function() {
-            PageController.__super__.initialize.apply(this, arguments);
+        initialize: function(...args) {
+            PageController.__super__.initialize.apply(this, args);
 
-            var page = new PageModel();
+            const page = new PageModel();
             this.listenTo(page, 'request', this.onPageRequest);
             this.listenTo(page, 'sync', this.onPageLoaded);
             this.listenTo(page, 'invalid', this.onPageInvalid);
@@ -40,7 +39,7 @@ define(function(require, exports, module) {
             this.model = page;
 
             // application is in action till first 'page:afterChange' event
-            var isInAction = true;
+            let isInAction = true;
 
             this.subscribeEvent('page:beforeChange', function() {
                 isInAction = true;
@@ -75,10 +74,8 @@ define(function(require, exports, module) {
          * @param {Object} options
          */
         index: function(params, route, options) {
-            var cacheItem;
-
-            var url = this._combineRouteUrl(route);
-            var args = {// collect arguments to reuse in events of page_fetch state change
+            const url = this._combineRouteUrl(route);
+            const args = {// collect arguments to reuse in events of page_fetch state change
                 params: params,
                 route: route,
                 options: options
@@ -96,7 +93,7 @@ define(function(require, exports, module) {
             }
             delete options.redirection;
 
-            cacheItem = this.cache.get(route.path);
+            const cacheItem = this.cache.get(route.path);
 
             if (cacheItem && cacheItem.page && route.query === cacheItem.query && options.force !== true) {
                 options.fromCache = true;
@@ -126,10 +123,10 @@ define(function(require, exports, module) {
          * @private
          */
         _beforePageLoad: function(route, params, options) {
-            var url;
-            var opts;
-            var oldRoute = route.previous;
-            var newRoute = _.extend(_.omit(route, ['previous']), {params: params});
+            let url;
+            let opts;
+            const oldRoute = route.previous;
+            const newRoute = _.extend(_.omit(route, ['previous']), {params: params});
             this.publishEvent('page:beforeChange', oldRoute, newRoute, options);
 
             // if route has been changed during 'page:beforeChange' event,
@@ -168,11 +165,11 @@ define(function(require, exports, module) {
          * @param {Object} options
          */
         onPageLoaded: function(model, result, options) {
-            var self = this;
-            var updatePromises = [];
-            var pageData = model.getAttributes();
-            var actionArgs = options.actionArgs;
-            var jqXHR = options.xhr;
+            const self = this;
+            const updatePromises = [];
+            const pageData = model.getAttributes();
+            const actionArgs = options.actionArgs;
+            const jqXHR = options.xhr;
 
             if (pageData.title) {
                 this.adjustTitle(pageData.title);
@@ -182,8 +179,8 @@ define(function(require, exports, module) {
 
             // execute callback function when all promises are either resolved or rejected
             function waitPromises(promises, callback) {
-                $.when.apply($, promises).always(function() {
-                    var pendingPromises = _.filter(promises, function(promise) {
+                $.when(...promises).always(function() {
+                    const pendingPromises = _.filter(promises, function(promise) {
                         return promise.state() === 'pending';
                     });
                     if (pendingPromises.length) {
@@ -213,8 +210,8 @@ define(function(require, exports, module) {
          * @param {Object} options
          */
         onPageInvalid: function(model, error, options) {
-            var pathDesc;
-            var redirectOptions;
+            let pathDesc;
+            let redirectOptions;
             if (error.redirect) {
                 pathDesc = {url: error.location};
                 redirectOptions = _.extend(
@@ -236,8 +233,8 @@ define(function(require, exports, module) {
          * @param {Object} options
          */
         onPageError: function(model, jqXHR, options) {
-            var rawData = jqXHR.responseText;
-            var data = {};
+            const rawData = jqXHR.responseText;
+            let data = {};
 
             if (jqXHR.status === 200 && rawData.indexOf('http') === 0) {
                 data = {redirect: true, fullRedirect: true, location: rawData};
@@ -245,7 +242,7 @@ define(function(require, exports, module) {
                 return;
             }
 
-            var payload = {stopPageProcessing: false};
+            const payload = {stopPageProcessing: false};
             this.publishEvent('page:beforeError', jqXHR, payload);
             if (payload.stopPageProcessing) {
                 history.back();
@@ -273,10 +270,10 @@ define(function(require, exports, module) {
          * @private
          */
         _processRedirect: function(pathDesc, params, options) {
-            var parser;
-            var pathname;
-            var query;
-            var getUrl = function(pathname, query) {
+            let parser;
+            let pathname;
+            let query;
+            const getUrl = function(pathname, query) {
                 query = utils.queryParams.parse(query);
                 query._rand = Math.random();
                 query = utils.queryParams.stringify(query);
@@ -310,7 +307,7 @@ define(function(require, exports, module) {
                 utils.redirectTo(pathDesc, options);
                 return;
             }
-            utils.redirectTo.apply(utils, arguments);
+            utils.redirectTo(pathDesc, params, options);
         },
 
         /**
@@ -320,19 +317,19 @@ define(function(require, exports, module) {
          */
         _setNavigationHandlers: function() {
             mediator.setHandler('redirectTo', function(pathDesc, params, options) {
-                var queue = [];
+                const queue = [];
                 mediator.trigger('page:beforeRedirectTo', queue, pathDesc, params, options);
-                $.when.apply($, queue).done(_.bind(function() {
+                $.when(...queue).done(_.bind(function() {
                     this._processRedirect(pathDesc, params, options);
                 }, this));
             }, this);
 
             mediator.setHandler('refreshPage', function(options) {
-                var queue = [];
+                const queue = [];
                 mediator.trigger('page:beforeRefresh', queue);
                 options = options || {};
                 _.defaults(options, {forceStartup: true, force: true});
-                $.when.apply($, queue).done(_.bind(function(customOptions) {
+                $.when(...queue).done(_.bind(function(customOptions) {
                     _.extend(options, customOptions || {});
                     this._processRedirect({url: location.href}, options);
                     mediator.trigger('page:afterRefresh');
@@ -354,10 +351,10 @@ define(function(require, exports, module) {
                 prevPos = -1;
             }
             rawData = rawData.trim();
-            var jsonStartPos = rawData.indexOf('{', prevPos + 1);
-            var additionalData = '';
-            var dataObj = null;
-            var data;
+            const jsonStartPos = rawData.indexOf('{', prevPos + 1);
+            let additionalData = '';
+            let dataObj = null;
+            let data;
             if (jsonStartPos > 0) {
                 additionalData = rawData.substr(0, jsonStartPos);
                 data = rawData.substr(jsonStartPos);

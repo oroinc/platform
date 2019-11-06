@@ -1,21 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var options = {
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const options = {
         successMessage: 'oro.email.menu.mark_unread.success.message',
         errorMessage: 'oro.email.menu.mark_unread.error.message',
         redirect: '/'
     };
 
     function onClick(e) {
-        var url;
         e.preventDefault();
 
-        url = $(e.target).data('url');
+        const url = $(e.target).data('url');
         mediator.execute('showLoading');
         $.post({
             url: url,
@@ -30,8 +29,7 @@ define(function(require) {
 
     return function(additionalOptions) {
         _.extend(options, additionalOptions || {});
-        var button;
-        button = options._sourceElement;
+        const button = options._sourceElement;
         button.click(onClick);
     };
 });

@@ -11,25 +11,10 @@ define([
     'use strict';
 
     /**
-     * Content Management
-     *
-     * component:
-     *  - provides API of page content caching;
-     *  - stores content tags for pages;
-     *  - listing sever messages for content update;
-     *  - shows notification for outdated content;
-     *
-     * @export orosync/js/content-manager
-     * @name   orosync.contentManager
-     * @type {Object}
-     */
-    var contentManager;
-
-    /**
      * Hash object with relation page URL -> its content
      * @type {Object.<string, Object>}
      */
-    var pagesCache = {};
+    const pagesCache = {};
 
     /**
      * Information about current page (URL and tags for current page)
@@ -42,7 +27,7 @@ define([
      *    state: {Object.<string, *>} // each page component can cache own state
      * }
      */
-    var current = {
+    let current = {
         // collect tags and state, even if the page is not initialized
         tags: [],
         state: {}
@@ -52,7 +37,7 @@ define([
      * User ID needed to check whenever update person is the same user
      * @type {String}
      */
-    var currentUser = null;
+    let currentUser = null;
 
     /**
      * Notifier object
@@ -62,7 +47,7 @@ define([
      *     title: {string}
      * }
      */
-    var notifier = {
+    const notifier = {
         result: null,
         title: null
     };
@@ -71,7 +56,7 @@ define([
      * Pages that has been out dated
      * @type {Object}
      */
-    var outdatedPageHandlers = {};
+    const outdatedPageHandlers = {};
 
     /**
      * On URL changes clean up tags collection and set a new URL as current
@@ -80,9 +65,7 @@ define([
      * @param {string} query
      */
     function changeUrl(path, query) {
-        var item;
-
-        item = pagesCache[path] || {};
+        const item = pagesCache[path] || {};
 
         _.extend(item, {
             path: path,
@@ -111,7 +94,7 @@ define([
      * @param {string} title
      */
     function sendMessage(title) {
-        var options = {
+        const options = {
             onClose: function() {
                 notifier.result.close();
                 notifier.result = null;
@@ -134,8 +117,8 @@ define([
      * @param {string} path
      */
     function defaultCallback(path) {
-        var data = contentManager.get(path);
-        var title = data ? '<b>' + data.page.titleShort + '</b>' : 'the';
+        const data = contentManager.get(path);
+        const title = data ? '<b>' + data.page.titleShort + '</b>' : 'the';
         if (notifier.result === null || notifier.title !== title) {
             sendMessage(title);
         }
@@ -170,24 +153,24 @@ define([
      * @param {Array} tags
      */
     function onUpdate(tags) {
-        var userTags = _.pluck(_.filter(tags, function(tag) {
+        const userTags = _.pluck(_.filter(tags, function(tag) {
             return (tag.username || null) === currentUser;
         }), 'tagname');
 
-        var otherTags = _.pluck(_.reject(tags, function(tag) {
+        const otherTags = _.pluck(_.reject(tags, function(tag) {
             return (tag.username || null) === currentUser;
         }), 'tagname');
 
-        var pages = _.values(pagesCache);
+        const pages = _.values(pagesCache);
         if (!_.contains(pages, current)) {
             pages.unshift(current);
         }
 
         _.each(pages, function(page) {
-            var handler;
-            var callbacks = [];
-            var items = page.tags;
-            var path = page.path;
+            let handler;
+            let callbacks = [];
+            const items = page.tags;
+            const path = page.path;
 
             _.each(items, function(options) {
                 // remove page from cache silently if current user made changes
@@ -228,8 +211,8 @@ define([
 
     // handles page request
     mediator.on('page:request', function(args) {
-        var path = args.route.path !== null && args.route.path !== void 0 ? args.route.path : current.path;
-        var query = args.route.query !== null && args.route.query !== void 0 ? args.route.query : current.query;
+        const path = args.route.path !== null && args.route.path !== void 0 ? args.route.path : current.path;
+        const query = args.route.query !== null && args.route.query !== void 0 ? args.route.query : current.query;
         changeUrl(path, query);
         if (notifier.result) {
             notifier.result.close();
@@ -240,9 +223,8 @@ define([
 
     // handles page update
     mediator.on('page:update', function(page, args) {
-        var options;
         current.page = page;
-        options = args.options;
+        const options = args.options;
         // if it's forced page reload and page was in a cache, update it
         if (options.cache === true || (options.force === true && contentManager.get())) {
             contentManager.add();
@@ -259,16 +241,28 @@ define([
      * @returns {*}
      */
     function fetchPath(url) {
-        var _ref;
         // it's anchor address inside current page
         if (url[0] === '#') {
             url = current.path;
         }
-        _ref = url.split('#')[0].split('?');
+        const _ref = url.split('#')[0].split('?');
         return mediator.execute('retrievePath', _ref[0]);
     }
 
-    contentManager = {
+    /**
+     * Content Management
+     *
+     * component:
+     *  - provides API of page content caching;
+     *  - stores content tags for pages;
+     *  - listing sever messages for content update;
+     *  - shows notification for outdated content;
+     *
+     * @export orosync/js/content-manager
+     * @name   orosync.contentManager
+     * @type {Object}
+     */
+    const contentManager = {
         /**
          * Setups content management component, sets initial URL
          *
@@ -289,7 +283,7 @@ define([
          *      handler which will be executed on content by the tags gets outdated
          */
         tagContent: function(tags, callback) {
-            var obj = {
+            const obj = {
                 tags: _.isArray(tags) ? tags : [tags]
             };
             if (callback) {
@@ -323,8 +317,7 @@ define([
          * Add current page to permanent cache
          */
         add: function() {
-            var path;
-            path = current.path;
+            const path = current.path;
             pagesCache[path] = current;
         },
 
@@ -379,10 +372,10 @@ define([
          */
         changeUrl: function(url, options) {
             options = options || {};
-            var _ref = url.split('?');
+            const _ref = url.split('?');
             current.path = _ref[0];
             current.query = _ref[1] || '';
-            var route = _.pick(current, ['path', 'query']);
+            const route = _.pick(current, ['path', 'query']);
             mediator.execute('changeRoute', route, options);
         },
 
@@ -393,8 +386,7 @@ define([
          * @param {string} value
          */
         changeUrlParam: function(param, value) {
-            var route;
-            var query = Chaplin.utils.queryParams.parse(current.query);
+            let query = Chaplin.utils.queryParams.parse(current.query);
             if (query[param] === value || (
                 (query[param] === null || query[param] === void 0) &&
                 (value === null || value === void 0)
@@ -414,7 +406,7 @@ define([
             query = Chaplin.utils.queryParams.stringify(query);
             current.query = query;
 
-            route = _.pick(current, ['path', 'query']);
+            const route = _.pick(current, ['path', 'query']);
             mediator.execute('changeRoute', route, {replace: true});
         },
 
@@ -435,8 +427,7 @@ define([
          * @param {string} hash
          */
         checkState: function(key, hash) {
-            var query;
-            query = Chaplin.utils.queryParams.parse(current.query);
+            const query = Chaplin.utils.queryParams.parse(current.query);
             return query[key] === hash || query[key] === void 0 && hash === null;
         },
 
@@ -508,15 +499,15 @@ define([
         normalizeUrl: function(urlString, options) {
             urlString = urlString.trim();
 
-            var hasRelativeProtocol = urlString.indexOf('//') === 0;
-            var isRelativeUrl = !hasRelativeProtocol && /^\.*\//.test(urlString);
+            const hasRelativeProtocol = urlString.indexOf('//') === 0;
+            const isRelativeUrl = !hasRelativeProtocol && /^\.*\//.test(urlString);
 
             // Prepend protocol
             if (!isRelativeUrl) {
                 urlString = urlString.replace(/^(?!(?:\w+:)?\/\/)|^\/\//, 'http:');
             }
 
-            var urlObj = document.createElement('a');
+            const urlObj = document.createElement('a');
             urlObj.href = urlString;
 
             // Remove auth
@@ -563,12 +554,12 @@ define([
         normalizeQuery: function(query, options) {
             options = _.extend({ignoreGetParameters: []}, options || {});
 
-            var queryObj = tools.unpackFromQueryString(query);
+            let queryObj = tools.unpackFromQueryString(query);
             queryObj = _.pick(queryObj, _.difference(_.keys(queryObj), options.ignoreGetParameters));
 
             if (queryObj['grid']) {
                 queryObj['grid'] = _.mapObject(queryObj['grid'], function(state) {
-                    var stateUnpacked = tools.unpackFromQueryString(state);
+                    const stateUnpacked = tools.unpackFromQueryString(state);
                     return tools.packToQuerySortedString(stateUnpacked);
                 });
             }
@@ -581,8 +572,7 @@ define([
          * @returns {script}
          */
         currentUrl: function() {
-            var url;
-            url = mediator.execute('combineRouteUrl', current);
+            const url = mediator.execute('combineRouteUrl', current);
             return url;
         },
 

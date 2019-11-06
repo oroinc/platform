@@ -6,8 +6,6 @@ define([
 ], function(_, __, MassAction, messenger) {
     'use strict';
 
-    var MergeMassAction;
-
     /**
      * Merge mass action class.
      *
@@ -15,12 +13,12 @@ define([
      * @class   oro.datagrid.action.MergeMassAction
      * @extends oro.datagrid.action.MassAction
      */
-    MergeMassAction = MassAction.extend({
+    const MergeMassAction = MassAction.extend({
         /**
          * @inheritDoc
          */
-        constructor: function MergeMassAction() {
-            MergeMassAction.__super__.constructor.apply(this, arguments);
+        constructor: function MergeMassAction(options) {
+            MergeMassAction.__super__.constructor.call(this, options);
         },
 
         /**
@@ -31,7 +29,7 @@ define([
          * @constructor
          */
         initialize: function(options) {
-            MergeMassAction.__super__.initialize.apply(this, arguments);
+            MergeMassAction.__super__.initialize.call(this, options);
             this.on('preExecute', this.onPreExecute, this);
         },
 
@@ -40,13 +38,13 @@ define([
          * @param {object} options Additional param options needed to stop action
          */
         onPreExecute: function(event, options) {
-            var totalRecords;
-            var validationMessage;
+            let totalRecords;
+            let validationMessage;
 
-            var maxLength = this.max_element_count;
-            var selectionState = this.datagrid.getSelectionState();
-            var isInset = selectionState.inset;
-            var length = selectionState.selectedIds.length;
+            const maxLength = this.max_element_count;
+            const selectionState = this.datagrid.getSelectionState();
+            const isInset = selectionState.inset;
+            let length = selectionState.selectedIds.length;
 
             if (!isInset) {
                 totalRecords = this.datagrid.collection.state.totalRecords;

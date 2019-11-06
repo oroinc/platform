@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var StepEditView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var __ = require('orotranslation/js/translator');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var DialogWidget = require('oro/dialog-widget');
-    var helper = require('oroworkflow/js/tools/workflow-helper');
-    var TransitionsListView = require('../transition/transition-list-view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const __ = require('orotranslation/js/translator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const DialogWidget = require('oro/dialog-widget');
+    const helper = require('oroworkflow/js/tools/workflow-helper');
+    const TransitionsListView = require('../transition/transition-list-view');
 
-    StepEditView = BaseView.extend({
+    const StepEditView = BaseView.extend({
         attributes: {
             'class': 'widget-content'
         },
@@ -28,8 +27,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function StepEditView() {
-            StepEditView.__super__.constructor.apply(this, arguments);
+        constructor: function StepEditView(options) {
+            StepEditView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -38,14 +37,14 @@ define(function(require) {
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
-            var template = this.options.template || $('#step-form-template').html();
+            const template = this.options.template || $('#step-form-template').html();
             this.template = _.template(template);
             this.widget = null;
         },
 
         onStepAdd: function() {
-            var formData = helper.getFormData(this.widget.form);
-            var order = parseInt(formData.order);
+            const formData = helper.getFormData(this.widget.form);
+            const order = parseInt(formData.order);
 
             if (!this.model.get('name')) {
                 this.model.set('name', helper.getNameByString(formData.label, 'step_'));
@@ -87,7 +86,7 @@ define(function(require) {
 
         renderWidget: function() {
             if (!this.widget) {
-                var title = this.model.get('name') ? __('Edit step') : __('Add new step');
+                let title = this.model.get('name') ? __('Edit step') : __('Add new step');
                 if (this.model.get('_is_clone')) {
                     title = __('Clone step');
                 }
@@ -114,7 +113,7 @@ define(function(require) {
                 submitHandler: _.bind(this.onStepAdd, this),
                 ignore: '[type="hidden"]',
                 highlight: function(element) {
-                    var tabContent = $(element).closest('.tab-pane');
+                    const tabContent = $(element).closest('.tab-pane');
                     if (tabContent.is(':hidden')) {
                         tabContent
                             .closest('.oro-tabs')
@@ -126,7 +125,7 @@ define(function(require) {
         },
 
         render: function() {
-            var data = this.model.toJSON();
+            const data = this.model.toJSON();
             data.transitionsAllowed = (this.options.workflow.get('steps').length > 1 && this.model.get('name'));
             this.$el.html(this.template(data));
 

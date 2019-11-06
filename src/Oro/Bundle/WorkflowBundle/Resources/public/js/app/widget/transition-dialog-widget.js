@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var TransitionDialogWidget;
-    var DialogWidget = require('oro/dialog-widget');
-    var mediator = require('oroui/js/mediator');
-    var TransitionEventHandlers = require('oroworkflow/js/transition-event-handlers');
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const DialogWidget = require('oro/dialog-widget');
+    const mediator = require('oroui/js/mediator');
+    const TransitionEventHandlers = require('oroworkflow/js/transition-event-handlers');
+    const $ = require('jquery');
+    const _ = require('underscore');
 
-    TransitionDialogWidget = DialogWidget.extend({
+    const TransitionDialogWidget = DialogWidget.extend({
         listen: {
             transitionSuccess: 'onTransitionSuccess',
             transitionFailure: 'onTransitionFailure'
@@ -17,15 +16,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function TransitionDialogWidget() {
-            TransitionDialogWidget.__super__.constructor.apply(this, arguments);
+        constructor: function TransitionDialogWidget(options) {
+            TransitionDialogWidget.__super__.constructor.call(this, options);
         },
 
         /**
          * @param {Object} response
          */
         onTransitionSuccess: function(response) {
-            var element = $('<div>');
+            const element = $('<div>');
             this.hide();
             TransitionEventHandlers.getOnSuccess(element)(response);
         },
@@ -34,7 +33,7 @@ define(function(require) {
          * @param {XMLHttpRequest} jqxhr
          */
         onTransitionFailure: function(jqxhr) {
-            var element = $('<div>');
+            const element = $('<div>');
             this.hide();
             TransitionEventHandlers.getOnFailure(element)(jqxhr);
         },
@@ -46,13 +45,13 @@ define(function(require) {
          */
         _onContentLoad: function(content) {
             if (_.has(content, 'workflowItem')) {
-                var element = $('<div>');
+                const element = $('<div>');
                 this.hide();
                 mediator.execute('showLoading');
                 TransitionEventHandlers.getOnSuccess(element)(content);
             }
 
-            return TransitionDialogWidget.__super__._onContentLoad.apply(this, arguments);
+            return TransitionDialogWidget.__super__._onContentLoad.call(this, content);
         }
     });
 

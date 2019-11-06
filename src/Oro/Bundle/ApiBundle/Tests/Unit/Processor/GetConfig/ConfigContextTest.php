@@ -39,6 +39,33 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $this->context->get(ConfigContext::TARGET_ACTION));
     }
 
+    public function testIsCollection()
+    {
+        self::assertFalse($this->context->isCollection());
+
+        $this->context->setIsCollection(true);
+        self::assertTrue($this->context->isCollection());
+        self::assertTrue($this->context->get(ConfigContext::COLLECTION));
+    }
+
+    public function testParentClassName()
+    {
+        self::assertNull($this->context->getParentClassName());
+
+        $this->context->setParentClassName('test');
+        self::assertEquals('test', $this->context->getParentClassName());
+        self::assertEquals('test', $this->context->get(ConfigContext::PARENT_CLASS_NAME));
+    }
+
+    public function testAssociationName()
+    {
+        self::assertNull($this->context->getAssociationName());
+
+        $this->context->setAssociationName('test');
+        self::assertEquals('test', $this->context->getAssociationName());
+        self::assertEquals('test', $this->context->get(ConfigContext::ASSOCIATION));
+    }
+
     public function testMaxRelatedEntities()
     {
         self::assertNull($this->context->getMaxRelatedEntities());

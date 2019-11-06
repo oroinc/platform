@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var colorUtil = require('oroui/js/tools/color-util');
+    const $ = require('jquery');
+    const colorUtil = require('oroui/js/tools/color-util');
 
     colorUtil.configure({DARK: $('body').css('color')});
 });

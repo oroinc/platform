@@ -1,19 +1,19 @@
 define(function(require) {
     'use strict';
 
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var WidgetPickerItemView = require('oroui/js/app/views/widget-picker/widget-picker-item-view');
-    var _ = require('underscore');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const WidgetPickerItemView = require('oroui/js/app/views/widget-picker/widget-picker-item-view');
+    const _ = require('underscore');
 
-    var WidgetPickerCollectionView = BaseCollectionView.extend({
+    const WidgetPickerCollectionView = BaseCollectionView.extend({
         itemView: WidgetPickerItemView,
         isWidgetLoadingInProgress: false,
 
         /**
          * @inheritDoc
          */
-        constructor: function WidgetPickerCollectionView() {
-            WidgetPickerCollectionView.__super__.constructor.apply(this, arguments);
+        constructor: function WidgetPickerCollectionView(options) {
+            WidgetPickerCollectionView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -28,7 +28,7 @@ define(function(require) {
             }
             _.extend(this, _.pick(options, ['filterModel', 'loadWidget']));
             options.filterer = _.bind(this.filterModel.filterer, this.filterModel);
-            WidgetPickerCollectionView.__super__.initialize.apply(this, arguments);
+            WidgetPickerCollectionView.__super__.initialize.call(this, options);
         },
 
         /**
@@ -36,14 +36,14 @@ define(function(require) {
          */
         delegateListeners: function() {
             this.listenTo(this.filterModel, 'change', this.filter);
-            return WidgetPickerCollectionView.__super__.delegateListeners.apply(this, arguments);
+            return WidgetPickerCollectionView.__super__.delegateListeners.call(this);
         },
 
         /**
          * @inheritDoc
          */
-        initItemView: function() {
-            var view = WidgetPickerCollectionView.__super__.initItemView.apply(this, arguments);
+        initItemView: function(model) {
+            const view = WidgetPickerCollectionView.__super__.initItemView.call(this, model);
             this.listenTo(view, 'widget_add', this.processWidgetAdd);
             view.setFilterModel(this.filterModel);
             return view;

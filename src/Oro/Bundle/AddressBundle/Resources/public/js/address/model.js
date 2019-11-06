@@ -3,14 +3,12 @@ define([
 ], function(Backbone) {
     'use strict';
 
-    var AddressModel;
-
     /**
      * @export  oroaddress/js/address/model
      * @class   oroaddress.address.Model
      * @extends Backbone.Model
      */
-    AddressModel = Backbone.Model.extend({
+    const AddressModel = Backbone.Model.extend({
         defaults: {
             label: '',
             namePrefix: '',
@@ -37,12 +35,12 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function AddressModel() {
-            AddressModel.__super__.constructor.apply(this, arguments);
+        constructor: function AddressModel(attrs, options) {
+            AddressModel.__super__.constructor.call(this, attrs, options);
         },
 
         getSearchableString: function() {
-            var address = '';
+            let address = '';
 
             if (this.get('country')) {
                 address += this.get('country') + ', ';

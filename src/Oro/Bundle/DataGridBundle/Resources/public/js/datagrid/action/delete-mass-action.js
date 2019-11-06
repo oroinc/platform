@@ -7,8 +7,6 @@ define([
 ], function(DeleteConfirmation, __, _, MassAction, mediator) {
     'use strict';
 
-    var DeleteMassAction;
-
     /**
      * Delete mass action class.
      *
@@ -16,7 +14,7 @@ define([
      * @class   oro.datagrid.action.DeleteMassAction
      * @extends oro.datagrid.action.MassAction
      */
-    DeleteMassAction = MassAction.extend({
+    const DeleteMassAction = MassAction.extend({
         /** @property {Function} */
         confirmModalConstructor: DeleteConfirmation,
 
@@ -48,8 +46,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function DeleteMassAction() {
-            DeleteMassAction.__super__.constructor.apply(this, arguments);
+        constructor: function DeleteMassAction(options) {
+            DeleteMassAction.__super__.constructor.call(this, options);
         },
 
         /**
@@ -59,13 +57,13 @@ define([
          * @param options
          */
         initialize: function(options) {
-            DeleteMassAction.__super__.initialize.apply(this, arguments);
+            DeleteMassAction.__super__.initialize.call(this, options);
             this.confirmMessage = __(this.defaultMessages.confirm_content);
             this.confirmation = false;
         },
 
         getConfirmDialogOptions: function() {
-            var options = DeleteMassAction.__super__.getConfirmDialogOptions.call(this);
+            const options = DeleteMassAction.__super__.getConfirmDialogOptions.call(this);
 
             options.allowOk = this.allowOk;
 
@@ -90,7 +88,7 @@ define([
                 this.confirmation = true;
                 return DeleteMassAction.__super__.execute.call(this);
             } else {
-                DeleteMassAction.__super__._onAjaxSuccess.apply(this, arguments);
+                DeleteMassAction.__super__._onAjaxSuccess.call(this, data, textStatus, jqXHR);
 
                 mediator.trigger('datagrid:afterMassRemoveRow:' + this.datagrid.name);
             }
@@ -129,7 +127,7 @@ define([
                     this.allowOk = false;
                 } else if (data.deletable <= data.max_limit) {
                     if (data.deletable >= data.selected) {
-                        var placeholders = {selected: data.selected};
+                        const placeholders = {selected: data.selected};
                         this.confirmMessage = __(this.confirmMessages.selected_message, placeholders, data.selected);
                     } else {
                         this.confirmMessage = __(this.confirmMessages.restricted_access_message, {
@@ -149,7 +147,7 @@ define([
 
         getLink: function(parameters) {
             if (this.requestType === 'DELETE') {
-                var actionParameters = this.getActionParameters();
+                const actionParameters = this.getActionParameters();
                 if (_.isUndefined(parameters)) {
                     parameters = {};
                 }

@@ -8,8 +8,6 @@ define([
 ], function($, _, Backgrid, SelectStateModel, BaseView, template) {
     'use strict';
 
-    var SelectAllHeaderCell;
-
     /**
      * Contains mass-selection logic
      *  - watches models selection, keeps reference to selected
@@ -22,7 +20,7 @@ define([
      * @class   orodatagrid.datagrid.headerCell.SelectAllHeaderCell
      * @extends BaseView
      */
-    SelectAllHeaderCell = BaseView.extend({
+    const SelectAllHeaderCell = BaseView.extend({
         keepElement: false,
         /** @property */
         className: 'select-all-header-cell renderable',
@@ -37,8 +35,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function SelectAllHeaderCell() {
-            SelectAllHeaderCell.__super__.constructor.apply(this, arguments);
+        constructor: function SelectAllHeaderCell(options) {
+            SelectAllHeaderCell.__super__.constructor.call(this, options);
         },
 
         /**
@@ -50,7 +48,7 @@ define([
          * @param {Backbone.Collection} options.collection
          */
         initialize: function(options) {
-            var debouncedUpdateState = _.bind(_.debounce(this.updateState, 50), this);
+            const debouncedUpdateState = _.bind(_.debounce(this.updateState, 50), this);
             this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
@@ -68,7 +66,7 @@ define([
             }
             delete this.selectState;
             delete this.column;
-            SelectAllHeaderCell.__super__.dispose.apply(this, arguments);
+            SelectAllHeaderCell.__super__.dispose.call(this);
         },
 
         /**
@@ -119,7 +117,7 @@ define([
         },
 
         onDropdownClick: function(e) {
-            var $el = $(e.target);
+            const $el = $(e.target);
             if ($el.is('[data-select-all]')) {
                 // Handles click on selectAll button
                 this.collection.trigger('backgrid:selectAll');

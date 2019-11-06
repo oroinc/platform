@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var ImportExportButtonsView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var ImportExportManager = require('oroimportexport/js/importexport-manager');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const ImportExportManager = require('oroimportexport/js/importexport-manager');
 
     // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11701
-    ImportExportButtonsView = BaseView.extend({
+    const ImportExportButtonsView = BaseView.extend({
         /**
          * @property {Object}
          */
@@ -41,8 +40,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ImportExportButtonsView() {
-            ImportExportButtonsView.__super__.constructor.apply(this, arguments);
+        constructor: function ImportExportButtonsView(options) {
+            ImportExportButtonsView.__super__.constructor.call(this, options);
         },
 
         /**

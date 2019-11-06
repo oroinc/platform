@@ -1,29 +1,30 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var mask = require('oroui/js/dropdown-mask');
+    const $ = require('jquery');
+    const mask = require('oroui/js/dropdown-mask');
     require('oroui/js/jquery-timepicker-l10n');
     require('jquery.timepicker');
 
-    var origTimepicker = $.fn.timepicker;
-    $.fn.timepicker = function(method) {
-        var options;
-        var result;
+    const origTimepicker = $.fn.timepicker;
+    $.fn.timepicker = function(method, ...args) {
+        let options;
+        let result;
         if (typeof method === 'object' || !method || method === 'init') {
-            options = method === 'init' ? arguments[1] : method;
+            options = method === 'init' ? args[1] : method;
             options = $.extend(true, {}, origTimepicker.defaults, options);
             result = origTimepicker.call(this, options);
         } else {
-            result = origTimepicker.apply(this, arguments);
+            args.unshift(method);
+            result = origTimepicker.apply(this, args);
         }
         return result;
     };
 
     $(document)
         .on('showTimepicker', function(e) {
-            var $input = $(e.target);
-            var zIndex = $input.data('timepicker-list').css('zIndex');
+            const $input = $(e.target);
+            const zIndex = $input.data('timepicker-list').css('zIndex');
             mask.show(zIndex - 1)
                 .onhide(function() {
                     $input.timepicker('hide');

@@ -70,10 +70,10 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit\Framework\TestCase
         $context = new ConfigContext();
 
         $extra->configureContext($context);
-        self::assertNull($context->getTargetAction());
+        self::assertSame('', $context->getTargetAction());
         self::assertFalse($context->isCollection());
-        self::assertNull($context->getParentClassName());
-        self::assertNull($context->getAssociationName());
+        self::assertSame('', $context->getParentClassName());
+        self::assertSame('', $context->getAssociationName());
 
         self::assertNull($extra->getAction());
         self::assertFalse($extra->isCollection());
@@ -89,8 +89,8 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit\Framework\TestCase
         $extra->configureContext($context);
         self::assertEquals('action', $context->getTargetAction());
         self::assertFalse($context->isCollection());
-        self::assertNull($context->getParentClassName());
-        self::assertNull($context->getAssociationName());
+        self::assertSame('', $context->getParentClassName());
+        self::assertSame('', $context->getAssociationName());
 
         self::assertEquals('action', $extra->getAction());
         self::assertFalse($extra->isCollection());
@@ -106,8 +106,8 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit\Framework\TestCase
         $extra->configureContext($context);
         self::assertEquals('action', $context->getTargetAction());
         self::assertTrue($context->isCollection());
-        self::assertNull($context->getParentClassName());
-        self::assertNull($context->getAssociationName());
+        self::assertSame('', $context->getParentClassName());
+        self::assertSame('', $context->getAssociationName());
 
         self::assertEquals('action', $extra->getAction());
         self::assertTrue($extra->isCollection());

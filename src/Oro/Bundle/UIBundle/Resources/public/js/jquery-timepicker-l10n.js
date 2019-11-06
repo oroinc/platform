@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var __ = require('orotranslation/js/translator');
-    var localeSettings = require('orolocale/js/locale-settings');
+    const $ = require('jquery');
+    const __ = require('orotranslation/js/translator');
+    const localeSettings = require('orolocale/js/locale-settings');
     require('jquery.timepicker');
 
-    var decimal = localeSettings.getNumberFormats('decimal').decimal_separator_symbol;
-    var timeFormat = localeSettings.getVendorDateTimeFormat('php', 'time', 'g:i A');
+    const decimal = localeSettings.getNumberFormats('decimal').decimal_separator_symbol;
+    const timeFormat = localeSettings.getVendorDateTimeFormat('php', 'time', 'g:i A');
 
     $.fn.timepicker.defaults = {
         timeFormat: timeFormat,

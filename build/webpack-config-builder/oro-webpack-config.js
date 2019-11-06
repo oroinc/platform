@@ -8,6 +8,7 @@ const LayoutModulesConfigLoader = require('./modules-config/layout-modules-confi
 const LayoutStyleLoader = require('./style/layout-style-loader');
 const MapModulesPlugin = require('./plugin/map/map-modules-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const HappyPack = require('happypack');
 const ModulesConfigLoader = require('./modules-config/modules-config-loader');
 const DynamicImportsFileWriter = require('./writer/dynamic-imports-file-writer');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
@@ -19,6 +20,7 @@ const postcssConfig = path.join(__dirname, '../postcss.config.js');
 const prepareModulesMap = require('./plugin/map/prepare-modules-map');
 const resolve = require('enhanced-resolve');
 const webpackMerge = require('webpack-merge');
+const babelConfig = require('./../babel.config.js');
 
 class ConfigBuilder {
     constructor() {
@@ -80,10 +82,10 @@ class ConfigBuilder {
      * @returns {Function}
      */
     getWebpackConfig() {
-        return (env, args) => {
+        return (env = {}, args = {}) => {
             this._initialize(args, env);
 
-            let selectedTheme = env ? env.theme : undefined;
+            let selectedTheme = env.theme;
             this._validateThemeName(selectedTheme);
 
             let themes = [];
@@ -114,7 +116,7 @@ class ConfigBuilder {
 
             const resolvedPublicPath = path.resolve(this._publicPath);
 
-            const stats = env && env.stats ? env.stats : {
+            const stats = env.stats || {
                 hash: false,
                 version: false,
                 children: false,
@@ -128,13 +130,20 @@ class ConfigBuilder {
                 warnings: false
             };
             let webpackConfig = {
+                watchOptions: {
+                    aggregateTimeout: 200,
+                    ignored: [
+                        /\/node_modules\/.*\.js$/,
+                        /\/bundles\/(npmassets|bowerassets|components)\/.*\.js$/
+                    ]
+                },
                 stats: stats,
                 output: {
                     filename: '[name].js',
-                    // Due of using third  party libraries 'chunkFilename' should consist of only from [name]
+                    // Due of using third party libraries 'chunkFilename' should consist of only from [name]
                     chunkFilename: 'chunk/[name].js?version=[chunkhash:8]',
                 },
-                devtool: 'inline-cheap-module-source-map',
+                devtool: !env.skipSourcemap && 'inline-cheap-module-source-map',
                 mode: 'development',
                 optimization: {
                     namedModules: true,
@@ -145,10 +154,12 @@ class ConfigBuilder {
                                 minSize: 30,
                                 minChunks: 2,
                                 priority: 10,
+                                reuseExistingChunk: true
                             },
                             vendors: {
                                 test: /[\\/]node_modules[\\/]/,
-                                name: 'commons',
+                                name: 'vendors',
+                                priority: -10
                             },
                             tinymce: {
                                 test: /tinymce/,
@@ -171,8 +182,11 @@ class ConfigBuilder {
                         path.join(__dirname, '../node_modules'),
                     ]
                 },
-
                 module: {
+                    noParse: [
+                        /\/bundles\/(npmassets|bowerassets|components)\/(?!jquery|asap)\/.*\.js$/,
+                        /\/bundles\/\.*\/lib\/(?!chaplin|bootstrap|jquery\.dialog).*\.js$/
+                    ],
                     rules: [
                         {
                             test: /\.s?css$/,
@@ -234,9 +248,37 @@ class ConfigBuilder {
                     new webpack.IgnorePlugin({
                         resourceRegExp: /^\.\/locale$/,
                         contextRegExp: /moment$/
+                    }),
+                    new webpack.optimize.MinChunkSizePlugin({
+                        minChunkSize: 30000 // Minimum number of characters
                     })
                 ]
             };
+
+            if (!env.skipJS && !env.skipBabel) {
+                let happyPackOptions = {
+                    id: 'babel',
+                    loaders: [
+                        {
+                            loader: 'babel-loader',
+                            options: babelConfig
+                        }
+                    ]
+                };
+
+                webpackConfig.plugins.push(new HappyPack(happyPackOptions));
+
+                webpackConfig.module.rules.push({
+                    test: /\.js$/,
+                    exclude: [
+                        /\/platform\/build\//,
+                        /\/bundles\/(?:bowerassets|npmassets|components)\//,
+                        /\/bundles\/.+\/lib\/?/
+                    ],
+                    use: 'happypack/loader?id=babel'
+                });
+            }
+
             if (args.hot) {
                 const https = this._appConfig.devServerOptions.https;
                 const schema = https ? 'https' : 'http';
@@ -257,7 +299,6 @@ class ConfigBuilder {
                 };
                 webpackConfig.output.publicPath = `${schema}://${devServerHost}:${devServerPort}/`;
             }
-
 
             //Additional setting for production mode
             if (this._isProduction) {
@@ -312,8 +353,8 @@ class ConfigBuilder {
                     return moduleName => resolver({}, '', moduleName, {});
                 })(resolve.create.sync({...resolverConfig}));
 
-                let cssEntryPoints = env && !env.skipCSS ? this._getCssEntryPoints(theme, buildPublicPath) : {};
-                let jsEntryPoints = env && !env.skipJS && Object.keys(themeConfig.aliases).length
+                let cssEntryPoints = !env.skipCSS ? this._getCssEntryPoints(theme, buildPublicPath) : {};
+                let jsEntryPoints = !env.skipJS && Object.keys(themeConfig.aliases).length
                     ? this._getJsEntryPoints(theme) : {};
 
                 let entryPoints = {...cssEntryPoints, ...jsEntryPoints};
@@ -355,7 +396,7 @@ class ConfigBuilder {
 
     _initialize(args, env) {
         this._isProduction = args.mode === 'production';
-        this._symfonyEnv = env ? env.symfony : undefined;
+        this._symfonyEnv = env.symfony;
         this._appConfig = AppConfigLoader.getConfig(this._cachePath, this._symfonyEnv);
 
         this._modulesConfigLoader = new ModulesConfigLoader(
@@ -393,8 +434,6 @@ class ConfigBuilder {
         return {
             'app': [
                 'whatwg-fetch',
-                'core-js/fn/promise',
-                'oroui/js/extend/polyfill',
                 'oroui/js/app',
                 'oroui/js/app/services/app-ready-load-modules'
             ]

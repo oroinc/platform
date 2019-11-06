@@ -1,9 +1,8 @@
 define(function(require) {
     'use strict';
-    var JsPlumbOverlayManager;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var BLOCK_MOVE_ITERATIONS = 16;
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const BLOCK_MOVE_ITERATIONS = 16;
 
     function Block(el) {
         this.name = $(el).find('.step-label').text();
@@ -30,7 +29,7 @@ define(function(require) {
     });
 
     function OverlayBlock(el, overlay, points) {
-        OverlayBlock.__super__.apply(this, arguments);
+        OverlayBlock.__super__.call(this, el);
         this.jsPlumbOverlayInstance = overlay;
         this.location = overlay.getLocation();
         this._originalLocation = this.location;
@@ -46,11 +45,11 @@ define(function(require) {
     OverlayBlock.__super__ = Block;
     _.extend(OverlayBlock.prototype, {
         _fillSegments: function(points) {
-            var i;
-            var segment;
-            var p1;
-            var p2;
-            var totalLength = 0;
+            let i;
+            let segment;
+            let p1;
+            let p2;
+            let totalLength = 0;
             for (i = 1; i < points.length; i++) {
                 segment = {};
                 p1 = points[i - 1];
@@ -75,14 +74,13 @@ define(function(require) {
         },
 
         setNearestLocation: function(dx, dy) {
-            var location;
-            var x = this.x + dx;
-            var y = this.y + dy;
-            var locations = [];
-            var passed = 0;
+            const x = this.x + dx;
+            const y = this.y + dy;
+            const locations = [];
+            let passed = 0;
             _.each(this.segments, function(segment) {
-                var min;
-                var max;
+                let min;
+                let max;
                 if (segment.orientation === 'v') { // vertical segment
                     min = Math.min(segment.y1, segment.y2);
                     max = Math.max(segment.y1, segment.y2);
@@ -111,7 +109,7 @@ define(function(require) {
                     passed += max - min;
                 }
             }, this);
-            location = _.min(locations, function(location) {
+            const location = _.min(locations, function(location) {
                 return location.distance;
             });
             this.moveX = 0;
@@ -148,12 +146,11 @@ define(function(require) {
         },
 
         setLocation: function(location) {
-            var segment;
-            var passed = 0;
-            segment = _.find(this.segments, function(segment) {
-                var min;
-                var max;
-                var diff;
+            let passed = 0;
+            const segment = _.find(this.segments, function(segment) {
+                let min;
+                let max;
+                let diff;
                 if (segment.orientation === 'v') {
                     min = Math.min(segment.y1, segment.y2);
                     max = Math.max(segment.y1, segment.y2);
@@ -191,29 +188,28 @@ define(function(require) {
         },
 
         clone: function() {
-            var clone = new OverlayBlock(this.el, this.jsPlumbOverlayInstance, []);
+            const clone = new OverlayBlock(this.el, this.jsPlumbOverlayInstance, []);
             clone.setLocation(this.location);
             _.extend(clone, this);
             return clone;
         }
     });
 
-    JsPlumbOverlayManager = function(smartlineManager) {
+    const JsPlumbOverlayManager = function(smartlineManager) {
         this.smartlineManager = smartlineManager;
     };
     _.extend(JsPlumbOverlayManager.prototype, {
         calculate: function() {
-            var i;
-            var blocks;
-            var steps = [];
-            var overlays = [];
+            let i;
+            const steps = [];
+            const overlays = [];
             if (!this.smartlineManager.isCacheValid()) {
                 this.smartlineManager.refreshCache();
             }
             _.each(this.smartlineManager.cache.connections, function(cacheItem) {
-                var points = cacheItem.points;
+                const points = cacheItem.points;
                 _.each(cacheItem.connection.getOverlays(), function(overlay) {
-                    var block;
+                    let block;
                     if (overlay.type === 'Custom') {
                         block = new OverlayBlock(overlay.canvas, overlay, _.clone(points));
                         block.setLocation(0.5);
@@ -222,22 +218,22 @@ define(function(require) {
                 }, this);
             });
             _.each(_.keys(this.smartlineManager.jsPlumbInstance.sourceEndpointDefinitions), function(id) {
-                var el = document.getElementById(id);
+                const el = document.getElementById(id);
                 if (el) {
                     steps.push(new Block(el));
                 }
             });
-            blocks = steps.concat(overlays);
+            const blocks = steps.concat(overlays);
             for (i = 0; i < BLOCK_MOVE_ITERATIONS; i++) {
                 if (!this._moveBlocks(blocks, overlays)) {
                     break;
                 }
             }
             _.each(overlays, function(overlay) {
-                var overlapped;
+                let overlapped;
                 if (overlay.isChanged()) {
                     overlapped = _.find(blocks, function(block) {
-                        var deny = block !== overlay && overlay.isOverlapped(block);
+                        const deny = block !== overlay && overlay.isOverlapped(block);
                         return deny;
                     });
                     if (typeof overlapped === 'undefined') {
@@ -250,12 +246,12 @@ define(function(require) {
         },
 
         _moveBlocks: function(blocks, overlays) {
-            var changed = false;
+            let changed = false;
             _.each(blocks, function(block) {
                 _.each(overlays, function(overlay) {
-                    var deltaX;
-                    var deltaY;
-                    var multiplier;
+                    let deltaX;
+                    let deltaY;
+                    let multiplier;
                     if (block !== overlay && block.isOverlapped(overlay)) {
                         deltaX = overlay.x - block.x;
                         deltaY = overlay.y - block.y;

@@ -5,8 +5,6 @@ define([
 ], function(_, Backbone, Backgrid) {
     'use strict';
 
-    var FooterCell;
-
     /**
      * Datagrid footer cell
      *
@@ -14,7 +12,7 @@ define([
      * @class orodatagrid.datagrid.footer.FooterCell
      * @extends Backbone.View
      */
-    FooterCell = Backbone.View.extend({
+    const FooterCell = Backbone.View.extend({
         /** @property */
         tagName: 'th',
 
@@ -29,8 +27,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function FooterCell() {
-            FooterCell.__super__.constructor.apply(this, arguments);
+        constructor: function FooterCell(options) {
+            FooterCell.__super__.constructor.call(this, options);
         },
 
         /**
@@ -47,8 +45,8 @@ define([
             this.listenTo(options.collection, 'reset', this.render);
             this.listenTo(this.column, 'change:editable change:sortable change:renderable',
                 function(column) {
-                    var changed = column.changedAttributes();
-                    for (var key in changed) {
+                    const changed = column.changedAttributes();
+                    for (const key in changed) {
                         if (changed.hasOwnProperty(key)) {
                             this.$el.toggleClass(key, changed[key]);
                         }
@@ -63,9 +61,9 @@ define([
          */
         render: function() {
             this.$el.empty();
-            var columnName = this.column.get('name');
-            var state = this.collection.state || {};
-            var totals = state.totals || {};
+            const columnName = this.column.get('name');
+            const state = this.collection.state || {};
+            const totals = state.totals || {};
 
             if (_.isUndefined(totals[this.options.rowName])) {
                 this.$el.removeClass('renderable');
@@ -73,7 +71,7 @@ define([
             }
             if (!_.isUndefined(totals[this.options.rowName]) &&
                 _.has(totals[this.options.rowName].columns, columnName)) {
-                var columnTotals = totals[this.options.rowName].columns[columnName];
+                const columnTotals = totals[this.options.rowName].columns[columnName];
                 if (!columnTotals.label && !columnTotals.total) {
                     return this;
                 }
@@ -84,7 +82,7 @@ define([
             }
 
             if (!_.isUndefined(this.column.attributes.cell.prototype.className)) {
-                var className = this.column.attributes.cell.prototype.className;
+                const className = this.column.attributes.cell.prototype.className;
                 this.$el.addClass(_.isFunction(className) ? className.call(this) : className);
             }
 

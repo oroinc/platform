@@ -10,8 +10,7 @@ define([
 ], function(_, Backbone, __, PaginationInput, VisibleItemsCounter, PageSize, ActionsPanel, SortingDropdown) {
     'use strict';
 
-    var Toolbar;
-    var $ = Backbone.$;
+    const $ = Backbone.$;
 
     /**
      * Datagrid toolbar widget
@@ -20,7 +19,7 @@ define([
      * @class   orodatagrid.datagrid.Toolbar
      * @extends Backbone.View
      */
-    Toolbar = Backbone.View.extend({
+    const Toolbar = Backbone.View.extend({
         /** @property */
         template: '#template-datagrid-toolbar',
 
@@ -63,8 +62,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function Toolbar() {
-            Toolbar.__super__.constructor.apply(this, arguments);
+        constructor: function Toolbar(options) {
+            Toolbar.__super__.constructor.call(this, options);
         },
 
         /**
@@ -84,7 +83,7 @@ define([
 
             this.collection = options.collection;
 
-            var optionsiIemsCounter = _.defaults({collection: this.collection}, options.itemsCounter);
+            const optionsiIemsCounter = _.defaults({collection: this.collection}, options.itemsCounter);
             options.columns.trigger('configureInitializeOptions', this.itemsCounter, optionsiIemsCounter);
 
             this.subviews = {
@@ -166,11 +165,10 @@ define([
          * Render toolbar with pager and other views
          */
         render: function() {
-            var $pagination;
             this.$el.empty();
             this.$el.append(this.template({toolbarPosition: this.$el.data('gridToolbar')}));
 
-            $pagination = this.subviews.pagination.render().$el;
+            const $pagination = this.subviews.pagination.render().$el;
             $pagination.attr('class', this.$(this.selector.pagination).attr('class'));
 
             this.$(this.selector.pagination).replaceWith($pagination);

@@ -1,25 +1,24 @@
 define(function(require) {
     'use strict';
 
-    var PermissionModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
-    PermissionModel = BaseModel.extend({
+    const PermissionModel = BaseModel.extend({
         _initialAccessLevel: null,
 
         /**
          * @inheritDoc
          */
-        constructor: function PermissionModel() {
-            PermissionModel.__super__.constructor.apply(this, arguments);
+        constructor: function PermissionModel(attrs, options) {
+            PermissionModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
+        initialize: function(attrs, options) {
             this._initialAccessLevel = this.get('access_level');
-            PermissionModel.__super__.initialize.apply(this, arguments);
+            PermissionModel.__super__.initialize.call(this, attrs, options);
         },
 
         isAccessLevelChanged: function() {

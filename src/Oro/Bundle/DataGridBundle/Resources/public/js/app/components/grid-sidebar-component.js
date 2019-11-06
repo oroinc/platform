@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var GridSidebarComponent;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
-    var routing = require('routing');
-    var widgetManager = require('oroui/js/widget-manager');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var PageableCollection = require('orodatagrid/js/pageable-collection');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
+    const routing = require('routing');
+    const widgetManager = require('oroui/js/widget-manager');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const PageableCollection = require('orodatagrid/js/pageable-collection');
 
-    GridSidebarComponent = BaseComponent.extend({
+    const GridSidebarComponent = BaseComponent.extend({
         /**
          * @property {Object}
          */
@@ -39,8 +38,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function GridSidebarComponent() {
-            GridSidebarComponent.__super__.constructor.apply(this, arguments);
+        constructor: function GridSidebarComponent(options) {
+            GridSidebarComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -59,7 +58,7 @@ define(function(require) {
             if (collection.inputName === this.options.widgetRouteParameters.gridName) {
                 this.gridCollection = collection;
 
-                var self = this;
+                const self = this;
                 widgetManager.getWidgetInstanceByAlias(
                     this.options.widgetAlias,
                     function() {
@@ -67,7 +66,7 @@ define(function(require) {
                     }
                 );
 
-                var foundGrid = this.options._sourceElement
+                const foundGrid = this.options._sourceElement
                     .closest('[data-role="grid-sidebar-component-container"]')
                     .find(gridElement);
                 if (foundGrid.length) {
@@ -80,13 +79,13 @@ define(function(require) {
          * @param {Object} data
          */
         onSidebarChange: function(data) {
-            var params = _.extend(
+            const params = _.extend(
                 this._getQueryParamsFromUrl(location.search),
                 this._getDatagridParams(),
                 data.params
             );
             data = _.extend({reload: true, updateUrl: true}, data);
-            var widgetParams = _.extend(
+            const widgetParams = _.extend(
                 _.omit(this.options.widgetRouteParameters, this.options.gridParam),
                 params
             );
@@ -99,7 +98,7 @@ define(function(require) {
 
             if (data.reload) {
                 if (data.widgetReload) {
-                    var self = this;
+                    const self = this;
                     widgetManager.getWidgetInstanceByAlias(
                         this.options.widgetAlias,
                         function(widget) {
@@ -122,13 +121,13 @@ define(function(require) {
          * @private
          */
         _patchGridCollectionUrl: function(params) {
-            var collection = this.gridCollection;
+            const collection = this.gridCollection;
             if (!_.isUndefined(collection)) {
-                var url = collection.url;
+                let url = collection.url;
                 if (_.isUndefined(url)) {
                     return;
                 }
-                var newParams = _.extend(
+                const newParams = _.extend(
                     this._getQueryParamsFromUrl(url),
                     _.omit(params, this.options.gridParam)
                 );
@@ -146,8 +145,8 @@ define(function(require) {
          * @param {Object} params
          */
         _pushState: function(params) {
-            var paramsString = this._urlParamsToString(_.omit(params, ['saveState']));
-            var current = mediator.execute('pageCache:getCurrent');
+            const paramsString = this._urlParamsToString(_.omit(params, ['saveState']));
+            const current = mediator.execute('pageCache:getCurrent');
             mediator.execute('changeUrl', current.path + '?' + paramsString);
         },
 
@@ -165,7 +164,7 @@ define(function(require) {
                 return {};
             }
 
-            var query = url.substring(url.indexOf('?') + 1, url.length);
+            const query = url.substring(url.indexOf('?') + 1, url.length);
             if (!query.length) {
                 return {};
             }
@@ -187,7 +186,7 @@ define(function(require) {
          * @private
          */
         _getDatagridParams: function() {
-            var params = {};
+            const params = {};
             if (!_.has(this.gridCollection, 'options')) {
                 return params;
             }

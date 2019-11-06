@@ -14,7 +14,7 @@ define([
          * @return {*}
          */
         formatValue: function(data, format) {
-            var date;
+            let date;
             switch (format) {
                 case 'integer':
                 case 'smallint':
@@ -86,7 +86,7 @@ define([
                     return dateTimeFormatter.unformatBackendDateTime(data).valueOf(); // add convert to date
                 case 'datetime':
                 case 'time':
-                    var date = dateTimeFormatter.unformatBackendDateTime(data);
+                    const date = dateTimeFormatter.unformatBackendDateTime(data);
                     return date;
                 default:
                     return null;

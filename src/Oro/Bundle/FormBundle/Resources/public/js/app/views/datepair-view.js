@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var _ONE_DAY = 86400000;
-    var DatepairView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var moment = require('moment');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var Datepair = require('datepair');
+    const _ONE_DAY = 86400000;
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const moment = require('moment');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const Datepair = require('datepair');
 
     require('jquery.timepicker');
 
-    DatepairView = BaseView.extend({
+    const DatepairView = BaseView.extend({
 
         /**
          * Use native pickers of proper HTML-inputs
@@ -47,8 +46,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DatepairView() {
-            DatepairView.__super__.constructor.apply(this, arguments);
+        constructor: function DatepairView(options) {
+            DatepairView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -59,12 +58,12 @@ define(function(require) {
         initialize: function(options) {
             _.extend(this, _.pick(options, ['nativeMode']));
             this.options = _.defaults(_.pick(options, _.keys(this.options)), this.options);
-            DatepairView.__super__.initialize.apply(this, arguments);
+            DatepairView.__super__.initialize.call(this, options);
             this.initDatepair();
         },
 
         initDatepair: function() {
-            var options = _.extend(_.pick(this.options, 'startClass', 'endClass', 'timeClass', 'dateClass'), {
+            const options = _.extend(_.pick(this.options, 'startClass', 'endClass', 'timeClass', 'dateClass'), {
                 parseTime: this._parseTime.bind(this),
                 updateTime: this._updateTime.bind(this),
                 setMinTime: this._setMinTime.bind(this),
@@ -77,7 +76,7 @@ define(function(require) {
 
         _parseTime: function(input) {
             if (this.nativeMode) {
-                var momentInstance = moment($(input).val(), this.nativeTimeFormat, true);
+                const momentInstance = moment($(input).val(), this.nativeTimeFormat, true);
 
                 return momentInstance.toDate();
             } else {
@@ -87,7 +86,7 @@ define(function(require) {
 
         _parseDate: function(input) {
             if (this.nativeMode) {
-                var momentInstance = moment($(input).val(), this.nativeDateFormat, true);
+                const momentInstance = moment($(input).val(), this.nativeDateFormat, true);
 
                 return momentInstance.toDate();
             } else {
@@ -103,7 +102,7 @@ define(function(require) {
 
         _updateTime: function(input, dateObj) {
             if (this.nativeMode) {
-                var momentInstance = moment(dateObj);
+                const momentInstance = moment(dateObj);
                 $(input).val(momentInstance.format(this.nativeTimeFormat));
             } else {
                 $(input).timepicker('setTime', dateObj);
@@ -114,7 +113,7 @@ define(function(require) {
 
         _updateDate: function(input, dateObj) {
             if (this.nativeMode) {
-                var momentInstance = moment(dateObj);
+                const momentInstance = moment(dateObj);
                 $(input).val(momentInstance.format(this.nativeDateFormat));
             } else {
                 // calls 'setDate' method instead of native 'update'
@@ -126,14 +125,14 @@ define(function(require) {
 
         handleRangeError: function() {
             // resets 'start' and 'end' fields to default values on range error
-            var startDateInput = this.$('.' + this.options.startClass + '.' + this.options.dateClass);
-            var endDateInput = this.$('.' + this.options.endClass + '.' + this.options.dateClass);
-            var startTimeInput = this.$('.' + this.options.startClass + '.' + this.options.timeClass);
-            var endTimeInput = this.$('.' + this.options.endClass + '.' + this.options.timeClass);
-            var startDate = this._parseDate($(startDateInput));
-            var startTime = this._parseTime($(startTimeInput));
-            var newDate = new Date(startDate.getTime() + this.options.defaultDateDelta * _ONE_DAY);
-            var newTime = new Date(startTime.getTime() + this.options.defaultTimeDelta);
+            const startDateInput = this.$('.' + this.options.startClass + '.' + this.options.dateClass);
+            const endDateInput = this.$('.' + this.options.endClass + '.' + this.options.dateClass);
+            const startTimeInput = this.$('.' + this.options.startClass + '.' + this.options.timeClass);
+            const endTimeInput = this.$('.' + this.options.endClass + '.' + this.options.timeClass);
+            const startDate = this._parseDate($(startDateInput));
+            const startTime = this._parseTime($(startTimeInput));
+            const newDate = new Date(startDate.getTime() + this.options.defaultDateDelta * _ONE_DAY);
+            const newTime = new Date(startTime.getTime() + this.options.defaultTimeDelta);
             this._updateDate($(endDateInput), newDate);
             this._updateTime($(endTimeInput), newTime);
         }

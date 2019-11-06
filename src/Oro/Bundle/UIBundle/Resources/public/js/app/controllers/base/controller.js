@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var BaseController;
-    var $ = require('jquery');
-    var Chaplin = require('chaplin');
-    var beforeActionPromises = [
+    const $ = require('jquery');
+    const Chaplin = require('chaplin');
+    const beforeActionPromises = [
         // add DOM Ready promise to loads promises,
         // in order to prevent route action execution before the page is ready
         $.ready
     ];
 
-    BaseController = Chaplin.Controller.extend({
+    const BaseController = Chaplin.Controller.extend({
         /**
          * Handles before-action activity
          *  - initializes cache (on first route)
@@ -19,7 +18,7 @@ define(function(require) {
          * @override
          */
         beforeAction: function(params, route, options) {
-            BaseController.__super__.beforeAction.apply(this, arguments);
+            BaseController.__super__.beforeAction.call(this, params, route, options);
 
             // if it's first time route
             if (!route.previous) {
@@ -27,7 +26,7 @@ define(function(require) {
                 this.cache.init(route);
             }
 
-            return $.when.apply($, beforeActionPromises);
+            return $.when(...beforeActionPromises);
         },
 
         /**
@@ -38,8 +37,7 @@ define(function(require) {
          * @private
          */
         _combineRouteUrl: function(route) {
-            var url;
-            url = Chaplin.mediator.execute('combineFullUrl', route.path, route.query);
+            const url = Chaplin.mediator.execute('combineFullUrl', route.path, route.query);
             return url;
         },
 
@@ -53,9 +51,9 @@ define(function(require) {
              * @param {Object} route
              */
             init: function(route) {
-                var path = route.path;
-                var query = route.query;
-                var userName = Chaplin.mediator.execute('retrieveOption', 'userName') || false;
+                const path = route.path;
+                const query = route.query;
+                const userName = Chaplin.mediator.execute('retrieveOption', 'userName') || false;
                 Chaplin.mediator.execute({
                     name: 'pageCache:init',
                     silent: true

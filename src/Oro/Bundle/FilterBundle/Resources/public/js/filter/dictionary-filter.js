@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var DictionaryFilter;
-    var template = require('tpl-loader!orofilter/templates/filter/dictionary-filter.html');
-    var fieldTemplate = require('tpl-loader!orofilter/templates/filter/select-field.html');
-    var $ = require('jquery');
-    var routing = require('routing');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var ChoiceFilter = require('oro/filter/choice-filter');
-    var tools = require('oroui/js/tools');
+    const template = require('tpl-loader!orofilter/templates/filter/dictionary-filter.html');
+    const fieldTemplate = require('tpl-loader!orofilter/templates/filter/select-field.html');
+    const $ = require('jquery');
+    const routing = require('routing');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const ChoiceFilter = require('oro/filter/choice-filter');
+    const tools = require('oroui/js/tools');
     require('jquery.select2');
 
     /**
@@ -19,7 +18,7 @@ define(function(require) {
      * @class   oro.filter.DictionaryFilter
      * @extends oro.filter.ChoiceFilter
      */
-    DictionaryFilter = ChoiceFilter.extend({
+    const DictionaryFilter = ChoiceFilter.extend({
         /* eslint-disable quote-props */
         /**
          * select2 will apply to element with this selector
@@ -87,8 +86,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DictionaryFilter() {
-            DictionaryFilter.__super__.constructor.apply(this, arguments);
+        constructor: function DictionaryFilter(options) {
+            DictionaryFilter.__super__.constructor.call(this, options);
         },
 
         /**
@@ -108,16 +107,16 @@ define(function(require) {
             this.listenTo(this, 'renderCriteriaLoadValues', this.renderCriteriaLoadValues);
             this.listenTo(this, 'updateCriteriaLabels', this.updateCriteriaLabels);
 
-            DictionaryFilter.__super__.initialize.apply(this, arguments);
+            DictionaryFilter.__super__.initialize.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         reset: function() {
-            DictionaryFilter.__super__.reset.apply(this, arguments);
-            var select2element = this.$el.find(this.elementSelector);
-            var data = select2element.inputWidget('data');
+            DictionaryFilter.__super__.reset.call(this);
+            const select2element = this.$el.find(this.elementSelector);
+            const data = select2element.inputWidget('data');
             if (data) {
                 this.previousData = data;
             }
@@ -141,10 +140,10 @@ define(function(require) {
          * @param successEventName
          */
         loadValuesById: function(successEventName) {
-            var self = this;
+            const self = this;
 
             if (this.select2ConfigData === null) {
-                var $container = self.$(self.elementSelector).parent();
+                const $container = self.$(self.elementSelector).parent();
 
                 $container.addClass('loading');
 
@@ -165,11 +164,11 @@ define(function(require) {
                     }
                 });
             } else {
-                var select2ConfigData = this.select2ConfigData;
-                var value = this.value.value;
-                var result = {
+                const select2ConfigData = this.select2ConfigData;
+                const value = this.value.value;
+                const result = {
                     results: _.filter(select2ConfigData, function(item) {
-                        var id = item.id.toString();
+                        const id = item.id.toString();
                         return _.indexOf(value, id) !== -1;
                     })
                 };
@@ -213,7 +212,7 @@ define(function(require) {
          * @returns {oro.filter.DictionaryFilter}
          */
         updateLocalValues: function(values) {
-            var ids = [];
+            const ids = [];
             _.each(values, function(item) {
                 ids.push(item.id);
                 this.selectedData[item.id] = item;
@@ -236,17 +235,17 @@ define(function(require) {
          * Render template for filter
          */
         renderTemplate: function() {
-            var value = _.extend({}, this.emptyValue, this.value);
-            var selectedChoiceLabel = '';
+            const value = _.extend({}, this.emptyValue, this.value);
+            let selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
-                var foundChoice = _.find(this.choices, function(choice) {
+                const foundChoice = _.find(this.choices, function(choice) {
                     return value.type === choice.value;
                 });
                 selectedChoiceLabel = foundChoice.label;
             }
-            var parts = this._getParts();
+            const parts = this._getParts();
 
-            var $filter = $(this.template({
+            const $filter = $(this.template({
                 parts: parts,
                 isEmpty: false,
                 showLabel: this.showLabel,
@@ -265,10 +264,10 @@ define(function(require) {
          * init select2 for input
          */
         applySelect2: function() {
-            var self = this;
-            var select2Config = this.getSelect2Config();
-            var select2element = this.$el.find(this.elementSelector);
-            var values = this.getDataForSelect2();
+            const self = this;
+            const select2Config = this.getSelect2Config();
+            const select2element = this.$el.find(this.elementSelector);
+            const values = this.getDataForSelect2();
 
             select2element.removeClass('hide');
             select2element.attr('multiple', 'multiple');
@@ -289,7 +288,7 @@ define(function(require) {
          * Return config for select2
          */
         getSelect2Config: function() {
-            var config = {
+            const config = {
                 multiple: true,
                 containerCssClass: 'dictionary-filter',
                 dropdownAutoWidth: true,
@@ -342,9 +341,9 @@ define(function(require) {
          * @returns {Array}
          */
         getDataForSelect2: function() {
-            var values = [];
+            const values = [];
             _.each(this.value.value, function(value) {
-                var item = this.selectedData[value];
+                const item = this.selectedData[value];
 
                 if (item) {
                     values.push({
@@ -364,7 +363,7 @@ define(function(require) {
             if (this.isEmptyType(this.value.type)) {
                 return false;
             }
-            var value = this.getValue();
+            const value = this.getValue();
 
             return !value.value || value.value.length === 0;
         },
@@ -373,10 +372,10 @@ define(function(require) {
          * @inheritDoc
          */
         _getParts: function() {
-            var value = _.extend({}, this.emptyValue, this.getValue());
-            var dictionaryPartTemplate = this._getTemplate('fieldTemplate');
-            var parts = [];
-            var selectedPartLabel = this._getSelectedChoiceLabel('choices', this.value);
+            const value = _.extend({}, this.emptyValue, this.getValue());
+            const dictionaryPartTemplate = this._getTemplate('fieldTemplate');
+            const parts = [];
+            const selectedPartLabel = this._getSelectedChoiceLabel('choices', this.value);
             // add date parts only if embed template used
             if (this.templateTheme !== '') {
                 parts.push(
@@ -402,7 +401,7 @@ define(function(require) {
         setValue: function(value) {
             this.preloadSelectedData(value);
 
-            var oldValue = this.value;
+            const oldValue = this.value;
             this.value = tools.deepClone(value);
             this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
             this._updateDOMValue();
@@ -425,7 +424,7 @@ define(function(require) {
                 return;
             }
 
-            var data = this.$(this.elementSelector).inputWidget('data');
+            const data = this.$(this.elementSelector).inputWidget('data');
             _.each(data, function(elem) {
                 if (!('id' in elem)) {
                     return;
@@ -450,7 +449,7 @@ define(function(require) {
          * @inheritDoc
          */
         _readDOMValue: function() {
-            var value;
+            let value;
             if (this.isInitSelect2) {
                 value = this.$el.find('.select-values-autocomplete').inputWidget('val');
             } else {
@@ -466,9 +465,9 @@ define(function(require) {
          * @inheritDoc
          */
         _getSelectedChoiceLabel: function(property, value) {
-            var selectedChoiceLabel = '';
+            let selectedChoiceLabel = '';
             if (!_.isEmpty(this[property])) {
-                var foundChoice = _.find(this[property], function(choice) {
+                const foundChoice = _.find(this[property], function(choice) {
                     return (choice.value === value.type);
                 });
 
@@ -484,11 +483,11 @@ define(function(require) {
          * @inheritDoc
          */
         _getCriteriaHint: function() {
-            var value = this._getDisplayValue();
-            var option = null;
+            const value = this._getDisplayValue();
+            let option = null;
 
             if (!_.isUndefined(value.type)) {
-                var type = value.type;
+                const type = value.type;
                 option = this._getChoiceOption(type);
 
                 if (this.isEmptyType(type)) {
@@ -501,13 +500,13 @@ define(function(require) {
             }
 
             if (this.valueIsLoaded(value.value)) {
-                var self = this;
+                const self = this;
 
-                var hintRawValue = _.isObject(_.first(value.value))
+                const hintRawValue = _.isObject(_.first(value.value))
                     ? _.map(value.value, _.property('text'))
                     : _.chain(value.value)
                         .map(function(id) {
-                            var item = _.find(self.selectedData, function(item) {
+                            const item = _.find(self.selectedData, function(item) {
                                 return item.id.toString() === id.toString();
                             });
 
@@ -516,7 +515,7 @@ define(function(require) {
                         .filter(_.negate(_.isUndefined))
                         .value();
 
-                var hintValue = this.wrapHintValue ? ('"' + hintRawValue + '"') : hintRawValue;
+                const hintValue = this.wrapHintValue ? ('"' + hintRawValue + '"') : hintRawValue;
 
                 return (option ? option.label + ' ' : '') + hintValue;
             } else {
@@ -529,7 +528,7 @@ define(function(require) {
          */
         _hideCriteria: function() {
             this.$el.find(this.elementSelector).inputWidget('close');
-            DictionaryFilter.__super__._hideCriteria.apply(this, arguments);
+            DictionaryFilter.__super__._hideCriteria.call(this);
         },
 
         /**
@@ -541,8 +540,8 @@ define(function(require) {
          */
         valueIsLoaded: function(values) {
             if (values) {
-                var foundItems = 0;
-                var self = this;
+                let foundItems = 0;
+                const self = this;
                 _.each(values, function(item) {
                     if (self.selectedData && self.selectedData[item]) {
                         foundItems++;

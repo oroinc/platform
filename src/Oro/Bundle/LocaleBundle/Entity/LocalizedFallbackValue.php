@@ -9,6 +9,8 @@ use Oro\Bundle\LocaleBundle\Model\ExtendLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
 /**
+ * Holds string data related to the some localization.
+ *
  * @ORM\Table(
  *      name="oro_fallback_localization_val",
  *      indexes={
@@ -191,13 +193,16 @@ class LocalizedFallbackValue extends ExtendLocalizedFallbackValue
      */
     public function __toString()
     {
-        if ($this->string) {
-            return (string)$this->string;
-        } elseif ($this->text) {
-            return (string)$this->text;
-        } else {
-            return '';
+        $fields = get_object_vars($this);
+        ksort($fields);
+
+        foreach ($fields as $field => $value) {
+            if ($value && is_string($value) && !in_array($field, ['id', 'fallback'], true)) {
+                return $value;
+            }
         }
+
+        return '';
     }
 
     public function __clone()

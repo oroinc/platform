@@ -1,8 +1,8 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var Translator = require('orotranslation/lib/translator');
-    var config = require('module-config').default(module.id);
+    const Translator = require('orotranslation/lib/translator');
+    const config = require('module-config').default(module.id);
 
     return fetch(config.translationsResources)
         .then(function(response) {

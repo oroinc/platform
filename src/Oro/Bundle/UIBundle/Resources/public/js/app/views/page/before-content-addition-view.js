@@ -2,16 +2,14 @@ define(['./../base/page-region-view'
 ], function(PageRegionView) {
     'use strict';
 
-    var PageBeforeContentAdditionView;
-
-    PageBeforeContentAdditionView = PageRegionView.extend({
+    const PageBeforeContentAdditionView = PageRegionView.extend({
         pageItems: ['beforeContentAddition'],
 
         /**
          * @inheritDoc
          */
-        constructor: function PageBeforeContentAdditionView() {
-            PageBeforeContentAdditionView.__super__.constructor.apply(this, arguments);
+        constructor: function PageBeforeContentAdditionView(options) {
+            PageBeforeContentAdditionView.__super__.constructor.call(this, options);
         },
 
         template: function(data) {

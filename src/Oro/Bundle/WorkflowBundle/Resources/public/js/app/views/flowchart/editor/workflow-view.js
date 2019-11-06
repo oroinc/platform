@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var FlowchartEditorWorkflowView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var FlowchartViewerWorkflowView = require('../viewer/workflow-view');
-    var FlowChartEditorTransitionOverlayView = require('./transition-overlay-view');
-    var FlowchartEditorStepView = require('./step-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const FlowchartViewerWorkflowView = require('../viewer/workflow-view');
+    const FlowChartEditorTransitionOverlayView = require('./transition-overlay-view');
+    const FlowchartEditorStepView = require('./step-view');
 
-    FlowchartEditorWorkflowView = FlowchartViewerWorkflowView.extend({
+    const FlowchartEditorWorkflowView = FlowchartViewerWorkflowView.extend({
         isConnected: false,
 
         transitionOverlayView: FlowChartEditorTransitionOverlayView,
@@ -22,8 +21,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function FlowchartEditorWorkflowView() {
-            FlowchartEditorWorkflowView.__super__.constructor.apply(this, arguments);
+        constructor: function FlowchartEditorWorkflowView(options) {
+            FlowchartEditorWorkflowView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -36,7 +35,7 @@ define(function(require) {
         },
 
         connect: function() {
-            FlowchartEditorWorkflowView.__super__.connect.apply(this, arguments);
+            FlowchartEditorWorkflowView.__super__.connect.call(this);
             this.jsPlumbInstance.bind('connectionDrag', _.bind(this.onConnectionDragStart, this));
             this.jsPlumbInstance.bind('connectionDragStop', _.bind(this.onConnectionDragStop, this));
             this.jsPlumbInstance.bind('beforeDrop', _.bind(this.onBeforeConnectionDrop, this));
@@ -54,12 +53,12 @@ define(function(require) {
         },
 
         onBeforeConnectionDrop: function(data) {
-            var transitionModel;
-            var transitionName;
-            var startingSteps;
-            var suspendedStep;
-            var stepFrom = this.findStepModelByElement(data.connection.source);
-            var stepTo = this.findStepModelByElement(data.connection.target);
+            let transitionModel;
+            let transitionName;
+            let startingSteps;
+            let suspendedStep;
+            const stepFrom = this.findStepModelByElement(data.connection.source);
+            const stepTo = this.findStepModelByElement(data.connection.target);
             if (data.connection.suspendedElement && !stepTo.get('_is_start')) {
                 transitionModel = data.connection.overlayView.model;
                 transitionName = transitionModel.get('name');

@@ -132,6 +132,10 @@
             text-align: center;
             border: none;
 
+            .message {
+                text-align: center;
+            }
+
             &:before {
                 content: none;
             }
