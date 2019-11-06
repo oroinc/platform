@@ -1,21 +1,3 @@
-parameters:
-    oro_ui.router.class:                                   Oro\Bundle\UIBundle\Route\Router
-    oro_ui.format_converter.date_time.jquery_ui.class:     Oro\Bundle\UIBundle\Converter\JqueryUiDateTimeFormatConverter
-
-    oro_ui.label_provider.action_button.class:             Oro\Bundle\UIBundle\Provider\ActionButtonLabelProvider
-    oro_ui.label_provider.action_button_group.class:       Oro\Bundle\UIBundle\Provider\ActionButtonGroupLabelProvider
-    oro_ui.widget_provider.action_button.class:            Oro\Bundle\UIBundle\Provider\ActionButtonWidgetProvider
-    oro_ui.widget_provider.view_actions.class:             Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
-    oro_ui.widget_provider.update_actions.class:           Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
-    oro_ui.content_provider.manager.class:                 Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager
-
-    oro_ui.provider.widget_context.class:                  Oro\Bundle\UIBundle\Provider\WidgetContextProvider
-
-    oro_ui.config_settings.listener.class:                 Oro\Bundle\UIBundle\EventListener\ConfigSettingsListener
-
-    oro_ui.html_tag_helper.class:                          Oro\Bundle\UIBundle\Tools\HtmlTagHelper
-    oro_ui.user_agent_provider.class:                      Oro\Bundle\UIBundle\Provider\UserAgentProvider
-
 services:
     # Placeholder services
     oro_ui.placeholder.provider:
@@ -46,7 +28,7 @@ services:
 
     # Other services
     oro_ui.router:
-        class: '%oro_ui.router.class%'
+        class: Oro\Bundle\UIBundle\Route\Router
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
@@ -89,12 +71,12 @@ services:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     oro_ui.config_settings.listener:
-        class: '%oro_ui.config_settings.listener.class%'
+        class: Oro\Bundle\UIBundle\EventListener\ConfigSettingsListener
         tags:
             - { name: kernel.event_listener, event: oro_config.settings_before_save.oro_ui.application_url, method: onBeforeSave }
 
     oro_ui.format_converter.date_time.jquery_ui:
-        class: '%oro_ui.format_converter.date_time.jquery_ui.class%'
+        class: Oro\Bundle\UIBundle\Converter\JqueryUiDateTimeFormatConverter
         arguments:
             - '@oro_locale.formatter.date_time'
             - '@translator'
@@ -103,23 +85,23 @@ services:
 
     oro_ui.label_provider.action_button.abstract:
         abstract: true
-        class: '%oro_ui.label_provider.action_button.class%'
+        class: Oro\Bundle\UIBundle\Provider\ActionButtonLabelProvider
         arguments:
             - '@translator'
 
     oro_ui.label_provider.action_button_group:
-        class: '%oro_ui.label_provider.action_button_group.class%'
+        class: Oro\Bundle\UIBundle\Provider\ActionButtonGroupLabelProvider
         arguments:
             - '@translator'
 
     oro_ui.widget_provider.action_button.abstract:
         abstract: true
-        class: '%oro_ui.widget_provider.action_button.class%'
+        class: Oro\Bundle\UIBundle\Provider\ActionButtonWidgetProvider
         arguments:
             - '@oro_ui.placeholder.provider'
 
     oro_ui.widget_provider.view_actions:
-        class: '%oro_ui.widget_provider.view_actions.class%'
+        class: Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
         public: true
         arguments:
             - '@oro_ui.label_provider.action_button_group'
@@ -127,7 +109,7 @@ services:
             - '%oro_ui.widget_provider.view_actions.page_type%'
 
     oro_ui.widget_provider.update_actions:
-        class: '%oro_ui.widget_provider.update_actions.class%'
+        class: Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
         public: true
         arguments:
             - '@oro_ui.label_provider.action_button_group'
@@ -135,24 +117,24 @@ services:
             - '%oro_ui.widget_provider.update_actions.page_type%'
 
     oro_ui.content_provider.manager:
-        class: '%oro_ui.content_provider.manager.class%'
+        class: Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager
 
     Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager:
         alias: oro_ui.content_provider.manager
 
     oro_ui.provider.widget_context:
-        class: '%oro_ui.provider.widget_context.class%'
+        class: Oro\Bundle\UIBundle\Provider\WidgetContextProvider
         arguments:
             - '@request_stack'
 
     oro_ui.html_tag_helper:
-        class: '%oro_ui.html_tag_helper.class%'
+        class: Oro\Bundle\UIBundle\Tools\HtmlTagHelper
         arguments:
             - '@oro_form.provider.html_tag_provider'
             - '%kernel.cache_dir%'
 
     oro_ui.flash_message_helper:
-        class: 'Oro\Bundle\UIBundle\Tools\FlashMessageHelper'
+        class: Oro\Bundle\UIBundle\Tools\FlashMessageHelper
         arguments:
             - '@session'
             - '@translator'
@@ -162,7 +144,7 @@ services:
         alias: 'oro_ui.flash_message_helper'
 
     oro_ui.user_agent_provider:
-        class: '%oro_ui.user_agent_provider.class%'
+        class: Oro\Bundle\UIBundle\Provider\UserAgentProvider
         arguments:
             - '@request_stack'
 
@@ -196,7 +178,7 @@ services:
             - { name: kernel.cache_warmer, priority: 250 }
 
     oro_ui.config_extension.feature:
-        class: 'Oro\Bundle\UIBundle\Configuration\FeatureConfigurationExtension'
+        class: Oro\Bundle\UIBundle\Configuration\FeatureConfigurationExtension
         tags:
             - { name: oro_feature.config_extension }
 
@@ -252,7 +234,7 @@ services:
             - ['disableUseDefaultFor', ['app', 'oro_ui', 'application_url']]
 
     oro_ui.validator.move_to_child:
-        class: 'Oro\Bundle\UIBundle\Validator\Constraints\MoveToChildValidator'
+        class: Oro\Bundle\UIBundle\Validator\Constraints\MoveToChildValidator
         arguments:
             - '@translator'
         tags:

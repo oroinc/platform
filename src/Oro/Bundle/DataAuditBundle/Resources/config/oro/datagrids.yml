@@ -72,7 +72,7 @@ datagrids:
                 loggedAt:
                     data_name: a.loggedAt
             default:
-                id: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                id: DESC
         filters:
             columns:
                 action:
@@ -161,5 +161,5 @@ datagrids:
                 loggedAt:
                     data_name: a.loggedAt
             default:
-                id: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                id: DESC
         filters: ~

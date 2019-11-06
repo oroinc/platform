@@ -1,63 +1,42 @@
-parameters:
-    oro_filter.form.event_subscriber.date.class: Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber
-
-    oro_filter.form.type.date_range.class: Oro\Bundle\FilterBundle\Form\Type\DateRangeType
-    oro_filter.form.type.datetime_range.class: Oro\Bundle\FilterBundle\Form\Type\DateTimeRangeType
-
-    oro_filter.form.type.filter.class: Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType
-    oro_filter.form.type.filter.choice.class: Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType
-    oro_filter.form.type.filter.text.class: Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType
-    oro_filter.form.type.filter.number.class: Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType
-    oro_filter.form.type.filter.number_range.class: Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterType
-    oro_filter.form.type.filter.date_range.class: Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType
-    oro_filter.form.type.filter.datetime_range.class: Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType
-    oro_filter.form.type.filter.boolean.class: Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType
-    oro_filter.form.type.filter.entity.class: Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType
-    oro_filter.form.type.filter.selectrow.class: Oro\Bundle\FilterBundle\Form\Type\Filter\SelectRowFilterType
-    oro_filter.form.type.filter.many_to_many.class: Oro\Bundle\FilterBundle\Form\Type\Filter\ManyToManyFilterType
-    oro_filter.form.type.filter.choice_tree.class: Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceTreeFilterType
-    oro_filter.type.enum_filter.class: Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType
-    oro_filter.type.dictionary_filter.class: Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType
-
 services:
     oro_filter.form.event_subscriber.date:
-        class: '%oro_filter.form.event_subscriber.date.class%'
+        class: Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber
         arguments:
             - '@oro_filter.utils.date_filter_modifier'
             - '@oro_locale.settings'
 
     oro_filter.form.type.date_range:
-        class: '%oro_filter.form.type.date_range.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\DateRangeType
         arguments: ["@oro_locale.settings"]
         tags:
             - { name: form.type, alias: oro_type_date_range }
 
     oro_filter.form.type.datetime_range:
-        class: '%oro_filter.form.type.datetime_range.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\DateTimeRangeType
         arguments: ["@oro_locale.settings"]
         tags:
             - { name: form.type, alias: oro_type_datetime_range }
 
     oro_filter.form.type.filter:
-        class: '%oro_filter.form.type.filter.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_filter }
 
     oro_filter.form.type.filter.choice:
-        class: '%oro_filter.form.type.filter.choice.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_choice_filter }
 
     oro_filter.form.type.filter.text:
-        class: '%oro_filter.form.type.filter.text.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_text_filter }
 
     oro_filter.form.type.filter.number:
-        class: '%oro_filter.form.type.filter.number.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType
         arguments:
             - '@translator'
             - '@oro_locale.settings'
@@ -65,13 +44,13 @@ services:
             - { name: form.type, alias: oro_type_number_filter }
 
     oro_filter.form.type.filter.number_range:
-        class: '%oro_filter.form.type.filter.number_range.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterType
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_number_range_filter }
 
     oro_filter.form.type.filter.date_range:
-        class: '%oro_filter.form.type.filter.date_range.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType
         arguments:
             - '@translator'
             - '@oro_filter.provider.datemodifierprovider'
@@ -80,7 +59,7 @@ services:
             - { name: form.type, alias: oro_type_date_range_filter }
 
     oro_filter.form.type.filter.datetime_range:
-        class: '%oro_filter.form.type.filter.datetime_range.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType
         arguments:
             - '@translator'
             - '@oro_filter.provider.datemodifierprovider'
@@ -89,37 +68,37 @@ services:
             - { name: form.type, alias: oro_type_datetime_range_filter }
 
     oro_filter.form.type.filter.boolean:
-        class: '%oro_filter.form.type.filter.boolean.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_boolean_filter }
 
     oro_filter.form.type.filter.entity:
-        class: '%oro_filter.form.type.filter.entity.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_entity_filter }
 
     oro_filter.form.type.filter.selectrow:
-        class: '%oro_filter.form.type.filter.selectrow.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\SelectRowFilterType
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_selectrow_filter }
 
     oro_filter.form.type.filter.many_to_many:
-        class: '%oro_filter.form.type.filter.many_to_many.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\ManyToManyFilterType
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_many_to_many_filter }
 
     oro_filter.form.type.filter.choice_tree:
-        class: '%oro_filter.form.type.filter.choice_tree.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceTreeFilterType
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_choice_tree_filter }
 
     oro_filter.type.enum_filter:
-        class: '%oro_filter.type.enum_filter.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType
         arguments:
             - '@translator'
             - '@oro_entity_extend.enum_value_provider'
@@ -127,7 +106,7 @@ services:
             - { name: form.type, alias: oro_enum_filter }
 
     oro_filter.type.dictionary_filter:
-        class: '%oro_filter.type.dictionary_filter.class%'
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType
         arguments:
             - '@translator'
             - '@oro_entity_extend.enum_value_provider'

@@ -1,23 +1,4 @@
-parameters:
-    oro_organization.form.type.business_unit.class:                  Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitType
-    oro_organization.form.handler.business_unit.class:               Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler
-    oro_organization.form.type.business_unit_tree_type.class:        Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeType
-    oro_organization.form.type.business_unit_tree_select_type.class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeSelectType
-    oro_organization.form.type.business_unit.api.class:              Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitApiType
-    oro_organization.form.type.business_unit_select.class:           Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectType
-
-    oro_organization.form.type.organization.class:                   Oro\Bundle\OrganizationBundle\Form\Type\OrganizationType
-    oro_organization.form.handler.organization.class:                Oro\Bundle\OrganizationBundle\Form\Handler\OrganizationHandler
-    oro_organization.form.type.organization_select.class:            Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType
-    oro_organization.form.type.organizations_select.class:           Oro\Bundle\OrganizationBundle\Form\Type\OrganizationsSelectType
-
-    oro_organization.form.extension.owner.class:                     Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension
-    oro_organization.form.extension.organization.class:              Oro\Bundle\OrganizationBundle\Form\Extension\OrganizationFormExtension
-
 services:
-    #
-    # Business Unit
-    #
     oro_organization.form.business_unit:
         class: Symfony\Component\Form\Form
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
@@ -28,7 +9,7 @@ services:
             - Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitType
 
     oro_organization.form.type.business_unit:
-        class: '%oro_organization.form.type.business_unit.class%'
+        class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitType
         arguments:
             - '@oro_organization.business_unit_manager'
             - '@oro_security.token_accessor'
@@ -36,7 +17,7 @@ services:
             - { name: form.type, alias: oro_business_unit }
 
     oro_organization.form.type.business_unit.api:
-        class: '%oro_organization.form.type.business_unit.api.class%'
+        class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitApiType
         arguments:
             - '@oro_organization.business_unit_manager'
             - '@oro_security.token_accessor'
@@ -44,7 +25,7 @@ services:
             - { name: form.type, alias: business_unit }
 
     oro_organization.form.handler.business_unit:
-        class: '%oro_organization.form.handler.business_unit.class%'
+        class: Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
@@ -53,14 +34,14 @@ services:
             - '@doctrine.orm.entity_manager'
 
     oro_organization.form.type.business_unit_tree_type:
-        class: '%oro_organization.form.type.business_unit_tree_type.class%'
+        class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeType
         arguments:
             - '@oro_organization.business_unit_manager'
         tags:
             - { name: form.type, alias: oro_business_unit_tree }
 
     oro_organization.form.type.business_unit_tree_select_type:
-        class: '%oro_organization.form.type.business_unit_tree_select_type.class%'
+        class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeSelectType
         tags:
             - { name: form.type, alias: oro_business_unit_tree_select }
 
@@ -72,7 +53,7 @@ services:
         arguments: ["business_unit", Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitApiType, null]
 
     oro_organization.form.handler.business_unit.api:
-        class: '%oro_organization.form.handler.business_unit.class%'
+        class: Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
@@ -80,15 +61,15 @@ services:
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
-    oro_organization.form.type.businesS_unit_select:
-        class: '%oro_organization.form.type.business_unit_select.class%'
+    oro_organization.form.type.business_unit_select:
+        class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectType
         arguments:
             - '@doctrine'
             - '@oro_security.token_accessor'
         tags:
             - { name: form.type, alias: oro_business_unit_select }
 
-    oro_organization.form.type.businesS_unit_select_autocomplete:
+    oro_organization.form.type.business_unit_select_autocomplete:
         class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectAutocomplete
         arguments:
             - '@doctrine.orm.entity_manager'
@@ -97,18 +78,15 @@ services:
         tags:
             - { name: form.type, alias: "oro_type_business_unit_select_autocomplete" }
 
-    #
-    # Organization
-    #
     oro_organization.form.type.organization:
-        class: '%oro_organization.form.type.organization.class%'
+        class: Oro\Bundle\OrganizationBundle\Form\Type\OrganizationType
         arguments:
             - '@oro_security.token_accessor'
         tags:
             - { name: form.type, alias: oro_organization }
 
     oro_organization.form.handler.organization:
-        class: '%oro_organization.form.handler.organization.class%'
+        class: Oro\Bundle\OrganizationBundle\Form\Handler\OrganizationHandler
         arguments:
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
@@ -117,23 +95,21 @@ services:
         alias: oro_organization.form.handler.organization
 
     oro_organization.form.type.organization_select:
-        class: '%oro_organization.form.type.organization_select.class%'
+        class: Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType
         tags:
             - { name: form.type, alias: oro_organization_select }
 
     oro_organization.form.type.organizations_select:
-        class: '%oro_organization.form.type.organizations_select.class%'
+        class: Oro\Bundle\OrganizationBundle\Form\Type\OrganizationsSelectType
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_organization.business_unit_manager'
             - '@oro_security.token_accessor'
         tags:
             - { name: form.type, alias: oro_organizations_select }
-    #
-    # Ownership
-    #
+
     oro_organization.form.extension.owner:
-        class: '%oro_organization.form.extension.owner.class%'
+        class: Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_security.owner.ownership_metadata_provider'
@@ -145,29 +121,23 @@ services:
             - '@oro_security.owner.entity_owner_accessor'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
-    #
-    # Organizations
-    #
+
     oro_organization.form.extension.organization:
-        class: '%oro_organization.form.extension.organization.class%'
+        class: Oro\Bundle\OrganizationBundle\Form\Extension\OrganizationFormExtension
         arguments:
             - '@doctrine'
             - '@oro_security.token_accessor'
             - '@oro_security.owner.ownership_metadata_provider.link'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
-    #
-    # Listeners
-    #
+
     oro_organization.form.listener:
-        class: '%oro_organization.form.listener.class%'
+        class: Oro\Bundle\OrganizationBundle\Event\FormListener
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
             - { name: kernel.event_listener, event: entity_form.render.before, method: addOwnerField }
-    #
-    # Autocomplete search handler
-    #
+
     oro_organization.autocomplete.organization.search_handler:
         parent: oro_form.autocomplete.search_handler
         arguments:
@@ -176,9 +146,6 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: organization, acl_resource: oro_organization_view }
 
-    #
-    # Dashboard
-    #
     oro_organization.form.type.widget_business_unit_select:
         class: Oro\Bundle\OrganizationBundle\Form\Type\WidgetBusinessUnitSelectType
         arguments:

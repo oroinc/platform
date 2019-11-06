@@ -20,6 +20,6 @@ services:
             - { name: oro_featuretogle.feature, feature: email }
 
     oro_sidebar.config_extension.feature:
-        class: 'Oro\Bundle\SidebarBundle\Configuration\FeatureConfigurationExtension'
+        class: Oro\Bundle\SidebarBundle\Configuration\FeatureConfigurationExtension
         tags:
             - { name: oro_feature.config_extension }

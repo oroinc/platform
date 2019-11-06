@@ -1,13 +1,10 @@
-parameters:
-    oro_entity_config.metadata.metadata_factory.class:         Metadata\MetadataFactory
-    oro_entity_config.metadata.annotation_driver.class:        Oro\Bundle\EntityConfigBundle\Metadata\Driver\AnnotationDriver
-
 services:
     oro_entity_config.metadata.annotation_metadata_factory:
-        class:                                              '%oro_entity_config.metadata.metadata_factory.class%'
-        arguments:                                          ['@oro_entity_config.metadata.annotation_driver']
+        class: Metadata\MetadataFactory
+        arguments:
+            - '@oro_entity_config.metadata.annotation_driver'
 
     oro_entity_config.metadata.annotation_driver:
-        class:                                              '%oro_entity_config.metadata.annotation_driver.class%'
-        arguments:                                          ['@annotation_reader']
-        public:                                             false
+        class: Oro\Bundle\EntityConfigBundle\Metadata\Driver\AnnotationDriver
+        arguments:
+            - '@annotation_reader'

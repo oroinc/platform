@@ -3,13 +3,6 @@
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\DistributionBundle\DependencyInjection\OroDistributionExtension;
-use Oro\Bundle\DistributionBundle\Form\Type\Composer\ConfigType;
-use Oro\Bundle\DistributionBundle\Form\Type\Composer\RepositoryType;
-use Oro\Bundle\DistributionBundle\Manager\PackageManager;
-use Oro\Bundle\DistributionBundle\Routing\OroAutoLoader;
-use Oro\Bundle\DistributionBundle\Routing\OroExposeLoader;
-use Oro\Bundle\DistributionBundle\Script\Runner;
-use Oro\Bundle\DistributionBundle\Security\AccessDeniedListener;
 use Oro\Bundle\DistributionBundle\Translation\Translator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -65,19 +58,7 @@ class OroDistributionExtensionTest extends \PHPUnit\Framework\TestCase
     public function loadDataProvider()
     {
         $parameters = [
-            'oro_distribution.routing_loader.class' => OroAutoLoader::class,
-            'oro_distribution.expose_routing_loader.class' => OroExposeLoader::class,
-            'oro_distribution.package_manager.class' => PackageManager::class,
-            'oro_distribution.script_runner.class' => Runner::class,
-            'oro_distribution.composer.class' => 'Composer\Composer',
-            'oro_distribution.composer.io.class' => 'Composer\IO\BufferIO',
-            'oro_distribution.composer.installer.class' => 'Composer\Installer',
-            'oro_distribution.composer.installation_manager.class' => 'Composer\Installer\InstallationManager',
-            'oro_distribution.composer.json_file.class' => 'Composer\Json\JsonFile',
             'oro_distribution.composer_json' => '%kernel.project_dir%/composer.json',
-            'oro_distribution.security.access_denied_listener.class' => AccessDeniedListener::class,
-            'oro_distribution.form.type.composer_config.class' => ConfigType::class,
-            'oro_distribution.form.type.composer_repository.class' => RepositoryType::class,
             'oro_distribution.package_manager.system_paths' => [
                 'vendor',
                 'public/bundles',

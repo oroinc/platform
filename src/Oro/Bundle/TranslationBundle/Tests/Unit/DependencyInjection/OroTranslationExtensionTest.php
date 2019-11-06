@@ -20,9 +20,7 @@ class OroTranslationExtensionTest extends \PHPUnit\Framework\TestCase
      * @var array
      */
     protected $expectedParameters = array(
-        'oro_translation.form.type.translatable_entity.class',
         'translator.class',
-        'oro_translation.controller.class',
         'oro_translation.js_translation.domains',
         'oro_translation.debug_translator'
     );

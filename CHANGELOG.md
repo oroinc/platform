@@ -114,6 +114,16 @@ The current file describes significant changes in the code that may affect the u
   was replaced with `USER`.
 
 ### Removed
+
+#### All Bundles
+* All `*.class` parameters were removed from the dependency injection container.
+
+#### DataGridBundle
+* The DIC parameter `oro_datagrid.extension.orm_sorter.class` was removed.
+  If you use `%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC`
+  or `%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC` in `Resources/config/oro/datagrids.yml`,
+  replace them to `ASC` and `DESC` strings.
+
 #### EntityExtendBundle
 * Removed *HTML* field type, all HTML fields were converted to Text fields.  
 
