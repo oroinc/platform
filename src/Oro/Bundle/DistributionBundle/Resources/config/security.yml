@@ -1,6 +1,6 @@
 services:
     oro_distribution.listener.access_denied:
-        class: '%oro_distribution.security.access_denied_listener.class%'
+        class: Oro\Bundle\DistributionBundle\Security\AccessDeniedListener
         arguments: ["@session", "@router", "@security.token_storage"]
         tags:
            - { name: kernel.event_listener, event: kernel.exception, method: onAccessDeniedException }

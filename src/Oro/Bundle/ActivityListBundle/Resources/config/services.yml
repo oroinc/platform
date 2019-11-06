@@ -1,37 +1,9 @@
 parameters:
-    # entity
     oro_activity_list.entity.class: Oro\Bundle\ActivityListBundle\Entity\ActivityList
 
-    # managers
-    oro_activity_list.manager.class: Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager
-    oro_activity_list.collect_manager.class: Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager
-    oro_activity_list.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-
-    oro_activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
-    oro_activity_list.provider.email_recipients.class: Oro\Bundle\ActivityListBundle\Provider\EmailRecipientsProvider
-    oro_activity_list.event_listener.segment_condition_builder_options_listener.class: Oro\Bundle\ActivityListBundle\EventListener\SegmentConditionBuilderOptionsListener
-
-    oro_activity_list.entity_config_dumper.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension
-    oro_activity_list.entity_generator.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityGeneratorExtension
-    oro_activity_list.migration.extension.activity_list: Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension
-    oro_activity_list.migration.activity_list.post_up.listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListPostUpMigrationListener
-
-    oro_activity_list.placeholder.filter.class: Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter
-
-    oro_activity_list.filter.helper.class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper
-    oro_activity_list.filter.datagrid_helper.class: Oro\Bundle\ActivityListBundle\Filter\DatagridHelper
-    oro_activity_list.helper.activity_inheritance_targets.class: Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper
-
-    # Strategies
-    oro_activity_list.strategy.replace.class: Oro\Bundle\ActivityListBundle\Model\Strategy\ReplaceStrategy
-    oro_activity_list.strategy.unite.class: Oro\Bundle\ActivityListBundle\Model\Strategy\UniteStrategy
-    
-    # merge
-    oro_activity_list.listener.merge_listener.class: Oro\Bundle\ActivityListBundle\EventListener\MergeListener
-    oro_activity_list.accessor.activity.class: Oro\Bundle\ActivityListBundle\Model\Accessor\ActivityAccessor
 services:
     oro_activity_list.manager:
-        class: '%oro_activity_list.manager.class%'
+        class: Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager
         public: true
         arguments:
             - "@security.authorization_checker"
@@ -59,19 +31,19 @@ services:
             - "@oro_security.acl_helper"
 
     oro_activity_list.collect_manager:
-        class: '%oro_activity_list.collect_manager.class%'
+        class: Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager
         arguments:
             - "@oro_activity_list.provider.chain"
 
     oro_activity_list.manager.api:
-        class: '%oro_activity_list.manager.api.class%'
+        class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_activity_list.entity.class%'
             - "@doctrine.orm.entity_manager"
 
     oro_activity_list.placeholder.filter:
-        class: '%oro_activity_list.placeholder.filter.class%'
+        class: Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter
         public: true
         arguments:
             - "@oro_activity_list.provider.chain"
@@ -82,7 +54,7 @@ services:
             - { name: kernel.event_listener, event: oro.ui.grouping_chain_widget.before, method: isAllowedButton }
 
     oro_activity_list.event_listener.actitity_list_listener:
-        class:  '%oro_activity_list.event_listener.actitity_list_listener.class%'
+        class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
         arguments:
             - "@oro_activity_list.collect_manager"
             - "@oro_entity.doctrine_helper"
@@ -105,7 +77,7 @@ services:
         alias: oro_activity_list.provider.chain
 
     oro_activity_list.provider.email_recipients:
-        class: '%oro_activity_list.provider.email_recipients.class%'
+        class: Oro\Bundle\ActivityListBundle\Provider\EmailRecipientsProvider
         arguments:
             - "@doctrine"
             - "@oro_activity.manager"
@@ -115,12 +87,12 @@ services:
             - { name: oro_email.recipients_provider, priority: 10 }
 
     oro_activity_list.event_listener.segment_condition_builder_options_listener:
-        class: '%oro_activity_list.event_listener.segment_condition_builder_options_listener.class%'
+        class: Oro\Bundle\ActivityListBundle\EventListener\SegmentConditionBuilderOptionsListener
         tags:
             - { name: kernel.event_listener, event: oro_segment.condition_builder_options_load, method: onLoad }
 
     oro_activity_list.entity_config_dumper.extension:
-        class: '%oro_activity_list.entity_config_dumper.extension.class%'
+        class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension
         arguments:
             - "@oro_activity_list.provider.chain"
             - "@oro_entity_config.config_manager"
@@ -129,19 +101,19 @@ services:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
     oro_activity_list.entity_generator.extension:
-        class: '%oro_activity_list.entity_generator.extension.class%'
+        class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityGeneratorExtension
         arguments:
             - "@oro_activity_list.provider.chain"
         tags:
             - { name: oro_entity_extend.entity_generator_extension }
 
     oro_activity_list.migration.extension.activity_list:
-        class: '%oro_activity_list.migration.extension.activity_list%'
+        class: Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension
         tags:
             - { name: oro_migration.extension, extension_name: activity_list }
 
     oro_activity_list.migration.activity_list.post_up.listener:
-        class: '%oro_activity_list.migration.activity_list.post_up.listener.class%'
+        class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListPostUpMigrationListener
         arguments:
             - "@oro_activity_list.provider.chain"
             - "@oro_activity_list.migration.extension.activity_list"
@@ -152,7 +124,7 @@ services:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -110 }
 
     oro_activity_list.filter.helper:
-        class: '%oro_activity_list.filter.helper.class%'
+        class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper
         arguments:
             - "@oro_filter.datetime_range_filter"
             - "@oro_filter.choice_filter"
@@ -183,21 +155,21 @@ services:
             - { name: oro_service_link,  service: oro_activity_list.filter.datagrid_helper }
 
     oro_activity_list.filter.datagrid_helper:
-        class: '%oro_activity_list.filter.datagrid_helper.class%'
+        class: Oro\Bundle\ActivityListBundle\Filter\DatagridHelper
         arguments:
             - "@oro_query_designer.grid.datagrid_configuration_builder"
             - "@oro_activity_list.datagrid.builder.link"
             - "@event_dispatcher"
 
     oro_activity_list.helper.activity_inheritance_targets:
-        class: '%oro_activity_list.helper.activity_inheritance_targets.class%'
+        class: Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper
         arguments:
             - "@oro_entity_config.config_manager"
             - "@doctrine"
    
     # Strategies
     oro_activity_list.strategy.replace:
-        class: '%oro_activity_list.strategy.replace.class%'
+        class: Oro\Bundle\ActivityListBundle\Model\Strategy\ReplaceStrategy
         arguments:
             - "@oro_activity_list.manager"
             - "@oro_entity.doctrine_helper"
@@ -206,7 +178,7 @@ services:
             - { name: oro_entity_merge.strategy }
 
     oro_activity_list.strategy.unite:
-        class: '%oro_activity_list.strategy.unite.class%'
+        class: Oro\Bundle\ActivityListBundle\Model\Strategy\UniteStrategy
         arguments:
             - "@oro_activity_list.manager"
             - "@oro_entity.doctrine_helper"
@@ -215,7 +187,7 @@ services:
 
     # Merge accessor
     oro_activity_list.accessor.activity:
-        class: '%oro_activity_list.accessor.activity.class%'
+        class: Oro\Bundle\ActivityListBundle\Model\Accessor\ActivityAccessor
         arguments:
           - "@doctrine"
         tags:
@@ -223,7 +195,7 @@ services:
 
     # Merge listener
     oro_activity_list.listener.merge_listener:
-        class: '%oro_activity_list.listener.merge_listener.class%'
+        class: Oro\Bundle\ActivityListBundle\EventListener\MergeListener
         arguments:
           - "@translator"
           - "@oro_entity_config.provider.entity"

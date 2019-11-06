@@ -1,8 +1,5 @@
-parameters:
-    oro_dataaudit.form.type.filter.class: Oro\Bundle\DataAuditBundle\Form\Type\FilterType
-
 services:
     oro_dataaudit.form.type.filter:
-        class: '%oro_dataaudit.form.type.filter.class%'
+        class: Oro\Bundle\DataAuditBundle\Form\Type\FilterType
         tags:
             - { name: form.type, alias: oro_type_audit_filter }

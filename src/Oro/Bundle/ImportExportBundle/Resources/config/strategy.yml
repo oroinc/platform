@@ -1,10 +1,6 @@
-parameters:
-    oro_importexport.strategy.import.helper.class: Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper
-    oro_importexport.strategy.configurable_add_or_replace.class: Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy
-
 services:
     oro_importexport.strategy.import.helper:
-        class: '%oro_importexport.strategy.import.helper.class%'
+        class: Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper
         arguments:
             - '@doctrine'
             - '@validator'
@@ -35,7 +31,7 @@ services:
             - '@oro_importexport.field.database_helper'
 
     oro_importexport.strategy.configurable_add_or_replace:
-        class: '%oro_importexport.strategy.configurable_add_or_replace.class%'
+        class: Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy
         abstract: true
         arguments:
             - '@event_dispatcher'

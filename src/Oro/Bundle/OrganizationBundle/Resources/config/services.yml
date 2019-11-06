@@ -1,39 +1,10 @@
 parameters:
     oro_organization.business_unit.entity.class:               Oro\Bundle\OrganizationBundle\Entity\BusinessUnit
-    oro_organization.organization.manager.class:               Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager
     oro_organization.organization.entity.class:                Oro\Bundle\OrganizationBundle\Entity\Organization
 
-    oro_organization.business_unit.manager.api.class:          Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_organization.organization.manager.api.class:           Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-
-    oro_organization.form.listener.class:                      Oro\Bundle\OrganizationBundle\Event\FormListener
-    oro_organization.import_strategy.listener.class:           Oro\Bundle\OrganizationBundle\Event\ImportStrategyListener
-    oro_organization.listener.choice_tree_filter_load_data_listener.class: Oro\Bundle\OrganizationBundle\EventListener\ChoiceTreeFilterLoadDataListener
-
-    oro_organization.provider.business_units.class:            Oro\Bundle\OrganizationBundle\Provider\BusinessUnitGridService
-
-    oro_organization.entity_config_dumper.extension.class:     Oro\Bundle\OrganizationBundle\Tools\OwnershipEntityConfigDumperExtension
-
-    oro_organization.event.business_unit_grid_listener.class:  Oro\Bundle\OrganizationBundle\Event\BusinessUnitGridListener
-
-    oro_organization.autocomplete.organization_search_handler.class: Oro\Bundle\OrganizationBundle\Autocomplete\OrganizationSearchHandler
-
-    oro_organization.provider.phone.business_unit.class:       Oro\Bundle\OrganizationBundle\Provider\BusinessUnitPhoneProvider
-
-    oro_organization.orm.validator.oranization_unique.class:   Oro\Bundle\OrganizationBundle\Validator\Constraints\OrganizationUniqueEntityValidator
-    oro_organization.provider.filter.busines_unit_choice_tree.class: Oro\Bundle\OrganizationBundle\Provider\Filter\ChoiceTreeBusinessUnitProvider
-
-    oro_organization.autocomplete.business_unit.search_handler.class:  Oro\Bundle\FormBundle\Autocomplete\SearchHandler
-    oro_organization.provider.busines_unit_acl.class: Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider
-    oro_organization.autocomplete.business_unit_owner_search_handler.class: Oro\Bundle\OrganizationBundle\Autocomplete\BusinessUnitOwnerSearchHandler
-    oro_organization.autocomplete.business_unit_tree_search_handler.class: Oro\Bundle\OrganizationBundle\Autocomplete\BusinessUnitTreeSearchHandler
-
 services:
-    #
-    # Business Unit API
-    #
     oro_organization.business_unit.manager.api:
-        class: '%oro_organization.business_unit.manager.api.class%'
+        class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
@@ -54,24 +25,19 @@ services:
         alias: oro_organization.business_unit_manager
 
     oro_organization.organization_manager:
-        class: '%oro_organization.organization.manager.class%'
+        class: Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@doctrine'
 
-    #
-    # Organization API
-    #
     oro_organization.organization.manager.api:
-        class: '%oro_organization.organization.manager.api.class%'
+        class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_organization.organization.entity.class%'
             - '@doctrine.orm.entity_manager'
-    #
-    # Ownership
-    #
+
     oro_organization.form.type.ownership_type:
         class: Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType
         public: true
@@ -102,9 +68,6 @@ services:
             - '@oro_security.token_accessor'
             - '@oro_security.owner.ownership_metadata_provider'
 
-    #
-    # Twig
-    #
     oro_organization.twig.organization_extension:
         class: Oro\Bundle\OrganizationBundle\Twig\OrganizationExtension
         public: false
@@ -113,9 +76,6 @@ services:
         tags:
             - { name: twig.extension }
 
-    #
-    # Listeners / Subscribers
-    #
     oro_organization.entity_ownership.listener:
         class: Oro\Bundle\OrganizationBundle\EventListener\RecordOwnerDataListener
         arguments:
@@ -129,7 +89,7 @@ services:
             - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush, priority: 100 }
 
     oro_organization.import_strategy.listener:
-        class: '%oro_organization.import_strategy.listener.class%'
+        class: Oro\Bundle\OrganizationBundle\Event\ImportStrategyListener
         arguments:
             - '@doctrine'
             - '@oro_security.token_accessor'
@@ -138,11 +98,8 @@ services:
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }
             - { name: doctrine.event_listener, event: onClear }
 
-    #
-    # DataGrid
-    #
     oro_organization.provider.business_units_grid:
-        class: '%oro_organization.provider.business_units.class%'
+        class: Oro\Bundle\OrganizationBundle\Provider\BusinessUnitGridService
         public: true
         arguments:
             - '@doctrine.orm.entity_manager'
@@ -154,11 +111,8 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: choice-business-unit }
 
-    #
-    # Entity config dumper extension
-    #
     oro_organization.entity_config_dumper.extension:
-        class: '%oro_organization.entity_config_dumper.extension.class%'
+        class: Oro\Bundle\OrganizationBundle\Tools\OwnershipEntityConfigDumperExtension
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity_extend.relation_builder'
@@ -167,7 +121,7 @@ services:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
     oro_organization.event.business_unit_grid_listener:
-        class: '%oro_organization.event.business_unit_grid_listener.class%'
+        class: Oro\Bundle\OrganizationBundle\Event\BusinessUnitGridListener
         arguments:
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
@@ -176,9 +130,8 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.business-unit-grid, method: onBuildBefore }
 
-    # Autocomplete user organizations search handler
     oro_organization.autocomplete.organization_search_handler:
-        class: '%oro_organization.autocomplete.organization_search_handler.class%'
+        class: Oro\Bundle\OrganizationBundle\Autocomplete\OrganizationSearchHandler
         arguments:
             - '%oro_organization.organization.entity.class%'
             - ["id", "name"]
@@ -190,12 +143,12 @@ services:
         lazy: true
 
     oro_organization.provider.phone.business_unit:
-        class: '%oro_organization.provider.phone.business_unit.class%'
+        class: Oro\Bundle\OrganizationBundle\Provider\BusinessUnitPhoneProvider
         tags:
             - { name: oro_address.phone_provider, class: '%oro_organization.business_unit.entity.class%' }
 
     oro_organization.orm.validator.organization_unique:
-        class: '%oro_organization.orm.validator.oranization_unique.class%'
+        class: Oro\Bundle\OrganizationBundle\Validator\Constraints\OrganizationUniqueEntityValidator
         arguments:
             - '@doctrine'
             - '@oro_security.owner.ownership_metadata_provider'
@@ -204,7 +157,7 @@ services:
               - { name: validator.constraint_validator, alias: organization_unique }
 
     oro_organization.provider.filter.busines_unit_choice_tree:
-        class: '%oro_organization.provider.filter.busines_unit_choice_tree.class%'
+        class: Oro\Bundle\OrganizationBundle\Provider\Filter\ChoiceTreeBusinessUnitProvider
         arguments:
             - '@doctrine'
             - '@oro_security.token_accessor'
@@ -212,7 +165,7 @@ services:
             - '@oro_security.ownership_tree_provider.chain'
 
     oro_organization.autocomplete.business_unit.search_handler:
-        class: '%oro_organization.autocomplete.business_unit.search_handler.class%'
+        class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler
         parent: oro_form.autocomplete.search_handler
         arguments:
             - '%oro_organization.business_unit.entity.class%'
@@ -261,7 +214,7 @@ services:
             - { name: validator.constraint_validator, alias: owner_validator }
 
     oro_organization.provider.busines_unit_acl:
-        class: '%oro_organization.provider.busines_unit_acl.class%'
+        class: Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider
         arguments:
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
@@ -269,7 +222,7 @@ services:
             - '@oro_security.ownership_tree_provider'
 
     oro_organization.autocomplete.business_unit_owner_search_handler:
-        class: '%oro_organization.autocomplete.business_unit_owner_search_handler.class%'
+        class: Oro\Bundle\OrganizationBundle\Autocomplete\BusinessUnitOwnerSearchHandler
         parent: oro_form.autocomplete.search_handler
         arguments:
             - '%oro_organization.business_unit.entity.class%'
@@ -289,14 +242,14 @@ services:
         lazy: true
 
     oro_organization.listener.choice_tree_filter_load_data_listener:
-        class: '%oro_organization.listener.choice_tree_filter_load_data_listener.class%'
+        class: Oro\Bundle\OrganizationBundle\EventListener\ChoiceTreeFilterLoadDataListener
         arguments:
             - '@doctrine'
         tags:
             - { name: kernel.event_listener, event: oro_filter.choice_tree_filter_load_data, method: fillData }
 
     oro_organization.autocomplete.business_unit_tree_search_handler:
-        class: '%oro_organization.autocomplete.business_unit_tree_search_handler.class%'
+        class: Oro\Bundle\OrganizationBundle\Autocomplete\BusinessUnitTreeSearchHandler
         parent: oro_organization.autocomplete.business_unit_owner_search_handler
         calls:
             - [setTokenAccessor, ['@oro_security.token_accessor']]

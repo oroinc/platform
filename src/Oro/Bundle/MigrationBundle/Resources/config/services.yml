@@ -1,14 +1,6 @@
-parameters:
-    oro_migration.db_id_name_generator.class:            Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator
-    oro_migration.migrations.query_executor.class:       Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor
-    oro_migration.migrations.executor.class:             Oro\Bundle\MigrationBundle\Migration\MigrationExecutorWithNameGenerator
-    oro_migration.migration.pre_up.listener.class:       Oro\Bundle\MigrationBundle\EventListener\PreUpMigrationListener
-    oro_migration.migrations.extension_manager.class:    Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager
-    oro_migration.migration.extension.rename.class:      Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension
-    oro_migration.migration.extension.data_storage.class: Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension
 services:
     oro_migration.db_id_name_generator:
-        class: '%oro_migration.db_id_name_generator.class%'
+        class: Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator
 
     oro_migration.service_container:
         class: Oro\Bundle\MigrationBundle\Container\MigrationContainer
@@ -43,12 +35,12 @@ services:
             - '@event_dispatcher'
 
     oro_migration.migrations.query_executor:
-        class: '%oro_migration.migrations.query_executor.class%'
+        class: Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor
         arguments:
             - '@doctrine.dbal.default_connection'
 
     oro_migration.migrations.executor:
-        class: '%oro_migration.migrations.executor.class%'
+        class: Oro\Bundle\MigrationBundle\Migration\MigrationExecutorWithNameGenerator
         arguments:
             - '@oro_migration.migrations.query_executor'
             - '@oro_cache.oro_data_cache_manager'
@@ -57,20 +49,20 @@ services:
             - [setNameGenerator, ['@oro_migration.db_id_name_generator']]
 
     oro_migration.migration.pre_up.listener:
-        class: '%oro_migration.migration.pre_up.listener.class%'
+        class: Oro\Bundle\MigrationBundle\EventListener\PreUpMigrationListener
         tags:
             - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp }
 
     oro_migration.migrations.extension_manager:
-        class: '%oro_migration.migrations.extension_manager.class%'
+        class: Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager
 
     oro_migration.migration.extension.rename:
-        class: '%oro_migration.migration.extension.rename.class%'
+        class: Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension
         tags:
             - { name: oro_migration.extension, extension_name: rename }
 
     oro_migration.migration.extension.data_storage:
-        class: '%oro_migration.migration.extension.data_storage.class%'
+        class: Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension
         tags:
             - { name: oro_migration.extension, extension_name: data_store }
 
