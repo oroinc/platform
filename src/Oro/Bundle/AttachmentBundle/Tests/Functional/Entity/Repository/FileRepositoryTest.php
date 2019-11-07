@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DigitalAssetBundle\Tests\Functional\Entity\Repository;
+namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Entity\Repository;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\Repository\FileRepository;
@@ -19,6 +19,7 @@ class FileRepositoryTest extends WebTestCase
     {
         $this->initClient();
         $this->loadFixtures([LoadFileData::class]);
+
         $container = $this->getContainer();
         $this->repository = $container->get('doctrine')->getRepository(File::class);
     }
@@ -37,6 +38,16 @@ class FileRepositoryTest extends WebTestCase
                 $fileC->getUuid() => $fileC,
             ],
             $this->repository->findAllForEntityByOneUuid($fileA->getUuid())
+        );
+    }
+
+    public function testFindForEntityField(): void
+    {
+        $this->assertEquals(
+            [
+                $this->getReference(LoadFileData::FILE_1)
+            ],
+            $this->repository->findForEntityField(\stdClass::class, 1, 'fieldA')
         );
     }
 }

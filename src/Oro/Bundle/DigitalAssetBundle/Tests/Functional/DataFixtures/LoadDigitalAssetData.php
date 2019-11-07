@@ -97,12 +97,12 @@ class LoadDigitalAssetData extends AbstractFixture implements DependentFixtureIn
             $manager->persist($digitalAsset);
             $this->setReference($assetRef, $digitalAsset);
 
-            foreach ($mapping['children'] as $childRef => $mapping) {
+            foreach ($mapping['children'] as $childRef => $childMapping) {
                 $childFile = new File();
                 $childFile->setFilename('digital/asset/child.file');
-                $childFile->setParentEntityClass($mapping['class']);
-                $childFile->setParentEntityId($mapping['id']);
-                $childFile->setParentEntityFieldName($mapping['field']);
+                $childFile->setParentEntityClass($childMapping['class']);
+                $childFile->setParentEntityId($childMapping['id']);
+                $childFile->setParentEntityFieldName($childMapping['field']);
                 $childFile->setDigitalAsset($digitalAsset);
                 $manager->persist($childFile);
                 $this->setReference($childRef, $childFile);
