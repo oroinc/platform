@@ -74,6 +74,14 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->helper->sanitize($value));
     }
 
+    public function testSanitizeWithNullValue(): void
+    {
+        $this->helper->sanitize('<p>sometext</p>', 'default');
+        $this->assertInstanceOf(\HTMLPurifier_ErrorCollector::class, $this->helper->getLastErrorCollector());
+        $this->helper->sanitize('', 'default');
+        $this->assertNull($this->helper->getLastErrorCollector());
+    }
+
     /**
      * @dataProvider iframeDataProvider
      *

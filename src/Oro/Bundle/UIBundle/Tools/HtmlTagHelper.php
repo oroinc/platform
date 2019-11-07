@@ -106,6 +106,8 @@ class HtmlTagHelper
     public function sanitize($value, $scope = 'default')
     {
         if (!$value) {
+            $this->lastErrorCollector = null;
+
             return $value;
         }
 
