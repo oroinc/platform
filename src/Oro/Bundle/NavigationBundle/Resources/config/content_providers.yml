@@ -1,13 +1,6 @@
-parameters:
-    oro_navigation.content_provider.menu.class:                 Oro\Bundle\NavigationBundle\ContentProvider\MenuContentProvider
-    oro_navigation.content_provider.title.class:                Oro\Bundle\NavigationBundle\ContentProvider\TitleContentProvider
-    oro_navigation.content_provider.title_short.class:          Oro\Bundle\NavigationBundle\ContentProvider\TitleShortContentProvider
-    oro_navigation.content_provider.title_serialized.class:     Oro\Bundle\NavigationBundle\ContentProvider\TitleSerializedContentProvider
-    oro_navigation.content_provider.navigation_elements.class:  Oro\Bundle\NavigationBundle\ContentProvider\NavigationElementsContentProvider
-
 services:
     oro_navigation.content_provider.menu.history_menu:
-        class: '%oro_navigation.content_provider.menu.class%'
+        class: Oro\Bundle\NavigationBundle\ContentProvider\MenuContentProvider
         arguments:
             - '@oro_menu.twig.extension'
             - "history"
@@ -16,7 +9,7 @@ services:
             - { name: oro_ui.content_provider }
 
     oro_navigation.content_provider.menu.mostviewed_menu:
-        class: '%oro_navigation.content_provider.menu.class%'
+        class: Oro\Bundle\NavigationBundle\ContentProvider\MenuContentProvider
         arguments:
             - '@oro_menu.twig.extension'
             - "mostviewed"
@@ -25,7 +18,7 @@ services:
             - { name: oro_ui.content_provider }
 
     oro_navigation.content_provider.menu.application_menu:
-        class: '%oro_navigation.content_provider.menu.class%'
+        class: Oro\Bundle\NavigationBundle\ContentProvider\MenuContentProvider
         arguments:
             - '@oro_menu.twig.extension'
             - "application_menu"
@@ -34,28 +27,28 @@ services:
             - { name: oro_ui.content_provider, enabled: false }
 
     oro_navigation.content_provider.title:
-        class: '%oro_navigation.content_provider.title.class%'
+        class: Oro\Bundle\NavigationBundle\ContentProvider\TitleContentProvider
         arguments:
             - '@oro_navigation.title_service'
         tags:
             - { name: oro_ui.content_provider }
 
     oro_navigation.content_provider.title_short:
-        class: '%oro_navigation.content_provider.title_short.class%'
+        class: Oro\Bundle\NavigationBundle\ContentProvider\TitleShortContentProvider
         arguments:
             - '@oro_navigation.title_service'
         tags:
             - { name: oro_ui.content_provider }
 
     oro_navigation.content_provider.title_serialized:
-        class: '%oro_navigation.content_provider.title_serialized.class%'
+        class: Oro\Bundle\NavigationBundle\ContentProvider\TitleSerializedContentProvider
         arguments:
             - '@oro_navigation.title_service'
         tags:
             - { name: oro_ui.content_provider }
 
     oro_navigation.content_provider.navigation_elements:
-        class: '%oro_navigation.content_provider.navigation_elements.class%'
+        class: Oro\Bundle\NavigationBundle\ContentProvider\NavigationElementsContentProvider
         arguments:
             - '@oro_navigation.configuration.provider'
             - '@request_stack'

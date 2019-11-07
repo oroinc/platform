@@ -31,32 +31,25 @@ Form components are form types, data transformers and event listeners.
 #### Form Types
 
 ```
-parameters:
-    oro_form.type.date.class:              Oro\Bundle\FormBundle\Form\Type\OroDateType
-    oro_form.type.datetime.class:          Oro\Bundle\FormBundle\Form\Type\OroDateTimeType
-    oro_form.type.entity_identifier.class: Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType
-    oro_form.type.jqueryselect2_hidden.class: Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType
-    oro_form.type.duration.class:          Oro\Bundle\FormBundle\Form\Type\OroDurationType
-
 services:
     oro_form.type.date:
-        class: %oro_form.type.date.class%
+        class: Oro\Bundle\FormBundle\Form\Type\OroDateType
         tags:
             - { name: form.type, alias: oro_date }
 
     oro_form.type.datetime:
-        class: %oro_form.type.datetime.class%
+        class: Oro\Bundle\FormBundle\Form\Type\OroDateTimeType
         tags:
             - { name: form.type, alias: oro_datetime }
 
     oro_form.type.entity_identifier:
-        class: %oro_form.type.entity_identifier.class%
+        class: Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType
         tags:
             - { name: form.type, alias: oro_entity_identifier }
         arguments: ["@doctrine"]
 
     oro_form.type.jqueryselect2_hidden:
-        class: %oro_form.type.jqueryselect2_hidden.class%
+        class: Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_form.autocomplete.configuration
@@ -64,7 +57,7 @@ services:
             - { name: form.type, alias: oro_jqueryselect2_hidden }
 
     oro_form.type.duration:
-        class: '%oro_form.type.duration.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroDurationType
         tags:
             - { name: form.type, alias: oro_duration }
 ```

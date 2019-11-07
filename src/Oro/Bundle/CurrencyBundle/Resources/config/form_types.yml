@@ -1,11 +1,6 @@
-parameters:
-    oro_currency.form.type.currency_selection.class: Oro\Bundle\CurrencyBundle\Form\Type\CurrencySelectionType
-    oro_currency.form.type.price.class: Oro\Bundle\CurrencyBundle\Form\Type\PriceType
-    oro_currency.form.type.currency.class: Oro\Bundle\CurrencyBundle\Form\Type\CurrencyType
-
 services:
     oro_currency.form.type.currency_selection:
-        class: '%oro_currency.form.type.currency_selection.class%'
+        class: Oro\Bundle\CurrencyBundle\Form\Type\CurrencySelectionType
         arguments:
             - '@oro_currency.config.currency'
             - '@oro_locale.settings'
@@ -14,7 +9,7 @@ services:
             - { name: form.type, alias: oro_currency_selection }
 
     oro_currency.form.type.price:
-        class: '%oro_currency.form.type.price.class%'
+        class: Oro\Bundle\CurrencyBundle\Form\Type\PriceType
         calls:
             - [setDataClass, ['%oro_currency.price.model%']]
         tags:
@@ -28,6 +23,6 @@ services:
             - { name: form.type, alias: oro_multicurrency }
 
     oro_currency.form.type.currency:
-        class: '%oro_currency.form.type.currency.class%'
+        class: Oro\Bundle\CurrencyBundle\Form\Type\CurrencyType
         tags:
             - { name: form.type, alias: oro_currency }

@@ -191,7 +191,7 @@ datagrids:
                 domain:
                     data_name: domain
             default:
-                language: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                language: ASC
         filters:
             columns:
                 language:

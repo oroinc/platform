@@ -1,15 +1,6 @@
-parameters:
-    oro_query_designer.query_designer.manager.class:                Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager
-    oro_query_designer.query_designer.restriction_builder.class:    Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder
-    oro_query_designer.config.resolver.class:                       Oro\Bundle\QueryDesignerBundle\QueryDesigner\ConfigurationResolver
-    oro_query_designer.grid.extension.orm_datasource.class:         Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension
-    oro_query_designer.validator.query_validator.class:             Oro\Bundle\QueryDesignerBundle\Validator\QueryValidator
-    oro_query_designer.validator.grouping_validator.class:          Oro\Bundle\QueryDesignerBundle\Validator\GroupingValidator
-    oro_query_designer.grid.datagrid_configuration_builder.class:   Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder
-    oro_query_designer.group_by_helper.class:                       Oro\Bundle\QueryDesignerBundle\Model\GroupByHelper
 services:
     oro_query_designer.query_designer.manager:
-        class: '%oro_query_designer.query_designer.manager.class%'
+        class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager
         lazy: true
         arguments:
             - '@oro_query_designer.configuration.provider'
@@ -22,7 +13,7 @@ services:
         alias: 'oro_query_designer.query_designer.manager'
 
     oro_query_designer.query_designer.restriction_builder:
-        class: '%oro_query_designer.query_designer.restriction_builder.class%'
+        class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder
         arguments:
             - '@oro_query_designer.query_designer.manager'
             - '@oro_config.manager'
@@ -35,7 +26,7 @@ services:
             - { name: oro_filter.extension.orm_filter.filter, type: conditions_group }
 
     oro_query_designer.config.resolver:
-        class: '%oro_query_designer.config.resolver.class%'
+        class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\ConfigurationResolver
         arguments:
             - '@oro_entity.orm.entity_class_resolver'
             - '@service_container'
@@ -64,19 +55,19 @@ services:
             - { name: console.command }
 
     oro_query_designer.grid.extension.orm_datasource:
-        class: '%oro_query_designer.grid.extension.orm_datasource.class%'
+        class: Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension
         arguments:
             - '@oro_query_designer.query_designer.restriction_builder'
         tags:
             - { name: oro_datagrid.extension }
 
     oro_query_designer.exclusion_provider:
-        class: '%oro_entity.exclusion_provider.chain.class%'
+        class: Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
         calls:
             - [addProvider, ['@oro_entity.exclusion_provider']]
 
     oro_query_designer.entity_provider:
-        class: '%oro_entity.entity_provider.class%'
+        class: Oro\Bundle\EntityBundle\Provider\EntityProvider
         parent: oro_entity.entity_provider.abstract
         calls:
             - [setExclusionProvider, ['@oro_query_designer.exclusion_provider']]
@@ -90,7 +81,7 @@ services:
             - [setExclusionProvider, ['@oro_query_designer.exclusion_provider']]
 
     oro_query_designer.entity_field_list_provider:
-        class: '%oro_entity.entity_field_list_provider.class%'
+        class: Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
@@ -99,7 +90,7 @@ services:
             - '@oro_entity_config.helper.entity_config'
 
     oro_query_designer.grid.datagrid_configuration_builder:
-        class: '%oro_query_designer.grid.datagrid_configuration_builder.class%'
+        class: Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder
         public: false
         arguments:
             - '@oro_query_designer.query_designer.manager'
@@ -111,7 +102,7 @@ services:
             - [setVirtualRelationProvider, ['@oro_entity.virtual_relation_provider.chain']]
 
     oro_query_designer.validator.query_validator:
-        class: '%oro_query_designer.validator.query_validator.class%'
+        class: Oro\Bundle\QueryDesignerBundle\Validator\QueryValidator
         arguments:
             - '@oro_datagrid.configuration.provider.chain'
             - '@oro_datagrid.datagrid.builder'
@@ -130,14 +121,14 @@ services:
             - { name: validator.constraint_validator, alias: oro_query_designer.definition_query_validator }
 
     oro_query_designer.validator.grouping_validator:
-        class: '%oro_query_designer.validator.grouping_validator.class%'
+        class: Oro\Bundle\QueryDesignerBundle\Validator\GroupingValidator
         arguments:
             - '@translator'
         tags:
             - { name: validator.constraint_validator, alias: oro_query_designer.grouping_validator }
 
     oro_query_designer.group_by_helper:
-        class: '%oro_query_designer.group_by_helper.class%'
+        class: Oro\Bundle\QueryDesignerBundle\Model\GroupByHelper
 
     oro_query_designer.query_designer.filter_processor:
         class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\FilterProcessor
@@ -152,7 +143,7 @@ services:
             - { name: oro_dashboard.widget_provider.filter }
 
     oro_query_designer.query_designer.subquery_limit_helper:
-        class: 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper'
+        class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper
         public: false
 
     oro_query_designer.query_designer.segment_filters_purifier:

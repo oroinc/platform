@@ -102,7 +102,7 @@ datagrids:
                 auth_status:
                     data_name: au.priority
             default:
-                username: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                username: ASC
 
         filters:
             columns:
@@ -217,7 +217,7 @@ datagrids:
                 name:
                     data_name: g.name
             default:
-                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                name: ASC
 
         filters:
             columns:
@@ -293,7 +293,7 @@ datagrids:
                 label:
                     data_name: r.label
             default:
-                label: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                label: ASC
 
         filters:
             columns:
@@ -389,7 +389,7 @@ datagrids:
         sorters:
             multiple_sorting: true
             default:
-                lastName: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                lastName: ASC
 
     role-users-grid:
         extends: user-relation-grid
@@ -460,8 +460,8 @@ datagrids:
                     data_name: has_role
 
             default:
-                has_role: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
-                lastName: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                has_role: DESC
+                lastName: ASC
         options:
             rowSelection:
                 dataField: id
@@ -574,8 +574,8 @@ datagrids:
                 has_group:
                     data_name: has_group
             default:
-                has_group: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
-                lastName: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                has_group: DESC
+                lastName: ASC
 
         options:
             rowSelection:
@@ -633,7 +633,7 @@ datagrids:
                 enabled:
                     data_name: u.enabled
             default:
-                username: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                username: ASC
         filters:
             columns:
                 firstName:
@@ -700,7 +700,7 @@ datagrids:
                 username:
                     data_name: u.username
             default:
-                username: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                username: ASC
         filters:
             columns:
                 firstName:
@@ -779,7 +779,7 @@ datagrids:
                 enabled:
                     data_name: u.enabled
             default:
-                username: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                username: ASC
 
         filters:
             columns:

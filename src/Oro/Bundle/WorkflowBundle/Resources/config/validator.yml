@@ -1,9 +1,6 @@
-parameters:
-    oro_workflow.validator.transition_is_allowed.class: Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowedValidator
-
 services:
     oro_workflow.validator.transition_is_allowed:
-        class: '%oro_workflow.validator.transition_is_allowed.class%'
+        class: Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowedValidator
         arguments:
             - '@oro_workflow.registry'
         tags:

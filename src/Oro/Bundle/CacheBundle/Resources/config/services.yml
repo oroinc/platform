@@ -1,9 +1,6 @@
-parameters:
-    oro_cache.oro_data_cache_manager.class:                    Oro\Bundle\CacheBundle\Manager\OroDataCacheManager
-
 services:
     oro_cache.oro_data_cache_manager:
-        class: '%oro_cache.oro_data_cache_manager.class%'
+        class: Oro\Bundle\CacheBundle\Manager\OroDataCacheManager
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
 

@@ -54,7 +54,7 @@ datagrids:
                 name:
                     data_name: r.name
             default:
-                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                name: DESC
         filters:
             columns:
                 name:

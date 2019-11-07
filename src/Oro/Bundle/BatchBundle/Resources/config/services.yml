@@ -1,18 +1,15 @@
 parameters:
-    oro_batch.orm.query_builder.count_query_optimizer.class: Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer
     akeneo_batch.logger.batch_log_handler.class:             Oro\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler
-
-    oro_batch.job.repository.class: Oro\Bundle\BatchBundle\Job\DoctrineJobRepository
 
 services:
     oro_batch.orm.query_builder.count_query_optimizer:
-        class: '%oro_batch.orm.query_builder.count_query_optimizer.class%'
+        class: Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer
         calls:
             - [setEventDispatcher, ['@event_dispatcher']]
             - [setRelationHelper, ['@oro_entity.helper.relation_helper']]
 
     oro_batch.job.repository:
-        class: '%oro_batch.job.repository.class%'
+        class: Oro\Bundle\BatchBundle\Job\DoctrineJobRepository
         arguments:
             - '@doctrine'
             - '%akeneo_batch.entity.job_execution.class%'

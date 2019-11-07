@@ -79,7 +79,7 @@ datagrids:
                 assigned:
                     data_name: assigned
             default:
-                assigned: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                assigned: DESC
         filters:
             columns:
                 assigned:

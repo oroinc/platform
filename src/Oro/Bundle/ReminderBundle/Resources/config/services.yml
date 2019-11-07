@@ -1,16 +1,9 @@
 parameters:
     oro_reminder.entity.class:                    Oro\Bundle\ReminderBundle\Entity\Reminder
-    oro_reminder.entity.manager.class:            Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager
-    oro_reminder.sender.class:                    Oro\Bundle\ReminderBundle\Model\ReminderSender
-    oro_reminder.send_processor_registry.class:   Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry
-    oro_reminder.send_processor.email.class:      Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor
-    oro_reminder.send_processor.web_socket.class: Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor
-    oro_reminder.web_socket.message_params_provider.class: Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider
-    oro_reminder.url_provider.class:              Oro\Bundle\ReminderBundle\Model\UrlProvider
 
 services:
     oro_reminder.entity.manager:
-        class: '%oro_reminder.entity.manager.class%'
+        class: Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager
         arguments:
             - '@oro_entity.doctrine_helper'
 
@@ -24,18 +17,18 @@ services:
             - { name: doctrine.event_listener, event: postPersist, lazy: false }
 
     oro_reminder.sender:
-        class: '%oro_reminder.sender.class%'
+        class: Oro\Bundle\ReminderBundle\Model\ReminderSender
         arguments:
             - '@oro_reminder.send_processor_registry'
         lazy: true
 
     oro_reminder.send_processor_registry:
-        class: '%oro_reminder.send_processor_registry.class%'
+        class: Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry
         arguments:
             - []
 
     oro_reminder.send_processor.email:
-        class: '%oro_reminder.send_processor.email.class%'
+        class: Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor
         arguments:
             - '@oro_notification.manager.email_notification'
             - '@oro_reminder.model.template_email_notification'
@@ -44,7 +37,7 @@ services:
             - { name: oro_reminder.send_processor }
 
     oro_reminder.send_processor.web_socket:
-        class: '%oro_reminder.send_processor.web_socket.class%'
+        class: Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor
         arguments:
             - '@oro_sync.websocket_client'
             - '@oro_sync.client.connection_checker'
@@ -54,7 +47,7 @@ services:
 
     #Message params providers
     oro_reminder.web_socket.message_params_provider:
-        class: '%oro_reminder.web_socket.message_params_provider.class%'
+        class: Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider
         arguments:
             - '@translator'
             - '@oro_locale.formatter.date_time'
@@ -62,7 +55,7 @@ services:
             - '@oro_entity_config.provider.reminder'
 
     oro_reminder.url_provider:
-        class: '%oro_reminder.url_provider.class%'
+        class: Oro\Bundle\ReminderBundle\Model\UrlProvider
         arguments:
             - '@oro_entity_config.config_manager'
             - '@router'

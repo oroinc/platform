@@ -1008,6 +1008,21 @@ define(function(require) {
                     this._onDatagridRefresh();
                 }
             });
+
+            this.listenTo(mediator, 'datagrid:highlightNew:' + this.name, (...ids) => {
+                ids = ids.map(id => id.toString());
+                this.collection.each(model => {
+                    if (ids.includes(model.id)) {
+                        model.set('isNew', true);
+                    }
+                });
+            });
+
+            this.listenTo(mediator, 'datagrid:doInitialRefresh:' + this.name, () => {
+                this.setAdditionalParameter('refresh', true);
+                this.collection.getFirstPage();
+                this.removeAdditionalParameter('refresh');
+            });
         },
 
         /**

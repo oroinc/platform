@@ -21,7 +21,6 @@ class OroCurrencyExtensionTest extends ExtensionTestCase
 
         $expectedParameters = [
             'oro_currency.price.model',
-            'oro_currency.form.type.currency_selection.class',
         ];
         $this->assertParametersLoaded($expectedParameters);
 
