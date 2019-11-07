@@ -384,7 +384,10 @@ define(function(require) {
                         $children.replaceWith(text);
                     }
                 } else {
-                    if (!$children.is(this.combinedHighlightSelectors)) {
+                    if (
+                        children.nodeType === Node.ELEMENT_NODE &&
+                        !$children.is(this.combinedHighlightSelectors)
+                    ) {
                         result = this.highlightElement({
                             $el: $children
                         }) || result;
