@@ -93,7 +93,7 @@ define(function(require) {
         _onFormReset: function(form) {
             form = form || this.form;
 
-            $(form).trigger('reset');
+            $(form).trigger('doReset');
             $(form).find('[type="file"]').trigger('change');
 
             $(form).find('[type="text"]').each((index, element) => {
