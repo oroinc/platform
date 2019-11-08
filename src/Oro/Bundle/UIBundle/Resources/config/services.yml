@@ -149,6 +149,8 @@ services:
             - ['setAttribute', ['div', 'data-interval', 'Number']]
             - ['setAttribute', ['div', 'data-parent', 'Text']]
             - ['setAttribute', ['div', 'data-target', 'Text']]
+            - ['setAttribute', ['div', 'data-title', 'Text']]
+            - ['setAttribute', ['div', 'data-type', 'Text']]
             - ['setAttribute', ['div', 'data-offset', 'Number']]
             - ['setAttribute', ['div', 'data-delay', 'Number']]
             - ['setAttribute', ['div', 'data-autohide', 'Bool']]
