@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -93,6 +94,8 @@ class EmailController extends RestController
      *
      * @param int $id The id of the email
      *
+     * @Rest\Put(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Update email",
      *      resource=true
@@ -100,7 +103,7 @@ class EmailController extends RestController
      * @AclAncestor("oro_email_email_user_edit")
      * @return Response
      */
-    public function putAction($id)
+    public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
     }

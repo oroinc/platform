@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Routing\ClassResourceInterface;
@@ -76,7 +77,8 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @param int $id User id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @Rest\Get(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Get user data",
      *      resource=true,
@@ -85,8 +87,10 @@ class UserController extends RestController implements ClassResourceInterface
      *      }
      * )
      * @AclAncestor("oro_user_user_view")
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getAction($id)
+    public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
     }
@@ -111,7 +115,8 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @param int $id User id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @Rest\Put(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Update existing user",
      *      resource=true,
@@ -120,8 +125,10 @@ class UserController extends RestController implements ClassResourceInterface
      *      }
      * )
      * @AclAncestor("oro_user_user_update")
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function putAction($id)
+    public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
     }
@@ -131,7 +138,8 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @param int $id User id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @Rest\Delete(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Delete user",
      *      resource=true,
@@ -145,8 +153,10 @@ class UserController extends RestController implements ClassResourceInterface
      *      class="OroUserBundle:User",
      *      permission="DELETE"
      * )
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }
@@ -156,7 +166,8 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @param int $id User id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @Rest\Get(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Get user roles",
      *      resource=true,
@@ -165,8 +176,10 @@ class UserController extends RestController implements ClassResourceInterface
      *      }
      * )
      * @AclAncestor("oro_user_role_view")
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getRolesAction($id)
+    public function getRolesAction(int $id)
     {
         $entity = $this->getManager()->find($id);
 
@@ -182,7 +195,8 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @param int $id User id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @Rest\Get(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Get user groups",
      *      resource=true,
@@ -191,8 +205,10 @@ class UserController extends RestController implements ClassResourceInterface
      *      }
      * )
      * @AclAncestor("oro_user_group_view")
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getGroupsAction($id)
+    public function getGroupsAction(int $id)
     {
         $entity = $this->getManager()->find($id);
 
@@ -256,6 +272,8 @@ class UserController extends RestController implements ClassResourceInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function transformEntityField($field, &$value)
     {

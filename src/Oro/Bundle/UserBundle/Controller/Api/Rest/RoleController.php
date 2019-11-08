@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Routing\ClassResourceInterface;
@@ -55,7 +56,8 @@ class RoleController extends RestController implements ClassResourceInterface
      *
      * @param int $id Role id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @Rest\Get(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Get role data",
      *      resource=true,
@@ -64,8 +66,10 @@ class RoleController extends RestController implements ClassResourceInterface
      *      }
      * )
      * @AclAncestor("oro_user_role_view")
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getAction($id)
+    public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
     }
@@ -90,7 +94,8 @@ class RoleController extends RestController implements ClassResourceInterface
      *
      * @param int $id Role id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @Rest\Put(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Update existing role",
      *      resource=true,
@@ -99,8 +104,10 @@ class RoleController extends RestController implements ClassResourceInterface
      *      }
      * )
      * @AclAncestor("oro_user_role_update")
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function putAction($id)
+    public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
     }
@@ -110,7 +117,8 @@ class RoleController extends RestController implements ClassResourceInterface
      *
      * @param int $id Role id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @Rest\Delete(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Delete role",
      *      resource=true,
@@ -124,8 +132,10 @@ class RoleController extends RestController implements ClassResourceInterface
      *      class="OroUserBundle:Role",
      *      permission="DELETE"
      * )
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }
