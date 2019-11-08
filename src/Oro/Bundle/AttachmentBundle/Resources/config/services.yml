@@ -133,6 +133,13 @@ services:
             - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postRemove }
             - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postUpdate }
 
+    oro_attachment.listener.entity_delete_listener:
+        class: Oro\Bundle\AttachmentBundle\EventListener\EntityDeleteListener
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+
     oro_attachment.twig.file_extension:
         class: 'Oro\Bundle\AttachmentBundle\Twig\FileExtension'
         public: false

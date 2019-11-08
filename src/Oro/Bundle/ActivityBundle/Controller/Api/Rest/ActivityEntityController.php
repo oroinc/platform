@@ -31,7 +31,10 @@ class ActivityEntityController extends RestController
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
      *
-     * @Get("/activities/{activity}/{id}/relations")
+     * @Get(
+     *     "/activities/{activity}/{id}/relations",
+     *      requirements={"id"="\d+"}
+     * )
      *
      * @QueryParam(
      *      name="page",
@@ -53,7 +56,7 @@ class ActivityEntityController extends RestController
      *
      * @return Response
      */
-    public function cgetAction(Request $request, $activity, $id)
+    public function cgetAction(Request $request, $activity, int $id)
     {
         $manager = $this->getManager();
         $manager->setClass($manager->resolveEntityClass($activity, true));
@@ -72,7 +75,10 @@ class ActivityEntityController extends RestController
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
      *
-     * @Post("/activities/{activity}/{id}/relations")
+     * @Post(
+     *     "/activities/{activity}/{id}/relations",
+     *      requirements={"id"="\d+"}
+     * )
      *
      * @ApiDoc(
      *      description="Adds an association between an activity and a target entity",
@@ -81,7 +87,7 @@ class ActivityEntityController extends RestController
      *
      * @return Response
      */
-    public function postAction($activity, $id)
+    public function postAction($activity, int $id)
     {
         $manager = $this->getManager();
         $manager->setClass($manager->resolveEntityClass($activity, true));
@@ -97,7 +103,10 @@ class ActivityEntityController extends RestController
      * @param string $entity   The type of the target entity.
      * @param mixed  $entityId The id of the target entity.
      *
-     * @Delete("/activities/{activity}/{id}/{entity}/{entityId}")
+     * @Delete(
+     *     "/activities/{activity}/{id}/{entity}/{entityId}",
+     *      requirements={"id"="\d+"}
+     * )
      *
      * @ApiDoc(
      *      description="Deletes an association between an activity and a target entity",
@@ -106,7 +115,7 @@ class ActivityEntityController extends RestController
      *
      * @return Response
      */
-    public function deleteAction($activity, $id, $entity, $entityId)
+    public function deleteAction($activity, int $id, $entity, $entityId)
     {
         $manager       = $this->getManager();
         $activityClass = $manager->resolveEntityClass($activity, true);
