@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Controller\Api\Rest;
 
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
@@ -65,6 +66,8 @@ class ActivityListController extends RestController
      * Get ActivityList single object
      *
      * @param integer $entityId Entity id
+     *
+     * @Rest\Get(requirements={"entityId"="\d+"})
      *
      * @ApiDoc(
      *      description="Returns an ActivityList object",

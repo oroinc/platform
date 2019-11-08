@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * API CRUD controller for activity entities.
+ *
  * @RouteResource("activity_relation")
  * @NamePrefix("oro_api_")
  */
@@ -30,7 +32,10 @@ class ActivityEntityController extends RestController
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
      *
-     * @Get("/activities/{activity}/{id}/relations")
+     * @Get(
+     *     "/activities/{activity}/{id}/relations",
+     *      requirements={"id"="\d+"}
+     * )
      *
      * @QueryParam(
      *      name="page",
@@ -71,7 +76,10 @@ class ActivityEntityController extends RestController
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
      *
-     * @Post("/activities/{activity}/{id}/relations")
+     * @Post(
+     *     "/activities/{activity}/{id}/relations",
+     *      requirements={"id"="\d+"}
+     * )
      *
      * @ApiDoc(
      *      description="Adds an association between an activity and a target entity",
@@ -96,7 +104,10 @@ class ActivityEntityController extends RestController
      * @param string $entity   The type of the target entity.
      * @param mixed  $entityId The id of the target entity.
      *
-     * @Delete("/activities/{activity}/{id}/{entity}/{entityId}")
+     * @Delete(
+     *     "/activities/{activity}/{id}/{entity}/{entityId}",
+     *      requirements={"id"="\d+"}
+     * )
      *
      * @ApiDoc(
      *      description="Deletes an association between an activity and a target entity",

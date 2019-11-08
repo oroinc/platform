@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TagBundle\Controller\Api\Rest;
 
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Routing\ClassResourceInterface;
@@ -22,6 +23,8 @@ class TaxonomyController extends RestController implements ClassResourceInterfac
      * REST DELETE
      *
      * @param int $id
+     *
+     * @Rest\Delete(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Delete taxonomy",
