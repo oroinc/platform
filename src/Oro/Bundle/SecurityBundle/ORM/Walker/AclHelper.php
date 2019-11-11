@@ -2,14 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
-use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * This class adds the AccessRuleWalker tree walker with context to query to add ACL restrictions.
@@ -21,20 +16,15 @@ class AclHelper
     public const CHECK_ROOT_ENTITY = 'checkRootEntity';
     public const CHECK_RELATIONS   = 'checkRelations';
 
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
-
-    /** @var AccessRuleExecutor */
-    protected $accessRuleExecutor;
+    /** @var AccessRuleWalkerContextFactoryInterface */
+    private $contextFactory;
 
     /**
-     * @param TokenStorageInterface $tokenStorage
-     * @param AccessRuleExecutor    $accessRuleExecutor
+     * @param AccessRuleWalkerContextFactoryInterface $contextFactory
      */
-    public function __construct(TokenStorageInterface $tokenStorage, AccessRuleExecutor $accessRuleExecutor)
+    public function __construct(AccessRuleWalkerContextFactoryInterface $contextFactory)
     {
-        $this->tokenStorage = $tokenStorage;
-        $this->accessRuleExecutor = $accessRuleExecutor;
+        $this->contextFactory = $contextFactory;
     }
 
     /**
@@ -55,27 +45,7 @@ class AclHelper
      */
     public function apply($query, string $permission = 'VIEW', array $options = [])
     {
-        $token = $this->tokenStorage->getToken();
-        $userId = null;
-        $userClass = null;
-        $organizationId = null;
-        if ($token) {
-            $user = $token->getUser();
-            if ($user instanceof UserInterface) {
-                $userId = $user->getId();
-                $userClass = ClassUtils::getClass($user);
-            }
-            if ($token instanceof OrganizationAwareTokenInterface) {
-                $organizationId = $token->getOrganization()->getId();
-            }
-        }
-        $context = new AccessRuleWalkerContext(
-            $this->accessRuleExecutor,
-            $permission,
-            $userClass,
-            $userId,
-            $organizationId
-        );
+        $context = $this->contextFactory->createContext($permission);
         foreach ($options as $optionName => $value) {
             $context->setOption($optionName, $value);
         }
