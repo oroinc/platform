@@ -16,6 +16,7 @@ use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -88,6 +89,9 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
      * @var AclHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $aclHelper;
+
+    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $logger;
 
     protected function setUp()
     {
@@ -165,9 +169,12 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
             $this->testProperties
         );
 
+        $this->logger = $this->createMock(LoggerInterface::class);
+
         $this->searchHandler->initDoctrinePropertiesByManagerRegistry($this->managerRegistry);
         $this->searchHandler->initSearchIndexer($this->indexer, $this->testSearchConfig);
         $this->searchHandler->setAclHelper($this->aclHelper);
+        $this->searchHandler->setLogger($this->logger);
     }
 
     public function testConstructorAndInitialize()
@@ -236,6 +243,8 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
         MockHelper::addMockExpectedCalls($this->queryBuilder, $expectQueryBuilderCalls, $this);
         MockHelper::addMockExpectedCalls($this->expr, $expectExprCalls, $this);
         MockHelper::addMockExpectedCalls($this->query, $expectQueryCalls, $this);
+
+        $this->logger->expects($this->never())->method('critical');
 
         $actualResult = $this->searchHandler->search($query['query'], $query['page'], $query['perPage']);
         $this->assertEquals($expectedResult, $actualResult);
@@ -585,6 +594,49 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
         $qb->expects($this->once())
             ->method('getQuery')
             ->willReturn($query);
+
+        $this->assertEquals($expected, $this->searchHandler->search($searchQuery, 1, 10, true));
+    }
+
+    public function testSearchByIdsExceptionLogged()
+    {
+        $searchQuery = 'some-wrong-query-string';
+        $searchIds = ['some-wrong-query-string'];
+        $expected = [
+            'results' => [],
+            'more' => false
+        ];
+
+        $expr = new Expr();
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->expects($this->any())
+            ->method('expr')
+            ->willReturn($expr);
+        $qb->expects($this->once())
+            ->method('where')
+            ->with($expr->in('e.id', ':entityIds'))
+            ->willReturnSelf();
+        $qb->expects($this->once())
+            ->method('setParameter')
+            ->with('entityIds', $searchIds)
+            ->willReturnSelf();
+
+        $this->entityRepository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects($this->once())
+            ->method('getResult')
+            ->willThrowException(new \Exception('Some exception message'));
+
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $this->logger->expects($this->once())
+            ->method('critical')
+            ->with('Some exception message');
 
         $this->assertEquals($expected, $this->searchHandler->search($searchQuery, 1, 10, true));
     }
