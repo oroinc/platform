@@ -29,9 +29,6 @@ services:
         class: Oro\Bundle\FormBundle\Provider\HtmlTagProvider
         arguments:
             - []
-            - '%oro_form.html_purifier_mode%'
-            - '%oro_form.html_purifier_iframe_domains%'
-            - '%oro_form.html_purifier_uri_schemes%'
 
     oro_form.count_query_optimization_listener:
         class: Oro\Bundle\FormBundle\EventListener\CountQueryOptimizationListener

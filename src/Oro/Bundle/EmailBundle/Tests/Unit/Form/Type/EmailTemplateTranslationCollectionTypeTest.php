@@ -11,6 +11,7 @@ use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Asset\Context\ContextInterface;
@@ -47,6 +48,8 @@ class EmailTemplateTranslationCollectionTypeTest extends FormIntegrationTestCase
             ->method('getAllowedElements')
             ->willReturn(['br', 'a']);
 
+        $htmlTagHelper = new HtmlTagHelper($htmlTagProvider);
+
         /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
 
@@ -57,7 +60,8 @@ class EmailTemplateTranslationCollectionTypeTest extends FormIntegrationTestCase
                         $this->translator,
                         $this->localizationManager
                     ),
-                    OroRichTextType::class => new OroRichTextType($configManager, $htmlTagProvider, $context),
+                    OroRichTextType::class =>
+                        new OroRichTextType($configManager, $htmlTagProvider, $context, $htmlTagHelper),
                 ],
                 []
             ),
