@@ -25,12 +25,240 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         $this->cachePath = $this->getTempDir('cache_test_data');
         $this->htmlTagProvider = $this->createMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
         $this->helper = new HtmlTagHelper($this->htmlTagProvider, $this->cachePath);
+
+        $this->helper->setAttribute('img', 'usemap', 'CDATA');
+        $this->helper->setAttribute('img', 'ismap', 'Bool');
+
+        $this->helper->setElement('map', 'Block', 'Flow', 'Common', true);
+        $this->helper->setAttribute('map', 'id', 'ID');
+        $this->helper->setAttribute('map', 'name', 'CDATA');
+
+        $this->helper->setElement('area', 'Inline', 'Empty', 'Common', true);
+        $this->helper->setAttribute('area', 'id', 'ID');
+        $this->helper->setAttribute('area', 'name', 'CDATA');
+        $this->helper->setAttribute('area', 'title', 'Text');
+        $this->helper->setAttribute('area', 'alt', 'Text');
+        $this->helper->setAttribute('area', 'coords', 'CDATA');
+        $this->helper->setAttribute('area', 'accesskey', 'Character');
+        $this->helper->setAttribute('area', 'nohref', 'Bool');
+        $this->helper->setAttribute('area', 'href', 'URI');
+        $this->helper->setAttribute('area', 'shape', 'Enum#rect,circle,poly,default');
+        $this->helper->setAttribute('area', 'target', 'Enum#_blank,_self,_target,_top');
+        $this->helper->setAttribute('area', 'tabindex', 'Text');
     }
 
     protected function tearDown()
     {
         $fileSystem = new Filesystem();
         $fileSystem->remove($this->cachePath);
+    }
+
+    /**
+     * @param string $value
+     * @param string $allowableTags
+     * @param string $expected
+     *
+     * @dataProvider dataProvider
+     */
+    public function testSanitize($value, $allowableTags, $expected): void
+    {
+        $this->htmlTagProvider->expects($this->never())
+            ->method('getIframeRegexp');
+        $this->htmlTagProvider->expects($this->once())
+            ->method('getUriSchemes')
+            ->willReturn(['http' => true, 'https' => true]);
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn($allowableTags);
+
+        $this->assertEquals($expected, $this->helper->sanitize($value));
+    }
+
+    public function testSanitizeWithNullValue(): void
+    {
+        $this->helper->sanitize('<p>sometext</p>', 'default');
+        $this->assertInstanceOf(\HTMLPurifier_ErrorCollector::class, $this->helper->getLastErrorCollector());
+        $this->helper->sanitize('', 'default');
+        $this->assertNull($this->helper->getLastErrorCollector());
+    }
+
+    /**
+     * @dataProvider iframeDataProvider
+     *
+     * @param string $value
+     * @param array $allowedElements
+     * @param string $allowedTags
+     * @param string $expected
+     */
+    public function testSanitizeIframe($value, array $allowedElements, $allowedTags, $expected)
+    {
+        $this->htmlTagProvider->expects($this->once())
+            ->method('getIframeRegexp')
+            ->willReturn('<^https?://(www.)?(youtube.com/embed/|player.vimeo.com/video/)>');
+        $this->htmlTagProvider->expects($this->once())
+            ->method('getUriSchemes')
+            ->willReturn(['http' => true, 'https' => true]);
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedTags')
+            ->willReturn($allowedTags);
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn($allowedElements);
+
+        $this->assertEquals($expected, $this->helper->sanitize($value));
+    }
+
+    /**
+     * @dataProvider errorCollectorDataProvider
+     *
+     * @param string $htmlValue
+     * @param array $allowedElements
+     * @param array $expectedResult
+     */
+    public function testGetLastErrorCollector($htmlValue, array $allowedElements, array $expectedResult): void
+    {
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn($allowedElements);
+
+        $this->helper->sanitize($htmlValue);
+
+        $this->assertNotNull($this->helper->getLastErrorCollector());
+        $this->assertEquals($expectedResult, $this->helper->getLastErrorCollector()->getRaw());
+    }
+
+    public function testGetLastErrorCollectorEmpty(): void
+    {
+        $this->assertNull($this->helper->getLastErrorCollector());
+    }
+
+    /**
+     * @return array
+     */
+    public function dataProvider(): array
+    {
+        return array_merge($this->sanitizeDataProvider(), $this->xssDataProvider());
+    }
+
+    /**
+     * @return array
+     */
+    public function errorCollectorDataProvider(): array
+    {
+        return [
+            'without errors' => [
+                'htmlValue' => '<div><h1>Hello World!</h1></div>',
+                'allowedElements' => ['div', 'h1'],
+                'expectedResult' => []
+            ],
+            'with errors' => [
+                'htmlValue' => '<div><h1>Hello World!</h1></div>',
+                'allowedElements' => ['div'],
+                'expectedResult' => [
+                    [1, 1, 'Unrecognized <h1> tag removed', []],
+                    [1, 1, 'Unrecognized </h1> tag removed', []],
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function iframeDataProvider()
+    {
+        return [
+            'iframe allowed' => [
+                'value' => '<iframe id="video-iframe" allowfullscreen="" src="https://www.youtube.com/embed/' .
+                    'XWyzuVHRe0A?rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
+                'allowedElements' => ['iframe[id|allowfullscreen|src]'],
+                'allowedTags' => '<iframe></iframe>',
+                'expectedResult' => '<iframe id="video-iframe" allowfullscreen src="https://www.youtube.com/embed/'.
+                    'XWyzuVHRe0A?rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>'
+            ],
+            'iframe invalid src' => [
+                'value' => '<iframe id="video-iframe" allowfullscreen="" src="https://www.scam.com/embed/' .
+                    'XWyzuVHRe0A?rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
+                'allowedElements' => ['iframe[id|allowfullscreen|src]'],
+                'allowedTags' => '<iframe></iframe>',
+                'expectedResult' => '<iframe id="video-iframe" allowfullscreen></iframe>'
+            ],
+            'iframe bypass src' => [
+                'value' => '<iframe id="video-iframe" allowfullscreen="" src="https://www.scam.com/embed/' .
+                    'XWyzuVHRe0A?bypass=https://www.youtube.com/embed/XWyzuVHRe0A' .
+                    'rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
+                'allowedElements' => ['iframe[id|allowfullscreen|src]'],
+                'allowedTags' => '<iframe></iframe>',
+                'expectedResult' => '<iframe id="video-iframe" allowfullscreen></iframe>'
+            ],
+        ];
+    }
+
+    /**
+     * @link https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet
+     *
+     * @return array
+     */
+    protected function xssDataProvider(): array
+    {
+        $str = '<IMG SRC=&#x6A&#x61&#x76&#x61&#x73&#x63&#x72&#x69&#x70&#x74&#x3A&#x61&#x6C&#x65&#x72&#x74&#x28&#x27&' .
+            '#x58&#x53&#x53&#x27&#x29>';
+
+        return [
+            'image' => ['<IMG SRC="javascript:alert(\'XSS\');">', [], ''],
+            'script' => ['<script>alert(\'xss\');</script>', [], ''],
+            'coded' => [$str, [], ''],
+            'css expr' => ['<IMG STYLE="xss:expression(alert(\'XSS\'))">', [], '']
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function sanitizeDataProvider(): array
+    {
+        $mapHtml = '<img src="planets.gif" width="145" height="126" alt="Planets" usemap="#planetmap">'.
+            '<map name="planetmap">'.
+            '<area shape="rect" coords="0,0,82,126" href="sun.htm" alt="Sun" tabindex="-1">'.
+            '<area shape="circle" coords="90,58,3" href="mercur.htm" alt="Mercury" tabindex="0">'.
+            '<area shape="circle" coords="124,58,8" href="venus.htm" alt="Venus" tabindex="1">'.
+            '</map>';
+
+        return [
+            'default' => ['sometext', [], 'sometext'],
+            'not allowed tag' => ['<p>sometext</p>', ['a'], 'sometext'],
+            'allowed tag' => ['<p>sometext</p>', ['p'], '<p>sometext</p>'],
+            'mixed' => ['<p>sometext</p></br>', ['p'], '<p>sometext</p>'],
+            'attribute' => ['<p class="class">sometext</p>', ['p[class]'], '<p class="class">sometext</p>'],
+            'mixed attribute' => [
+                '<p class="class">sometext</p><span data-attr="mixed">',
+                ['p[class]'],
+                '<p class="class">sometext</p>'
+            ],
+            'prepare allowed' => ['<a>first text</a><c>second text</c>', ['a', 'b'], '<a>first text</a>second text'],
+            'prepare not allowed' => ['<p>sometext</p>', ['a[class]'], 'sometext'],
+            'prepare with allowed' => ['<p>sometext</p>', ['a', 'p[class]'], '<p>sometext</p>'],
+            'prepare attribute' => ['<p>sometext</p>', ['a[class]', 'p'], '<p>sometext</p>'],
+            'prepare attributes' => ['<p>sometext</p>', ['p[class|style]'], '<p>sometext</p>'],
+            'prepare or condition' => ['<p>sometext</p>', ['a[href|target=_blank]', 'b/p'], '<p>sometext</p>'],
+            'prepare empty' => ['<p>sometext</p>', ['[href|target=_blank],/'], 'sometext'],
+            'default attributes set' => ['<p>sometext</p>', ['@[style]', 'a'], 'sometext'],
+            'default attributes set with allowed' => ['<p>sometext</p>', ['@[style]', 'p'], '<p>sometext</p>'],
+            'id attribute' => [
+                '<div id="test" data-id="test2">sometext</div>',
+                ['div[id]'],
+                '<div id="test">sometext</div>'
+            ],
+            'map element' => [
+                $mapHtml,
+                [
+                    'img[src|width|height|alt|usemap]',
+                    'map[name]',
+                    'area[shape|coords|href|alt|tabindex]'
+                ],
+                $mapHtml
+            ]
+        ];
     }
 
     public function testGetStripped()
@@ -69,11 +297,6 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testHtmlPurify()
     {
-        $this->htmlTagProvider->expects($this->never())
-            ->method('isExtendedPurification');
-        $this->htmlTagProvider->expects($this->once())
-            ->method('isPurificationNeeded')
-            ->willReturn(true);
         $this->htmlTagProvider->expects($this->once())
             ->method('getUriSchemes')
             ->willReturn(['http' => true, 'https' => true]);
@@ -105,36 +328,6 @@ same linesame line2
 STR;
 
         $this->assertEquals($expected, $this->helper->purify($testString));
-    }
-
-    public function testHtmlPurifyDisabledPurification()
-    {
-        $this->htmlTagProvider->expects($this->never())
-            ->method('isExtendedPurification');
-        $this->htmlTagProvider->expects($this->once())
-            ->method('isPurificationNeeded')
-            ->willReturn(false);
-
-        $testString = <<<STR
-<html dir="ltr">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="GENERATOR" content="MSHTML 10.00.9200.17228">
-<style id="owaParaStyle">P {
-	MARGIN-BOTTOM: 0px; MARGIN-TOP: 0px
-}
-</style>
-</head>
-<body fPStyle="1" ocsi="0">
-<div style="direction: ltr;font-family: Tahoma;color: #000000;font-size: 10pt;">no subject</div>
-<div style="direction: ltr;font-family: Tahoma;color: #000000;font-size: 10pt;">no subject2</div>
-<span>same line</span><span>same line2</span>
-<p>same line</p><p>same line2</p>
-</body>
-</html>
-STR;
-
-        $this->assertEquals($testString, $this->helper->purify($testString));
     }
 
     public function testEscape()

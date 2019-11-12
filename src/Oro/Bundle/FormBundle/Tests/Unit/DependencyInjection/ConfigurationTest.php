@@ -32,7 +32,65 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'value' => true,
                         'scope' => 'app'
                     ]
+                ],
+                'html_purifier_modes' => [
+                    'scope_1' => [
+                        'extends' => null,
+                        'allowed_iframe_domains' => [],
+                        'allowed_uri_schemes' => [],
+                        'allowed_html_elements' => [],
+                    ],
+                    'scope_2' => [
+                        'extends' => 'scope_1',
+                        'allowed_iframe_domains' => [],
+                        'allowed_uri_schemes' => [],
+                        'allowed_html_elements' => [],
+                    ],
+                    'scope_3' => [
+                        'extends' => null,
+                        'allowed_iframe_domains' => [],
+                        'allowed_uri_schemes' => [],
+                        'allowed_html_elements' => [
+                            'table' => [
+                                'attributes' => ['cellspacing', 'cellpadding'],
+                                'hasClosingTag' => true
+                            ]
+                        ],
+                    ]
                 ]
+            ],
+            $processor->processConfiguration(new Configuration(), [[
+                'html_purifier_modes' => [
+                    'scope_1' => [],
+                    'scope_2' => [
+                        'extends' => 'scope_1'
+                    ],
+                    'scope_3' => [
+                        'allowed_html_elements' => [
+                            'table' => [
+                                'attributes' => ['cellspacing', 'cellpadding']
+                            ]
+                        ]
+                    ],
+                ]
+            ]])
+        );
+    }
+
+    public function testProcessConfigurationEmpty()
+    {
+        $processor = new Processor();
+
+        $this->assertEquals(
+            [
+                'settings' => [
+                    'resolved' => true,
+                    'wysiwyg_enabled' => [
+                        'value' => true,
+                        'scope' => 'app'
+                    ]
+                ],
+                'html_purifier_modes' => []
             ],
             $processor->processConfiguration(new Configuration(), [])
         );

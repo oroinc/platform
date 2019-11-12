@@ -9,6 +9,7 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterfa
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalkerContext;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalkerContextFactory;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
@@ -43,7 +44,9 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
         $this->tokenStorage = new TokenStorage();
         $this->accessRuleExecutor = $this->createMock(AccessRuleExecutor::class);
 
-        $this->helper = new AclHelper($this->tokenStorage, $this->accessRuleExecutor);
+        $this->helper = new AclHelper(
+            new AccessRuleWalkerContextFactory($this->tokenStorage, $this->accessRuleExecutor)
+        );
     }
 
     public function testApplyToQueryWithDefaultConfiguration()

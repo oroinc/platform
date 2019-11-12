@@ -41,7 +41,7 @@ class ParentEntityObjectSecurityCheck implements ProcessorInterface
 
         $isGranted = true;
         $parentEntity = $context->getParentEntity();
-        if ($parentEntity) {
+        if ($parentEntity && $this->isParentEntityShouldBeChecked($context)) {
             $isGranted = $this->authorizationChecker->isGranted($this->permission, $parentEntity);
         }
 
@@ -51,5 +51,20 @@ class ParentEntityObjectSecurityCheck implements ProcessorInterface
                 $this->permission
             ));
         }
+    }
+
+    /**
+     * @param ChangeRelationshipContext $context
+     *
+     * @return bool
+     */
+    private function isParentEntityShouldBeChecked(ChangeRelationshipContext $context): bool
+    {
+        $parentConfig = $context->getParentConfig();
+        if (null === $parentConfig) {
+            return true;
+        }
+
+        return false === $parentConfig->hasAclResource() || null !== $parentConfig->getAclResource();
     }
 }

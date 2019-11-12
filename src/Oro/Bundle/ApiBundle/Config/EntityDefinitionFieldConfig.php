@@ -348,7 +348,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     /**
      * Gets existing validation constraints from the form options.
      *
-     * @return Constraint[]|null
+     * @return array|null [Constraint object or [constraint name or class => constraint options, ...], ...]
      */
     public function getFormConstraints()
     {
@@ -369,6 +369,40 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     {
         $formOptions = $this->getFormOptions();
         $formOptions['constraints'][] = $constraint;
+        $this->setFormOptions($formOptions);
+    }
+
+    /**
+     * Removes a validation constraint from the form options by its class.
+     *
+     * @param string $constraintClass
+     */
+    public function removeFormConstraint($constraintClass)
+    {
+        $formOptions = $this->getFormOptions();
+        if (empty($formOptions) || !\array_key_exists('constraints', $formOptions)) {
+            return;
+        }
+
+        $resultConstraints = [];
+        foreach ($formOptions['constraints'] as $formConstraint) {
+            if (is_array($formConstraint)) {
+                $subConstraints = [];
+                foreach ($formConstraint as $className => $options) {
+                    if ($className === $constraintClass) {
+                        continue;
+                    }
+                    $subConstraints[$className] = $options;
+                }
+                if (!empty($subConstraints)) {
+                    $resultConstraints[] = $subConstraints;
+                }
+            } elseif ($formConstraint instanceof Constraint && !is_a($formConstraint, $constraintClass)) {
+                $resultConstraints[] = $formConstraint;
+            }
+        }
+
+        $formOptions['constraints'] = $resultConstraints;
         $this->setFormOptions($formOptions);
     }
 

@@ -8,55 +8,32 @@ namespace Oro\Bundle\FormBundle\Provider;
  */
 class HtmlTagProvider
 {
-    const HTML_PURIFIER_MODE_STRICT = 'strict';
-    const HTML_PURIFIER_MODE_EXTENDED = 'extended';
-    const HTML_PURIFIER_MODE_DISABLED = 'disabled';
-
-    /** elements forbidden in strict mode */
-    const STRICT_ELEMENTS = ['iframe', 'style'];
+    private const EXTEND_KEY = 'extends';
+    private const ALLOWED_HTML_ELEMENTS = 'allowed_html_elements';
+    private const ALLOWED_IFRAME_DOMAINS = 'allowed_iframe_domains';
+    private const ALLOWED_URI_SCHEMES = 'allowed_uri_schemes';
 
     /** @var array */
-    protected $elements = [];
-
-    /** @var string */
-    private $htmlPurifierMode;
-
-    /** @var array */
-    private $iframeDomains;
-
-    /** @var array */
-    private $uriSchemes;
+    private $purifierConfig = [];
 
     /**
-     * @param array $elements
-     * @param string $htmlPurifierMode
-     * @param array $iframeDomains
-     * @param array $uriSchemes
+     * @param array $purifierConfig
      */
-    public function __construct(
-        array $elements,
-        $htmlPurifierMode = self::HTML_PURIFIER_MODE_STRICT,
-        $iframeDomains = [],
-        $uriSchemes = []
-    ) {
-        $this->elements = $elements;
-        $this->htmlPurifierMode = $htmlPurifierMode;
-        $this->iframeDomains = $iframeDomains;
-        $this->uriSchemes = $uriSchemes;
-
-        $this->filterElementsForStrictMode($this->elements);
+    public function __construct(array $purifierConfig)
+    {
+        $this->purifierConfig = $purifierConfig;
     }
 
     /**
-     * Returns array of allowed elements to use in TinyMCE plugin
+     * Returns array of allowed elements
      *
+     * @param string $scope
      * @return array
      */
-    public function getAllowedElements()
+    public function getAllowedElements(string $scope): array
     {
-        $allowedElements = ['@[style|class]'];
-
-        foreach ($this->elements as $name => $data) {
+        $allowedElements = ['@[id|style|class]'];
+        foreach ($this->getPurifierConfigByKey($scope, self::ALLOWED_HTML_ELEMENTS) as $name => $data) {
             $allowedElement = $name;
             if (!empty($data['attributes'])) {
                 $allowedElement .= '[' . implode('|', $data['attributes']) . ']';
@@ -71,15 +48,15 @@ class HtmlTagProvider
     /**
      * Returns string consisted from allowed tags
      *
+     * @param string $scope
      * @return string
      */
-    public function getAllowedTags()
+    public function getAllowedTags(string $scope): string
     {
         $allowedTags = '';
-
-        foreach ($this->elements as $name => $data) {
+        foreach ($this->getPurifierConfigByKey($scope, self::ALLOWED_HTML_ELEMENTS) as $name => $data) {
             $allowedTag = '<' . $name . '>';
-            if (!array_key_exists('hasClosingTag', $data) || $data['hasClosingTag']) {
+            if (!is_array($data) || !array_key_exists('hasClosingTag', $data) || $data['hasClosingTag']) {
                 $allowedTag .= '</' . $name . '>';
             }
 
@@ -89,58 +66,64 @@ class HtmlTagProvider
         return $allowedTags;
     }
 
-    private function filterElementsForStrictMode(array &$allowedElements)
-    {
-        if ($this->htmlPurifierMode === self::HTML_PURIFIER_MODE_STRICT) {
-            $allowedElements = array_filter(
-                $allowedElements,
-                function ($allowedElement) {
-                    return !in_array($allowedElement, self::STRICT_ELEMENTS);
-                },
-                ARRAY_FILTER_USE_KEY
-            );
-        }
-    }
-
     /**
-     * @return bool
-     */
-    public function isPurificationNeeded()
-    {
-        return $this->htmlPurifierMode !== self::HTML_PURIFIER_MODE_DISABLED;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isExtendedPurification()
-    {
-        return $this->htmlPurifierMode === self::HTML_PURIFIER_MODE_EXTENDED;
-    }
-
-    /**
+     * @param string $scope
      * @return string
      */
-    public function getIframeRegexp()
+    public function getIframeRegexp(string $scope): string
     {
-        if (!$this->iframeDomains) {
+        $iframeDomains = $this->getPurifierConfigByKey($scope, self::ALLOWED_IFRAME_DOMAINS);
+        if (!$iframeDomains) {
             return '';
         }
 
-        return sprintf('<^https?://(www.)?(%s)>', implode('|', $this->iframeDomains));
+        return sprintf('<^https?://(www.)?(%s)>', implode('|', $iframeDomains));
     }
 
     /**
+     * @param string $scope
      * @return array
      */
-    public function getUriSchemes()
+    public function getUriSchemes(string $scope): array
     {
         $result = [];
-
-        foreach ($this->uriSchemes as $scheme) {
+        foreach ($this->getPurifierConfigByKey($scope, self::ALLOWED_URI_SCHEMES) as $scheme) {
             $result[$scheme] = true;
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $scope
+     * @param string $key
+     * @return array
+     */
+    private function getPurifierConfigByKey($scope, $key): array
+    {
+        $purifierConfig = [
+            self::ALLOWED_HTML_ELEMENTS => [],
+            self::ALLOWED_IFRAME_DOMAINS => [],
+            self::ALLOWED_URI_SCHEMES => [],
+        ];
+
+        if (array_key_exists($scope, $this->purifierConfig)) {
+            $purifierConfigByKey = $purifierConfig[$key];
+
+            if (array_key_exists(self::EXTEND_KEY, $this->purifierConfig[$scope])) {
+                $purifierConfigByKey = array_merge_recursive(
+                    $purifierConfigByKey,
+                    $this->getPurifierConfigByKey($this->purifierConfig[$scope][self::EXTEND_KEY], $key)
+                );
+            }
+
+            if (array_key_exists($key, $this->purifierConfig[$scope])) {
+                $purifierConfigByKey = array_merge_recursive($purifierConfigByKey, $this->purifierConfig[$scope][$key]);
+            }
+
+            $purifierConfig[$key] = $purifierConfigByKey;
+        }
+
+        return $purifierConfig[$key];
     }
 }

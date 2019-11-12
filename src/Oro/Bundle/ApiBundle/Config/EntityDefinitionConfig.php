@@ -412,6 +412,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /**
      * Gets the name of ACL resource that should be used to protect the entity.
+     * Return null if access should not be check.
      *
      * @return string|null
      */
@@ -422,6 +423,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /**
      * Sets the name of ACL resource that should be used to protect the entity.
+     * Set null if access should not be check.
      *
      * @param string|null $aclResource
      */

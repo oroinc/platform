@@ -44,7 +44,7 @@ class EnabledLocalizationsSearchHandler extends SearchHandler
             return [];
         }
 
-        list($searchTerm, $scope) = explode(static::DELIMITER, $search, 2);
+        [$searchTerm, $scope] = explode(static::DELIMITER, $search, 2);
         $entityIds = $this->searchIdsByTermAndWebsite($searchTerm, $firstResult, $maxResults, $scope);
         if (!count($entityIds)) {
             return [];
@@ -72,12 +72,7 @@ class EnabledLocalizationsSearchHandler extends SearchHandler
         int $maxResults,
         $scope = null
     ) {
-        $enabledLocalizationIds = $this->configManager->get(
-            Configuration::getConfigKeyByName(Configuration::ENABLED_LOCALIZATIONS),
-            [],
-            false,
-            $scope ? (int) $scope : null
-        );
+        $enabledLocalizationIds = $this->getEnabledLocalizationsByScope($scope);
 
         $query = $this->indexer->getSimpleSearchQuery($search, $firstResult, $maxResults, $this->entitySearchAlias);
         $query->getCriteria()->andWhere(Criteria::expr()->in(
@@ -93,5 +88,41 @@ class EnabledLocalizationsSearchHandler extends SearchHandler
             },
             $result->getElements()
         );
+    }
+
+    /**
+     * @param string $scope
+     * @return array
+     */
+    private function getEnabledLocalizationsByScope(string $scope): array
+    {
+        return (array) $this->configManager->get(
+            Configuration::getConfigKeyByName(Configuration::ENABLED_LOCALIZATIONS),
+            [],
+            false,
+            $scope ? (int) $scope : null
+        );
+    }
+
+    /**
+     * Overwrites parent method mo make grid search work correct considering new delimiter ";" which divides
+     * localization id and website
+     * {@inheritdoc}
+     */
+    protected function findById($query): array
+    {
+        //Explodes query string - "1;2". Where 1 - is localization id, and 2 - scope id
+        //By ";" - delimiter. Calling this method assumes we search only for ONE entity
+        [$searchId, $scope] = explode(static::DELIMITER, $query, 2);
+
+        //Get enabled localizations for current scope (website id)
+        $enabledLocalizationIds = $this->getEnabledLocalizationsByScope($scope);
+
+        //Check if searched id does not exist in current configuration no need to query
+        if (!\in_array($searchId, $enabledLocalizationIds)) {
+            return [];
+        }
+
+        return $this->getEntitiesByIds([$searchId]);
     }
 }

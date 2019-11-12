@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\AccessRule\Expr;
 use Oro\Bundle\SecurityBundle\AccessRule\Visitor;
 
 /**
- * Checks access by associated entity.
+ * Checks access by access rules of associated entity.
  */
 class Association implements ExpressionInterface
 {

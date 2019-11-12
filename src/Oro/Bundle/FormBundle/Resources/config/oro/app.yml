@@ -1,161 +1,133 @@
 oro_form:
-    wysiwyg:
-        # strict - filter html elements and attributes by white list.
-        #          Style and iframe elements are not allowed
-        # extended - same as strict but style and iframe elements are allowed
-        # disabled - HTML Purifier is disabled completely
-        html_purifier_mode: strict
+    html_purifier_modes:
+        default:
+            allowed_uri_schemes:
+                - 'http'
+                - 'https'
+                - 'mailto'
+                - 'ftp'
+                - 'data'
+                - 'tel'
 
-        # only these domains will be allowed in iframes
-        # (in case iframes are enabled in extended mode)
-        html_purifier_iframe_domains:
-            - 'youtube.com/embed/'
-            - 'player.vimeo.com/video/'
-
-        # allowed URI schemes for HTMLPurifier
-        html_purifier_uri_schemes:
-            - 'http'
-            - 'https'
-            - 'mailto'
-            - 'ftp'
-            - 'data'
-            - 'tel'
-
-        html_allowed_elements:
-            table:
-                attributes:
-                    - cellspacing
-                    - cellpadding
-                    - border
-                    - align
-                    - width
-            thead:
-                attributes:
-                    - align
-                    - valign
-            tbody:
-                attributes:
-                    - align
-                    - valign
-            tr:
-                attributes:
-                    - align
-                    - valign
-            td:
-                attributes:
-                    - align
-                    - valign
-                    - rowspan
-                    - colspan
-                    - bgcolor
-                    - nowrap
-                    - width
-                    - height
-            th:
-                attributes:
-                    - align
-                    - valign
-                    - rowspan
-                    - colspan
-                    - bgcolor
-                    - nowrap
-                    - width
-                    - height
-            a:
-                attributes:
-                    - "!href"
-                    - target
-                    - title
-            dl: ~
-            dt: ~
-            div:
-                attributes:
-                    - id
-            ul: ~
-            ol: ~
-            li: ~
-            em: ~
-            strong: ~
-            b: ~
-            p: ~
-            font:
-                attributes:
-                    - color
-            i: ~
-            br:
-                hasClosingTag: false
-            span:
-                attributes:
-                    - id
-            img:
-                attributes:
-                    - src
-                    - width
-                    - height
-                    - alt
-                hasClosingTag: false
-            h1: ~
-            h2: ~
-            h3: ~
-            h4: ~
-            h5: ~
-            h6: ~
-            hgroup: ~
-            abbr: ~
-            address: ~
-            article: ~
-            audio: ~
-            bdo: ~
-            blockquote: ~
-            caption: ~
-            cite: ~
-            code: ~
-            col: ~
-            colgroup: ~
-            dd: ~
-            del: ~
-            details: ~
-            dfn: ~
-            figure: ~
-            figcaption: ~
-            picture: ~
-            footer: ~
-            header: ~
-            hr: ~
-            iframe:
-                attributes:
-                    - id
-                    - allowfullscreen
-                    - frameborder
-                    - height
-                    - marginheight
-                    - marginwidth
-                    - name
-                    - scrolling
-                    - src
-                    - width
-            ins: ~
-            kbd: ~
-            mark: ~
-            menu: ~
-            nav: ~
-            pre: ~
-            q: ~
-            samp: ~
-            section: ~
-            small: ~
-            source:
-                attributes:
-                    - srcset
-                    - media
-            style:
-                attributes:
-                    - media
-                    - type
-            sub: ~
-            sup: ~
-            time: ~
-            tfoot: ~
-            var: ~
-            video: ~
-            aside: ~
+            allowed_html_elements:
+                table:
+                    attributes:
+                        - cellspacing
+                        - cellpadding
+                        - border
+                        - align
+                        - width
+                thead:
+                    attributes:
+                        - align
+                        - valign
+                tbody:
+                    attributes:
+                        - align
+                        - valign
+                tr:
+                    attributes:
+                        - align
+                        - valign
+                td:
+                    attributes:
+                        - align
+                        - valign
+                        - rowspan
+                        - colspan
+                        - bgcolor
+                        - nowrap
+                        - width
+                        - height
+                th:
+                    attributes:
+                        - align
+                        - valign
+                        - rowspan
+                        - colspan
+                        - bgcolor
+                        - nowrap
+                        - width
+                        - height
+                a:
+                    attributes:
+                        - "!href"
+                        - target
+                        - title
+                dl: ~
+                dt: ~
+                div:
+                    attributes:
+                        - id
+                ul: ~
+                ol: ~
+                li: ~
+                em: ~
+                strong: ~
+                b: ~
+                p: ~
+                font:
+                    attributes:
+                        - color
+                i: ~
+                br:
+                    hasClosingTag: false
+                span:
+                    attributes:
+                        - id
+                img:
+                    attributes:
+                        - src
+                        - width
+                        - height
+                        - alt
+                    hasClosingTag: false
+                h1: ~
+                h2: ~
+                h3: ~
+                h4: ~
+                h5: ~
+                h6: ~
+                hgroup: ~
+                abbr: ~
+                address: ~
+                article: ~
+                audio: ~
+                bdo: ~
+                blockquote: ~
+                caption: ~
+                cite: ~
+                code: ~
+                col: ~
+                colgroup: ~
+                dd: ~
+                del: ~
+                details: ~
+                dfn: ~
+                figure: ~
+                figcaption: ~
+                picture: ~
+                footer: ~
+                header: ~
+                hr: ~
+                ins: ~
+                kbd: ~
+                mark: ~
+                menu: ~
+                nav: ~
+                pre: ~
+                q: ~
+                samp: ~
+                section: ~
+                small: ~
+                source:
+                    attributes:
+                        - srcset
+                        - media
+                sub: ~
+                sup: ~
+                time: ~
+                tfoot: ~
+                var: ~
+                video: ~
+                aside: ~
