@@ -55,7 +55,7 @@ datagrids:
                     data_name: someAlias
                     apply_callback: callable # if you want to apply some operations instead of just adding ORDER BY
             default:
-                label: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC # sorters enabled by default, key is a column name
+                label: DESC # sorters enabled by default, key is a column name
 
             multiple_sorting: true|false # is multisorting mode enabled ? False by default
             

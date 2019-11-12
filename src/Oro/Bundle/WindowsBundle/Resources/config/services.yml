@@ -1,8 +1,5 @@
 parameters:
     oro_windows.entity.windows_state.class: Oro\Bundle\WindowsBundle\Entity\WindowsState
-    oro_windows.manager.windows_state.class: Oro\Bundle\WindowsBundle\Manager\WindowsStateManager
-    oro_windows.manager.windows_state_registry.class: Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry
-    oro_windows.manager.windows_state_request.class: Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager
 
 services:
     oro_windows.twig.extension:
@@ -14,12 +11,12 @@ services:
             - { name: twig.extension }
 
     oro_windows.manager.windows_state_registry:
-        class: '%oro_windows.manager.windows_state_registry.class%'
+        class: Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry
         arguments:
             - '@oro_windows.manager.windows_state'
 
     oro_windows.manager.windows_state.abstract:
-        class: '%oro_windows.manager.windows_state.class%'
+        class: Oro\Bundle\WindowsBundle\Manager\WindowsStateManager
         abstract: true
         arguments:
             - '@security.token_storage'
@@ -35,6 +32,6 @@ services:
             - '%oro_user.entity.class%'
 
     oro_windows.manager.windows_state_request:
-        class: '%oro_windows.manager.windows_state_request.class%'
+        class: Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager
         arguments:
             - '@request_stack'

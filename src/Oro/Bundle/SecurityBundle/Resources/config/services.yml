@@ -340,13 +340,18 @@ services:
         public: true
         arguments: [ '%kernel.secret%']
 
+    oro_security.access_rule_walker_context_factory:
+        class: Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalkerContextFactory
+        arguments:
+            - '@security.token_storage'
+            - '@oro_security.access_rule_executor'
+
     oro_security.acl_helper:
         class: Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
-            - '@security.token_storage'
-            - '@oro_security.access_rule_executor'
+            - '@oro_security.access_rule_walker_context_factory'
 
     Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper:
         alias: oro_security.acl_helper

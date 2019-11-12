@@ -8,6 +8,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * The CRUD controller for Item entity.
+ */
 class ItemController extends Controller
 {
     /**
@@ -19,7 +22,7 @@ class ItemController extends Controller
     public function indexAction()
     {
         return [
-            'entity_class' => $this->container->getParameter('oro_test.entity.item.class'),
+            'entity_class' => Item::class
         ];
     }
 

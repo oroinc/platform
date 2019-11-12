@@ -1,11 +1,6 @@
-parameters:
-    oro_form.validator.constraint_factory.class: Oro\Bundle\FormBundle\Validator\ConstraintFactory
-    oro_form.provider.html_tag_provider.class:   Oro\Bundle\FormBundle\Provider\HtmlTagProvider
-    oro_form.event.event_dispatcher.class:       Oro\Bundle\FormBundle\Event\EventDispatcher
-
 services:
     oro_form.validator.constraint_factory:
-        class: '%oro_form.validator.constraint_factory.class%'
+        class: Oro\Bundle\FormBundle\Validator\ConstraintFactory
 
     oro_form.twig.form_extension:
         class: Oro\Bundle\FormBundle\Twig\FormExtension
@@ -19,7 +14,7 @@ services:
         deprecated: The "%service_id%" service is deprecated since v2.1.0 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade (oro_form.update_handler) instead
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
-        class: 'Oro\Bundle\FormBundle\Model\UpdateHandler'
+        class: Oro\Bundle\FormBundle\Model\UpdateHandler
         arguments:
             - '@request_stack'
             - '@session'
@@ -31,12 +26,9 @@ services:
         alias: oro_form.model.update_handler
 
     oro_form.provider.html_tag_provider:
-        class: '%oro_form.provider.html_tag_provider.class%'
+        class: Oro\Bundle\FormBundle\Provider\HtmlTagProvider
         arguments:
             - []
-            - '%oro_form.html_purifier_mode%'
-            - '%oro_form.html_purifier_iframe_domains%'
-            - '%oro_form.html_purifier_uri_schemes%'
 
     oro_form.count_query_optimization_listener:
         class: Oro\Bundle\FormBundle\EventListener\CountQueryOptimizationListener
@@ -44,7 +36,7 @@ services:
             - { name: kernel.event_listener, event: oro.entity.count_query.optimize, method: onOptimize }
 
     oro_form.event.event_dispatcher:
-        class: '%oro_form.event.event_dispatcher.class%'
+        class: Oro\Bundle\FormBundle\Event\EventDispatcher
         arguments:
             - '@event_dispatcher'
 

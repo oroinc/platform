@@ -9,14 +9,19 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * The main implementation of SearchHandlerInterface.
+ * Search entities by given string.
  */
-class SearchHandler implements SearchHandlerInterface
+class SearchHandler implements SearchHandlerInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var Indexer
      */
@@ -255,7 +260,14 @@ class SearchHandler implements SearchHandlerInterface
             $queryBuilder = $this->entityRepository->createQueryBuilder('e');
             $queryBuilder->where($queryBuilder->expr()->in('e.' . $this->idFieldName, ':entityIds'));
             $queryBuilder->setParameter('entityIds', $entityIds);
-            return $queryBuilder->getQuery()->getResult();
+
+            try {
+                return $queryBuilder->getQuery()->getResult();
+            } catch (\Exception $exception) {
+                if ($this->logger) {
+                    $this->logger->critical($exception->getMessage());
+                }
+            }
         }
 
         return [];

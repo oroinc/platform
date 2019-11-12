@@ -49,7 +49,7 @@ class DigitalAssetControllerTest extends WebTestCase
             $this->getContainer()
                 ->get('doctrine')
                 ->getRepository(DigitalAsset::class)
-                ->findBy([], ['id' => 'ASC'], 1)
+                ->findBy([], ['id' => 'DESC'], 1)
         );
 
         $this->assertInstanceOf(DigitalAsset::class, $digitalAsset);
@@ -104,7 +104,7 @@ class DigitalAssetControllerTest extends WebTestCase
             $this->getContainer()
                 ->get('doctrine')
                 ->getRepository(DigitalAsset::class)
-                ->findBy([], ['id' => 'ASC'], 1)
+                ->findBy([], ['id' => 'DESC'], 1)
         );
 
         $this->assertInstanceOf(DigitalAsset::class, $digitalAsset);

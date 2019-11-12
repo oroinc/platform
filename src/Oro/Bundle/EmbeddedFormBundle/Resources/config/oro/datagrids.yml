@@ -22,7 +22,7 @@ datagrids:
                 title:
                     data_name: embedded_form.title
             default:
-                title: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                title: ASC
 
         filters:
             columns:

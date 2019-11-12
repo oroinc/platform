@@ -19,6 +19,7 @@ use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
@@ -78,6 +79,8 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
             ->method('getAllowedElements')
             ->willReturn(['br', 'a']);
 
+        $htmlTagHelper = new HtmlTagHelper($htmlTagProvider);
+
         /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
 
@@ -93,7 +96,8 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
                         $translator,
                         $this->localizationManager
                     ),
-                    OroRichTextType::class => new OroRichTextType($configManager, $htmlTagProvider, $context),
+                    OroRichTextType::class =>
+                        new OroRichTextType($configManager, $htmlTagProvider, $context, $htmlTagHelper),
                 ],
                 [
                     FormType::class => [new TooltipFormExtension($configProvider, $translator)],
@@ -121,6 +125,7 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
     /**
      * @dataProvider submitDataProvider
      * @param EmailTemplate $defaultData
+     * @param array $localizations
      * @param array $submittedData
      * @param EmailTemplate $expectedData
      */

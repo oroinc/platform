@@ -13,7 +13,7 @@ define(function(require) {
         validationOptions: null,
 
         events: {
-            reset: 'onReset'
+            doReset: 'onReset'
         },
 
         /**
@@ -41,6 +41,10 @@ define(function(require) {
         },
 
         dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
             delete this.validationOptions;
             if (this.validator) {
                 this.validator.destroy();

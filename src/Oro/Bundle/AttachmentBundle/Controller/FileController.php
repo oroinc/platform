@@ -78,7 +78,7 @@ class FileController extends Controller
     /**
      * @Route("media/cache/attachment/resize/{filter}/{filterMd5}/{id}/{filename}",
      *   name="oro_filtered_attachment",
-     *   requirements={"id"="\d+"}
+     *   requirements={"id"="\d+", "filterMd5"="^[0-9a-f]{32}$"}
      * )
      * @param int $id
      * @param string $filter

@@ -49,7 +49,7 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, Logger
         }
 
         try {
-            $url = $this->urlGenerator->generate($name, $parameters, $referenceType);
+            $url = (string) $this->urlGenerator->generate($name, $parameters, $referenceType);
             // Catches only InvalidParameterException because it is the only one that can be caused during normal
             // runtime, other exceptions should lead to direct fix.
         } catch (InvalidParameterException $e) {
