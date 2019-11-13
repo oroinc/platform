@@ -6,3 +6,17 @@ services:
             - '%database_driver%'
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata, connection: default }
+
+    oro_draft.duplicator.extension_provider:
+        class: Oro\Bundle\DraftBundle\Duplicator\ExtensionProvider
+        arguments:
+            - !tagged oro_draft.duplicator.extension
+
+    oro_draft.expression.context_accessor:
+        class: 'Oro\Component\ConfigExpression\ContextAccessor'
+
+    oro_draft.duplicator.duplicator:
+        class: Oro\Bundle\DraftBundle\Duplicator\Duplicator
+        arguments:
+            - '@oro_draft.duplicator.extension_provider'
+            - '@oro_draft.expression.context_accessor'

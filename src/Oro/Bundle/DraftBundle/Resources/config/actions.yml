@@ -1,0 +1,18 @@
+services:
+    oro_draft.action.draft_redirect:
+        class: Oro\Bundle\DraftBundle\Action\DraftRedirectAction
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@oro_entity_config.config_manager'
+            - '@router'
+            - 'redirectUrl'
+        tags:
+            - { name: oro_action.action, alias: draft_redirect }
+
+    oro_draft.action.draft_create:
+        class: Oro\Bundle\DraftBundle\Action\DraftCreateAction
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@oro_draft.duplicator.duplicator'
+        tags:
+            - { name: oro_action.action, alias: draft_entity }

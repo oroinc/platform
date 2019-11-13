@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
- * Manage bundle configuration
+ * Manage bundle configuration.
  */
 class OroDraftExtension extends Extension
 {
@@ -19,5 +19,7 @@ class OroDraftExtension extends Extension
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('actions.yml');
+        $loader->load('duplicator.yml');
     }
 }

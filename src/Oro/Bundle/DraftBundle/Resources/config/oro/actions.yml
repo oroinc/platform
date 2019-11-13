@@ -1,0 +1,24 @@
+action_groups:
+    oro_draft_create:
+        parameters:
+            source:
+                type: object
+            flush:
+                type: boolean
+                default: true
+        actions:
+            - '@draft_entity':
+                source: $.source
+                target: $.target
+            - '@tree':
+                conditions:
+                    '@equal': [true, $.flush]
+                actions:
+                    - '@flush_entity': $.target
+                    - '@flash_message':
+                        message: oro.draft.operations.create.success
+                        type: 'success'
+                    - '@draft_redirect':
+                        target: $.target
+                        route_parameters:
+                            id: $.target.id

@@ -7,3 +7,7 @@ oro:
             organization.label: Organization
             owner.label: Owner
             title.label: Title
+        operations:
+            create:
+                label: Create draft
+                success: Draft has been created
