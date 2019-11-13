@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -24,16 +25,23 @@ class DocumentationProviderCompilerPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds(self::PROVIDER_TAG);
         foreach ($taggedServices as $id => $attributes) {
             foreach ($attributes as $tagAttributes) {
-                $providers[DependencyInjectionUtil::getPriority($tagAttributes)][] = new Reference($id);
+                $providers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
+                    $id,
+                    DependencyInjectionUtil::getRequestType($tagAttributes)
+                ];
             }
         }
-        if (empty($providers)) {
-            return;
+
+        $services = [];
+        if ($providers) {
+            $providers = DependencyInjectionUtil::sortByPriorityAndFlatten($providers);
+            foreach ($providers as list($serviceId, $requestTypeExpr)) {
+                $services[$serviceId] = new Reference($serviceId);
+            }
         }
 
-        $providers = DependencyInjectionUtil::sortByPriorityAndFlatten($providers);
-
         $container->getDefinition(self::CHAIN_PROVIDER_SERVICE_ID)
-            ->replaceArgument(0, $providers);
+            ->setArgument(0, $providers)
+            ->setArgument(1, ServiceLocatorTagPass::register($container, $services));
     }
 }

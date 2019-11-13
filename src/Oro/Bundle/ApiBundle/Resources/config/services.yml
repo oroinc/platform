@@ -504,8 +504,8 @@ services:
         class: Oro\Bundle\ApiBundle\Request\EntityIdResolverRegistry
         public: false
         arguments:
-            - [] # resolvers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdResolverCompilerPass
-            - '@service_container'
+            - [] # resolvers. Injected by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdResolverCompilerPass
+            - ~ # service locator. Injected by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdResolverCompilerPass
             - '@oro_api.request_expression_matcher'
 
     oro_api.rest.entity_id_transformer:
@@ -765,7 +765,9 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\ChainDocumentationProvider
         public: false
         arguments:
-            - [] # providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentationProviderCompilerPass
+            - [] # providers. Injected by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentationProviderCompilerPass
+            - ~ # service locator. Injected by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentationProviderCompilerPass
+            - '@oro_api.request_expression_matcher'
 
     oro_api.api_doc.documentation_provider.predefined_ids:
         class: Oro\Bundle\ApiBundle\ApiDoc\PredefinedIdDocumentationProvider
