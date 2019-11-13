@@ -3,29 +3,19 @@ define(function(require) {
 
     const _ = require('underscore');
     const Backbone = require('backbone');
-    const SyncMachineProxyCache = require('oroui/js/app/models/sync-machine-proxy-cache');
-    const jsmoduleExposure = require('jsmodule-exposure');
-    const exposure = jsmoduleExposure.disclose('oroui/js/app/models/sync-machine-proxy-cache');
+    const Chaplin = require('chaplin');
+    const syncMachineProxyCacheManagerModuleInjector = require('inject-loader!oroui/js/app/models/sync-machine-proxy-cache');
 
-    xdescribe('oroui/js/app/models/sync-machine-proxy-cache', function() {
+    describe('oroui/js/app/models/sync-machine-proxy-cache', function() {
         let instance;
         let storedData;
         let storageMock;
         let errorHandlerMock;
         let storageKey;
         let expireTime;
+        let SyncMachineProxyCache;
 
         beforeEach(function() {
-            instance = _.extend(Object.create(Backbone.Events), SyncMachineProxyCache);
-            instance.SYNC_MACHINE_PROXY_CACHE_STORAGE_KEY = storageKey = 'test';
-            instance.SYNC_MACHINE_PROXY_CACHE_EXPIRE_TIME = expireTime = 1000;
-            instance.set = jasmine.createSpy('set');
-            instance.fetch = jasmine.createSpy('fetch').and.callFake(function() {
-                return {then: jasmine.createSpy('then')};
-            });
-            spyOn(instance, 'once').and.callThrough();
-            spyOn(instance, 'trigger').and.callThrough();
-
             storedData = {};
             storageMock = {
                 getItem: function(key) {
@@ -37,16 +27,27 @@ define(function(require) {
             };
             spyOn(storageMock, 'getItem').and.callThrough();
             spyOn(storageMock, 'setItem').and.callThrough();
-            exposure.substitute('persistentStorage').by(storageMock);
 
             errorHandlerMock = jasmine.createSpyObj('errorHandler', ['showErrorInConsole']);
-            exposure.substitute('errorHandler').by(errorHandlerMock);
+
+            SyncMachineProxyCache = syncMachineProxyCacheManagerModuleInjector({
+                'oroui/js/persistent-storage': storageMock,
+                'oroui/js/error': errorHandlerMock
+            });
+
+            instance = _.extend(Object.create(Backbone.Events), SyncMachineProxyCache);
+            instance.SYNC_MACHINE_PROXY_CACHE_STORAGE_KEY = storageKey = 'test';
+            instance.SYNC_MACHINE_PROXY_CACHE_EXPIRE_TIME = expireTime = 1000;
+            instance.set = jasmine.createSpy('set');
+            instance.fetch = jasmine.createSpy('fetch').and.callFake(function() {
+                return {then: jasmine.createSpy('then')};
+            });
+            spyOn(instance, 'once').and.callThrough();
+            spyOn(instance, 'trigger').and.callThrough();
         });
 
         afterEach(function() {
             storedData = {};
-            exposure.recover('persistentStorage');
-            exposure.recover('errorHandler');
         });
 
         describe('improperly implemented SyncMachineProxyCache', function() {
@@ -67,9 +68,9 @@ define(function(require) {
 
         describe('only unsynced instance reads from cache', function() {
             const cases = [
-                [SyncMachineProxyCache.SYNCING],
-                [SyncMachineProxyCache.SYNCED],
-                [SyncMachineProxyCache.STATE_CHANGE]
+                [Chaplin.SyncMachine.SYNCING],
+                [Chaplin.SyncMachine.SYNCED],
+                [Chaplin.SyncMachine.STATE_CHANGE]
             ];
 
             cases.forEach(function(testCase) {
@@ -181,10 +182,10 @@ define(function(require) {
                     setTimeout(function() {
                         instance.trigger('sync', instance, {foo: 'bar'});
                         done();
-                    }, 1);
+                    }, 2);
                 });
 
-                xit('time mark of data is updated in cache', function() { // skipped due to BAP-16852
+                it('time mark of data is updated in cache', function() {
                     const data = JSON.parse(storedData[storageKey]);
                     expect(storageMock.setItem).toHaveBeenCalledWith(storageKey, jasmine.any(String));
                     expect(data.time).toBeGreaterThan(cacheTimeMark);

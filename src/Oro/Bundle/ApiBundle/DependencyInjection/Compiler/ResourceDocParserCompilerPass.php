@@ -7,7 +7,9 @@ use Oro\Component\ChainProcessor\AbstractMatcher;
 use Oro\Component\ChainProcessor\ExpressionParser;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Registers resource documentation parsers for all supported API request types.
@@ -24,10 +26,11 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         // find resource documentation parsers
+        $services = [];
         $resourceDocParsers = [];
         $taggedServices = $container->findTaggedServiceIds(self::RESOURCE_DOC_PARSER_TAG);
         foreach ($taggedServices as $id => $attributes) {
-            $container->getDefinition($id)->setPublic(true);
+            $services[$id] = new Reference($id);
             foreach ($attributes as $tagAttributes) {
                 $resourceDocParsers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     $id,
@@ -36,8 +39,7 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
             }
         }
 
-        // sort by priority and flatten
-        if (!empty($resourceDocParsers)) {
+        if ($resourceDocParsers) {
             $resourceDocParsers = DependencyInjectionUtil::sortByPriorityAndFlatten($resourceDocParsers);
         }
 
@@ -56,9 +58,8 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
                 if (!isset($existingRequestType[$expr])) {
                     $existingRequestType[$expr] = true;
                     $id = self::DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID . '.' . $name;
-                    $container
-                        ->setDefinition($id, new ChildDefinition(self::DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID))
-                        ->setPublic(true);
+                    $container->setDefinition($id, new ChildDefinition(self::DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID));
+                    $services[$id] = new Reference($id);
                     $defaultResourceDocParsers[] = [$id, \implode('&', $view['request_type'])];
                 }
             }
@@ -67,7 +68,8 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
 
         // register
         $container->getDefinition(self::RESOURCE_DOC_PARSER_REGISTRY_SERVICE_ID)
-            ->replaceArgument(0, $resourceDocParsers);
+            ->setArgument(0, $resourceDocParsers)
+            ->setArgument(1, ServiceLocatorTagPass::register($container, $services));
     }
 
     /**

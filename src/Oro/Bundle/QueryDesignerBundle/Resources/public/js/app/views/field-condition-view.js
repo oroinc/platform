@@ -6,7 +6,7 @@ define(function(require) {
     const $ = require('jquery');
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const mapFilterModuleName = require('orofilter/js/map-filter-module-name');
     const AbstractConditionView = require('oroquerydesigner/js/app/views/abstract-condition-view');
     const FieldChoiceView = require('oroentity/js/app/views/field-choice-view');
@@ -41,7 +41,7 @@ define(function(require) {
                 this.$filterContainer.html('<span class="loading-indicator">' + __('Loading...') + '</span>');
             }, this), 100);
 
-            tools.loadModules(requires, _.bind(function(Filter, optionResolver) {
+            loadModules(requires, function(Filter, optionResolver) {
                 const appendFilter = _.bind(function() {
                     clearTimeout(showLoadingTimeout);
                     const filter = new (Filter.extend(filterOptions))();
@@ -55,7 +55,7 @@ define(function(require) {
                 } else {
                     appendFilter();
                 }
-            }, this));
+            }, this);
         },
 
         _createFilterOptions: function(fieldId) {

@@ -1,15 +1,15 @@
 define(function(require) {
     'use strict';
 
-    const Wamp = require('orosync/js/sync/wamp');
+    const wampModuleInjector = require('inject-loader!orosync/js/sync/wamp');
     const Backbone = require('backbone');
-    const jsmoduleExposure = require('jsmodule-exposure');
-    const exposure = jsmoduleExposure.disclose('orosync/js/sync/wamp');
 
-    xdescribe('orosync/js/sync/wamp', function() {
+    describe('orosync/js/sync/wamp', function() {
         let ab;
         let $;
         let session;
+        let Wamp;
+
         beforeEach(function() {
             ab = jasmine.createSpyObj('ab', ['debug', 'connect']);
             $ = jasmine.createSpy('$');
@@ -17,13 +17,12 @@ define(function(require) {
             $.and.returnValue({on: $.on});
             $.ajax = jasmine.createSpy('$.ajax');
             session = jasmine.createSpyObj('session', ['subscribe', 'unsubscribe', 'close']);
-            exposure.substitute('ab').by(ab);
-            exposure.substitute('$').by($);
+            Wamp = wampModuleInjector({
+                jquery: $,
+                autobahn: ab
+            });
         });
-        afterEach(function() {
-            exposure.recover('ab');
-            exposure.recover('$');
-        });
+
         describe('create instance', function() {
             let wamp;
             let options;

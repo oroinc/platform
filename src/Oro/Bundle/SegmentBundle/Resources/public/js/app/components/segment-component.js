@@ -4,7 +4,7 @@ define(function(require) {
     const $ = require('jquery');
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const BaseComponent = require('oroui/js/app/components/base/component');
     const EntityFieldsCollection = require('oroquerydesigner/js/app/models/entity-fields-collection');
     const GroupingModel = require('oroquerydesigner/js/app/models/grouping-model');
@@ -73,10 +73,7 @@ define(function(require) {
          */
         initialize: function(options) {
             const providerPromise = EntityStructureDataProvider.createDataProvider({}, this);
-            const modulesPromise = !options.extensions ? [] : tools.loadModules(options.extensions).then((...args) => {
-                // promise always has to return array of extensions, even if there's only one extension module
-                return args;
-            });
+            const modulesPromise = !options.extensions ? [] : loadModules(options.extensions);
             this.processOptions(options);
             this._deferredInit();
             $.when(modulesPromise, providerPromise)

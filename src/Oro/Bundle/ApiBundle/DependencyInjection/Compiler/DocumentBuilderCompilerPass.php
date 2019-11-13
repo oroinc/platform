@@ -4,8 +4,10 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Registers document builders for all supported API request types.
@@ -20,14 +22,14 @@ class DocumentBuilderCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        $services = [];
         $documentBuilders = [];
         $taggedServices = $container->findTaggedServiceIds(self::DOCUMENT_BUILDER_TAG);
         foreach ($taggedServices as $id => $attributes) {
-            $definition = $container->getDefinition($id);
-            if ($definition->isShared()) {
+            if ($container->getDefinition($id)->isShared()) {
                 throw new LogicException(sprintf('The document builder service "%s" should be non shared.', $id));
             }
-            $definition->setPublic(true);
+            $services[$id] = new Reference($id);
             foreach ($attributes as $tagAttributes) {
                 $documentBuilders[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     $id,
@@ -35,13 +37,13 @@ class DocumentBuilderCompilerPass implements CompilerPassInterface
                 ];
             }
         }
-        if (empty($documentBuilders)) {
-            return;
+
+        if ($documentBuilders) {
+            $documentBuilders = DependencyInjectionUtil::sortByPriorityAndFlatten($documentBuilders);
         }
 
-        $documentBuilders = DependencyInjectionUtil::sortByPriorityAndFlatten($documentBuilders);
-
         $container->getDefinition(self::DOCUMENT_BUILDER_FACTORY_SERVICE_ID)
-            ->replaceArgument(0, $documentBuilders);
+            ->setArgument(0, $documentBuilders)
+            ->setArgument(1, ServiceLocatorTagPass::register($container, $services));
     }
 }

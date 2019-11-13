@@ -5,7 +5,7 @@ define(function(require) {
     const $ = require('jquery');
     const _ = require('underscore');
     const routing = require('routing');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const mediator = require('oroui/js/mediator');
     const NoteView = require('../views/note-view');
     const NotesView = require('../views/notes-view');
@@ -42,7 +42,7 @@ define(function(require) {
 
             if (!_.isEmpty(options.modules)) {
                 this._deferredInit();
-                tools.loadModules(options.modules, function(modules) {
+                loadModules(options.modules, function(modules) {
                     _.extend(options.notesOptions, modules);
                     this.initView(options);
                     this._resolveDeferredInit();

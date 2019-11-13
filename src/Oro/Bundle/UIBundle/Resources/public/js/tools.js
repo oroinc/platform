@@ -267,26 +267,25 @@ define(function(require) {
         /**
          * Loads dynamic list of modules and execute callback function with passed modules
          *
+         * @deprecated use 'oroui/js/app/services/load-modules'
          * @param {Object.<string, string>|Array.<string>|string} modules
          *  - Object: where keys are formal module names and values are actual
          *  - Array: module names,
          *  - string: single module name
          * @param {function(Object)=} callback
          * @param {Object=} context
-         * @return {JQueryPromise}
+         * @return {Promise}
          */
         loadModules: loadModules,
 
         /**
          * Loads single module and returns promise
          *
-         * @deprecated
+         * @deprecated use 'oroui/js/app/services/load-modules'
          * @param {string} module name
-         * @return {JQueryPromise}
+         * @return {Promise}
          */
-        loadModule: function(module) {
-            return tools.loadModules(module);
-        },
+        loadModule: loadModules,
 
         /**
          * Loads single module and replaces the property
@@ -301,7 +300,7 @@ define(function(require) {
                 deferred.resolve(container[moduleProperty]);
                 return deferred.promise();
             }
-            return this.loadModules(container[moduleProperty]).then(function(realization) {
+            return loadModules(container[moduleProperty]).then(function(realization) {
                 container[moduleProperty] = realization;
                 return realization;
             });

@@ -24,8 +24,9 @@ function loadModule(name, ...values) {
 module.exports = function loadModules(modules, callback, context) {
     let requirements;
     let processModules;
+    const isModulesArray = _.isArray(modules);
 
-    if (_.isObject(modules) && !_.isArray(modules)) {
+    if (_.isObject(modules) && !isModulesArray) {
         // if modules is an object of {formal_name: module_name}
         requirements = _.values(modules);
         processModules = function(loadedModules) {
@@ -33,13 +34,12 @@ module.exports = function loadModules(modules, callback, context) {
             _.each(modules, _.partial(function(map, value, key) {
                 modules[key] = map[value];
             }, _.object(requirements, loadedModules)));
-            return [modules];
+            return modules;
         };
     } else {
-        // if modules is an array of module_names or single module_name
-        requirements = !_.isArray(modules) ? [modules] : modules;
+        requirements = isModulesArray ? modules : [modules];
         processModules = function(loadedModules) {
-            return loadedModules;
+            return isModulesArray ? loadedModules : loadedModules[0];
         };
     }
 
@@ -47,17 +47,13 @@ module.exports = function loadModules(modules, callback, context) {
         return loadModule(moduleName);
     });
 
-    return new Promise(function(resolve, reject) {
-        Promise.all(promises)
-            .then(function(modules) {
-                modules = processModules(modules);
-                if (callback) {
-                    callback.apply(context || null, modules);
-                }
-                resolve(...modules);
-            })
-            .catch(function(error) {
-                reject(error);
-            });
-    });
+    return Promise.all(promises)
+        .then(function(modules) {
+            modules = processModules(modules);
+            if (callback) {
+                callback[isModulesArray ? 'apply': 'call'](context || null, modules);
+            }
+            // promise can't be resolved a with multiple values
+            return modules;
+        });
 };

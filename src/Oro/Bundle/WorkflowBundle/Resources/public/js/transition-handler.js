@@ -1,13 +1,13 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/modal',
-    'oroui/js/tools',
-    'backbone',
-    'oroworkflow/js/transition-executor'
-], function($, _, __, Modal, tools, Backbone, performTransition) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const Modal = require('oroui/js/modal');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const Backbone = require('backbone');
+    const performTransition = require('oroworkflow/js/transition-executor');
 
     /**
      * Transition button click handler
@@ -48,7 +48,7 @@ define([
                 dialogOptions = _.extend(dialogOptions, additionalOptions);
             }
 
-            tools.loadModules('oroworkflow/transition-dialog-widget', function(Widget) {
+            loadModules('oroworkflow/transition-dialog-widget', function(Widget) {
                 const _widget = new Widget(dialogOptions);
                 Backbone.listenTo(_widget, 'widgetRemove', _.bind(function() {
                     resetInProgress();

@@ -4,7 +4,7 @@ define(function(require) {
     const $ = require('jquery');
     const _ = require('underscore');
     const BaseComponent = require('oroui/js/app/components/base/component');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const errorHandler = require('oroui/js/error');
 
     /**
@@ -38,10 +38,10 @@ define(function(require) {
             if (subPromises.length) {
                 // ensure that all nested components are already initialized
                 $.when(...subPromises).then(function() {
-                    tools.loadModules(options.view, initializeView);
+                    loadModules(options.view, initializeView);
                 });
             } else {
-                tools.loadModules(options.view, initializeView);
+                loadModules(options.view, initializeView);
             }
         },
 
