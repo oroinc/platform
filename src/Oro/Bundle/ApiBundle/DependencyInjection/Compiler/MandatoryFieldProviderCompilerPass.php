@@ -4,7 +4,9 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Registers all providers of mandatory fields.
@@ -19,10 +21,11 @@ class MandatoryFieldProviderCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        $services = [];
         $providers = [];
         $taggedServices = $container->findTaggedServiceIds(self::PROVIDER_TAG);
         foreach ($taggedServices as $id => $attributes) {
-            $container->getDefinition($id)->setPublic(true);
+            $services[$id] = new Reference($id);
             foreach ($attributes as $tagAttributes) {
                 $providers[] = [
                     $id,
@@ -30,11 +33,9 @@ class MandatoryFieldProviderCompilerPass implements CompilerPassInterface
                 ];
             }
         }
-        if (empty($providers)) {
-            return;
-        }
 
         $container->getDefinition(self::PROVIDER_REGISTRY_SERVICE_ID)
-            ->replaceArgument(0, $providers);
+            ->setArgument(0, $providers)
+            ->setArgument(1, ServiceLocatorTagPass::register($container, $services));
     }
 }

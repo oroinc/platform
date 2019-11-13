@@ -28,8 +28,8 @@ services:
         class: Oro\Component\ChainProcessor\ProcessorBagConfigProvider
         public: false
         arguments:
-            - [] # groups; they are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ProcessorBagCompilerPass
-            - [] # processors; they are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ProcessorBagCompilerPass
+            - [] # groups. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ProcessorBagCompilerPass
+            - [] # processors. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ProcessorBagCompilerPass
 
     oro_api.processor_iterator_factory:
         class: Oro\Bundle\ApiBundle\Processor\OptimizedProcessorIteratorFactory
@@ -47,16 +47,14 @@ services:
         class: Oro\Component\ChainProcessor\DependencyInjection\ProcessorRegistry
         public: false
         arguments:
-            # the service container is replaced by a service locator
-            # by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
-            - '@service_container'
+            - ~ # service locator. It is set by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
 
     oro_api.simple_processor_registry:
         class: Oro\Component\ChainProcessor\SimpleProcessorRegistry
         public: false
         decorates: oro_api.processor_registry
         arguments:
-            - [] # processors; they are set by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
+            - [] # processors. They are set by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
             - '@oro_api.simple_processor_registry.inner'
 
     oro_api.criteria_connector:
@@ -208,7 +206,7 @@ services:
         arguments:
             - '@oro_api.resources_provider'
             - '@oro_api.subresources_provider'
-            - [] # request_types; it is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ResourcesCacheWarmerCompilerPass
+            - [] # request types. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ResourcesCacheWarmerCompilerPass
         tags:
             - { name: kernel.cache_warmer, priority: -15 }
 
@@ -261,7 +259,7 @@ services:
     oro_api.config_extension_registry:
         class: Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry
         arguments:
-            - 0 # config_max_nesting_level; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - 0 # config_max_nesting_level. It is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
 
     oro_api.config_extension.filters:
         class: Oro\Bundle\ApiBundle\Config\Extension\FiltersConfigExtension
@@ -436,7 +434,7 @@ services:
         public: false
         arguments:
             - [] # query modifiers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryModifierCompilerPass
-            - '@service_container'
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryModifierCompilerPass
             - '@oro_api.request_expression_matcher'
 
     oro_api.entity_serializer.field_accessor:
@@ -453,7 +451,7 @@ services:
         public: false
         arguments:
             - [] # providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\MandatoryFieldProviderCompilerPass
-            - '@service_container'
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\MandatoryFieldProviderCompilerPass
             - '@oro_api.request_expression_matcher'
 
     oro_api.entity_serializer.config_normalizer:
@@ -496,7 +494,7 @@ services:
         public: false
         arguments:
             - [] # transformers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdTransformerCompilerPass
-            - '@service_container'
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdTransformerCompilerPass
             - '@oro_api.request_expression_matcher'
             - '@oro_api.entity_id_resolver_registry'
 
@@ -504,8 +502,8 @@ services:
         class: Oro\Bundle\ApiBundle\Request\EntityIdResolverRegistry
         public: false
         arguments:
-            - [] # resolvers. Injected by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdResolverCompilerPass
-            - ~ # service locator. Injected by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdResolverCompilerPass
+            - [] # resolvers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdResolverCompilerPass
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdResolverCompilerPass
             - '@oro_api.request_expression_matcher'
 
     oro_api.rest.entity_id_transformer:
@@ -539,8 +537,8 @@ services:
         class: Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry
         public: false
         arguments:
-            - [] # error_completers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ErrorCompleterCompilerPass
-            - '@service_container'
+            - [] # error completers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ErrorCompleterCompilerPass
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ErrorCompleterCompilerPass
             - '@oro_api.request_expression_matcher'
 
     oro_api.error_completer.default:
@@ -553,7 +551,7 @@ services:
         public: false
         arguments:
             - [] # document builders. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentBuilderCompilerPass
-            - '@service_container'
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentBuilderCompilerPass
             - '@oro_api.request_expression_matcher'
 
     oro_api.rest.document_builder:
@@ -765,8 +763,8 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\ChainDocumentationProvider
         public: false
         arguments:
-            - [] # providers. Injected by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentationProviderCompilerPass
-            - ~ # service locator. Injected by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentationProviderCompilerPass
+            - [] # providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentationProviderCompilerPass
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentationProviderCompilerPass
             - '@oro_api.request_expression_matcher'
 
     oro_api.api_doc.documentation_provider.predefined_ids:
@@ -836,7 +834,7 @@ services:
         public: false
         arguments:
             - [] # parsers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ResourceDocParserCompilerPass
-            - '@service_container'
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ResourceDocParserCompilerPass
             - '@oro_api.request_expression_matcher'
 
     # a template for non defined explicitly parsers

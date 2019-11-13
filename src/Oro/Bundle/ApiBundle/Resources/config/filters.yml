@@ -5,13 +5,13 @@ services:
         arguments:
             # regex pattern to match the following operators: =, !=, <>, >, <, >=, <=, *, !*, ~, !~, ^, !^, $, !$
             - '(!|<|>|%%21|%%3C|%%3E)?(=|%%3D)|<>|%%3C%%3E|<|>|\*|%%3C|%%3E|%%2A|(!|%%21)?(\*|~|\^|\$|%%2A|%%7E|%%5E|%%24)'
-            - [] # The operators. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - [] # operators. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
 
     oro_api.filter_operator_registry:
         class: Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry
         public: false
         arguments:
-            - [] # The operators. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - [] # operators. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
 
     oro_api.filter_names_registry:
         class: Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry
@@ -101,8 +101,8 @@ services:
         class: Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory
         public: false
         arguments:
-            - [] # The composite expressions. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryExpressionCompilerPass
-            - [] # The comparison expressions. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryExpressionCompilerPass
+            - [] # composite expressions. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryExpressionCompilerPass
+            - [] # comparison expressions. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryExpressionCompilerPass
             - '@oro_entity.orm.entity_class_resolver'
 
     oro_api.query.composite_expression.and:

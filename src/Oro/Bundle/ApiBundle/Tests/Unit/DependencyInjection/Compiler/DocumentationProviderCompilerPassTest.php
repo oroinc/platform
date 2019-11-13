@@ -91,11 +91,11 @@ class DocumentationProviderCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals(
             [
-                'provider5' => new ServiceClosureArgument(new Reference('provider5')),
-                'provider3' => new ServiceClosureArgument(new Reference('provider3')),
                 'provider1' => new ServiceClosureArgument(new Reference('provider1')),
                 'provider2' => new ServiceClosureArgument(new Reference('provider2')),
-                'provider4' => new ServiceClosureArgument(new Reference('provider4'))
+                'provider3' => new ServiceClosureArgument(new Reference('provider3')),
+                'provider4' => new ServiceClosureArgument(new Reference('provider4')),
+                'provider5' => new ServiceClosureArgument(new Reference('provider5'))
             ],
             $serviceLocatorDef->getArgument(0)
         );

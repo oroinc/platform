@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * The factory that creates the document builder for a specific request type.

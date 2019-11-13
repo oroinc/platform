@@ -21,9 +21,11 @@ class DocumentationProviderCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        $services = [];
         $providers = [];
         $taggedServices = $container->findTaggedServiceIds(self::PROVIDER_TAG);
         foreach ($taggedServices as $id => $attributes) {
+            $services[$id] = new Reference($id);
             foreach ($attributes as $tagAttributes) {
                 $providers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     $id,
@@ -32,12 +34,8 @@ class DocumentationProviderCompilerPass implements CompilerPassInterface
             }
         }
 
-        $services = [];
         if ($providers) {
             $providers = DependencyInjectionUtil::sortByPriorityAndFlatten($providers);
-            foreach ($providers as list($serviceId, $requestTypeExpr)) {
-                $services[$serviceId] = new Reference($serviceId);
-            }
         }
 
         $container->getDefinition(self::CHAIN_PROVIDER_SERVICE_ID)

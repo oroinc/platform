@@ -25,7 +25,6 @@ class CustomDataTypeCompleterCompilerPass implements CompilerPassInterface
         $completers = [];
         $taggedServices = $container->findTaggedServiceIds(self::COMPLETER_TAG);
         foreach ($taggedServices as $id => $attributes) {
-            $container->getDefinition($id)->setPublic(true);
             $services[$id] = new Reference($id);
             foreach ($attributes as $tagAttributes) {
                 $completers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
@@ -34,14 +33,9 @@ class CustomDataTypeCompleterCompilerPass implements CompilerPassInterface
                 ];
             }
         }
-        if (empty($completers)) {
-            throw new \InvalidArgumentException(sprintf(
-                'At least one service tagged by "%s" must be registered.',
-                self::COMPLETER_TAG
-            ));
+        if ($completers) {
+            $completers = DependencyInjectionUtil::sortByPriorityAndFlatten($completers);
         }
-
-        $completers = DependencyInjectionUtil::sortByPriorityAndFlatten($completers);
 
         $container->findDefinition(self::COMPLETER_HELPER_SERVICE_ID)
             ->replaceArgument(0, $completers)

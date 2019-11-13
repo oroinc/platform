@@ -4,7 +4,9 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Registers all error completers.
@@ -19,10 +21,11 @@ class ErrorCompleterCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        $services = [];
         $errorCompleters = [];
         $taggedServices = $container->findTaggedServiceIds(self::ERROR_COMPLETER_TAG);
         foreach ($taggedServices as $id => $attributes) {
-            $container->getDefinition($id)->setPublic(true);
+            $services[$id] = new Reference($id);
             foreach ($attributes as $tagAttributes) {
                 $errorCompleters[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     $id,
@@ -30,13 +33,13 @@ class ErrorCompleterCompilerPass implements CompilerPassInterface
                 ];
             }
         }
-        if (empty($errorCompleters)) {
-            return;
+
+        if ($errorCompleters) {
+            $errorCompleters = DependencyInjectionUtil::sortByPriorityAndFlatten($errorCompleters);
         }
 
-        $errorCompleters = DependencyInjectionUtil::sortByPriorityAndFlatten($errorCompleters);
-
         $container->getDefinition(self::ERROR_COMPLETER_REGISTRY_SERVICE_ID)
-            ->replaceArgument(0, $errorCompleters);
+            ->setArgument(0, $errorCompleters)
+            ->setArgument(1, ServiceLocatorTagPass::register($container, $services));
     }
 }
