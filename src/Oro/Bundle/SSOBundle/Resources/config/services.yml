@@ -1,12 +1,10 @@
 parameters:
-    oro_sso.oauth_provider.class: Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProvider
     hwi_oauth.authentication.provider.oauth.class: Oro\Bundle\SSOBundle\Security\OAuthProvider
     hwi_oauth.resource_owner.google.class: Oro\Bundle\SSOBundle\OAuth\ResourceOwner\GoogleResourceOwner
-    oro_sso.token.factory.oauth.class: Oro\Bundle\SSOBundle\Security\OAuthTokenFactory
 
 services:
     oro_sso.oauth_provider:
-        class:     '%oro_sso.oauth_provider.class%'
+        class: Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProvider
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments: ['@oro_user.manager', '@oro_config.global']
@@ -17,4 +15,4 @@ services:
             - { name: doctrine.orm.entity_listener, entity: '%oro_user.entity.class%', event: preUpdate }
 
     oro_sso.token.factory.oauth:
-        class: '%oro_sso.token.factory.oauth.class%'
+        class: Oro\Bundle\SSOBundle\Security\OAuthTokenFactory

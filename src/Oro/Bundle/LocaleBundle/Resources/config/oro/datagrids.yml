@@ -81,8 +81,8 @@ datagrids:
                 frontend_type: datetime
         sorters:
             default:
-                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
-                parentName: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                name: ASC
+                parentName: DESC
             columns:
                 name:
                     data_name: name
@@ -170,7 +170,7 @@ datagrids:
                 frontend_type: datetime
         sorters:
             default:
-                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                name: ASC
 
     oro-locale-localizations-select-grid:
         extends: oro-locale-localizations-grid

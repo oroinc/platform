@@ -95,14 +95,9 @@ class EmailOwnerProvider implements EmailOwnerProviderInterface
 UserBundle/Resources/config/services.yml
 
 ``` yaml
-parameters:
-    ...
-    oro_user.email.owner.provider.class: Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider
-
 services:
-    ...
     oro_user.email.owner.provider:
-        class: %oro_user.email.owner.provider.class%
+        class: Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider
         tags:
             - { name: oro_email.owner.provider, order: 1 }
 ```

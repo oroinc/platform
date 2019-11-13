@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Routing\ClassResourceInterface;
@@ -13,6 +14,8 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * API CRUD controller for Group entity.
+ *
  * @NamePrefix("oro_api_")
  */
 class GroupController extends RestController implements ClassResourceInterface
@@ -53,6 +56,8 @@ class GroupController extends RestController implements ClassResourceInterface
      *
      * @param int $id Group id
      *
+     * @Rest\Get(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Get group data",
      *      resource=true,
@@ -63,7 +68,7 @@ class GroupController extends RestController implements ClassResourceInterface
      * @AclAncestor("oro_user_group_view")
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getAction($id)
+    public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
     }
@@ -88,6 +93,8 @@ class GroupController extends RestController implements ClassResourceInterface
      *
      * @param int $id Group id
      *
+     * @Rest\Put(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Update existing group",
      *      resource=true,
@@ -98,7 +105,7 @@ class GroupController extends RestController implements ClassResourceInterface
      * @AclAncestor("oro_user_group_update")
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function putAction($id)
+    public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
     }
@@ -107,6 +114,8 @@ class GroupController extends RestController implements ClassResourceInterface
      * Delete group
      *
      * @param int $id Group id
+     *
+     * @Rest\Delete(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Delete group",
@@ -123,7 +132,7 @@ class GroupController extends RestController implements ClassResourceInterface
      * )
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }

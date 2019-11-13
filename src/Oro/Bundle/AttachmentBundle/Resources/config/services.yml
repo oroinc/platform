@@ -1,22 +1,6 @@
 parameters:
     oro_attachment.entity.class:                                 Oro\Bundle\AttachmentBundle\Entity\Attachment
     oro_attachment.file.entity.class:                            Oro\Bundle\AttachmentBundle\Entity\File
-    oro_attachment.manager.api.class:                            Oro\Bundle\AttachmentBundle\Entity\Manager\AttachmentApiEntityManager
-    oro_attachment.manager.file.api.class:                       Oro\Bundle\AttachmentBundle\Entity\Manager\FileApiEntityManager
-
-    oro_attachment.entity_config_dumper.extension.file.class:    Oro\Bundle\AttachmentBundle\Tools\FileEntityConfigDumperExtension
-    oro_attachment.entity_config_dumper.extension.class:         Oro\Bundle\AttachmentBundle\Tools\AttachmentConfigDumperExtension
-    oro_attachment.entity_generator.extension.class:             Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityGeneratorExtension
-    oro_attachment.migration.extension.attachment.class:         Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension
-
-    oro_attachment.serializer.file_normalizer.class:             Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer
-
-    oro_attachment.placeholder.filter.class:                     Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter
-    oro_attachment.attachment_grid_listener:                     Oro\Bundle\AttachmentBundle\EventListener\AttachmentGridListener
-
-    oro_attachment.datagrid.action.dialog.class:                 Oro\Bundle\AttachmentBundle\DataGrid\Action\DialogAction
-
-    oro_attachment.provider.attachment.class:                    Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
 
     oro_attachment.filesystem_dir.attachments:                   attachment
     oro_attachment.filesystem_name.attachments:                  attachments
@@ -108,7 +92,7 @@ services:
     oro_attachment.manager.api:
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
-        class: '%oro_attachment.manager.api.class%'
+        class: Oro\Bundle\AttachmentBundle\Entity\Manager\AttachmentApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '%oro_attachment.entity.class%'
@@ -118,7 +102,7 @@ services:
             - '@oro_entity.doctrine_helper'
 
     oro_attachment.manager.file.api:
-        class: '%oro_attachment.manager.file.api.class%'
+        class: Oro\Bundle\AttachmentBundle\Entity\Manager\FileApiEntityManager
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
@@ -149,6 +133,13 @@ services:
             - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postRemove }
             - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postUpdate }
 
+    oro_attachment.listener.entity_delete_listener:
+        class: Oro\Bundle\AttachmentBundle\EventListener\EntityDeleteListener
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+
     oro_attachment.twig.file_extension:
         class: 'Oro\Bundle\AttachmentBundle\Twig\FileExtension'
         public: false
@@ -158,7 +149,7 @@ services:
             - { name: twig.extension }
 
     oro_attachment.entity_config_dumper.extension.file:
-        class: '%oro_attachment.entity_config_dumper.extension.file.class%'
+        class: Oro\Bundle\AttachmentBundle\Tools\FileEntityConfigDumperExtension
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity_extend.relation_builder'
@@ -166,24 +157,24 @@ services:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
     oro_attachment.entity_config_dumper.extension:
-        class: '%oro_attachment.entity_config_dumper.extension.class%'
+        class: Oro\Bundle\AttachmentBundle\Tools\AttachmentConfigDumperExtension
         parent: oro_entity_extend.entity_config_dumper.extension.association
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
     oro_attachment.entity_generator.extension:
-        class: '%oro_attachment.entity_generator.extension.class%'
+        class: Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityGeneratorExtension
         tags:
             - { name: oro_entity_extend.entity_generator_extension }
 
 
     oro_attachment.migration.extension.attachment:
-        class: '%oro_attachment.migration.extension.attachment.class%'
+        class: Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension
         tags:
             - { name: oro_migration.extension, extension_name: attachment }
 
     oro_attachment.serializer.file_normalizer:
-        class: '%oro_attachment.serializer.file_normalizer.class%'
+        class: Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer
         calls:
             - [setAttachmentManager, ['@oro_attachment.manager']]
             - [setFileManager, ['@oro_attachment.file_manager']]
@@ -193,14 +184,14 @@ services:
             - { name: oro_importexport.normalizer}
 
     oro_attachment.placeholder.filter:
-        class: '%oro_attachment.placeholder.filter.class%'
+        class: Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter
         public: true
         arguments:
             - '@oro_attachment.association_helper'
             - '@oro_entity.doctrine_helper'
 
     oro_attachment.event_listener.attachment_grid_listener:
-        class: '%oro_attachment.attachment_grid_listener%'
+        class: Oro\Bundle\AttachmentBundle\EventListener\AttachmentGridListener
         arguments:
             - [entityId]
         tags:
@@ -215,7 +206,7 @@ services:
             - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata }
 
     oro_attachment.datagrid.action.dialog:
-        class: '%oro_attachment.datagrid.action.dialog.class%'
+        class: Oro\Bundle\AttachmentBundle\DataGrid\Action\DialogAction
         shared: false
         public: true
         tags:
@@ -231,7 +222,7 @@ services:
             - { name: oro_ui.update_action_provider, group: activity, priority: -90 }
 
     oro_attachment.provider.attachment:
-        class: '%oro_attachment.provider.attachment.class%'
+        class: Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:

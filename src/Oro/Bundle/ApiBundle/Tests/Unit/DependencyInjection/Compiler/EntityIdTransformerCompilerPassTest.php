@@ -4,8 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdTransformerCompilerPass;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class EntityIdTransformerCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
@@ -34,6 +37,12 @@ class EntityIdTransformerCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($this->container);
 
         self::assertEquals([], $this->registry->getArgument(0));
+
+        $serviceLocatorReference = $this->registry->getArgument(1);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
     public function testProcess()
@@ -62,6 +71,18 @@ class EntityIdTransformerCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ['transformer2', null]
             ],
             $this->registry->getArgument(0)
+        );
+
+        $serviceLocatorReference = $this->registry->getArgument(1);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals(
+            [
+                'transformer1' => new ServiceClosureArgument(new Reference('transformer1')),
+                'transformer2' => new ServiceClosureArgument(new Reference('transformer2'))
+            ],
+            $serviceLocatorDef->getArgument(0)
         );
     }
 }

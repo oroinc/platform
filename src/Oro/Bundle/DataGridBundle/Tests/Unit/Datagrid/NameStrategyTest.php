@@ -3,17 +3,22 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategy;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class NameStrategyTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var NameStrategy
-     */
-    protected $nameStrategy;
+    /** @var RequestStack */
+    private $requestStack;
+
+    /** @var NameStrategy */
+    private $nameStrategy;
 
     protected function setUp()
     {
-        $this->nameStrategy = new NameStrategy();
+        $this->requestStack = new RequestStack();
+
+        $this->nameStrategy = new NameStrategy($this->requestStack);
     }
 
     /**
@@ -111,5 +116,45 @@ class NameStrategyTest extends \PHPUnit\Framework\TestCase
                 'test_scope',
             ],
         ];
+    }
+
+    public function testGetGridUniqueNameShouldReturnOriginalNameIfRequestIsNull()
+    {
+        $name = 'name';
+
+        $uniqueName = $this->nameStrategy->getGridUniqueName($name);
+        $this->assertEquals($name, $uniqueName);
+    }
+
+    public function testGetGridUniqueNameShouldReturnOriginalNameIfCurrentRequestIsNotRelatedWithWidget()
+    {
+        $name = 'name';
+        $request = new Request();
+        $this->requestStack->push($request);
+
+        $uniqueName = $this->nameStrategy->getGridUniqueName($name);
+        $this->assertEquals($name, $uniqueName);
+    }
+
+    public function testGetGridShouldReturnNameSuffixedWithWidgetIdIfCurrentRequestIsRelatedWithWidget()
+    {
+        $request = new Request([
+            '_widgetId' => 5
+        ]);
+        $this->requestStack->push($request);
+
+        $uniqueName = $this->nameStrategy->getGridUniqueName('name');
+        $this->assertEquals('name_w5', $uniqueName);
+    }
+
+    public function testGetGridShouldReturnNameFromQueryStringIfCurrentRequestContainsIt()
+    {
+        $request = new Request([
+            'name_w1' => 'test'
+        ]);
+        $this->requestStack->push($request);
+
+        $uniqueName = $this->nameStrategy->getGridUniqueName('name');
+        $this->assertEquals('name_w1', $uniqueName);
     }
 }

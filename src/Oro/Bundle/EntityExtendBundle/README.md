@@ -345,7 +345,7 @@ This is done through the configuration of oro_entity_extend.validation_loader:
 
 ```yaml
     oro_entity_extend.validation_loader:
-        class: %oro_entity_extend.validation_loader.class%
+        class: Oro\Bundle\EntityExtendBundle\Validator\ExtendFieldValidationLoader
         public: false
         arguments:
             - @oro_entity_config.provider.extend
@@ -378,7 +378,7 @@ There is possibility for customize field rendering using this event.
 As example you can create Event Listener. Example:
 ```yaml
     oro_entity_extend.listener.extend_field_value_render:
-        class: %oro_entity_extend.listener.extend_field_value_render.class%
+        class: Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener
         arguments:
             - @oro_entity_config.config_manager
             - @router

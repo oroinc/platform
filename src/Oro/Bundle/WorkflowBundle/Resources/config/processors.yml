@@ -7,16 +7,14 @@ services:
         class: Oro\Component\ChainProcessor\DependencyInjection\ProcessorRegistry
         public: false
         arguments:
-            # the service container is replaced by a service locator
-            # by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
-            - '@service_container'
+            - ~ # service locator. It is set by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
 
     oro_workflow.simple_processor_registry:
         class: Oro\Component\ChainProcessor\SimpleProcessorRegistry
         public: false
         decorates: oro_workflow.processor_registry
         arguments:
-            - [] # processors; injected by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
+            - [] # processors. They are set by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
             - '@oro_workflow.simple_processor_registry.inner'
 
     oro_workflow.processor_bag:
@@ -33,7 +31,7 @@ services:
         arguments:
             - # groups
                 'transit': ['initialize', 'configure', 'createForm', 'processForm', 'handle', 'normalize', 'result']
-            - [] # processors; injected by Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass
+            - [] # processors. They are set by Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass
 
     oro_workflow.transit.action_processor:
         class: Oro\Bundle\WorkflowBundle\Processor\TransitActionProcessor

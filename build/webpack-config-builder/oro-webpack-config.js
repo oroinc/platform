@@ -133,8 +133,8 @@ class ConfigBuilder {
                 watchOptions: {
                     aggregateTimeout: 200,
                     ignored: [
-                        /\/node_modules\/.*\.js$/,
-                        /\/bundles\/(npmassets|bowerassets|components)\/.*\.js$/
+                        /[\/\\]node_modules[\/\\].*\.js$/,
+                        /[\/\\]bundles[\/\\](npmassets|bowerassets|components)[\/\\].*\.js$/
                     ]
                 },
                 stats: stats,
@@ -157,7 +157,7 @@ class ConfigBuilder {
                                 reuseExistingChunk: true
                             },
                             vendors: {
-                                test: /[\\/]node_modules[\\/]/,
+                                test: /[\/\\]node_modules[\/\\]/,
                                 name: 'vendors',
                                 priority: -10
                             },
@@ -184,8 +184,8 @@ class ConfigBuilder {
                 },
                 module: {
                     noParse: [
-                        /\/bundles\/(npmassets|bowerassets|components)\/(?!jquery|asap)\/.*\.js$/,
-                        /\/bundles\/\.*\/lib\/(?!chaplin|bootstrap|jquery\.dialog).*\.js$/
+                        /[\/\\]bundles[\/\\](npmassets|bowerassets|components)[\/\\](?!jquery|asap)[\/\\].*\.js$/,
+                        /[\/\\]bundles[\/\\]\.*[\/\\]lib[\/\\](?!chaplin|bootstrap|jquery\.dialog).*\.js$/
                     ],
                     rules: [
                         {
@@ -246,7 +246,7 @@ class ConfigBuilder {
                     new CleanupStatsPlugin(),
                     // Ignore all locale files of moment.js
                     new webpack.IgnorePlugin({
-                        resourceRegExp: /^\.\/locale$/,
+                        resourceRegExp: /^\.[\/\\]locale$/,
                         contextRegExp: /moment$/
                     }),
                     new webpack.optimize.MinChunkSizePlugin({
@@ -271,9 +271,9 @@ class ConfigBuilder {
                 webpackConfig.module.rules.push({
                     test: /\.js$/,
                     exclude: [
-                        /\/platform\/build\//,
-                        /\/bundles\/(?:bowerassets|npmassets|components)\//,
-                        /\/bundles\/.+\/lib\/?/
+                        /[\/\\]platform[\/\\]build[\/\\]/,
+                        /[\/\\]bundles[\/\\](?:bowerassets|npmassets|components)[\/\\]/,
+                        /[\/\\]bundles[\/\\].+[\/\\]lib[\/\\]?/
                     ],
                     use: 'happypack/loader?id=babel'
                 });
@@ -377,7 +377,7 @@ class ConfigBuilder {
                     module: {
                         rules: [
                             {
-                                test: /\/configs\.json$/,
+                                test: /[\/\\]configs\.json$/,
                                 loader: 'config-loader',
                                 options: {
                                     resolver,

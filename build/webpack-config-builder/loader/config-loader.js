@@ -12,7 +12,7 @@ module.exports = function(source) {
     const mappedConfigs = {};
 
     for (let [moduleName, config] of Object.entries(rawConfigs)) {
-        let moduleId = path.relative(relativeTo, resolver(moduleName));
+        let moduleId = path.relative(relativeTo, resolver(moduleName)).split(path.sep).join('/');
         if (moduleId[0] !== '/' && moduleId.slice(0, 3) !== '../') {
             moduleId = './' + moduleId;
         }

@@ -60,7 +60,7 @@ class AccessRuleExecutor
      *
      * @return bool
      */
-    public function matches(Criteria $criteria, array $ruleOptions): bool
+    private function matches(Criteria $criteria, array $ruleOptions): bool
     {
         foreach ($ruleOptions as $optionName => $optionValue) {
             if (!$this->matcher->matches($criteria, $optionName, $optionValue)) {

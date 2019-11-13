@@ -1,17 +1,11 @@
-parameters:
-    oro_note.form.type.note.class:                 Oro\Bundle\NoteBundle\Form\Type\NoteType
-    oro_note.form.type.note_api.class:             Oro\Bundle\NoteBundle\Form\Type\NoteApiType
-    oro_note.form.handler.note.class:              Oro\Bundle\NoteBundle\Form\Handler\NoteHandler
-    oro_note.form.handler.note_api.class:          Oro\Bundle\NoteBundle\Form\Handler\NoteApiHandler
-
 services:
     oro_note.form.type.note:
-        class: '%oro_note.form.type.note.class%'
+        class: Oro\Bundle\NoteBundle\Form\Type\NoteType
         tags:
             - { name: form.type, alias: oro_note }
 
     oro_note.form.type.note_api:
-        class: '%oro_note.form.type.note_api.class%'
+        class: Oro\Bundle\NoteBundle\Form\Type\NoteApiType
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
@@ -36,7 +30,7 @@ services:
             - Oro\Bundle\NoteBundle\Form\Type\NoteApiType
 
     oro_note.form.handler.note:
-        class: '%oro_note.form.handler.note.class%'
+        class: Oro\Bundle\NoteBundle\Form\Handler\NoteHandler
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
@@ -46,7 +40,7 @@ services:
             - '@oro_activity.manager'
 
     oro_note.form.handler.note_api:
-        class: '%oro_note.form.handler.note_api.class%'
+        class: Oro\Bundle\NoteBundle\Form\Handler\NoteApiHandler
         # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:

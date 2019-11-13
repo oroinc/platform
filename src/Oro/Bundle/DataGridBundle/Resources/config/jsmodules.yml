@@ -43,6 +43,7 @@ configs:
     orodatagrid/js/datagrid/cell/action-cell: {}
     orodatagrid/js/datagrid/dropdown-select-choice-launcher: {}
     orodatagrid/js/datagrid/grid-views/model: {}
+    orodatagrid/js/datagrid/grid-views/view: {}
     orodatagrid/js/datagrid/sorting/dropdown: {}
     orodatagrid/js/grid-views-builder: {}
 dynamic-imports:

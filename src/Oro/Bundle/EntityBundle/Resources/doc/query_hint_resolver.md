@@ -38,7 +38,7 @@ To map a hint to a custom output walker use the attribute `output_walker` instea
                 name: oro_entity.query_hint
                 hint: oro_translation.translatable
                 alias: HINT_TRANSLATABLE
-                output_walker: %oro_translation.translation_walker.class%
+                output_walker: Gedmo\Translatable\Query\TreeWalker\TranslationWalker
 ``` 
 
 The following example shows how hints can be used in YAML configuration files:

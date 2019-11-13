@@ -98,7 +98,6 @@
         "bower-asset/flotr2": "dev-master",
         "bower-asset/bean": "1.0.6",
         "bower-asset/jquery-validate": "1.16.0",
-        "bower-asset/jquery": "3.1.1",
         "bower-asset/backgrid": "0.3.7",
         "bower-asset/backgrid-paginator": "0.3.8",
         "bower-asset/backbone-pageable": "1.2.3",

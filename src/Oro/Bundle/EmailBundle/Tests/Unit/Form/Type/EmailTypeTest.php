@@ -26,6 +26,7 @@ use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Asset\Context\ContextInterface;
@@ -185,7 +186,9 @@ class EmailTypeTest extends TypeTestCase
             ->method('getAllowedElements')
             ->willReturn(['br', 'a']);
         $context = $this->createMock(ContextInterface::class);
-        $richTextType = new OroRichTextType($configManager, $htmlTagProvider, $context);
+        /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject $htmlTagHelper */
+        $htmlTagHelper = $this->createMock(HtmlTagHelper::class);
+        $richTextType = new OroRichTextType($configManager, $htmlTagProvider, $context, $htmlTagHelper);
         $resizableRichTextType = new OroResizeableRichTextType($configManager, $htmlTagProvider);
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

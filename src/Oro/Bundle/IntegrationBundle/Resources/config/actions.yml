@@ -1,9 +1,6 @@
-parameters:
-    oro_integration.action.schedule_sync.class: Oro\Bundle\IntegrationBundle\Datagrid\ScheduleSyncAction
-
 services:
     oro_integration.action.schedule_sync:
-        class: '%oro_integration.action.schedule_sync.class%'
+        class: Oro\Bundle\IntegrationBundle\Datagrid\ScheduleSyncAction
         shared: false
         public: true
         tags:
