@@ -3,9 +3,7 @@ define(function(require) {
 
     require('jasmine-jquery');
     const $ = require('jquery');
-    const ComponentManager = require('oroui/js/app/components/component-manager');
-    const jsmoduleExposure = require('jsmodule-exposure');
-    const exposure = jsmoduleExposure.disclose('oroui/js/app/components/component-manager');
+    const componentManagerModuleInjector = require('inject-loader!oroui/js/app/components/component-manager');
     const componentsLoadModule = require('../../Fixture/app/components/component-manager/components-loader-mock');
     require('oroui/js/app/modules/component-shortcuts-module');
     require('orofrontend/js/app/modules/component-shortcuts-module');
@@ -14,7 +12,15 @@ define(function(require) {
         return JSON.stringify(obj).replace(/"/g, '&quot;');
     }
 
-    xdescribe('Component Manager', function() {
+    describe('Component Manager', function() {
+        let ComponentManager;
+
+        beforeEach(function() {
+            ComponentManager = componentManagerModuleInjector({
+                'oroui/js/app/services/load-modules': jasmine.createSpy().and.callFake(componentsLoadModule)
+            });
+        });
+
         it('Initialize widget placed inside own separated layout', function() {
             window.setFixtures([
                 '<div id="container" data-layout="separate">',
@@ -72,18 +78,6 @@ define(function(require) {
         });
 
         describe('required sibling components', function() {
-            let originalLoadModules;
-
-            beforeEach(function() {
-                const tools = exposure.retrieve('tools');
-                originalLoadModules = tools.loadModules;
-                tools.loadModules = jasmine.createSpy().and.callFake(componentsLoadModule);
-            });
-
-            afterEach(function() {
-                exposure.retrieve('tools').loadModules = originalLoadModules;
-            });
-
             describe('override required componentName with options', function() {
                 let manager;
                 beforeEach(function(done) {

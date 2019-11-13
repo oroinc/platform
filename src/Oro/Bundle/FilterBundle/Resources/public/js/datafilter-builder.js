@@ -5,7 +5,7 @@ define(function(require, exports, module) {
     const _ = require('underscore');
     const mediator = require('oroui/js/mediator');
     const routing = require('routing');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const mapFilterModuleName = require('orofilter/js/map-filter-module-name');
     let FiltersManager = require('orofilter/js/collection-filters-manager');
     const FiltersTogglePlugin = require('orofilter/js/plugins/filters-toggle-plugin');
@@ -25,7 +25,7 @@ define(function(require, exports, module) {
 
             _.defaults(this.metadata, {filters: {}});
             const modules = methods.collectModules.call(this);
-            tools.loadModules(modules, function(modules) {
+            loadModules(modules, function(modules) {
                 this.modules = modules;
                 deferred.resolve();
             }, this);

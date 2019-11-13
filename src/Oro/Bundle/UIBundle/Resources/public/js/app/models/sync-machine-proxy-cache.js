@@ -7,7 +7,7 @@ define(function(require) {
     const persistentStorage = require('oroui/js/persistent-storage');
     const errorHandler = require('oroui/js/error');
 
-    const SyncMachineProxyCache = {...Chaplin.SyncMachine};
+    const SyncMachineProxyCache = Object.assign({}, Chaplin.SyncMachine);
     SyncMachineProxyCache.__super__ = Chaplin.SyncMachine;
 
     /**

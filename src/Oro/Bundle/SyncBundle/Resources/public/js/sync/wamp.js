@@ -1,10 +1,10 @@
-define([
-    'jquery',
-    'underscore',
-    'backbone',
-    'autobahn'
-], function($, _, Backbone, ab) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const ab = require('autobahn');
 
     const defaultOptions = {
         port: 80,

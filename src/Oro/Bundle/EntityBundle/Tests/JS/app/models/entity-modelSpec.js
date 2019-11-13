@@ -2,25 +2,22 @@ define(function(require) {
     'use strict';
 
     const Backbone = require('backbone');
-    const jsmoduleExposure = require('jsmodule-exposure');
-    const exposure = jsmoduleExposure.disclose('oroentity/js/app/models/entity-model');
     const RegistryMock = require('../../Fixture/app/services/registry/registry-mock');
-    const EntityModel = require('oroentity/js/app/models/entity-model');
+    const entityModelModuleInjector = require('inject-loader!oroentity/js/app/models/entity-model');
 
-    xdescribe('oroentity/js/app/models/entity-model', function() {
+    describe('oroentity/js/app/models/entity-model', function() {
         let applicant1;
         let applicant2;
         let registryMock;
+        let EntityModel;
 
         beforeEach(function() {
             applicant1 = Object.create(Backbone.Events);
             applicant2 = Object.create(Backbone.Events);
             registryMock = new RegistryMock();
-            exposure.substitute('registry').by(registryMock);
-        });
-
-        afterEach(function() {
-            exposure.recover('registry');
+            EntityModel = entityModelModuleInjector({
+                'oroui/js/app/services/registry': registryMock
+            });
         });
 
         it('static method EntityModel.globalId', function() {
@@ -320,24 +317,22 @@ define(function(require) {
             };
 
             beforeEach(function() {
-                spyOn(EntityModel, 'getEntityModel').and.callThrough();
                 getEntityRelationshipCollection = jasmine.createSpy('getEntityRelationshipCollection').and
                     .callFake(function(params, applicant) {
                         return new Backbone.Collection(params.data);
                     });
-                exposure.substitute('mediator').by({
-                    execute: function(name, params, applicant) {
-                        if (name === 'getEntityRelationshipCollection') {
-                            return getEntityRelationshipCollection(params, applicant);
+                EntityModel = entityModelModuleInjector({
+                    'oroui/js/app/services/registry': registryMock,
+                    'oroui/js/mediator': {
+                        execute: function(name, params, applicant) {
+                            if (name === 'getEntityRelationshipCollection') {
+                                return getEntityRelationshipCollection(params, applicant);
+                            }
                         }
                     }
                 });
-
+                spyOn(EntityModel, 'getEntityModel').and.callThrough();
                 entityModel = new EntityModel(rawData);
-            });
-
-            afterEach(function() {
-                exposure.recover('mediator');
             });
 
             it('init relationships', function() {

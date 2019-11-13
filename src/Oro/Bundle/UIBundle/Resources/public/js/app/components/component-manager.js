@@ -1,14 +1,13 @@
-define([
-    'require',
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/tools',
-    'oroui/js/app/components/base/component',
-    'oroui/js/component-shortcuts-manager',
-    'chaplin' // it is a circular dependency, so there's no local variable assigned
-], function(require, $, _, __, tools, BaseComponent, ComponentShortcutsManager) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const ComponentShortcutsManager = require('oroui/js/component-shortcuts-manager');
 
     const console = window.console;
 
@@ -228,7 +227,7 @@ define([
         _loadAndInitializeComponent: function(data) {
             const initDeferred = $.Deferred();
 
-            tools.loadModules(data.module)
+            loadModules(data.module)
                 .then(this._onComponentLoaded.bind(this, initDeferred, data.options))
                 .catch(this._onComponentLoadError.bind(this, initDeferred));
 

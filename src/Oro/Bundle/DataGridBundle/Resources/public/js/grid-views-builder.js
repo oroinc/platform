@@ -4,7 +4,7 @@ define(function(require, exports, module) {
     const $ = require('jquery');
     const _ = require('underscore');
     const mediator = require('oroui/js/mediator');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const GridViewsView = require('orodatagrid/js/datagrid/grid-views/view');
     const GridViewsCollection = require('orodatagrid/js/datagrid/grid-views/collection');
     const gridGridViewsSelector = '.page-title > .navbar-extra .pull-left-extra > .pull-left';
@@ -47,7 +47,7 @@ define(function(require, exports, module) {
 
             if (_.isString(self.GridViewsView)) {
                 self.buildViews = _.wrap(self.buildViews, function(buildViews, grid) {
-                    tools.loadModules(this.GridViewsView)
+                    loadModules(this.GridViewsView)
                         .then(_.bind(function(GridViewsView) {
                             this.GridViewsView = GridViewsView;
                             buildViews.call(this, grid);

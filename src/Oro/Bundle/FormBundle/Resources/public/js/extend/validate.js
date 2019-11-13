@@ -4,7 +4,7 @@ define(function(require, exports, module) {
     const $ = require('jquery.validate');
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const logger = require('oroui/js/tools/logger');
     const validationHandler = require('oroform/js/optional-validation-groups-handler');
     const error = require('oroui/js/error');
@@ -510,7 +510,7 @@ define(function(require, exports, module) {
      * @param {string|Array.<string>} module name of AMD module or list of modules
      */
     $.validator.loadMethod = function(module) {
-        tools.loadModules($.makeArray(module), function(...modules) {
+        loadModules($.makeArray(module), function(...modules) {
             _.each(modules, function(args) {
                 $.validator.addMethod(...args);
             });

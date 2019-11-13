@@ -2,11 +2,10 @@ define(function(require) {
     'use strict';
 
     const Backbone = require('backbone');
-    const jsmoduleExposure = require('jsmodule-exposure');
-    const exposure = jsmoduleExposure.disclose('oroui/js/app/services/registry/registry');
-    const EntityRegistry = require('oroui/js/app/services/registry/registry');
+    const registryModuleInjector = require('inject-loader!oroui/js/app/services/registry/registry');
 
-    xdescribe('oroui/js/app/services/registry/registry', function() {
+    describe('oroui/js/app/services/registry/registry', function() {
+        let Registry;
         let registry;
         let applicant1;
         let applicant2;
@@ -17,7 +16,6 @@ define(function(require) {
         let MockRegistryEntry;
 
         beforeEach(function() {
-            registry = new EntityRegistry();
             instance1 = applicant1 = Object.create(Backbone.Events);
             instance2 = applicant2 = Object.create(Backbone.Events);
             instance3 = applicant3 = Object.create(Backbone.Events);
@@ -52,15 +50,15 @@ define(function(require) {
             }
             MockRegistryEntry = jasmine.createSpy('RegistryEntry', RegistryEntry).and.callThrough();
 
-            exposure.substitute('RegistryEntry').by(MockRegistryEntry);
-        });
+            Registry = registryModuleInjector({
+                'oroui/js/app/services/registry/registry-entry': MockRegistryEntry
+            });
 
-        afterEach(function() {
-            exposure.recover('RegistryEntry');
+            registry = new Registry();
         });
 
         it('implements Backbone.Events', function() {
-            expect(Object.getPrototypeOf(EntityRegistry.prototype)).toBe(Backbone.Events);
+            expect(Object.getPrototypeOf(Registry.prototype)).toBe(Backbone.Events);
         });
 
         it('throw error on invalid instance', function() {

@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     const _ = require('underscore');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const BaseModel = require('oroui/js/app/models/base/model');
     const mediator = require('oroui/js/mediator');
     const constants = require('orosidebar/js/sidebar-constants');
@@ -38,7 +38,7 @@ define(function(require) {
 
         loadModule: function() {
             if (!this.loadModulePromise) {
-                this.loadModulePromise = tools.loadModules([this.get('module')])
+                this.loadModulePromise = loadModules(this.get('module'))
                     .then(this.createController.bind(this))
                     .catch(this.onWidgetLoadError.bind(this));
             }

@@ -8,7 +8,7 @@ define(function(require) {
     const addressFormatter = require('orolocale/js/formatter/address');
     const deleteConfirmation = require('oroui/js/delete-confirmation');
     const __ = require('orotranslation/js/translator');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
 
     /**
      * @export  oroaddress/js/address/view
@@ -79,7 +79,7 @@ define(function(require) {
             this.mapping = _.extend({}, this.defaultMapping, this.options.map || {});
             if (this.options.confirmRemoveComponent) {
                 if (_.isString(this.options.confirmRemoveComponent)) {
-                    this.confirmRemoveComponentPromise = tools.loadModule(this.options.confirmRemoveComponent);
+                    this.confirmRemoveComponentPromise = loadModules(this.options.confirmRemoveComponent);
                 } else {
                     this.confirmRemoveComponent = this.options.confirmRemoveComponent;
                 }

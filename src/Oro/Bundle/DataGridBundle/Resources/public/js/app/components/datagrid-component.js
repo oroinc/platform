@@ -4,6 +4,7 @@ define(function(require) {
     const $ = require('jquery');
     const _ = require('underscore');
     const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const mediator = require('oroui/js/mediator');
     const Backbone = require('backbone');
     const BaseComponent = require('oroui/js/app/components/base/component');
@@ -79,7 +80,7 @@ define(function(require) {
             _.each(options.builders, function(module) {
                 const built = $.Deferred();
                 optionsProcessedPromises.push(built.promise());
-                tools.loadModules(module, function(impl) {
+                loadModules(module, function(impl) {
                     builderImpl.push(impl);
                     if (!_.has(impl, 'processDatagridOptions')) {
                         built.resolve();
@@ -190,7 +191,7 @@ define(function(require) {
             this.collectModules();
 
             // load all dependencies and build grid
-            tools.loadModules(this.modules, this.build, this);
+            loadModules(this.modules, this.build, this);
 
             this.listenTo(this.metadataModel, 'change:massActions', function(model, massActions) {
                 this.grid.massActions.reset(this.buildMassActionsOptions(massActions));

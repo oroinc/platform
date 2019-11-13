@@ -2,26 +2,24 @@ define(function(require) {
     'use strict';
 
     const Backbone = require('backbone');
-    const jsmoduleExposure = require('jsmodule-exposure');
-    const exposure = jsmoduleExposure.disclose('oroentity/js/app/models/entity-relationship-collection');
+    const entityRelationshipCollectionModuleInjector = require('inject-loader!oroentity/js/app/models/entity-relationship-collection');
+
     const EntityModel = require('oroentity/js/app/models/entity-model');
     const RegistryMock = require('../../Fixture/app/services/registry/registry-mock');
-    const EntityRelationshipCollection = require('oroentity/js/app/models/entity-relationship-collection');
 
-    xdescribe('oroentity/js/app/models/entity-relationship-collection', function() {
+    describe('oroentity/js/app/models/entity-relationship-collection', function() {
         let applicant1;
         let applicant2;
         let registryMock;
+        let EntityRelationshipCollection;
 
         beforeEach(function() {
             applicant1 = Object.create(Backbone.Events);
             applicant2 = Object.create(Backbone.Events);
             registryMock = new RegistryMock();
-            exposure.substitute('registry').by(registryMock);
-        });
-
-        afterEach(function() {
-            exposure.recover('registry');
+            EntityRelationshipCollection = entityRelationshipCollectionModuleInjector({
+                'oroui/js/app/services/registry': registryMock
+            });
         });
 
         it('static method EntityRelationshipCollection.globalId', function() {
