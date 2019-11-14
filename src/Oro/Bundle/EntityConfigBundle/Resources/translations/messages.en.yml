@@ -18,6 +18,7 @@ oro:
             was_restored: Attribute was restored
             cannot_be_restored: This attribute cannot be restored because an attribute with similar name exists.
             confirm_delete: Do you really want to delete this attribute?
+            system: system
 
         attribute_family:
             entity_label: Product Family

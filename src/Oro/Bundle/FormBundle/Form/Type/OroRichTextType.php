@@ -5,6 +5,7 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Component\Form\AbstractType;
@@ -37,6 +38,9 @@ class OroRichTextType extends AbstractType
 
     /** @var string */
     protected $cacheDir;
+
+    /** @var HtmlTagHelper */
+    private $htmlTagHelper;
 
     /**
      * @url http://www.tinymce.com/wiki.php/Configuration:toolbar
@@ -80,6 +84,14 @@ class OroRichTextType extends AbstractType
     }
 
     /**
+     * @param HtmlTagHelper $htmlTagHelper
+     */
+    public function setHtmlTagHelper(HtmlTagHelper $htmlTagHelper): void
+    {
+        $this->htmlTagHelper = $htmlTagHelper;
+    }
+
+    /**
      * @param AssetHelper $assetHelper
      */
     public function setAssetHelper(AssetHelper $assetHelper)
@@ -93,10 +105,13 @@ class OroRichTextType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (null !== $options['wysiwyg_options']['valid_elements']) {
-            $builder->addModelTransformer(new SanitizeHTMLTransformer(
+            $transformer = new SanitizeHTMLTransformer(
                 $options['wysiwyg_options']['valid_elements'],
                 $this->cacheDir
-            ));
+            );
+            $transformer->setHtmlTagHelper($this->htmlTagHelper);
+
+            $builder->addModelTransformer($transformer);
         }
     }
 

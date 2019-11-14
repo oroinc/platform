@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Controller\Api\Rest;
 
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
@@ -15,6 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * API CRUD controller for BusinessUnit entity.
+ *
  * @RouteResource("businessunit")
  * @NamePrefix("oro_api_")
  */
@@ -74,6 +77,8 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      *
      * @param int $id Business unit item id
      *
+     * @Rest\Put(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Update business unit",
      *      resource=true
@@ -89,7 +94,9 @@ class BusinessUnitController extends RestController implements ClassResourceInte
     /**
      * REST GET item
      *
-     * @param string $id
+     * @param int $id
+     *
+     * @Rest\Get(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Get business unit item",
@@ -147,6 +154,8 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      * REST DELETE
      *
      * @param int $id
+     *
+     * @Rest\Delete(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Delete business unit",

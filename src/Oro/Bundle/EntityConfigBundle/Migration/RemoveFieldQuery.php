@@ -143,10 +143,14 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
             if (isset($data['extend']['schema']['property'][$this->entityField])) {
                 unset($data['extend']['schema']['property'][$this->entityField]);
             }
-            $entityName = $data['extend']['schema']['entity'];
-            if (isset($data['extend']['schema']['doctrine'][$entityName]['fields'][$this->entityField])) {
-                unset($data['extend']['schema']['doctrine'][$entityName]['fields'][$this->entityField]);
+
+            if (isset($data['extend']['schema'])) {
+                $entityName = $data['extend']['schema']['entity'];
+                if (isset($data['extend']['schema']['doctrine'][$entityName]['fields'][$this->entityField])) {
+                    unset($data['extend']['schema']['doctrine'][$entityName]['fields'][$this->entityField]);
+                }
             }
+
             if (isset($data['extend']['index'][$this->entityField])) {
                 unset($data['extend']['index'][$this->entityField]);
             }

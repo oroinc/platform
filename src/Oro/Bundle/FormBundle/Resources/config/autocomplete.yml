@@ -20,6 +20,7 @@ services:
             - [initSearchIndexer, ["@oro_search.index", '%oro_search.entities_config%']]
             - [initDoctrinePropertiesByManagerRegistry, ["@doctrine"]]
             - [setAclHelper,["@oro_security.acl_helper"]]
+            - [setLogger,["@logger"]]
 
     oro_form.autocomplete.full_name.search_handler:
         class: '%oro_form.autocomplete.full_name.search_handler.class%'

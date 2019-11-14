@@ -42,6 +42,23 @@ class FormValidationHandler
     }
 
     /**
+     * Dispatches "pre_validate" event for the given form.
+     *
+     * @param FormInterface $form
+     *
+     * @throws \InvalidArgumentException if the given for is not root form or it is not submitted yet
+     */
+    public function preValidate(FormInterface $form): void
+    {
+        $this->assertSubmittedRootForm($form);
+
+        $this->dispatchPreValidateEventForChildren($form);
+        if ($this->hasApiEventContext($form)) {
+            $this->dispatchPreValidateEvent($this->createFormEvent($form));
+        }
+    }
+
+    /**
      * Validates the given form.
      *
      * @param FormInterface $form
@@ -50,19 +67,7 @@ class FormValidationHandler
      */
     public function validate(FormInterface $form): void
     {
-        if (!$form->isRoot()) {
-            throw new \InvalidArgumentException('The root form is expected.');
-        }
-        if (!$form->isSubmitted()) {
-            throw new \InvalidArgumentException('The submitted form is expected.');
-        }
-
-        $event = $this->createFormEvent($form);
-
-        $this->dispatchPreValidateEventForChildren($form);
-        if ($this->hasApiEventContext($form)) {
-            $this->dispatchPreValidateEvent($event);
-        }
+        $this->assertSubmittedRootForm($form);
 
         /**
          * Mark all children of the processing root form as submitted
@@ -74,20 +79,32 @@ class FormValidationHandler
          * Using the first approach we can submit all Data API forms
          * with $clearMissing = false and manage the validation just via "enable_full_validation" form option.
          * @link https://symfony.com/doc/current/form/direct_submit.html
-         * @see \Symfony\Component\Form\Form::submit
+         * @see  \Symfony\Component\Form\Form::submit
          * @link https://github.com/symfony/symfony/pull/10567
-         * @see \Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper::acceptsErrors
-         * @see \Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener
-         * @see \Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
+         * @see  \Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper::acceptsErrors
+         * @see  \Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener
+         * @see  \Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
          */
         if ($form->getConfig()->getOption(ValidationExtension::ENABLE_FULL_VALIDATION)) {
             ReflectionUtil::markFormChildrenAsSubmitted($form, $this->propertyAccessor);
         }
-        $this->getValidationListener()->validateForm($event);
+        $this->getValidationListener()->validateForm($this->createFormEvent($form));
+    }
+
+    /**
+     * Dispatches "post_validate" event for the given form.
+     *
+     * @param FormInterface $form
+     *
+     * @throws \InvalidArgumentException if the given for is not root form or it is not submitted yet
+     */
+    public function postValidate(FormInterface $form): void
+    {
+        $this->assertSubmittedRootForm($form);
 
         $this->dispatchPostValidateEventForChildren($form);
         if ($this->hasApiEventContext($form)) {
-            $this->dispatchPostValidateEvent($event);
+            $this->dispatchPostValidateEvent($this->createFormEvent($form));
         }
     }
 
@@ -100,6 +117,21 @@ class FormValidationHandler
             $this->validator,
             new ViolationMapper()
         );
+    }
+
+    /**
+     * @param FormInterface $form
+     *
+     * @throws \InvalidArgumentException if the given for is not root form or it is not submitted yet
+     */
+    private function assertSubmittedRootForm(FormInterface $form): void
+    {
+        if (!$form->isRoot()) {
+            throw new \InvalidArgumentException('The root form is expected.');
+        }
+        if (!$form->isSubmitted()) {
+            throw new \InvalidArgumentException('The submitted form is expected.');
+        }
     }
 
     /**

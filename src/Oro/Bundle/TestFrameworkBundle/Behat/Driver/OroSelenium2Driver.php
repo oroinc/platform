@@ -169,7 +169,7 @@ JS;
                 return false;
             }
 
-            if (document.querySelector('.loader-mask.shown, .lazy-loading') !== null) {
+            if (document.querySelector(':not(.map-visual-frame)>.loader-mask.shown, .lazy-loading') !== null) {
                 return false;
             }
             
@@ -221,7 +221,7 @@ JS;
                 return false;
             }
 
-            if (document.querySelector('.loader-mask.shown, .lazy-loading') !== null) {
+            if (document.querySelector(':not(.map-visual-frame)>.loader-mask.shown, .lazy-loading') !== null) {
                 return false;
             }
             

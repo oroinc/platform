@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
 use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\DataTransformerInterface;
 
@@ -30,6 +31,11 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
     protected $cacheDir;
 
     /**
+     * @var HtmlTagHelper
+     */
+    protected $htmlTagHelper;
+
+    /**
      * @param string|null $allowedElements
      * @param string|null $cacheDir
      */
@@ -37,6 +43,14 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
     {
         $this->allowedElements = $allowedElements;
         $this->cacheDir        = $cacheDir;
+    }
+
+    /**
+     * @param HtmlTagHelper $htmlTagHelper
+     */
+    public function setHtmlTagHelper(HtmlTagHelper $htmlTagHelper): void
+    {
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**

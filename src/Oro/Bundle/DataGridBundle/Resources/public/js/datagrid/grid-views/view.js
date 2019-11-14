@@ -13,6 +13,9 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var DeleteConfirmation = require('oroui/js/delete-confirmation');
     var routing = require('routing');
+    var config = _.defaults(require('module').config(), {
+        hideSwitcherOnNoData: true
+    });
 
     /**
      * Datagrid views widget
@@ -570,6 +573,7 @@ define(function(require) {
          * @param {GridViewModel} model
          */
         _onModelRemove: function(model) {
+            this.render();
             this.collection.state.gridView = this.DEFAULT_GRID_VIEW_ID;
 
             var systemModel = this._getDefaultSystemViewModel();
@@ -615,30 +619,34 @@ define(function(require) {
             return this;
         },
 
-        render: function(o) {
-            var html;
-            this.$el.empty();
+        render: function() {
+            var content;
+            var isCollectionEmpty = this.collection.length === 0 && _.isEmpty(this.collection.state.filters);
 
-            this._checkCurrentState();
+            if (config.hideSwitcherOnNoData && isCollectionEmpty) {
+                content = this.renderPlainTitle();
+            } else {
+                this._checkCurrentState();
 
-            var title = this.renderTitle();
+                var title = this.renderTitle();
+                var actions = this._getViewActions();
 
-            var actions = this._getViewActions();
-            html = this.template({
-                title: title,
-                titleLabel: this.title,
-                disabled: !this.enabled,
-                choices: this.getViewChoices(),
-                current: this.collection.state.gridView,
-                dirty: this.viewDirty,
-                editedLabel: __('oro.datagrid.gridView.data_edited'),
-                actionsLabel: __('oro.datagrid.gridView.actions'),
-                actions: actions,
-                showActions: this.showActions(actions),
-                gridViewId: this.cid
-            });
+                content = this.template({
+                    title: title,
+                    titleLabel: this.title,
+                    disabled: !this.enabled,
+                    choices: this.getViewChoices(),
+                    current: this.collection.state.gridView,
+                    dirty: this.viewDirty,
+                    editedLabel: __('oro.datagrid.gridView.data_edited'),
+                    actionsLabel: __('oro.datagrid.gridView.actions'),
+                    actions: actions,
+                    showActions: this.showActions(actions),
+                    gridViewId: this.cid
+                });
+            }
 
-            this.$el.append(html);
+            this.$el.html(content);
 
             mediator.trigger('layout:reposition');
 
@@ -646,11 +654,23 @@ define(function(require) {
         },
 
         /**
-         * @returns {HTMLElement}
+         * @returns {string}
          */
         renderTitle: function() {
             return this.titleTemplate({
                 title: this._getCurrentViewLabel(),
+                hasCaret: true,
+                navbar: Boolean(this.title)
+            });
+        },
+
+        /**
+         * @returns {string}
+         */
+        renderPlainTitle: function() {
+            return this.titleTemplate({
+                title: this.title || '',
+                hasCaret: false,
                 navbar: Boolean(this.title)
             });
         },
@@ -697,8 +717,8 @@ define(function(require) {
                     label: __('oro.datagrid.action.save_grid_view'),
                     name: 'save',
                     enabled: this._getViewIsDirty(GridView) &&
-                             typeof GridView !== 'undefined' &&
-                            GridView.get('editable')
+                        typeof GridView !== 'undefined' &&
+                        GridView.get('editable')
                 },
                 {
                     label: __('oro.datagrid.action.save_grid_view_as'),
@@ -715,16 +735,16 @@ define(function(require) {
                     label: __('oro.datagrid.action.share_grid_view'),
                     name: 'share',
                     enabled: typeof GridView !== 'undefined' &&
-                            GridView.get('type') === 'private' &&
-                             this.permissions.SHARE
+                        GridView.get('type') === 'private' &&
+                        this.permissions.SHARE
                 },
                 {
                     label: __('oro.datagrid.action.unshare_grid_view'),
                     name: 'unshare',
                     enabled: typeof GridView !== 'undefined' &&
-                            GridView.get('editable') &&
-                            GridView.get('type') === 'public' &&
-                            this.permissions.SHARE
+                        GridView.get('editable') &&
+                        GridView.get('type') === 'public' &&
+                        this.permissions.SHARE
                 },
                 {
                     label: __('oro.datagrid.action.discard_grid_view_changes'),
@@ -741,8 +761,8 @@ define(function(require) {
                     label: __('oro.datagrid.action.set_as_default_grid_view'),
                     name: 'use_as_default',
                     enabled: typeof GridView !== 'undefined' &&
-                            !GridView.get('is_default') &&
-                            (!this._isCurrentViewSystem() || currentDefaultView)
+                        !GridView.get('is_default') &&
+                        (!this._isCurrentViewSystem() || currentDefaultView)
                 }
             ];
         },
@@ -799,12 +819,14 @@ define(function(require) {
          * @returns {undefined|GridViewModel}
          */
         _getCurrentViewModel: function() {
-            if (!this._hasActiveView()) {
+            var currentView = this._getCurrentView();
+
+            if (_.isUndefined(currentView)) {
                 return;
             }
 
             return this.viewsCollection.findWhere({
-                name: this._getCurrentView().value
+                name: currentView.value
             });
         },
 
@@ -840,7 +862,9 @@ define(function(require) {
          * @returns {boolean}
          */
         _isCurrentViewSystem: function() {
-            return this._getCurrentView().value === this.DEFAULT_GRID_VIEW_ID;
+            var currentView = this._getCurrentView();
+
+            return currentView && currentView.value === this.DEFAULT_GRID_VIEW_ID;
         },
 
         /**
