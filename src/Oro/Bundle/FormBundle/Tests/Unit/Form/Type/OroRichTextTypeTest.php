@@ -5,6 +5,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Packages;
@@ -28,15 +29,20 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|HtmlTagProvider */
     protected $htmlTagProvider;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|HtmlTagHelper */
+    private $htmlTagHelper;
+
     protected function setUp()
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->assetsHelper = $this->createMock(Packages::class);
         $this->htmlTagProvider = $this->createMock(HtmlTagProvider::class);
         $this->context = $this->createMock(ContextInterface::class);
+        $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
 
         $this->formType = new OroRichTextType($this->configManager, $this->htmlTagProvider, $this->context);
         $this->formType->setAssetHelper($this->assetsHelper);
+        $this->formType->setHtmlTagHelper($this->htmlTagHelper);
         parent::setUp();
     }
 
