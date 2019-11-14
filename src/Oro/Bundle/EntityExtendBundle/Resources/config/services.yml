@@ -407,7 +407,7 @@ services:
                     -
                         - Regex:
                             pattern: '/^\-{0,1}[\d+]*$/'
-                            message: "This value should contain only numbers."
+                            message: "This value should contain only whole numbers."
             -
                 - addConstraints
                 -
@@ -415,7 +415,7 @@ services:
                     -
                         - Regex:
                               pattern: '/^\-{0,1}[\d+]*$/'
-                              message: "This value should contain only numbers."
+                              message: "This value should contain only whole numbers."
             -
                 - addConstraints
                 -
@@ -423,7 +423,7 @@ services:
                     -
                         - Regex:
                               pattern: '/^\-{0,1}[\d+]*$/'
-                              message: "This value should contain only numbers."
+                              message: "This value should contain only whole numbers."
             - [addConstraints, ['float', [{ Type: {type: 'numeric'} }]]]
             - [addConstraints, ['decimal', [{ Type: {type: 'numeric'} }]]]
             - [addConstraints, ['money', [{ Type: {type: 'numeric'} }]]]
