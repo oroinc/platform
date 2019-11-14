@@ -4,7 +4,9 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Registers all query modifiers.
@@ -19,10 +21,11 @@ class QueryModifierCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        $services = [];
         $queryModifiers = [];
         $taggedServices = $container->findTaggedServiceIds(self::QUERY_MODIFIER_TAG);
         foreach ($taggedServices as $id => $attributes) {
-            $container->getDefinition($id)->setPublic(true);
+            $services[$id] = new Reference($id);
             foreach ($attributes as $tagAttributes) {
                 $queryModifiers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     $id,
@@ -30,13 +33,13 @@ class QueryModifierCompilerPass implements CompilerPassInterface
                 ];
             }
         }
-        if (empty($queryModifiers)) {
-            return;
+
+        if ($queryModifiers) {
+            $queryModifiers = DependencyInjectionUtil::sortByPriorityAndFlatten($queryModifiers);
         }
 
-        $queryModifiers = DependencyInjectionUtil::sortByPriorityAndFlatten($queryModifiers);
-
         $container->getDefinition(self::QUERY_MODIFIER_REGISTRY_SERVICE_ID)
-            ->replaceArgument(0, $queryModifiers);
+            ->setArgument(0, $queryModifiers)
+            ->setArgument(1, ServiceLocatorTagPass::register($container, $services));
     }
 }

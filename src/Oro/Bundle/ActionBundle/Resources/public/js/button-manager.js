@@ -8,7 +8,7 @@ define(function(require) {
     const messenger = require('oroui/js/messenger');
     const widgetManager = require('oroui/js/widget-manager');
     const Backbone = require('backbone');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
 
     const ButtonManager = function(options) {
         this.initialize(options);
@@ -64,7 +64,7 @@ define(function(require) {
 
             if (this.options.confirmation.component) {
                 this.confirmModalConstructor = null;
-                this.confirmModalModulePromise = tools.loadModule(this.options.confirmation.component);
+                this.confirmModalModulePromise = loadModules(this.options.confirmation.component);
             }
         },
 
@@ -103,7 +103,7 @@ define(function(require) {
             if (this.options.hasDialog) {
                 const options = this._getDialogOptions();
                 if (this.options.showDialog) {
-                    tools.loadModules(this.options.jsDialogWidget, function(Widget) {
+                    loadModules(this.options.jsDialogWidget, function(Widget) {
                         const _widget = new Widget(options);
                         Backbone.listenTo(_widget, 'formSave', _.bind(function(response) {
                             _widget.hide();

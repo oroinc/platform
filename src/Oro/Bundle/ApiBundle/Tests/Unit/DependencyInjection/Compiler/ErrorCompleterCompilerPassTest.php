@@ -4,8 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ErrorCompleterCompilerPass;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class ErrorCompleterCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
@@ -34,6 +37,12 @@ class ErrorCompleterCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($this->container);
 
         self::assertEquals([], $this->registry->getArgument(0));
+
+        $serviceLocatorReference = $this->registry->getArgument(1);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
     public function testProcess()
@@ -63,25 +72,17 @@ class ErrorCompleterCompilerPassTest extends \PHPUnit\Framework\TestCase
             ],
             $this->registry->getArgument(0)
         );
-    }
 
-    public function testProcessWhenErrorCompleterIsNotPublic()
-    {
-        $errorCompleter1 = $this->container->setDefinition('error_completer1', new Definition());
-        $errorCompleter1->setPublic(false);
-        $errorCompleter1->addTag(
-            'oro.api.error_completer',
-            ['requestType' => 'rest']
-        );
-
-        $this->compiler->process($this->container);
-
+        $serviceLocatorReference = $this->registry->getArgument(1);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals(
             [
-                ['error_completer1', 'rest']
+                'error_completer1' => new ServiceClosureArgument(new Reference('error_completer1')),
+                'error_completer2' => new ServiceClosureArgument(new Reference('error_completer2'))
             ],
-            $this->registry->getArgument(0)
+            $serviceLocatorDef->getArgument(0)
         );
-        self::assertTrue($errorCompleter1->isPublic());
     }
 }

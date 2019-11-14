@@ -3,7 +3,7 @@ define(function(require) {
 
     const BaseComponent = require('oroui/js/app/components/base/component');
     const ButtonManager = require('oroaction/js/button-manager');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const _ = require('underscore');
     const $ = require('jquery');
 
@@ -41,7 +41,7 @@ define(function(require) {
             const buttonOptions = this.$button.data('options') || {};
             if (buttonOptions.confirmation && buttonOptions.confirmation.component) {
                 this._deferredInit();
-                tools.loadModules(buttonOptions.confirmation.component)
+                loadModules(buttonOptions.confirmation.component)
                     .then(this._resolveDeferredInit.bind(this));
             }
         },

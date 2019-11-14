@@ -4,6 +4,7 @@ define(function(require) {
     const $ = require('jquery');
     const _ = require('underscore');
     const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const error = require('oroui/js/error');
 
     const inlineEdititngBuilder = {
@@ -139,7 +140,7 @@ define(function(require) {
                         return editorView;
                     }));
                 } else {
-                    promises.push(tools.loadModules(editor.view)
+                    promises.push(loadModules(editor.view)
                         .then(function(editorView) {
                             editor.view = editorView;
                             if (_.isFunction(editorView.processMetadata)) {
@@ -150,7 +151,7 @@ define(function(require) {
                 }
 
                 if (_.isString(editor.component)) {
-                    promises.push(tools.loadModules(editor.component)
+                    promises.push(loadModules(editor.component)
                         .then(function(editorComponent) {
                             editor.component = editorComponent;
                             if (_.isFunction(editorComponent.processMetadata)) {

@@ -1,4 +1,5 @@
-define(['./dropdown-button', 'oroui/js/persistent-storage'], function($, persistentStorage) {
+define(['./dropdown-button', 'oroui/js/mediator', 'oroui/js/persistent-storage'
+], function($, mediator, persistentStorage) {
     'use strict';
 
     $.widget('oroui.pinnedDropdownButtonProcessor', $.oroui.dropdownButtonProcessor, {
@@ -58,6 +59,7 @@ define(['./dropdown-button', 'oroui/js/persistent-storage'], function($, persist
             if (key) {
                 persistentStorage.setItem(key, $(e.target).data('button-index') || 0);
             }
+            mediator.trigger('dropdown-button:click');
         },
 
         /**

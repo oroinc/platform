@@ -32,13 +32,17 @@ class CustomDataTypeCompleterCompilerPassTest extends \PHPUnit\Framework\TestCas
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage At least one service tagged by "oro.api.custom_data_type_completer" must be registered.
-     */
     public function testProcessWhenNoCompleters()
     {
         $this->compiler->process($this->container);
+
+        self::assertEquals([], $this->completerHelper->getArgument(0));
+
+        $serviceLocatorReference = $this->completerHelper->getArgument(1);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
     public function testProcess()

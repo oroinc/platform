@@ -5,7 +5,7 @@ define(function(require) {
     const _ = require('underscore');
     const BaseComponent = require('oroui/js/app/components/base/component');
     const mediator = require('oroui/js/mediator');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const mapWidgetModuleName = require('oroui/js/widget/map-widget-module-name');
 
     /**
@@ -117,7 +117,7 @@ define(function(require) {
             if (!this.widget) {
                 // defines module name and load the module, before open widget
                 widgetModuleName = mapWidgetModuleName(this.options.type);
-                tools.loadModules(widgetModuleName, function(Widget) {
+                loadModules(widgetModuleName, function(Widget) {
                     if (this.disposed) {
                         return;
                     }

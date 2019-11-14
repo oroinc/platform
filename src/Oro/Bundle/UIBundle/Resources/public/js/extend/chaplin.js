@@ -2,9 +2,10 @@ define([
     'jquery',
     'underscore',
     'oroui/js/tools',
+    'oroui/js/app/services/load-modules',
     'chaplin',
     'oroui/js/extend/backbone' // it is a circular dependency, required just to make sure that backbone is extended
-], function($, _, tools, Chaplin) {
+], function($, _, tools, loadModules, Chaplin) {
     'use strict';
 
     const original = {};
@@ -213,7 +214,7 @@ define([
             }
         } catch (e) {
             if (e instanceof URIError) {
-                tools.loadModules(['oroui/js/messenger', 'orotranslation/js/translator'], function(messenger, __) {
+                loadModules(['oroui/js/messenger', 'orotranslation/js/translator'], function(messenger, __) {
                     messenger.showErrorMessage(__('oro.ui.malformed_url_loading_error'));
                 });
             }

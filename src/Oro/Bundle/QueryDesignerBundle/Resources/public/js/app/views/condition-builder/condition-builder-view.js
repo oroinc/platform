@@ -5,6 +5,7 @@ define(function(require) {
     const _ = require('underscore');
     const Backbone = require('backbone');
     const __ = require('orotranslation/js/translator');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const tools = require('oroui/js/tools');
     const BaseView = require('oroui/js/app/views/base/view');
     const ConditionItemView = require('oroquerydesigner/js/app/views/condition-builder/condition-item-view');
@@ -296,7 +297,7 @@ define(function(require) {
             const modules = this.$criteriaList.find('[data-module]').map(function(i, elem) {
                 return $(elem).data('module');
             }).get();
-            tools.loadModules(_.object(modules, modules), function(modules) {
+            loadModules(_.object(modules, modules), function(modules) {
                 this.criteriaModules = modules;
                 deferred.resolve(modules);
             }, this);

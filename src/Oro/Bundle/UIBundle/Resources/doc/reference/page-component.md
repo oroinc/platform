@@ -70,7 +70,7 @@ MyComponent = BaseComponent.extend({
             // deferred init start, means myView will be initialized in async way
             this._deferredInit();
             // there are some modules we need to load before init view
-            tools.loadModules(options.modules, function (modules) {
+            loadModules(options.modules, function (modules) {
                 _.extend(options.viewOptions, modules);
                 this.initView(options.viewOptions);
                 // resolves deferred initialization once view gets ready

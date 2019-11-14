@@ -7,6 +7,7 @@ define(function(require) {
     const routing = require('routing');
     const __ = require('orotranslation/js/translator');
     const mediator = require('oroui/js/mediator');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const tools = require('oroui/js/tools');
     const Modal = require('oroui/js/modal');
     const ActionLauncher = require('orodatagrid/js/datagrid/action-launcher');
@@ -230,7 +231,7 @@ define(function(require) {
             this.frontend_options = this.frontend_options || {};
             this.frontend_options.url = this.getLinkWithParameters();
             this.frontend_options.title = this.frontend_options.title || this.label;
-            tools.loadModules('oro/' + this.frontend_handle + '-widget', function(WidgetType) {
+            loadModules('oro/' + this.frontend_handle + '-widget', function(WidgetType) {
                 const widget = new WidgetType(this.frontend_options);
                 widget.render();
             }.bind(this));
