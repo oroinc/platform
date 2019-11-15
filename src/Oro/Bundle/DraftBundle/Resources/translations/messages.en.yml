@@ -11,3 +11,6 @@ oro:
             create:
                 label: Create draft
                 success: Draft has been created
+            publish:
+                label: Publish draft
+                success: Draft has been published

@@ -7,7 +7,7 @@ action_groups:
                 type: boolean
                 default: true
         actions:
-            - '@draft_entity':
+            - '@draft_create':
                 source: $.source
                 target: $.target
             - '@tree':
@@ -19,9 +19,25 @@ action_groups:
                         message: oro.draft.operations.create.success
                         type: 'success'
                     - '@draft_redirect':
-                        target: $.target
-                        route_parameters:
-                            id: $.target.id
+                        source: $.target
+                        route: $.routes[update]
+    oro_draft_publish:
+        parameters:
+            source:
+                type: object
+        actions:
+            - '@draft_publish':
+                source: $.source
+                target: $.target
+            - '@remove_entity': $.source
+            - '@flush_entity': $.target
+            - '@flash_message':
+                message: oro.draft.operations.publish.success
+                type: 'success'
+            - '@draft_redirect':
+                source: $.target
+                route: $.routes[view]
+
 operations:
     CREATE_DRAFT:
         label: oro.draft.operations.create.label
@@ -45,3 +61,25 @@ operations:
                       source: $.data
                   results:
                       redirectUrl: $.redirectUrl
+
+    PUBLISH_DRAFT:
+        label: oro.draft.operations.publish.label
+        button_options:
+            icon: fa-files-o
+            class: btn
+        for_all_entities: true
+        acl_resource: [[VIEW], $.data]
+        groups:
+            - view_navButtons
+        preconditions:
+            '@and':
+                - '@not_equal': [$.data.draftUuid, null]
+                - '@not_equal': [$.data.draftSource, null]
+                - '@instanceof': [$.data, Oro\Bundle\DraftBundle\Entity\DraftableInterface]
+        actions:
+            - '@run_action_group':
+                action_group: oro_draft_publish
+                parameters_mapping:
+                    source: $.data
+                results:
+                    redirectUrl: $.redirectUrl

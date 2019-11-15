@@ -5,10 +5,8 @@ namespace Oro\Bundle\DraftBundle\Action;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Component\Action\Action\Redirect;
+use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
@@ -16,12 +14,13 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
- * Responsible for redirect action after draft create.
+ * Responsible for redirect to entity page.
  */
-class DraftRedirectAction extends Redirect
+class DraftRedirectAction extends AbstractAction
 {
-    private const OPTION_KEY_TARGET = 'target';
-    private const OPTION_KEY_ROUTE_PARAMETERS = 'route_parameters';
+    private const REDIRECT_PATH = 'redirectUrl';
+    private const OPTION_KEY_ROUTE = 'route';
+    private const OPTION_KEY_SOURCE = 'source';
 
     /**
      * @var ConfigManager
@@ -29,19 +28,28 @@ class DraftRedirectAction extends Redirect
     private $configManager;
 
     /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
+     * @var array
+     */
+    private $options;
+
+    /**
      * @param ContextAccessor $contextAccessor
      * @param ConfigManager $configManager
      * @param RouterInterface $router
-     * @param $redirectPath
      */
     public function __construct(
         ContextAccessor $contextAccessor,
         ConfigManager $configManager,
-        RouterInterface $router,
-        $redirectPath
+        RouterInterface $router
     ) {
-        parent::__construct($contextAccessor, $router, $redirectPath);
+        parent::__construct($contextAccessor);
         $this->configManager = $configManager;
+        $this->router = $router;
     }
 
     /**
@@ -52,10 +60,17 @@ class DraftRedirectAction extends Redirect
     public function initialize(array $options): DraftRedirectAction
     {
         $this->getOptionResolver()->resolve($options);
-        $this->urlAttribute = new PropertyPath($this->urlAttribute);
         $this->options = $options;
 
         return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function executeAction($context): void
+    {
+        $this->contextAccessor->setValue($context, new PropertyPath(self::REDIRECT_PATH), $this->getUrl($context));
     }
 
     /**
@@ -63,16 +78,52 @@ class DraftRedirectAction extends Redirect
      *
      * @return string
      */
-    protected function getRoute($context): string
+    private function getRoute($context): string
     {
-        $object = $this->contextAccessor->getValue($context, $this->options['target']);
-        if ($object instanceof DraftableInterface) {
-            $metadata = $this->configManager->getEntityMetadata(ClassUtils::getRealClass($object));
+        $object = $this->getSource($context);
+        $metadata = $this->configManager->getEntityMetadata(ClassUtils::getRealClass($object));
 
-            return $metadata->routes['update'];
+        return $this->contextAccessor->getValue($metadata, $this->options[self::OPTION_KEY_ROUTE]);
+    }
+
+    /**
+     * @param $context
+     *
+     * @return array
+     */
+    private function getRouteParameters($context): array
+    {
+        $object = $this->getSource($context);
+
+        return ['id' => $object->getId()];
+    }
+
+    /**
+     * @param $context
+     *
+     * @return string
+     */
+    private function getUrl($context): string
+    {
+        $route = $this->getRoute($context);
+        $routeParameters = $this->getRouteParameters($context);
+
+        return $this->router->generate($route, $routeParameters);
+    }
+
+    /**
+     * @param $context
+     *
+     * @return DraftableInterface
+     */
+    private function getSource($context): DraftableInterface
+    {
+        $source = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_SOURCE]);
+        if ($source instanceof DraftableInterface) {
+            return $source;
         }
 
-        throw new \LogicException('Parameter must implement DraftableInterface');
+        throw new \LogicException('Parameter \'source\' must implement DraftableInterface');
     }
 
     /**
@@ -81,17 +132,10 @@ class DraftRedirectAction extends Redirect
     private function getOptionResolver(): OptionsResolver
     {
         $optionResolver = new OptionsResolver();
-        $optionResolver->setRequired(self::OPTION_KEY_TARGET);
-        $optionResolver->setAllowedTypes(self::OPTION_KEY_TARGET, ['object', PropertyPathInterface::class]);
-        $optionResolver->setRequired(self::OPTION_KEY_ROUTE_PARAMETERS);
-        $optionResolver->setAllowedTypes(self::OPTION_KEY_ROUTE_PARAMETERS, ['array']);
-        $optionResolver->setNormalizer(self::OPTION_KEY_ROUTE_PARAMETERS, function (Options $options, $value) {
-            if (!array_key_exists('id', $value)) {
-                throw new InvalidOptionsException('The required options "id" are missing.');
-            }
-
-            return $value;
-        });
+        $optionResolver->setRequired(self::OPTION_KEY_SOURCE);
+        $optionResolver->setRequired(self::OPTION_KEY_ROUTE);
+        $optionResolver->setAllowedTypes(self::OPTION_KEY_SOURCE, ['object', PropertyPathInterface::class]);
+        $optionResolver->setAllowedTypes(self::OPTION_KEY_ROUTE, ['object', PropertyPathInterface::class]);
 
         return $optionResolver;
     }

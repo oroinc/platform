@@ -5,7 +5,6 @@ services:
             - '@oro_action.expression.context_accessor'
             - '@oro_entity_config.config_manager'
             - '@router'
-            - 'redirectUrl'
         tags:
             - { name: oro_action.action, alias: draft_redirect }
 
@@ -13,6 +12,14 @@ services:
         class: Oro\Bundle\DraftBundle\Action\DraftCreateAction
         arguments:
             - '@oro_action.expression.context_accessor'
-            - '@oro_draft.duplicator.duplicator'
+            - '@oro_draft.model.draft_manager'
         tags:
-            - { name: oro_action.action, alias: draft_entity }
+            - { name: oro_action.action, alias: draft_create }
+
+    oro_draft.action.draft_publish:
+        class: Oro\Bundle\DraftBundle\Action\DraftPublishAction
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@oro_draft.model.draft_manager'
+        tags:
+            - { name: oro_action.action, alias: draft_publish }

@@ -20,7 +20,6 @@ class DraftRedirectActionTest extends \PHPUnit\Framework\TestCase
     use EntityTrait;
 
     private const ROUTE_NAME = 'route_name';
-    private const REDIRECT_PATH = 'redirectUrl';
 
     /** @var DraftRedirectAction */
     private $action;
@@ -49,8 +48,7 @@ class DraftRedirectActionTest extends \PHPUnit\Framework\TestCase
         $this->action = new DraftRedirectAction(
             $this->contextAccessor,
             $this->configManager,
-            $this->router,
-            self::REDIRECT_PATH
+            $this->router
         );
         $this->action->setDispatcher($dispatcher);
     }
@@ -73,46 +71,43 @@ class DraftRedirectActionTest extends \PHPUnit\Framework\TestCase
     public function initializeExceptionDataProvider(): array
     {
         return [
-            'empty target' => [
+            'empty options' => [
+                'options' => [],
+                'exceptionName' => MissingOptionsException::class,
+            ],
+            'empty source' => [
                 'options' => [
-                    'route_parameters' => ['id' => 1]
+                    'route' => new PropertyPath('route'),
                 ],
                 'exceptionName' => MissingOptionsException::class,
             ],
-            'invalid target type' => [
+            'invalid source type' => [
                 'options' => [
-                    'target' => null,
-                    'route_parameters' => ['id' => 1]
+                    'source' => null,
+                    'route' => new PropertyPath('route'),
                 ],
                 'exceptionName' => InvalidOptionsException::class,
             ],
-            'empty route_parameters' => [
+            'empty route' => [
                 'options' => [
-                    'target' => new PropertyPath('target'),
+                    'source' => new PropertyPath('source'),
                 ],
                 'exceptionName' => MissingOptionsException::class,
             ],
-            'invalid route_parameters type' => [
+            'invalid route type' => [
                 'options' => [
-                    'target' => new PropertyPath('target'),
-                    'route_parameters' => null
+                    'source' => new PropertyPath('source'),
+                    'route' => null,
                 ],
                 'exceptionName' => InvalidOptionsException::class,
-            ],
-            'empty id' => [
-                'options' => [
-                    'target' => new PropertyPath('target'),
-                    'route_parameters' => []
-                ],
-                'exceptionName' => InvalidOptionsException::class,
-            ],
+            ]
         ];
     }
 
     public function testExecute(): void
     {
         $this->configManager
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getEntityMetadata')
             ->willReturn($this->getEntity(
                 EntityMetadata::class,
@@ -120,11 +115,11 @@ class DraftRedirectActionTest extends \PHPUnit\Framework\TestCase
                 ['name' => DraftableEntityStub::class]
             ));
 
-        $context = new ActionData(['target' => $this->getEntity(DraftableEntityStub::class, ['id' => 1])]);
-        $this->action->initialize(['target' => new PropertyPath('target'), 'route_parameters' => ['id' => 1]]);
+        $context = new ActionData(['source' => $this->getEntity(DraftableEntityStub::class, ['id' => 1])]);
+        $this->action->initialize(['source' => new PropertyPath('source'), 'route' => new PropertyPath('route')]);
         $this->action->execute($context);
 
-        $expectedUrlRedirect = $this->contextAccessor->getValue($context, new PropertyPath(self::REDIRECT_PATH));
+        $expectedUrlRedirect = $this->contextAccessor->getValue($context, new PropertyPath('redirectUrl'));
         $this->assertEquals(self::ROUTE_NAME, $expectedUrlRedirect);
     }
 }

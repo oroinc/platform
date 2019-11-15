@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DraftBundle\Tests\Unit\Action;
 
 use Oro\Bundle\DraftBundle\Action\DraftCreateAction;
+use Oro\Bundle\DraftBundle\Action\DraftPublishAction;
 use Oro\Bundle\DraftBundle\Manager\DraftManager;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\ArrayAccessStub;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
@@ -12,7 +13,7 @@ use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class DraftCreateActionTest extends \PHPUnit\Framework\TestCase
+class DraftPublishActionTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -36,7 +37,7 @@ class DraftCreateActionTest extends \PHPUnit\Framework\TestCase
         $this->contextAccessor = new ContextAccessor();
         $this->draftMananager = $this->createMock(DraftManager::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->action = new DraftCreateAction($this->contextAccessor, $this->draftMananager);
+        $this->action = new DraftPublishAction($this->contextAccessor, $this->draftMananager);
         $this->action->setDispatcher($this->eventDispatcher);
     }
 
@@ -60,7 +61,7 @@ class DraftCreateActionTest extends \PHPUnit\Framework\TestCase
 
         $this->draftMananager
             ->expects($this->once())
-            ->method('createDraft')
+            ->method('createPublication')
             ->willReturn($source);
 
         $this->action->initialize([
@@ -69,7 +70,6 @@ class DraftCreateActionTest extends \PHPUnit\Framework\TestCase
         ]);
         $this->action->execute($context);
         $expectedTarget = $this->contextAccessor->getValue($context, $targetProperty);
-
         $this->assertSame($source, $expectedTarget);
     }
 }

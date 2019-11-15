@@ -15,8 +15,15 @@ services:
     oro_draft.expression.context_accessor:
         class: 'Oro\Component\ConfigExpression\ContextAccessor'
 
-    oro_draft.duplicator.duplicator:
-        class: Oro\Bundle\DraftBundle\Duplicator\Duplicator
+    oro_draft.publisher.publisher:
+        class: Oro\Bundle\DraftBundle\Manager\Publisher
+        arguments:
+            - '@=service("oro_entity_config.config_manager").getProvider("draft")'
+            - '@doctrine.orm.entity_manager'
+
+    oro_draft.model.draft_manager:
+        class: Oro\Bundle\DraftBundle\Manager\DraftManager
         arguments:
             - '@oro_draft.duplicator.extension_provider'
-            - '@oro_draft.expression.context_accessor'
+            - '@oro_action.expression.context_accessor'
+            - '@oro_draft.publisher.publisher'

@@ -7,9 +7,9 @@ use Oro\Bundle\DraftBundle\Manager\DraftManager;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
 /**
- * Responsible for draft create.
+ * Responsible for draft publishing.
  */
-class DraftCreateAction extends AbstractDraftAction
+class DraftPublishAction extends AbstractDraftAction
 {
     /**
      * @var DraftManager
@@ -32,7 +32,7 @@ class DraftCreateAction extends AbstractDraftAction
     protected function executeAction($context): void
     {
         $source = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_SOURCE]);
-        $target = $this->draftManager->createDraft($source, $context);
+        $target = $this->draftManager->createPublication($source, $context);
         $this->contextAccessor->setValue($context, $this->options[self::OPTION_KEY_TARGET], $target);
     }
 }
