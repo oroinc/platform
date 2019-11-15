@@ -22,3 +22,26 @@ action_groups:
                         target: $.target
                         route_parameters:
                             id: $.target.id
+operations:
+    CREATE_DRAFT:
+        label: oro.draft.operations.create.label
+        for_all_entities: true
+        acl_resource: [[VIEW], $.data]
+        groups:
+            - view_navButtons
+        button_options:
+            icon: fa-files-o
+            class: btn
+        preconditions:
+            '@and':
+                - '@equal': [$.data.draftUuid, null]
+                - '@equal': [$.data.draftSource, null]
+                - '@equal': [$.data.draftProject, null]
+                - '@instanceof': [$.data, Oro\Bundle\DraftBundle\Entity\DraftableInterface]
+        actions:
+            - '@run_action_group':
+                  action_group: oro_draft_create
+                  parameters_mapping:
+                      source: $.data
+                  results:
+                      redirectUrl: $.redirectUrl
