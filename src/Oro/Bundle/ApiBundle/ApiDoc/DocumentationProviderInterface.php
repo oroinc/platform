@@ -14,7 +14,7 @@ interface DocumentationProviderInterface
      *
      * @param RequestType $requestType
      *
-     * @return string|null
+     * @return string|null A string contains the documentation in Markdown format
      */
     public function getDocumentation(RequestType $requestType): ?string;
 }

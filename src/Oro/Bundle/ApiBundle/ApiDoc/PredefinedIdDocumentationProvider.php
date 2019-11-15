@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Request\EntityIdResolverRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
- * Builds documentation for predefined identifiers of API resources.
+ * Builds a documentation for predefined identifiers of API resources.
  */
 class PredefinedIdDocumentationProvider implements DocumentationProviderInterface
 {
