@@ -140,7 +140,7 @@ class ConfigBuilder {
                 stats: stats,
                 output: {
                     filename: '[name].js',
-                    // Due of using third party libraries 'chunkFilename' should consist of only from [name]
+                    // Because we use third party libraries 'chunkFilename' should include only [name]
                     chunkFilename: 'chunk/[name].js?version=[chunkhash:8]',
                 },
                 devtool: !env.skipSourcemap && 'inline-cheap-module-source-map',
