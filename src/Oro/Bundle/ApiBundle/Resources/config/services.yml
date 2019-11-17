@@ -329,8 +329,8 @@ services:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry
         public: false
         arguments:
-            - [] # config bags. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
-            - '@service_container'
+            - [] # config bags. They are set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
             - '@oro_api.request_expression_matcher'
 
     oro_api.config_loader_factory:
@@ -353,16 +353,16 @@ services:
         class: Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry
         public: false
         arguments:
-            - [] # entity alias resolvers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
-            - '@service_container'
+            - [] # entity alias resolvers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
             - '@oro_api.request_expression_matcher'
 
     oro_api.entity_exclusion_provider_registry:
         class: Oro\Bundle\ApiBundle\Provider\ExclusionProviderRegistry
         public: false
         arguments:
-            - [] # exclusion providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
-            - '@service_container'
+            - [] # exclusion providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
             - '@oro_api.request_expression_matcher'
 
     oro_api.entity_exclusion_provider.shared:
@@ -375,8 +375,8 @@ services:
         class: Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry
         public: false
         arguments:
-            - [] # entity override providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
-            - '@service_container'
+            - [] # entity override providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
             - '@oro_api.request_expression_matcher'
 
     oro_api.query_acl_helper:

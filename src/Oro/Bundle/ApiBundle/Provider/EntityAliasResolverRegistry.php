@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
 use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * The registry that allows to get the entity alias resolver for a specific request type.
