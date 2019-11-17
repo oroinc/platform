@@ -1,7 +1,6 @@
 services:
     oro_api.update_relationship.processor:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\UpdateRelationshipProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - update_relationship

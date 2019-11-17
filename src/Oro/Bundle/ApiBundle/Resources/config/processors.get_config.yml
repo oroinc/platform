@@ -1,32 +1,26 @@
 services:
     oro_api.get_config.processor:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - get_config
 
     oro_api.merge_config_helper.parent_resource:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeParentResourceHelper
-        public: false
         arguments:
             - '@oro_api.config_provider'
 
     oro_api.merge_config_helper.action:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeActionConfigHelper
-        public: false
 
     oro_api.merge_config_helper.filter:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeFilterConfigHelper
-        public: false
 
     oro_api.merge_config_helper.sorter:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeSorterConfigHelper
-        public: false
 
     oro_api.merge_config_helper.subresource:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeSubresourceConfigHelper
-        public: false
         arguments:
             - '@oro_api.merge_config_helper.action'
             - '@oro_api.merge_config_helper.filter'
@@ -34,7 +28,6 @@ services:
 
     oro_api.complete_definition_helper.entity:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteEntityDefinitionHelper
-        public: false
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_override_provider_registry'
@@ -47,19 +40,16 @@ services:
 
     oro_api.complete_definition_helper.object:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteObjectDefinitionHelper
-        public: false
         arguments:
             - '@oro_api.complete_definition_helper.association'
 
     oro_api.complete_definition_helper.association:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteAssociationHelper
-        public: false
         arguments:
             - '@oro_api.config_provider'
 
     oro_api.complete_definition_helper.custom_data_type:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteCustomDataTypeHelper
-        public: false
         arguments:
             - [] # completers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\CustomDataTypeCompleterCompilerPass
             - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\CustomDataTypeCompleterCompilerPass
@@ -67,7 +57,6 @@ services:
 
     oro_api.custom_data_type_completer.unidirectional_association:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\UnidirectionalAssociationCompleter
-        public: false
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_override_provider_registry'
@@ -76,7 +65,6 @@ services:
 
     oro_api.custom_data_type_completer.association:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CustomAssociationCompleter
-        public: false
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.complete_definition_helper.association'

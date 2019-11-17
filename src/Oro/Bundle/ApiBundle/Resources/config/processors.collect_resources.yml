@@ -1,7 +1,6 @@
 services:
     oro_api.collect_resources.processor:
         class: Oro\Bundle\ApiBundle\Processor\CollectResourcesProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - collect_resources

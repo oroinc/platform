@@ -1,7 +1,6 @@
 services:
     oro_api.update_subresource.processor:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - update_subresource
@@ -10,7 +9,6 @@ services:
 
     oro_api.add_subresource.processor:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - add_subresource
@@ -19,7 +17,6 @@ services:
 
     oro_api.delete_subresource.processor:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - delete_subresource
