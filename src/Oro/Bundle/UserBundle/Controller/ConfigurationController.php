@@ -118,7 +118,10 @@ class ConfigurationController extends AbstractController
             'form'           => $form ? $form->createView() : null,
             'activeGroup'    => $activeGroup,
             'activeSubGroup' => $activeSubGroup,
-            'scopeInfo'      => $manager->getScopeInfo()
+            'scopeInfo'      => $manager->getScopeInfo(),
+            'scopeEntity'    => $entity,
+            'scopeEntityClass' => User::class,
+            'scopeEntityId'  => $entity->getId()
         ];
     }
 

@@ -16,7 +16,7 @@ Feature: Email SMTP settings
     When I scroll to top
     And I save form
     Then I should see "Could not establish the SMTP connection" error message
-    When I click "Check SMTP Connection"
+    When I click "Check Connection (Saved Settings)"
     Then I should see "Could not establish connection" error message
 
   Scenario: Check SMTP settings in system configuration with incorrect parameters
@@ -39,14 +39,16 @@ Feature: Email SMTP settings
       | Encryption | SSL              |
       | Username   | unknown          |
       | Password   | unknown          |
-    When I click "Check SMTP Connection"
+    When I click "Check Connection (New Settings)"
     Then I should see "Could not establish connection"
 
   Scenario: Check SMTP settings in system configuration with correct parameters
     Given I fill form with:
       | Username | test_user     |
       | Password | test_password |
-    When I click "Check SMTP Connection"
+    When I click "Check Connection (Saved Settings)"
+    Then I should see "Could not establish connection"
+    When I click "Check Connection (New Settings)"
     Then I should see "Connection established successfully"
     And I save form
 
