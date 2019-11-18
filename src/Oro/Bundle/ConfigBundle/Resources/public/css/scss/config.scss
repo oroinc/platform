@@ -67,15 +67,14 @@
         }
     }
 
-    .controls .control-subgroup {
-        &.parent-scope-checkbox {
-            margin-top: ($content-padding-small / 2);
-            margin-#{$end}: $content-padding-small;
+    .control-subgroup.parent-scope-checkbox {
+        margin-top: ($content-padding-small / 2);
+        margin-#{$end}: $content-padding-small;
 
-            label, .checkbox-view__text {
-                margin: side-values(0 $content-padding-small 0 0);
-                line-height: 1.75;
-            }
+        label, .checkbox-view__text {
+            margin: side-values(0 $content-padding-small 0 0);
+            line-height: 1.75;
+            white-space: nowrap;
         }
 
         .parent-scope-checkbox__wrapper {
