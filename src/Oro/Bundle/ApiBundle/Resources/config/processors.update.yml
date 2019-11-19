@@ -1,7 +1,6 @@
 services:
     oro_api.update.processor:
         class: Oro\Bundle\ApiBundle\Processor\UpdateProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - update

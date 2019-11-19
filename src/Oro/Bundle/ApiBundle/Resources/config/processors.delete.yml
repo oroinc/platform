@@ -1,7 +1,6 @@
 services:
     oro_api.delete.processor:
         class: Oro\Bundle\ApiBundle\Processor\DeleteProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - delete

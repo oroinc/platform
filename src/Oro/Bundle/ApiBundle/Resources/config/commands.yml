@@ -1,7 +1,4 @@
 services:
-    _defaults:
-        public: false
-
     Oro\Bundle\ApiBundle\Command\CacheClearCommand:
         arguments:
             - '@oro_api.cache_manager'

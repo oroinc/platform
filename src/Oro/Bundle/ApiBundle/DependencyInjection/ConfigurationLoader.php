@@ -17,6 +17,7 @@ use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider;
 use Oro\Component\Config\Cache\ChainConfigCacheState;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -84,16 +85,20 @@ class ConfigurationLoader
             }
         }
         $this->container->getDefinition(self::CONFIG_BAG_REGISTRY_SERVICE_ID)
-            ->replaceArgument(0, $this->sortByRequestTypeExpression($configBagsConfig));
+            ->setArgument(0, $this->sortByRequestTypeExpression($configBagsConfig))
+            ->setArgument(1, $this->registerServiceLocator($configBagsConfig));
         $this->container->getDefinition(self::ENTITY_ALIAS_RESOLVER_REGISTRY_SERVICE_ID)
-            ->replaceArgument(0, $this->sortByRequestTypeExpression($entityAliasResolversConfig));
+            ->setArgument(0, $this->sortByRequestTypeExpression($entityAliasResolversConfig))
+            ->setArgument(1, $this->registerServiceLocator($entityAliasResolversConfig));
         $this->container->getDefinition(self::ENTITY_EXCLUSION_PROVIDER_REGISTRY_SERVICE_ID)
-            ->replaceArgument(0, $this->sortByRequestTypeExpression($exclusionProvidersConfig));
+            ->setArgument(0, $this->sortByRequestTypeExpression($exclusionProvidersConfig))
+            ->setArgument(1, $this->registerServiceLocator($exclusionProvidersConfig));
         $this->container->getDefinition(self::ENTITY_OVERRIDE_PROVIDER_REGISTRY_SERVICE_ID)
-            ->replaceArgument(0, $this->sortByRequestTypeExpression($entityOverrideProvidersConfig));
+            ->setArgument(0, $this->sortByRequestTypeExpression($entityOverrideProvidersConfig))
+            ->setArgument(1, $this->registerServiceLocator($entityOverrideProvidersConfig));
         if ($this->container->hasDefinition(self::CONFIG_CACHE_STATE_REGISTRY_SERVICE_ID)) {
             $this->container->getDefinition(self::CONFIG_CACHE_STATE_REGISTRY_SERVICE_ID)
-                ->replaceArgument(0, $this->sortByRequestTypeExpression($configCacheStatesConfig));
+                ->setArgument(0, $this->sortByRequestTypeExpression($configCacheStatesConfig));
             $this->container->getDefinition('oro_api.resources_cache_accessor')
                 ->addMethodCall(
                     'setConfigCacheStateRegistry',
@@ -242,7 +247,7 @@ class ConfigurationLoader
                 new Reference('oro_api.config_cache_factory'),
                 new Reference('oro_api.config_cache_warmer')
             ])
-            ->setPublic(true);
+            ->setPublic(false);
 
         return $configCacheServiceId;
     }
@@ -263,9 +268,7 @@ class ConfigurationLoader
         $this->container
             ->register($configCacheStateServiceId, ChainConfigCacheState::class)
             ->setArguments([
-                [
-                    new Reference($configCacheServiceId)
-                ]
+                [new Reference($configCacheServiceId)]
             ])
             ->setPublic(false);
 
@@ -285,7 +288,7 @@ class ConfigurationLoader
         $this->container
             ->register($configBagServiceId, ConfigBag::class)
             ->setArguments([new Reference($configCacheServiceId), $fileName])
-            ->setPublic(true);
+            ->setPublic(false);
 
         return $configBagServiceId;
     }
@@ -305,7 +308,7 @@ class ConfigurationLoader
                 $configBags,
                 new Reference('oro_api.config_merger.entity')
             ])
-            ->setPublic(true);
+            ->setPublic(false);
 
         return $configBagServiceId;
     }
@@ -356,7 +359,7 @@ class ConfigurationLoader
                 new Reference('logger'),
                 $configFiles
             ])
-            ->setPublic(true)
+            ->setPublic(false)
             ->addTag('monolog.logger', ['channel' => 'api']);
         if ($configCacheStateServiceId) {
             $entityAliasResolverDef->addMethodCall(
@@ -380,7 +383,7 @@ class ConfigurationLoader
         $this->container
             ->register($entityOverrideProviderServiceId, EntityOverrideProvider::class)
             ->setArguments([new Reference($configCacheServiceId)])
-            ->setPublic(true);
+            ->setPublic(false);
 
         return $entityOverrideProviderServiceId;
     }
@@ -415,7 +418,7 @@ class ConfigurationLoader
         $chainExclusionProviderServiceId = 'oro_api.chain_entity_exclusion_provider.' . $configKey;
         $this->container
             ->register($chainExclusionProviderServiceId, ChainExclusionProvider::class)
-            ->setPublic(true)
+            ->setPublic(false)
             ->addMethodCall('addProvider', [new Reference($exclusionProviderServiceId)])
             ->addMethodCall('addProvider', [new Reference($aliasedExclusionProviderServiceId)])
             ->addMethodCall('addProvider', [new Reference(self::SHARED_ENTITY_EXCLUSION_PROVIDER_SERVICE_ID)]);
@@ -444,5 +447,21 @@ class ConfigurationLoader
         );
 
         return $items;
+    }
+
+    /**
+     * @param array $items [[service id, expression], ...]
+     *
+     * @return Reference
+     */
+    private function registerServiceLocator(array $items): Reference
+    {
+        $services = [];
+        foreach ($items as $item) {
+            $id = $item[0];
+            $services[$id] = new Reference($id);
+        }
+
+        return ServiceLocatorTagPass::register($this->container, $services);
     }
 }

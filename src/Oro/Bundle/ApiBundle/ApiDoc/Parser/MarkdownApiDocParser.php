@@ -6,7 +6,7 @@ use Michelf\MarkdownExtra;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\InheritDocUtil;
-use Symfony\Component\HttpKernel\Config\FileLocator;
+use Symfony\Component\Config\FileLocatorInterface;
 
 /**
  * Extracts documentation for API resources from Markdown files.
@@ -50,16 +50,16 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
      */
     private $loadedData = [];
 
-    /** @var FileLocator */
+    /** @var FileLocatorInterface */
     private $fileLocator;
 
     /** @var string[] */
     private $parsedFiles = [];
 
     /**
-     * @param FileLocator $fileLocator
+     * @param FileLocatorInterface $fileLocator
      */
-    public function __construct(FileLocator $fileLocator)
+    public function __construct(FileLocatorInterface $fileLocator)
     {
         $this->fileLocator = $fileLocator;
     }
