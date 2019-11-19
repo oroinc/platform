@@ -5,6 +5,7 @@ define(function(require) {
     const _ = require('underscore');
     const BaseComponent = require('oroui/js/app/components/base/component');
     const CheckSmtpConnectionView = require('../views/check-smtp-connection-view');
+    const CheckSavedSmtpConnectionView = require('../views/check-saved-smtp-connection-view');
     const CheckSmtpConnectionModel = require('../models/check-smtp-connection-model');
 
     const CheckSmtpConnectionComponent = BaseComponent.extend({
@@ -24,13 +25,18 @@ define(function(require) {
         initialize: function(options) {
             if (options.elementNamePrototype) {
                 const viewOptions = _.extend({
-                    model: new CheckSmtpConnectionModel({}),
                     el: $(options._sourceElement).closest(options.parentElementSelector),
                     entity: options.forEntity || 'user',
                     entityId: options.id,
                     organization: options.organization || ''
                 }, options.viewOptions || {});
-                this.view = new CheckSmtpConnectionView(viewOptions);
+
+                if (options.view !== 'saved') {
+                    viewOptions.model = new CheckSmtpConnectionModel({});
+                    this.view = new CheckSmtpConnectionView(viewOptions);
+                } else {
+                    this.view = new CheckSavedSmtpConnectionView(viewOptions);
+                }
             } else {
                 // unable to initialize
                 $(options._sourceElement).remove();

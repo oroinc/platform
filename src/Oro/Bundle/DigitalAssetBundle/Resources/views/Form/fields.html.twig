@@ -43,7 +43,7 @@
                 options: {
                     view: 'orodigitalasset/js/app/views/digital-asset-choose-form-view',
                     isImageType: dam_widget.is_image_type,
-                    isSet: form.digitalAsset.vars.data is not empty,
+                    isSet: (value is not empty and value.id) or form.digitalAsset.vars.data is not empty,
                     widgetOptions: {
                         title: (dam_widget.is_image_type
                             ? 'oro.digitalasset.dam.dialog.select_image'

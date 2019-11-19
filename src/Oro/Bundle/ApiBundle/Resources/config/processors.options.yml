@@ -1,7 +1,6 @@
 services:
     oro_api.options.processor:
         class: Oro\Bundle\ApiBundle\Processor\OptionsProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - options
