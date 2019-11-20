@@ -57,3 +57,8 @@ $alert-success-color: $success-darken !default;
 $alert-success-close-color: $success-light !default;
 $alert-success-icon-color: $success-light !default;
 $alert-success-icon-content: $fa-var-check !default;
+
+$alert-compact-inner-offset: 4px 8px !default;
+$alert-compact-offset-buttom: 12px !default;
+$alert-compact-display: flex !default;
+$alert-compact-icon-inner-offset: 12px !default;
