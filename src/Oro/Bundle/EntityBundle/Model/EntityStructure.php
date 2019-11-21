@@ -39,14 +39,10 @@ class EntityStructure implements \Serializable
 
     /**
      * @param string $id
-     *
-     * @return self
      */
     public function setId($id)
     {
         $this->id = $id;
-
-        return $this;
     }
 
     /**
@@ -67,14 +63,10 @@ class EntityStructure implements \Serializable
 
     /**
      * @param string $alias
-     *
-     * @return self
      */
     public function setAlias($alias)
     {
         $this->alias = $alias;
-
-        return $this;
     }
 
     /**
@@ -87,14 +79,10 @@ class EntityStructure implements \Serializable
 
     /**
      * @param string $pluralAlias
-     *
-     * @return self
      */
     public function setPluralAlias($pluralAlias)
     {
         $this->pluralAlias = $pluralAlias;
-
-        return $this;
     }
 
     /**
@@ -107,14 +95,10 @@ class EntityStructure implements \Serializable
 
     /**
      * @param string $className
-     *
-     * @return self
      */
     public function setClassName($className)
     {
         $this->className = $className;
-
-        return $this;
     }
 
     /**
@@ -127,8 +111,6 @@ class EntityStructure implements \Serializable
 
     /**
      * @param EntityFieldStructure[] $fields
-     *
-     * @return self
      */
     public function setFields(array $fields)
     {
@@ -136,20 +118,14 @@ class EntityStructure implements \Serializable
         foreach ($fields as $field) {
             $this->addField($field);
         }
-
-        return $this;
     }
 
     /**
      * @param EntityFieldStructure $field
-     *
-     * @return self
      */
     public function addField(EntityFieldStructure $field)
     {
         $this->fields[] = $field;
-
-        return $this;
     }
 
     /**
@@ -203,14 +179,10 @@ class EntityStructure implements \Serializable
 
     /**
      * @param string $label
-     *
-     * @return self
      */
     public function setLabel($label)
     {
         $this->label = $label;
-
-        return $this;
     }
 
     /**
@@ -223,14 +195,10 @@ class EntityStructure implements \Serializable
 
     /**
      * @param string $pluralLabel
-     *
-     * @return self
      */
     public function setPluralLabel($pluralLabel)
     {
         $this->pluralLabel = $pluralLabel;
-
-        return $this;
     }
 
     /**
@@ -243,14 +211,10 @@ class EntityStructure implements \Serializable
 
     /**
      * @param string $icon
-     *
-     * @return self
      */
     public function setIcon($icon)
     {
         $this->icon = $icon;
-
-        return $this;
     }
 
     /**
@@ -263,14 +227,10 @@ class EntityStructure implements \Serializable
 
     /**
      * @param array $routes
-     *
-     * @return self
      */
     public function setRoutes($routes)
     {
         $this->routes = $routes;
-
-        return $this;
     }
 
     /**

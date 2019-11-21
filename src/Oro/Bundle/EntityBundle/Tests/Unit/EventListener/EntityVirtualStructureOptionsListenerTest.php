@@ -31,7 +31,8 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
 
     public function testOnOptionsRequest()
     {
-        $fieldStructure = (new EntityFieldStructure())->setName('field1');
+        $fieldStructure = new EntityFieldStructure();
+        $fieldStructure->setName('field1');
         $entityStructure = $this->getEntity(
             EntityStructure::class,
             [
@@ -47,7 +48,8 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
             ->willReturn(true);
 
         $event = $this->getEntity(EntityStructureOptionsEvent::class, ['data' => [$entityStructure]]);
-        $expectedFieldStructure = (clone $fieldStructure)->addOption('virtual', true);
+        $expectedFieldStructure = clone $fieldStructure;
+        $expectedFieldStructure->addOption('virtual', true);
         $expectedEntityStructure = $this->getEntity(
             EntityStructure::class,
             [
@@ -62,7 +64,8 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
     public function testOnOptionsRequestUnidirectional()
     {
         $fieldName = sprintf('class%sfield', UnidirectionalFieldHelper::DELIMITER);
-        $fieldStructure = (new EntityFieldStructure())->setName($fieldName);
+        $fieldStructure = new EntityFieldStructure();
+        $fieldStructure->setName($fieldName);
         $entityStructure = $this->getEntity(
             EntityStructure::class,
             [
@@ -78,7 +81,8 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
             ->willReturn(true);
 
         $event = $this->getEntity(EntityStructureOptionsEvent::class, ['data' => [$entityStructure]]);
-        $expectedFieldStructure = (clone $fieldStructure)->addOption('virtual', true);
+        $expectedFieldStructure = clone $fieldStructure;
+        $expectedFieldStructure->addOption('virtual', true);
         $expectedEntityStructure = $this->getEntity(
             EntityStructure::class,
             [

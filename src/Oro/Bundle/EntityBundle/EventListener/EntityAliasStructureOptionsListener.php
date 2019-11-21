@@ -33,9 +33,8 @@ class EntityAliasStructureOptionsListener
                 continue;
             }
 
-            $entityStructure
-                ->setAlias($this->entityAliasResolver->getAlias($className))
-                ->setPluralAlias($this->entityAliasResolver->getPluralAlias($className));
+            $entityStructure->setAlias($this->entityAliasResolver->getAlias($className));
+            $entityStructure->setPluralAlias($this->entityAliasResolver->getPluralAlias($className));
         }
         $event->setData($data);
     }
