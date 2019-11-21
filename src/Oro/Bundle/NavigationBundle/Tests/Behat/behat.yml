@@ -55,12 +55,26 @@ oro_behat_extension:
     MenuTree:
       selector: 'div.jstree-wrapper'
 
+    Menu Form Title Fallbacks:
+      selector:
+        type: xpath
+        locator: '(//button[contains(@class, "fallback-status")])[1]'
+
     Menu Form:
       selector: 'form[name="menu_update"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
         mapping:
           Title: 'menu_update[titles][values][default]'
+          Title First: 'menu_update[titles][values][localizations][1][value]'
+          Title First Use Fallback: 'menu_update[titles][values][localizations][1][use_fallback]'
+          Title First Fallback: 'menu_update[titles][values][localizations][1][fallback]'
+          Title Second: 'menu_update[titles][values][localizations][2][value]'
+          Title Second Use Fallback: 'menu_update[titles][values][localizations][2][use_fallback]'
+          Title Second Fallback: 'menu_update[titles][values][localizations][2][fallback]'
+          Title Third: 'menu_update[titles][values][localizations][3][value]'
+          Title Third Use Fallback: 'menu_update[titles][values][localizations][3][use_fallback]'
+          Title Third Fallback: 'menu_update[titles][values][localizations][3][fallback]'
           URI: 'menu_update[uri]'
           Icon: 'menu_update[icon]'
           Description: 'menu_update[descriptions][values][default]'
