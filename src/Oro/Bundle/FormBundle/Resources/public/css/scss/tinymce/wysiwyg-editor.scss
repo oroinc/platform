@@ -1,0 +1,31 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/variables";
+@import "oroui/css/scss/oro/variables";
+
+@import "npmassets/bootstrap/scss/reboot";
+@import "npmassets/bootstrap/scss/type";
+
+body {
+    padding: 8px;
+
+    background-color: $primary-inverse;
+    scrollbar-3dlight-color: $primary-900;
+    scrollbar-arrow-color: $primary-400;
+    scrollbar-base-color: $primary-900;
+    scrollbar-darkshadow-color: $primary-750;
+    scrollbar-face-color: $primary-800;
+    scrollbar-highlight-color: $primary-900;
+    scrollbar-shadow-color: $primary-900;
+    scrollbar-track-color: $primary-860;
+
+    &[contenteditable="false"] {
+        cursor: not-allowed;
+        background-color: $primary-830;
+    }
+}
+
+ul,
+ol {
+    padding-#{$start}: 16px;
+}

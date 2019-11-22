@@ -156,8 +156,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     public function optionsDataProvider()
     {
         $toolbar = [
-            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo 
-             | fullscreen'
+            'undo redo formatselect bold italic underline | forecolor backcolor | bullist numlist ' .
+            '| alignleft aligncenter alignright alignjustify | link | bdesk_photo | fullscreen'
         ];
         $elements = [
             '@[style|class]',
@@ -193,8 +193,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             'data-page-component-module' => 'oroui/js/app/components/view-component',
             'data-page-component-options' => [
                 'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-                'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
-                'skin_url' => 'bundles/oroform/css/tinymce',
+                'content_css' => 'build/css/tinymce/wysiwyg-editor.css',
+                'skin_url' => 'build/css/tinymce',
                 'plugins' => ['textcolor', 'code', 'link', 'bdesk_photo', 'fullscreen', 'paste', 'lists', 'advlist'],
                 'toolbar' => $toolbar,
                 'valid_elements' => '',
@@ -288,8 +288,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                                     'fullscreen'
                                 ],
                                 'valid_elements' => implode(',', $elements),
-                                'content_css' => 'subfolder/bundles/oroform/css/wysiwyg-editor.css',
-                                'skin_url' => 'subfolder/bundles/oroform/css/tinymce'
+                                'content_css' => 'subfolder/build/css/tinymce/wysiwyg-editor.css',
+                                'skin_url' => 'subfolder/build/css/tinymce'
                             ]
                         )
                     ]
