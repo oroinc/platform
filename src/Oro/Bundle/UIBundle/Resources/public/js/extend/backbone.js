@@ -5,6 +5,7 @@ define(function(require) {
     const _ = require('underscore');
     const Backbone = require('backbone');
     const componentContainerMixin = require('oroui/js/app/components/base/component-container-mixin');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const tools = require('oroui/js/tools');
     const pageVisibilityTracker = require('oroui/js/tools/page-visibility-tracker');
 
@@ -337,7 +338,7 @@ define(function(require) {
                 return oldLoadUrl.apply(this, args);
             } catch (e) {
                 if (e instanceof URIError) {
-                    tools.loadModules(['oroui/js/messenger', 'orotranslation/js/translator'], function(messenger, __) {
+                    loadModules(['oroui/js/messenger', 'orotranslation/js/translator'], function(messenger, __) {
                         messenger.showErrorMessage(__('oro.ui.malformed_url_loading_error'));
                     });
                     return false;

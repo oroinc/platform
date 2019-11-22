@@ -4,29 +4,34 @@ define(function(require) {
     const Backbone = require('backbone');
     const $ = require('jquery');
     const _ = require('underscore');
-    const jsmoduleExposure = require('jsmodule-exposure');
     const data = require('../../Fixture/app/services/entitystructure-data.json');
     const RegistryMock = require('../../Fixture/app/services/registry/registry-mock');
-    const EntityModel = require('oroentity/js/app/models/entity-model');
-    const EntityStructuresCollection = require('oroentity/js/app/models/entitystructures-collection');
-    const EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
+    const providerModuleInjector = require('inject-loader!oroentity/js/app/services/entity-structure-data-provider');
+    const entityModelModuleInjector = require('inject-loader!oroentity/js/app/models/entity-model');
+    const entityCollectionModuleInjector = require('inject-loader!oroentity/js/app/models/entity-collection');
+    const entityStructuresCollectionModuleInjector = require('inject-loader!oroentity/js/app/models/entitystructures-collection');
 
-    const collectionExposure = jsmoduleExposure.disclose('oroentity/js/app/models/entity-collection');
-    const providerExposure = jsmoduleExposure.disclose('oroentity/js/app/services/entity-structure-data-provider');
+    const routing = {
+        generate: jasmine.createSpy('entitySync').and.returnValue('test/url')
+    };
 
-    xdescribe('oroentity/js/app/services/entity-structure-data-provider', function() {
+    const EntityModel = entityModelModuleInjector({
+        routing: routing
+    });
+
+    describe('oroentity/js/app/services/entity-structure-data-provider', function() {
         let applicant1;
         let applicant2;
         let registryMock;
         let entitySyncMock;
+        let EntityStructuresCollection;
+        let EntityStructureDataProvider;
 
         beforeEach(function() {
             applicant1 = Object.create(Backbone.Events);
             applicant2 = Object.create(Backbone.Events);
 
             registryMock = new RegistryMock();
-            providerExposure.substitute('registry').by(registryMock);
-            collectionExposure.substitute('registry').by(registryMock);
 
             entitySyncMock = jasmine.createSpy('entitySync').and.callFake(function(method, model, options) {
                 // mocks fetch collection action
@@ -36,13 +41,22 @@ define(function(require) {
                 deferred.done(options.success).resolve(data);
                 return xhrMock;
             });
-            collectionExposure.substitute('entitySync').by(entitySyncMock);
-        });
 
-        afterEach(function() {
-            providerExposure.recover('registry');
-            collectionExposure.recover('registry');
-            collectionExposure.recover('entitySync');
+            const EntityCollection = entityCollectionModuleInjector({
+                'oroui/js/app/services/registry': registryMock,
+                'oroentity/js/app/models/entity-sync': entitySyncMock,
+                'oroentity/js/app/models/entity-model': EntityModel,
+                'routing': routing
+            });
+
+            EntityStructuresCollection = entityStructuresCollectionModuleInjector({
+                'oroentity/js/app/models/entity-collection': EntityCollection
+            });
+
+            EntityStructureDataProvider = providerModuleInjector({
+                'oroui/js/app/services/registry': registryMock,
+                'oroentity/js/app/models/entitystructures-collection': EntityStructuresCollection
+            });
         });
 
         describe('entity structures data provider', function() {

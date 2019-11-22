@@ -3,29 +3,70 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Model;
 
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
-use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class EntityFieldStructureTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTestCaseTrait;
-
-    public function testAccessors()
+    public function testName()
     {
-        static::assertPropertyAccessors(new EntityFieldStructure(), [
-            ['name', 'name'],
-            ['label', 'label'],
-            ['type', 'type'],
-            ['relationType', 'relationType'],
-            ['relatedEntityName', 'relatedEntityName'],
-            ['options', ['option1' => true]],
-        ]);
+        $field = new EntityFieldStructure();
+        self::assertNull($field->getName());
+
+        $value = 'test';
+        $field->setName($value);
+        self::assertSame($value, $field->getName());
     }
 
-    public function testGetNotExistingOption()
+    public function testLabel()
     {
-        $item = new EntityFieldStructure();
-        $this->assertFalse($item->hasOption('unknown'));
-        $this->assertNull($item->getOption('unknown'));
+        $field = new EntityFieldStructure();
+        self::assertNull($field->getLabel());
+
+        $value = 'test';
+        $field->setLabel($value);
+        self::assertSame($value, $field->getLabel());
+    }
+
+    public function testType()
+    {
+        $field = new EntityFieldStructure();
+        self::assertNull($field->getType());
+
+        $value = 'test';
+        $field->setType($value);
+        self::assertSame($value, $field->getType());
+    }
+
+    public function testRelationType()
+    {
+        $field = new EntityFieldStructure();
+        self::assertNull($field->getRelationType());
+
+        $value = 'test';
+        $field->setRelationType($value);
+        self::assertSame($value, $field->getRelationType());
+    }
+
+    public function testRelatedEntityName()
+    {
+        $field = new EntityFieldStructure();
+        self::assertNull($field->getRelatedEntityName());
+
+        $value = 'test';
+        $field->setRelatedEntityName($value);
+        self::assertSame($value, $field->getRelatedEntityName());
+    }
+
+    public function testOptions()
+    {
+        $field = new EntityFieldStructure();
+        self::assertSame([], $field->getOptions());
+        self::assertFalse($field->hasOption('option1'));
+        self::assertNull($field->getOption('option1'));
+
+        $field->addOption('option1', 'value1');
+        self::assertTrue($field->hasOption('option1'));
+        self::assertSame('value1', $field->getOption('option1'));
+        self::assertSame(['option1' => 'value1'], $field->getOptions());
     }
 
     public function testSerialization()

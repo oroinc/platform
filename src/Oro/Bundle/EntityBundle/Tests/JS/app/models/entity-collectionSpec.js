@@ -1,22 +1,19 @@
 define(function(require) {
     'use strict';
 
-    const jsmoduleExposure = require('jsmodule-exposure');
-    const exposure = jsmoduleExposure.disclose('oroentity/js/app/models/entity-collection');
     const RegistryMock = require('../../Fixture/app/services/registry/registry-mock');
     const EntityModel = require('oroentity/js/app/models/entity-model');
-    const EntityCollection = require('oroentity/js/app/models/entity-collection');
+    const entityCollectionModuleInjector = require('inject-loader!oroentity/js/app/models/entity-collection');
 
-    xdescribe('oroentity/js/app/models/entity-collection', function() {
+    describe('oroentity/js/app/models/entity-collection', function() {
         let registryMock;
+        let EntityCollection;
 
         beforeEach(function() {
             registryMock = new RegistryMock();
-            exposure.substitute('registry').by(registryMock);
-        });
-
-        afterEach(function() {
-            exposure.recover('registry');
+            EntityCollection = entityCollectionModuleInjector({
+                'oroui/js/app/services/registry': registryMock
+            });
         });
 
         describe('create collection', function() {

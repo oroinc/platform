@@ -1,7 +1,6 @@
 services:
     oro_api.customize_loaded_data.processor:
         class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - customize_loaded_data

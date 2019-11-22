@@ -3,7 +3,7 @@ define(function(require) {
 
     const viewportManager = require('oroui/js/viewport-manager');
     const BaseComponent = require('oroui/js/app/components/base/component');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const mediator = require('oroui/js/mediator');
     const _ = require('underscore');
 
@@ -43,7 +43,7 @@ define(function(require) {
 
             this.resolveComponent();
 
-            tools.loadModules(this.options.component, _.bind(this.onComponentLoaded, this));
+            loadModules(this.options.component, this.onComponentLoaded, this);
         },
 
         resolveComponent: function() {

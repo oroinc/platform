@@ -1,7 +1,6 @@
 services:
     oro_api.get_subresource.processor:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresourceProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - get_subresource

@@ -5,7 +5,7 @@ Oro\Bundle\NavigationBundle\Entity\PageState:
         pageId:
             - NotBlank:     ~
             - Length:
-                max:        4000
+                max:        10920
         user:
             - NotBlank:     ~
         data:

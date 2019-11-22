@@ -35,6 +35,8 @@
             'action': formAction,
             'attr': {
                 'id': form.vars.id,
+                'data-scope-class': scopeEntityClass is defined ? scopeEntityClass : null,
+                'data-scope-id': scopeEntityId is defined ? scopeEntityId : null,
                 'data-collect': 'true',
                 'data-page-component-view': options|json_encode
             }
