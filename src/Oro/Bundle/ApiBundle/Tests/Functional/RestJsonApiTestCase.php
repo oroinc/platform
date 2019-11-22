@@ -52,6 +52,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     {
         $this->checkHateoasHeader($server);
         $this->checkWsseAuthHeader($server);
+        $this->checkCsrfHeader($server);
 
         if (!empty($parameters['filter'])) {
             foreach ($parameters['filter'] as $key => $filter) {
@@ -100,7 +101,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         );
 
         // make sure that REST API call does not start the session
-        self::assertSessionNotStarted($method, $uri);
+        static::assertSessionNotStarted($method, $uri, $server);
 
         return $this->client->getResponse();
     }

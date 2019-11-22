@@ -44,6 +44,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
     {
         $this->checkHateoasHeader($server);
         $this->checkWsseAuthHeader($server);
+        $this->checkCsrfHeader($server);
 
         $this->client->request(
             $method,
@@ -55,7 +56,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
         );
 
         // make sure that REST API call does not start the session
-        self::assertSessionNotStarted($method, $uri);
+        self::assertSessionNotStarted($method, $uri, $server);
 
         return $this->client->getResponse();
     }

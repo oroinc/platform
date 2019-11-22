@@ -38,6 +38,9 @@ class CsrfRequestManager
         $tokenValue = $useRequestValue
             ? $request->get(self::CSRF_TOKEN_ID)
             : $request->headers->get(self::CSRF_HEADER);
+        if (!$tokenValue) {
+            return false;
+        }
 
         return $this->csrfTokenManager->isTokenValid(new CsrfToken(self::CSRF_TOKEN_ID, $tokenValue));
     }
