@@ -80,24 +80,6 @@ final class BigDecimal extends BigNumber
     }
 
     /**
-     * Returns a BigDecimal with the current value and the specified scale.
-     *
-     * @deprecated Use `toScale()`.
-     *
-     * @param int $scale
-     * @param int $roundingMode
-     *
-     * @return BigDecimal
-     */
-    public function withScale($scale, $roundingMode = RoundingMode::UNNECESSARY)
-    {
-        /** @var BrickBigDecimal $brickBigDecimal */
-        $brickBigDecimal = $this->getTargetObject()->withScale($scale, $roundingMode);
-
-        return new self($brickBigDecimal);
-    }
-
-    /**
      * Returns a copy of this BigDecimal with the decimal point moved $n places to the left.
      *
      * @param int $number

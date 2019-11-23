@@ -118,6 +118,9 @@ The current file describes significant changes in the code that may affect the u
 #### All Bundles
 * All `*.class` parameters were removed from the dependency injection container.
 
+#### Math component
+* The deprecated method `Oro\Component\Math\BigDecimal::withScale()` was removed. Use `toScale()` method instead.  
+
 #### DataGridBundle
 * The DIC parameter `oro_datagrid.extension.orm_sorter.class` was removed.
   If you use `%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC`
