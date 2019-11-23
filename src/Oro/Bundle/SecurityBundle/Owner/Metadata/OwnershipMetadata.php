@@ -155,14 +155,6 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function getGlobalOwnerFieldName()
-    {
-        return $this->getOrganizationFieldName();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getAccessLevelNames()
     {
         if (!$this->hasOwner()) {

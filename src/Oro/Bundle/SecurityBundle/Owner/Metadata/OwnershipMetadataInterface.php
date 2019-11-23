@@ -67,12 +67,6 @@ interface OwnershipMetadataInterface
     public function getOrganizationColumnName();
 
     /**
-     * @return string
-     * @deprecated since 2.3, use getOrganizationFieldName instead
-     */
-    public function getGlobalOwnerFieldName();
-
-    /**
      * Get list of allowed access level names
      *
      * @return array
