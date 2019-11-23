@@ -127,6 +127,12 @@ The current file describes significant changes in the code that may affect the u
   or `%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC` in `Resources/config/oro/datagrids.yml`,
   replace them to `ASC` and `DESC` strings.
 
+#### EntityConfigBundle
+* The deprecated class `Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent` was removed.
+  It was replaced with `Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent`.
+* The deprecated class `Oro\Bundle\EntityConfigBundle\Event\FlushConfigEvent` was removed.
+  It was replaced with `Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent`.
+
 #### EntityExtendBundle
 * Removed *HTML* field type, all HTML fields were converted to Text fields.  
 
@@ -134,9 +140,9 @@ The current file describes significant changes in the code that may affect the u
 * The deprecated constant `Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension::NAME_PATH` was removed.
 
 #### SoapBundle
+* The deprecated `Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpEntityNameParameterFilter` class was removed. Use `Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter` instead.  
 
 #### SecurityBundle
-* The deprecated `Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpEntityNameParameterFilter` class was removed. Use `Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter` instead.  
 * The deprecated method `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface::getGlobalOwnerFieldName()` was removed. Use `getOrganizationFieldName()` method instead.  
 
 #### TagBundle
