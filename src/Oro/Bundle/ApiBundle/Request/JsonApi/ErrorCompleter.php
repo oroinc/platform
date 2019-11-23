@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
@@ -24,6 +25,8 @@ use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
  */
 class ErrorCompleter extends AbstractErrorCompleter
 {
+    private const POINTER_DELIMITER = '/';
+
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
@@ -48,7 +51,7 @@ class ErrorCompleter extends AbstractErrorCompleter
     /**
      * {@inheritdoc}
      */
-    public function complete(Error $error, RequestType $requestType, EntityMetadata $metadata = null)
+    public function complete(Error $error, RequestType $requestType, EntityMetadata $metadata = null): void
     {
         $this->completeStatusCode($error);
         $this->completeCode($error);
@@ -57,12 +60,45 @@ class ErrorCompleter extends AbstractErrorCompleter
         $this->completeSource($error, $requestType, $metadata);
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
+    public function fixIncludedEntityPath(
+        string $entityPath,
+        Error $error,
+        RequestType $requestType,
+        EntityMetadata $metadata = null
+    ): void {
+        $this->completeSource($error, $requestType, $metadata);
+        $errorSource = $error->getSource();
+        if (null === $errorSource) {
+            $error->setSource(ErrorSource::createByPointer($entityPath));
+        } else {
+            $pointer = $errorSource->getPointer();
+            if ($pointer && 0 === \strpos($pointer, self::POINTER_DELIMITER . JsonApiDoc::DATA)) {
+                $errorSource->setPointer($entityPath . \substr($pointer, \strlen(JsonApiDoc::DATA) + 1));
+            } else {
+                $propertyPath = $errorSource->getPropertyPath();
+                if ($propertyPath) {
+                    $propertyPath = \str_replace(self::POINTER_DELIMITER, ConfigUtil::PATH_DELIMITER, $entityPath)
+                        . ConfigUtil::PATH_DELIMITER
+                        . $propertyPath;
+                    if (0 === \strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
+                        $propertyPath = \substr($propertyPath, 1);
+                    }
+                    $errorSource->setPropertyPath($propertyPath);
+                }
+            }
+        }
+    }
+
     /**
      * @param Error               $error
      * @param RequestType         $requestType
      * @param EntityMetadata|null $metadata
      */
-    private function completeSource(Error $error, RequestType $requestType, EntityMetadata $metadata = null)
+    private function completeSource(Error $error, RequestType $requestType, EntityMetadata $metadata = null): void
     {
         $source = $error->getSource();
         if (null === $source && $this->isConfigFilterConstraintViolation($error)) {
@@ -85,7 +121,10 @@ class ErrorCompleter extends AbstractErrorCompleter
                         ? JsonApiDoc::DATA
                         : JsonApiDoc::META;
                     $source->setPointer(
-                        \sprintf('/%s/%s', $dataSection, \implode('/', \array_merge($pointerPrefix, $pointer)))
+                        self::POINTER_DELIMITER
+                        . $dataSection
+                        . self::POINTER_DELIMITER
+                        . \implode(self::POINTER_DELIMITER, \array_merge($pointerPrefix, $pointer))
                     );
                     $source->setPropertyPath(null);
                 }
@@ -96,13 +135,13 @@ class ErrorCompleter extends AbstractErrorCompleter
     /**
      * @param string $propertyPath
      *
-     * @return array
+     * @return array [normalized property path, path, pointer prefix]
      */
-    private function normalizePropertyPath($propertyPath)
+    private function normalizePropertyPath(string $propertyPath): array
     {
         $pointerPrefix = [];
         $normalizedPropertyPath = $propertyPath;
-        $path = \explode('.', $propertyPath);
+        $path = \explode(ConfigUtil::PATH_DELIMITER, $propertyPath);
         if (\count($path) > 1 && \is_numeric($path[0])) {
             $normalizedPropertyPath = \substr($propertyPath, \strlen($path[0]) + 1);
             $pointerPrefix[] = \array_shift($path);
@@ -118,7 +157,7 @@ class ErrorCompleter extends AbstractErrorCompleter
      *
      * @return string[]
      */
-    private function getPointer(EntityMetadata $metadata, $normalizedPropertyPath, array $path)
+    private function getPointer(EntityMetadata $metadata, string $normalizedPropertyPath, array $path): array
     {
         $pointer = [];
         if (\in_array($normalizedPropertyPath, $metadata->getIdentifierFieldNames(), true)) {
@@ -146,7 +185,7 @@ class ErrorCompleter extends AbstractErrorCompleter
      *
      * @return string[]
      */
-    private function getAssociationPointer(array $path, AssociationMetadata $association)
+    private function getAssociationPointer(array $path, AssociationMetadata $association): array
     {
         $pointer = DataType::isAssociationAsField($association->getDataType())
             ? [JsonApiDoc::ATTRIBUTES, $path[0]]
@@ -162,13 +201,17 @@ class ErrorCompleter extends AbstractErrorCompleter
     }
 
     /**
-     * @param string $message
-     * @param string $source
+     * @param string|null $message
+     * @param string      $source
      *
      * @return string
      */
-    private function appendSourceToMessage($message, $source)
+    private function appendSourceToMessage(?string $message, string $source): string
     {
+        if (!$message) {
+            return \sprintf('Source: %s.', $source);
+        }
+
         if (!$this->endsWith($message, '.')) {
             $message .= '.';
         }
@@ -182,7 +225,7 @@ class ErrorCompleter extends AbstractErrorCompleter
      *
      * @return bool
      */
-    private function endsWith($haystack, $needle)
+    private function endsWith(string $haystack, string $needle): bool
     {
         return \substr($haystack, -\strlen($needle)) === $needle;
     }
@@ -193,7 +236,7 @@ class ErrorCompleter extends AbstractErrorCompleter
      *
      * @return string
      */
-    private function getConfigFilterConstraintParameter(Error $error, RequestType $requestType)
+    private function getConfigFilterConstraintParameter(Error $error, RequestType $requestType): string
     {
         $filterNames = $this->filterNamesRegistry->getFilterNames($requestType);
         /** @var NotSupportedConfigOperationException $e */
@@ -220,7 +263,7 @@ class ErrorCompleter extends AbstractErrorCompleter
      *
      * @return string|null
      */
-    private function getEntityType($entityClass, RequestType $requestType)
+    private function getEntityType(string $entityClass, RequestType $requestType): ?string
     {
         return ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,

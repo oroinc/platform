@@ -898,10 +898,11 @@ services:
             - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: 250 }
 
     oro_api.json_api.process_included_entities:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ProcessIncludedEntities
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessIncludedEntities
         arguments:
             - '@oro_api.action_processor_bag'
             - '@oro_api.error_completer_registry'
+            - '@oro_api.exception_text_extractor'
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, requestType: json_api, priority: 200 }
             - { name: oro.api.processor, action: update, group: transform_data, requestType: json_api, priority: 200 }
@@ -1018,30 +1019,6 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: -80 }
             - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: -80 }
             - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -80 }
-
-    oro_api.json_api.collect_form_errors:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CollectFormErrors
-        arguments:
-            - '@oro_api.constraint_text_extractor'
-            - '@oro_api.error_completer_registry'
-            - '@oro_api.form_property_accessor'
-        tags:
-            - { name: oro.api.processor, action: create, group: transform_data, requestType: json_api, priority: -99 }
-            - { name: oro.api.processor, action: update, group: transform_data, requestType: json_api, priority: -99 }
-
-    oro_api.json_api.subresource.collect_form_errors:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\JsonApi\CollectFormErrors
-        arguments:
-            - '@oro_api.constraint_text_extractor'
-            - '@oro_api.error_completer_registry'
-            - '@oro_api.form_property_accessor'
-        tags:
-            - { name: oro.api.processor, action: delete_subresource, group: transform_data, requestType: json_api, priority: -99 }
-            - { name: oro.api.processor, action: add_subresource, group: transform_data, requestType: json_api, priority: -99 }
-            - { name: oro.api.processor, action: update_subresource, group: transform_data, requestType: json_api, priority: -99 }
-            - { name: oro.api.processor, action: delete_relationship, group: transform_data, requestType: json_api, priority: -99 }
-            - { name: oro.api.processor, action: add_relationship, group: transform_data, requestType: json_api, priority: -99 }
-            - { name: oro.api.processor, action: update_relationship, group: transform_data, requestType: json_api, priority: -99 }
 
     oro_api.collect_form_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors
