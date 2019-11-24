@@ -170,6 +170,12 @@ The current file describes significant changes in the code that may affect the u
 #### TagBundle
 * The deprecated constant `Oro\Bundle\TagBundle\Grid\AbstractTagsExtension::GRID_NAME_PATH` was removed.
 
+#### TranslationBundle
+* The deprecated option `is_translated_group` for `Symfony\Component\Form\Extension\Core\Type\ChoiceType` was removed.
+  Use `translatable_groups` option instead.
+* The deprecated option `is_translated_option` for `Symfony\Component\Form\Extension\Core\Type\ChoiceType` was removed.
+  Use `translatable_options` option instead.
+
 ## 4.0.0 (2019-07-31)
 [Show detailed list of changes](incompatibilities-4-0.md)
 
