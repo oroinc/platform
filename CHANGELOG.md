@@ -141,6 +141,8 @@ The current file describes significant changes in the code that may affect the u
   and `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::isDatasourceSkipAclApply()` instead.
 * The deprecated constant `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_SKIP_COUNT_WALKER_PATH` was removed.
   Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::DATASOURCE_SKIP_COUNT_WALKER_PATH` instead.
+* The deprecated class `Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper`
+  and service `oro_datagrid.grid_configuration.helper` were removed.
 
 #### EntityConfigBundle
 * The deprecated class `Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent` was removed.
