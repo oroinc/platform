@@ -20,7 +20,8 @@ system_configuration:
                     - NotBlank: ~
                     - Type: integer
                     - Range:
-                          min: 1
+                        min: 1
+                        max: 2047 # in bytes equivalents to ~2147483647 which max allowed value for fileSize column of File entity
 
         oro_attachment.upload_file_mime_types:
             data_type: string
