@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
+use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ParameterBag;
@@ -26,6 +27,9 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ErrorCompleterInterface */
     private $errorCompleter;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExceptionTextExtractorInterface */
+    private $exceptionTextExtractor;
 
     /** @var ParameterBag */
     private $sharedData;
@@ -43,6 +47,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 
         $this->processorBag = $this->createMock(ActionProcessorBagInterface::class);
         $this->errorCompleter = $this->createMock(ErrorCompleterInterface::class);
+        $this->exceptionTextExtractor = $this->createMock(ExceptionTextExtractorInterface::class);
 
         $errorCompleterRegistry = $this->createMock(ErrorCompleterRegistry::class);
         $errorCompleterRegistry->expects(self::any())
@@ -52,7 +57,8 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 
         $this->processor = new ProcessIncludedEntities(
             $this->processorBag,
-            $errorCompleterRegistry
+            $errorCompleterRegistry,
+            $this->exceptionTextExtractor
         );
     }
 
@@ -121,7 +127,9 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
                 }
             );
         $this->errorCompleter->expects(self::never())
-            ->method('complete');
+            ->method('fixIncludedEntityPath');
+        $this->exceptionTextExtractor->expects(self::never())
+            ->method('getExceptionStatusCode');
 
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
@@ -182,12 +190,15 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
                 }
             );
         $this->errorCompleter->expects(self::once())
-            ->method('complete')
+            ->method('fixIncludedEntityPath')
             ->with(
+                $includedEntityData->getPath(),
                 self::identicalTo($error),
                 $expectedContext->getRequestType(),
                 self::identicalTo($actionMetadata)
             );
+        $this->exceptionTextExtractor->expects(self::never())
+            ->method('getExceptionStatusCode');
 
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
@@ -249,12 +260,15 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
                 }
             );
         $this->errorCompleter->expects(self::once())
-            ->method('complete')
+            ->method('fixIncludedEntityPath')
             ->with(
+                $includedEntityData->getPath(),
                 self::identicalTo($error),
                 $expectedContext->getRequestType(),
                 self::identicalTo($actionMetadata)
             );
+        $this->exceptionTextExtractor->expects(self::never())
+            ->method('getExceptionStatusCode');
 
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
@@ -312,7 +326,9 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
                 }
             );
         $this->errorCompleter->expects(self::never())
-            ->method('complete');
+            ->method('fixIncludedEntityPath');
+        $this->exceptionTextExtractor->expects(self::never())
+            ->method('getExceptionStatusCode');
 
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
@@ -335,7 +351,12 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $includedEntityData = new IncludedEntityData('/included/0', 0, true);
         $includedEntities->add($includedEntity, 'Test\Class', 'id', $includedEntityData);
 
-        $error = Error::createValidationError('some error');
+        $errorException = new \Exception();
+        $error = Error::create('some error');
+        $error->setInnerException($errorException);
+
+        $expectedError = clone $error;
+        $expectedError->setStatusCode(Response::HTTP_CONFLICT);
 
         $expectedContext = new UpdateContext($this->configProvider, $this->metadataProvider);
         $expectedContext->setVersion($this->context->getVersion());
@@ -373,18 +394,23 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
                 }
             );
         $this->errorCompleter->expects(self::once())
-            ->method('complete')
+            ->method('fixIncludedEntityPath')
             ->with(
+                $includedEntityData->getPath(),
                 self::identicalTo($error),
                 $expectedContext->getRequestType(),
                 self::identicalTo($actionMetadata)
             );
+        $this->exceptionTextExtractor->expects(self::once())
+            ->method('getExceptionStatusCode')
+            ->with(self::identicalTo($errorException))
+            ->willReturn(Response::HTTP_CONFLICT);
 
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
         $this->context->getRequestHeaders()->set('header1', 'value1');
         $this->processor->process($this->context);
-        self::assertEquals([$error], $actionContext->getErrors());
+        self::assertEquals([$expectedError], $actionContext->getErrors());
         self::assertNull($includedEntityData->getMetadata());
     }
 }

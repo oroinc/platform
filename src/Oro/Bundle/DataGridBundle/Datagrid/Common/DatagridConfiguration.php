@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Datagrid\Common;
 
 use Doctrine\ORM\EntityRepository;
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
@@ -151,8 +150,8 @@ class DatagridConfiguration extends ConfigObject
         if ($this->offsetExistByPath(self::ACL_RESOURCE_PATH)) {
             $result = $this->offsetGetByPath(self::ACL_RESOURCE_PATH);
         } else {
-            // Support backward compatibility until 1.11 to get this option from deprecated path.
-            $result = $this->offsetGetByPath(Builder::DATASOURCE_ACL_PATH, false);
+            // @deprecated Since 1.9. Support backward compatibility until 1.11 to get this option from deprecated path.
+            $result = $this->offsetGetByPath('[source][acl_resource]', false);
         }
 
         return $result;
@@ -168,8 +167,8 @@ class DatagridConfiguration extends ConfigObject
         if ($this->offsetExistByPath(self::DATASOURCE_SKIP_ACL_APPLY_PATH)) {
             $result = $this->offsetGetByPath(self::DATASOURCE_SKIP_ACL_APPLY_PATH);
         } else {
-            // Support backward compatibility until 1.11 to get this option from deprecated path.
-            $result = $this->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false);
+            // @deprecated Since 1.9. Support backward compatibility until 1.11 to get this option from deprecated path.
+            $result = $this->offsetGetByPath('[options][skip_acl_check]', false);
         }
 
         return (bool)$result;

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\EventListener;
 
-use FOS\RestBundle\EventListener\BodyListener as BaseBodyListener;
 use JsonStreamingParser\Exception\ParsingException;
 use JsonStreamingParser\Listener\InMemoryListener;
 use JsonStreamingParser\Parser;
@@ -13,12 +12,26 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  * Decorates {@see \FOS\RestBundle\EventListener\BodyListener} to correct an exception message
  * if a request body contains an invalid JSON document.
  */
-class BodyListener extends BaseBodyListener
+class ErrorHandlingBodyListenerDecorator implements BodyListenerInterface
 {
-    public function onKernelRequest(GetResponseEvent $event)
+    /** @var BodyListenerInterface */
+    private $listener;
+
+    /**
+     * @param BodyListenerInterface $listener
+     */
+    public function __construct(BodyListenerInterface $listener)
+    {
+        $this->listener = $listener;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         try {
-            parent::onKernelRequest($event);
+            $this->listener->onKernelRequest($event);
         } catch (BadRequestHttpException $e) {
             if ($e->getMessage() === 'Invalid json message received') {
                 $content = $event->getRequest()->getContent();

@@ -12,44 +12,11 @@ use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Provides a functionality to build datagrids.
+ */
 class Builder
 {
-    /**
-     * @deprecated Since 1.9, will be removed after 1.11.
-     * @see DatagridConfiguration::DATASOURCE_PATH
-     */
-    const DATASOURCE_PATH           = '[source]';
-
-    /**
-     * @deprecated Since 1.9, will be removed after 1.11.
-     * @see DatagridConfiguration::DATASOURCE_TYPE_PATH, DatagridConfiguration::getDatasourceType
-     */
-    const DATASOURCE_TYPE_PATH      = '[source][type]';
-
-    /**
-     * @deprecated Since 1.9, will be removed after 1.11.
-     * @see DatagridConfiguration::ACL_RESOURCE_PATH, DatagridConfiguration::getAclResource
-     */
-    const DATASOURCE_ACL_PATH       = '[source][acl_resource]';
-
-    /**
-     * @deprecated Since 1.9, will be removed after 1.11.
-     * @see DatagridConfiguration::BASE_DATAGRID_CLASS_PATH
-     */
-    const BASE_DATAGRID_CLASS_PATH  = '[options][base_datagrid_class]';
-
-    /**
-     * @deprecated Since 1.9, will be removed after 1.11.
-     * @see DatagridConfiguration::DATASOURCE_SKIP_ACL_APPLY_PATH, DatagridConfiguration::isDatasourceSkipAclApply
-     */
-    const DATASOURCE_SKIP_ACL_CHECK = '[options][skip_acl_check]';
-
-    /**
-     * @deprecated Since 1.9, will be removed after 1.11.
-     * @see DatagridConfiguration::DATASOURCE_SKIP_COUNT_WALKER_PATH
-     */
-    const DATASOURCE_SKIP_COUNT_WALKER_PATH = '[options][skip_count_walker]';
-
     /** @var string */
     protected $baseDatagridClass;
 
@@ -89,7 +56,7 @@ class Builder
     public function build(DatagridConfiguration $config, ParameterBag $parameters, array $additionalParameters = [])
     {
         /**
-         * @TODO: should be refactored in BAP-6849
+         * should be refactored in BAP-6849
          */
         $minified = $parameters->get(ParameterBag::MINIFIED_PARAMETERS);
         if (is_array($minified) && array_key_exists('g', $minified) && is_array($minified['g'])) {
@@ -97,7 +64,7 @@ class Builder
         }
 
         /**
-         * @TODO: should be refactored in BAP-6826
+         * should be refactored in BAP-6826
          */
         $event = new PreBuild($config, $parameters);
         $this->eventDispatcher->dispatch(PreBuild::NAME, $event);

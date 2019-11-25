@@ -545,6 +545,20 @@ services:
         arguments:
             - '@oro_api.rest.routes'
 
+    oro_api.rest.body_listener_adapter:
+        class: Oro\Bundle\ApiBundle\EventListener\FosRestBodyListenerAdapter
+        decorates: 'fos_rest.body_listener'
+        decoration_priority: 250
+        arguments:
+            - '@oro_api.rest.body_listener_adapter.inner'
+
+    oro_api.rest.error_handling_body_listener:
+        class: Oro\Bundle\ApiBundle\EventListener\ErrorHandlingBodyListenerDecorator
+        decorates: 'fos_rest.body_listener'
+        decoration_priority: -250
+        arguments:
+            - '@oro_api.rest.error_handling_body_listener.inner'
+
     oro_api.rest.api_doc_annotation_handler:
         class: Oro\Bundle\ApiBundle\ApiDoc\ChainApiDocAnnotationHandler
 

@@ -28,7 +28,7 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
     /**
      * @param Error $error
      */
-    protected function completeStatusCode(Error $error)
+    protected function completeStatusCode(Error $error): void
     {
         if (null === $error->getStatusCode() && null !== $error->getInnerException()) {
             $statusCode = $this->exceptionTextExtractor->getExceptionStatusCode($error->getInnerException());
@@ -41,7 +41,7 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
     /**
      * @param Error $error
      */
-    protected function completeCode(Error $error)
+    protected function completeCode(Error $error): void
     {
         if (null === $error->getCode() && null !== $error->getInnerException()) {
             $code = $this->exceptionTextExtractor->getExceptionCode($error->getInnerException());
@@ -54,7 +54,7 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
     /**
      * @param Error $error
      */
-    protected function completeTitle(Error $error)
+    protected function completeTitle(Error $error): void
     {
         if (null === $error->getTitle()) {
             if ($this->isConfigFilterConstraintViolation($error)) {
@@ -77,7 +77,7 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
     /**
      * @param Error $error
      */
-    protected function completeDetail(Error $error)
+    protected function completeDetail(Error $error): void
     {
         if (null === $error->getDetail()) {
             if ($this->isConfigFilterConstraintViolation($error)) {
@@ -96,7 +96,7 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
      *
      * @return bool
      */
-    protected function isConfigFilterConstraintViolation(Error $error)
+    protected function isConfigFilterConstraintViolation(Error $error): bool
     {
         if (null === $error->getInnerException()) {
             return false;

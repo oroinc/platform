@@ -2,3 +2,10 @@ Oro\Bundle\AttachmentBundle\Entity\Attachment:
     properties:
         file:
             - Valid: ~
+
+Oro\Bundle\AttachmentBundle\Entity\File:
+    properties:
+        fileSize:
+            - Type: integer
+            - Range:
+                  max: 2147483647 # max allowed value for integer column

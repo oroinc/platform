@@ -10,11 +10,11 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\QueryDesignerBundle\Grid\QueryDesignerQueryConfiguration;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
 
+/**
+ * The datagrid extension that adds query designer filters to the grid datasource.
+ */
 class OrmDatasourceExtension extends AbstractExtension
 {
-    /** @deprecated since 1.10. Use config->getName() instead */
-    const NAME_PATH = '[name]';
-
     /**
      * @var string[]
      */

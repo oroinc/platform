@@ -58,6 +58,7 @@ app-modules:
     - oroui/js/app/modules/color-util
     - oroui/js/app/modules/component-shortcuts-module
     - oroui/js/app/modules/css-variable-module
+    - oroui/js/app/modules/focus-visible
     - oroui/js/app/modules/init-layout
     - oroui/js/app/modules/init-lightgallery
     - oroui/js/app/modules/input-widgets

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -14,6 +15,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  * E.g. if an error is created due to an exception occurs,
  * such error does not have "statusCode", "title", "details" and other properties,
  * and these properties are extracted from the Exception object.
+ * Also, removes duplicated errors if any.
  */
 class CompleteErrors implements ProcessorInterface
 {
@@ -47,6 +49,51 @@ class CompleteErrors implements ProcessorInterface
         foreach ($errors as $error) {
             $errorCompleter->complete($error, $requestType, $metadata);
         }
+        if (\count($errors) > 1) {
+            $this->removeDuplicates($errors, $context);
+        }
+    }
+
+    /**
+     * @param Error[] $errors
+     * @param Context $context
+     */
+    private function removeDuplicates(array $errors, Context $context): void
+    {
+        $context->resetErrors();
+        $map = [];
+        foreach ($errors as $error) {
+            $key = $this->getErrorHash($error);
+            if (!isset($map[$key])) {
+                $map[$key] = true;
+                $context->addError($error);
+            }
+        }
+    }
+
+    /**
+     * @param Error $error
+     *
+     * @return string
+     */
+    private function getErrorHash(Error $error): string
+    {
+        $result = serialize([
+            $error->getStatusCode(),
+            $error->getCode(),
+            $error->getTitle(),
+            $error->getDetail()
+        ]);
+        $source = $error->getSource();
+        if (null !== $source) {
+            $result .= serialize([
+                $source->getPropertyPath(),
+                $source->getPointer(),
+                $source->getParameter()
+            ]);
+        }
+
+        return $result;
     }
 
     /**
@@ -54,7 +101,7 @@ class CompleteErrors implements ProcessorInterface
      *
      * @return EntityMetadata|null
      */
-    private function getMetadata(Context $context)
+    private function getMetadata(Context $context): ?EntityMetadata
     {
         $entityClass = $context->getClassName();
         if (!$entityClass || false === strpos($entityClass, '\\')) {

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrder;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrderLineItem;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 
@@ -89,6 +90,120 @@ class PendingValidationTest extends RestJsonApiTestCase
                     'title'  => 'not blank constraint',
                     'detail' => 'This value should not be blank.',
                     'source' => ['pointer' => '/included/2/attributes/quantity']
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testErrorPathIfOwningEntityValidatorAddsViolationToChildEntity()
+    {
+        $orderType = $this->getEntityType(TestOrder::class);
+        $targetType = $this->getEntityType(TestTarget::class);
+        $orderLineItemType = $this->getEntityType(TestOrderLineItem::class);
+
+        $data = [
+            'data'     => [
+                'type'          => $orderType,
+                'attributes'    => ['poNumber' => 'order1'],
+                'relationships' => [
+                    'targetEntity' => ['data' => ['type' => $targetType, 'id' => 'target1']],
+                    'items'        => [
+                        'data' => [
+                            ['type' => $orderLineItemType, 'id' => 'item1'],
+                            ['type' => $orderLineItemType, 'id' => 'item2'],
+                            ['type' => $orderLineItemType, 'id' => 'item3']
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                ['type' => $targetType, 'id' => 'target1', 'attributes' => ['name' => 't']],
+                ['type' => $orderLineItemType, 'id' => 'item1', 'attributes' => ['quantity' => 1001]],
+                ['type' => $orderLineItemType, 'id' => 'item2', 'attributes' => ['quantity' => 1]],
+                ['type' => $orderLineItemType, 'id' => 'item3', 'attributes' => ['quantity' => 1001]]
+            ]
+        ];
+
+        $response = $this->post(['entity' => $orderType], $data, [], false);
+
+        $this->assertResponseValidationErrors(
+            [
+                [
+                    'title'  => 'callback constraint',
+                    'detail' => 'The name must have at least 2 symbols.',
+                    'source' => ['pointer' => '/included/0/attributes/name']
+                ],
+                [
+                    'title'  => 'callback constraint',
+                    'detail' => 'The quantity must be less than 1000.',
+                    'source' => ['pointer' => '/included/1/attributes/quantity']
+                ],
+                [
+                    'title'  => 'callback constraint',
+                    'detail' => 'The quantity must be less than 1000.',
+                    'source' => ['pointer' => '/included/3/attributes/quantity']
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testErrorPathIfOwningEntityValidatorAddsViolationToChildEntityAndOwningEntityIsInIncludedData()
+    {
+        $orderType = $this->getEntityType(TestOrder::class);
+        $targetType = $this->getEntityType(TestTarget::class);
+        $orderLineItemType = $this->getEntityType(TestOrderLineItem::class);
+
+        $data = [
+            'data'     => [
+                'type'          => $orderLineItemType,
+                'attributes'    => ['quantity' => 1],
+                'relationships' => [
+                    'order' => ['data' => ['type' => $orderType, 'id' => 'order1']]
+                ]
+            ],
+            'included' => [
+                [
+                    'type'          => $orderType,
+                    'id'            => 'order1',
+                    'attributes'    => ['poNumber' => 'order1'],
+                    'relationships' => [
+                        'targetEntity' => ['data' => ['type' => $targetType, 'id' => 'target1']],
+                        'items'        => [
+                            'data' => [
+                                ['type' => $orderLineItemType, 'id' => 'item1'],
+                                ['type' => $orderLineItemType, 'id' => 'item2'],
+                                ['type' => $orderLineItemType, 'id' => 'item3']
+                            ]
+                        ]
+                    ]
+                ],
+                ['type' => $targetType, 'id' => 'target1', 'attributes' => ['name' => 't']],
+                ['type' => $orderLineItemType, 'id' => 'item1', 'attributes' => ['quantity' => 1001]],
+                ['type' => $orderLineItemType, 'id' => 'item2', 'attributes' => ['quantity' => 1]],
+                ['type' => $orderLineItemType, 'id' => 'item3', 'attributes' => ['quantity' => 1001]]
+            ]
+        ];
+
+        $response = $this->post(['entity' => $orderLineItemType], $data, [], false);
+
+        $this->assertResponseValidationErrors(
+            [
+                [
+                    'title'  => 'callback constraint',
+                    'detail' => 'The name must have at least 2 symbols.',
+                    'source' => ['pointer' => '/included/1/attributes/name']
+                ],
+                [
+                    'title'  => 'callback constraint',
+                    'detail' => 'The quantity must be less than 1000.',
+                    'source' => ['pointer' => '/included/2/attributes/quantity']
+                ],
+                [
+                    'title'  => 'callback constraint',
+                    'detail' => 'The quantity must be less than 1000.',
+                    'source' => ['pointer' => '/included/4/attributes/quantity']
                 ]
             ],
             $response

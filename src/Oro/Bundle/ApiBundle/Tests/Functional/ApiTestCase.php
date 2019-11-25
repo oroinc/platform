@@ -284,25 +284,9 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * Loads the response content.
-     *
-     * @param array|string $expectedContent The file name or full file path to YAML template file or array
-     *
-     * @return array
-     */
-    protected function loadResponseData($expectedContent)
-    {
-        if (is_string($expectedContent)) {
-            $expectedContent = $this->loadYamlData($expectedContent, $this->getResponseDataFolderName());
-        }
-
-        return self::processTemplateData($expectedContent);
-    }
-
-    /**
      * Converts the given request to an array that can be sent to the server.
      *
-     * @param array|string $request
+     * @param array|string $request The file name or full file path to YAML template file or array
      *
      * @return array
      */
@@ -313,6 +297,23 @@ abstract class ApiTestCase extends WebTestCase
         }
 
         return self::processTemplateData($request);
+    }
+
+    /**
+     * Converts the given response to an array that can be used to compare it
+     * with a response received from the server.
+     *
+     * @param array|string $expectedContent The file name or full file path to YAML template file or array
+     *
+     * @return array
+     */
+    protected function getResponseData($expectedContent)
+    {
+        if (is_string($expectedContent)) {
+            $expectedContent = $this->loadYamlData($expectedContent, $this->getResponseDataFolderName());
+        }
+
+        return self::processTemplateData($expectedContent);
     }
 
     /**
@@ -334,7 +335,7 @@ abstract class ApiTestCase extends WebTestCase
         string $key = 'id',
         string $placeholder = 'new'
     ): array {
-        $expectedContent = $this->loadResponseData($expectedContent);
+        $expectedContent = $this->getResponseData($expectedContent);
         $content = self::jsonToArray($response->getContent());
         $this->walkResponseContent($expectedContent, $content, $key, $placeholder);
 
