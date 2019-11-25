@@ -24,7 +24,7 @@ class DataCollectorCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if ($container->hasDefinition('profiler')) {
+        if ($container->hasDefinition('profiler') && $container->getParameter('kernel.environment') === 'dev') {
             $this->configureDataCollectors($container);
         } else {
             $container->getParameterBag()->remove(self::LOGGING_HYDRATORS_PARAM_NAME);

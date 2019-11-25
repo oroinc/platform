@@ -41,7 +41,9 @@ class OroEntityExtension extends Extension
             $config['default_query_cache_lifetime']
         );
 
-        $loader->load('collectors.yml');
+        if ('dev' === $container->getParameter('kernel.environment')) {
+            $loader->load('collectors.yml');
+        }
     }
 
     /**
