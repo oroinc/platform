@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Controller;
 
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Form\Type\DigitalAssetInDialogType;
@@ -9,9 +10,7 @@ use Oro\Bundle\DigitalAssetBundle\Form\Type\DigitalAssetType;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Psr\Log\LoggerInterface;
@@ -106,8 +105,8 @@ class DigitalAssetController extends AbstractController
             throw new NotFoundHttpException();
         }
 
-        $attachmentEntityFieldConfig = $this
-            ->getAttachmentEntityFieldConfig($resolvedParentEntityClass, $parentEntityFieldName);
+        $attachmentEntityFieldConfig = $this->get(AttachmentEntityConfigProviderInterface::class)
+            ->getFieldConfig($resolvedParentEntityClass, $parentEntityFieldName);
 
         if (!$attachmentEntityFieldConfig) {
             throw new NotFoundHttpException();
@@ -177,36 +176,6 @@ class DigitalAssetController extends AbstractController
     }
 
     /**
-     * @param string $parentEntityClass
-     * @param string $parentEntityFieldName
-     *
-     * @return ConfigInterface|null
-     */
-    protected function getAttachmentEntityFieldConfig(
-        string $parentEntityClass,
-        string $parentEntityFieldName
-    ): ?ConfigInterface {
-        try {
-            $attachmentEntityFieldConfig = $this->get(EntityConfigManager::class)
-                ->getFieldConfig('attachment', $parentEntityClass, $parentEntityFieldName);
-        } catch (RuntimeException $e) {
-            $this->get(LoggerInterface::class)
-                ->warning(
-                    sprintf(
-                        'Entity field config for %s entity class and %s field was not found',
-                        $parentEntityClass,
-                        $parentEntityFieldName
-                    ),
-                    ['exception' => $e]
-                );
-
-            return null;
-        }
-
-        return $attachmentEntityFieldConfig;
-    }
-
-    /**
      * @Route("/widget/choose-image", name="oro_digital_asset_widget_choose_image")
      * @Template("@OroDigitalAsset/DigitalAsset/widget/choose.html.twig")
      * @AclAncestor("oro_digital_asset_create")
@@ -248,7 +217,7 @@ class DigitalAssetController extends AbstractController
                 TranslatorInterface::class,
                 LoggerInterface::class,
                 EntityClassNameHelper::class,
-                EntityConfigManager::class,
+                AttachmentEntityConfigProviderInterface::class,
                 FileConstraintsProvider::class,
             ]
         );

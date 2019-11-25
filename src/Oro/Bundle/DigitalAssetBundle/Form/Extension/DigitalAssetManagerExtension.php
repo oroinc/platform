@@ -4,18 +4,13 @@ namespace Oro\Bundle\DigitalAssetBundle\Form\Extension;
 
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Provider\PreviewMetadataProvider;
 use Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -28,12 +23,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Enables digital asset manager on file/image form types.
  */
-class DigitalAssetManagerExtension extends AbstractTypeExtension implements LoggerAwareInterface
+class DigitalAssetManagerExtension extends AbstractTypeExtension
 {
-    use LoggerAwareTrait;
-
-    /** @var ConfigManager */
-    private $entityConfigManager;
+    /** @var AttachmentEntityConfigProviderInterface */
+    private $attachmentEntityConfigProvider;
 
     /** @var EntityClassNameHelper */
     private $entityClassNameHelper;
@@ -48,25 +41,24 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension implements Logg
     private $fileReflector;
 
     /**
-     * @param ConfigManager $entityConfigManager
+     * @param AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider
      * @param EntityClassNameHelper $entityClassNameHelper
      * @param PreviewMetadataProvider $previewMetadataProvider
      * @param EntityToIdTransformer $digitalAssetToIdTransformer
      * @param FileReflector $fileReflector
      */
     public function __construct(
-        ConfigManager $entityConfigManager,
+        AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider,
         EntityClassNameHelper $entityClassNameHelper,
         PreviewMetadataProvider $previewMetadataProvider,
         EntityToIdTransformer $digitalAssetToIdTransformer,
         FileReflector $fileReflector
     ) {
-        $this->entityConfigManager = $entityConfigManager;
+        $this->attachmentEntityConfigProvider = $attachmentEntityConfigProvider;
         $this->entityClassNameHelper = $entityClassNameHelper;
         $this->previewMetadataProvider = $previewMetadataProvider;
         $this->digitalAssetToIdTransformer = $digitalAssetToIdTransformer;
         $this->fileReflector = $fileReflector;
-        $this->logger = new NullLogger();
     }
 
     /**
@@ -141,7 +133,7 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension implements Logg
             $entityClass = $this->getParentEntityClass($form);
             $fieldName = $this->getParentEntityFieldName($form);
 
-            $attachmentConfig = $this->getAttachmentFieldConfig($entityClass, $fieldName);
+            $attachmentConfig = $this->attachmentEntityConfigProvider->getFieldConfig($entityClass, $fieldName);
 
             if ($attachmentConfig && $attachmentConfig->is('use_dam')) {
                 // Adds extra block prefix to render DAM widget.
@@ -164,33 +156,6 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension implements Logg
                 ];
             }
         }
-    }
-
-    /**
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return ConfigInterface|null
-     */
-    private function getAttachmentFieldConfig(string $entityClass, string $fieldName): ?ConfigInterface
-    {
-        try {
-            $attachmentFieldConfig = $this->entityConfigManager->getFieldConfig('attachment', $entityClass, $fieldName);
-        } catch (RuntimeException $e) {
-            $this->logger
-                ->warning(
-                    sprintf(
-                        'Entity field config for %s entity class and %s field was not found',
-                        $entityClass,
-                        $fieldName
-                    ),
-                    ['exception' => $e]
-                );
-
-            return null;
-        }
-
-        return $attachmentFieldConfig;
     }
 
     /**

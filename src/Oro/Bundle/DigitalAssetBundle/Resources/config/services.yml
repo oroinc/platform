@@ -63,13 +63,11 @@ services:
     oro_digital_asset.form.extension.digital_asset_manager:
         class: Oro\Bundle\DigitalAssetBundle\Form\Extension\DigitalAssetManagerExtension
         arguments:
-            - '@oro_entity_config.config_manager'
+            - '@oro_attachment.provider.attachment_entity_config'
             - '@oro_entity.entity_class_name_helper'
             - '@oro_digital_asset.provider.preview_metadata'
             - '@oro_digital_asset.form.transformer.digital_asset_to_id'
             - '@oro_digital_asset.reflector.file_reflector'
-        calls:
-            - [setLogger, ['@logger']]
         tags:
             - { name: form.type_extension }
 

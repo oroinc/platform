@@ -5,35 +5,28 @@ namespace Oro\Bundle\AttachmentBundle\Provider;
 use Oro\Bundle\AttachmentBundle\DependencyInjection\Configuration as AttachmentConfiguration;
 use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager as SystemConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
-use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
 
 /**
  * Provides a list of constraints for uploaded file.
  */
-class FileConstraintsProvider implements LoggerAwareInterface
+class FileConstraintsProvider
 {
-    use LoggerAwareTrait;
-
     /** @var SystemConfigManager */
     private $systemConfigManager;
 
-    /** @var EntityConfigManager */
-    private $entityConfigManager;
+    /** @var AttachmentEntityConfigProviderInterface */
+    private $attachmentEntityConfigProvider;
 
     /**
      * @param SystemConfigManager $configManager
-     * @param EntityConfigManager $entityConfigManager
+     * @param AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider
      */
-    public function __construct(SystemConfigManager $configManager, EntityConfigManager $entityConfigManager)
-    {
+    public function __construct(
+        SystemConfigManager $configManager,
+        AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider
+    ) {
         $this->systemConfigManager = $configManager;
-        $this->entityConfigManager = $entityConfigManager;
-        $this->logger = new NullLogger();
+        $this->attachmentEntityConfigProvider = $attachmentEntityConfigProvider;
     }
 
     /**
@@ -85,7 +78,7 @@ class FileConstraintsProvider implements LoggerAwareInterface
      */
     public function getAllowedMimeTypesForEntity(string $entityClass): array
     {
-        $entityConfig = $this->getAttachmentEntityConfig($entityClass);
+        $entityConfig = $this->attachmentEntityConfigProvider->getEntityConfig($entityClass);
         if ($entityConfig) {
             $mimeTypes = MimeTypesConverter::convertToArray($entityConfig->get('mimetypes'));
         }
@@ -98,28 +91,6 @@ class FileConstraintsProvider implements LoggerAwareInterface
     }
 
     /**
-     * @param string $entityClass
-     *
-     * @return ConfigInterface|null
-     */
-    private function getAttachmentEntityConfig(string $entityClass): ?ConfigInterface
-    {
-        try {
-            $attachmentFieldConfig = $this->entityConfigManager->getEntityConfig('attachment', $entityClass);
-        } catch (RuntimeException $e) {
-            $this->logger
-                ->warning(
-                    sprintf('Entity config for %s entity class was not found', $entityClass),
-                    ['exception' => $e]
-                );
-
-            return null;
-        }
-
-        return $attachmentFieldConfig;
-    }
-
-    /**
      * Gets file and image mime types from entity field config.
      *
      * @param string $entityClass
@@ -129,7 +100,7 @@ class FileConstraintsProvider implements LoggerAwareInterface
      */
     public function getAllowedMimeTypesForEntityField(string $entityClass, string $fieldName): array
     {
-        $entityFieldConfig = $this->getAttachmentFieldConfig($entityClass, $fieldName);
+        $entityFieldConfig = $this->attachmentEntityConfigProvider->getFieldConfig($entityClass, $fieldName);
         if ($entityFieldConfig) {
             $mimeTypes = MimeTypesConverter::convertToArray($entityFieldConfig->get('mimetypes'));
         }
@@ -143,33 +114,6 @@ class FileConstraintsProvider implements LoggerAwareInterface
         }
 
         return $mimeTypes;
-    }
-
-    /**
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return ConfigInterface|null
-     */
-    private function getAttachmentFieldConfig(string $entityClass, string $fieldName): ?ConfigInterface
-    {
-        try {
-            $attachmentFieldConfig = $this->entityConfigManager->getFieldConfig('attachment', $entityClass, $fieldName);
-        } catch (RuntimeException $e) {
-            $this->logger
-                ->warning(
-                    sprintf(
-                        'Entity field config for %s entity class and %s field was not found',
-                        $entityClass,
-                        $fieldName
-                    ),
-                    ['exception' => $e]
-                );
-
-            return null;
-        }
-
-        return $attachmentFieldConfig;
     }
 
     /**
@@ -193,7 +137,7 @@ class FileConstraintsProvider implements LoggerAwareInterface
      */
     public function getMaxSizeForEntity(string $entityClass): int
     {
-        $entityConfig = $this->getAttachmentEntityConfig($entityClass);
+        $entityConfig = $this->attachmentEntityConfigProvider->getEntityConfig($entityClass);
         if ($entityConfig) {
             $maxFileSize = (int)$entityConfig->get('maxsize') * AttachmentConfiguration::BYTES_MULTIPLIER;
         }
@@ -215,7 +159,7 @@ class FileConstraintsProvider implements LoggerAwareInterface
      */
     public function getMaxSizeForEntityField(string $entityClass, string $fieldName): int
     {
-        $entityFieldConfig = $this->getAttachmentFieldConfig($entityClass, $fieldName);
+        $entityFieldConfig = $this->attachmentEntityConfigProvider->getFieldConfig($entityClass, $fieldName);
         if ($entityFieldConfig) {
             $maxFileSize = (int)$entityFieldConfig->get('maxsize') * AttachmentConfiguration::BYTES_MULTIPLIER;
         }
