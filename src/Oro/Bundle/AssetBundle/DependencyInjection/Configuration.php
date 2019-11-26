@@ -27,7 +27,7 @@ class Configuration implements ConfigurationInterface
                     ->info('Path to NPM executable')
                 ->end()
                 ->scalarNode('build_timeout')
-                    ->defaultValue(300)
+                    ->defaultValue(900)
                     ->info('Assets build timeout in seconds, null to disable timeout')
                 ->end()
                 ->scalarNode('npm_install_timeout')
