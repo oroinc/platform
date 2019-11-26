@@ -10,7 +10,7 @@ define(function(require) {
 
         // PLEASE don't make this value less than 180px - IE will display editor with bugs
         // (to adjust need to also change tinymce iframe stylesheet body{min-height:100px} style,
-        // see Oro\Bundle\FormBundle\Resources\public\css\wysiwyg-editor.css)
+        // see Oro\Bundle\FormBundle\Resources\public\css\scss\tinymce\wysiwyg-editor.scss)
         minimalWysiwygEditorHeight: 180,
 
         /**
