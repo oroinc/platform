@@ -67,7 +67,7 @@ oro:
 
         config:
             file_size_settings.label: File Size Settings
-            file_size.label:     File size
+            file_size.label:     File Size (MB)
             thumb_width.label:   Thumbnail width
             thumb_height.label:  Thumbnail height
             attachment.label:    Upload Settings

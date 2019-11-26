@@ -54,11 +54,15 @@ Feature:  Digital asset management
       | Type         | Image        |
     And click "Continue"
     And I fill form with:
-      | File size          | 5                       |
-      | Thumbnail Width    | 190                     |
-      | Thumbnail Height   | 120                     |
-      | Allowed MIME types | [image/jpeg, image/png] |
-      | Use DAM            | Yes                     |
+      | File Size (MB)        | 5000                    |
+      | Thumbnail Width       | 190                     |
+      | Thumbnail Height      | 120                     |
+      | Allowed MIME types    | [image/jpeg, image/png] |
+      | Use DAM               | Yes                     |
+    When I save and create new form
+    Then I should see "This value should be 2,047 or less."
+    And I fill form with:
+      | File Size (MB) | 5 |
     When I save and create new form
     Then I should see "Field saved" flash message
     And I fill form with:
@@ -67,9 +71,9 @@ Feature:  Digital asset management
       | Type         | File         |
     And click "Continue"
     And I fill form with:
-      | File size          | 5                 |
-      | Allowed MIME types | [application/pdf] |
-      | Use DAM            | Yes               |
+      | File Size (MB)        | 5                 |
+      | Allowed MIME types    | [application/pdf] |
+      | Use DAM               | Yes               |
     When I save and close form
     Then I should see "Field saved" flash message
     And I click update schema

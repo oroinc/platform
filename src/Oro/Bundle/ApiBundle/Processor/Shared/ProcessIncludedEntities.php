@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Request\ErrorStatusCodesWithoutContentTrait;
+use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,21 +24,27 @@ class ProcessIncludedEntities implements ProcessorInterface
     use ErrorStatusCodesWithoutContentTrait;
 
     /** @var ActionProcessorBagInterface */
-    protected $processorBag;
+    private $processorBag;
 
     /** @var ErrorCompleterRegistry */
-    protected $errorCompleterRegistry;
+    private $errorCompleterRegistry;
+
+    /** @var ExceptionTextExtractorInterface */
+    private $exceptionTextExtractor;
 
     /**
-     * @param ActionProcessorBagInterface $processorBag
-     * @param ErrorCompleterRegistry      $errorCompleterRegistry
+     * @param ActionProcessorBagInterface     $processorBag
+     * @param ErrorCompleterRegistry          $errorCompleterRegistry
+     * @param ExceptionTextExtractorInterface $exceptionTextExtractor
      */
     public function __construct(
         ActionProcessorBagInterface $processorBag,
-        ErrorCompleterRegistry $errorCompleterRegistry
+        ErrorCompleterRegistry $errorCompleterRegistry,
+        ExceptionTextExtractorInterface $exceptionTextExtractor
     ) {
         $this->processorBag = $processorBag;
         $this->errorCompleterRegistry = $errorCompleterRegistry;
+        $this->exceptionTextExtractor = $exceptionTextExtractor;
     }
 
     /**
@@ -86,7 +93,7 @@ class ProcessIncludedEntities implements ProcessorInterface
      * @param string             $entityIncludeId
      * @param IncludedEntityData $entityData
      */
-    protected function processIncludedEntity(
+    private function processIncludedEntity(
         FormContext $context,
         array $entityRequestData,
         $entity,
@@ -124,12 +131,8 @@ class ProcessIncludedEntities implements ProcessorInterface
             $actionMetadata = $actionContext->getMetadata();
             $errors = $actionContext->getErrors();
             foreach ($errors as $error) {
-                $errorCompleter->complete($error, $requestType, $actionMetadata);
-                $this->fixIncludedEntityErrorPath($error, $entityData->getPath());
-                $errorStatusCode = $error->getStatusCode();
-                if (null !== $errorStatusCode && $this->isErrorResponseWithoutContent($errorStatusCode)) {
-                    $error->setStatusCode(Response::HTTP_BAD_REQUEST);
-                }
+                $this->completeErrorStatusCode($error);
+                $errorCompleter->fixIncludedEntityPath($entityData->getPath(), $error, $requestType, $actionMetadata);
                 $context->addError($error);
             }
         } else {
@@ -139,11 +142,19 @@ class ProcessIncludedEntities implements ProcessorInterface
     }
 
     /**
-     * @param Error  $error
-     * @param string $entityPath
+     * @param Error $error
      */
-    protected function fixIncludedEntityErrorPath(Error $error, string $entityPath): void
+    private function completeErrorStatusCode(Error $error): void
     {
-        // no default implementation, the path to an included entity depends on the request type
+        $statusCode = $error->getStatusCode();
+        if (null === $error->getStatusCode() && null !== $error->getInnerException()) {
+            $statusCode = $this->exceptionTextExtractor->getExceptionStatusCode($error->getInnerException());
+        }
+        if (null !== $statusCode && $this->isErrorResponseWithoutContent($statusCode)) {
+            $statusCode = Response::HTTP_BAD_REQUEST;
+        }
+        if (null !== $statusCode) {
+            $error->setStatusCode($statusCode);
+        }
     }
 }

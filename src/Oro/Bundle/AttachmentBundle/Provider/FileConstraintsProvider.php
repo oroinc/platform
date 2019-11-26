@@ -123,9 +123,10 @@ class FileConstraintsProvider
      */
     public function getMaxSize(): int
     {
-        $maxFileSize = $this->systemConfigManager->get('oro_attachment.maxsize');
+        $maxFileSize = (int)$this->systemConfigManager
+                ->get('oro_attachment.maxsize') * AttachmentConfiguration::BYTES_MULTIPLIER;
 
-        return (int) $maxFileSize * AttachmentConfiguration::BYTES_MULTIPLIER;
+        return (int)$maxFileSize;
     }
 
     /**
@@ -146,7 +147,7 @@ class FileConstraintsProvider
             $maxFileSize = $this->getMaxSize();
         }
 
-        return $maxFileSize;
+        return (int)$maxFileSize;
     }
 
     /**
@@ -168,6 +169,6 @@ class FileConstraintsProvider
             $maxFileSize = $this->getMaxSize();
         }
 
-        return $maxFileSize;
+        return (int)$maxFileSize;
     }
 }

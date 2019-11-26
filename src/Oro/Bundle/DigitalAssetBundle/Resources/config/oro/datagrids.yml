@@ -130,11 +130,14 @@ datagrids:
             query:
                 where:
                     and:
-                        - file.fileSize < :max_file_size
+                        - file.fileSize < CAST(:max_file_size as int)
                         - file.mimeType IN (:mime_types)
             bind_parameters:
-                - mime_types
-                - max_file_size
+                -
+                    name: mime_types
+                -
+                    name: max_file_size
+                    type: integer
         properties:
             previewMetadata:
                 type: callback

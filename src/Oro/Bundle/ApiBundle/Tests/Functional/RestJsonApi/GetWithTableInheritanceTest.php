@@ -34,7 +34,7 @@ class GetWithTableInheritanceTest extends RestJsonApiTestCase
         /** @var TestDepartment $department */
         $department = $this->getReference('test_department');
 
-        $expects = $this->loadResponseData($expects);
+        $expects = $this->getResponseData($expects);
         $expects['data'][0]['id'] = (string)$department->getId();
 
         $expects['data'][0]['relationships']['staff']['data'][0]['id'] =

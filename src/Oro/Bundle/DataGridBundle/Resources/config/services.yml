@@ -242,11 +242,6 @@ services:
             - [setFileManager, ['@oro_importexport.file.file_manager']]
             - [setLogger, ['@logger']]
 
-    oro_datagrid.grid_configuration.helper:
-        class: Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper
-        arguments:
-            - '@oro_entity.orm.entity_class_resolver'
-
     oro_datagrid.mixin_configuration.helper:
         class: Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper
         arguments:
