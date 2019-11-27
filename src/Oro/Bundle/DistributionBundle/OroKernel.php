@@ -308,4 +308,34 @@ abstract class OroKernel extends Kernel
 
         return $container;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildContainer()
+    {
+        $container = parent::buildContainer();
+
+        $parametersConfig = $this->getProjectDir() . '/config/parameters.yml';
+        if (!file_exists($parametersConfig)) {
+            return $container;
+        }
+
+        $parameters = Yaml::parse(file_get_contents($parametersConfig)) ?: [];
+
+        $deploymentType = $parameters['parameters']['deployment_type'] ?? '';
+        if (!$deploymentType) {
+            return $container;
+        }
+
+        $deploymentConfig = sprintf('%s/config/deployment/config_%s.yml', $this->getProjectDir(), $deploymentType);
+        if (!file_exists($deploymentConfig)) {
+            throw new \LogicException(
+                sprintf('Deployment config "%s" for type "%s" not found.', $deploymentConfig, $deploymentType)
+            );
+        }
+        $this->getContainerLoader($container)->load($deploymentConfig);
+
+        return $container;
+    }
 }

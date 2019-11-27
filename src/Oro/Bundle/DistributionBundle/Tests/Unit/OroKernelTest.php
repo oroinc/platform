@@ -3,7 +3,9 @@
 namespace Oro\Bundle\DistributionBundle\Tests\Unit;
 
 use Oro\Bundle\DistributionBundle\OroKernel;
+use Oro\Bundle\DistributionBundle\Tests\Unit\Stub\BundleStub;
 use Oro\Bundle\DistributionBundle\Tests\Unit\Stub\OroKernelStub;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OroKernelTest extends \PHPUnit\Framework\TestCase
 {
@@ -12,9 +14,39 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
      */
     protected $kernel;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->kernel = new OroKernelStub('env', false);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        $cacheDir = $this->kernel->getCacheDir();
+
+        if (!is_dir($cacheDir)) {
+            return;
+        }
+
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($cacheDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($files as $fileInfo) {
+            if ($fileInfo->isDir()) {
+                rmdir($fileInfo->getRealPath());
+            } else {
+                unlink($fileInfo->getRealPath());
+            }
+        }
+
+        rmdir($cacheDir);
     }
 
     /**
@@ -30,7 +62,10 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function bundleList()
+    /**
+     * @return array
+     */
+    public function bundleList(): array
     {
         return [
             [
@@ -88,7 +123,7 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider bundlesDataProvider
      */
-    public function testCollectBundles(array $bundles)
+    public function testRegisterBundles(array $bundles)
     {
         $this->assertEquals(
             $bundles,
@@ -104,38 +139,59 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 [
-                    'Acme\Bundle\TestBundle\AcmeSimplifiedBundle'       => [
-                        'name'     => 'Acme\Bundle\TestBundle\AcmeSimplifiedBundle',
-                        'kernel'   => null,
-                        'priority' => 0
-                    ],
-                    'Acme\Bundle\TestBundle\AcmeDuplicateBundle'        => [
-                        'name'     => 'Acme\Bundle\TestBundle\AcmeDuplicateBundle',
-                        'kernel'   => null,
-                        'priority' => 50
-                    ],
-                    'Acme\Bundle\TestBundle\AcmeFirstRegisteredBundle'  => [
-                        'name'     => 'Acme\Bundle\TestBundle\AcmeFirstRegisteredBundle',
-                        'kernel'   => null,
-                        'priority' => 50
-                    ],
-                    'Acme\Bundle\TestBundle\AcmeRegisteredBundle'       => [
-                        'name'     => 'Acme\Bundle\TestBundle\AcmeRegisteredBundle',
-                        'kernel'   => null,
-                        'priority' => 50
-                    ],
-                    'Acme\Bundle\TestBundle\AcmeSecondRegisteredBundle' => [
-                        'name'     => 'Acme\Bundle\TestBundle\AcmeSecondRegisteredBundle',
-                        'kernel'   => null,
-                        'priority' => 50
-                    ],
-                    'Acme\Bundle\TestBundle\AcmeThirdRegisteredBundle'  => [
-                        'name'     => 'Acme\Bundle\TestBundle\AcmeThirdRegisteredBundle',
-                        'kernel'   => null,
-                        'priority' => 50
-                    ]
+                    new BundleStub('Acme\Bundle\TestBundle\AcmeSimplifiedBundle'),
+                    new BundleStub('Acme\Bundle\TestBundle\AcmeDuplicateBundle'),
+                    new BundleStub('Acme\Bundle\TestBundle\AcmeFirstRegisteredBundle'),
+                    new BundleStub('Acme\Bundle\TestBundle\AcmeRegisteredBundle'),
+                    new BundleStub('Acme\Bundle\TestBundle\AcmeSecondRegisteredBundle'),
+                    new BundleStub('Acme\Bundle\TestBundle\AcmeThirdRegisteredBundle'),
                 ],
             ]
         ];
+    }
+
+    public function testBootDeploymentWitoutParameters()
+    {
+        $this->kernel->setAppDir('application/app1-without-parameters');
+        $this->kernel->boot();
+
+        /* @var $container ContainerInterface */
+        $container = $this->kernel->getContainer();
+        $this->assertFalse($container->hasParameter('deployment_type'));
+        $this->assertEquals('configParam1GlobalValue', $container->getParameter('configParam1'));
+    }
+
+    public function testBootDeploymentWithEmptyDeploymetType()
+    {
+        $this->kernel->setAppDir('application/app2-without-deployment-type');
+        $this->kernel->boot();
+
+        /* @var $container ContainerInterface */
+        $container = $this->kernel->getContainer();
+        $this->assertNull($container->getParameter('deployment_type'));
+        $this->assertEquals('configParam1GlobalValue', $container->getParameter('configParam1'));
+    }
+
+    public function testBootDeploymentWithoutDeploymentFile()
+    {
+        $appDir = 'application/app3-without-deployment-config';
+        $configPath = $this->kernel->getProjectDir() . '/' . $appDir . '/config/deployment/config_local.yml';
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(sprintf('Deployment config "%s" for type "local" not found', $configPath));
+
+        $this->kernel->setAppDir($appDir);
+        $this->kernel->boot();
+    }
+
+    public function testBootDeploymentWithLocalConfig()
+    {
+        $this->kernel->setAppDir('application/app4-with-deployment-config');
+        $this->kernel->boot();
+
+        /* @var $container ContainerInterface */
+        $container = $this->kernel->getContainer();
+        $this->assertEquals('local', $container->getParameter('deployment_type'));
+        $this->assertEquals('configParam1DeploymentValue', $container->getParameter('configParam1'));
     }
 }
