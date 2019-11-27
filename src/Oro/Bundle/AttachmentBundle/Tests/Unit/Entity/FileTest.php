@@ -25,6 +25,7 @@ class FileTest extends \PHPUnit\Framework\TestCase
     {
         $properties = [
             ['id', 1],
+            ['uuid', '123e4567-e89b-12d3-a456-426655440000', false],
             ['owner', new User()],
             ['filename', 'sample_filename'],
             ['extension', 'smplext'],
@@ -72,19 +73,23 @@ class FileTest extends \PHPUnit\Framework\TestCase
 
     public function testSerialize(): void
     {
-        $this->assertSame(serialize([null, null]), $this->entity->serialize());
+        $this->assertSame(serialize([null, null, $this->entity->getUuid()]), $this->entity->serialize());
 
         $this->assertEquals(
-            serialize([1, 'sample_filename']),
-            $this->getEntity(File::class, $params = ['id' => 1, 'filename' => 'sample_filename'])->serialize()
+            serialize([1, 'sample_filename', 'test-uuid']),
+            $this->getEntity(
+                File::class,
+                ['id' => 1, 'filename' => 'sample_filename', 'uuid' => 'test-uuid']
+            )->serialize()
         );
     }
 
     public function testUnserialize(): void
     {
-        $this->entity->unserialize(serialize([1, 'sample_filename']));
+        $this->entity->unserialize(serialize([1, 'sample_filename', 'test-uuid']));
 
-        $this->assertEquals('sample_filename', $this->entity->getFilename());
-        $this->assertEquals(1, $this->entity->getId());
+        $this->assertSame('sample_filename', $this->entity->getFilename());
+        $this->assertSame(1, $this->entity->getId());
+        $this->assertSame('test-uuid', $this->entity->getUuid());
     }
 }
