@@ -4,11 +4,12 @@ namespace Oro\Bundle\PlatformBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\EntityListenerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ConsoleGlobalOptionsCompilerPass;
-use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\DataCollectorCompilerPass;
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\DebugSecurityVoterCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineListenersPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineOrmListenersPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyServicesCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\OptionalListenersCompilerPass;
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ProfilerStorageCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\TwigServiceLocatorPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UndoLazyEntityManagerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineConfigurationPass;
@@ -24,7 +25,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 /**
  * The PlatformBundle bundle class.
  */
-
 class OroPlatformBundle extends Bundle
 {
     const PACKAGE_NAME = 'oro/platform';
@@ -66,6 +66,7 @@ class OroPlatformBundle extends Bundle
         $container->addCompilerPass(new UndoLazyEntityManagerPass());
         $container->addCompilerPass(new ConsoleGlobalOptionsCompilerPass());
         $container->addCompilerPass(new TwigServiceLocatorPass());
-        $container->addCompilerPass(new DataCollectorCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
+        $container->addCompilerPass(new DebugSecurityVoterCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
+        $container->addCompilerPass(new ProfilerStorageCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
     }
 }
