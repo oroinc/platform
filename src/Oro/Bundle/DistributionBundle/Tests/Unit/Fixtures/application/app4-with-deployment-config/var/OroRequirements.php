@@ -1,9 +1,6 @@
 <?php
-
+//@codingStandardsIgnoreStart
 if (!class_exists(OroRequirements::class)) {
-    /**
-     * OroRequirements stub
-     */
     class OroRequirements
     {
         const REQUIRED_PHP_VERSION  = '7.1.26';
@@ -12,3 +9,4 @@ if (!class_exists(OroRequirements::class)) {
         const REQUIRED_NODEJS_VERSION  = '>=12.0';
     }
 }
+// @codingStandardsIgnoreEnd

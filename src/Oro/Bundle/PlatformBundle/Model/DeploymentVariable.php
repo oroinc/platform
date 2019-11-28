@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\PlatformBundle\Model;
 
+/**
+ * DeploymentVariable
+ */
 class DeploymentVariable
 {
     /** @var string */
