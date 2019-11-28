@@ -70,6 +70,14 @@ services:
     Oro\Bundle\PlatformBundle\Provider\PackageProvider:
         alias: oro_platform.provider.package
 
+    oro_platform.provider.deployment_variables:
+        class: 'Oro\Bundle\PlatformBundle\Provider\DeploymentVariableProvider'
+        arguments:
+            - '@parameter_bag'
+
+    Oro\Bundle\PlatformBundle\Provider\DeploymentVariableProvider:
+        alias: oro_platform.provider.deployment_variables
+
     oro_platform.twig.platform_extension:
         class: Oro\Bundle\PlatformBundle\Twig\PlatformExtension
         public: false
