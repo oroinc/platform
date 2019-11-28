@@ -1,5 +1,19 @@
 services:
     oro_workflow.entity_manager_clearer_stub:
         class: Oro\Bundle\WorkflowBundle\Tests\Functional\Stub\EntityManagerClearerStub
+        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        public: true
         arguments:
             - '@doctrine'
+
+    oro_workflow.notification_manager:
+        decorates: oro_notification.manager
+        class: Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\NotificationManager
+        parent: oro_notification.manager
+        public: true
+
+    oro_workflow.notification_email_handler:
+        decorates: oro_notification.email_handler
+        class: Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\EmailNotificationHandler
+        parent: oro_notification.email_handler
+        public: true
