@@ -604,11 +604,18 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
+     * @param string $entityClass
+     *
      * @return EntityManager
      */
-    protected function getEntityManager()
+    protected function getEntityManager(string $entityClass = null)
     {
-        return self::getContainer()->get('doctrine')->getManager();
+        $doctrine = self::getContainer()->get('doctrine');
+        if ($entityClass) {
+            return $doctrine->getManagerForClass($entityClass);
+        }
+
+        return $doctrine->getManager();
     }
 
     /**

@@ -174,6 +174,24 @@ class CustomizeFormDataContext extends CustomizeDataContext
     }
 
     /**
+     * Finds the name of a form field by its property path.
+     *
+     * @param string             $propertyPath The name of an entity field
+     * @param FormInterface|null $form         The parent form of the searching child form
+     *
+     * @return string|null
+     */
+    public function findFormFieldName(string $propertyPath, FormInterface $form = null): ?string
+    {
+        $fieldForm = $this->findFormField($propertyPath, $form);
+        if (null === $fieldForm) {
+            return null;
+        }
+
+        return $fieldForm->getName();
+    }
+
+    /**
      * Sets a form object related to a customizing entity.
      *
      * @param FormInterface $form

@@ -216,6 +216,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setForm($form);
         self::assertNull($this->context->findFormField($propertyPath));
+        self::assertNull($this->context->findFormFieldName($propertyPath));
     }
 
     public function testFindFormFieldWhenFieldDoesNotExistAndExistFormFieldWithSameNameButMappedToAnotherProperty()
@@ -227,6 +228,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setForm($form);
         self::assertNull($this->context->findFormField($propertyPath));
+        self::assertNull($this->context->findFormFieldName($propertyPath));
     }
 
     public function testFindFormFieldForNotRenamedField()
@@ -239,6 +241,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setForm($form);
         self::assertSame($formField, $this->context->findFormField($propertyPath));
+        self::assertSame($propertyPath, $this->context->findFormFieldName($propertyPath));
     }
 
     public function testFindFormFieldForRenamedField()
@@ -253,6 +256,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setForm($form);
         self::assertSame($formField, $this->context->findFormField($propertyPath));
+        self::assertSame($fieldName, $this->context->findFormFieldName($propertyPath));
     }
 
     public function testDataAndResult()
