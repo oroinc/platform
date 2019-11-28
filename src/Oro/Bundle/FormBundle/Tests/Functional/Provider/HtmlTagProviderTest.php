@@ -27,7 +27,7 @@ class HtmlTagProviderTest extends WebTestCase
         'a[!href|target|title]',
         'dl',
         'dt',
-        'div[id]',
+        'div[data-title|data-type]',
         'ul',
         'ol',
         'li',
@@ -35,10 +35,11 @@ class HtmlTagProviderTest extends WebTestCase
         'strong',
         'b',
         'p',
+        'u',
         'font[color]',
         'i',
         'br',
-        'span[id]',
+        'span',
         'img[src|width|height|alt]',
         'h1',
         'h2',
@@ -78,6 +79,7 @@ class HtmlTagProviderTest extends WebTestCase
         'samp',
         'section',
         'small',
+        'strike',
         'source[srcset|media]',
         'sub',
         'sup',
@@ -90,13 +92,13 @@ class HtmlTagProviderTest extends WebTestCase
 
     /** @var string */
     protected $allowedTags = '<table></table><thead></thead><tbody></tbody><tr></tr><td></td><th></th><a></a>' .
-    '<dl></dl><dt></dt><div></div><ul></ul><ol></ol><li></li><em></em><strong></strong><b></b><p></p>' .
+    '<dl></dl><dt></dt><div></div><ul></ul><ol></ol><li></li><em></em><strong></strong><b></b><p></p><u></u>' .
     '<font></font><i></i><br><span></span><img><h1></h1><h2></h2><h3></h3><h4></h4><h5></h5><h6></h6>' .
     '<hgroup></hgroup><abbr></abbr><address></address><article></article><audio></audio><bdo></bdo>' .
     '<blockquote></blockquote><caption></caption><cite></cite><code></code><col></col><colgroup></colgroup>' .
     '<dd></dd><del></del><details></details><dfn></dfn><figure></figure><figcaption></figcaption>' .
     '<picture></picture><footer></footer><header></header><hr></hr><ins></ins><kbd></kbd><mark></mark>' .
-    '<menu></menu><nav></nav><pre></pre><q></q><samp></samp><section></section><small></small>' .
+    '<menu></menu><nav></nav><pre></pre><q></q><samp></samp><section></section><small></small><strike></strike>' .
     '<source></source><sub></sub><sup></sup><time></time><tfoot></tfoot><var></var><video></video>' .
     '<aside></aside>';
 
