@@ -27,14 +27,21 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
      */
     protected function tearDown()
     {
-        $cacheDir = $this->kernel->getCacheDir();
+        $this->removeDir($this->kernel->getCacheDir());
+        $this->removeDir($this->kernel->getLogDir());
+    }
 
-        if (!is_dir($cacheDir)) {
+    /**
+     * @param string $dir
+     */
+    private function removeDir(string $dir)
+    {
+        if (!is_dir($dir)) {
             return;
         }
 
         $files = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($cacheDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
         );
 
@@ -46,7 +53,7 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
             }
         }
 
-        rmdir($cacheDir);
+        rmdir($dir);
     }
 
     /**

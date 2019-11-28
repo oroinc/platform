@@ -1,6 +1,9 @@
 <?php
 
 if (!class_exists(OroRequirements::class)) {
+    /**
+     * OroRequirements stub
+     */
     class OroRequirements
     {
         const REQUIRED_PHP_VERSION  = '7.1.26';

@@ -52,6 +52,27 @@ class OroKernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
+    public function getCacheDir()
+    {
+        $appDir = ($this->appDir ? '/' . $this->appDir : '');
+
+        return sys_get_temp_dir() . $appDir . '/var/cache/' . $this->environment;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLogDir()
+    {
+        $appDir = ($this->appDir ? '/' . $this->appDir : '');
+
+        return sys_get_temp_dir() . $appDir . '/var/log';
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
     protected function findBundles($roots = [])
     {
         return [
