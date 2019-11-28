@@ -225,7 +225,7 @@ services:
         parent: oro_notification.email_handler
         public: false
         tags:
-            - { name: notification.handler, alias: workflow_notification_handler, priority: -100 }
+            - { name: notification.handler, alias: workflow_notification_handler, priority: 100 }
 
     oro_workflow.database_checker:
         public: false
