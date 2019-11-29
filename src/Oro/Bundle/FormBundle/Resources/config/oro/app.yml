@@ -58,7 +58,8 @@ oro_form:
                 dt: ~
                 div:
                     attributes:
-                        - id
+                        - data-title
+                        - data-type
                 ul: ~
                 ol: ~
                 li: ~
@@ -66,15 +67,14 @@ oro_form:
                 strong: ~
                 b: ~
                 p: ~
+                u: ~
                 font:
                     attributes:
                         - color
                 i: ~
                 br:
                     hasClosingTag: false
-                span:
-                    attributes:
-                        - id
+                span: ~
                 img:
                     attributes:
                         - src
@@ -120,6 +120,7 @@ oro_form:
                 samp: ~
                 section: ~
                 small: ~
+                strike: ~
                 source:
                     attributes:
                         - srcset

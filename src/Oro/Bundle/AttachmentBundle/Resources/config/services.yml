@@ -309,7 +309,7 @@ services:
         class: 'Oro\Bundle\AttachmentBundle\Acl\FileAccessControlChecker'
         public: false
         arguments:
-            - '@oro_entity_config.config_manager'
+            - '@oro_attachment.provider.attachment_entity_config'
 
     oro_attachment.url_generator:
         class: Oro\Bundle\AttachmentBundle\Provider\AttachmentFilterAwareUrlGenerator
@@ -323,6 +323,25 @@ services:
         class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlProvider'
         arguments:
             - '@oro_attachment.url_generator'
+
+    Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface:
+        alias: 'oro_attachment.provider.file_url'
+
+    oro_attachment.provider.file_url_by_uuid.cache:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_attachment_file_url_by_uuid' ] ]
+
+    oro_attachment.provider.file_url_by_uuid:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlByUuidProvider'
+        arguments:
+            - '@oro_attachment.provider.file_url'
+            - '@oro_attachment.provider.file_url_by_uuid.cache'
+            - '@doctrine'
+
+    Oro\Bundle\AttachmentBundle\Provider\FileUrlByUuidProvider:
+        alias: 'oro_attachment.provider.file_url_by_uuid'
 
     oro_attachment.provider.resized_image_path:
         class: 'Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProvider'
@@ -382,7 +401,7 @@ services:
         class: 'Oro\Bundle\AttachmentBundle\Provider\FileApplicationsProvider'
         public: false
         arguments:
-            - '@oro_entity_config.config_manager'
+            - '@oro_attachment.provider.attachment_entity_config'
 
     oro_attachment.filtered_attachment_migration:
         class: 'Oro\Bundle\AttachmentBundle\Migration\FilteredAttachmentMigrationService'
@@ -405,9 +424,7 @@ services:
         class: Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider
         arguments:
             - '@oro_config.manager'
-            - '@oro_entity_config.config_manager'
-        calls:
-            - [setLogger, ['@logger']]
+            - '@oro_attachment.provider.attachment_entity_config'
 
     Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider:
         alias: oro_attachment.provider.file_constraints
@@ -434,3 +451,13 @@ services:
 
     Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface:
         alias: oro_attachment.provider.file_title
+
+    oro_attachment.provider.attachment_entity_config:
+        class: Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProvider
+        arguments:
+            - '@oro_entity_config.config_manager'
+        calls:
+            - [setLogger, ['@logger']]
+
+    Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface:
+        alias: oro_attachment.provider.attachment_entity_config

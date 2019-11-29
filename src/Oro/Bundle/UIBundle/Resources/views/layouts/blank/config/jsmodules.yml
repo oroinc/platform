@@ -88,6 +88,7 @@ dynamic-imports:
         - oroui/js/app/views/datepicker/datepicker-view
         - oroui/js/app/views/datepicker/datetimepicker-view
         - oroui/js/app/views/element-value-copy-to-clipboard-view
+        - oroui/js/app/views/input-widget/number
         - oroui/js/app/views/input-widget/select2
         - oroui/js/app/views/input-widget/uniform-file
         - oroui/js/app/views/input-widget/uniform-select

@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
@@ -15,33 +16,54 @@ class LoadDigitalAssetData extends AbstractFixture implements DependentFixtureIn
     use UserUtilityTrait;
 
     public const DIGITAL_ASSET_1 = 'digital_asset_1';
+    public const DIGITAL_ASSET_1_SOURCE = 'digital_asset_1_source';
+    public const DIGITAL_ASSET_1_CHILD_1 = 'digital_asset_1_child_1';
+    public const DIGITAL_ASSET_1_CHILD_2 = 'digital_asset_1_child_2';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function load(ObjectManager $manager): void
-    {
-        $sourceFile = new File();
-        $sourceFile->setFilename('digital/asset/source.file');
-        $manager->persist($sourceFile);
+    public const DIGITAL_ASSET_2 = 'digital_asset_2';
+    public const DIGITAL_ASSET_2_SOURCE = 'digital_asset_2_source';
+    public const DIGITAL_ASSET_2_CHILD_1 = 'digital_asset_2_child_1';
+    public const DIGITAL_ASSET_2_CHILD_2 = 'digital_asset_2_child_2';
 
-        $digitalAsset = new DigitalAsset();
-        $digitalAsset->setSourceFile($sourceFile);
-        $digitalAsset->setOwner($this->getFirstUser($manager));
-        $digitalAsset->setOrganization($this->getReference('organization'));
-        $manager->persist($digitalAsset);
+    public const DIGITAL_ASSET_3 = 'digital_asset_3';
+    public const DIGITAL_ASSET_3_SOURCE = 'digital_asset_3_source';
 
-        $this->setReference(self::DIGITAL_ASSET_1, $digitalAsset);
-
-        for ($i = 0; $i < 2; $i++) {
-            $childFile = new File();
-            $childFile->setFilename('digital/asset/child.file' . $i);
-            $childFile->setDigitalAsset($digitalAsset);
-            $manager->persist($childFile);
-        }
-
-        $manager->flush();
-    }
+    public const REFERENCE_MAPPING = [
+        self::DIGITAL_ASSET_1 => [
+            'source' => self::DIGITAL_ASSET_1_SOURCE,
+            'children' => [
+                self::DIGITAL_ASSET_1_CHILD_1 => [
+                    'class' => \stdClass::class,
+                    'id' => 1,
+                    'field' => 'attachmentFieldA',
+                ],
+                self::DIGITAL_ASSET_1_CHILD_2 => [
+                    'class' => \stdClass::class,
+                    'id' => 42,
+                    'field' => 'attachmentFieldB',
+                ],
+            ],
+        ],
+        self::DIGITAL_ASSET_2 => [
+            'source' => self::DIGITAL_ASSET_2_SOURCE,
+            'children' => [
+                self::DIGITAL_ASSET_2_CHILD_1 => [
+                    'class' => \stdClass::class,
+                    'id' => 1,
+                    'field' => 'attachmentFieldA',
+                ],
+                self::DIGITAL_ASSET_2_CHILD_2 => [
+                    'class' => \stdClass::class,
+                    'id' => 42,
+                    'field' => 'attachmentFieldC',
+                ],
+            ],
+        ],
+        self::DIGITAL_ASSET_3 => [
+            'source' => self::DIGITAL_ASSET_3_SOURCE,
+            'children' => [],
+        ],
+    ];
 
     /**
      * {@inheritdoc}
@@ -51,5 +73,42 @@ class LoadDigitalAssetData extends AbstractFixture implements DependentFixtureIn
         return [
             LoadOrganization::class,
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function load(ObjectManager $manager): void
+    {
+        $user = $this->getFirstUser($manager);
+
+        /** @var OrganizationInterface $organization */
+        $organization = $this->getReference('organization');
+
+        foreach (self::REFERENCE_MAPPING as $assetRef => $mapping) {
+            $sourceFile = new File();
+            $sourceFile->setFilename('digital/asset/source.file');
+            $this->setReference($mapping['source'], $sourceFile);
+
+            $digitalAsset = new DigitalAsset();
+            $digitalAsset->setSourceFile($sourceFile);
+            $digitalAsset->setOwner($user);
+            $digitalAsset->setOrganization($organization);
+            $manager->persist($digitalAsset);
+            $this->setReference($assetRef, $digitalAsset);
+
+            foreach ($mapping['children'] as $childRef => $childMapping) {
+                $childFile = new File();
+                $childFile->setFilename('digital/asset/child.file');
+                $childFile->setParentEntityClass($childMapping['class']);
+                $childFile->setParentEntityId($childMapping['id']);
+                $childFile->setParentEntityFieldName($childMapping['field']);
+                $childFile->setDigitalAsset($digitalAsset);
+                $manager->persist($childFile);
+                $this->setReference($childRef, $childFile);
+            }
+        }
+
+        $manager->flush();
     }
 }

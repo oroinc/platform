@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\AttachmentBundle\Model\ExtendFile;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -14,9 +15,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * Contains information about uploaded file. Can be attached to any entity which requires file or image functionality.
  *
  * @ORM\Table(name="oro_attachment_file", indexes = {
- *      @ORM\Index("att_file_orig_filename_idx", columns = {"original_filename"})
+ *      @ORM\Index("att_file_orig_filename_idx", columns = {"original_filename"}),
+ *      @ORM\Index("att_file_uuid_idx", columns = {"uuid"})
  * })
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\AttachmentBundle\Entity\Repository\FileRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
@@ -48,6 +50,13 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="uuid", type="guid", nullable=true)
+     */
+    protected $uuid;
 
     /**
      * @var UserInterface
@@ -157,6 +166,11 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
      */
     protected $emptyFile;
 
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     /**
      * Get id
      *
@@ -165,6 +179,25 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @param string|null $uuid
+     * @return File
+     */
+    public function setUuid(?string $uuid): File
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
     }
 
     /**
@@ -360,6 +393,10 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->updatedAt = clone $this->createdAt;
+
+        if (!$this->uuid) {
+            $this->uuid = UUIDGenerator::v4();
+        }
     }
 
     /**
@@ -410,6 +447,9 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
         if ($this->id) {
             $this->id = null;
         }
+
+        // Resets uuid for clonned object, will be created on prePersist
+        $this->uuid = null;
     }
 
     /**
@@ -420,6 +460,7 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
         return serialize([
             $this->id,
             $this->filename,
+            $this->uuid,
         ]);
     }
 
@@ -428,10 +469,11 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
      */
     public function unserialize($serialized)
     {
-        list(
+        [
             $this->id,
             $this->filename,
-            ) = unserialize($serialized);
+            $this->uuid
+        ] = unserialize($serialized);
     }
 
     /**
