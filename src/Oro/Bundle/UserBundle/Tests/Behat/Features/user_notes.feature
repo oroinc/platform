@@ -1,7 +1,6 @@
 @ticket-BAP-10956
 @automatically-ticket-tagged
-@skip
-# unskip after OPI-86 will resolved
+
 Feature: User Notes
   In order to have ability to manage notes
   As OroCRM sales rep
@@ -47,6 +46,7 @@ Scenario: Edit note in view page
     | Attachment | note-attachment2.jpg |
   When I click "Save"
   Then I should see "Very good actor" note in activity list
+  And I collapse "Very good actor" in activity list
   And I should see note-attachment2.jpg text in activity
 
 Scenario: Delete note

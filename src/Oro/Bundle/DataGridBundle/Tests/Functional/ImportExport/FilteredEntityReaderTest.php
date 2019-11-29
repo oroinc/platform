@@ -31,7 +31,7 @@ class FilteredEntityReaderTest extends WebTestCase
             ->getRepository(User::class)
             ->findOneBy([]);
 
-        $token = new OrganizationToken($user->getOrganization());
+        $token = new OrganizationToken($user->getOrganization(), ['ROLE_ADMINISTRATOR']);
         $token->setUser($user);
 
         $container->get('security.token_storage')

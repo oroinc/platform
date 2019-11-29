@@ -1,14 +1,12 @@
 services:
     oro_tag.form.tag:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_tag_tag_form", Oro\Bundle\TagBundle\Form\Type\TagType]
 
     oro_tag.form.handler.tag:
         class: Oro\Bundle\TagBundle\Form\Handler\TagHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_tag.form.tag'
@@ -67,14 +65,12 @@ services:
 
     oro_tag.form.tag.api:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_tag_tag_form", Oro\Bundle\TagBundle\Form\Type\TagType, null]
 
     oro_tag.form.handler.api:
         class: Oro\Bundle\TagBundle\Form\Handler\TagHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_tag.form.type.tag.api'
@@ -83,7 +79,6 @@ services:
 
     oro_tag.form.handler.taggable.api:
         class: Oro\Bundle\TagBundle\Form\Handler\TagEntityApiHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_tag.form.taggable.api'
@@ -116,14 +111,12 @@ services:
 
     oro_tag.form.taxonomy:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_tag_taxonomy_form", Oro\Bundle\TagBundle\Form\Type\TaxonomyType]
 
     oro_tag.form.handler.taxonomy:
         class: Oro\Bundle\TagBundle\Form\Handler\TaxonomyHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_tag.form.taxonomy'

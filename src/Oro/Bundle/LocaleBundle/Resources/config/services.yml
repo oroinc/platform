@@ -97,7 +97,6 @@ services:
     # Calendar
     oro_locale.calendar:
         shared: false
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         class: Oro\Bundle\LocaleBundle\Model\Calendar
 
@@ -170,7 +169,6 @@ services:
 
     oro_locale.formatter.date_time:
         class: Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_locale.settings'
@@ -178,7 +176,6 @@ services:
 
     oro_locale.formatter.number:
         class: Oro\Bundle\LocaleBundle\Formatter\NumberFormatter
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_locale.settings'
@@ -195,7 +192,6 @@ services:
 
     oro_locale.formatter.language_code:
         class: Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@translator'
@@ -329,7 +325,6 @@ services:
 
     oro_locale.manager.localization:
         class: Oro\Bundle\LocaleBundle\Manager\LocalizationManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_entity.doctrine_helper'

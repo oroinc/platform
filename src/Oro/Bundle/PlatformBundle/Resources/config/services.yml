@@ -80,7 +80,6 @@ services:
 
     oro_platform.optional_listeners.manager:
         class: Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
            - []
@@ -116,7 +115,6 @@ services:
 
     oro_platform.command_executor:
         class: Oro\Component\PhpUtils\Tools\CommandExecutor\CommandExecutor
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '%kernel.project_dir%/bin/console'

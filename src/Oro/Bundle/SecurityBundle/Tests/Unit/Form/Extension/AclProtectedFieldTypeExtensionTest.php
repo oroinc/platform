@@ -113,13 +113,17 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
             $formErrors->current()->getMessage()
         );
         $this->assertEquals(2, $this->logger->countErrors());
-        $this->assertEquals(
-            "Non accessible field `city` detected in form `form`. Validation errors: ERROR: city error\n",
-            $this->logger->getLogs('error')[0]
+        $this->assertTrue(
+            $this->logger->hasRecord(
+                "Non accessible field `city` detected in form `form`. Validation errors: ERROR: city error\n",
+                'error'
+            )
         );
-        $this->assertEquals(
-            "Non accessible field `country` detected in form `form`. Validation errors: ERROR: country error\n",
-            $this->logger->getLogs('error')[1]
+        $this->assertTrue(
+            $this->logger->hasRecord(
+                "Non accessible field `country` detected in form `form`. Validation errors: ERROR: country error\n",
+                'error'
+            )
         );
     }
 
@@ -148,9 +152,11 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
             $formErrors->current()->getMessage()
         );
         $this->assertEquals(1, $this->logger->countErrors());
-        $this->assertEquals(
-            "Non accessible field `city` detected in form `form`. Validation errors: ERROR: city error\n",
-            $this->logger->getLogs('error')[0]
+        $this->assertTrue(
+            $this->logger->hasRecord(
+                "Non accessible field `city` detected in form `form`. Validation errors: ERROR: city error\n",
+                'error'
+            )
         );
         $this->assertTrue($view->children['city']->isRendered());
         $this->assertFalse($view->children['street']->isRendered());

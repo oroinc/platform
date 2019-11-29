@@ -11,7 +11,7 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Provides a set of methods to simplify managing associations between the Email as the activity entity
@@ -28,7 +28,7 @@ class EmailActivityManager
     /** @var EmailThreadProvider */
     protected $emailThreadProvider;
 
-    /** @var TokenStorage */
+    /** @var TokenStorageInterface */
     protected $tokenStorage;
 
     /** @var ServiceLink */
@@ -41,7 +41,7 @@ class EmailActivityManager
      * @param ActivityManager           $activityManager
      * @param EmailActivityListProvider $activityListProvider
      * @param EmailThreadProvider       $emailThreadProvider
-     * @param TokenStorage              $tokenStorage
+     * @param TokenStorageInterface     $tokenStorage
      * @param ServiceLink               $entityOwnerAccessorLink
      * @param EntityManager             $em
      */
@@ -49,7 +49,7 @@ class EmailActivityManager
         ActivityManager $activityManager,
         EmailActivityListProvider $activityListProvider,
         EmailThreadProvider $emailThreadProvider,
-        TokenStorage $tokenStorage,
+        TokenStorageInterface $tokenStorage,
         ServiceLink $entityOwnerAccessorLink,
         EntityManager $em
     ) {

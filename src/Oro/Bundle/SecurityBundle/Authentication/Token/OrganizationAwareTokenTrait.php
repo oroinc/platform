@@ -36,7 +36,7 @@ trait OrganizationAwareTokenTrait
     /**
      * {@inheritdoc}
      */
-    public function serialize()
+    public function __serialize(): array
     {
         // clone organization object to have another reference
         // because during deserialization we can have an issue (SegFault on PHP 7.0.11 with ZendOpcache)
@@ -47,29 +47,21 @@ trait OrganizationAwareTokenTrait
         }
 
         if ($this instanceof AbstractToken) {
-            return serialize([$organization, parent::serialize()]);
+            return [$organization, parent::__serialize()];
         }
 
-        return serialize([$organization, '']);
+        return [$organization, ''];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        if (false !== strpos($serialized, '}||a')) {
-            // convert from old serialization format
-            // this is required because after upgrade to new version of the platform
-            // an existing sessions can contain serialized tokens in the old format
-            list($serializedOrganization, $serializedTokenWithoutOrganization) = explode('||', $serialized);
-            $organization = unserialize($serializedOrganization);
-        } else {
-            list($organization, $serializedTokenWithoutOrganization) = unserialize($serialized);
-        }
+        list($organization, $serializedTokenWithoutOrganization) = $serialized;
 
         if ($this instanceof AbstractToken) {
-            parent::unserialize($serializedTokenWithoutOrganization);
+            parent::__unserialize($serializedTokenWithoutOrganization);
         }
         $this->organization = $organization;
     }

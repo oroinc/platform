@@ -2,7 +2,6 @@ services:
     # Services for WorkflowData serialization
     oro_workflow.serializer.data.serializer:
         class: Oro\Bundle\WorkflowBundle\Serializer\WorkflowDataSerializer
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
           - ['@oro_workflow.serializer.data.normalizer']

@@ -120,11 +120,11 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
      */
     protected function getEntityManager()
     {
-        return $this->getClient()->getContainer()->get('doctrine.orm.entity_manager');
+        return $this->getClientInstance()->getContainer()->get('doctrine.orm.entity_manager');
     }
 
     /**
      * @return Client
      */
-    abstract protected function getClient();
+    abstract protected function getClientInstance();
 }

@@ -1,21 +1,18 @@
 services:
     oro_integration.action_handler.channel_delete:
         class: 'Oro\Bundle\IntegrationBundle\ActionHandler\ChannelDeleteActionHandler'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_integration.delete_manager'
 
     oro_integration.action_handler.channel_disable:
         class: 'Oro\Bundle\IntegrationBundle\ActionHandler\ChannelDisableActionHandler'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@doctrine.orm.entity_manager'
 
     oro_integration.action_handler.channel_enable:
         class: 'Oro\Bundle\IntegrationBundle\ActionHandler\ChannelEnableActionHandler'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@doctrine.orm.entity_manager'

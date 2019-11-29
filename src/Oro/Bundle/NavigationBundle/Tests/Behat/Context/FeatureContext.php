@@ -139,6 +139,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function clickBarsIcon()
     {
+        $this->waitForAjax();
         $this->getPage()->find('css', '.dot-menu > a')->click();
     }
 

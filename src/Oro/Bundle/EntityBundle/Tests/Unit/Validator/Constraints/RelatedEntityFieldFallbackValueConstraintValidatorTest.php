@@ -91,7 +91,7 @@ class RelatedEntityFieldFallbackValueConstraintValidatorTest extends ConstraintV
             ->willReturn(EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD);
 
         $violation = new ConstraintViolation(
-            null,
+            'Wrong scalar value!',
             'Wrong scalar value!',
             [],
             'root',

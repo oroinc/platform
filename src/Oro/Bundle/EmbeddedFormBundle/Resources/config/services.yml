@@ -13,7 +13,6 @@ services:
 
     oro_embedded_form.manager:
         class: Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@form.registry'
@@ -40,7 +39,6 @@ services:
 
     oro_embedded_form.embed_form_layout_manager:
         class: Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_embedded_form.layout_manager'

@@ -145,7 +145,6 @@ services:
 
     oro_message_queue.consumption.cache_state:
         class: Oro\Bundle\MessageQueueBundle\Consumption\CacheState
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_message_queue.consumption.cache_state_driver.dbal'

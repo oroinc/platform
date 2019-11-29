@@ -5,8 +5,9 @@ namespace Oro\Component\ExpressionLanguage\Tests\Unit;
 use Oro\Component\ExpressionLanguage\ExpressionLanguage;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionFunction;
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
-use Symfony\Component\ExpressionLanguage\Tests\Fixtures\TestProvider;
 
 class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
 {
@@ -68,7 +69,30 @@ class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
 
     public function testProviders()
     {
-        $this->expressionLanguage = new ExpressionLanguage(null, [new TestProvider()]);
+        $this->expressionLanguage = new ExpressionLanguage(
+            null,
+            [
+                new class() implements ExpressionFunctionProviderInterface {
+                    /**
+                     * {@inheritdoc}
+                     */
+                    public function getFunctions(): array
+                    {
+                        return [
+                            new ExpressionFunction(
+                                'identity',
+                                static function ($input) {
+                                    return $input;
+                                },
+                                static function (array $values, $input) {
+                                    return $input;
+                                }
+                            ),
+                        ];
+                    }
+                }
+            ]
+        );
         $this->assertEquals('foo', $this->expressionLanguage->evaluate('identity("foo")'));
         $this->assertEquals('"foo"', $this->expressionLanguage->compile('identity("foo")'));
     }
