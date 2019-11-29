@@ -26,7 +26,6 @@ services:
 
     oro_entity.delete_handler_registry:
         class: Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - ~ # handlers; it is injected by Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityDeleteHandlerCompilerPass
@@ -141,7 +140,6 @@ services:
 
     oro_entity.entity_provider:
         class: Oro\Bundle\EntityBundle\Provider\EntityProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_entity.entity_provider.abstract
 
@@ -252,7 +250,6 @@ services:
 
     oro_entity.entity_field_provider:
         class: Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_entity.entity_field_provider.abstract
 
@@ -265,7 +262,6 @@ services:
 
     oro_entity.entity_field_list_provider:
         class: Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_entity.entity_field_provider'
@@ -329,7 +325,6 @@ services:
 
     oro_entity.entity_alias_resolver:
         class: Oro\Bundle\EntityBundle\ORM\EntityAliasResolver
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_entity.entity_alias_loader'
@@ -388,7 +383,6 @@ services:
 
     oro_entity.entity_class_name_helper:
         class: Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_entity.entity_alias_resolver'
@@ -398,7 +392,6 @@ services:
 
     oro_entity.entity_name_resolver:
         class: Oro\Bundle\EntityBundle\Provider\EntityNameResolver
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - !tagged oro_entity.name_provider
@@ -491,7 +484,6 @@ services:
 
     oro_entity.manager.dictionary.api:
         class: Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -527,7 +519,6 @@ services:
 
     oro_entity.manager.api.entity_data_api_manager:
         class: Oro\Bundle\EntityBundle\Manager\Api\EntityDataApiManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_entity.manager.entity_field_manager'

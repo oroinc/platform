@@ -12,7 +12,6 @@ services:
 
     oro_form.model.update_handler:
         deprecated: The "%service_id%" service is deprecated since v2.1.0 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade (oro_form.update_handler) instead
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         class: Oro\Bundle\FormBundle\Model\UpdateHandler
         arguments:
@@ -56,7 +55,6 @@ services:
 
     oro_form.update_handler:
         class: Oro\Bundle\FormBundle\Model\UpdateHandlerFacade
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@request_stack'

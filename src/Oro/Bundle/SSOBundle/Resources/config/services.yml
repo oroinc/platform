@@ -5,7 +5,6 @@ parameters:
 services:
     oro_sso.oauth_provider:
         class: Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments: ['@oro_user.manager', '@oro_config.global']
 

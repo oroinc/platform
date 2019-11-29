@@ -1128,16 +1128,6 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return Client
-     */
-    protected function getClient()
-    {
-        return self::getClientInstance();
-    }
-
-    /**
      * @return string
      */
     protected function getCurrentDir()

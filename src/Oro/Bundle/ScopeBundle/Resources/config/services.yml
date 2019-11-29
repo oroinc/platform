@@ -10,7 +10,6 @@ services:
 
     oro_scope.context_request_helper:
         class: 'Oro\Bundle\ScopeBundle\Helper\ContextRequestHelper'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
 
     Oro\Bundle\ScopeBundle\Helper\ContextRequestHelper:
@@ -18,7 +17,6 @@ services:
 
     oro_scope.scope_manager:
         class: Oro\Bundle\ScopeBundle\Manager\ScopeManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - ~ # container; it is injected by Oro\Bundle\ScopeBundle\DependencyInjection\Compiler\ScopeProviderPass
@@ -59,7 +57,6 @@ services:
 
     oro_scope.context_normalizer:
         class: Oro\Bundle\ScopeBundle\Manager\ContextNormalizer
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_scope.scope_manager'

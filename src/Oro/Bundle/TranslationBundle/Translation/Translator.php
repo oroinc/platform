@@ -82,6 +82,9 @@ class Translator extends BaseTranslator
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var array */
+    private $cacheVary;
+
     /**
      * @param ContainerInterface $container
      * @param MessageFormatter $formatter
@@ -101,6 +104,7 @@ class Translator extends BaseTranslator
         $this->messageFormatter = $formatter;
         $this->originalOptions = $this->options;
         $this->resourceFiles = $this->options['resource_files'];
+        $this->cacheVary = $this->options['cache_vary'] ?? [];
         $this->logger = new NullLogger();
     }
 
@@ -427,6 +431,7 @@ class Translator extends BaseTranslator
 
         // set new fallback locales and clear catalogues to generate new ones for new strategy
         $this->setFallbackLocales($fallbackLocales);
+        $this->cacheVary['fallback_locales'] = $fallbackLocales;
     }
 
     /**
@@ -527,7 +532,7 @@ class Translator extends BaseTranslator
     private function getCatalogueCachePath(string $locale): string
     {
         return $this->options['cache_dir'] .'/catalogue.' .$locale .'.' .strtr(
-            substr(base64_encode(hash('sha256', serialize($this->getFallbackLocales()), true)), 0, 7),
+            substr(base64_encode(hash('sha256', serialize($this->cacheVary), true)), 0, 7),
             '/',
             '_'
         ).'.php';

@@ -9,8 +9,11 @@ use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 use Oro\Bundle\ImportExportBundle\Converter\QueryBuilderAwareInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
-use Symfony\Component\Serializer\SerializerInterface;
+use Oro\Bundle\ImportExportBundle\Serializer\SerializerInterface;
 
+/**
+ * Basic export processor.
+ */
 class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
 {
     /**
@@ -45,11 +48,16 @@ class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
         if (! $this->serializer) {
             throw new RuntimeException('Serializer must be injected.');
         }
-        $data = $this->serializer->serialize(
-            $object,
-            '',
-            $this->context->getConfiguration()
+
+        $format = '';
+        $context = $this->context->getConfiguration();
+
+        $data = $this->serializer->encode(
+            $this->serializer->normalize($object, $format, $context),
+            $format,
+            $context
         );
+
         if ($this->dataConverter) {
             $data = $this->dataConverter->convertToExportFormat($data);
         }

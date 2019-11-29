@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
  */
 class UsernamePasswordOrganizationToken extends UsernamePasswordToken implements OrganizationAwareTokenInterface
 {
+    use AuthenticatedTokenTrait;
     use OrganizationAwareTokenTrait;
 
     /**

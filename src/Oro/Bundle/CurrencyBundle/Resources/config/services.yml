@@ -31,7 +31,6 @@ services:
     #currencyConfig
     oro_currency.config.currency:
         class: 'Oro\Bundle\CurrencyBundle\Config\DefaultCurrencyConfigProvider'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         lazy: true
         arguments:

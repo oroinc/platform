@@ -8,7 +8,7 @@ use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Stub\CommandStub;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
+use Symfony\Component\Console\Output\NullOutput;
 
 class ConsoleCommandListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -34,7 +34,7 @@ class ConsoleCommandListenerTest extends \PHPUnit\Framework\TestCase
 
         $command = new Command('oro:search:index');
         $input = new ArrayInput([]);
-        $output = new DummyOutput();
+        $output = new NullOutput();
         $event = new ConsoleCommandEvent($command, $input, $output);
 
         $this->listener->onConsoleCommand($event);
@@ -50,7 +50,7 @@ class ConsoleCommandListenerTest extends \PHPUnit\Framework\TestCase
 
         $command = new CommandStub('stub:command');
         $input = new ArrayInput([]);
-        $output = new DummyOutput();
+        $output = new NullOutput();
         $event = new ConsoleCommandEvent($command, $input, $output);
 
         $this->listener->onConsoleCommand($event);

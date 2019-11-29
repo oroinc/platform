@@ -146,7 +146,10 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
             new TwigFilter('floor', 'floor'),
             new TwigFilter('ceil', 'ceil'),
             new TwigFilter('oro_preg_replace', [$this, 'pregReplace']),
-            new TwigFilter('oro_sort_by', [$this, 'sortBy'])
+            new TwigFilter('oro_sort_by', [$this, 'sortBy']),
+            new TwigFilter('url_decode', static function ($url) {
+                return urldecode($url);
+            })
         ];
     }
 

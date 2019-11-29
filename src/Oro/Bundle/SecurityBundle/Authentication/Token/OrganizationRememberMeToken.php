@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class OrganizationRememberMeToken extends RememberMeToken implements OrganizationAwareTokenInterface
 {
+    use AuthenticatedTokenTrait;
     use OrganizationAwareTokenTrait;
 
     /**

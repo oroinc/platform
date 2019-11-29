@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SSOBundle\Security;
 
 use HWI\Bundle\OAuthBundle\Security\Core\Authentication\Token\OAuthToken as HWIOAuthToken;
+use Oro\Bundle\SecurityBundle\Authentication\Token\AuthenticatedTokenTrait;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenTrait;
 
@@ -11,5 +12,6 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenTrait;
  */
 class OAuthToken extends HWIOAuthToken implements OrganizationAwareTokenInterface
 {
+    use AuthenticatedTokenTrait;
     use OrganizationAwareTokenTrait;
 }

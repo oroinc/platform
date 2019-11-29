@@ -3,9 +3,8 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\NotificationBundle\Provider\DoctrineListener;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
-class DoctrineListenerTest extends TestCase
+class DoctrineListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DoctrineListener

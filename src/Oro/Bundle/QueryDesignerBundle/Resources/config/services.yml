@@ -82,7 +82,6 @@ services:
 
     oro_query_designer.entity_field_list_provider:
         class: Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_query_designer.entity_field_provider'

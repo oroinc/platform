@@ -110,7 +110,7 @@ trait AuditChangedEntitiesExtensionTrait
      */
     protected function getEntityManager()
     {
-        return $this->getClient()->getContainer()->get('doctrine.orm.entity_manager');
+        return $this->getClientInstance()->getContainer()->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -118,11 +118,11 @@ trait AuditChangedEntitiesExtensionTrait
      */
     protected function getAuditChangedEntitiesProcessor()
     {
-        return $this->getClient()->getContainer()->get('oro_dataaudit.async.audit_changed_entities');
+        return $this->getClientInstance()->getContainer()->get('oro_dataaudit.async.audit_changed_entities');
     }
 
     /**
      * @return Client
      */
-    abstract protected function getClient();
+    abstract protected function getClientInstance();
 }

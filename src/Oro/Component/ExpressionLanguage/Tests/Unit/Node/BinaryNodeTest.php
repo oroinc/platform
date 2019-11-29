@@ -2,12 +2,12 @@
 
 namespace Oro\Component\ExpressionLanguage\Tests\Unit\Node;
 
+use Oro\Bundle\ConfigBundle\Tests\Unit\Config\Tree\AbstractNodeDefinitionTest;
 use Oro\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
-use Symfony\Component\ExpressionLanguage\Tests\Node\AbstractNodeTest;
 
-class BinaryNodeTest extends AbstractNodeTest
+class BinaryNodeTest extends AbstractNodeDefinitionTest
 {
     /**
      * @return array

@@ -2,12 +2,12 @@
 
 namespace Oro\Component\ExpressionLanguage\Tests\Unit\Node;
 
+use Oro\Bundle\ConfigBundle\Tests\Unit\Config\Tree\AbstractNodeDefinitionTest;
 use Oro\Component\ExpressionLanguage\Node as CustomNode;
 use Oro\Component\ExpressionLanguage\Tests\Unit\Node\Stub\SimpleObject;
 use Symfony\Component\ExpressionLanguage\Node;
-use Symfony\Component\ExpressionLanguage\Tests\Node\AbstractNodeTest;
 
-class GetAttrNodeTest extends AbstractNodeTest
+class GetAttrNodeTest extends AbstractNodeDefinitionTest
 {
     /**
      * @return array

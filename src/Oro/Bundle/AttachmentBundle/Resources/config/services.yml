@@ -17,7 +17,6 @@ parameters:
 
 services:
     oro_attachment.manager:
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         class: Oro\Bundle\AttachmentBundle\Manager\AttachmentManager
         arguments:
@@ -32,7 +31,6 @@ services:
         alias: oro_attachment.manager
 
     oro_attachment.file_manager:
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         class: Oro\Bundle\AttachmentBundle\Manager\FileManager
         parent: oro_gaufrette.file_manager
@@ -90,7 +88,6 @@ services:
             - '@oro_entity_config.config_manager'
 
     oro_attachment.manager.api:
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         class: Oro\Bundle\AttachmentBundle\Entity\Manager\AttachmentApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
@@ -103,7 +100,6 @@ services:
 
     oro_attachment.manager.file.api:
         class: Oro\Bundle\AttachmentBundle\Entity\Manager\FileApiEntityManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -223,7 +219,6 @@ services:
 
     oro_attachment.provider.attachment:
         class: Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@doctrine.orm.entity_manager'
@@ -366,7 +361,6 @@ services:
 
     oro_attachment.provider.resized_image:
         class: 'Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_attachment.file_manager'
@@ -378,7 +372,6 @@ services:
 
     oro_attachment.manager.image_resize:
         class: 'Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_attachment.provider.resized_image'

@@ -21,7 +21,6 @@ services:
 
     oro_message_queue.client.driver:
         class: 'Oro\Component\MessageQueue\Client\DriverInterface'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@oro_message_queue.client.driver_factory', 'create']
         arguments:
@@ -38,7 +37,6 @@ services:
 
     oro_message_queue.message_producer:
         alias: 'oro_message_queue.client.message_producer'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
 
     oro_message_queue.client.router:
@@ -69,7 +67,6 @@ services:
 
     oro_message_queue.client.meta.destination_meta_registry:
         class: 'Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_message_queue.client.config'

@@ -9,7 +9,6 @@ parameters:
 services:
     oro_user.manager:
         class: Oro\Bundle\UserBundle\Entity\UserManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_user.security.user_loader'
@@ -27,7 +26,6 @@ services:
 
     oro_user.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -36,7 +34,6 @@ services:
 
     oro_user.permission_manager.api:
         class: Oro\Bundle\UserBundle\Entity\Manager\UserPermissionApiEntityManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -110,7 +107,6 @@ services:
 
     oro_user.status_manager:
         class: Oro\Bundle\UserBundle\Entity\Manager\StatusManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - "@doctrine.orm.entity_manager"
@@ -123,7 +119,6 @@ services:
 
     oro_user.role_manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -137,7 +132,6 @@ services:
 
     oro_user.group_manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -316,7 +310,6 @@ services:
 
     oro_user.handler.reset_password_handler:
         class: Oro\Bundle\UserBundle\Handler\ResetPasswordHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         lazy: true
         arguments:
@@ -401,7 +394,6 @@ services:
 
     oro_user.provider.role_privilege_category_provider:
         class: Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@translator'
@@ -413,7 +405,6 @@ services:
 
     oro_user.provider.role_privilege_capability_provider:
         class: Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@translator'
@@ -505,7 +496,6 @@ services:
 
     oro_user.provider.user_logging_info_provider:
         class: Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@request_stack'

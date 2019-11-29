@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Datagrid;
 use Oro\Bundle\DataAuditBundle\Datagrid\AuthorProvider;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
-use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AuthorProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -14,7 +14,16 @@ class AuthorProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->provider = new AuthorProvider(new StubTranslator());
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(
+                static function (string $key) {
+                    return sprintf('[trans]%s[/trans]', $key);
+                }
+            );
+
+        $this->provider = new AuthorProvider($translator);
     }
 
     public function testGetAuthorEmpty()
