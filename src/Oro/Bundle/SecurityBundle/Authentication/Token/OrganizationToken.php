@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Role\Role;
  */
 class OrganizationToken extends AbstractToken implements OrganizationAwareTokenInterface
 {
+    use AuthenticatedTokenTrait;
     use OrganizationAwareTokenTrait;
 
     /**

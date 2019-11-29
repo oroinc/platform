@@ -10,10 +10,19 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Serializer as BaseSerializer;
 
-class Serializer extends BaseSerializer implements DenormalizerInterface, NormalizerInterface
+/**
+ * Serializes and deserializes data given by the import/export functionality.
+ */
+class Serializer extends BaseSerializer implements SerializerInterface, DenormalizerInterface, NormalizerInterface
 {
     const PROCESSOR_ALIAS_KEY = 'processorAlias';
     const ENTITY_NAME_KEY     = 'entityName';
+
+    /** @var array */
+    private $denormalizerCache = [];
+
+    /** @var array */
+    private $normalizerCache = [];
 
     /**
      * {@inheritdoc}

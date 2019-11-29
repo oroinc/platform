@@ -8,6 +8,9 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
+/**
+ * Sets redirect response as result of workflow processing.
+ */
 class FormSubmitLayoutRedirectProcessor implements ProcessorInterface
 {
     /**
@@ -21,7 +24,7 @@ class FormSubmitLayoutRedirectProcessor implements ProcessorInterface
 
         foreach ($this->lookUpRedirectUrl($context) as $url) {
             if ($url) {
-                $context->setResult(new RedirectResponse($url));
+                $context->setResult(new RedirectResponse(urldecode($url)));
                 $context->setProcessed(true);
                 break;
             }

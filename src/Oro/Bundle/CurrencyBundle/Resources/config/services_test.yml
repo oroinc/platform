@@ -1,5 +1,4 @@
 services:
     oro_currency.tests.price_rounding_service:
         alias: oro_currency.rounding.price_rounding_service
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true

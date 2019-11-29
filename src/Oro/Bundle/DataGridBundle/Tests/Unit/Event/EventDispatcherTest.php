@@ -44,7 +44,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
 
         foreach ($expectedEvents as $k => $event) {
             $this->realDispatcherMock->expects($this->at($k))->method('dispatch')
-                ->with($event);
+                ->with(new GridEvent($gridMock), $event);
         }
 
         $event = new GridEvent($gridMock);
@@ -82,12 +82,13 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         $config   = DatagridConfiguration::create($config);
 
-        foreach ($expectedEvents as $k => $event) {
+        $event = new GridConfigEvent($config);
+
+        foreach ($expectedEvents as $k => $eventName) {
             $this->realDispatcherMock->expects($this->at($k))->method('dispatch')
-                ->with($event);
+                ->with($event, $eventName);
         }
 
-        $event = new GridConfigEvent($config);
         $this->dispatcher->dispatch(self::TEST_EVENT_NAME, $event);
     }
     public function testDispatchException()

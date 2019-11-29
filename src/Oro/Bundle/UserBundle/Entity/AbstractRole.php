@@ -5,6 +5,9 @@ namespace Oro\Bundle\UserBundle\Entity;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Role\Role as BaseRole;
 
+/**
+ * Abstract class for the any Role.
+ */
 abstract class AbstractRole extends BaseRole
 {
     /**
@@ -41,9 +44,9 @@ abstract class AbstractRole extends BaseRole
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return (string)$this->getLabel();
+        return (string)$this->getRole();
     }
 
     /**

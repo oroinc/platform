@@ -346,7 +346,7 @@ class ACLContext extends OroFeatureContext implements
     }
 
     /**
-     * @param $role
+     * @param Role $role
      * @return UserRoleForm
      */
     protected function openRoleEditForm($role)
@@ -363,14 +363,14 @@ class ACLContext extends OroFeatureContext implements
 
         $filterItem->open();
         $filterItem->selectType('is equal to');
-        $filterItem->setFilterValue($role->__toString());
+        $filterItem->setFilterValue($role->getLabel());
         $filterItem->submit();
         $this->waitForAjax();
 
         /** @var Grid $grid */
         $grid = $this->createElement('Grid');
 
-        $grid->clickActionLink($role, 'Edit');
+        $grid->clickActionLink($role->getLabel(), 'Edit');
         $this->waitForAjax();
 
         return $this->getRoleEditFormElement();

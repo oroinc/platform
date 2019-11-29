@@ -1,14 +1,12 @@
 services:
     oro_user.form.user:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_user_user_form", Oro\Bundle\UserBundle\Form\Type\UserType, null]
 
     oro_user.form.user.api:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["user", Oro\Bundle\UserBundle\Form\Type\UserApiType, null]
@@ -20,35 +18,30 @@ services:
 
     oro_user.form.role.api:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["role", Oro\Bundle\UserBundle\Form\Type\RoleApiType, null]
 
     oro_user.form.group:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_user_group_form", Oro\Bundle\UserBundle\Form\Type\GroupType]
 
     oro_user.form.group.api:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["group", Oro\Bundle\UserBundle\Form\Type\GroupApiType, null]
 
     oro_user.form.reset:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_user_reset_form", Oro\Bundle\UserBundle\Form\Type\ResetType, null, { validation_groups: [ResetPassword, Default] }]
 
     oro_user.form.status:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_user_status_form", Oro\Bundle\UserBundle\Form\Type\StatusType, null]
@@ -97,7 +90,6 @@ services:
 
     oro_user.form.type.set_password.form:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments:
@@ -190,7 +182,6 @@ services:
 
     oro_user.form.handler.user:
         class: Oro\Bundle\UserBundle\Form\Handler\UserHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_user.form.user'
@@ -204,7 +195,6 @@ services:
 
     oro_user.form.handler.user.api:
         class: Oro\Bundle\UserBundle\Form\Handler\UserHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_user.form.user.api'
@@ -213,7 +203,6 @@ services:
 
     oro_user.form.handler.role.api:
         class: Oro\Bundle\UserBundle\Form\Handler\RoleHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_user.form.role.api'
@@ -222,7 +211,6 @@ services:
 
     oro_user.form.handler.group:
         class: Oro\Bundle\UserBundle\Form\Handler\GroupHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_user.form.group'
@@ -231,7 +219,6 @@ services:
 
     oro_user.form.handler.group.api:
         class: Oro\Bundle\UserBundle\Form\Handler\GroupHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_user.form.group.api'
@@ -240,7 +227,6 @@ services:
 
     oro_user.form.handler.reset:
         class: Oro\Bundle\UserBundle\Form\Handler\ResetHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_user.form.reset'
@@ -249,7 +235,6 @@ services:
 
     oro_user.form.handler.status:
         class: Oro\Bundle\UserBundle\Form\Handler\StatusHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_user.form.status'
@@ -273,7 +258,6 @@ services:
 
     oro_user.form.handler.acl_role:
         parent: oro_user.form.handler.abstract.acl_role
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         shared: false
         calls:
@@ -282,7 +266,6 @@ services:
 
     oro_user.form.handler.set_password:
         class: Oro\Bundle\UserBundle\Form\Handler\SetPasswordHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@logger'

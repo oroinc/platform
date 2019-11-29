@@ -21,7 +21,6 @@ services:
 
     oro_security.token_accessor:
         class: Oro\Bundle\SecurityBundle\Authentication\TokenAccessor
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@security.token_storage'
@@ -46,7 +45,6 @@ services:
 
     oro_security.acl.manager:
         class: Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_security.acl.object_identity_factory'
@@ -348,7 +346,6 @@ services:
 
     oro_security.acl_helper:
         class: Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_security.access_rule_walker_context_factory'
@@ -434,7 +431,6 @@ services:
 
     oro_security.token.factory.username_password_organization:
         class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
 
     oro_security.token.factory.organization_rememberme:

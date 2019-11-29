@@ -170,7 +170,6 @@ services:
 
     oro_datagrid.grid_view.manager.api:
         class: Oro\Bundle\DataGridBundle\Entity\Manager\GridViewApiEntityManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -180,7 +179,6 @@ services:
 
     oro_datagrid.form.grid_view.api:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments:
@@ -189,7 +187,6 @@ services:
 
     oro_datagrid.grid_view.form.handler.api:
         class: Oro\Bundle\DataGridBundle\Form\Handler\GridViewApiHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_datagrid.form.grid_view.api'
@@ -310,7 +307,6 @@ services:
 
     oro_datagrid.multi_grid_provider:
         class: Oro\Bundle\DataGridBundle\Provider\MultiGridProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@security.authorization_checker'

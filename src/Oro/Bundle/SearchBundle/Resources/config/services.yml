@@ -6,7 +6,6 @@ parameters:
 services:
     oro_search.index:
         class: Oro\Bundle\SearchBundle\Engine\Indexer
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_search.search.engine'

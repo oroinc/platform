@@ -81,7 +81,7 @@ class RegionTextValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($address, $this->constraint);
         $this
             ->buildViolation($this->constraint->message)
-            ->atPath(null)
+            ->atPath('')
             ->assertRaised();
     }
 

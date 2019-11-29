@@ -28,7 +28,6 @@ services:
 
     oro_importexport.async.export:
         class: 'Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_importexport.async.export_abstract
         tags:

@@ -21,7 +21,7 @@
 {% if pageParams.parent_route is defined %}
     {% set indexPath = path(pageParams.parent_route, pageParams.parent_route_parameters is defined ? pageParams.parent_route_parameters : []) %}
 {% else %}
-    {% set indexPath = app.request.query.get('originalUrl') %}
+    {% set indexPath = app.request.query.get('originalUrl')|url_decode %}
 {% endif %}
 
 {% oro_title_set({params : {"%workflow_title%": pageTitle ~ ' - ' ~ indexLabel} }) %}
@@ -35,7 +35,7 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
     {% if indexPath %}
-        {{ UI.cancelButton(indexPath) }}
+        {{ UI.cancelButton(indexPath|url_decode) }}
     {% endif %}
 
     <div class="btn-group">
@@ -50,7 +50,7 @@
 
 {% block pageHeader %}
     {% set breadcrumbs = {
-        'indexPath': indexPath,
+        'indexPath': indexPath|url_decode,
         'indexLabel': indexLabel|trans,
         'entityTitle': pageTitle|trans
     } %}
