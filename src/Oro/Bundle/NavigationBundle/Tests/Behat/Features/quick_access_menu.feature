@@ -1,6 +1,5 @@
 @ticket-BAP-11232
 @automatically-ticket-tagged
-@skip
 @BAP-16190
 Feature: Quick access menu
   In order to quick access to some page in application
