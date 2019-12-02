@@ -22,19 +22,21 @@ class BuildMonologHandlersPass implements CompilerPassInterface
         foreach ($configs as $config) {
             if (array_key_exists('handlers', $config)) {
                 foreach ($config['handlers'] as $name => $handler) {
-                    if ('service' === $handler['type'] && self::CONSOLE_ERROR_HANDLER_ID === $handler['id']) {
-                        $nestedHandlerId = sprintf('monolog.handler.%s', $handler['handler']);
-                        $nestedHandlerDefinition = $container->getDefinition($nestedHandlerId);
-
-                        $consoleErrorHandler = $container->getDefinition(self::CONSOLE_ERROR_HANDLER_ID);
-                        $consoleErrorHandler->setArguments([
-                            $nestedHandlerDefinition,
-                            $this->getArgument($handler, 'buffer_size', 0),
-                            $this->getArgument($handler, 'level', Logger::DEBUG),
-                            $this->getArgument($handler, 'bubble', true),
-                            $this->getArgument($handler, 'flush_on_overflow', false),
-                        ]);
+                    if (!array_key_exists('id', $handler) || self::CONSOLE_ERROR_HANDLER_ID !== $handler['id']) {
+                        continue;
                     }
+
+                    $nestedHandlerId = sprintf('monolog.handler.%s', $handler['handler']);
+                    $nestedHandlerDefinition = $container->getDefinition($nestedHandlerId);
+
+                    $consoleErrorHandler = $container->getDefinition(self::CONSOLE_ERROR_HANDLER_ID);
+                    $consoleErrorHandler->setArguments([
+                        $nestedHandlerDefinition,
+                        $this->getArgument($handler, 'buffer_size', 0),
+                        $this->getArgument($handler, 'level', Logger::DEBUG),
+                        $this->getArgument($handler, 'bubble', true),
+                        $this->getArgument($handler, 'flush_on_overflow', false),
+                    ]);
                 }
             }
         }
