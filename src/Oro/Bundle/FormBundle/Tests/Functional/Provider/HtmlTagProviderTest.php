@@ -53,7 +53,7 @@ class HtmlTagProviderTest extends WebTestCase
         'article',
         'audio',
         'bdo',
-        'blockquote',
+        'blockquote[cite]',
         'caption',
         'cite',
         'code',
