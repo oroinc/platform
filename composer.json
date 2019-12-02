@@ -91,7 +91,7 @@
         "bower-asset/lightgallery": "1.4.0",
         "bower-asset/jquery-ui-multiselect-widget": "2.0.1",
         "bower-asset/autolinker.js": "1.6.*",
-        "bower-asset/font-awesome": "4.7.*",
+        "npm-asset/font-awesome": "4.7.*",
         "npm-asset/bootstrap": "4.3.1",
         "npm-asset/popper.js": "1.14.7",
         "npm-asset/asap": "2.0.6",

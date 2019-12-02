@@ -383,26 +383,6 @@
             "type": "bower-asset"
         },
         {
-            "name": "bower-asset/font-awesome",
-            "version": "v4.7.0",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:FortAwesome/Font-Awesome.git",
-                "reference": "a8386aae19e200ddb0f6845b5feeee5eb7013687"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/a8386aae19e200ddb0f6845b5feeee5eb7013687",
-                "reference": "a8386aae19e200ddb0f6845b5feeee5eb7013687"
-            },
-            "type": "bower-asset",
-            "license": [
-                "OFL-1.1",
-                "MIT",
-                "CC-BY-3.0"
-            ]
-        },
-        {
             "name": "bower-asset/fuse",
             "version": "v3.2.0",
             "source": {
@@ -4956,6 +4936,18 @@
             "type": "npm-asset",
             "license": [
                 "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/font-awesome",
+            "version": "4.7.0",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/font-awesome/-/font-awesome-4.7.0.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "(OFL-1.1 AND MIT)"
             ]
         },
         {
