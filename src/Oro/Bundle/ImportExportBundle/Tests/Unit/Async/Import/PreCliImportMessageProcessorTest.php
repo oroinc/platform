@@ -8,6 +8,8 @@ use Oro\Bundle\ImportExportBundle\Async\Import\PreCliImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Context\Context;
+use Oro\Bundle\ImportExportBundle\Event\BeforeImportChunksEvent;
+use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\CliImportHandler;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
@@ -25,10 +27,19 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PreCliImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
+
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
+
+    protected function setUp()
+    {
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+    }
 
     public function testImportProcessShouldReturnSubscribedTopics()
     {
@@ -58,6 +69,9 @@ class PreCliImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createNotificationsettingsStub(),
             100
         );
+        $processor->setEventDispatcher($this->eventDispatcher);
+        $this->eventDispatcher->expects($this->never())
+            ->method('dispatch');
 
         $message = $this->createMessageMock();
         $message
@@ -110,6 +124,9 @@ class PreCliImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createNotificationsettingsStub(),
             100
         );
+        $processor->setEventDispatcher($this->eventDispatcher);
+        $this->eventDispatcher->expects($this->never())
+            ->method('dispatch');
 
         $message = $this->createMessageMock();
         $message
@@ -188,6 +205,9 @@ class PreCliImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createNotificationsettingsStub(),
             100
         );
+        $processor->setEventDispatcher($this->eventDispatcher);
+        $this->eventDispatcher->expects($this->never())
+            ->method('dispatch');
 
         $message = $this->createMessageMock();
         $message
@@ -273,6 +293,9 @@ class PreCliImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createNotificationsettingsStub(),
             100
         );
+        $processor->setEventDispatcher($this->eventDispatcher);
+        $this->eventDispatcher->expects($this->never())
+            ->method('dispatch');
 
         $message = $this->createMessageMock();
         $message
@@ -367,6 +390,9 @@ class PreCliImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createNotificationsettingsStub(),
             100
         );
+        $processor->setEventDispatcher($this->eventDispatcher);
+        $this->eventDispatcher->expects($this->never())
+            ->method('dispatch');
 
         $result = $processor->process($message, $this->createSessionMock());
 
@@ -514,6 +540,10 @@ class PreCliImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createNotificationsettingsStub(),
             100
         );
+        $processor->setEventDispatcher($this->eventDispatcher);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS, new BeforeImportChunksEvent($messageData));
 
         $message = $this->createMessageMock();
         $message

@@ -60,6 +60,8 @@ services:
             - '@oro_importexport.writer.writer_chain'
             - '@oro_notification.model.notification_settings'
             - '%oro_importexport.import.size_of_batch%'
+        calls:
+            - [setEventDispatcher, ['@event_dispatcher']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -78,6 +80,7 @@ services:
         calls:
             - [setManagerRegistry, ['@doctrine']]
             - [setImportHandler, ['@oro_importexport.handler.import.http']]
+            - [setEventDispatcher, ['@event_dispatcher']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
