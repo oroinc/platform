@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Event;
 
+/**
+ * Import/Export events
+ */
 final class Events
 {
     /**
@@ -84,7 +87,14 @@ final class Events
     /**
      * This event occurs after processing some job.
      *
-     * Can be used to do some staff after job. For example, clean cache.
+     * Can be used to do some stuff after the job. For example, clean cache.
      */
     const AFTER_JOB_EXECUTION = 'oro.import_export.after_job_execution';
+
+    /**
+     * This event occurs before chunk jobs are created in import processor.
+     *
+     * Can be used to send extra messages before processing chunks.
+     */
+    const BEFORE_CREATING_IMPORT_CHUNK_JOBS = 'oro.import_export.before_import_chunks';
 }

@@ -59,6 +59,7 @@ services:
             - '@oro_importexport.writer.writer_chain'
             - '@oro_notification.model.notification_settings'
             - '@doctrine'
+            - '@event_dispatcher'
             - '%oro_importexport.import.size_of_batch%'
         calls:
             - [setLogger, ['@logger']]
