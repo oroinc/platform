@@ -5,6 +5,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit;
 use Oro\Bundle\DistributionBundle\OroKernel;
 use Oro\Bundle\DistributionBundle\Tests\Unit\Stub\BundleStub;
 use Oro\Bundle\DistributionBundle\Tests\Unit\Stub\OroKernelStub;
+use PHPUnit\Util\ErrorHandler;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OroKernelTest extends \PHPUnit\Framework\TestCase
@@ -29,6 +30,9 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
     {
         $this->removeDir($this->kernel->getCacheDir());
         $this->removeDir($this->kernel->getLogDir());
+
+        // restore error handler
+        set_error_handler([ErrorHandler::class, 'handleError']);
     }
 
     /**

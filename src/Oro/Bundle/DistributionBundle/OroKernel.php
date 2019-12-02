@@ -4,6 +4,7 @@ namespace Oro\Bundle\DistributionBundle;
 
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
+use Oro\Bundle\DistributionBundle\Resolver\DeploymentConfigResolver;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use OroRequirements;
@@ -492,25 +493,9 @@ abstract class OroKernel extends Kernel
     {
         $container = parent::buildContainer();
 
-        $parametersConfig = $this->getProjectDir() . '/config/parameters.yml';
-        if (!file_exists($parametersConfig)) {
-            return $container;
+        if (null !== ($deploymentConfig = DeploymentConfigResolver::resolveConfig($this->getProjectDir()))) {
+            $this->getContainerLoader($container)->load($deploymentConfig);
         }
-
-        $parameters = Yaml::parse(file_get_contents($parametersConfig)) ?: [];
-
-        $deploymentType = $parameters['parameters']['deployment_type'] ?? '';
-        if (!$deploymentType) {
-            return $container;
-        }
-
-        $deploymentConfig = sprintf('%s/config/deployment/config_%s.yml', $this->getProjectDir(), $deploymentType);
-        if (!file_exists($deploymentConfig)) {
-            throw new \LogicException(
-                sprintf('Deployment config "%s" for type "%s" not found.', $deploymentConfig, $deploymentType)
-            );
-        }
-        $this->getContainerLoader($container)->load($deploymentConfig);
 
         return $container;
     }
