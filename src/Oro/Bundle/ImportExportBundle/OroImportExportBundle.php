@@ -12,8 +12,8 @@ use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TemplateEntityRep
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\WriterCompilerPass;
 use Oro\Bundle\ImportExportBundle\MimeType\CsvMimeTypeGuesser;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\Mime\MimeTypes;
 
 /**
  * ImportExport Bundle. Registers compiler passes. Adds MIME Type guesser.
@@ -42,6 +42,6 @@ class OroImportExportBundle extends Bundle
      */
     public function boot()
     {
-        MimeTypeGuesser::getInstance()->register(new CsvMimeTypeGuesser());
+        MimeTypes::getDefault()->registerGuesser(new CsvMimeTypeGuesser());
     }
 }
