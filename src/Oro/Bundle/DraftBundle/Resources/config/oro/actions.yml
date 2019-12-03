@@ -83,3 +83,15 @@ operations:
                     source: $.data
                 results:
                     redirectUrl: $.redirectUrl
+    DUPLICATE_DRAFT:
+        extends: CREATE_DRAFT
+        label: oro.draft.operations.duplicate.label
+        replace:
+            - preconditions
+            - acl_resource
+        acl_resource: [[VIEW], $.data]
+        preconditions:
+            '@and':
+                - '@not_equal': [$.data.draftUuid, null]
+                - '@instanceof': [$.data.draftSource, Oro\Bundle\DraftBundle\Entity\DraftableInterface]
+                - '@instanceof': [$.data, Oro\Bundle\DraftBundle\Entity\DraftableInterface]

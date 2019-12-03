@@ -21,9 +21,29 @@ services:
             - '@=service("oro_entity_config.config_manager").getProvider("draft")'
             - '@doctrine.orm.entity_manager'
 
-    oro_draft.model.draft_manager:
+    oro_draft.form_extension.draft_localized_fallback_value_extension:
+        class: Oro\Bundle\DraftBundle\Form\Extension\DraftLocalizedFallbackValueExtension
+        arguments:
+            - '@oro_draft.helper.draft_helper'
+        tags:
+            - { name: form.type_extension }
+
+    oro_draft.event_listener.draft_controller_arguments_listener:
+        class: Oro\Bundle\DraftBundle\EventListener\DraftKernelListener
+        arguments:
+            - '@oro_draft.manager.draft_manager'
+            - '@oro_draft.helper.draft_helper'
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller_arguments, method: onKernelControllerArguments, priority: -255 }
+
+    oro_draft.manager.draft_manager:
         class: Oro\Bundle\DraftBundle\Manager\DraftManager
         arguments:
             - '@oro_draft.duplicator.extension_provider'
             - '@oro_action.expression.context_accessor'
             - '@oro_draft.publisher.publisher'
+
+    oro_draft.helper.draft_helper:
+        class: Oro\Bundle\DraftBundle\Helper\DraftHelper
+        arguments:
+            - '@request_stack'

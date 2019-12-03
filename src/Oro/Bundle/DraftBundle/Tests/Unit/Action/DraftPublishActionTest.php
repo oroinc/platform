@@ -4,8 +4,8 @@ namespace Oro\Bundle\DraftBundle\Tests\Unit\Action;
 
 use Oro\Bundle\DraftBundle\Action\DraftCreateAction;
 use Oro\Bundle\DraftBundle\Action\DraftPublishAction;
+use Oro\Bundle\DraftBundle\Duplicator\DraftContext;
 use Oro\Bundle\DraftBundle\Manager\DraftManager;
-use Oro\Bundle\DraftBundle\Tests\Unit\Stub\ArrayAccessStub;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
@@ -52,7 +52,7 @@ class DraftPublishActionTest extends \PHPUnit\Framework\TestCase
 
     public function testExecute(): void
     {
-        $context = new ArrayAccessStub();
+        $context = new DraftContext();
         $source = $this->getEntity(DraftableEntityStub::class);
         $sourceProperty = new PropertyPath('source');
         $targetProperty = new PropertyPath('target');

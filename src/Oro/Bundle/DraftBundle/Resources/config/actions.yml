@@ -12,7 +12,7 @@ services:
         class: Oro\Bundle\DraftBundle\Action\DraftCreateAction
         arguments:
             - '@oro_action.expression.context_accessor'
-            - '@oro_draft.model.draft_manager'
+            - '@oro_draft.manager.draft_manager'
         tags:
             - { name: oro_action.action, alias: draft_create }
 
@@ -20,6 +20,6 @@ services:
         class: Oro\Bundle\DraftBundle\Action\DraftPublishAction
         arguments:
             - '@oro_action.expression.context_accessor'
-            - '@oro_draft.model.draft_manager'
+            - '@oro_draft.manager.draft_manager'
         tags:
             - { name: oro_action.action, alias: draft_publish }

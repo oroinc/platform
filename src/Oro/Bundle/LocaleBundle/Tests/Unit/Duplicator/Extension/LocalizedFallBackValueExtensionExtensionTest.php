@@ -6,9 +6,9 @@ use DeepCopy\Filter\Doctrine\DoctrineCollectionFilter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Oro\Bundle\DraftBundle\Duplicator\DraftContext;
 use Oro\Bundle\DraftBundle\Duplicator\Matcher\PropertiesNameMatcher;
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
-use Oro\Bundle\DraftBundle\Tests\Unit\Stub\ArrayAccessStub;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\LocaleBundle\Duplicator\Extension\LocalizedFallBackValueExtension;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
@@ -60,7 +60,7 @@ class LocalizedFallBackValueExtensionExtensionTest extends \PHPUnit\Framework\Te
 
     public function testGetMatcher(): void
     {
-        $context = new ArrayAccessStub();
+        $context = new DraftContext();
         $context->offsetSet('source', $this->getEntity(DraftableEntityStub::class));
         $this->extension->setContext($context);
         $this->assertEquals(new PropertiesNameMatcher(['field1']), $this->extension->getMatcher());

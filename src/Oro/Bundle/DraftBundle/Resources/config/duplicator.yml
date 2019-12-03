@@ -42,10 +42,18 @@ services:
         tags:
             - { name: oro_draft.duplicator.extension, priority: -255 }
 
-    oro_draft.duplicator_extension.data_time_extension:
-        class: Oro\Bundle\DraftBundle\Duplicator\Extension\DataTimeExtension
+    oro_draft.duplicator_extension.date_time_extension:
+        class: Oro\Bundle\DraftBundle\Duplicator\Extension\DateTimeExtension
         tags:
             - { name: oro_draft.duplicator.extension, priority: 255 }
+
+    oro_draft.duplicator_extension.ownership_extension:
+        class: Oro\Bundle\DraftBundle\Duplicator\Extension\OwnershipExtension
+        arguments:
+            - '@oro_security.owner.checker'
+            - '@oro_security.owner.ownership_metadata_provider'
+        tags:
+            - { name: oro_draft.duplicator.extension, priority: 0 }
 
     oro_draft.duplicator_extension.draft_source_extension:
         class: Oro\Bundle\DraftBundle\Duplicator\Extension\DraftSourceExtension

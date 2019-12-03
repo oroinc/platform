@@ -3,10 +3,10 @@
 namespace Oro\Bundle\DraftBundle\Tests\Unit\Duplicator\Extension;
 
 use DeepCopy\Matcher\PropertyNameMatcher;
+use Oro\Bundle\DraftBundle\Duplicator\DraftContext;
 use Oro\Bundle\DraftBundle\Duplicator\Extension\DraftSourceExtension;
 use Oro\Bundle\DraftBundle\Duplicator\Filter\SourceFilter;
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
-use Oro\Bundle\DraftBundle\Tests\Unit\Stub\ArrayAccessStub;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Component\Testing\Unit\EntityTrait;
 
@@ -24,7 +24,7 @@ class DraftSourceExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilter(): void
     {
-        $context = new ArrayAccessStub();
+        $context = new DraftContext();
         $source = $this->getEntity(DraftableEntityStub::class);
         $context->offsetSet('source', $source);
         $this->extension->setContext($context);

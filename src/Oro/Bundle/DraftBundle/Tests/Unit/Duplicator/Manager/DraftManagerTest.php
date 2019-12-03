@@ -3,11 +3,11 @@
 namespace Oro\Bundle\DraftBundle\Tests\Unit\Duplicator\Filter;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\DraftBundle\Duplicator\DraftContext;
 use Oro\Bundle\DraftBundle\Duplicator\Extension\DraftSourceExtension;
 use Oro\Bundle\DraftBundle\Duplicator\ExtensionProvider;
 use Oro\Bundle\DraftBundle\Manager\DraftManager;
 use Oro\Bundle\DraftBundle\Manager\Publisher;
-use Oro\Bundle\DraftBundle\Tests\Unit\Stub\ArrayAccessStub;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -33,9 +33,16 @@ class DraftManagerTest extends \PHPUnit\Framework\TestCase
         $this->draftManager = new DraftManager($extensionProvider, $this->contextAccessor, $this->publisher);
     }
 
+    public function testManageDraftWithoutContext(): void
+    {
+        $source = $this->getEntity(DraftableEntityStub::class);
+        $draft = $this->draftManager->createDraft(new DraftableEntityStub());
+        $this->assertEquals($source, $draft->getDraftSource());
+    }
+
     public function testCreateDraft(): void
     {
-        $context = new ArrayAccessStub();
+        $context = new DraftContext();
         $source = $this->getEntity(DraftableEntityStub::class);
         $draft = $this->draftManager->createDraft(new DraftableEntityStub(), $context);
 
@@ -50,7 +57,7 @@ class DraftManagerTest extends \PHPUnit\Framework\TestCase
             ->method('create')
             ->willReturnArgument(0);
 
-        $context = new ArrayAccessStub();
+        $context = new DraftContext();
         $source = $this->getEntity(DraftableEntityStub::class);
         $publication = $this->draftManager->createPublication(new DraftableEntityStub(), $context);
 

@@ -5,19 +5,21 @@ namespace Oro\Bundle\DraftBundle\Duplicator\Extension;
 use DeepCopy\Filter\Filter;
 use DeepCopy\Matcher\Matcher;
 use DeepCopy\Matcher\PropertyTypeMatcher;
-use Oro\Component\Duplicator\Filter\ShallowCopyFilter;
+use Oro\Bundle\DraftBundle\Duplicator\Filter\DateTimeFilter;
+use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
+use Oro\Bundle\DraftBundle\Manager\DraftManager;
 
 /**
  * Responsible for copying behavior of DateTime type parameters.
  */
-class DataTimeExtension extends AbstractDuplicatorExtension
+class DateTimeExtension extends AbstractDuplicatorExtension
 {
     /**
      * @return Filter
      */
     public function getFilter(): Filter
     {
-        return new ShallowCopyFilter();
+        return new DateTimeFilter();
     }
 
     /**
@@ -26,5 +28,13 @@ class DataTimeExtension extends AbstractDuplicatorExtension
     public function getMatcher(): Matcher
     {
         return new PropertyTypeMatcher(\DateTime::class);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isSupport(DraftableInterface $source): bool
+    {
+        return $this->getContext()->offsetGet('action') === DraftManager::ACTION_CREATE_DRAFT;
     }
 }

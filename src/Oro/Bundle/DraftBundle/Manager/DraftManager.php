@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DraftBundle\Manager;
 
 use DeepCopy\DeepCopy;
+use Oro\Bundle\DraftBundle\Duplicator\DraftContext;
 use Oro\Bundle\DraftBundle\Duplicator\Extension\DuplicatorExtensionInterface;
 use Oro\Bundle\DraftBundle\Duplicator\ExtensionProvider;
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
@@ -53,8 +54,9 @@ class DraftManager
      *
      * @return DraftableInterface
      */
-    public function createDraft(DraftableInterface $source, \ArrayAccess $context): DraftableInterface
+    public function createDraft(DraftableInterface $source, \ArrayAccess $context = null): DraftableInterface
     {
+        $context = $context ?? $this->createContext();
         $this->contextAccessor->setValue($context, 'action', self::ACTION_CREATE_DRAFT);
         $copier = $this->getDeepCopy($source, $context);
 
@@ -67,8 +69,9 @@ class DraftManager
      *
      * @return DraftableInterface
      */
-    public function createPublication(DraftableInterface $source, \ArrayAccess $context): DraftableInterface
+    public function createPublication(DraftableInterface $source, \ArrayAccess $context = null): DraftableInterface
     {
+        $context = $context ?? $this->createContext();
         $this->contextAccessor->setValue($context, 'action', self::ACTION_PUBLISH_DRAFT);
         $copier = $this->getDeepCopy($source, $context);
 
@@ -103,5 +106,13 @@ class DraftManager
         }
 
         return $deepCopy;
+    }
+
+    /**
+     * @return DraftContext
+     */
+    private function createContext(): DraftContext
+    {
+        return new DraftContext();
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DraftBundle\Action;
 
-use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\DraftBundle\Manager\DraftManager;
 use Oro\Component\ConfigExpression\ContextAccessor;
 

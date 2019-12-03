@@ -21,6 +21,7 @@ class PropertiesNameMatcher implements Matcher
     {
         $this->properties = $properties;
     }
+
     /**
      * @inheritDoc
      */

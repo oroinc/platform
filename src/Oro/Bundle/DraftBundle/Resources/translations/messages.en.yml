@@ -1,5 +1,7 @@
 oro:
     draft:
+        draft:
+            label: Draft
         draftproject:
             entity_label: Project
             entity_plural_label: Projects
@@ -10,7 +12,12 @@ oro:
         operations:
             create:
                 label: Create draft
-                success: Draft has been created
+                success: Draft has been saved
+            update:
+                save_as_draft.label: Save as draft
+                save_as_new_draft.label: Save as new draft
             publish:
                 label: Publish draft
-                success: Draft has been published
+                success: Draft has been created
+            duplicate:
+              label: Duplicate
