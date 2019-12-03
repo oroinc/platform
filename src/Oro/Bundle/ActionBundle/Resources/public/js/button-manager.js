@@ -186,8 +186,13 @@ define(function(require) {
             }, this);
 
             if (response.redirectUrl) {
+                const redirectOptions = {redirect: true};
+                if (response.newTab === true) {
+                    redirectOptions.target = '_blank';
+                }
+
                 mediator.once('page:afterChange', callback);
-                this.doRedirect(response.redirectUrl);
+                this.doRedirect(response.redirectUrl, redirectOptions);
             } else if (response.refreshGrid) {
                 mediator.execute('hideLoading');
                 _.each(response.refreshGrid, function(gridname) {
@@ -230,9 +235,13 @@ define(function(require) {
 
         /**
          * @param {String} redirectUrl
+         * @param {Object} options
          */
-        doRedirect: function(redirectUrl) {
-            mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
+        doRedirect: function(redirectUrl, options) {
+            mediator.execute('redirectTo', {url: redirectUrl}, options);
+            if (options.target === '_blank') {
+                mediator.execute('hideLoading');
+            }
         },
 
         /**
