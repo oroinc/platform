@@ -55,7 +55,7 @@ class MsMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
     public function testGuess($path, array $files, $expectedMimeType)
     {
         $GLOBALS['_FILES'] = $files;
-        $this->assertEquals($expectedMimeType, $this->guesser->guess($path));
+        $this->assertEquals($expectedMimeType, $this->guesser->guessMimeType($path));
     }
 
     /**

@@ -27,7 +27,7 @@ class CsvMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
      */
     public function testGuess($path, $expectedMimeType)
     {
-        $this->assertEquals($expectedMimeType, $this->guesser->guess($path));
+        $this->assertEquals($expectedMimeType, $this->guesser->guessMimeType($path));
     }
 
     /**
@@ -73,6 +73,6 @@ class CsvMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $this->guesser->setEscape('_');
 
         $path = realpath(__DIR__ . '/Fixtures/customized.csv');
-        $this->assertEquals('text/csv', $this->guesser->guess($path));
+        $this->assertEquals('text/csv', $this->guesser->guessMimeType($path));
     }
 }

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Guesser;
 
 use Oro\Bundle\ImportExportBundle\MimeType\UploadedFileExtensionHelper;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
 
 /**
  * MIME Type guesser for ms outlook msg files.
@@ -22,7 +22,7 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guess($path)
+    public function guessMimeType(string $path): ?string
     {
         $extension = UploadedFileExtensionHelper::getExtensionByPath($path);
         if (!$extension) {
@@ -42,5 +42,13 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
         }
 
         return $this->typesMap[$extension][$bytes];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isGuesserSupported(): bool
+    {
+        return true;
     }
 }

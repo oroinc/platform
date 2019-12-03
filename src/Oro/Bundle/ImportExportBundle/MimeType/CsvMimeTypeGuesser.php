@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\MimeType;
 
-use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
+use Symfony\Component\Mime\FileinfoMimeTypeGuesser;
 
 /**
  * Guess CSV mime type for a given path.
@@ -30,7 +30,7 @@ class CsvMimeTypeGuesser extends FileinfoMimeTypeGuesser
     /**
      * {@inheritDoc}
      */
-    public function guess($path)
+    public function guessMimeType(string $path): ?string
     {
         // Guess for files with csv extension only
         if (UploadedFileExtensionHelper::getExtensionByPath($path) !== self::EXTENSION) {
@@ -38,7 +38,7 @@ class CsvMimeTypeGuesser extends FileinfoMimeTypeGuesser
         }
 
         // Guess MIME type with FileinfoMimeTypeGuesser. For text/csv return, no need to guess further.
-        $mimeType = parent::guess($path);
+        $mimeType = parent::guessMimeType($path);
         if ($mimeType === self::MIME_TYPE) {
             return $mimeType;
         }
