@@ -22,7 +22,7 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
         $referenceRepository->set(
             'oro_entity_pagination_translation_key',
             $doctrine->getManager()->getRepository(TranslationKey::class)->findOneBy([
-                'key' => 'oro.entity_pagination.pager_of_%total%_record|pager_of_%total%_records',
+                'key' => 'oro.entity_pagination.pager_of_%count%_record|pager_of_%count%_records',
                 'domain' => 'messages'
             ])
         );

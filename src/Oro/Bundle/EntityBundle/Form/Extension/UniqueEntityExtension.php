@@ -91,10 +91,9 @@ class UniqueEntityExtension extends AbstractTypeExtension
                     'errorPath' => '',
                     'message'   => $this
                         ->translator
-                        ->transChoice(
+                        ->trans(
                             'oro.entity.validation.unique_field',
-                            sizeof($fields),
-                            ['%field%' => implode(', ', $labels)]
+                            ['%count%' => sizeof($fields), '%field%' => implode(', ', $labels)]
                         ),
                 ]
             );

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\NavigationBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,18 +16,19 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ClearNavigationHistoryCommand extends Command implements CronCommandInterface
 {
+    /** @var string */
     protected static $defaultName = 'oro:navigation:history:clear';
 
     private const CLEAN_BEFORE_PARAM = 'interval';
     private const DEFAULT_INTERVAL = '1 day';
 
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     private $doctrine;
 
     /**
-     * @param RegistryInterface $doctrine
+     * @param ManagerRegistry $doctrine
      */
-    public function __construct(RegistryInterface $doctrine)
+    public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
 

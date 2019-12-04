@@ -69,8 +69,8 @@ class MailboxUnboudRulesExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return MailboxType::class;
+        return [MailboxType::class];
     }
 }

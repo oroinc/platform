@@ -70,7 +70,7 @@
             </ul>
 
             <div class="entity-pagination_total">
-                {{ 'oro.entity_pagination.pager_of_%total%_record|pager_of_%total%_records'|transchoice(pager.total, {'%total%': pager.total}) }}
+                {{ 'oro.entity_pagination.pager_of_%count%_record|pager_of_%count%_records'|trans({'%count%': pager.total}) }}
             </div>
         </div>
     {% endif %}

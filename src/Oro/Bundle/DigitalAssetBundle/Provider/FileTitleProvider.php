@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Provider;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * Provides title for file, taking it from the related digital asset.
@@ -20,18 +20,18 @@ class FileTitleProvider implements FileTitleProviderInterface
     /** @var LocalizationHelper */
     private $localizationHelper;
 
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     private $doctrine;
 
     /**
      * @param FileTitleProviderInterface $innerFileTitleProvider
      * @param LocalizationHelper $localizationHelper
-     * @param RegistryInterface $doctrine
+     * @param ManagerRegistry $doctrine
      */
     public function __construct(
         FileTitleProviderInterface $innerFileTitleProvider,
         LocalizationHelper $localizationHelper,
-        RegistryInterface $doctrine
+        ManagerRegistry $doctrine
     ) {
         $this->innerFileTitleProvider = $innerFileTitleProvider;
         $this->localizationHelper = $localizationHelper;

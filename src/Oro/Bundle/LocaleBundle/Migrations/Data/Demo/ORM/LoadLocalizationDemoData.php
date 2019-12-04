@@ -11,7 +11,7 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Migrations\Data\Demo\ORM\LoadLanguageDemoData;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locales;
 
 class LoadLocalizationDemoData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
@@ -57,7 +57,7 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
         foreach ($this->localizations as $item) {
             /** @var Language $language */
             $language = $this->getReference($item['language']);
-            $name = Intl::getLocaleBundle()->getLocaleName($item['formatting'], $localeCode);
+            $name = Locales::getName($item['formatting'], $localeCode);
 
             $localization = $repository->findOneBy(['name' => $name]);
 

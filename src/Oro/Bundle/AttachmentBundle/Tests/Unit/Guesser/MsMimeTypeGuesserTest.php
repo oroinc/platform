@@ -45,14 +45,21 @@ class MsMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
         }
     }
 
+    public function testIsGuesserSupported(): void
+    {
+        $this->assertTrue($this->guesser->isGuesserSupported());
+    }
+
     /**
      * @dataProvider guessDataProvider
      *
      * @param string      $path
      * @param array       $files
      * @param string|null $expectedMimeType
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
      */
-    public function testGuess($path, array $files, $expectedMimeType)
+    public function testGuessMimeType($path, array $files, $expectedMimeType): void
     {
         $GLOBALS['_FILES'] = $files;
         $this->assertEquals($expectedMimeType, $this->guesser->guessMimeType($path));

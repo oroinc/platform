@@ -18,7 +18,7 @@ class AutocompletePasswordTypeExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetExtendedType(): void
     {
-        self::assertEquals(PasswordType::class, $this->extension->getExtendedType());
+        self::assertEquals([PasswordType::class], AutocompletePasswordTypeExtension::getExtendedTypes());
     }
 
     /**

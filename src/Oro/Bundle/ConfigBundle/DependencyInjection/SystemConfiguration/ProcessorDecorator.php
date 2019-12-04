@@ -183,9 +183,9 @@ class ProcessorDecorator
      */
     protected function getConfigurationTree()
     {
-        $tree = new TreeBuilder();
+        $tree = new TreeBuilder(self::ROOT);
 
-        $tree->root(self::ROOT)
+        $tree->getRootNode()
             ->children()
                 ->append($this->getGroupsNode())
                 ->append($this->getFieldsNode())
@@ -201,9 +201,9 @@ class ProcessorDecorator
      */
     protected function getGroupsNode()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder(self::GROUPS_NODE);
 
-        $node = $builder->root(self::GROUPS_NODE)
+        $node = $builder->getRootNode()
             ->prototype('array')
                 ->children()
                     ->scalarNode('title')->isRequired()->end()
@@ -244,9 +244,9 @@ class ProcessorDecorator
      */
     protected function getFieldsNode()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder(self::FIELDS_ROOT);
 
-        $node = $builder->root(self::FIELDS_ROOT)
+        $node = $builder->getRootNode()
             ->prototype('array')
                 ->children()
                     ->scalarNode('data_type')->end()
@@ -326,9 +326,9 @@ class ProcessorDecorator
      */
     protected function getTreeNode()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder(self::TREE_ROOT);
 
-        $node = $builder->root(self::TREE_ROOT)
+        $node = $builder->getRootNode()
             ->prototype('array')
                 ->prototype('array')
                     ->children()
