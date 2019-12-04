@@ -39,6 +39,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function iFillFormWith(TableNode $table, $formName = "OroForm")
     {
         /** @var Form $form */
+        $this->waitForAjax();
         $form = $this->createElement($formName);
         $form->fill($table);
     }
