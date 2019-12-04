@@ -65,6 +65,13 @@ oro:
                 label:               Parent entity field name
                 description:         The field name where this file is stored of the entity to which this file belongs.
 
+        fileitem:
+            entity_label: File Item
+            entity_plural_label: File Items
+            id.label: Id
+            file.label: File
+            sort_order.label: Sort Order
+
         config:
             file_size_settings.label: File Size Settings
             file_size.label:     File Size (MB)
