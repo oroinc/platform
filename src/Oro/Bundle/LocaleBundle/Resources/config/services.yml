@@ -317,7 +317,7 @@ services:
         class: 'Oro\Bundle\LocaleBundle\Manager\LocalizationManager'
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_config.global'
+            - '@oro_config.manager'
             - '@oro.cache.memory_cache_chain'
 
     oro_locale.provider.current_localization:

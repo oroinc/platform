@@ -206,7 +206,7 @@ services:
         calls:
             - [ setAdditionalEmailAssociationProvider, ['@oro_notification.additional_email_association_provider'] ]
         tags:
-            - { name: notification.handler, alias: workflow_notification_handler, priority: -100 }
+            - { name: notification.handler, alias: workflow_notification_handler, priority: 100 }
 
     oro_workflow.database_checker:
         public: false

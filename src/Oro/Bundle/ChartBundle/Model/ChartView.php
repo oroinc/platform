@@ -4,6 +4,10 @@ namespace Oro\Bundle\ChartBundle\Model;
 
 use Oro\Bundle\ChartBundle\Model\Data\DataInterface;
 
+/**
+ * Represent chart view.
+ * Purifies data to be HTML safe.
+ */
 class ChartView
 {
     /**
@@ -54,8 +58,25 @@ class ChartView
     public function render()
     {
         $context = $this->vars;
-        $context['data'] = $this->data->toArray();
+        $context['data'] = $this->getSafeHtmlData($this->data->toArray());
 
         return $this->twig->render($this->template, $context);
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function getSafeHtmlData(array $data): array
+    {
+        foreach ($data as &$item) {
+            if (\is_string($item)) {
+                $item = htmlentities($item);
+            } elseif (\is_array($item)) {
+                $item = $this->getSafeHtmlData($item);
+            }
+        }
+
+        return $data;
     }
 }

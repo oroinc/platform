@@ -25,11 +25,15 @@ oro_behat_extension:
     WYSIWYG editor:
       selector: '[data-bound-view="oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view"] iframe'
 
-    WYSIWYG Source code button:
-      selector: 'div.mce-container-body div[aria-label="Source code"] button'
+    WYSIWYG Upload Embed Image button:
+      selector: 'div.mce-container-body div[aria-label="Image Embed Upload"] button'
 
-    WYSIWYG textarea:
-      selector: 'textarea.mce-textbox'
+    WYSIWYG Upload File:
+      selector: 'body'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          File: 'bdesk_image'
 
     Entity pagination:
       selector: '#entity-pagination'

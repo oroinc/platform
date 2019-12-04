@@ -10,6 +10,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+/**
+ * Provides actions to configure user profiles.
+ */
 class ConfigurationController extends Controller
 {
     /**
@@ -108,7 +111,10 @@ class ConfigurationController extends Controller
             'form'           => $form ? $form->createView() : null,
             'activeGroup'    => $activeGroup,
             'activeSubGroup' => $activeSubGroup,
-            'scopeInfo'      => $manager->getScopeInfo()
+            'scopeInfo'      => $manager->getScopeInfo(),
+            'scopeEntity'    => $entity,
+            'scopeEntityClass' => User::class,
+            'scopeEntityId'  => $entity->getId()
         ];
     }
 }

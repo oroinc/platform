@@ -1,0 +1,42 @@
+/* @theme: admin.oro; */
+
+$mce-tinymce-panel-background: $primary-900 !default;
+$mce-tinymce-panel-border: none !default;
+
+$mce-panel-border: 2px solid $primary-750 !default;
+$mce-panel-border-radius: 2px !default;
+$mce-panel-inner-offset: 0 !default;
+$mce-panel-box-sizing: border-box !default;
+
+$mce-tinymce-fullscreen-width: auto !default;
+$mce-tinymce-fullscreen-max-width: none !default;
+$mce-tinymce-fullscreen-bottom: 0 !default;
+
+$mce-tinymce-toolbar-grp-border-top-left-radius: 0 !default;
+$mce-tinymce-toolbar-grp-border-top-right-radius: 0 !default;
+
+$mce-tinymce-edit-area-border-bottom-left-radius: 0 !default;
+$mce-tinymce-edit-area-border-bottom-right-radius: 0 !default;
+$mce-tinymce-edit-area-overflow: hidden !default;
+
+$mce-fullscreen-overlay-display: block !default;
+$mce-fullscreen-overlay-content: '' !default;
+$mce-fullscreen-overlay-position: fixed !default;
+$mce-fullscreen-overlay-top: 0 !default;
+$mce-fullscreen-overlay-left: 0 !default;
+$mce-fullscreen-overlay-right: 0 !default;
+$mce-fullscreen-overlay-bottom: 0 !default;
+$mce-fullscreen-overlay-z-index: 9 !default;
+$mce-fullscreen-overlay-background-color: #000 !default;
+$mce-fullscreen-overlay-opacity: .2 !default;
+
+$mce-bdesk-image-width: 225px !default;
+$mce-bdesk-image-line-height: inherit !default;
+
+$mce-window-head-mce-ico-font: 14px FontAwesome !default;
+
+$mce-window-head-mce-ico-remove-content: $fa-var-remove !default;
+
+$mce-window-line-height: normal !default;
+$mce-window-color: #fff !default;
+$mce-window-width: 61px !default;

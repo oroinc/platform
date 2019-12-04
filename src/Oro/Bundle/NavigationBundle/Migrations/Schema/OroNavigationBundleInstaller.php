@@ -13,7 +13,7 @@ class OroNavigationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_8_3';
+        return 'v1_8_4';
     }
 
     /**
@@ -116,7 +116,7 @@ class OroNavigationBundleInstaller implements Installation
         $table = $schema->createTable('oro_navigation_pagestate');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', []);
-        $table->addColumn('page_id', 'string', ['length' => 4000]);
+        $table->addColumn('page_id', 'string', ['length' => 10920]);
         $table->addColumn('page_hash', 'string', ['length' => 32]);
         $table->addColumn('data', 'text', []);
         $table->addColumn('created_at', 'datetime', []);

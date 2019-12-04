@@ -49,12 +49,12 @@ class OroRichTextType extends AbstractType
     public static $toolbars = [
         self::TOOLBAR_SMALL  => ['undo redo | bold italic underline | bullist numlist link | bdesk_photo | fullscreen'],
         self::TOOLBAR_DEFAULT => [
-            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo 
-             | fullscreen'
+            'undo redo formatselect bold italic underline | forecolor backcolor | bullist numlist ' .
+            '| alignleft aligncenter alignright alignjustify | link | bdesk_photo | fullscreen'
         ],
         self::TOOLBAR_LARGE => [
-            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo 
-            | fullscreen'
+            'undo redo formatselect bold italic underline | forecolor backcolor | bullist numlist ' .
+            '| alignleft aligncenter alignright alignjustify | link | bdesk_photo | fullscreen'
         ],
     ];
 
@@ -136,7 +136,7 @@ class OroRichTextType extends AbstractType
         $defaultWysiwygOptions = [
             'plugins'            => self::$defaultPlugins,
             'toolbar_type'       => self::TOOLBAR_DEFAULT,
-            'skin_url'           => $assetsBaseUrl . 'bundles/oroform/css/tinymce',
+            'skin_url'           => $assetsBaseUrl . 'css/tinymce',
             'valid_elements'     => implode(',', $this->htmlTagProvider->getAllowedElements()),
             'menubar'            => false,
             'statusbar'          => false,
@@ -156,7 +156,7 @@ class OroRichTextType extends AbstractType
                 'module'  => 'oroui/js/app/components/view-component',
                 'options' => [
                     'view'        => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-                    'content_css' => $assetsBaseUrl . 'bundles/oroform/css/wysiwyg-editor.css',
+                    'content_css' => $assetsBaseUrl . 'css/tinymce/wysiwyg-editor.css',
                 ]
             ],
         ];

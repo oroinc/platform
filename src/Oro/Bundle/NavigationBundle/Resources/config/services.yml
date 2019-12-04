@@ -408,7 +408,7 @@ services:
     oro_navigation.menu_update.builder.menu_default_visibility:
         class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
         arguments:
-            - '@oro_locale.helper.localization'
+            - '@oro_locale.helper.default_locale_localization'
             - '@oro_navigation.provider.menu_update_provider'
         tags:
             - { name: oro_menu.builder, priority: 100 }
