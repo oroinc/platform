@@ -26,8 +26,8 @@ class EntityConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::ROOT_NODE);
+        $treeBuilder = new TreeBuilder(self::ROOT_NODE);
+        $rootNode = $treeBuilder->getRootNode();
 
         $node = $rootNode->children();
         $this->appendExclusions($node);

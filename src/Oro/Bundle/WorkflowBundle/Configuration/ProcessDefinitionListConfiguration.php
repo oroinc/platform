@@ -36,8 +36,8 @@ class ProcessDefinitionListConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('configuration');
+        $treeBuilder = new TreeBuilder('configuration');
+        $rootNode = $treeBuilder->getRootNode();
         $rootNode->useAttributeAsKey('name');
         $this->definitionConfiguration->addDefinitionNodes($rootNode->prototype('array'));
 

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locales;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -37,11 +37,6 @@ class FormattingCodeFormatter
             return $this->translator->trans('N/A');
         }
 
-        $name = Intl::getLocaleBundle()->getLocaleName(
-            $code,
-            $this->localeSettings->getLanguage()
-        );
-
-        return $name ?: $code;
+        return Locales::exists($code) ? Locales::getName($code, $this->localeSettings->getLanguage()) : $code;
     }
 }

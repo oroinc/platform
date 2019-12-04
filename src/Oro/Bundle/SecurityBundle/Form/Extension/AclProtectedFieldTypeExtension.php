@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Form\Extension;
 use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
@@ -44,11 +45,9 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
-            ? 'Symfony\Component\Form\Extension\Core\Type\FormType'
-            : 'form';
+        return [FormType::class];
     }
 
     /**

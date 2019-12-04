@@ -8,7 +8,7 @@ use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Currencies;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -164,7 +164,7 @@ class CurrencyExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     public function getCurrencyName($currency, $displayLocale = null)
     {
-        return Intl::getCurrencyBundle()->getCurrencyName($currency, $displayLocale);
+        return Currencies::getName($currency, $displayLocale);
     }
 
     /**

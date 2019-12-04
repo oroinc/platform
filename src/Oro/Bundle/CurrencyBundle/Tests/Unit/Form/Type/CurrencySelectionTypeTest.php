@@ -10,7 +10,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Currencies;
 
 class CurrencySelectionTypeTest extends FormIntegrationTestCase
 {
@@ -114,14 +114,13 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
      */
     public function submitDataProvider()
     {
-        $currencyBundle = Intl::getCurrencyBundle();
-        $usdSymbol = $currencyBundle->getCurrencySymbol('USD');
-        $gbpSymbol = $currencyBundle->getCurrencySymbol('GBP');
-        $rubSymbol = $currencyBundle->getCurrencySymbol('RUB');
-        $uahSymbol = $currencyBundle->getCurrencySymbol('UAH');
+        $usdSymbol = Currencies::getSymbol('USD');
+        $gbpSymbol = Currencies::getSymbol('GBP');
+        $rubSymbol = Currencies::getSymbol('RUB');
+        $uahSymbol = Currencies::getSymbol('UAH');
 
-        $usdName = $currencyBundle->getCurrencyName('USD');
-        $uahName = $currencyBundle->getCurrencyName('UAH');
+        $usdName = Currencies::getName('USD');
+        $uahName = Currencies::getName('UAH');
 
         return [
             'currency symbol and data from system config' => [
@@ -189,7 +188,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
                 'inputOptions' => ['full_currency_list' => true],
                 'expectedOptions' => [
                     'full_currency_list' => true,
-                    'choices' => $this->getChoiceViews($currencyBundle->getCurrencyNames('en'))
+                    'choices' => $this->getChoiceViews(Currencies::getNames('en'))
                 ],
                 'submittedData' => 'GBP'
             ],

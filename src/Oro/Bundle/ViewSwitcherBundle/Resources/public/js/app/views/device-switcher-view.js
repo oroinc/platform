@@ -115,6 +115,11 @@ define(function(require, exports, module) {
         switcherStyle: null,
 
         /**
+         * @type {String}
+         */
+        applicationUrl: null,
+
+        /**
          * @inheritDoc
          */
         listen: {
@@ -174,6 +179,7 @@ define(function(require, exports, module) {
                     this.startTrackUrlChanges();
                     url = iframe.location.pathname.split(this.frameUrlSegment).pop();
                     this.updateUrl(url);
+                    this.loadApplicationUrl();
 
                     if (this.updateFaviconPage) {
                         updateFavicon();
@@ -445,6 +451,10 @@ define(function(require, exports, module) {
          * @private
          */
         _isLoginPage: function(url) {
+            if (this.applicationUrl && this.applicationUrl.indexOf(location.origin) === -1) {
+                return false;
+            }
+
             return /login/.test(url);
         },
 
@@ -507,7 +517,28 @@ define(function(require, exports, module) {
          * User logout and back to login demo page
          */
         onLogout: function() {
-            this.iframe.location = this.logoutUrl;
+            if (this.applicationUrl && this.applicationUrl.indexOf(location.origin) === -1) {
+                location.href = this.applicationUrl;
+            } else {
+                this.iframe.location = this.logoutUrl;
+            }
+        },
+
+        loadApplicationUrl: function() {
+            const self = this;
+            const frameWindow = this.getFrameWindow();
+
+            if (null === this.applicationUrl && frameWindow.loadModules) {
+                frameWindow.loadModules(['routing'], function(routing) {
+                    if (this.pageModel.get('isAdminPanel')) {
+                        return;
+                    }
+
+                    $.get(routing.generate('oro_view_switcher_frontend_get_application_url'), function(response) {
+                        self.applicationUrl = response.applicationUrl;
+                    });
+                }.bind(this));
+            }
         }
     });
 

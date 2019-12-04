@@ -9,7 +9,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locales;
 
 class LanguageProvider
 {
@@ -42,7 +42,7 @@ class LanguageProvider
     public function getAvailableLanguages($onlyEnabled = false)
     {
         $codes = $this->getRepository()->getAvailableLanguageCodes($onlyEnabled);
-        $locales = Intl::getLocaleBundle()->getLocaleNames($this->localeSettings->getLanguage());
+        $locales = Locales::getNames($this->localeSettings->getLanguage());
 
         return array_intersect_key($locales, array_flip($codes));
     }

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\MimeType;
 
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeExtensionGuesser;
+use Symfony\Component\Mime\MimeTypes;
 
-class MimeTypeGuesser extends MimeTypeExtensionGuesser
+class MimeTypeGuesser
 {
     /**
      * Guesses a mime type for the given file extension
@@ -14,13 +14,6 @@ class MimeTypeGuesser extends MimeTypeExtensionGuesser
      */
     public function guessByFileExtension($extension)
     {
-        $extension = strtolower($extension);
-        foreach ($this->defaultExtensions as $mimeType => $ext) {
-            if ($extension === $ext) {
-                return $mimeType;
-            }
-        }
-
-        return null;
+        return MimeTypes::getDefault()->guessMimeType($extension);
     }
 }

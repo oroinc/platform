@@ -17,8 +17,8 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $finder = new NodeJsExecutableFinder;
-        $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('oro_asset')
+        $treeBuilder = new TreeBuilder('oro_asset');
+        $treeBuilder->getRootNode()
             ->children()
                 ->scalarNode('nodejs_path')
                     ->info('Path to NodeJs executable')

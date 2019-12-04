@@ -16,8 +16,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('oro_embedded_form');
+        $treeBuilder = new TreeBuilder('oro_embedded_form');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->addDefaultsIfNotSet()

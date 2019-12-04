@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Async;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\IntegrationBundle\Authentication\Token\IntegrationTokenAwareTrait;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
@@ -14,7 +15,6 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -28,7 +28,7 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
     use IntegrationTokenAwareTrait;
 
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     private $doctrine;
     
@@ -48,14 +48,14 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
     private $logger;
 
     /**
-     * @param RegistryInterface $doctrine
+     * @param ManagerRegistry $doctrine
      * @param TokenStorageInterface $tokenStorage
      * @param SyncProcessorRegistry $syncProcessorRegistry
      * @param JobRunner $jobRunner
      * @param LoggerInterface $logger;
      */
     public function __construct(
-        RegistryInterface $doctrine,
+        ManagerRegistry $doctrine,
         TokenStorageInterface $tokenStorage,
         SyncProcessorRegistry $syncProcessorRegistry,
         JobRunner $jobRunner,

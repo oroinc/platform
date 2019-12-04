@@ -14,9 +14,9 @@ class QueryConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('query');
 
-        $builder->root('query')
+        $builder->getRootNode()
             ->addDefaultsIfNotSet()
             ->children()
                 ->arrayNode('select')
@@ -48,9 +48,9 @@ class QueryConfiguration implements ConfigurationInterface
             throw new InvalidConfigurationException(sprintf('Invalid where type "%s"', $name));
         }
 
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder($name);
 
-        return $builder->root($name)
+        return $builder->getRootNode()
             ->requiresAtLeastOneElement()
             ->prototype('scalar')->end();
     }

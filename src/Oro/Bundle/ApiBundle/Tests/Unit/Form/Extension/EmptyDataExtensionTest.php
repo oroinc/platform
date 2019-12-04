@@ -42,9 +42,9 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
         return $emptyDataNormalizer;
     }
 
-    public function testGetExtendedType()
+    public function testGetExtendedTypes()
     {
-        self::assertEquals(FormType::class, $this->emptyDataExtension->getExtendedType());
+        self::assertEquals([FormType::class], EmptyDataExtension::getExtendedTypes());
     }
 
     /**

@@ -57,9 +57,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder($this->root);
 
-        $builder->root($this->root)
+        $builder->getRootNode()
             ->validate()
                 ->ifTrue(
                     function ($value) {

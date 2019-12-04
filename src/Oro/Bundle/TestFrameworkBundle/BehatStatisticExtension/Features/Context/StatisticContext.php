@@ -47,7 +47,6 @@ class StatisticContext implements Context
             throw new \RuntimeException('Unable to find the PHP executable.');
         }
         $this->phpBin = $php;
-        $this->process = new Process(null);
     }
 
     /** @BeforeScenario */
@@ -73,8 +72,7 @@ class StatisticContext implements Context
     {
         $argumentsString = strtr($argumentsString, ['\'' => '"']);
 
-        $this->process->setWorkingDirectory($this->testAppPath);
-        $this->process->setCommandLine(
+        $this->process = new Process(
             sprintf(
                 '%s %s %s %s -c %s',
                 $this->phpBin,
@@ -82,7 +80,8 @@ class StatisticContext implements Context
                 $argumentsString,
                 strtr('--format-settings=\'{"timer": false}\'', ['\'' => '"', '"' => '\"']),
                 $this->testAppPath.'/behat.yml'
-            )
+            ),
+            $this->testAppPath
         );
         $this->process->start();
         $this->process->wait();

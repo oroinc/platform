@@ -33,8 +33,9 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->directory = $this->getTempDir('permissions_handler');
 
-        $this->handler = new PermissionsHandler();
-        $this->handler->setProcess($this->process);
+        $this->handler = $this->getMockBuilder(PermissionsHandler::class)
+            ->setMethods(['getProcess'])
+            ->getMock();
     }
 
     public function testSetPermissionsSetfacl()
@@ -44,9 +45,9 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('isSuccessful')
             ->will($this->returnValue(true));
 
-        $this->process
-            ->expects($this->any())
-            ->method('setCommandLine')
+        $this->handler
+            ->expects($this->exactly(3))
+            ->method('getProcess')
             ->with(
                 $this->callback(
                     function ($argument) {
@@ -67,15 +68,13 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
                                     ],
                                     PermissionsHandler::SETFACL
                                 )
-                            ]
+                            ],
+                            true
                         );
                     }
                 )
-            );
-
-        $this->process
-            ->expects($this->exactly(3))
-            ->method('setCommandLine');
+            )
+            ->willReturn($this->process);
 
         $this->process
             ->expects($this->atLeastOnce())
@@ -92,9 +91,9 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('isSuccessful')
             ->will($this->returnValue(true));
 
-        $this->process
-            ->expects($this->any())
-            ->method('setCommandLine')
+        $this->handler
+            ->expects($this->exactly(3))
+            ->method('getProcess')
             ->with(
                 $this->callback(
                     function ($argument) {
@@ -107,15 +106,13 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
                                     [PermissionsHandler::USER, $this->directory],
                                     PermissionsHandler::CHMOD
                                 )
-                            ]
+                            ],
+                            true
                         );
                     }
                 )
-            );
-
-        $this->process
-            ->expects($this->exactly(3))
-            ->method('setCommandLine');
+            )
+            ->willReturn($this->process);
 
         $this->process
             ->expects($this->atLeastOnce())
@@ -127,6 +124,11 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetPermissions()
     {
+        $this->handler
+            ->expects($this->any())
+            ->method('getProcess')
+            ->willReturn($this->process);
+
         $this->process
             ->expects($this->atLeastOnce())
             ->method('isSuccessful')

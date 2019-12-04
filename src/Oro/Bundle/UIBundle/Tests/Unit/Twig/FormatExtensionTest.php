@@ -137,8 +137,8 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
         $date = new \DateTime('-1 year -1 month', new \DateTimeZone('UTC'));
 
         $this->translator->expects($this->once())
-            ->method('transChoice')
-            ->with('oro.age', 1, ['%count%' => 1])
+            ->method('trans')
+            ->with('oro.age', ['%count%' => 1])
             ->will($this->returnValue('age 1'));
 
         $this->assertEquals(

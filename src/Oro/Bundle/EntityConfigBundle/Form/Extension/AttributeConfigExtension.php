@@ -120,8 +120,8 @@ class AttributeConfigExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return ConfigType::class;
+        return [ConfigType::class];
     }
 }

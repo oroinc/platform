@@ -20,9 +20,9 @@ class SettingsBuilder
      */
     public static function append(ArrayNodeDefinition $root, array $settings): void
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('settings');
         $node = $builder
-            ->root('settings')
+            ->getRootNode()
             ->addDefaultsIfNotSet()
             ->children()
             // additional flag to ensure that values are processed by "configuration processor"
