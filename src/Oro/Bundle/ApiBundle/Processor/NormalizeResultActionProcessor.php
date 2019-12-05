@@ -122,7 +122,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
         if (ApiActionGroup::NORMALIZE_RESULT === $group || !$this->isNormalizeResultEnabled($context)) {
             // rethrow an exception occurred in any processor from the "normalize_result" group
             // or if the "normalize_result" group is disabled,
-            // this is required to prevent circular handling of such exception
+            // it is required to prevent circular handling of such exception
             if (!$context->isSoftErrorsHandling()) {
                 throw $e;
             }

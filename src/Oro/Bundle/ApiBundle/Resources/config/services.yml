@@ -799,3 +799,9 @@ services:
         class: Oro\Bundle\ApiBundle\Util\RequestDependedTextProcessor
         arguments:
             - '@oro_api.request_expression_matcher'
+
+    oro_api.action_group_executor:
+        class: Oro\Bundle\ApiBundle\Util\ActionGroupExecutor
+        arguments:
+            - '@oro_action.action_group_registry'
+            - '@translator'
