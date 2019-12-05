@@ -164,6 +164,23 @@ Theme name to build. When not provided, all available themes are built.
 
 ### Options
 
+#### `--skip-css`
+
+Allows assembling scripts only, without rebuilding the styles.
+
+#### `--skip-js`
+
+Allows assembling styles only, without rebuilding the scripts.
+
+#### `--skip-babel`
+
+This option turns off Babel utilization during the building process. It allows assembling ES as it is, without transpiling it to JS. 
+It is a useful option for development purposes that enables you to assemble scripts for browsers that support ES well natively, e.g., Chrome, FireFox, Safari.    
+
+#### `--skip-sourcemap`
+
+Turns off SourceMaps building.
+
 #### `--hot`
 
 Turn on hot module replacement. It allows all styles to be updated at runtime
