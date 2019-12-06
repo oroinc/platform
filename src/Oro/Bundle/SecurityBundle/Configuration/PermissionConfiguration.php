@@ -71,6 +71,10 @@ class PermissionConfiguration implements ConfigurationInterface
                         ->prototype('scalar')
                         ->end()
                     ->end()
+                    ->arrayNode('apply_to_interfaces')
+                        ->prototype('scalar')
+                        ->end()
+                    ->end()
                 ->end()
             ->end();
 

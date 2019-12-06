@@ -20,4 +20,11 @@ oro:
                 label: Publish draft
                 success: Draft has been created
             duplicate:
-              label: Duplicate
+                label: Duplicate
+        permission:
+            create.label: Create Drafts
+            view_all.label: View All Drafts
+            edit_all.label: Edit All Drafts
+            delete_own.label: Delete Own Drafts
+            delete_all.label: Delete All Drafts
+            publish.label: Publish Drafts
