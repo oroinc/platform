@@ -9,7 +9,6 @@ use Oro\Bundle\DraftBundle\Duplicator\Matcher\PropertiesNameMatcher;
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\DraftBundle\Manager\DraftManager;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
-use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
@@ -23,19 +22,10 @@ class OwnershipExtension extends AbstractDuplicatorExtension
     private $ownershipMetadataProvider;
 
     /**
-     * @var OwnerChecker
-     */
-    private $ownerChecker;
-
-    /**
-     * @param OwnerChecker $ownerChecker
      * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
      */
-    public function __construct(
-        OwnerChecker $ownerChecker,
-        OwnershipMetadataProviderInterface $ownershipMetadataProvider
-    ) {
-        $this->ownerChecker = $ownerChecker;
+    public function __construct(OwnershipMetadataProviderInterface $ownershipMetadataProvider)
+    {
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
@@ -67,8 +57,7 @@ class OwnershipExtension extends AbstractDuplicatorExtension
         $className = ClassUtils::getRealClass($source);
 
         return $this->getContext()->offsetGet('action') === DraftManager::ACTION_CREATE_DRAFT
-            && $this->ownershipMetadataProvider->getMetadata($className)->hasOwner()
-            && $this->ownerChecker->isOwnerCanBeSet($source);
+            && $this->ownershipMetadataProvider->getMetadata($className)->hasOwner();
     }
 
     /**

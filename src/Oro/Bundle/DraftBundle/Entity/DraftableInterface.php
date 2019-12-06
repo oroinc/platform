@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DraftBundle\Entity;
 
+use Oro\Bundle\UserBundle\Entity\User;
+
 /**
  * DraftableInterface is the interface that all draft entities must implement.
  */
@@ -42,4 +44,16 @@ interface DraftableInterface
      * @return DraftableInterface
      */
     public function setDraftSource(DraftableInterface $draftSource): DraftableInterface;
+
+    /**
+     * @return User|null
+     */
+    public function getDraftOwner(): ?User;
+
+    /**
+     * @param User $user
+     *
+     * @return DraftableInterface
+     */
+    public function setDraftOwner(User $user): DraftableInterface;
 }

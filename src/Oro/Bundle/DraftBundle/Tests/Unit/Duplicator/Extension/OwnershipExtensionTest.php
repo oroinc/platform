@@ -11,7 +11,6 @@ use Oro\Bundle\DraftBundle\Manager\DraftManager;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
-use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class OwnershipExtensionTest extends \PHPUnit\Framework\TestCase
@@ -26,24 +25,14 @@ class OwnershipExtensionTest extends \PHPUnit\Framework\TestCase
      */
     private $ownershipMetadataProvider;
 
-    /**
-     * @var OwnerChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $ownerChecker;
-
     protected function setUp(): void
     {
-        $this->ownerChecker = $this->createMock(OwnerChecker::class);
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
-        $this->ownershipExtension = new OwnershipExtension($this->ownerChecker, $this->ownershipMetadataProvider);
+        $this->ownershipExtension = new OwnershipExtension($this->ownershipMetadataProvider);
     }
 
     public function testIsSupport(): void
     {
-        $this->ownerChecker
-            ->expects($this->once())
-            ->method('isOwnerCanBeSet')
-            ->willReturn('true');
         $ownershipMetadata = $this->getEntity(
             OwnershipMetadata::class,
             ['ownerType' => OwnershipMetadata::OWNER_TYPE_USER]

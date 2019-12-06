@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DraftBundle\Helper;
 
+use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\UIBundle\Route\Router;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -38,5 +39,15 @@ class DraftHelper
         $action = $this->requestStack->getMasterRequest()->request->get(Router::ACTION_PARAMETER);
 
         return self::SAVE_AS_DRAFT_ACTION === $action;
+    }
+
+    /**
+     * @param DraftableInterface $object
+     *
+     * @return bool
+     */
+    public static function isDraft(DraftableInterface $object): bool
+    {
+        return null != $object->getDraftUuid();
     }
 }

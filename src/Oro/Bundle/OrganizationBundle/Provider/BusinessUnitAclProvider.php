@@ -4,7 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Provider;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
-use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -20,7 +20,7 @@ class BusinessUnitAclProvider
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /** @var AclVoter */
+    /** @var AclVoterInterface */
     protected $aclVoter;
 
     /** @var OwnerTreeProvider */
@@ -35,13 +35,13 @@ class BusinessUnitAclProvider
     /**
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param TokenAccessorInterface        $tokenAccessor
-     * @param AclVoter                      $aclVoter
+     * @param AclVoterInterface             $aclVoter
      * @param OwnerTreeProvider             $treeProvider
      */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
-        AclVoter $aclVoter,
+        AclVoterInterface $aclVoter,
         OwnerTreeProvider $treeProvider
     ) {
         $this->authorizationChecker = $authorizationChecker;

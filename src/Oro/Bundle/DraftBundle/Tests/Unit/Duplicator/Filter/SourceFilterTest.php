@@ -26,14 +26,11 @@ class SourceFilterTest extends \PHPUnit\Framework\TestCase
     {
         /** @var DraftableInterface $draftSource */
         $source = $this->getEntity(DraftableEntityStub::class, ['id' => 2]);
-        /** @var DraftableInterface $draftSource */
-        $draftSource = $this->getEntity(DraftableEntityStub::class, ['id' => 1]);
         $filter = new SourceFilter($source);
         $object = new DraftableEntityStub();
-        $object->setDraftSource($draftSource);
 
+        $this->assertNull($object->getDraftSource());
         $filter->apply($object, 'draftSource', null);
-        $this->assertSame($draftSource, $object->getDraftSource());
-        $this->assertNotSame($source, $object->getDraftSource());
+        $this->assertSame($source, $object->getDraftSource());
     }
 }

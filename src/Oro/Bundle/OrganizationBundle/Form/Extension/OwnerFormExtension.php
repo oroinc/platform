@@ -15,7 +15,7 @@ use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
 use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectAutocomplete;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
-use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
@@ -76,7 +76,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     /** @var User */
     protected $currentUser;
 
-    /** @var AclVoter */
+    /** @var AclVoterInterface */
     protected $aclVoter;
 
     /** @var OwnerTreeProvider */
@@ -94,7 +94,7 @@ class OwnerFormExtension extends AbstractTypeExtension
      * @param BusinessUnitManager                $businessUnitManager
      * @param AuthorizationCheckerInterface      $authorizationChecker
      * @param TokenAccessorInterface             $tokenAccessor
-     * @param AclVoter                           $aclVoter
+     * @param AclVoterInterface                  $aclVoter
      * @param OwnerTreeProvider                  $treeProvider
      * @param EntityOwnerAccessor                $entityOwnerAccessor
      */
@@ -104,7 +104,7 @@ class OwnerFormExtension extends AbstractTypeExtension
         BusinessUnitManager $businessUnitManager,
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
-        AclVoter $aclVoter,
+        AclVoterInterface $aclVoter,
         OwnerTreeProvider $treeProvider,
         EntityOwnerAccessor $entityOwnerAccessor
     ) {

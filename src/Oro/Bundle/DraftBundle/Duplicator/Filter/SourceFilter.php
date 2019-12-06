@@ -17,9 +17,7 @@ class SourceFilter extends ReplaceValueFilter
     {
         $reflectionProperty = ReflectionHelper::getProperty($object, $property);
         $reflectionProperty->setAccessible(true);
-        $value = $reflectionProperty->getValue($object);
-        if (null === $value) {
-            parent::apply($object, $property, $objectCopier);
-        }
+
+        parent::apply($object, $property, $objectCopier);
     }
 }

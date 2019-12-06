@@ -43,7 +43,29 @@ services:
             - '@oro_action.expression.context_accessor'
             - '@oro_draft.publisher.publisher'
 
+    oro_draft.helper.draft_permission_helper:
+        class: Oro\Bundle\DraftBundle\Helper\DraftPermissionHelper
+        arguments:
+            - '@oro_security.token_accessor'
+
     oro_draft.helper.draft_helper:
         class: Oro\Bundle\DraftBundle\Helper\DraftHelper
         arguments:
             - '@request_stack'
+
+    oro_draft.voter.basic_permissions_draft_voter:
+        class: Oro\Bundle\DraftBundle\Voter\BasicPermissionsDraftVoter
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_draft.helper.draft_permission_helper'
+            - '@security.authorization_checker'
+        tags:
+            - { name: security.voter }
+
+    oro_draft.voter.acl_voter:
+        class: Oro\Bundle\DraftBundle\Voter\AclVoter
+        decorates: oro_security.acl.voter.basic_permissions
+        arguments:
+            - '@oro_draft.voter.acl_voter.inner'
+        tags:
+            - { name: security.voter }

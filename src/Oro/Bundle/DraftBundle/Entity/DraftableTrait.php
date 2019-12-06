@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DraftBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Provides basic implementation for entities which implement DraftableInterface.
@@ -28,6 +29,14 @@ trait DraftableTrait
      * @var DraftableInterface|null
      */
     protected $draftSource;
+
+    /**
+     * @var User
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="draft_owner_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
+     */
+    protected $draftOwner;
 
     /**
      * @return string|null
@@ -87,5 +96,25 @@ trait DraftableTrait
     public function getDraftSource(): ?DraftableInterface
     {
         return $this->draftSource;
+    }
+
+    /**
+     * @return User
+     */
+    public function getDraftOwner(): ?User
+    {
+        return $this->draftOwner;
+    }
+
+    /**
+     * @param User $draftOwner
+     *
+     * @return DraftableInterface
+     */
+    public function setDraftOwner(User $draftOwner): DraftableInterface
+    {
+        $this->draftOwner = $draftOwner;
+
+        return $this;
     }
 }

@@ -42,7 +42,7 @@ operations:
     CREATE_DRAFT:
         label: oro.draft.operations.create.label
         for_all_entities: true
-        acl_resource: [[VIEW], $.data]
+        acl_resource: [CREATE_DRAFT, $.data]
         groups:
             - view_navButtons
         button_options:
@@ -68,7 +68,7 @@ operations:
             icon: fa-files-o
             class: btn
         for_all_entities: true
-        acl_resource: [[VIEW], $.data]
+        acl_resource: [PUBLISH_DRAFT, $.data]
         groups:
             - view_navButtons
         preconditions:
@@ -88,8 +88,6 @@ operations:
         label: oro.draft.operations.duplicate.label
         replace:
             - preconditions
-            - acl_resource
-        acl_resource: [[VIEW], $.data]
         preconditions:
             '@and':
                 - '@not_equal': [$.data.draftUuid, null]

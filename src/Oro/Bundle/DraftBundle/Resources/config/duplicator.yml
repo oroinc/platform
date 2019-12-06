@@ -47,15 +47,27 @@ services:
         tags:
             - { name: oro_draft.duplicator.extension, priority: 255 }
 
-    oro_draft.duplicator_extension.ownership_extension:
-        class: Oro\Bundle\DraftBundle\Duplicator\Extension\OwnershipExtension
-        arguments:
-            - '@oro_security.owner.checker'
-            - '@oro_security.owner.ownership_metadata_provider'
-        tags:
-            - { name: oro_draft.duplicator.extension, priority: 0 }
-
     oro_draft.duplicator_extension.draft_source_extension:
         class: Oro\Bundle\DraftBundle\Duplicator\Extension\DraftSourceExtension
         tags:
-            - { name: oro_draft.duplicator.extension, priority: 0 }
+            - { name: oro_draft.duplicator.extension, priority: 255 }
+
+    oro_draft.duplicator_extension.owner_extension:
+        class: Oro\Bundle\DraftBundle\Duplicator\Extension\DuplicatorExtension
+        arguments:
+            - !service
+                class: DeepCopy\Matcher\PropertyNameMatcher
+                arguments: ['draftOwner']
+            - !service
+                class: Oro\Bundle\DraftBundle\Duplicator\Filter\OwnerFilter
+                arguments: ['@security.token_storage']
+        tags:
+            - { name: oro_draft.duplicator.extension, priority: 255 }
+
+    oro_draft.duplicator_extension.ownership_extension:
+        class: Oro\Bundle\DraftBundle\Duplicator\Extension\OwnershipExtension
+        arguments:
+            - '@oro_security.owner.ownership_metadata_provider'
+        tags:
+            - { name: oro_draft.duplicator.extension, priority: 255 }
+

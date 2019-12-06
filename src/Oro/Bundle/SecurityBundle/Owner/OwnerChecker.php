@@ -7,7 +7,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
-use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
@@ -27,7 +27,7 @@ class OwnerChecker
     /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
-    /** @var AclVoter */
+    /** @var AclVoterInterface */
     protected $aclVoter;
 
     /** @var AuthorizationCheckerInterface */
@@ -50,7 +50,7 @@ class OwnerChecker
      * @param AuthorizationCheckerInterface      $authorizationChecker
      * @param TokenAccessorInterface             $tokenAccessor
      * @param OwnerTreeProvider                  $treeProvider
-     * @param AclVoter                           $aclVoter
+     * @param AclVoterInterface                  $aclVoter
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -60,7 +60,7 @@ class OwnerChecker
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
         OwnerTreeProvider $treeProvider,
-        AclVoter $aclVoter
+        AclVoterInterface $aclVoter
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
