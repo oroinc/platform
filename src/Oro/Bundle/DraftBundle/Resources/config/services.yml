@@ -69,3 +69,8 @@ services:
             - '@oro_draft.voter.acl_voter.inner'
         tags:
             - { name: security.voter }
+
+    oro_draft.listener.search_listener:
+        class: Oro\Bundle\DraftBundle\EventListener\SearchListener
+        tags:
+            - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 100 }
