@@ -25,6 +25,11 @@ define(function(require) {
             fullRedirect: false,
             redirectUrl: '',
             dialogUrl: '',
+            /**
+             *  Receives callback function that will be resolved with event object {result: <result>},
+             *  where result * is a sign that was done changes through dialog or no
+             */
+            onDialogResult: null,
             executionUrl: '',
             requestMethod: 'GET',
             confirmation: {},
@@ -49,6 +54,11 @@ define(function(require) {
          * @type {Object}
          */
         confirmModal: null,
+
+        /**
+         * @type {boolean}
+         */
+        isFormSaveInProgress: false,
 
         /**
          * @type {String}
@@ -94,12 +104,13 @@ define(function(require) {
                     tools.loadModules(this.options.jsDialogWidget, function(Widget) {
                         var _widget = new Widget(options);
                         Backbone.listenTo(_widget, 'formSave', _.bind(function(response) {
+                            this.isFormSaveInProgress = true;
                             _widget.hide();
                             self.doResponse(response, e);
+                            this.isFormSaveInProgress = false;
                         }, this));
-
                         _widget.render();
-                    });
+                    }, this);
                 } else {
                     this.doRedirect(options.url);
                 }
@@ -187,6 +198,10 @@ define(function(require) {
                 mediator.once('page:afterChange', callback);
 
                 this.doPageReload(response);
+            }
+
+            if (_.isFunction(this.options.onDialogResult)) {
+                this.options.onDialogResult({result: response.success || false});
             }
         },
 
@@ -315,7 +330,26 @@ define(function(require) {
                 options = _.extend(options, additionalOptions);
             }
 
+            options.dialogOptions.close = _.wrap(
+                options.dialogOptions.close,
+                _.bind(this.onDialogClose, this)
+            );
+
             return options;
+        },
+
+        /**
+         *
+         * @param {function} wrappedOnCloseDialogCallback
+         */
+        onDialogClose: function(wrappedOnCloseDialogCallback) {
+            if (_.isFunction(wrappedOnCloseDialogCallback)) {
+                wrappedOnCloseDialogCallback();
+            }
+
+            if (_.isFunction(this.options.onDialogResult) && false === this.isFormSaveInProgress) {
+                this.options.onDialogResult({result: false});
+            }
         },
 
         dispose: function() {

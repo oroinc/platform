@@ -2,6 +2,12 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## 3.1.16
+
+### Changed
+#### WorkflowBundle
+* For service `oro_workflow.handler.workflow_notification_handler` tagged with `oro_workflow.handler.workflow_notification_handler` changed priority from -100 to 100
+
 ## 3.1.5
 
 ### Added

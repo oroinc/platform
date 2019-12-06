@@ -611,7 +611,18 @@ class OroMainContext extends MinkContext implements
      */
     public function closeUiDialog()
     {
-        $this->getSession()->getPage()->find('css', 'button.ui-dialog-titlebar-close')->press();
+        $buttons = $this->getSession()->getPage()->findAll('css', 'button.ui-dialog-titlebar-close');
+        /**
+         * The last dialog window in most cases will be visible,
+         * because dialog adds one after another to HTML tree
+         */
+        rsort($buttons);
+        foreach ($buttons as $button) {
+            if ($button->isVisible()) {
+                $button->press();
+                break;
+            }
+        }
     }
 
     /**

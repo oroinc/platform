@@ -92,6 +92,8 @@ class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
             $parentMessageId,
             $jobName,
             function (JobRunner $jobRunner, Job $job) use ($jobName, $body, $files) {
+                $this->dispatchBeforeChunksEvent($body);
+
                 foreach ($files as $key => $file) {
                     $jobRunner->createDelayed(
                         sprintf('%s:chunk.%s', $jobName, ++$key),
