@@ -565,6 +565,7 @@ services:
     oro_api.rest.chain_routing_options_resolver:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestChainRouteOptionsResolver
         arguments:
+            - [] # resolvers. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocCompilerPass
             - '@oro_api.rest.doc_view_detector'
 
     oro_api.rest.routing_options_resolver.prefix:

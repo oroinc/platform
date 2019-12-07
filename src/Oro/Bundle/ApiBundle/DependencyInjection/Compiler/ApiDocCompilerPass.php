@@ -210,44 +210,38 @@ class ApiDocCompilerPass implements CompilerPassInterface
      */
     private function registerRoutingOptionsResolvers(ContainerBuilder $container)
     {
-        $chainServiceDef = DependencyInjectionUtil::findDefinition(
-            $container,
-            self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE
-        );
-        if (null !== $chainServiceDef) {
-            $services = [];
-            $views = $container->getParameter(OroApiExtension::API_DOC_VIEWS_PARAMETER_NAME);
-            $taggedServices = $container->findTaggedServiceIds(self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME);
-            foreach ($taggedServices as $id => $attributes) {
-                foreach ($attributes as $attribute) {
-                    $view = DependencyInjectionUtil::getRequiredAttribute(
-                        $attribute,
-                        'view',
+        $services = [];
+        $views = $container->getParameter(OroApiExtension::API_DOC_VIEWS_PARAMETER_NAME);
+        $taggedServices = $container->findTaggedServiceIds(self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME);
+        foreach ($taggedServices as $id => $attributes) {
+            foreach ($attributes as $attribute) {
+                $view = DependencyInjectionUtil::getRequiredAttribute(
+                    $attribute,
+                    'view',
+                    $id,
+                    self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME
+                );
+                if (!in_array($view, $views, true)) {
+                    throw new LogicException(sprintf(
+                        'The "%s" is invalid value for attribute "view" of tag "%s". Service: "%s".'
+                        . ' Possible values: %s.',
+                        $view,
+                        self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME,
                         $id,
-                        self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME
-                    );
-                    if (!in_array($view, $views, true)) {
-                        throw new LogicException(sprintf(
-                            'The "%s" is invalid value for attribute "view" of tag "%s". Service: "%s".'
-                            . ' Possible values: %s.',
-                            $view,
-                            self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME,
-                            $id,
-                            implode(', ', $views)
-                        ));
-                    }
-                    $services[DependencyInjectionUtil::getPriority($attribute)][] = [new Reference($id), $view];
+                        implode(', ', $views)
+                    ));
                 }
-            }
-            if (empty($services)) {
-                return;
-            }
-
-            $services = DependencyInjectionUtil::sortByPriorityAndFlatten($services);
-            foreach ($services as $service) {
-                $chainServiceDef->addMethodCall('addResolver', $service);
+                $services[DependencyInjectionUtil::getPriority($attribute)][] = [new Reference($id), $view];
             }
         }
+        if (empty($services)) {
+            return;
+        }
+
+        $services = DependencyInjectionUtil::sortByPriorityAndFlatten($services);
+        $container
+            ->getDefinition(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)
+            ->replaceArgument(0, $services);
     }
 
     /**
